@@ -14,7 +14,9 @@ program.version('0.0.1')
     .option('-I, --another-input <required>','required user input')
     .parse(process.argv);
 
-// Parse Scratch programs
+// Parse the specification (a Scratch project)
+
+// Parse Scratch program (a Scratch project)
 var buffer = fs.readFileSync('test-inputs/sample.sb3');
 parser(buffer, false, function (err, project) {
     if (err) {
@@ -22,6 +24,12 @@ parser(buffer, false, function (err, project) {
     }
     // do something interesting
 });
+
+// Create the control-flow automata
+
+// Create the program analysis and program analysis algorithms
+
+// Run the program analysis
 
 // Create and run the Scratch virtual machine
 var vm = new VirtualMachine();
