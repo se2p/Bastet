@@ -24,5 +24,12 @@
     "prettier": "^1.18.2",
     "should": "^13.2.3",
     "supertest": "^4.0.2"
+  },
+  "dependencies": {
+    "immutable": "^4.0.0-rc.12",
+    "scratch-blocks": "0.1.0-prerelease.1569422127",
+    "scratch-parser": "^5.0.0",
+    "scratch-translate-extension-languages": "0.0.20190416132834",
+    "scratch-vm": "^0.2.0-prerelease.20191001145300"
   }
 }
