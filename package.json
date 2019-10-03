@@ -1,0 +1,21 @@
+{
+  "name": "bastet-verifier",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.infosun.fim.uni-passau.de:model-checking/tools/bastet-verifier.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^6.2.1",
+    "should": "^13.2.3",
+    "supertest": "^4.0.2"
+  }
+}
