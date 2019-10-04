@@ -1,4 +1,4 @@
-# Basted Model Checker
+# Basted Framework
 
-A model checker for Scratch programs
+A configurable framework for the analysis and verification of Scratch program.
 
