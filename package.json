@@ -26,6 +26,7 @@
     "supertest": "^4.0.2"
   },
   "dependencies": {
+    "assert": "2.0.0",
     "commander": "3.0.2",
     "immutable": "^4.0.0-rc.12",
     "scratch-blocks": "0.1.0-prerelease.1569422127",
