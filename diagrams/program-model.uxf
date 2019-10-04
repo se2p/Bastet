@@ -242,7 +242,7 @@ m1=2</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>496</x>
+      <x>552</x>
       <y>720</y>
       <w>128</w>
       <h>24</h>
@@ -1113,5 +1113,17 @@ bg=red</panel_attributes>
     <panel_attributes>m1=1
 m2=1</panel_attributes>
     <additional_attributes>370.0;10.0;290.0;10.0;290.0;40.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>104</x>
+      <y>480</y>
+      <w>248</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>m1=1
+m2=n</panel_attributes>
+    <additional_attributes>10.0;10.0;200.0;10.0;290.0;30.0</additional_attributes>
   </element>
 </diagram>
