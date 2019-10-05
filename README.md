@@ -22,6 +22,26 @@ This framework implements:
 - Counterexample-guided abstraction refinement (CEGAR)
 - Craig interpolation (in a first step for an interval analysis)
 
+## Citing
+
+The foundations for this work were developed in our FSE'19 paper on "Testing
+Scratch Programs Automatically":
+
+```
+@inproceedings{DBLP:conf/sigsoft/StahlbauerKF19,
+  author    = {Andreas Stahlbauer and
+               Marvin Kreis and
+               Gordon Fraser},
+  title     = {Testing scratch programs automatically},
+  booktitle = {{ESEC/SIGSOFT} {FSE}},
+  pages     = {165--175},
+  publisher = {{ACM}},
+  year      = {2019}
+}
+```
+
+
+
 ## Development Environment
 
 - IDE: JetBrains WebStorm 2019.x
