@@ -22,7 +22,7 @@ This framework implements:
 - Counterexample-guided abstraction refinement (CEGAR)
 - Craig interpolation (in a first step for an interval analysis)
 
-## Citing
+## Publications and Citing
 
 The foundations for this work were developed in our FSE'19 paper on "Testing
 Scratch Programs Automatically":
