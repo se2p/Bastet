@@ -10,7 +10,7 @@ to one paradigm only. Nevertheless, Bastet should (in the long run) support
 to transform a program (for analysis) to do either a prurely shared-memory
 based approach, a purely message-passing based approach, or an hybrid approach.
 
-Typically, Scratch programs make heavily usage of timer to control program exeuction.
+Typically, Scratch programs make heavily usage of **timers** to control program exeuction.
 That is, to specify Scratch programs a specification langauge with some notion
 of time should be prefered. We operationalize all given speficications as 
 Scratch programs. 
