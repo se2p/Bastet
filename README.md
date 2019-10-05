@@ -2,13 +2,18 @@
 
 Bastet is a framework for the analysis and verification of Scratch programs.
 
-Scratch programs run higly concurrent (Green threads) and can be distributed 
-among different machines. Communication among processes is implemented both based 
+Scratch programs run higly **concurrent** (Green threads) and can be distributed 
+among different machines. **Communication among processes** is implemented both based 
 on message passing but also based on shared memory. Since message passing can
 be implemented based on shared memory and vice versa we could stick
 to one paradigm only. Nevertheless, Bastet should (in the long run) support
 to transform a program (for analysis) to do either a prurely shared-memory
 based approach, a purely message-passing based approach, or an hybrid approach.
+
+Typically, Scratch programs make heavily usage of timer to control program exeuction.
+That is, to specify Scratch programs a specification langauge with some notion
+of time should be prefered. We operationalize all given speficications as 
+Scratch programs. 
 
 This framework implements:
 - Abstract interpretation (including its lattice-theoretical foundations)
