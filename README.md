@@ -7,7 +7,7 @@ among different machines. **Communication among processes** is implemented both 
 on message passing but also based on shared memory. Since message passing can
 be implemented based on shared memory and vice versa we could stick
 to one paradigm only. Nevertheless, *Bastet* should (in the long run) support
-to transform a program (for analysis) to do either a prurely shared-memory
+to transform a program (for analysis) to do either a purely shared-memory
 based approach, a purely message-passing based approach, or an hybrid approach.
 
 Typically, Scratch programs make heavily usage of **timers** to control program exeuction.
@@ -28,18 +28,17 @@ The foundations for this work were developed in our FSE'19 paper on "Testing
 Scratch Programs Automatically":
 
 ```
-@inproceedings{DBLP:conf/sigsoft/StahlbauerKF19,
+@inproceedings{TestingScratchPrograms,
   author    = {Andreas Stahlbauer and
                Marvin Kreis and
                Gordon Fraser},
-  title     = {Testing scratch programs automatically},
+  title     = {Testing Scratch Programs Automatically},
   booktitle = {{ESEC/SIGSOFT} {FSE}},
   pages     = {165--175},
   publisher = {{ACM}},
   year      = {2019}
 }
 ```
-
 
 ## Development Environment
 
