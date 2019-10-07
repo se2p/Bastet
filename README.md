@@ -41,7 +41,6 @@ Scratch Programs Automatically":
 ```
 
 
-
 ## Development Environment
 
 - IDE: JetBrains WebStorm 2019.x
