@@ -1,12 +1,12 @@
 # Basted Framework
 
-Bastet is a framework for the analysis and verification of Scratch programs.
+*Bastet* is a framework for the analysis and verification of Scratch programs.
 
 Scratch programs run higly **concurrent** (Green threads) and can be distributed 
 among different machines. **Communication among processes** is implemented both based 
 on message passing but also based on shared memory. Since message passing can
 be implemented based on shared memory and vice versa we could stick
-to one paradigm only. Nevertheless, Bastet should (in the long run) support
+to one paradigm only. Nevertheless, *Bastet* should (in the long run) support
 to transform a program (for analysis) to do either a prurely shared-memory
 based approach, a purely message-passing based approach, or an hybrid approach.
 
