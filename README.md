@@ -1,4 +1,4 @@
-# Basted Framework
+# Bastet Framework
 
 *Bastet* is a framework for the analysis and verification of Scratch programs.
 
