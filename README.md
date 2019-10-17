@@ -44,4 +44,5 @@ Scratch Programs Automatically":
 
 - IDE: JetBrains WebStorm 2019.x
 - NodeJs 10.16 (LTS)
+- TypeScript 3.6 (npm install -g typescript)
 - UMLet UML Editor 14.3
