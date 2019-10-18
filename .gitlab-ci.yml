@@ -11,7 +11,7 @@ cache:
 install_dependencies:
   stage: build
   script:
-    - npm install --global typescript
+    - npm install -D typescript
     - npm install
   artifacts:
     paths:
@@ -19,4 +19,6 @@ install_dependencies:
 
 testing_testing:
   stage: test
-  script: npm test
+  script:
+    - npm install -D typescript
+    - npm test
