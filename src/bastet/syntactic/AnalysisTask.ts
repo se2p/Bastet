@@ -26,4 +26,5 @@ export class VerificationTask extends AnalysisTask {
     get specification() {
         return this._spec;
     }
+
 }

@@ -27,7 +27,15 @@ export default class Script {
        return [];
     }
 
-    get initialLocationi() {
+    public getTransitionsFrom(from: ControlLocation) {
+        throw new Error("Implement me");
+    }
+
+    public getTransitionsTo(to: ControlLocation) {
+        throw new Error("Implement me");
+    }
+
+    get initialLocation() {
         return this._initialLocation;
     }
 
