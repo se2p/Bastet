@@ -10,8 +10,6 @@ using typedoc: https://typedoc.org/guides/doccomments/
 
 ## Modules
 
-- lowercase letters for the name of modules (and namespaces)
-
 -  Do not use namespaces in modules # 
 
 ## File Structure
