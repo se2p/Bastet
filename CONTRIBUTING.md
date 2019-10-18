@@ -1,6 +1,10 @@
-# Contributing to Bastet
+# Prerequisite
 
-## Coding Conventions
+1) Node Package Manager: https://nodejs.org/en/download/
+2) TypeScript compiler: `npm install --global typescript`
+3) Install ts-node: `npm install --global ts-node`
 
-- JavaScript style guide: https://standardjs.com/rules.html
-- All plain-text documents should adhere to the Markdown format
+# Building
+
+1) Install the dependencies: `npm install`
+2) Build and run the project: `npm run build`

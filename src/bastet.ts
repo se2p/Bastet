@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 'use strict';
 
-const fs = require('fs');
+import * as fs from "fs";
+const commander = require('commander');
 const parser = require('scratch-parser');
 const VirtualMachine = require('scratch-vm');
-const program = require('commander');
 
 // Parsing of command line options
+const program = new commander.Command();
 program.version('0.0.1')
     .option('-o, --option','option description')
     .option('-m, --more','we can have as many options as we want')
@@ -18,9 +19,9 @@ program.version('0.0.1')
 
 // Parse Scratch program (a Scratch project)
 var buffer = fs.readFileSync('test-inputs/sample.sb3');
-parser(buffer, false, function (err, project) {
+parser(buffer, false, function (err:string, project:string) {
     if (err) {
-        // handle the error 
+        // handle the error
     }
     // do something interesting
 });

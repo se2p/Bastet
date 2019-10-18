@@ -1,38 +1,44 @@
 {
-  "name": "bastet-verifier",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "bastet-framework",
+  "version": "0.0.1",
+  "description": "Program Analysis Framework",
+  "main": "bastet.js",
   "scripts": {
-    "test": "mocha --recursive test",
-    "lint": "eslint --fix . && echo 'Lint complete.'"
+    "start": "npm run serve",
+    "build": "npm run build-ts && npm run lint && npm run copy-static-assets",
+    "serve": "node dist/bastet.js",
+    "watch-node": "nodemon dist/bastet.js",
+    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
+    "test": "jest --forceExit --coverage --verbose",
+    "watch-test": "npm run test -- --watchAll",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w",
+    "lint": "tsc --noEmit && eslint \"**/*.{js,ts}\" --quiet --fix",
+    "copy-static-assets": "ts-node copyStaticAssets.ts",
+    "debug": "npm run build && npm run watch-debug",
+    "serve-debug": "nodemon --inspect dist/server.js",
+    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\""
   },
   "repository": {
     "type": "git",
-    "url": "git@gitlab.infosun.fim.uni-passau.de:model-checking/tools/bastet-verifier.git"
+    "url": "git@gitlab.infosun.fim.uni-passau.de:model-checking/tools/bastet-framework.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "program analysis",
+    "abstract interpretation",
+    "model checking",
+    "verification",
+    "data flow",
+    "testing"
+  ],
+  "author": "University of Passau, and the contributors",
+  "license": "Apache-2.0",
   "devDependencies": {
+    "@types/node": "^12.11.1",
+    "@typescript-eslint/eslint-plugin": "^2.4.0",
+    "@typescript-eslint/parser": "^2.4.0",
     "eslint": "^6.5.1",
-    "eslint-config-prettier": "^6.3.0",
-    "eslint-plugin-prettier": "^3.1.1",
-    "eslint-plugin-react": "^7.15.1",
-    "eslint-plugin-react-hooks": "^2.1.1",
-    "mocha": "^6.2.1",
-    "prettier": "^1.18.2",
-    "should": "^13.2.3",
-    "supertest": "^4.0.2"
-  },
-  "dependencies": {
-    "assert": "2.0.0",
-    "commander": "3.0.2",
-    "immutable": "^4.0.0-rc.12",
-    "scratch-blocks": "0.1.0-prerelease.1569422127",
-    "scratch-parser": "5.0.0",
-    "scratch-translate-extension-languages": "0.0.20190416132834",
-    "scratch-vm": "^0.2.0-prerelease.20191001145300",
-    "webpack": "4.41.0"
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0"
   }
 }
