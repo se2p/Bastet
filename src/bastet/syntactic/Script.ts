@@ -13,18 +13,18 @@ export default class Script {
 
     private readonly _initialLocation: ControlLocation;
 
-    constructor (pInitialLocation: ControlLocation, pTransitions: ControlTransition[], pLocations?: ControlLocation[]) { 
-        this._initialLocation = pInitialLocation;
-        this._transitions = pTransitions;
-        if (pLocations) {
-            this._locations = pLocations;
+    constructor (initialLocation: ControlLocation, transitions: ControlTransition[], locations?: ControlLocation[]) { 
+        this._initialLocation = initialLocation;
+        this._transitions = transitions;
+        if (locations) {
+            this._locations = locations;
         } else {
-            this._locations = this.extractLocations(pTransitions);
+            this._locations = this.extractLocations(transitions);
         }
     }    
 
     private extractLocations(pTransitions: ControlTransition[]) {
-       return []; 
+       return [];
     }
 
     get initialLocationi() {
