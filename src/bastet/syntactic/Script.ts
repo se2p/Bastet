@@ -7,8 +7,10 @@ import ControlTransition  from "./ControlTransition";
  */
 export default class Script {
 
+    /** List of control transitions of the script */
     private readonly _transitions: ControlTransition[];
 
+    /** The list of  of  */
     private readonly _locations: ControlLocation[];
 
     private readonly _initialLocation: ControlLocation;
