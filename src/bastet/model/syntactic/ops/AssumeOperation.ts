@@ -1,6 +1,6 @@
-import ProgramOperation from "./ProgramOperation";
+import { ProgramOperation } from "./ProgramOperation";
 
-export default class AssumeOperation implements ProgramOperation {
+export class AssumeOperation implements ProgramOperation {
 
 
 }

@@ -11,6 +11,10 @@ export const bottomElementAttributes: MapElementAttributes = {
 
 export class MapElement extends Record(bottomElementAttributes) implements MapElementAttributes, AbstractElement {
 
+    constructor(mapping: Map<string, AbstractElement>) {
+        super({'elements': mapping});
+    }
+
     get elements() {
         return this.get('elements');
     }

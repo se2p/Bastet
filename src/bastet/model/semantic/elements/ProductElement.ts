@@ -11,6 +11,10 @@ export const bottomElementAttributes: ProductElementAttributes = {
 
 export class ProductElement extends Record(bottomElementAttributes) implements ProductElementAttributes, AbstractElement {
 
+    constructor(elements: AbstractElement[]) {
+        super({'elements': elements})
+    }
+
     get elements() {
         return this.get('elements');
     }

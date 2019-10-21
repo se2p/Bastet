@@ -15,7 +15,7 @@ const nullControlTransitionAttributes: ControlTransitionAttributes = {
     op: noopProgramOperation
 }
 
-export default class ControlTransition extends Record(nullControlTransitionAttributes) implements ControlTransitionAttributes {
+export class ControlTransition extends Record(nullControlTransitionAttributes) implements ControlTransitionAttributes {
 
     get from() {
         return this.get('from');

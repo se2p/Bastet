@@ -11,6 +11,10 @@ export const bottomElementAttributes: PowersetElementAttributes = {
 
 export class PowersetElement extends Record(bottomElementAttributes) implements PowersetElementAttributes, AbstractElement {
 
+    constructor(elements: Set<AbstractElement>) {
+        super({'elements': elements})
+    }
+
     get elements() {
         return this.get('elements');
     }

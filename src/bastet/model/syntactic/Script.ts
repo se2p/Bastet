@@ -1,5 +1,5 @@
-import ControlLocation from "./ControlLocation";
-import ControlTransition  from "./ControlTransition";
+import { ControlLocation } from "./ControlLocation";
+import { ControlTransition } from "./ControlTransition";
 
 /**
  * A single script, which represents the control flow 
