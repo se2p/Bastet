@@ -1,3 +1,1 @@
-export default class DataLocation {
-
-}
+export default class DataLocation {}

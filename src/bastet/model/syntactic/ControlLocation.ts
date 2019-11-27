@@ -1,19 +1,11 @@
-import { Record } from 'immutable';
+export default class ControlLocation {
+    private readonly _id: number
 
-export interface ControlLocationAttributes {
-    readonly locid: number;
-}
-
-export const bottomControlLocationAttributes: ControlLocationAttributes = {
-    locid: -1
-}
-
-export class ControlLocation extends Record(bottomControlLocationAttributes) implements ControlLocationAttributes {
-
-    get locid() {
-        return this.get('locid');
+    constructor(id: number) {
+        this._id = id
     }
 
+    get id() {
+        return this._id
+    }
 }
-
-export const bottomControlLocation = new ControlLocation();
