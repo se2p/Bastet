@@ -6,7 +6,7 @@ import { MapElement } from '../../../../../src/bastet/model/semantic/elements/Ma
 describe('Functionality of immutable maps', function() {
     it('Operations on immutable maps', function() {
         let map = Map({ a: 1, b: 2 })
-        let product = [new FlatElement(1), new MapElement(map)]
-        let e = new ProductElement(product)
+        // let product = [new FlatElement(1), new MapElement(map)]
+        // let e = new ProductElement(product)
     })
 })
