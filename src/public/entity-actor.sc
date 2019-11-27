@@ -80,4 +80,55 @@ actor Entity {
         vol = attribute "volume";
     } returns vol
 
+    control_stop,
+    control_delete_this_clone;
+
+    data_setvariableto, sensing_setdragmode, motion_setrotationstyle, looks_seteffectto,
+    sound_seteffectto, sound_setvolumeto;
+
+    operator_join, operator_letter_of, sensing_username, data_itemoflist,
+    sound_volume, motion_xposition, motion_yposition, motion_direction,
+    looks_costumenumbername, looks_backdropnumbername, looks_size, sensing_answer, sensing_of;
+
+
+        data_replaceitemoflist, data_insertatlist, data_deletealloflist, data_deleteoflist, data_addtolist;
+
+    operator_add, operator_subtract, operator_multiply, operator_divide,
+    operator_mod, operator_random, operator_round, operator_length,
+    data_lengthoflist, data_itemnumoflist, sensing_timer, sensing_dayssince2000,
+    sensing_current, sensing_distanceto, sensing_mousex, sensing_mousey,
+    sensing_loudness, operator_mathop;
+
+        control_wait,            //"wait" NumExpr "seconds"
+        control_wait_until,      //"wait" "until" BoolExpr
+        control_stop,            //"stop" "other" "scripts" "in" "sprite"
+        control_create_clone_of, // "create" "clone" "of" Ident
+        event_broadcast,         // "broadcast" Message
+        event_broadcastandwait,  // "broadcast" Message "and" "wait"
+        sensing_resettimer,      // "reset" "timer"
+        data_changevariableby,    // "change" Variable "by" Expression
+
+        sound_changevolumeby,
+        sound_changeeffectby,
+        looks_changeeffectby;
+
+
+        sensing_askandwait, //  "ask"  StringExpr  "and" "wait"
+        looks_switchbackdropto, // "switch" "backdrop" "to"  Backdrop
+        looks_cleargraphiceffects, // "clear" "graphic" "effects"
+        data_showvariable,
+        data_hidevariable,
+        data_showlist,
+        data_hidelist;
+
+            sound_playuntildone,    //    "play" "sound"  ElementChoice  "until" "done"
+            sound_play,             // |  "start" "sound"  ElementChoice
+            sound_cleareffects,     // |  "clear" "sound" "effects"
+            sound_stopallsounds;    // |  "stop" "all" "sounds"
+
+    sensing_touchingobject, sensing_touchingcolor, sensing_coloristouchingcolor,
+    sensing_keypressed, sensing_mousedown, operator_gt, operator_lt, operator_equals,
+    operator_and, operator_or, operator_not, operator_contains, data_listcontainsitem;
+
+
 }

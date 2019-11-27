@@ -51,4 +51,34 @@ actor Sprite is Entity {
         // ...
     } returns result
 
+        looks_show,            //   "show"
+        looks_hide,            //   |  "hide"
+        looks_sayforsecs,      //   |  "say" StringExpr "for" NumExpr  "secs"
+        looks_say,             //   |  "say" StringExpr
+        looks_thinkforsecs,    //   |  "think" StringExpr "for" NumExpr  "secs"
+        looks_think,           //   |  "think" StringExpr
+        looks_switchcostumeto,    //   |  "switch" "costume" "to" ElementChoice
+        looks_nextcostume,        //   |  "switch" "costume" "to" ElementChoice
+        looks_changesizeby,       //   |  "change" "size" "by"  NumExpr
+        looks_setsizeto,          //   |  "set" "size" "to"  NumExpr  "percent"
+        looks_gotofrontback,      //   |  "go" "to" "layer"  NumExpr
+        looks_goforwardbackwardlayers;    //   |  "change" "layer" "by"  NumExpr
+
+
+        motion_movesteps,       // "move"  NumExpr  "steps"
+        motion_turnright,       // |  "turn" "right"  NumExpr "degrees"
+        motion_turnleft,        // |  "turn" "left"  NumExpr "degrees"
+        motion_gotoxy,
+        motion_goto,            // |  "go" "to"  Position
+        motion_glideto,
+        motion_glidesecstoxy,   // |  "glide"  NumExpr  "secs" "to" Position
+        motion_pointindirection,// |  "point" "in" "direction" NumExpr
+        motion_pointtowards,    // |  "point" "towards"  Position
+        motion_changexby,       // |  "change" "x" "by"  NumExpr
+        motion_changeyby,       // |  "change" "y" "by"  NumExpr
+        motion_setx,            // |  "set" "x" "to"  NumExpr
+        motion_sety,            // |  "set" "y" "to"  NumExpr
+        motion_ifonedgebounce;  // |  "if" "on" "edge" "bounce"
+
+
 }
