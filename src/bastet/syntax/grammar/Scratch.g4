@@ -3,10 +3,16 @@ grammar Scratch;
 // A program has a name and is composed of a list of actors.
 // The term 'actor' is used to describe one entity in the Scratch world.
 // We use the terms 'script group' and 'entity' as synonyms for 'actor'.
-program : 'program' Ident actorDefinitionList ;
+program : fileType Ident importDefinitionList actorDefinitionList ;
+
+fileType : 'program' | 'module' ;
+
+importDefinitionList : importDefinition* ;
+
+importDefinition : 'import' Ident 'from' URI ;
 
 // Actors in a list of actors are separated by whitespace
-actorDefinitionList : actorDefinition | actorDefinitionList actorDefinition ;
+actorDefinitionList : actorDefinition* | actorDefinitionList actorDefinition ;
 
 // An actor has a type and an unique identifier.
 // It is composed of a set of resources, a set of variables,
