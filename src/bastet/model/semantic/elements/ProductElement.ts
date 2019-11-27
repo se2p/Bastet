@@ -1,18 +1,21 @@
-import {AbstractElement} from "./AbstractElement";
-import {Record} from "immutable";
+import { AbstractElement } from './AbstractElement'
+import { Record } from 'immutable'
 
 export interface ProductElementAttributes {
-    readonly elements: AbstractElement[];
+    readonly elements: AbstractElement[]
 }
 
 export const bottomElementAttributes: ProductElementAttributes = {
-    elements: []
+    elements: [],
 }
 
-export class ProductElement extends Record(bottomElementAttributes) implements ProductElementAttributes, AbstractElement {
-
-    get elements() {
-        return this.get('elements');
+export class ProductElement extends Record(bottomElementAttributes)
+    implements ProductElementAttributes, AbstractElement {
+    constructor(elements: AbstractElement[]) {
+        super({ elements: elements })
     }
 
+    get elements() {
+        return this.get('elements')
+    }
 }

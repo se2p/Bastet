@@ -4,6 +4,7 @@
   "description": "Program Analysis Framework",
   "main": "bastet.js",
   "scripts": {
+    "antlr4ts": "antlr4ts -visitor src/grammar/Scratch.g4",
     "start": "npm run serve",
     "build": "npm run build-ts && npm run lint && npm run copy-static-assets",
     "serve": "node dist/bastet.js",
@@ -38,15 +39,17 @@
     "@types/node": "^12.11.1",
     "@typescript-eslint/eslint-plugin": "^2.4.0",
     "@typescript-eslint/parser": "^2.4.0",
+    "antlr4ts-cli": "^0.5.0-alpha.3",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
     "eslint-plugin-prettier": "^3.1.1",
     "jest": "^24.9.0",
     "prettier": "^1.18.2",
     "ts-jest": "^24.1.0",
-    "typescript": "^3.6.4"
+    "typescript": "^3.7.2"
   },
   "dependencies": {
+    "antlr4ts": "^0.5.0-alpha.3",
     "immutable": "^4.0.0-rc.12"
   }
 }

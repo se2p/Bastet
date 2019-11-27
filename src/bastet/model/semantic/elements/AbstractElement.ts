@@ -1,3 +1,1 @@
-export interface AbstractElement {
-
-}
+export interface AbstractElement {}

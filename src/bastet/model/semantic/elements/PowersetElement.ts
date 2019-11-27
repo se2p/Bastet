@@ -1,19 +1,21 @@
-import {AbstractElement} from "./AbstractElement";
-import {Set, Record} from "immutable";
+import { AbstractElement } from './AbstractElement'
+import { Set, Record } from 'immutable'
 
 export interface PowersetElementAttributes {
-    readonly elements: Set<AbstractElement>;
+    readonly elements: Set<AbstractElement>
 }
 
 export const bottomElementAttributes: PowersetElementAttributes = {
-    elements: Set()
+    elements: Set(),
 }
 
-export class PowersetElement extends Record(bottomElementAttributes) implements PowersetElementAttributes, AbstractElement {
-
-    get elements() {
-        return this.get('elements');
+export class PowersetElement extends Record(bottomElementAttributes)
+    implements PowersetElementAttributes, AbstractElement {
+    constructor(elements: Set<AbstractElement>) {
+        super({ elements: elements })
     }
 
+    get elements() {
+        return this.get('elements')
+    }
 }
-

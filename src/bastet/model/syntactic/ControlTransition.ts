@@ -1,32 +1,28 @@
-import { Record } from 'immutable';
+import ControlLocation from './ControlLocation'
+import ProgramOperation from './ops/ProgramOperation'
 
-import {ControlLocation, bottomControlLocation} from "./ControlLocation";
-import {ProgramOperation, noopProgramOperation} from "./ops/ProgramOperation";
+export default class ControlTransition {
+    private readonly _fromLocation: ControlLocation
 
-export interface ControlTransitionAttributes {
-    readonly from: ControlLocation;
-    readonly to: ControlLocation;
-    readonly op: ProgramOperation;
-}
+    private readonly _toLocation: ControlLocation
 
-const nullControlTransitionAttributes: ControlTransitionAttributes = {
-    from: bottomControlLocation,
-    to: bottomControlLocation,
-    op: noopProgramOperation
-}
+    private readonly _operation: ProgramOperation
 
-export default class ControlTransition extends Record(nullControlTransitionAttributes) implements ControlTransitionAttributes {
+    constructor(from: ControlLocation, to: ControlLocation, op: ProgramOperation) {
+        this._fromLocation = from
+        this._toLocation = to
+        this._operation = op
+    }
 
     get from() {
-        return this.get('from');
+        return this._fromLocation
     }
 
     get to() {
-        return this.get('to');
+        return this._toLocation
     }
 
     get op() {
-        return this.get('op');
+        return this._operation
     }
-
 }
