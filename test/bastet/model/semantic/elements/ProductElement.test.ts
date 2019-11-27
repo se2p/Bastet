@@ -1,7 +1,7 @@
 import assert from 'assert'
 import { Map } from 'immutable'
-import { ProductElement } from '../../../../../src/bastet/model/semantic/elements/ProductElement'
-import { MapElement } from '../../../../../src/bastet/model/semantic/elements/MapElement'
+import { ProductElement } from '../../../../../src/bastet/syntax/elements/ProductElement'
+import { MapElement } from '../../../../../src/bastet/syntax/elements/MapElement'
 
 describe('Functionality of immutable maps', function() {
     it('Operations on immutable maps', function() {

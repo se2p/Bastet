@@ -76,15 +76,16 @@ scriptList : script | scriptList script ;
 // The different events that can trigger the execution
 // of a script are defined by the non-terminal `Event`.
 event :
-    'never'
- |  'green' 'flag'
- |  'started' 'as' 'clone'
- |  'received' 'message' message
- |  'reached condition' boolExpr
- |  'value' 'of' variable 'above' numExpr
- |  'backdrop' 'switched' 'to' Ident
- |  key 'pressed'
- |  'clicked' ;
+    'never' # NeverEvent
+ |  'green' 'flag' # GreenFlagEvent
+ |  'started' 'as' 'clone' # CloneStartEvent
+ |  'received' 'message' message # MessageReceivedEvent
+ |  'reached condition' boolExpr # ConditionReachedEvent
+ |  'value' 'of' variable 'above' numExpr # VariableValueEvent
+ |  'backdrop' 'switched' 'to' Ident # BackdropChangeEvent
+ |  key 'pressed' # KeyEvent
+ |  'clicked' # ClickEvent
+ ;
 
 // Scratch allows to define procedures, that is,
 // reusable code blocks (also known as 'custom blocks').
