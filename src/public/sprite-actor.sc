@@ -23,15 +23,13 @@ actor Sprite is Entity {
 
     // @Category "Sensing"
     define (touching edge) as {
-        declare result as boolean;
         // ...
-    } returns result
+    } returns result : boolean
 
     // @Category "Sensing"
     define (touching mousepointer) as {
-        declare result as boolean;
         // ...
-    } returns result
+    } returns result : boolean
 
     // @Category "Sensing"
     define (touching color <color as c>) as {

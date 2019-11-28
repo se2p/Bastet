@@ -1,28 +1,23 @@
 import {Actor} from './Actor'
+import {Maps} from "../../utils/Maps";
 
-export default class Program {
+export class App {
 
     private readonly _basename: string;
 
-    private readonly _filepath: string;
-
     private readonly _ident: string;
 
-    private readonly _actors: Actor[];
+    /** Set of actors */
+    private readonly _actors: { [id: string] : Actor; };
 
-    constructor(basename: string, filepath: string, ident: string, actors: Actor[]) {
+    constructor(basename: string, ident: string, actors: Actor[]) {
         this._basename = basename;
-        this._filepath = filepath;
         this._ident = ident;
-        this._actors = actors;
+        this._actors = Maps.createMap(actors);
     }
 
     get basename() {
         return this._basename;
-    }
-
-    get filepath() {
-        return this._filepath;
     }
 
     get ident() {

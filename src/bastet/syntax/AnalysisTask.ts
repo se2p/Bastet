@@ -1,9 +1,9 @@
-import Program from './Program'
+import App from './app/App'
 
 export abstract class AnalysisTask {
-    private readonly _program: Program
+    private readonly _program: App
 
-    constructor(program: Program) {
+    constructor(program: App) {
         this._program = program
     }
 
@@ -13,9 +13,9 @@ export abstract class AnalysisTask {
 }
 
 export class VerificationTask extends AnalysisTask {
-    private readonly _spec: Program
+    private readonly _spec: App
 
-    constructor(program: Program, specification: Program) {
+    constructor(program: App, specification: App) {
         super(program)
         this._spec = specification
     }

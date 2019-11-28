@@ -10,37 +10,44 @@ actor Entity {
     // ATTENTION: The 'define' construct is similar to macros found in Lisp.
     //  See https://en.wikibooks.org/wiki/Scheme_Programming/Macros
 
-    define (change image to <string as id>) as external {
+    define image_change_image_to (id: string) as {
        // JAVASCRIPT CODE here (signaled by the 'external' keyword)
     }
 
-    define (while (boolean as condition) do {block}) as {
-       until (not condition) do block;
-    }
 
     // @Category "Looks"
-    define (change <string as effect> effect by <number as value>) as {
-
-    }
-
-    // @Category "Looks"
-    define (clear graphic effects) as {
+    // @Block "change <string as effect> effect by <number as value>
+    define looks_changeeffectby (effect:string, value:number) as {
 
     }
 
     // @Category "Looks"
-    define (backdrop number) as {
-        declare num as number;
-        // ...
-    } returns num
+    // @Block "clear graphic effects"
+    define looks_cleargraphiceffects () as {
+
+    }
+
+    // @Category "Looks"
+    // @Block "backdrop number"
+    define looks_backdropnumber as {
+
+    } returns result : number
+
+    // @Category "Looks"
+    // @Block "backdrop name"
+    define looks_backdropname as {
+
+    } returns result : string
 
     // @Category "Sound"
-    define (play sound <sound as snd> until done) as {
+    // @Block "play sound <sound as snd> until done"
+    define sound_playuntildone (snd: sound) as {
 
     }
 
     // @Category "Sound"
-    define (start sound <sound as snd>) as {
+    // @Blo0ck "start sound <sound as snd>"
+    define sound_play (snd: sound) as {
 
     }
 
@@ -50,38 +57,41 @@ actor Entity {
     }
 
     // @Category "Sound"
-    define (change <string as effect> sound effect by <number as num>) as {
+    // @Block "change <string as effect> sound effect by <number as num>"
+    define sound_changeeffectby (effect: string, value: number) as {
 
     }
 
     // @Category "Sound"
-    define (set <string as effect> sound effect to <number as num>) as {
+    // @Block "set <string as effect> sound effect to <number as num>"
+    define sound_seteffectto (effect: string, value: number) as {
 
     }
 
     // @Category "Sound"
-    define (clear sound effects) as {
+    // @Block "clear sound effects"
+    define sound_cleareffects () as {
 
     }
 
     // @Category "Sound"
-    define (change volume by <number as delta>) as {
+    // @Block "change volume by <number as delta>"
+    define sound_changevolumeby (delta: number) as {
 
     }
 
     // @Category "Sound"
-    define (set volume to <number as percent>) as {
+    // @Block "set volume to <number as percent>"
+    define sound_setvolumeto (percent: number) as {
 
     }
 
     // @Category "Sound"
-    define (volume) as {
-        declare vol as number;
-        vol = attribute "volume";
-    } returns vol
+    // @Block "volume"
+    define volume () as {
+        result = attribute "volume"
+    } returns result : int
 
-    control_stop,
-    control_delete_this_clone;
 
     data_setvariableto, sensing_setdragmode, motion_setrotationstyle, looks_seteffectto,
     sound_seteffectto, sound_setvolumeto;
@@ -110,19 +120,18 @@ actor Entity {
 
         sound_changevolumeby,
         sound_changeeffectby,
-        looks_changeeffectby;
+        ;
 
 
         sensing_askandwait, //  "ask"  StringExpr  "and" "wait"
         looks_switchbackdropto, // "switch" "backdrop" "to"  Backdrop
-        looks_cleargraphiceffects, // "clear" "graphic" "effects"
+
         data_showvariable,
         data_hidevariable,
         data_showlist,
         data_hidelist;
 
-            sound_playuntildone,    //    "play" "sound"  ElementChoice  "until" "done"
-            sound_play,             // |  "start" "sound"  ElementChoice
+
             sound_cleareffects,     // |  "clear" "sound" "effects"
             sound_stopallsounds;    // |  "stop" "all" "sounds"
 
