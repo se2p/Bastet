@@ -1,4 +1,6 @@
 import {WithIdent} from "./WithIdent";
+import {ImmutableMap} from "./ImmutableMap";
+import {NotSupportedException} from "../core/exceptions/NotSupportedException";
 
 export class Maps {
 
@@ -28,4 +30,7 @@ export class Maps {
         return result;
     }
 
+    static immutableCopyOf<V>(map: {[id: string]: V}): ImmutableMap<string, V> {
+        throw new NotSupportedException("Implement me");
+    }
 }

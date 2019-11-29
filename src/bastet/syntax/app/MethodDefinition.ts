@@ -1,6 +1,9 @@
 import {FromParseTree} from "../FromParseTree";
 import {RuleNode} from "antlr4ts/tree";
 import {WithIdent} from "../../utils/WithIdent";
+import {AppResource} from "./AppResource";
+
+export type MethodDefinitionMap = { [id:string]: MethodDefinition } ;
 
 export class MethodDefinition extends FromParseTree implements WithIdent {
 

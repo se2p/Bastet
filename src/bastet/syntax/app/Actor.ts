@@ -1,10 +1,16 @@
 import {FromParseTree} from "../FromParseTree";
 import {RuleNode} from "antlr4ts/tree";
-import {AppResource} from "./AppResource";
+import {AppResource, AppResourceMap} from "./AppResource";
 import {Script} from "./controlflow/Script";
 import {Statement} from "../ast/statements/Statement";
-import {MethodDefinition} from "./MethodDefinition";
+import {MethodDefinition, MethodDefinitionMap} from "./MethodDefinition";
 import {Maps} from "../../utils/Maps";
+import {Lists} from "../../utils/Lists";
+import {ImmutableList} from "../../utils/ImmutableList";
+import {ImmutableMap} from "../../utils/ImmutableMap";
+import ProgramOperation from "./controlflow/ops/ProgramOperation";
+import {Scripts} from "./controlflow/Scripts";
+import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -20,36 +26,41 @@ export class Actor extends FromParseTree {
     private readonly _ident: string;
 
     /** Set of the actor's resources */
-    private readonly _resources: { [id: string] : AppResource; };
+    private readonly _resources: ImmutableMap<string, AppResource>;
+
+    /** Set of the actor's data locations (variables) */
+    private readonly _datalocs: ImmutableMap<string, DataLocation>;
 
     /** List of initialization statements. Includes declarations and initializations. */
-    private readonly _initStatements: Statement[];
+    private readonly _initScript: Script;
 
     /** Set of the actor's methods */
-    private readonly _methodDefinitions: { [id: string] : MethodDefinition; };
+    private readonly _methodDefinitions: ImmutableMap<string, MethodDefinition>;
 
     /** List of scripts that define the behavior of the actor. */
-    private readonly _scripts: Script[];
+    private readonly _scripts: ImmutableList<Script>;
 
     constructor(node: RuleNode, ident: string, inheritFrom: Actor|null,
-                resources: AppResource[], initStatements: Statement[],
-                methods: MethodDefinition[], scripts: Script[]) {
+                resources: AppResourceMap, datalocs: DataLocationMap,
+                initScript: Script, methods: MethodDefinitionMap, scripts: Script[]) {
         super(node);
         this._ident = ident;
         this._inheritsFrom = inheritFrom;
-        this._resources = Maps.createMap(resources);
-        this._initStatements = initStatements;
-        this._methodDefinitions = Maps.createMap(methods);
-        this._scripts = scripts;
+        this._initScript = initScript;
+        this._resources = Maps.immutableCopyOf(resources);
+        this._datalocs = Maps.immutableCopyOf(datalocs);
+        this._methodDefinitions = Maps.immutableCopyOf(methods);
+        this._scripts = Lists.immutableCopyOf(scripts);
 
         if (inheritFrom) {
             // TODO: Handle re-definitions of resources or methods with the same identifier
             //      Rename the basic versions so that they can be referenced by the
             //      inheriting actors?
             this._resources = Maps.mergeMaps(this.resourceMap, inheritFrom.resourceMap);
-            this._initStatements = this._initStatements.concat(inheritFrom.initStatements);
+            this._initScript = Scripts.concat(inheritFrom._initScript, this._initScript);
             this._methodDefinitions = Maps.mergeMaps(this.methodMap, inheritFrom.methodMap);
-            this._scripts = this._scripts.concat(inheritFrom.script);
+            this._datalocs = Maps.mergeMaps(this.datalocMap, inheritFrom.datalocMap);
+            this._scripts = this._scripts.concat(inheritFrom.scripts);
         }
     }
 
@@ -69,8 +80,8 @@ export class Actor extends FromParseTree {
         return this._resources;
     }
 
-    get initStatements(): Statement[] {
-        return this._initStatements;
+    get initScript(): Script {
+        return this._initScript;
     }
 
     get methods(): MethodDefinition[] {
@@ -81,7 +92,7 @@ export class Actor extends FromParseTree {
         return this._methodDefinitions;
     }
 
-    get script(): Script[] {
+    get scripts(): ImmutableList<Script> {
         return this._scripts;
     }
 

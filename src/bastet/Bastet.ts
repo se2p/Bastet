@@ -11,6 +11,7 @@ import {ProgramParser} from "./syntax/parser/ProgramParser";
 import {Preconditions} from "./utils/Preconditions";
 import {AppBuilder} from "./syntax/app/AppBuilder";
 import {ProgramContext} from "./syntax/parser/grammar/ScratchParser";
+import instantiate = WebAssembly.instantiate;
 
 const commander = require('commander');
 
@@ -86,6 +87,8 @@ export class Bastet {
         // by generic constructs.
         let transformer = new ToIntermediateTransformer();
         let intermediateAST = transformer.transform(rawAST);
+
+        Preconditions.checkState(intermediateAST instanceof ProgramContext);
 
         return intermediateAST as ProgramContext;
     }

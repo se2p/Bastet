@@ -1,6 +1,9 @@
 import {FromParseTree} from "../FromParseTree";
 import {RuleNode} from "antlr4ts/tree";
 import {WithIdent} from "../../utils/WithIdent";
+import {Actor} from "./Actor";
+
+export type AppResourceMap = { [id:string]: AppResource } ;
 
 export class AppResource extends FromParseTree implements WithIdent {
 
