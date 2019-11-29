@@ -1,4 +1,4 @@
-import App from './app/App'
+import {App} from './app/App'
 
 export abstract class AnalysisTask {
     private readonly _program: App

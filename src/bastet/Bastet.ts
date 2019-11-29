@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 'use strict';
 
 import {ProgramParserFactory} from "./syntax/parser/ProgramParserFactory";
@@ -8,6 +7,8 @@ import {RuleNode} from "antlr4ts/tree";
 import {NotSupportedException} from "./core/exceptions/NotSupportedException";
 import {App} from "./syntax/app/App";
 import {AnalysisProcedure} from "./analyses/AnalysisProcedure";
+import {ProgramParser} from "./syntax/parser/ProgramParser";
+import {Preconditions} from "./utils/Preconditions";
 
 const commander = require('commander');
 
@@ -48,18 +49,17 @@ export class Bastet {
     }
 
     private createAnalysisProcedure(programArguments) : AnalysisProcedure {
-        throw new NotSupportedException("Implement me");
+        throw new NotSupportedException("Implement 'createAnalysisProcedure'");
     }
 
     private parseProgramArguments() : any {
         const program = new commander.Command();
-        let programArguments = program
+        return program
             .version('0.0.1')
             .option('-d, --debug', 'Debugging mode')
-            .option('-P, --program <required>', 'Program file')
-            .option('-S, --specification <required>', 'Specification file')
+            .requiredOption('-P, --program <required>', 'Program file')
+            .requiredOption('-S, --specification <required>', 'Specification file')
             .parse(process.argv);
-        return programArguments;
     }
 
     /**
@@ -69,11 +69,13 @@ export class Bastet {
      * @param filepath
      */
     private parseIntoIntermediateAST(filepath: string) {
+        Preconditions.checkNotEmpty(filepath);
+
         // Create the parser for the file format
-        let scratchParser = ProgramParserFactory.createParserFor(filepath);
+        let scratchParser : ProgramParser = ProgramParserFactory.createParserFor(filepath);
 
         // Create the RAW AST (no simplifications or generalizations were applied)
-        let rawAST = scratchParser.parse(filepath);
+        let rawAST = scratchParser.parseFile(filepath);
 
         // Transform the AST: Replaces specific statements or expressions
         // by generic constructs.
@@ -84,7 +86,7 @@ export class Bastet {
     }
 
     private createControlFlowFrom(intermediateSpecAST: RuleNode, actorNamePrefix?: string): App {
-        throw new NotSupportedException("Implement me");
+        throw new NotSupportedException("Implement 'createControlFlowFrom'");
     }
 }
 

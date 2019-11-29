@@ -5,18 +5,18 @@ import fs from "fs";
 import path from "path";
 import {ProgramParser} from "./ProgramParser";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {Preconditions} from "../../utils/Preconditions";
 
 export class TextualProgramParser implements ProgramParser {
 
     public parseFile(filepath: string): ProgramContext {
+        Preconditions.checkNotEmpty(filepath);
+
         let basename = path.basename(filepath);
-        let sourcecode : string;
-        fs.readFile(filepath, function (err, data) {
-            if (err) {
-                throw new IllegalArgumentException("Reading file failed: " + err);
-            }
-            sourcecode = data.toString('utf8');
-        });
+        let sourcecode : string = fs.readFileSync(filepath, 'utf8');
+
+        Preconditions.checkNotEmpty(sourcecode, "Empty source file");
+
         return this.parseSource(basename, sourcecode);
     }
 
