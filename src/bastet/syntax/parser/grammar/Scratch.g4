@@ -96,7 +96,7 @@ numExpr  :
  |  'loudness';
 
 touchable :
- 'mousepointer'  |  'edge'  |  'sprite' StringExpr | color ;
+ 'mousepointer'  |  'edge'  |  'sprite' stringExpr | color ;
 
 elementChoice :
    'next'
@@ -115,7 +115,7 @@ timeComp :
  |  'second' ;
 
 position  :
-    'pivot_of' StringExpr
+    'pivot_of' stringExpr
  |  'random_pos'
  |  'mouse_pos'
  |  '('  numExpr ',' numExpr  ')' ;

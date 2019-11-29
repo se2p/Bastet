@@ -178,7 +178,7 @@ commonStmt  :
     'wait' numExpr 'seconds'
  |  'wait' 'until' boolExpr
  |  'stop' 'other' 'scripts' 'in' 'actor'
- |  'create' 'clone' 'of' StringExpr
+ |  'create' 'clone' 'of' stringExpr
  |  'broadcast' message
  |  'broadcast' message 'and' 'wait'
  |  'reset' 'timer'
