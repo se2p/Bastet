@@ -14,10 +14,10 @@ import {DataLocationMap} from "./controlflow/DataLocation";
 export class AppBuilder {
 
     public static buildControlFlowsFromSyntaxTree(programOrigin: string, programAST: ProgramContext, actorNamePrefix: string): App {
-        // Phase 1: Build the app WITHOUT taking the INHERITANCE of actors into account.
+        // Phase 1: Build the actors WITHOUT taking the INHERITANCE of actors into account.
         let flatActors: ActorMap = AppBuilder.buildActorsFlat(programAST, actorNamePrefix);
 
-        // Phase 2: Rebuild the apps AND TAKE INHERITANCE into account.
+        // Phase 2: Rebuild the actors AND TAKE INHERITANCE into account.
         let appActors: ActorMap = AppBuilder.rebuildWithActorInheritance(flatActors);
 
         return new App(programOrigin, programAST.Ident().text, appActors);
