@@ -1,30 +1,32 @@
-import {ANTLRInputStream, CharStreams, CommonTokenStream} from 'antlr4ts';
+import {CharStreams, CommonTokenStream} from 'antlr4ts';
 import {ScratchLexer} from "./grammar/ScratchLexer";
 import {ProgramContext, ScratchParser} from "./grammar/ScratchParser";
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
+import {ProgramParser} from "./ProgramParser";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
-export class TextualProgramParser {
+export class TextualProgramParser implements ProgramParser {
 
-    public parseScratchProgramFromFile(filepath: string): ProgramContext {
+    public parseFile(filepath: string): ProgramContext {
         let basename = path.basename(filepath);
         let sourcecode : string;
         fs.readFile(filepath, function (err, data) {
             if (err) {
-                throw new Error("Reading file failed: " + err);
+                throw new IllegalArgumentException("Reading file failed: " + err);
             }
             sourcecode = data.toString('utf8');
         });
-        return this.parseScratchProgram(basename, sourcecode);
+        return this.parseSource(basename, sourcecode);
     }
 
     /**
-     * Create an intermediate AST for a given scratch program.
+     * Create an transformers AST for a given scratch program.
      *
      * @param basename
      * @param sourcecode
      */
-    public parseScratchProgram(basename: string, sourcecode: string): ProgramContext {
+    public parseSource(basename: string, sourcecode: string): ProgramContext {
         // Create a character stream and the lexer
         let inputStream = CharStreams.fromString(sourcecode);
         let lexer = new ScratchLexer(inputStream);

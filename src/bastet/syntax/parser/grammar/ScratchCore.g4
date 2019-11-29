@@ -158,7 +158,7 @@ expressionListPlain : expression (',' expression) | ;
 // An expression statement.
 // The main aim of having such a statement is to not
 // loose information when using Scratch ASTs as
-// an intermediate representation.
+// an transformers representation.
 // This statement will get more relevant if functions (custom
 // blocks with return values get introduced to Scratch.
 expressionStmt : 'evaluate' expression ;
@@ -178,7 +178,7 @@ commonStmt  :
     'wait' numExpr 'seconds'
  |  'wait' 'until' boolExpr
  |  'stop' 'other' 'scripts' 'in' 'actor'
- |  'create' 'clone' 'of' Ident
+ |  'create' 'clone' 'of' StringExpr
  |  'broadcast' message
  |  'broadcast' message 'and' 'wait'
  |  'reset' 'timer'
