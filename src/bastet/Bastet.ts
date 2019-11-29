@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 'use strict';
 
-import {ProgramParserFactory} from "./bastet/syntax/parser/ProgramParserFactory";
-import {ToIntermediateTransformer} from "./bastet/syntax/transformers/ToIntermediateTransformer";
-import {ControlFlows} from "./bastet/syntax/app/ControlFlows";
+import {ProgramParserFactory} from "./syntax/parser/ProgramParserFactory";
+import {ToIntermediateTransformer} from "./syntax/transformers/ToIntermediateTransformer";
+import {ControlFlows} from "./syntax/app/ControlFlows";
 import {RuleNode} from "antlr4ts/tree";
-import {NotSupportedException} from "./bastet/core/exceptions/NotSupportedException";
-import {App} from "./bastet/syntax/app/App";
-import {AnalysisProcedure} from "./bastet/analyses/AnalysisProcedure";
+import {NotSupportedException} from "./core/exceptions/NotSupportedException";
+import {App} from "./syntax/app/App";
+import {AnalysisProcedure} from "./analyses/AnalysisProcedure";
 
 const commander = require('commander');
 
 /**
- * The main class of the Bastet program analysis framework.
+ * The main class of the Main program analysis framework.
  */
 export class Bastet {
 
@@ -88,5 +88,4 @@ export class Bastet {
     }
 }
 
-var bastet = new Bastet();
-let analysisResult = bastet.runAnalysis();
+

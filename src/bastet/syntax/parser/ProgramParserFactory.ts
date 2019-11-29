@@ -1,12 +1,13 @@
 import path from "path";
 import {InvalidInputFormatException} from "../../core/exceptions/InvalidInputFormatException";
 import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
+import {TextualProgramParser} from "./TextualProgramParser";
 
 export class ProgramParserFactory {
 
     private static readonly fileParserMapping = {
         ".sc" : function(filepath: string) {
-            return
+            return new TextualProgramParser();
         },
         ".sb2": function(filepath: string) {
             throw new NotSupportedException("Support from Scratch project files is not yet implemented");
