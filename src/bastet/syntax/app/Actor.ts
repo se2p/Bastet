@@ -6,6 +6,8 @@ import {Statement} from "../ast/statements/Statement";
 import {MethodDefinition} from "./MethodDefinition";
 import {Maps} from "../../utils/Maps";
 
+export type ActorMap = { [id:string]: Actor } ;
+
 /**
  * Represents an actor.
  */
@@ -60,7 +62,7 @@ export class Actor extends FromParseTree {
     }
 
     get resources(): AppResource[] {
-        return Object.keys(this._resources).map(k => this._resources[k]);
+        return Maps.values(this._resources);
     }
 
     get resourceMap(): { [id: string]: AppResource } {
@@ -72,7 +74,7 @@ export class Actor extends FromParseTree {
     }
 
     get methods(): MethodDefinition[] {
-        return Object.keys(this._methodDefinitions).map(k => this._methodDefinitions[k]);
+        return Maps.values(this._methodDefinitions);
     }
 
     get methodMap(): { [id: string]: MethodDefinition } {

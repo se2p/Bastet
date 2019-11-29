@@ -9,6 +9,8 @@ import {App} from "./syntax/app/App";
 import {AnalysisProcedure} from "./analyses/AnalysisProcedure";
 import {ProgramParser} from "./syntax/parser/ProgramParser";
 import {Preconditions} from "./utils/Preconditions";
+import {AppBuilder} from "./syntax/app/AppBuilder";
+import {ProgramContext} from "./syntax/parser/grammar/ScratchParser";
 
 const commander = require('commander');
 
@@ -29,15 +31,18 @@ export class Bastet {
             return {};
         }
 
+        let programFilepath: string = programArguments.program;
+        let specFilepath: string = programArguments.specification;
+
         // Parse the program (a Scratch program) into an intermediate AST
-        let intermediateProgramAST = this.parseIntoIntermediateAST(programArguments.program);
+        let intermediateProgramAST = this.parseIntoIntermediateAST(programFilepath);
 
         // Parse the specification (also a Scratch program) into an intermediate AST
-        let intermediateSpecAST = this.parseIntoIntermediateAST(programArguments.specification);
+        let intermediateSpecAST = this.parseIntoIntermediateAST(specFilepath);
 
         // Create the control-flow structure of the verification task
-        let programControlFlow = this.createControlFlowFrom(intermediateProgramAST);
-        let specControlFlow = this.createControlFlowFrom(intermediateSpecAST, "__spec");
+        let programControlFlow = this.createControlFlowFrom(programFilepath, intermediateProgramAST);
+        let specControlFlow = this.createControlFlowFrom(specFilepath, intermediateSpecAST, "__spec");
         let taskControlFlow = ControlFlows.unionOf(programControlFlow, specControlFlow);
 
         // TODO: Allow for sequences of analysis procedures that can built on the respective previous results.
@@ -68,7 +73,7 @@ export class Bastet {
      *
      * @param filepath
      */
-    private parseIntoIntermediateAST(filepath: string) {
+    private parseIntoIntermediateAST(filepath: string): ProgramContext {
         Preconditions.checkNotEmpty(filepath);
 
         // Create the parser for the file format
@@ -82,11 +87,11 @@ export class Bastet {
         let transformer = new ToIntermediateTransformer();
         let intermediateAST = transformer.transform(rawAST);
 
-        return intermediateAST;
+        return intermediateAST as ProgramContext;
     }
 
-    private createControlFlowFrom(intermediateSpecAST: RuleNode, actorNamePrefix?: string): App {
-        throw new NotSupportedException("Implement 'createControlFlowFrom'");
+    private createControlFlowFrom(programOrigin: string, intermediateSpecAST: ProgramContext, actorNamePrefix?: string): App {
+        return AppBuilder.buildControlFlowsFromSyntaxTree(programOrigin, intermediateSpecAST, actorNamePrefix);
     }
 }
 

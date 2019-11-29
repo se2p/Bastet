@@ -2,6 +2,10 @@ import {WithIdent} from "./WithIdent";
 
 export class Maps {
 
+    public static values<T>(inputMap: { [id: string] : T; }) : T[] {
+        return Object.keys(inputMap).map(k => inputMap[k]);
+    }
+
     public static createMap<T extends WithIdent> (elements: T[]): { [id: string] : T; } {
         let result : { [id: string] : T; } = {};
         for (let e of elements) {

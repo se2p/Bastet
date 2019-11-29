@@ -1,31 +1,34 @@
-import {Actor} from './Actor'
+import {Actor, ActorMap} from './Actor'
 import {Maps} from "../../utils/Maps";
 
 export class App {
 
-    private readonly _basename: string;
+    private readonly _origin: string;
 
     private readonly _ident: string;
 
-    /** Set of actors */
-    private readonly _actors: { [id: string] : Actor; };
+    private readonly _actors: ActorMap;
 
-    constructor(basename: string, ident: string, actors: Actor[]) {
-        this._basename = basename;
+    constructor(origin: string, ident: string, actors: ActorMap) {
+        this._origin = origin;
         this._ident = ident;
-        this._actors = Maps.createMap(actors);
+        this._actors = actors;
     }
 
-    get basename() {
-        return this._basename;
+    get origin() {
+        return this._origin;
     }
 
     get ident() {
         return this._ident;
     }
 
-    get actors() {
+    get actorMap() {
         return this.actors;
+    }
+
+    get actors() {
+        return Maps.values(this._actors);
     }
 
 }
