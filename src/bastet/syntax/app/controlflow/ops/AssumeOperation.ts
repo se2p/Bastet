@@ -1,3 +1,5 @@
 import ProgramOperation from './ProgramOperation'
 
-export class AssumeOperation implements ProgramOperation {}
+export class AssumeOperation extends ProgramOperation {
+    
+}

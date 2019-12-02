@@ -49,9 +49,10 @@ resourceList : resource* ;
 // declaration statement, the variable is either local to the actor
 // or local to the current stack of a script execution.
 declarationStmt :
-        'declare' Ident 'as' type
-     |  'declare' 'attribute' stringExpr 'as' type
-     |  'declare' 'attribute' stringExpr 'of' Ident 'as' type ;
+        'declare' Ident 'as' type # DeclareVariable
+     |  'declare' 'attribute' stringExpr 'as' type # DeclareAttribute
+     |  'declare' 'attribute' stringExpr 'of' Ident 'as' type # DeclareAttributeOf
+     ;
 
 // A list of variable declarations.
 declarationStmtList : declarationStmt* ;
@@ -184,6 +185,7 @@ commonStmt  :
  |  'reset' 'timer'
  |  'change'  variable 'by' expression
  |  'change' 'attribute' stringExpr 'by' numExpr
+ |  'epsilon'
  |  setStmt ;
 
 listStmt :
@@ -201,9 +203,10 @@ setStmt :
 setStmtList : setStmt* ;
 
 terminationStmt :
-    'stop' 'all'
- |  'stop' 'this' 'script'
- |  'delete' 'this' 'clone' ;
+    'stop' 'all' # StopAll
+ |  'stop' 'this' 'script' # StopThis
+ |  'delete' 'this' 'clone' # DeleteThisClone
+ ;
 
 stringExpr : coreStringExpr ;
 

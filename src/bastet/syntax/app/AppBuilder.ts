@@ -1,7 +1,7 @@
 import {
     ActorDefinitionContext,
     BooleanTypeContext,
-    DeclarationStmtListContext, EnumTypeContext, ListTypeContext, MapTypeContext,
+    DeclarationStmtListContext, DeclareVariableContext, EnumTypeContext, ListTypeContext, MapTypeContext,
     MethodDefinitionListContext,
     NumerTypeContext,
     ProgramContext,
@@ -90,9 +90,14 @@ export class AppBuilder {
 
         // Data locations based on the declaration statements
         for (let stmt of declarationStmtListContext.declarationStmt()) {
-            const id: string = stmt.Ident().text;
-            const type: ScratchType = AppBuilder.buildType(stmt.type());
-            result[id] = new DataLocation(stmt, id, type);
+            if (stmt instanceof DeclareVariableContext) {
+                let declStmt: DeclareVariableContext = stmt as DeclareVariableContext;
+                const id: string = declStmt.Ident().text;
+                const type: ScratchType = AppBuilder.buildType(declStmt.type());
+                result[id] = new DataLocation(declStmt, id, type);
+            } else {
+                throw new ImplementMeException();
+            }
         }
 
         // Data locations based on the resources

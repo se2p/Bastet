@@ -2,16 +2,17 @@ import ControlLocation from './ControlLocation'
 import ProgramOperation from './ops/ProgramOperation'
 
 export default class ControlTransition {
-    private readonly _fromLocation: ControlLocation
 
-    private readonly _toLocation: ControlLocation
+    private readonly _fromLocation: ControlLocation;
 
-    private readonly _operation: ProgramOperation
+    private readonly _toLocation: ControlLocation;
+
+    private readonly _operation: ProgramOperation;
 
     constructor(from: ControlLocation, to: ControlLocation, op: ProgramOperation) {
-        this._fromLocation = from
-        this._toLocation = to
-        this._operation = op
+        this._fromLocation = from;
+        this._toLocation = to;
+        this._operation = op;
     }
 
     get from() {
@@ -25,4 +26,5 @@ export default class ControlTransition {
     get op() {
         return this._operation
     }
+
 }
