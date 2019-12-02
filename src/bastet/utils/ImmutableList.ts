@@ -4,7 +4,7 @@ export class ImmutableList<E> implements Iterable<E> {
 
     private readonly _list: Array<E>;
 
-    constructor(...items: E[]) {
+    constructor(items: E[]) {
         this._list = Array.from(items);
     }
 
@@ -34,6 +34,10 @@ export class ImmutableList<E> implements Iterable<E> {
 
     map<U>(callbackfn: <E>(value: E, index: number, array: E[]) => U, thisArg?: any): U[] {
         return this._list.map(callbackfn, this);
+    }
+
+    get length(): number {
+        return this._list.length;
     }
 
 }

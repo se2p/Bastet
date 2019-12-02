@@ -1,10 +1,10 @@
 import {App} from "./App";
-import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
 export class ControlFlows {
 
     public static unionOf(controlflow1: App, controlflow2: App) : App {
-        throw new NotSupportedException("Not yet implemented");
+        throw new ImplementMeException();
     }
 
 }

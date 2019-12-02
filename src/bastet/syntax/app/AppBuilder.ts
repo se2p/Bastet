@@ -1,15 +1,25 @@
 import {
-    ActorDefinitionContext, DeclarationStmtListContext, MethodDefinitionListContext,
-    ProgramContext, ResourceListContext, ScriptListContext, SetStmtListContext
+    ActorDefinitionContext,
+    BooleanTypeContext,
+    DeclarationStmtListContext, EnumTypeContext, ListTypeContext, MapTypeContext,
+    MethodDefinitionListContext,
+    NumerTypeContext,
+    ProgramContext,
+    ResourceContext,
+    ResourceListContext,
+    ScriptListContext,
+    SetStmtListContext,
+    TypeContext
 } from "../parser/grammar/ScratchParser";
 import {Actor, ActorMap} from "./Actor";
 import {App} from "./App";
-import {AppResourceMap} from "./AppResource";
+import {AppResource, AppResourceMap, AppResourceType} from "./AppResource";
 import {MethodDefinitionMap} from "./MethodDefinition";
-import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
 import {Script} from "./controlflow/Script";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {DataLocationMap} from "./controlflow/DataLocation";
+import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
+import {BooleanType, ListType, MapType, NumberType, ScratchType, StringEnumType} from "../ast/ScratchType";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 export class AppBuilder {
 
@@ -53,22 +63,56 @@ export class AppBuilder {
     }
 
     private static buildScripts(scriptListContext: ScriptListContext): Script[] {
-        throw new NotSupportedException("Implement me");
+        throw new ImplementMeException();
     }
 
     private static buildMethodDefs(methodDefinitionListContext: MethodDefinitionListContext): MethodDefinitionMap {
-        throw new NotSupportedException("Implement me");
+        throw new ImplementMeException();
     }
 
     private static buildInitScript(resourceListContext: ResourceListContext, declarationStmtListContext: DeclarationStmtListContext, stmtList: SetStmtListContext): Script {
-        throw new NotSupportedException("Implement me");
+        throw new ImplementMeException();
     }
 
     private static buildResources(resourceListContext: ResourceListContext): AppResourceMap {
-        throw new NotSupportedException("Implement me");
+        let result: AppResourceMap = {};
+        for (let rc of resourceListContext.resource()) {
+            const id: string = rc.Ident().text;
+            const rt: AppResourceType = AppResource.typeFromString(rc.resourceType().text);
+            const uri: string = rc.resourceLocator().text;
+            result[id] = new AppResource(rc, id, rt, uri);
+        }
+        return result;
     }
 
     private static buildDatalocs(resourceListContext: ResourceListContext, declarationStmtListContext: DeclarationStmtListContext): DataLocationMap {
-        throw new NotSupportedException("Implement me");
+        let result: DataLocationMap = {};
+
+        // Data locations based on the declaration statements
+        for (let stmt of declarationStmtListContext.declarationStmt()) {
+            const id: string = stmt.Ident().text;
+            const type: ScratchType = AppBuilder.buildType(stmt.type());
+            result[id] = new DataLocation(stmt, id, type);
+        }
+
+        // Data locations based on the resources
+        console.warn("Resource declarations ignored");
+        return result;
+    }
+
+    private static buildType(typeContext: TypeContext) {
+        if (typeContext instanceof BooleanTypeContext) {
+            return new BooleanType();
+        } else if (typeContext instanceof NumerTypeContext) {
+            return new NumberType();
+        } else if (typeContext instanceof ListTypeContext) {
+            return new ListType();
+        } else if (typeContext instanceof MapTypeContext) {
+            return new MapType();
+        } else if (typeContext instanceof EnumTypeContext) {
+            return new StringEnumType();
+        } else {
+            throw new IllegalArgumentException("Type not supported");
+        }
     }
 }

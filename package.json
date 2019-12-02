@@ -50,8 +50,10 @@
     "typescript": "^3.7.2"
   },
   "dependencies": {
+    "acorn": "^7.1.0",
     "antlr4ts": "^0.5.0-alpha.3",
     "commander": "^4.0.1",
-    "immutable": "^4.0.0-rc.12"
+    "immutable": "^4.0.0-rc.12",
+    "typescript-logging": "^0.6.4"
   }
 }

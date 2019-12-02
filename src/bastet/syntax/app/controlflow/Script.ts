@@ -49,7 +49,7 @@ export class Script {
         return this._transitions;
     }
 
-    get locatios() {
+    get locations() {
         return this._locations;
     }
 

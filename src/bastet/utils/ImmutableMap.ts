@@ -47,9 +47,9 @@ export class ImmutableMap<K, V> implements ReadonlyMap<K, V>, Iterable<[K, V]> {
         return new ImmutableMap<string, V>(interm.entries());
     }
 
-    public static copyOf<K, V>(input: ReadonlyMap<K, V>) {
+    public static copyOf<K, V>(input: ReadonlyMap<K, V>): ImmutableMap<K, V> {
         if (input.constructor == ImmutableMap) {
-            return input;
+            return <ImmutableMap<K, V>> input;
         }
         return new ImmutableMap(input.entries());
     }

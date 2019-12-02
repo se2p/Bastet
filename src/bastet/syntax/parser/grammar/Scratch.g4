@@ -45,10 +45,8 @@ actorLookStmt :
 spriteLookStmt  :
     'show'
  |  'hide'
- |  'say' stringExpr 'for' numExpr  'secs'
- |  'say' stringExpr
- |  'think' stringExpr 'for' numExpr  'secs'
- |  'think' stringExpr
+ |  'say' stringExpr ('for' numExpr  'secs')?
+ |  'think' stringExpr ('for' numExpr  'secs')?
  |  'switch' 'costume' 'to' elementChoice
  |  'change' 'size' 'by'  numExpr
  |  'set' 'size' 'to'  numExpr  'percent'

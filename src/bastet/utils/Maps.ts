@@ -52,6 +52,19 @@ export class Maps {
         return result;
     }
 
+    public static mergeImmutableMaps<K,V> (map1: ImmutableMap<K, V>, map2: ImmutableMap<K, V>): ImmutableMap<K, V> {
+        let result = new Map<K, V>(map1.entries());
+
+        map2.forEach((v,k) => {
+            if (result.has(k)) {
+                throw new IllegalArgumentException("Merge only supports unique entries!");
+            }
+            result.set(k, map2.get(k));
+        });
+
+        return new ImmutableMap(result.entries());
+    }
+
     /**
      * Create an immutable map from a given dictionary.
      *

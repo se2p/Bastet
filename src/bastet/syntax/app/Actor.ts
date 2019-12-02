@@ -56,11 +56,11 @@ export class Actor extends FromParseTree {
             // TODO: Handle re-definitions of resources or methods with the same identifier
             //      Rename the basic versions so that they can be referenced by the
             //      inheriting actors?
-            this._resources = Maps.mergeMaps(this.resourceMap, inheritFrom.resourceMap);
+            this._resources = Maps.mergeImmutableMaps(this.resourceMap, inheritFrom.resourceMap);
             this._initScript = Scripts.concat(inheritFrom._initScript, this._initScript);
-            this._methodDefinitions = Maps.mergeMaps(this.methodMap, inheritFrom.methodMap);
-            this._datalocs = Maps.mergeMaps(this.datalocMap, inheritFrom.datalocMap);
-            this._scripts = this._scripts.concat(inheritFrom.scripts);
+            this._methodDefinitions = Maps.mergeImmutableMaps(this.methodMap, inheritFrom.methodMap);
+            this._datalocs = Maps.mergeImmutableMaps(this.datalocMap, inheritFrom.datalocMap);
+            this._scripts = Lists.concatImmutableLists(this._scripts, inheritFrom.scripts);
         }
     }
 
@@ -72,11 +72,19 @@ export class Actor extends FromParseTree {
         return this._inheritsFrom;
     }
 
-    get resources(): AppResource[] {
-        return Maps.values(this._resources);
+    get datalocs(): IterableIterator<DataLocation> {
+        return this._datalocs.values();
     }
 
-    get resourceMap(): { [id: string]: AppResource } {
+    get datalocMap(): ImmutableMap<string, DataLocation> {
+        return this._resources;
+    }
+
+    get resources(): IterableIterator<AppResource> {
+        return this._resources.values();
+    }
+
+    get resourceMap(): ImmutableMap<string, AppResource> {
         return this._resources;
     }
 
@@ -84,11 +92,11 @@ export class Actor extends FromParseTree {
         return this._initScript;
     }
 
-    get methods(): MethodDefinition[] {
-        return Maps.values(this._methodDefinitions);
+    get methods(): IterableIterator<MethodDefinition> {
+        return this._methodDefinitions.values();
     }
 
-    get methodMap(): { [id: string]: MethodDefinition } {
+    get methodMap(): ImmutableMap<string, MethodDefinition> {
         return this._methodDefinitions;
     }
 

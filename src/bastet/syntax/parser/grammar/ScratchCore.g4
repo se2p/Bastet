@@ -11,7 +11,7 @@ fileType : 'program' | 'module' ;
 
 importDefinitionList : importDefinition* ;
 
-importDefinition : 'import' Ident 'from' URI ;
+importDefinition : 'import' Ident 'from' resourceLocator ;
 
 // Actors in a list of actors are separated by whitespace
 actorDefinitionList : actorDefinition* ;
@@ -38,7 +38,7 @@ actorComponentsDefinition : resourceList declarationStmtList setStmtList methodD
 // define the static UI content to compose a Scratch program.
 // The type 'image' is used both for the *backdrops* of the stage
 // and for the *costumes* of the sprites.
-resource : resourceType Ident URI ;
+resource : resourceType Ident resourceLocator ;
 
 resourceType : 'image' | 'sound' ;
 
@@ -59,12 +59,12 @@ declarationStmtList : declarationStmt* ;
 // The list of datatypes that are allowed for the declaration
 // of variables and attributes.
 type :
-   'number'
- | 'boolean'
- | 'string'
- | 'enum' '[' expressionListPlain ']'
- | 'list' type
- | 'map' indexType ;
+   'number' # NumerType
+ | 'boolean' # BooleanType
+ | 'string' # StringType
+ | 'enum' '[' expressionListPlain ']' # EnumType
+ | 'list' type # ListType
+ | 'map' indexType # MapType;
 
 // Maps and lists can be indexed either by numbers or strings.
 indexType : 'number' | 'string' ;
@@ -194,8 +194,8 @@ listStmt :
  |  'replace' 'item'  numExpr 'of' variable  'by'  stringExpr    ;
 
 setStmt :
-    'set' 'attribute' stringExpr 'to' expression
- |  'set' 'attribute' stringExpr 'of' Ident 'to' expression
+    'set' 'attribute' String 'to' expression
+ |  'set' 'attribute' String 'of' Ident 'to' expression
  |  'set' variable 'to' expression  ;
 
 setStmtList : setStmt* ;
@@ -335,6 +335,6 @@ Boolean : Bool ;
 
 key : 'key' numExpr ;
 
-URI : String ;
+resourceLocator : String ;
 
 message : stringExpr ;

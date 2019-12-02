@@ -3,7 +3,6 @@
 import {ProgramParserFactory} from "./syntax/parser/ProgramParserFactory";
 import {ToIntermediateTransformer} from "./syntax/transformers/ToIntermediateTransformer";
 import {ControlFlows} from "./syntax/app/ControlFlows";
-import {RuleNode} from "antlr4ts/tree";
 import {NotSupportedException} from "./core/exceptions/NotSupportedException";
 import {App} from "./syntax/app/App";
 import {AnalysisProcedure} from "./analyses/AnalysisProcedure";
@@ -11,7 +10,6 @@ import {ProgramParser} from "./syntax/parser/ProgramParser";
 import {Preconditions} from "./utils/Preconditions";
 import {AppBuilder} from "./syntax/app/AppBuilder";
 import {ProgramContext} from "./syntax/parser/grammar/ScratchParser";
-import instantiate = WebAssembly.instantiate;
 
 const commander = require('commander');
 
@@ -42,8 +40,8 @@ export class Bastet {
         let intermediateSpecAST = this.parseIntoIntermediateAST(specFilepath);
 
         // Create the control-flow structure of the verification task
-        let programControlFlow = this.createControlFlowFrom(programFilepath, intermediateProgramAST);
         let specControlFlow = this.createControlFlowFrom(specFilepath, intermediateSpecAST, "__spec");
+        let programControlFlow = this.createControlFlowFrom(programFilepath, intermediateProgramAST);
         let taskControlFlow = ControlFlows.unionOf(programControlFlow, specControlFlow);
 
         // TODO: Allow for sequences of analysis procedures that can built on the respective previous results.

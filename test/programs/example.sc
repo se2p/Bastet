@@ -1,6 +1,6 @@
 program ExampleProgram
 
-stage Stage begin
+actor Stage is ScratchStage begin
     image backdrop1 "file://back1.png"
     image backdrop2 "file://back2.png"
     sound sound1 "file://sound1.wav"
@@ -14,12 +14,12 @@ stage Stage begin
 
     set variable3 to [ "foo", "bar", "wauz" ]
 
-    script on green flag do begin
+    script on startup do begin
         set variable1 to 1
     end
 end
 
-sprite Test begin
+actor Test is ScratchSrpite begin
     image backdrop1 "file://back1.png"
     image backdrop2 "file://back2.png"
     sound sound1 "file://sound1.wav"
@@ -33,18 +33,18 @@ sprite Test begin
 
     set variable3 to [ "foo", "bar", "wauz" ]
 
-    script on green flag do begin
+    script on startup do begin
         set variable1 to 1
     end
 end
 
-sprite Sprite1 begin
-    script on green flag do begin
+actor Sprite1 is ScratchSprite begin
+    script on startup do begin
         say "Hello World"
     end
 end
 
-sprite Sprite2 begin
+actor Sprite2 is ScratchSprite begin
     procedure foo (n: number, m: number) begin
         say as string (n + m)
     end
