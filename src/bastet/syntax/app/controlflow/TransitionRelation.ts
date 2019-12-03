@@ -1,6 +1,8 @@
 import {ProgramOperation} from "./ops/ProgramOperation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ControlLocation, LocationID} from "./ControlLocation";
+import {ImmutableMap} from "../../../utils/ImmutableMap";
+import {ImmutableSet} from "../../../utils/ImmutableSet";
 
 export class TransitionRelationBuilder {
 
@@ -56,6 +58,33 @@ export class TransitionRelationBuilder {
 }
 
 export class TransitionRelation {
+
+    private readonly _transitions: ImmutableMap<LocationID, ImmutableMap<LocationID, ImmutableSet<ProgramOperation>>>;
+
+    private readonly _locations: ImmutableMap<number, ControlLocation>;
+
+    private readonly _entryLocations: ImmutableSet<ControlLocation>;
+
+    private readonly _exitLocations: ImmutableSet<ControlLocation>;
+
+    constructor(transitions: Map<LocationID, Map<LocationID, Set<ProgramOperation>>>,
+                locations: Map<LocationID, ControlLocation>,
+                entryLocs: Set<ControlLocation>,
+                exitLocs: Set<ControlLocation>) {
+        this._transitions = this.makeImmutable(transitions);
+        this._locations = ImmutableMap.copyOf(locations);
+        this._entryLocations = ImmutableSet.copyOf(entryLocs);
+        this._exitLocations = ImmutableSet.copyOf(exitLocs);
+    }
+
+    private makeImmutable(input: Map<LocationID, Map<LocationID, Set<ProgramOperation>>>):
+        ImmutableMap<LocationID, ImmutableMap<LocationID, ImmutableSet<ProgramOperation>>> {
+        throw new ImplementMeException();
+    }
+
+}
+
+export class TransitionRelations {
 
     static concat(result: TransitionRelation, stmtTR: TransitionRelation): TransitionRelation {
         throw new ImplementMeException();

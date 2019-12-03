@@ -1,6 +1,5 @@
-import AppEvent from '../AppEvent'
+import {AppEvent} from '../AppEvent'
 import {TransitionRelation} from "./TransitionRelation";
-import {ScriptBuilder} from "./ScriptBuilder";
 
 /**
  * A single script, which represents the control flow
@@ -25,10 +24,6 @@ export class Script {
 
     get event(): AppEvent {
         return this._event;
-    }
-
-    public static builder(): ScriptBuilder {
-        return new ScriptBuilder();
     }
 
 }

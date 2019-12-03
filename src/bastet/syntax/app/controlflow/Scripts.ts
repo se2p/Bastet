@@ -1,5 +1,5 @@
 import {Script} from "./Script";
-import {TransitionRelation} from "./TransitionRelation";
+import {TransitionRelations} from "./TransitionRelation";
 import {Preconditions} from "../../../utils/Preconditions";
 
 export class Scripts {
@@ -13,8 +13,7 @@ export class Scripts {
      */
     public static concat(script1: Script, script2: Script) : Script {
         Preconditions.checkArgument(script1.event === script2.event);
-
-        const newTR = TransitionRelation.concat(script1.transitions, script2.transitions);
+        const newTR = TransitionRelations.concat(script1.transitions, script2.transitions);
         return new Script(script1.event, newTR);
     }
 

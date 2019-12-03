@@ -1,4 +1,5 @@
 import {RuleNode} from "antlr4ts/tree";
+import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
 
 export type OperationID = number;
 
@@ -15,7 +16,7 @@ export abstract class ProgramOperation {
     }
 
     public static withID(id: OperationID): ProgramOperation {
-
+        throw new ImplementMeException();
     }
 
 }

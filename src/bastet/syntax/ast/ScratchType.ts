@@ -15,6 +15,20 @@ export abstract class ScratchType {
 
 }
 
+export class VoidType extends ScratchType {
+
+    constructor() {
+        super();
+    }
+
+    private static readonly VOID_TYPE = new VoidType();
+
+    static instance() {
+        return this.VOID_TYPE;
+    }
+
+}
+
 export class NumberType extends ScratchType {
 
     constructor() {

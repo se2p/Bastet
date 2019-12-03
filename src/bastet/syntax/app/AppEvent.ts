@@ -1,10 +1,45 @@
 import {FromParseTree} from "../FromParseTree";
 import {RuleNode} from "antlr4ts/tree";
 
-export default class AppEvent extends FromParseTree {
+export abstract class AppEvent {
 
-    constructor(node: RuleNode) {
-        super(node);
+}
+
+export class NeverEvent extends AppEvent {
+
+    private static readonly INSTANCE = new NeverEvent();
+
+    static instance(): NeverEvent {
+        return this.INSTANCE;
+    }
+}
+
+export class StartupEvent extends AppEvent {
+
+    private static readonly INSTANCE = new StartupEvent();
+
+    static instance(): StartupEvent {
+        return this.INSTANCE;
     }
 
 }
+
+export class CloneStartEvent extends AppEvent {
+
+}
+
+export class MessageReceivedEvent extends AppEvent {
+
+}
+
+export class ConditionReachedEvent extends AppEvent {
+
+}
+
+export class AppEvents {
+
+    static never(): NeverEvent {
+        return NeverEvent.instance();
+    }
+}
+

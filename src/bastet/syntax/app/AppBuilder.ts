@@ -3,7 +3,7 @@ import {
     BooleanTypeContext,
     DeclarationStmtListContext, DeclareVariableContext, EnumTypeContext, EventContext, ListTypeContext, MapTypeContext,
     MethodDefinitionListContext, MethodResultDeclarationContext,
-    NumerTypeContext, ParameterListContext,
+    NumerTypeContext, ParameterContext, ParameterListContext,
     ProgramContext,
     ResourceListContext,
     ScriptListContext,
@@ -20,8 +20,8 @@ import DataLocation, {DataLocationID, DataLocationMap} from "./controlflow/DataL
 import {BooleanType, ListType, MapType, NumberType, ScratchType, StringEnumType} from "../ast/ScratchType";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
-import AppEvent from "./AppEvent";
-import {DataLocationDeclaration} from "./controlflow/DataLocationDeclaration";
+import {AppEvent, AppEvents, NeverEvent, StartupEvent} from "./AppEvent";
+import {TransitionRelation, TransitionRelationBuilder, TransitionRelations} from "./controlflow/TransitionRelation";
 
 export class AppBuilder {
 
@@ -76,32 +76,56 @@ export class AppBuilder {
     }
 
     private static buildEvent(eventContext: EventContext): AppEvent {
+        if (eventContext instanceof NeverEvent) {
+            return NeverEvent.instance();
+        } else if (eventContext instanceof StartupEvent) {
+            return StartupEvent.instance();
+        }
         throw new ImplementMeException();
     }
 
     private static buildMethodDefs(methodDefinitionListContext: MethodDefinitionListContext): MethodDefinitionMap {
         let result: MethodDefinitionMap = {};
         for (let methodDef of methodDefinitionListContext.methodDefinition()) {
-            let methodName = methodDef.Ident().toString();
-            let paramDecls = AppBuilder.buildParameterDeclarations(methodDef.parameterList());
-            let resultDecl = AppBuilder.buildMethodResultDef(methodDef.methodResultDeclaration());
+            const methodName = methodDef.Ident().toString();
+            const paramDecls = AppBuilder.buildParameterDeclarations(methodDef.parameterList());
+            const resultDecl = AppBuilder.buildMethodResultDef(methodDef.methodResultDeclaration());
             result[methodName] = new MethodDefinition(methodDef, methodName, paramDecls, resultDecl);
         }
         return result;
     }
 
-    private static buildMethodResultDef(methodResultDeclarationContext: MethodResultDeclarationContext): DataLocationDeclaration {
-        throw new ImplementMeException();
+    private static buildMethodResultDef(methodResultDeclarationContext: MethodResultDeclarationContext): DataLocation {
+        if (methodResultDeclarationContext.Ident()) {
+            const id: string = methodResultDeclarationContext.Ident().text;
+            const t: ScratchType = this.buildType(methodResultDeclarationContext.type());
+            return new DataLocation(methodResultDeclarationContext, id, t);
+        } else {
+            return DataLocation.void();
+        }
     }
 
-    private static buildParameterDeclarations(parameterListContext: ParameterListContext): Map<DataLocationID, DataLocationDeclaration> {
-        return undefined;
+    private static buildParameterDeclarations(parameterListContext: ParameterListContext): DataLocationMap {
+        let result: DataLocationMap = {};
+        const params: ParameterContext[] = parameterListContext.parameterListPlain().parameter();
+        for (let p of params) {
+            const id: string = p.Ident().text;
+            const t: ScratchType = this.buildType(p.type());
+            result[id] = new DataLocation(p, id, t);
+        }
+        return result;
     }
 
     private static buildInitScript(resourceListContext: ResourceListContext, declarationStmtListContext: DeclarationStmtListContext, stmtList: SetStmtListContext): Script {
-        throw new ImplementMeException();
+        const visitor = new RelationBuildingVisitor();
+        const transrelRes = resourceListContext.accept(visitor);
+        const transrelLocs = declarationStmtListContext.accept(visitor);
+        const transrelSet = stmtList.accept(visitor);
+        const compundTransRel = TransitionRelations.concat(transrelRes,
+            TransitionRelations.concat(transrelLocs, transrelSet));
+        return new Script(AppEvents.never(), compundTransRel);
     }
-
+ß
     private static buildResources(resourceListContext: ResourceListContext): AppResourceMap {
         let result: AppResourceMap = {};
         for (let rc of resourceListContext.resource()) {
@@ -119,7 +143,7 @@ export class AppBuilder {
         // Data locations based on the declaration statements
         for (let stmt of declarationStmtListContext.declarationStmt()) {
             if (stmt instanceof DeclareVariableContext) {
-                let declStmt: DeclareVariableContext = stmt as DeclareVariableContext;
+                const declStmt: DeclareVariableContext = stmt as DeclareVariableContext;
                 const id: string = declStmt.Ident().text;
                 const type: ScratchType = AppBuilder.buildType(declStmt.type());
                 result[id] = new DataLocation(declStmt, id, type);

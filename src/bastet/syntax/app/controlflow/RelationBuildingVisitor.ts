@@ -1,6 +1,6 @@
 import {Script} from "./Script";
 import {ScratchVisitor} from "../../parser/grammar/ScratchVisitor";
-import {TransitionRelation} from "./TransitionRelation";
+import {TransitionRelation, TransitionRelations} from "./TransitionRelation";
 import {ErrorNode, ParseTree, RuleNode, TerminalNode} from "antlr4ts/tree";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ProgramOperationFactory} from "./ops/ProgramOperationFactory";
@@ -9,7 +9,7 @@ import {ControlLocation} from "./ControlLocation";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {
     CallStmtContext, IfStmtContext, NonCtrlStmtContext, RepeatForeverStmtContext,
-    RepeatTimesStmtContext, ScriptContext, StmtListContext,
+    RepeatTimesStmtContext, ResourceContext, ResourceListContext, ScriptContext, StmtListContext,
     TerminationStmtContext, UntilStmtContext
 } from "../../parser/grammar/ScratchParser";
 
@@ -20,7 +20,7 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
         // ATTENTION: The inter-procedural transition relation
         // is built in a different step.
         const op: ProgramOperation = ProgramOperationFactory.createFor(ctx);
-        return TransitionRelation.forOpSeq(op);
+        return TransitionRelations.forOpSeq(op);
     }
 
     visitIfStmt (ctx: IfStmtContext): TransitionRelation {
@@ -32,21 +32,23 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
         if (ctx.elseCase().stmtList()) {
             elseStatements = ctx.stmtList().accept(this);
         } else {
-            elseStatements = TransitionRelation.epsilon();
+            elseStatements = TransitionRelations.epsilon();
         }
 
         const exitLocation = ControlLocation.fresh();
-        const thenCaseGuarded = TransitionRelation.concat(thenAssumeOp, thenStatements);
-        const elseCaseGuarded = TransitionRelation.concat(elseAssumeOp, elseStatements);
+        const thenCaseGuarded = TransitionRelations.concat(
+            TransitionRelations.forOpSeq(thenAssumeOp), thenStatements);
+        const elseCaseGuarded = TransitionRelations.concat(
+            TransitionRelations.forOpSeq(elseAssumeOp), elseStatements);
 
-        return TransitionRelation.branching(thenCaseGuarded, elseCaseGuarded, exitLocation);
+        return TransitionRelations.branching(thenCaseGuarded, elseCaseGuarded, exitLocation);
     }
 
     visitRepeatForeverStmt (ctx: RepeatForeverStmtContext) : TransitionRelation {
         const loopBody: TransitionRelation = ctx.stmtList().accept(this);
         const loopHead: ControlLocation = ControlLocation.fresh();
-        const headRelation = TransitionRelation.singleton(loopHead);
-        return TransitionRelation.concatAndGoto(headRelation, loopBody, loopHead);
+        const headRelation = TransitionRelations.singleton(loopHead);
+        return TransitionRelations.concatAndGoto(headRelation, loopBody, loopHead);
     }
 
     visitRepeatTimesStmt (ctx: RepeatTimesStmtContext) : TransitionRelation {
@@ -58,28 +60,28 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
         const loopBody: TransitionRelation = ctx.stmtList().accept(this);
         const condAssumeOp = ProgramOperationFactory.assumeOpFrom(ctx.boolExpr());
 
-        return TransitionRelation.concatAndGoto(
-            TransitionRelation.singleton(loopHead),
-            TransitionRelation.concat(condAssumeOp, loopBody),
+        return TransitionRelations.concatAndGoto(
+            TransitionRelations.singleton(loopHead),
+            TransitionRelations.concat(TransitionRelations.forOpSeq(condAssumeOp), loopBody),
             loopHead);
     }
 
     visitNonCtrlStmt (ctx: NonCtrlStmtContext) : TransitionRelation {
         const op: ProgramOperation = ProgramOperationFactory.createFor(ctx);
-        return TransitionRelation.forOpSeq(op);
+        return TransitionRelations.forOpSeq(op);
     }
 
     visitStmtList (ctx: StmtListContext) :  TransitionRelation {
-        let result: TransitionRelation = TransitionRelation.epsilon();
+        let result: TransitionRelation = TransitionRelations.epsilon();
 
         for (let stmt of ctx.stmtListPlain().stmt()) {
             let stmtTR: TransitionRelation = stmt.accept(this);
-            result = TransitionRelation.concat(result, stmtTR);
+            result = TransitionRelations.concat(result, stmtTR);
         }
 
         if (ctx.terminationStmt()) {
             let stmtTR: TransitionRelation = ctx.terminationStmt().accept(this);
-            result = TransitionRelation.concat(result, stmtTR);
+            result = TransitionRelations.concat(result, stmtTR);
         }
 
         return result;
@@ -87,7 +89,7 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
 
     visitTerminationStmt (ctx: TerminationStmtContext) : TransitionRelation {
         const op: ProgramOperation = ProgramOperationFactory.createFor(ctx);
-        return TransitionRelation.forOpSeq(op);
+        return TransitionRelations.forOpSeq(op);
     }
 
     visit(tree: ParseTree): TransitionRelation {
@@ -95,15 +97,36 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
     }
 
     visitChildren(node: RuleNode): TransitionRelation {
+        console.log(node);
         throw new ImplementMeException();
     }
 
     visitErrorNode(node: ErrorNode): TransitionRelation {
+        console.log(node);
         throw new ImplementMeException();
     }
 
     visitTerminal(node: TerminalNode): TransitionRelation {
+        console.log(node);
         throw new ImplementMeException();
+    }
+
+    visitResourceList(node: ResourceListContext): TransitionRelation {
+        let result: TransitionRelation = TransitionRelations.epsilon();
+
+        for (let res of node.resource()) {
+            let stmtTR: TransitionRelation = res.accept(this);
+            result = TransitionRelations.concat(result, stmtTR);
+        }
+
+        return result;
+    }
+
+    visitResource(node: ResourceContext): TransitionRelation {
+        // FIXME: Load the resources. Add operations
+        // that set, for example, attribute variables.
+        const op: ProgramOperation = ProgramOperationFactory.createFor(node);
+        return TransitionRelations.forOpSeq(op);
     }
 
     public static buildFromTree(tree: ScriptContext): Script {
