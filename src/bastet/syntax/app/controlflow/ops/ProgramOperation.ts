@@ -5,9 +5,9 @@ export type OperationID = number;
 
 export abstract class ProgramOperation {
 
-    private readonly _ast: RuleNode;
+    private readonly _ast: RuleNode|null;
 
-    constructor(ast: RuleNode) {
+    constructor(ast: RuleNode|null) {
         this._ast = ast;
     }
 
@@ -15,12 +15,22 @@ export abstract class ProgramOperation {
         return this._ast;
     }
 
+}
+
+export class NoopProgramOperation extends ProgramOperation {
+
+}
+
+export class ProgramOperations {
+
     public static withID(id: OperationID): ProgramOperation {
         throw new ImplementMeException();
     }
 
-}
+    private static readonly EPSILON_OP = new NoopProgramOperation(null);
 
-export class NoopProgramOperation extends ProgramOperation {
+    public static epsilon(): ProgramOperation {
+        return this.EPSILON_OP;
+    }
 
 }

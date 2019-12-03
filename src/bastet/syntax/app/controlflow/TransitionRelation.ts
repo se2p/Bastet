@@ -1,4 +1,4 @@
-import {ProgramOperation} from "./ops/ProgramOperation";
+import {ProgramOperation, ProgramOperations} from "./ops/ProgramOperation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ControlLocation, LocationID} from "./ControlLocation";
 import {ImmutableMap} from "../../../utils/ImmutableMap";
@@ -61,16 +61,16 @@ export class TransitionRelation {
 
     private readonly _transitions: ImmutableMap<LocationID, ImmutableMap<LocationID, ImmutableSet<ProgramOperation>>>;
 
-    private readonly _locations: ImmutableMap<number, ControlLocation>;
+    private readonly _locations: ImmutableMap<LocationID, ControlLocation>;
 
-    private readonly _entryLocations: ImmutableSet<ControlLocation>;
+    private readonly _entryLocations: ImmutableSet<LocationID>;
 
-    private readonly _exitLocations: ImmutableSet<ControlLocation>;
+    private readonly _exitLocations: ImmutableSet<LocationID>;
 
     constructor(transitions: Map<LocationID, Map<LocationID, Set<ProgramOperation>>>,
                 locations: Map<LocationID, ControlLocation>,
-                entryLocs: Set<ControlLocation>,
-                exitLocs: Set<ControlLocation>) {
+                entryLocs: Set<LocationID>,
+                exitLocs: Set<LocationID>) {
         this._transitions = this.makeImmutable(transitions);
         this._locations = ImmutableMap.copyOf(locations);
         this._entryLocations = ImmutableSet.copyOf(entryLocs);
@@ -79,6 +79,13 @@ export class TransitionRelation {
 
     private makeImmutable(input: Map<LocationID, Map<LocationID, Set<ProgramOperation>>>):
         ImmutableMap<LocationID, ImmutableMap<LocationID, ImmutableSet<ProgramOperation>>> {
+        let map1: Map<LocationID, ImmutableMap<LocationID, ImmutableSet<ProgramOperation>>>;
+        map1 = new Map();
+        for (let [key1, value1] of input.entries()) {
+            for (let [key2, value2] of value1.entries()) {
+
+            }
+        }
         throw new ImplementMeException();
     }
 
@@ -91,7 +98,8 @@ export class TransitionRelations {
     }
 
     static epsilon(): TransitionRelation {
-        throw new ImplementMeException();
+        const f = ControlLocation.fresh();
+        return this.singleton(f);
     }
 
     static forOpSeq(op: ProgramOperation): TransitionRelation {
@@ -106,8 +114,14 @@ export class TransitionRelations {
         throw new ImplementMeException();
     }
 
-    static singleton(loopHead: ControlLocation): TransitionRelation {
-        throw new ImplementMeException();
+    static singleton(controlLocation: ControlLocation): TransitionRelation {
+        const loc: LocationID = controlLocation.ident;
+        const e = ProgramOperations.epsilon();
+        const trans: Map<LocationID, Map<LocationID, Set<ProgramOperation>>> = new Map([[loc, new Map([[loc, new Set([e])]])]]);
+        const locs: Map<LocationID, ControlLocation> = new Map([[loc, controlLocation]]);
+        const entry: Set<LocationID> = new Set([loc]);
+        const exit: Set<LocationID> = new Set([loc]);
+        return new TransitionRelation(trans, locs, entry, exit);
     }
 
     static continueFrom(loopHead: ControlLocation, transitionRelation: TransitionRelation) {
