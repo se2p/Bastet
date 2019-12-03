@@ -55,4 +55,8 @@ export class ControlLocation implements WithIdent {
         return result;
     }
 
+    public static fresh(): ControlLocation {
+        return this.for(this.newLocationID());
+    }
+
 }
