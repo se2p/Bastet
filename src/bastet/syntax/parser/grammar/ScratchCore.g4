@@ -93,7 +93,8 @@ coreEvent :
 // reusable code blocks (also known as 'custom blocks').
 // A procedure is identified by a name and is parameterized
 // to take a number of arguments.
-methodDefinition : 'define' Ident parameterList stmtList ('returns' Ident ':' type)? ;
+methodDefinition : 'define' Ident parameterList stmtList methodResultDeclaration ;
+methodResultDeclaration : 'returns' Ident ':' type | ;
 
 // A list of procedure definitions.
 methodDefinitionList : methodDefinition* ;

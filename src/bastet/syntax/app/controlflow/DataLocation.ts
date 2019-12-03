@@ -1,6 +1,8 @@
 import {ScratchType} from "../../ast/ScratchType";
 import {DeclarationStmtContext} from "../../parser/grammar/ScratchParser";
 
+export type DataLocationID = string;
+
 export type DataLocationMap = { [id:string]: DataLocation } ;
 
 export default class DataLocation {

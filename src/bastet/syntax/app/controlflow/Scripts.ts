@@ -1,5 +1,6 @@
 import {Script} from "./Script";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {TransitionRelation} from "./TransitionRelation";
+import {Preconditions} from "../../../utils/Preconditions";
 
 export class Scripts {
 
@@ -11,7 +12,10 @@ export class Scripts {
      * @param script2
      */
     public static concat(script1: Script, script2: Script) : Script {
-        throw new ImplementMeException();
+        Preconditions.checkArgument(script1.event === script2.event);
+
+        const newTR = TransitionRelation.concat(script1.transitions, script2.transitions);
+        return new Script(script1.event, newTR);
     }
 
 }

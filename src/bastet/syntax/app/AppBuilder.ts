@@ -1,11 +1,10 @@
 import {
     ActorDefinitionContext,
     BooleanTypeContext,
-    DeclarationStmtListContext, DeclareVariableContext, EnumTypeContext, ListTypeContext, MapTypeContext,
-    MethodDefinitionListContext,
-    NumerTypeContext,
+    DeclarationStmtListContext, DeclareVariableContext, EnumTypeContext, EventContext, ListTypeContext, MapTypeContext,
+    MethodDefinitionListContext, MethodResultDeclarationContext,
+    NumerTypeContext, ParameterListContext,
     ProgramContext,
-    ResourceContext,
     ResourceListContext,
     ScriptListContext,
     SetStmtListContext,
@@ -14,12 +13,15 @@ import {
 import {Actor, ActorMap} from "./Actor";
 import {App} from "./App";
 import {AppResource, AppResourceMap, AppResourceType} from "./AppResource";
-import {MethodDefinitionMap} from "./MethodDefinition";
+import {MethodDefinition, MethodDefinitionMap} from "./MethodDefinition";
 import {Script} from "./controlflow/Script";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
+import DataLocation, {DataLocationID, DataLocationMap} from "./controlflow/DataLocation";
 import {BooleanType, ListType, MapType, NumberType, ScratchType, StringEnumType} from "../ast/ScratchType";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
+import AppEvent from "./AppEvent";
+import {DataLocationDeclaration} from "./controlflow/DataLocationDeclaration";
 
 export class AppBuilder {
 
@@ -63,11 +65,37 @@ export class AppBuilder {
     }
 
     private static buildScripts(scriptListContext: ScriptListContext): Script[] {
+        let result: Script[] = [];
+        for (let scriptContext of scriptListContext.script()) {
+            const event = AppBuilder.buildEvent(scriptContext.event());
+            const visitor = new RelationBuildingVisitor();
+            const transRelation = scriptContext.stmtList().accept(visitor);
+            result.push(new Script(event, transRelation));
+        }
+        return result;
+    }
+
+    private static buildEvent(eventContext: EventContext): AppEvent {
         throw new ImplementMeException();
     }
 
     private static buildMethodDefs(methodDefinitionListContext: MethodDefinitionListContext): MethodDefinitionMap {
+        let result: MethodDefinitionMap = {};
+        for (let methodDef of methodDefinitionListContext.methodDefinition()) {
+            let methodName = methodDef.Ident().toString();
+            let paramDecls = AppBuilder.buildParameterDeclarations(methodDef.parameterList());
+            let resultDecl = AppBuilder.buildMethodResultDef(methodDef.methodResultDeclaration());
+            result[methodName] = new MethodDefinition(methodDef, methodName, paramDecls, resultDecl);
+        }
+        return result;
+    }
+
+    private static buildMethodResultDef(methodResultDeclarationContext: MethodResultDeclarationContext): DataLocationDeclaration {
         throw new ImplementMeException();
+    }
+
+    private static buildParameterDeclarations(parameterListContext: ParameterListContext): Map<DataLocationID, DataLocationDeclaration> {
+        return undefined;
     }
 
     private static buildInitScript(resourceListContext: ResourceListContext, declarationStmtListContext: DeclarationStmtListContext, stmtList: SetStmtListContext): Script {
@@ -120,4 +148,5 @@ export class AppBuilder {
             throw new IllegalArgumentException("Type not supported");
         }
     }
+
 }

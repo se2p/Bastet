@@ -6,17 +6,21 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {ProgramOperationFactory} from "./ops/ProgramOperationFactory";
 import {ProgramOperation} from "./ops/ProgramOperation";
 import {ControlLocation} from "./ControlLocation";
-import {
-    CallStmtContext,
-    IfStmtContext, NonCtrlStmtContext, RepeatForeverStmtContext, RepeatTimesStmtContext,
-    ScriptContext, StmtListContext, TerminationStmtContext, UntilStmtContext
-} from "../../parser/grammar/ScratchParser";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+import {
+    CallStmtContext, IfStmtContext, NonCtrlStmtContext, RepeatForeverStmtContext,
+    RepeatTimesStmtContext, ScriptContext, StmtListContext,
+    TerminationStmtContext, UntilStmtContext
+} from "../../parser/grammar/ScratchParser";
 
-class RelationBuildingVisitor implements ScratchVisitor<TransitionRelation> {
+
+export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelation> {
 
     visitCallStmt (ctx: CallStmtContext): TransitionRelation {
-        throw new ImplementMeException();
+        // ATTENTION: The inter-procedural transition relation
+        // is built in a different step.
+        const op: ProgramOperation = ProgramOperationFactory.createFor(ctx);
+        return TransitionRelation.forOpSeq(op);
     }
 
     visitIfStmt (ctx: IfStmtContext): TransitionRelation {
@@ -81,7 +85,7 @@ class RelationBuildingVisitor implements ScratchVisitor<TransitionRelation> {
         return result;
     }
 
-    visitTerminationStmt (ctx: TerminationStmtContext) :  TransitionRelation {
+    visitTerminationStmt (ctx: TerminationStmtContext) : TransitionRelation {
         const op: ProgramOperation = ProgramOperationFactory.createFor(ctx);
         return TransitionRelation.forOpSeq(op);
     }
@@ -102,11 +106,6 @@ class RelationBuildingVisitor implements ScratchVisitor<TransitionRelation> {
         throw new ImplementMeException();
     }
 
-}
-
-
-export class VisitingScriptBuilder {
-
     public static buildFromTree(tree: ScriptContext): Script {
         throw new ImplementMeException();
     }
@@ -116,3 +115,4 @@ export class VisitingScriptBuilder {
     }
 
 }
+
