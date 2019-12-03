@@ -1,4 +1,4 @@
-import ProgramOperation from "./ProgramOperation";
+import {ProgramOperation} from "./ProgramOperation";
 
 export class DeclarationOperation extends ProgramOperation {
 

@@ -1,4 +1,4 @@
-import ControlLocation from './ControlLocation'
+import {ControlLocation} from './ControlLocation'
 import ControlTransition from './ControlTransition'
 import AppEvent from '../AppEvent'
 

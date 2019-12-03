@@ -1,6 +1,8 @@
 import {RuleNode} from "antlr4ts/tree";
 
-export default abstract class ProgramOperation {
+export type OperationID = number;
+
+export abstract class ProgramOperation {
 
     private readonly _ast: RuleNode;
 
@@ -10,6 +12,10 @@ export default abstract class ProgramOperation {
 
     get ast() {
         return this._ast;
+    }
+
+    public static withID(id: OperationID): ProgramOperation {
+
     }
 
 }

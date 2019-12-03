@@ -1,4 +1,4 @@
-import ProgramOperation from "./ProgramOperation";
+import {ProgramOperation} from "./ProgramOperation";
 import {NumberExpression} from "../expressions/NumberExpression";
 import {BooleanExpression} from "../expressions/BooleanExpression";
 import {StringExpression} from "../expressions/StringExpression";

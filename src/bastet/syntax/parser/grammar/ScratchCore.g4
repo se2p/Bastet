@@ -112,9 +112,7 @@ parameterListPlain : parameter (',' parameter)* | ;
 // Some statements that terminate the control flow
 // are only allowed at the end of the list to
 // make their semantics clearer for the programmer.
-stmtList :
-     'begin' stmtListPlain 'end'
-   | 'begin' stmtListPlain terminationStmt 'end' ;
+stmtList : 'begin' stmtListPlain (terminationStmt)? 'end';
 
 // A plain list of program statements.
 // Statements are separated by whitespace.
@@ -122,17 +120,18 @@ stmtListPlain : stmt* ;
 
 // The control flow of Scratch program is controlled by
 // designated control-flow statements.
-controlStmt :
+controlStmt : coreControlStmt ;
+
+coreControlStmt :
     ifStmt
  |  untilStmt
  |  repeatTimesStmt
- |  repeatForeverStmt ;
+ |  repeatForeverStmt
+ |  callStmt ;
 
 // A conditional statement. Either in the form of an 'if ... then ...'
 // or an 'if ... then ... else ...'.
-ifStmt :
-     'if' boolExpr 'then' stmtList
-   | 'if' boolExpr 'then' stmtList 'else' stmtList  ;
+ifStmt : 'if' boolExpr 'then' stmtList ('else' stmtList)?  ;
 
 // Scratch uses `until` instead of `while` which is in
 // favour of the game-like nature of most programs written in it.
@@ -165,12 +164,14 @@ expressionListPlain : expression (',' expression) | ;
 expressionStmt : 'evaluate' expression ;
 
 // The list of statements that are available in Scratch.
-stmt : coreStmt ;
+stmt :
+    controlStmt # ControlStatement
+    | nonCtrlStmt # NonControlStatement ;
 
-coreStmt :
-    controlStmt
- |  expressionStmt
- |  callStmt
+nonCtrlStmt : coreNonCtrlStmt ;
+
+coreNonCtrlStmt :
+ expressionStmt
  |  commonStmt
  |  listStmt
  |  declarationStmt  ;
@@ -324,13 +325,16 @@ coreExpression :
 unspecifiedExpr : '?expr' ;
 
 variable :
- Ident | Ident '.' Ident ;
+      Ident # FlatVariable
+    | Ident '.' Ident # QualifiedVariable;
 
 color :
  'rgba' numExpr numExpr numExpr numExpr
  |  'from' 'number' numExpr ;
 
-Ident : Identifier | 'strid' String ;
+Ident :
+    Identifier
+    | 'strid' String ;
 
 number : DecimalLiteral ;
 

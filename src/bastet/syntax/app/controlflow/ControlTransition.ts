@@ -1,4 +1,4 @@
-import ControlLocation from './ControlLocation'
+import {ControlLocation} from './ControlLocation'
 import ProgramOperation from './ops/ProgramOperation'
 
 export default class ControlTransition {

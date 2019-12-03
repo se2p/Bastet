@@ -1,5 +1,7 @@
+export type IdentType = number | string ;
+
 export interface WithIdent {
 
-    ident: string;
+    ident: IdentType;
 
 }

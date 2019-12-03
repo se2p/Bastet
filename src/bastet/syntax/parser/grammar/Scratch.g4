@@ -10,8 +10,8 @@ event :
  |  'clicked' # ClickEvent
  ;
 
-stmt :
-  coreStmt
+nonCtrlStmt :
+  coreNonCtrlStmt
  |  spriteMotionStmt
  |  actorLookStmt
  |  spriteLookStmt
