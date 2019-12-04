@@ -3,7 +3,6 @@ import {NumberExpression} from "../expressions/NumberExpression";
 import {BooleanExpression} from "../expressions/BooleanExpression";
 import {StringExpression} from "../expressions/StringExpression";
 import {IdentExpression} from "../expressions/IdentExpression";
-import {ExpressionContext} from "../../../parser/grammar/ScratchParser";
 import {Expression} from "../expressions/Expression";
 
 export class WaitForTimeOp extends ProgramOperation {

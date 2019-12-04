@@ -1,5 +1,5 @@
-import { AbstractElement } from './AbstractElement'
-import { Record } from 'immutable'
+import {AbstractElement} from './AbstractElement'
+import {Record} from 'immutable'
 
 export interface ProductElementAttributes {
     readonly elements: AbstractElement[]

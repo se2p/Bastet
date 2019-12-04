@@ -1,5 +1,5 @@
-import { AbstractElement } from './AbstractElement'
-import { Set, Record } from 'immutable'
+import {AbstractElement} from './AbstractElement'
+import {Record, Set} from 'immutable'
 
 export interface FlatElementAttributes {
     readonly value: any

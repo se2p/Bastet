@@ -1,7 +1,6 @@
 import {FromParseTree} from "../FromParseTree";
 import {RuleNode} from "antlr4ts/tree";
 import {WithIdent} from "../../utils/WithIdent";
-import {Actor} from "./Actor";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 export type AppResourceMap = { [id:string]: AppResource } ;

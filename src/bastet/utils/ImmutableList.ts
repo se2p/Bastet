@@ -1,5 +1,3 @@
-import {ImplementMeException} from "../core/exceptions/ImplementMeException";
-
 export class ImmutableList<E> implements Iterable<E> {
 
     private readonly _list: Array<E>;

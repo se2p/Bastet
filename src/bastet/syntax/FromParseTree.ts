@@ -1,4 +1,4 @@
-import { RuleNode } from "antlr4ts/tree/RuleNode"
+import {RuleNode} from "antlr4ts/tree/RuleNode"
 
 export abstract class FromParseTree {
 

@@ -1,6 +1,5 @@
 import {IllegalArgumentException} from "../core/exceptions/IllegalArgumentException";
 import {IllegalStateException} from "../core/exceptions/IllegalStateException";
-import {type} from "os";
 
 export class Preconditions {
 

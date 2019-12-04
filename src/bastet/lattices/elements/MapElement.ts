@@ -1,5 +1,5 @@
-import { AbstractElement } from './AbstractElement'
-import { Map, Record } from 'immutable'
+import {AbstractElement} from './AbstractElement'
+import {Map, Record} from 'immutable'
 
 export interface MapElementAttributes {
     readonly elements: Map<string, AbstractElement>

@@ -9,14 +9,16 @@ import {
     ListTypeContext,
     MapTypeContext,
     MethodDefinitionListContext,
-    MethodResultDeclarationContext, NeverEventContext,
+    MethodResultDeclarationContext,
+    NeverEventContext,
     NumerTypeContext,
     ParameterContext,
     ParameterListContext,
     ProgramContext,
     ResourceListContext,
     ScriptListContext,
-    SetStmtListContext, StartupEventContext,
+    SetStmtListContext,
+    StartupEventContext,
     StringTypeContext,
     TypeContext
 } from "../parser/grammar/ScratchParser";
@@ -26,14 +28,13 @@ import {AppResource, AppResourceMap, AppResourceType} from "./AppResource";
 import {MethodDefinition, MethodDefinitionMap} from "./MethodDefinition";
 import {Script} from "./controlflow/Script";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import DataLocation, {DataLocationID, DataLocationMap} from "./controlflow/DataLocation";
+import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
 import {BooleanType, ListType, MapType, NumberType, ScratchType, StringEnumType, StringType} from "../ast/ScratchType";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {AppEvent, AppEvents, NeverEvent, StartupEvent} from "./AppEvent";
-import {TransitionRelation, TransitionRelationBuilder, TransitionRelations} from "./controlflow/TransitionRelation";
+import {TransitionRelations} from "./controlflow/TransitionRelation";
 import {TransitionRelationToDot} from "./controlflow/TransitionRelationToDot";
-import {type} from "os";
 
 export class AppBuilder {
 

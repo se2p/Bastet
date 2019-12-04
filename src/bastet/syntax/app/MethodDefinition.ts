@@ -1,8 +1,7 @@
 import {FromParseTree} from "../FromParseTree";
 import {RuleNode} from "antlr4ts/tree";
 import {WithIdent} from "../../utils/WithIdent";
-import {AppResource} from "./AppResource";
-import DataLocation, {DataLocationID, DataLocationMap} from "./controlflow/DataLocation";
+import DataLocation from "./controlflow/DataLocation";
 import {DataLocationDeclaration} from "./controlflow/DataLocationDeclaration";
 
 export type MethodDefinitionMap = { [id:string]: MethodDefinition } ;

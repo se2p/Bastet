@@ -1,4 +1,4 @@
-import {Actor, ActorMap} from './Actor'
+import {ActorMap} from './Actor'
 import {Maps} from "../../utils/Maps";
 
 export class App {

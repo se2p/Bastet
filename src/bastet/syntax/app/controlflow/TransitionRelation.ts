@@ -1,7 +1,7 @@
 import {OperationID, ProgramOperation, ProgramOperations} from "./ops/ProgramOperation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ControlLocation, LocationID} from "./ControlLocation";
-import { Map as ImmMap, Set as ImmSet } from "immutable"
+import {Map as ImmMap, Set as ImmSet} from "immutable"
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 
 export class TransitionRelationBuilder {

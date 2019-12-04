@@ -1,6 +1,5 @@
 import {RuleNode} from "antlr4ts/tree";
 import {WithIdent} from "../../../../utils/WithIdent";
-import {IllegalStateException} from "../../../../core/exceptions/IllegalStateException";
 
 export type OperationID = number;
 

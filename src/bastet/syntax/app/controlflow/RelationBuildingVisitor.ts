@@ -17,7 +17,9 @@ import {
     RepeatTimesStmtContext,
     ResourceContext,
     ResourceListContext,
-    ScriptContext, SetStmtContext, SetStmtListContext,
+    ScriptContext,
+    SetStmtContext,
+    SetStmtListContext,
     StmtListContext,
     TerminationStmtContext,
     UntilStmtContext
@@ -81,7 +83,7 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
         return TransitionRelations.forOpSeq(op);
     }
 
-    visitStmtList (ctx: StmtListContext) :  TransitionRelation {
+    visitStmtList (ctx: StmtListContext) : TransitionRelation {
         let result: TransitionRelation = TransitionRelations.epsilon();
 
         for (let stmt of ctx.stmtListPlain().stmt()) {

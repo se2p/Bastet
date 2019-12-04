@@ -4,7 +4,6 @@ import {ProgramContext, ScratchParser} from "./grammar/ScratchParser";
 import fs from "fs";
 import path from "path";
 import {ProgramParser} from "./ProgramParser";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {Preconditions} from "../../utils/Preconditions";
 
 export class TextualProgramParser implements ProgramParser {

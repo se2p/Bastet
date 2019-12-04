@@ -1,5 +1,5 @@
-import { AbstractElement } from './AbstractElement'
-import { Record } from 'immutable'
+import {AbstractElement} from './AbstractElement'
+import {Record} from 'immutable'
 
 export interface IntervalAttributes {
     readonly fromIncluse: any
