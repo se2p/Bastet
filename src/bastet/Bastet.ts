@@ -40,8 +40,8 @@ export class Bastet {
         let intermediateSpecAST = this.parseIntoIntermediateAST(specFilepath);
 
         // Create the control-flow structure of the verification task
+        let programControlFlow = this.createControlFlowFrom(programFilepath, intermediateProgramAST, "");
         let specControlFlow = this.createControlFlowFrom(specFilepath, intermediateSpecAST, "__spec");
-        let programControlFlow = this.createControlFlowFrom(programFilepath, intermediateProgramAST);
         let taskControlFlow = ControlFlows.unionOf(programControlFlow, specControlFlow);
 
         // TODO: Allow for sequences of analysis procedures that can built on the respective previous results.

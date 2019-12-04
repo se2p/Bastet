@@ -107,8 +107,19 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
     }
 
     visitChildren(node: RuleNode): TransitionRelation {
-        const op: ProgramOperation = ProgramOperationFactory.createFor(node);
-        return TransitionRelations.forOpSeq(op);
+        if (node.childCount == 1) {
+            return node.getChild(0).accept(this);
+        } else if (node.childCount > 1) {
+            let result: TransitionRelation = TransitionRelations.epsilon();
+            let i = 0;
+            for (let i = 0; i<node.childCount; i++) {
+                let child = node.getChild(i);
+                result = TransitionRelations.concat(result, child.accept(this));
+            }
+            return result;
+        } else {
+            throw new ImplementMeException();
+        }
     }
 
     visitErrorNode(node: ErrorNode): TransitionRelation {
@@ -125,7 +136,9 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
         let result: TransitionRelation = TransitionRelations.epsilon();
 
         for (let decl of node.declarationStmt()) {
-            let declTR: TransitionRelation = decl.accept(this);
+            const op: ProgramOperation = ProgramOperationFactory.createFor(node);
+            const declTR = TransitionRelations.forOpSeq(op);
+
             result = TransitionRelations.concat(result, declTR);
         }
 
