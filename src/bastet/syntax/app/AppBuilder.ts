@@ -59,17 +59,20 @@ export class AppBuilder {
             const actor: Actor = AppBuilder.buildActorFlat(actorDefinition, actorNamePrefix);
             result[actor.ident] = actor;
 
-            let toDotWriter = new TransitionRelationToDot();
-            let i: number = 1;
-            for (let s of actor.scripts) {
-                let target: string = `output/actor_${actor.ident}_script_${i}.dot`;
-                console.log(target);
-                toDotWriter.export(s.transitions, target);
-                i++;
-            }
+            this.exportScriptsToDoT(actor);
         }
 
         return result;
+    }
+
+    private static exportScriptsToDoT(actor: Actor): void {
+        let toDotWriter = new TransitionRelationToDot();
+        let i: number = 1;
+        for (let s of actor.scripts) {
+            let target: string = `output/actor_${actor.ident}_script_${i}.dot`;
+            toDotWriter.export(s.transitions, target);
+            i++;
+        }
     }
 
     private static buildActorFlat(actorDefinition: ActorDefinitionContext, actorNamePrefix: string) {
