@@ -1,7 +1,8 @@
 import {OperationID, ProgramOperation, ProgramOperations} from "./ops/ProgramOperation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ControlLocation, LocationID} from "./ControlLocation";
-import { Record as ImmRecord, Map as ImmMap, Set as ImmSet } from "immutable"
+import { Map as ImmMap, Set as ImmSet } from "immutable"
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 
 export class TransitionRelationBuilder {
 
@@ -86,6 +87,10 @@ export class TransitionRelation {
         this._exitLocations = exitLocs;
     }
 
+    get transitionTable(): TransitionTable {
+        return this._transitions;
+    }
+
     get locations(): IterableIterator<ControlLocation> {
         throw new ImplementMeException();
     }
@@ -114,7 +119,44 @@ export class TransitionRelation {
 
 export class TransitionRelations {
 
+    /**
+     * ATTENTION: The transition relation `tr2` is not re-labeled by this method.
+     *
+     * @param tr1
+     * @param tr2
+     */
     static concat(tr1: TransitionRelation, tr2: TransitionRelation): TransitionRelation {
+        // Exit locations of TR1 with the entry locations of TR2
+
+        let locs: ImmSet<LocationID> = tr1.locationSet.merge(tr2.locationSet);
+        let entryLocs: ImmSet<LocationID> = tr1.entryLocationSet;
+        let exitLocs: ImmSet<LocationID> = tr2.exitLocationSet;
+        let tx: TransitionTable = tr1.transitionTable.merge(tr2.transitionTable);
+
+        for (let exloc of tr1.exitLocationSet) {
+            for (let entloc of tr2.entryLocationSet) {
+                this.addTransition(tx, exloc, entloc, ProgramOperations.epsilon());
+            }
+        }
+
+        return new TransitionRelation(tx, locs, entryLocs, exitLocs);
+    }
+
+    private static addTransition(tx: TransitionTable, from: LocationID, to: LocationID, op: ProgramOperation): TransitionTable {
+        const oldTargets: ImmMap<LocationID, ImmSet<OperationID>> = tx.get(from) || ImmMap();
+        const oldReachingOps: ImmSet<OperationID> = oldTargets.get(to) || ImmSet();
+        const newReachingOps: ImmSet<OperationID> = oldReachingOps.add(ProgramOperations.epsilon().ident);
+        const newTargets: ImmMap<LocationID, ImmSet<OperationID>> = oldTargets.set(to, newReachingOps);
+        return tx.set(from, newTargets);
+    }
+
+    /**
+     * Re-label the transition relation with fresh control locations.
+     *
+     * @param The transition relation to relabel.
+     * @returns the relabeled transition relation.
+     */
+    static relabel(tr: TransitionRelation): TransitionRelation {
         throw new ImplementMeException();
     }
 
@@ -123,16 +165,75 @@ export class TransitionRelations {
         return this.singleton(f);
     }
 
-    static forOpSeq(op: ProgramOperation): TransitionRelation {
-        throw new ImplementMeException();
+    static forOpSeq(...ops: ProgramOperation[]): TransitionRelation {
+        let result: TransitionRelation = this.epsilon();
+        for (let op of ops) {
+            let succLoc: ControlLocation = ControlLocation.fresh();
+            result = this.concatTrOpGoto(result, op, succLoc);
+        }
+        return result;
     }
 
     static branching(thenCaseGuarded: TransitionRelation, elseCaseGuarded: TransitionRelation, exitLocation: ControlLocation): TransitionRelation {
         throw new ImplementMeException();
     }
 
-    static concatAndGoto(headRelation: any, loopBody: TransitionRelation, loopHead: ControlLocation): TransitionRelation {
+    static concatTrOpGoto(tr: TransitionRelation, op: ProgramOperation, goto: ControlLocation): TransitionRelation {
+        if (tr.locationSet.has(goto.ident)) {
+            throw new IllegalArgumentException("Circular references not yet supported! Implement me");
+        }
+        if (tr.entryLocationSet.has(goto.ident)) {
+            throw new IllegalArgumentException("Circular references not yet supported! Implement me");
+        }
+
+        let locs = tr.locationSet.add(goto.ident);
+
+        let tx: TransitionTable = tr.transitionTable;
+        let entryLocs: ImmSet<LocationID> = tr.entryLocationSet;
+        let exitLocs: ImmSet<LocationID> = tr.exitLocationSet;
+
+        let fromLocs: ImmSet<LocationID> = tr.exitLocationSet;
+        for (let from of fromLocs) {
+            tx = this.addTransition(tr.transitionTable, from, goto.ident, op);
+            exitLocs = exitLocs.remove(from);
+        }
+
+        return new TransitionRelation(tx, locs, entryLocs, exitLocs);
+    }
+
+    static concatOpTr(loc: ControlLocation, op: ProgramOperation, tr: TransitionRelation): TransitionRelation {
+        if (tr.locationSet.has(loc.ident)) {
+            throw new IllegalArgumentException("Circular references not yet supported! Implement me");
+        }
+        if (tr.entryLocationSet.has(loc.ident)) {
+            throw new IllegalArgumentException("Circular references not yet supported! Implement me");
+        }
+
+        let locs = tr.locationSet.add(loc.ident);
+
+        let tx: TransitionTable = tr.transitionTable;
+        let entryLocs: ImmSet<LocationID> = tr.entryLocationSet;
+        let exitLocs: ImmSet<LocationID> = tr.exitLocationSet;
+
+        let toLocs: ImmSet<LocationID> = tr.entryLocationSet;
+        for (let to of toLocs) {
+            tx = this.addTransition(tr.transitionTable, loc.ident, to, op);
+            entryLocs = entryLocs.remove(to);
+        }
+
+        return new TransitionRelation(tx, locs, entryLocs, exitLocs);
+    }
+
+    static concatAndGoto(headRelation: TransitionRelation, loopBody: TransitionRelation, loopHead: ControlLocation): TransitionRelation {
         throw new ImplementMeException();
+    }
+
+    static singleTransition(from: ControlLocation, to: ControlLocation, op: ProgramOperation): TransitionRelation {
+        const trans: TransitionTable = ImmMap([[from.ident, ImmMap([[to.ident, ImmSet([op.ident])]])]]);
+        const locs: ImmSet<LocationID> = ImmSet([from.ident, to.ident]);
+        const entry: ImmSet<LocationID> = ImmSet([from.ident]);
+        const exit: ImmSet<LocationID> = ImmSet([to.ident]);
+        return new TransitionRelation(trans, locs, entry, exit);
     }
 
     static singleton(controlLocation: ControlLocation): TransitionRelation {
@@ -148,5 +249,6 @@ export class TransitionRelations {
     static continueFrom(loopHead: ControlLocation, transitionRelation: TransitionRelation) {
         throw new ImplementMeException();
     }
+
 
 }

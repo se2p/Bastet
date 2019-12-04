@@ -8,9 +8,19 @@ import {ProgramOperation} from "./ops/ProgramOperation";
 import {ControlLocation} from "./ControlLocation";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {
-    CallStmtContext, IfStmtContext, NonCtrlStmtContext, RepeatForeverStmtContext,
-    RepeatTimesStmtContext, ResourceContext, ResourceListContext, ScriptContext, StmtListContext,
-    TerminationStmtContext, UntilStmtContext
+    CallStmtContext,
+    DeclarationStmtContext,
+    DeclarationStmtListContext,
+    IfStmtContext,
+    NonCtrlStmtContext,
+    RepeatForeverStmtContext,
+    RepeatTimesStmtContext,
+    ResourceContext,
+    ResourceListContext,
+    ScriptContext, SetStmtContext, SetStmtListContext,
+    StmtListContext,
+    TerminationStmtContext,
+    UntilStmtContext
 } from "../../parser/grammar/ScratchParser";
 
 
@@ -111,6 +121,22 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
         throw new ImplementMeException();
     }
 
+    visitDeclarationStmtList(node: DeclarationStmtListContext): TransitionRelation {
+        let result: TransitionRelation = TransitionRelations.epsilon();
+
+        for (let decl of node.declarationStmt()) {
+            let declTR: TransitionRelation = decl.accept(this);
+            result = TransitionRelations.concat(result, declTR);
+        }
+
+        return result;
+    }
+
+    visitDeclarationStmt(node: DeclarationStmtContext): TransitionRelation {
+        const op: ProgramOperation = ProgramOperationFactory.createFor(node);
+        return TransitionRelations.forOpSeq(op);
+    }
+
     visitResourceList(node: ResourceListContext): TransitionRelation {
         let result: TransitionRelation = TransitionRelations.epsilon();
 
@@ -125,6 +151,22 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
     visitResource(node: ResourceContext): TransitionRelation {
         // FIXME: Load the resources. Add operations
         // that set, for example, attribute variables.
+        const op: ProgramOperation = ProgramOperationFactory.createFor(node);
+        return TransitionRelations.forOpSeq(op);
+    }
+
+    visitSetStmtList(node: SetStmtListContext): TransitionRelation {
+        let result: TransitionRelation = TransitionRelations.epsilon();
+
+        for (let setStmt of node.setStmt()) {
+            let stmtTR: TransitionRelation = setStmt.accept(this);
+            result = TransitionRelations.concat(result, stmtTR);
+        }
+
+        return result;
+    }
+
+    visitSetStmt(node: SetStmtContext): TransitionRelation {
         const op: ProgramOperation = ProgramOperationFactory.createFor(node);
         return TransitionRelations.forOpSeq(op);
     }
