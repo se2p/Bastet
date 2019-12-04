@@ -40,11 +40,8 @@ export class NoopProgramOperation extends ProgramOperation {
 export class ProgramOperations {
 
     private static opCodeToIdMap: Map<string, OperationID> = new Map();
-
     private static opMap: Map<OperationID, ProgramOperation> = new Map();
-
     private static readonly EPSILON_OP = new NoopProgramOperation(null);
-
     private static idSequencePos: OperationID = 0;
 
     public static fresh(): OperationID {
@@ -71,7 +68,8 @@ export class ProgramOperations {
 
     public static register(op: ProgramOperation): void {
         if (this.opMap.has(op.ident)) {
-            throw new IllegalStateException(`Operation with ID ${op.ident} already registered!`);
+            return;
+            // throw new IllegalStateException(`Operation with ID ${op.ident} already registered!`);
         }
         this.opMap.set(op.ident, op);
     }

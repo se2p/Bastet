@@ -22,7 +22,8 @@ actorDefinitionList : actorDefinition* ;
 // and definitions, and a list of scripts.
 // Along to the (user defined) set of variables, an actor has
 // *attributes* that influence its representation and behavior.
-actorDefinition : 'actor' Ident ('is' Ident)? 'begin' actorComponentsDefinition 'end' ;
+actorDefinition : 'actor' Ident inheritsFrom 'begin' actorComponentsDefinition 'end' ;
+inheritsFrom : 'is' Ident | ;
 
 // Whe distinguish between three types of actors:
 // A generic actor type ('actor'), the stage, and a type for sprites.
@@ -155,7 +156,7 @@ expressionList : '(' expressionListPlain ')' ;
 
 // The expression list without brackets.
 // Expressions are separated by comma.
-expressionListPlain : expression (',' expression) | ;
+expressionListPlain : expression (',' expression)* | ;
 
 // An expression statement.
 // The main aim of having such a statement is to not

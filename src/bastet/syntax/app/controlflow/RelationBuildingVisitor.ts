@@ -107,8 +107,8 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
     }
 
     visitChildren(node: RuleNode): TransitionRelation {
-        console.log(node);
-        throw new ImplementMeException();
+        const op: ProgramOperation = ProgramOperationFactory.createFor(node);
+        return TransitionRelations.forOpSeq(op);
     }
 
     visitErrorNode(node: ErrorNode): TransitionRelation {

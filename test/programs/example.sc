@@ -45,11 +45,11 @@ actor Sprite1 is ScratchSprite begin
 end
 
 actor Sprite2 is ScratchSprite begin
-    procedure foo (n: number, m: number) begin
+    define foo (n: number, m: number) begin
         say as string (n + m)
     end
 
-    script on green flag do begin
+    script on startup do begin
         say "Hello again!"
         foo(1, 41)
     end

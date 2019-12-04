@@ -115,6 +115,19 @@ export class TransitionRelation {
         return this._exitLocations;
     }
 
+    public transitionsFrom(from: LocationID): [OperationID, LocationID][] {
+        let transitionsTo: ImmMap<LocationID, ImmSet<OperationID>> = this.transitionTable.get(from) || ImmMap();
+
+        let result: [OperationID, LocationID][] = [];
+        for (let [to, ops] of transitionsTo.entries()) {
+            for (let o of ops) {
+                result.push([o, to]);
+            }
+        }
+
+        return result;
+    }
+
 }
 
 export class TransitionRelations {

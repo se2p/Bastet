@@ -1,13 +1,23 @@
 import {
     ActorDefinitionContext,
     BooleanTypeContext,
-    DeclarationStmtListContext, DeclareVariableContext, EnumTypeContext, EventContext, ListTypeContext, MapTypeContext,
-    MethodDefinitionListContext, MethodResultDeclarationContext,
-    NumerTypeContext, ParameterContext, ParameterListContext,
+    DeclarationStmtListContext,
+    DeclareVariableContext,
+    EnumTypeContext,
+    EventContext,
+    InCoreEventContext,
+    ListTypeContext,
+    MapTypeContext,
+    MethodDefinitionListContext,
+    MethodResultDeclarationContext, NeverEventContext,
+    NumerTypeContext,
+    ParameterContext,
+    ParameterListContext,
     ProgramContext,
     ResourceListContext,
     ScriptListContext,
-    SetStmtListContext,
+    SetStmtListContext, StartupEventContext,
+    StringTypeContext,
     TypeContext
 } from "../parser/grammar/ScratchParser";
 import {Actor, ActorMap} from "./Actor";
@@ -17,11 +27,13 @@ import {MethodDefinition, MethodDefinitionMap} from "./MethodDefinition";
 import {Script} from "./controlflow/Script";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import DataLocation, {DataLocationID, DataLocationMap} from "./controlflow/DataLocation";
-import {BooleanType, ListType, MapType, NumberType, ScratchType, StringEnumType} from "../ast/ScratchType";
+import {BooleanType, ListType, MapType, NumberType, ScratchType, StringEnumType, StringType} from "../ast/ScratchType";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {AppEvent, AppEvents, NeverEvent, StartupEvent} from "./AppEvent";
 import {TransitionRelation, TransitionRelationBuilder, TransitionRelations} from "./controlflow/TransitionRelation";
+import {TransitionRelationToDot} from "./controlflow/TransitionRelationToDot";
+import {type} from "os";
 
 export class AppBuilder {
 
@@ -46,6 +58,15 @@ export class AppBuilder {
         for (let actorDefinition of actorDefinitions) {
             const actor: Actor = AppBuilder.buildActorFlat(actorDefinition, actorNamePrefix);
             result[actor.ident] = actor;
+
+            let toDotWriter = new TransitionRelationToDot();
+            let i: number = 1;
+            for (let s of actor.scripts) {
+                let target: string = `output/actor_${actor.ident}_script_${i}.dot`;
+                console.log(target);
+                toDotWriter.export(s.transitions, target);
+                i++;
+            }
         }
 
         return result;
@@ -76,11 +97,16 @@ export class AppBuilder {
     }
 
     private static buildEvent(eventContext: EventContext): AppEvent {
-        if (eventContext instanceof NeverEvent) {
+        if (eventContext instanceof InCoreEventContext) {
+            eventContext = (eventContext as InCoreEventContext).coreEvent();
+        }
+
+        if (eventContext instanceof NeverEventContext) {
             return NeverEvent.instance();
-        } else if (eventContext instanceof StartupEvent) {
+        } else if (eventContext instanceof StartupEventContext) {
             return StartupEvent.instance();
         }
+
         throw new ImplementMeException();
     }
 
@@ -162,6 +188,8 @@ export class AppBuilder {
             return new BooleanType();
         } else if (typeContext instanceof NumerTypeContext) {
             return new NumberType();
+        } else if (typeContext instanceof StringTypeContext) {
+            return new StringType();
         } else if (typeContext instanceof ListTypeContext) {
             return new ListType();
         } else if (typeContext instanceof MapTypeContext) {
@@ -169,7 +197,7 @@ export class AppBuilder {
         } else if (typeContext instanceof EnumTypeContext) {
             return new StringEnumType();
         } else {
-            throw new IllegalArgumentException("Type not supported");
+            throw new IllegalArgumentException("Type not supported: " + typeContext.constructor.name);
         }
     }
 
