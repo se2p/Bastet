@@ -27,17 +27,22 @@ export class TransitionRelationToDot {
         let output: string[] = [];
         let fs = require('fs');
 
+        let visited: Set<LocationID> = new Set<LocationID>();
         let worklist: Array<LocationID> = new Array();
         tr.entryLocationSet.forEach((e) => worklist.push(e));
 
-        output.push(`graph relation {`);
+        output.push(`digraph relation {`);
 
         while (worklist.length > 0) {
             let fromlocid: LocationID = worklist.pop();
-            let fromWork: [OperationID, LocationID][] = tr.transitionsFrom(fromlocid);
-            for (let [opid, tolocid] of fromWork) {
-                let op = ProgramOperations.withID(opid);
-                output.push(`${fromlocid} -> ${tolocid} [label="${escape(op.toString())}"];`);
+            if (!visited.has(fromlocid)) {
+                visited.add(fromlocid);
+                let fromWork: [OperationID, LocationID][] = tr.transitionsFrom(fromlocid);
+                for (let [opid, tolocid] of fromWork) {
+                    let op = ProgramOperations.withID(opid);
+                    output.push(`    ${fromlocid} -> ${tolocid} [label="${escape(op.toString())}"];`);
+                    worklist.push(tolocid);
+                }
             }
         }
 

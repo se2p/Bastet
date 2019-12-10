@@ -124,6 +124,16 @@ export class TransitionRelation {
         this._exitLocations = exitLocs;
     }
 
+    public toString() {
+        let lines: string[] = [];
+        for (let fromId of this._locations) {
+            for (let [op, toId] of this.transitionsFrom(fromId)) {
+                lines.push(`${fromId} ${op} ${toId}`);
+            }
+        }
+        return lines.join("\n");
+    }
+
     private buildBackwardsTransitions(): void {
         if (this._backwards) {
             return;
@@ -229,7 +239,7 @@ export class TransitionRelations {
     private static addTransition(tx: TransitionTable, from: LocationID, to: LocationID, op: ProgramOperation): TransitionTable {
         const oldTargets: ImmMap<LocationID, ImmSet<OperationID>> = tx.get(from) || ImmMap();
         const oldReachingOps: ImmSet<OperationID> = oldTargets.get(to) || ImmSet();
-        const newReachingOps: ImmSet<OperationID> = oldReachingOps.add(ProgramOperations.epsilon().ident);
+        const newReachingOps: ImmSet<OperationID> = oldReachingOps.add(op.ident);
         const newTargets: ImmMap<LocationID, ImmSet<OperationID>> = oldTargets.set(to, newReachingOps);
         return tx.set(from, newTargets);
     }

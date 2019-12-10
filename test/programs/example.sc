@@ -41,6 +41,9 @@ end
 actor Sprite1 is ScratchSprite begin
     script on startup do begin
         say "Hello World"
+        if true then begin
+            say "Hello World again!"
+        end
     end
 end
 

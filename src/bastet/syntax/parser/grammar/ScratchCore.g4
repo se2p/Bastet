@@ -125,11 +125,12 @@ stmtListPlain : stmt* ;
 controlStmt : coreControlStmt ;
 
 coreControlStmt :
-    ifStmt
- |  untilStmt
- |  repeatTimesStmt
- |  repeatForeverStmt
- |  callStmt ;
+    ifStmt # IfStatement
+ |  untilStmt # UntilStatement
+ |  repeatTimesStmt # RepeatTimeStatement
+ |  repeatForeverStmt # RepeatForeverStatement
+ |  callStmt # CallStatement
+ ;
 
 // A conditional statement. Either in the form of an 'if ... then ...'
 // or an 'if ... then ... else ...'.

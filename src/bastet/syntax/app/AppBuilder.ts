@@ -93,6 +93,8 @@ export class AppBuilder {
             toDotWriter.export(s.transitions, target);
             i++;
         }
+        const target: string = `output/actor_${actor.ident}_script_init.dot`;
+        toDotWriter.export(actor.initScript.transitions, target);
     }
 
     private static buildActorFlat(actorDefinition: ActorDefinitionContext, actorNamePrefix: string) {
