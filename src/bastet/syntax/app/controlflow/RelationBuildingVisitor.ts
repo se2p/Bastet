@@ -134,7 +134,7 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
         if (node.constructor.name.startsWith("Core")) {
             return false;
         }
-        else if (node.constructor.name.endsWith("Statement")) {
+        else if (node.constructor.name.endsWith("StatementContext")) {
             return true;
         }
         return false;
@@ -147,7 +147,7 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
         } else if (node.childCount == 1) {
             return node.getChild(0).accept(this);
         } else {
-            throw new ImplementMeException();
+            throw new Error("Implement for " + node.constructor.name);
         }
     }
 

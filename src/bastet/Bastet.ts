@@ -29,6 +29,7 @@ import {ProgramParser} from "./syntax/parser/ProgramParser";
 import {Preconditions} from "./utils/Preconditions";
 import {AppBuilder} from "./syntax/app/AppBuilder";
 import {ProgramContext} from "./syntax/parser/grammar/ScratchParser";
+import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
 
 const commander = require('commander');
 
@@ -53,10 +54,10 @@ export class Bastet {
         let specFilepath: string = programArguments.specification;
 
         // Parse the program (a Scratch program) into an intermediate AST
-        let intermediateProgramAST = this.parseIntoIntermediateAST(programFilepath);
+        let intermediateProgramAST = this.parseIntoIntermediateAST("program", programFilepath);
 
         // Parse the specification (also a Scratch program) into an intermediate AST
-        let intermediateSpecAST = this.parseIntoIntermediateAST(specFilepath);
+        let intermediateSpecAST = this.parseIntoIntermediateAST("spec", specFilepath);
 
         // Create the control-flow structure of the verification task
         let programControlFlow = this.createControlFlowFrom(programFilepath, intermediateProgramAST, "");
@@ -91,21 +92,25 @@ export class Bastet {
      *
      * @param filepath
      */
-    private parseIntoIntermediateAST(filepath: string): ProgramContext {
+    private parseIntoIntermediateAST(ident: string, filepath: string): ProgramContext {
         Preconditions.checkNotEmpty(filepath);
 
         // Create the parser for the file format
-        let scratchParser : ProgramParser = ProgramParserFactory.createParserFor(filepath);
+        const scratchParser : ProgramParser = ProgramParserFactory.createParserFor(filepath);
 
         // Create the RAW AST (no simplifications or generalizations were applied)
-        let rawAST = scratchParser.parseFile(filepath);
+        const rawAST = scratchParser.parseFile(filepath);
 
         // Transform the AST: Replaces specific statements or expressions
         // by generic constructs.
-        let transformer = new ToIntermediateTransformer();
-        let intermediateAST = transformer.transform(rawAST);
+        const transformer = new ToIntermediateTransformer();
+        const intermediateAST = transformer.transform(rawAST);
 
         Preconditions.checkState(intermediateAST instanceof ProgramContext);
+
+        const toDotVisitor = new AstToDotVisitor();
+        intermediateAST.accept(toDotVisitor);
+        toDotVisitor.writeToFile(`output/ast_${ident}.dot`);
 
         return intermediateAST as ProgramContext;
     }
