@@ -19,58 +19,63 @@ nonCtrlStmt :
  |  penStmt ;
 
 spriteMotionStmt  :
-    'move'  numExpr  'steps'
- |  'turn' 'right'  numExpr 'degrees'
- |  'turn' 'left'  numExpr 'degrees'
- |  'go' 'to'  position
- |  'glide'  numExpr  'secs' 'to' position
- |  'point' 'in' 'direction' numExpr
- |  'point' 'towards'  position
- |  'change' 'x' 'by'  numExpr
- |  'change' 'y' 'by'  numExpr
- |  'set' 'x' 'to'  numExpr
- |  'set' 'y' 'to'  numExpr
- |  'if' 'on' 'edge' 'bounce' ;
+    'move'  numExpr  'steps' # MoveNumStepsStatement
+ |  'turn' 'right'  numExpr 'degrees' # TurnRightDegreeStatement
+ |  'turn' 'left'  numExpr 'degrees' # TurnLeftDegreeStatement
+ |  'go' 'to'  position # GoToPositionStatement
+ |  'glide'  numExpr  'secs' 'to' position # GlideNumSecsToStatement
+ |  'point' 'in' 'direction' numExpr # PointInDirStatement
+ |  'point' 'towards'  position # PointTowardsPosStatement
+ |  'change' 'x' 'by'  numExpr # ChangeXbyStatement
+ |  'change' 'y' 'by'  numExpr # ChangeYbyStatement
+ |  'set' 'x' 'to'  numExpr # SetXtoStatement
+ |  'set' 'y' 'to'  numExpr # SetYtoStatement
+ |  'if' 'on' 'edge' 'bounce' # IfOnEdgeBounceStatement
+ ;
 
 actorLookStmt :
-    'ask'  stringExpr  'and' 'wait'
- |  'switch' 'backdrop' 'to'  elementChoice
- |  'switch' 'backdrop' 'to'  elementChoice  'and' 'wait'
- |  'clear' 'graphic' 'effects'
- |  'change' 'graphic' 'effect' stringExpr 'by' numExpr
- |  'set' 'graphic' 'effect' stringExpr 'to' numExpr
- |  'show' 'variable'  variable
- |  'hide' 'variable'  variable ;
+    'ask'  stringExpr  'and' 'wait' # AskAndWaitStatement
+ |  'switch' 'backdrop' 'to'  elementChoice # SwitchBackdropToStatement
+ |  'switch' 'backdrop' 'to'  elementChoice  'and' 'wait' # SwitchBackdropAndWaitStatement
+ |  'clear' 'graphic' 'effects' # ClearGraphicEffectsStatement
+ |  'change' 'graphic' 'effect' stringExpr 'by' numExpr # ChagenGraphicEffectsByStatement
+ |  'set' 'graphic' 'effect' stringExpr 'to' numExpr # SetGraphicEffectToStatement
+ |  'show' 'variable'  variable # ShowVariableStatement
+ |  'hide' 'variable'  variable # HideVariableStatement
+ ;
 
 spriteLookStmt  :
-    'show'
- |  'hide'
- |  'say' stringExpr ('for' numExpr  'secs')?
- |  'think' stringExpr ('for' numExpr  'secs')?
- |  'switch' 'costume' 'to' elementChoice
- |  'change' 'size' 'by'  numExpr
- |  'set' 'size' 'to'  numExpr  'percent'
- |  'change' 'layer' 'by'  numExpr
- |  'go' 'to' 'layer'  numExpr
- |  'go' 'to' 'front' 'layer'
- |  'go' 'to' 'back' 'layer' ;
+    'show' # ShowSpriteStatement
+ |  'hide' # HideSpriteStatement
+ |  'say' stringExpr ('for' numExpr  'secs')? # SayForStatement
+ |  'think' stringExpr ('for' numExpr  'secs')? # ThinkForStatement
+ |  'switch' 'costume' 'to' elementChoice # SwitchCostumeStatement
+ |  'change' 'size' 'by'  numExpr # ChagenSizeByStatement
+ |  'set' 'size' 'to'  numExpr  'percent' # SetSizeToPercStatement
+ |  'change' 'layer' 'by'  numExpr # ChagenLayerByStatement
+ |  'go' 'to' 'layer'  numExpr # GotoLayerStatement
+ |  'go' 'to' 'front' 'layer' # GotoFrontLayerStatement
+ |  'go' 'to' 'back' 'layer' # GotoBackLayerStatement
+ ;
 
 actorSoundStmt  :
-    'play' 'sound'  elementChoice  'until' 'done'
- |  'start' 'sound'  elementChoice
- |  'change' 'sound' 'effect' stringExpr 'by' numExpr
- |  'set' 'sound' 'effect' stringExpr 'to' numExpr
- |  'clear' 'sound' 'effects'
- |  'stop' 'all' 'sounds' ;
+    'play' 'sound'  elementChoice  'until' 'done' # PlaySoundUntilStatement
+ |  'start' 'sound'  elementChoice # StartSoundStatement
+ |  'change' 'sound' 'effect' stringExpr 'by' numExpr # ChangeSoundEffectStatement
+ |  'set' 'sound' 'effect' stringExpr 'to' numExpr # SetSoundEffectStatement
+ |  'clear' 'sound' 'effects' # CleareSoundEffectsStatement
+ |  'stop' 'all' 'sounds' # StopAllSoundsStatement
+ ;
 
 penStmt :
-    'erase' 'all'
- |  'stamp'
- |  'pen down'
- |  'pen up'
- |  'set' 'pen' 'color' color
- |  'set' 'pen' stringExpr 'to' numExpr
- |  'change' 'pen' stringExpr 'by' numExpr ;
+    'erase' 'all' # EraseAllStatement
+ |  'stamp' # StampStatement
+ |  'pen down' # PenDownStatement
+ |  'pen up' # PenUpStatement
+ |  'set' 'pen' 'color' color # SetPenColorStatement
+ |  'set' 'pen' stringExpr 'to' numExpr # SetPenAttributeStatement
+ |  'change' 'pen' stringExpr 'by' numExpr # ChangePenAttributeByStement
+ ;
 
 stringExpr  :
     coreStringExpr
@@ -101,7 +106,8 @@ elementChoice :
  | 'prev'
  | 'random'
  | 'with_number' numExpr
- | 'with_name' stringExpr ;
+ | 'with_name' stringExpr
+ ;
 
 timeComp :
     'year'
@@ -110,11 +116,13 @@ timeComp :
  |  'day' 'of' 'week'
  |  'hour'
  |  'minute'
- |  'second' ;
+ |  'second'
+ ;
 
 position  :
     'pivot_of' stringExpr
  |  'random_pos'
  |  'mouse_pos'
- |  '('  numExpr ',' numExpr  ')' ;
+ |  '('  numExpr ',' numExpr  ')'
+ ;
 

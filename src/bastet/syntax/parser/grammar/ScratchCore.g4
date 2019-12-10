@@ -180,29 +180,30 @@ coreNonCtrlStmt :
  |  declarationStmt  ;
 
 commonStmt  :
-    'wait' numExpr 'seconds'
- |  'wait' 'until' boolExpr
- |  'stop' 'other' 'scripts' 'in' 'actor'
- |  'create' 'clone' 'of' stringExpr
- |  'broadcast' message
- |  'broadcast' message 'and' 'wait'
- |  'reset' 'timer'
- |  'change'  variable 'by' expression
- |  'change' 'attribute' stringExpr 'by' numExpr
- |  'epsilon'
- |  setStmt ;
+    'wait' numExpr 'seconds' # WaitSecsStatement
+ |  'wait' 'until' boolExpr # WaitUntilStatement
+ |  'stop' 'other' 'scripts' 'in' 'actor' # StopOthersInActorStatement
+ |  'create' 'clone' 'of' stringExpr # CreateCloneOfStatement
+ |  'broadcast' message # BroadcastMessageStatement
+ |  'broadcast' message 'and' 'wait' # BroadcastAndWaitStatement
+ |  'reset' 'timer' # ResetTimerStatement
+ |  'change'  variable 'by' expression # ChangeVarByStatement
+ |  'change' 'attribute' stringExpr 'by' numExpr # ChagenAttributeByStatement
+ |  'epsilon' # EpsilonStatement
+ |  setStmt # SetStatement;
 
 listStmt :
-    'delete' 'all' 'of' variable
- |  'delete'  numExpr  'of'  variable
- |  'add'  stringExpr  'to'  variable
- |  'insert'  stringExpr  'at'  numExpr  'of'  variable
- |  'replace' 'item'  numExpr 'of' variable  'by'  stringExpr    ;
+    'delete' 'all' 'of' variable # DeleteAllFromStatement
+ |  'delete'  numExpr  'of'  variable # DeleteIthFromStatement
+ |  'add'  stringExpr  'to'  variable # AddElementToStatement
+ |  'insert'  stringExpr  'at'  numExpr  'of'  variable # InsertAtStatement
+ |  'replace' 'item'  numExpr 'of' variable  'by'  stringExpr # ReplaceElementAtStatement
+ ;
 
 setStmt :
-    'set' 'attribute' String 'to' expression
- |  'set' 'attribute' String 'of' Ident 'to' expression
- |  'set' variable 'to' expression  ;
+    'set' 'attribute' String 'to' expression # SetAttributeToStatement
+ |  'set' 'attribute' String 'of' Ident 'to' expression # SetAttributeOfToStatement
+ |  'set' variable 'to' expression  # SetVariableToStatement;
 
 setStmtList : setStmt* ;
 
@@ -332,7 +333,7 @@ variable :
     | Ident '.' Ident # QualifiedVariable;
 
 color :
- 'rgba' numExpr numExpr numExpr numExpr
+    'rgba' numExpr numExpr numExpr numExpr
  |  'from' 'number' numExpr ;
 
 Ident :

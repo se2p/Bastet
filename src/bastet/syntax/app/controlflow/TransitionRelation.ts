@@ -18,10 +18,13 @@
  */
 
 import {OperationID, ProgramOperation, ProgramOperations} from "./ops/ProgramOperation";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ControlLocation, LocationID} from "./ControlLocation";
 import {Map as ImmMap, Set as ImmSet} from "immutable"
-import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+
+export type TargetId = LocationID;
+export type SourceId = LocationID;
 
 export class TransitionRelationBuilder {
 
@@ -80,8 +83,21 @@ export class TransitionRelationBuilder {
     }
 
     public build(): TransitionRelation {
-        throw new ImplementMeException();
-        // return new Script(this._initialLocation, transitions, locations);
+        let locations: ImmSet<LocationID> = ImmSet(this._locations.keys());
+        let entryLocs: ImmSet<LocationID> = ImmSet(this._entryLocations);
+        let exitLocs: ImmSet<LocationID> = ImmSet(this._exitLocations);
+
+        let transitions: TransitionTable = ImmMap();
+        for(let [fromID, fwdTargetMap] of this._transitions.entries()) {
+            let fromMap: ImmMap<LocationID, ImmSet<OperationID>> = ImmMap();
+            for (let [targetID, fwdTransOps] of fwdTargetMap.entries()) {
+                const ops = ImmSet(fwdTransOps.values());
+                fromMap = fromMap.set(targetID, ops);
+            }
+            transitions = transitions.set(fromID, fromMap);
+        }
+
+        return new TransitionRelation(transitions, locations, entryLocs, exitLocs);
     }
 
 }
@@ -98,12 +114,40 @@ export class TransitionRelation {
 
     private readonly _exitLocations: ImmSet<LocationID>;
 
+    private _backwards: TransitionRelation = null;
+
     constructor(transitions: TransitionTable, locations: ImmSet<LocationID>,
                 entryLocs: ImmSet<LocationID>, exitLocs: ImmSet<LocationID>) {
         this._transitions = transitions;
         this._locations = locations;
         this._entryLocations = entryLocs;
         this._exitLocations = exitLocs;
+    }
+
+    private buildBackwardsTransitions(): void {
+        if (this._backwards) {
+            return;
+        }
+
+        let builder = new TransitionRelationBuilder();
+
+        for(let [fromID, fwdTargetMap] of this._transitions.entries()) {
+            for (let [targetID, fwdTransOps] of fwdTargetMap.entries()) {
+                for (let opID of fwdTransOps) {
+                    let fromLocation = ControlLocation.for(fromID);
+                    let toLocation = ControlLocation.for(targetID);
+                    let op = ProgramOperations.withID(opID);
+                    builder.addTransition(toLocation, fromLocation, op);
+                }
+            }
+        }
+
+        this._backwards = builder.build();
+    }
+
+    get backwards(): TransitionRelation {
+        this.buildBackwardsTransitions();
+        return this._backwards;
     }
 
     get transitionTable(): TransitionTable {
@@ -147,6 +191,14 @@ export class TransitionRelation {
         return result;
     }
 
+    public transitionsTo(to: LocationID): [OperationID, LocationID][] {
+        return this.backwards.transitionsFrom(to);
+    }
+
+    public static builder(): TransitionRelationBuilder {
+        return new TransitionRelationBuilder();
+    }
+
 }
 
 export class TransitionRelations {
@@ -167,7 +219,7 @@ export class TransitionRelations {
 
         for (let exloc of tr1.exitLocationSet) {
             for (let entloc of tr2.entryLocationSet) {
-                this.addTransition(tx, exloc, entloc, ProgramOperations.epsilon());
+                tx = this.addTransition(tx, exloc, entloc, ProgramOperations.epsilon());
             }
         }
 
@@ -226,8 +278,10 @@ export class TransitionRelations {
 
         let fromLocs: ImmSet<LocationID> = tr.exitLocationSet;
         for (let from of fromLocs) {
-            tx = this.addTransition(tr.transitionTable, from, goto.ident, op);
-            exitLocs = exitLocs.remove(from);
+            tx = this.addTransition(tx, from, goto.ident, op);
+            exitLocs = exitLocs
+                .remove(from)
+                .add(goto.ident);
         }
 
         return new TransitionRelation(tx, locs, entryLocs, exitLocs);
@@ -249,7 +303,7 @@ export class TransitionRelations {
 
         let toLocs: ImmSet<LocationID> = tr.entryLocationSet;
         for (let to of toLocs) {
-            tx = this.addTransition(tr.transitionTable, loc.ident, to, op);
+            tx = this.addTransition(tx, loc.ident, to, op);
             entryLocs = entryLocs.remove(to);
         }
 
@@ -261,26 +315,23 @@ export class TransitionRelations {
     }
 
     static singleTransition(from: ControlLocation, to: ControlLocation, op: ProgramOperation): TransitionRelation {
-        const trans: TransitionTable = ImmMap([[from.ident, ImmMap([[to.ident, ImmSet([op.ident])]])]]);
-        const locs: ImmSet<LocationID> = ImmSet([from.ident, to.ident]);
-        const entry: ImmSet<LocationID> = ImmSet([from.ident]);
-        const exit: ImmSet<LocationID> = ImmSet([to.ident]);
-        return new TransitionRelation(trans, locs, entry, exit);
+        return TransitionRelation.builder()
+            .addEntryLocation(from)
+            .addExitLocation(to)
+            .addTransition(from, to, op)
+            .build();
     }
 
     static singleton(controlLocation: ControlLocation): TransitionRelation {
-        const loc: LocationID = controlLocation.ident;
-        const epsilonOp: OperationID = ProgramOperations.epsilon().ident;
-        const trans: TransitionTable = ImmMap([[loc, ImmMap([[loc, ImmSet([epsilonOp])]])]]);
-        const locs: ImmSet<LocationID> = ImmSet([loc]);
-        const entry: ImmSet<LocationID> = ImmSet([loc]);
-        const exit: ImmSet<LocationID> = ImmSet([loc]);
-        return new TransitionRelation(trans, locs, entry, exit);
+        return TransitionRelation.builder()
+            .addEntryLocation(controlLocation)
+            .addExitLocation(controlLocation)
+            .addTransition(controlLocation, controlLocation, ProgramOperations.epsilon())
+            .build();
     }
 
     static continueFrom(loopHead: ControlLocation, transitionRelation: TransitionRelation) {
         throw new ImplementMeException();
     }
-
 
 }

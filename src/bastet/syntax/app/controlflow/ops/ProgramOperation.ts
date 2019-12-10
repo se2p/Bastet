@@ -60,10 +60,13 @@ export class ProgramOperations {
     private static opCodeToIdMap: Map<string, OperationID> = new Map();
     private static opMap: Map<OperationID, ProgramOperation> = new Map();
     private static readonly EPSILON_OP = new NoopProgramOperation(null);
-    private static idSequencePos: OperationID = 0;
+    private static idSequencePos: OperationID;
 
     public static fresh(): OperationID {
-        return this.idSequencePos++;
+        if (isNaN(ProgramOperations.idSequencePos)) {
+            ProgramOperations.idSequencePos = 0;
+        }
+        return ProgramOperations.idSequencePos++;
     }
 
     public static constructOp(ast: RuleNode): OperationID {

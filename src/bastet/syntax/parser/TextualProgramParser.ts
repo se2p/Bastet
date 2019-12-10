@@ -30,8 +30,8 @@ export class TextualProgramParser implements ProgramParser {
     public parseFile(filepath: string): ProgramContext {
         Preconditions.checkNotEmpty(filepath);
 
-        let basename = path.basename(filepath);
-        let sourcecode : string = fs.readFileSync(filepath, 'utf8');
+        const basename = path.basename(filepath);
+        const sourcecode : string = fs.readFileSync(filepath, 'utf8');
 
         Preconditions.checkNotEmpty(sourcecode, "Empty source file");
 
@@ -46,15 +46,15 @@ export class TextualProgramParser implements ProgramParser {
      */
     public parseSource(basename: string, sourcecode: string): ProgramContext {
         // Create a character stream and the lexer
-        let inputStream = CharStreams.fromString(sourcecode);
-        let lexer = new ScratchLexer(inputStream);
-        let tokenStream = new CommonTokenStream(lexer);
+        const inputStream = CharStreams.fromString(sourcecode);
+        const lexer = new ScratchLexer(inputStream);
+        const tokenStream = new CommonTokenStream(lexer);
 
         // Create the parser
-        let parser = new ScratchParser(tokenStream);
+        const parser = new ScratchParser(tokenStream);
 
         // Parse the program and construct the AST
-        let programContext = parser.program();
+        const programContext = parser.program();
 
         return programContext;
     }

@@ -38,8 +38,11 @@ export class ControlLocation implements WithIdent {
     private static locationSequence: number = 0;
 
     private static newLocationID(): LocationID {
-        this.locationSequence++;
-        return this.locationSequence;
+        if (isNaN(ControlLocation.locationSequence)) {
+            ControlLocation.locationSequence = 0;
+        }
+        ControlLocation.locationSequence++;
+        return ControlLocation.locationSequence;
     }
 
     public static compound(majorLoc: ControlLocation, minorLoc: ControlLocation): ControlLocation {

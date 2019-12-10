@@ -42,6 +42,7 @@ export class TransitionRelationToDot {
         }
 
         output.push(`}`);
+        output.push("");
 
         fs.writeFileSync(filepath, output.join("\n"));
     }

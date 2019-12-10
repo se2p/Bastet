@@ -26,7 +26,7 @@ export class ImmutableMap<K, V> implements ReadonlyMap<K, V>, Iterable<[K, V]> {
         this._map = new Map<K, V>(entries);
     }
 
-    public get(key: K) : V | null {
+    public get(key: K) : V | undefined {
         return this._map.get(key);
     }
 

@@ -27,9 +27,9 @@ import {ProgramOperation} from "./ops/ProgramOperation";
 import {ControlLocation} from "./ControlLocation";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {
-    CallStmtContext,
+    CallStmtContext, CommonStmtContext, CoreNonCtrlStmtContext,
     DeclarationStmtContext,
-    DeclarationStmtListContext,
+    DeclarationStmtListContext, ExpressionStmtContext,
     IfStmtContext,
     NonCtrlStmtContext,
     RepeatForeverStmtContext,
@@ -97,7 +97,12 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
             loopHead);
     }
 
-    visitNonCtrlStmt (ctx: NonCtrlStmtContext) : TransitionRelation {
+    visitCommonStmt (ctx: CommonStmtContext) : TransitionRelation {
+        const op: ProgramOperation = ProgramOperationFactory.createFor(ctx);
+        return TransitionRelations.forOpSeq(op);
+    }
+
+    visitExpressionStmt (ctx: ExpressionStmtContext) : TransitionRelation {
         const op: ProgramOperation = ProgramOperationFactory.createFor(ctx);
         return TransitionRelations.forOpSeq(op);
     }

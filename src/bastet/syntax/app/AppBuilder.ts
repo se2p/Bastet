@@ -59,10 +59,10 @@ export class AppBuilder {
 
     public static buildControlFlowsFromSyntaxTree(programOrigin: string, programAST: ProgramContext, actorNamePrefix: string): App {
         // Phase 1: Build the actors WITHOUT taking the INHERITANCE of actors into account.
-        let flatActors: ActorMap = AppBuilder.buildActorsFlat(programAST, actorNamePrefix);
+        const flatActors: ActorMap = AppBuilder.buildActorsFlat(programAST, actorNamePrefix);
 
         // Phase 2: Rebuild the actors AND TAKE INHERITANCE into account.
-        let appActors: ActorMap = AppBuilder.rebuildWithActorInheritance(flatActors);
+        const appActors: ActorMap = AppBuilder.rebuildWithActorInheritance(flatActors);
 
         return new App(programOrigin, programAST.Ident().text, appActors);
     }
@@ -86,10 +86,10 @@ export class AppBuilder {
     }
 
     private static exportScriptsToDoT(actor: Actor): void {
-        let toDotWriter = new TransitionRelationToDot();
+        const toDotWriter = new TransitionRelationToDot();
         let i: number = 1;
         for (let s of actor.scripts) {
-            let target: string = `output/actor_${actor.ident}_script_${i}.dot`;
+            const target: string = `output/actor_${actor.ident}_script_${i}.dot`;
             toDotWriter.export(s.transitions, target);
             i++;
         }
