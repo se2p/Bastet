@@ -23,7 +23,12 @@ import {
     TransitionRelations
 } from "../../../../../src/bastet/syntax/app/controlflow/TransitionRelation";
 import {ControlLocation} from "../../../../../src/bastet/syntax/app/controlflow/ControlLocation";
-import {ProgramOperations} from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
+import {
+    ProgramOperation,
+    ProgramOperations
+} from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
+import {StopAllContext, TerminationStmtContext} from "../../../../../src/bastet/syntax/parser/grammar/ScratchParser";
+import {RawOperation} from "../../../../../src/bastet/syntax/app/controlflow/ops/RawOperation";
 
 describe("TransitionRelation", () => {
 
@@ -122,6 +127,35 @@ describe("TransitionRelations", () => {
                 expect(tr.exitLocationSet.size).toEqual(1);
                 expect(tr.exitLocationSet).toContain(l7.ident);
             });
+        });
+
+    });
+
+    describe("eliminateEpsilons()", () => {
+
+        describe("case: no epsilon moves", () => {
+
+            const op = new RawOperation(new StopAllContext(new TerminationStmtContext(undefined, 0)));
+
+            const tr = TransitionRelation.builder()
+                .addTransitionByIDs(0, 1, op)
+                .addTransitionByIDs(1, 2, op)
+                .addEntryLocationWithID(0)
+                .addExitLocationWithID(2)
+                .build();
+
+            const te = TransitionRelations.eliminateEpsilons(tr);
+
+            it("leaves the transition relation unmodified", () => {
+                expect(tr.entryLocationSet.equals(te.entryLocationSet)).toBeTruthy();
+                expect(tr.exitLocationSet.equals(te.exitLocationSet)).toBeTruthy();
+                expect(tr.transitionTable.equals(te.transitionTable)).toBeTruthy();
+            });
+
+        });
+
+        describe("case: with epsilon moves", () => {
+
         });
 
     });

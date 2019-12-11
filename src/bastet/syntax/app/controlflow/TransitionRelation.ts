@@ -44,10 +44,18 @@ export class TransitionRelationBuilder {
         this._locations = new Map();
     }
 
+    public addEntryLocationWithID(id: LocationID): this {
+        return this.addEntryLocation(ControlLocation.for(id));
+    }
+
     public addEntryLocation(loc: ControlLocation): this {
         this._entryLocations.add(loc.ident);
         this.addLocation(loc);
         return this;
+    }
+
+    public addExitLocationWithID(id: LocationID): this {
+        return this.addExitLocation(ControlLocation.for(id));
     }
 
     public addExitLocation(loc: ControlLocation): this {
@@ -59,6 +67,10 @@ export class TransitionRelationBuilder {
     private addLocation(loc: ControlLocation): this {
         this._locations.set(loc.ident, loc);
         return this;
+    }
+
+    public addTransitionByIDs(from: LocationID, to: LocationID, op: ProgramOperation): this {
+        return this.addTransition(ControlLocation.for(from), ControlLocation.for(to), op);
     }
 
     public addTransition(from: ControlLocation, to: ControlLocation, op: ProgramOperation): this {
@@ -420,37 +432,40 @@ export class TransitionRelations {
     }
 
     static eliminateEpsilons(tr: TransitionRelation): TransitionRelation {
-        return tr;
-        // const builder = TransitionRelation.builder();
-        //
-        // const visited: Set<LocationID> = new Set();
-        // const worklist: Array<LocationID>  = new Array<LocationID>();
-        //
-        // for (let l of tr.entryLocationSet.values()) {
-        //     worklist.push(l);
-        //     builder.addEntryLocation(ControlLocation.for(l));
-        // }
-        //
-        // while (worklist.length > 0) {
-        //     const work: LocationID = worklist.pop();
-        //     if (!visited.has(work)) {
-        //         visited.add(work);
-        //         for (let [op, target] of tr.transitionsFrom(work)) {
-        //             let termStates = tr.closureTerminationStates(target);
-        //             for (let termState of termStates) {
-        //                 if (op === ProgramOperations.epsilon().ident) {
-        //                     if (work == target) {
-        //                         continue;
-        //                     }
-        //                 }
-        //                 builder.addTransition(ControlLocation.for(work), ControlLocation.for(termState), ProgramOperation.for(op));
-        //                 worklist.push(termState);
-        //             }
-        //         }
-        //     }
-        // }
-        //
-        // return builder.build();
+        const builder = TransitionRelation.builder();
+
+        const visited: Set<LocationID> = new Set();
+        const worklist: Array<LocationID>  = new Array<LocationID>();
+
+        for (let l of tr.entryLocationSet.values()) {
+            worklist.push(l);
+            builder.addEntryLocation(ControlLocation.for(l));
+        }
+
+        for (let l of tr.exitLocationSet.values()) {
+            builder.addExitLocation(ControlLocation.for(l));
+        }
+
+        while (worklist.length > 0) {
+            const work: LocationID = worklist.pop();
+            if (!visited.has(work)) {
+                visited.add(work);
+                for (let [op, target] of tr.transitionsFrom(work)) {
+                    let termStates = tr.closureTerminationStates(target);
+                    for (let termState of termStates) {
+                        if (op === ProgramOperations.epsilon().ident) {
+                            if (work == target) {
+                                continue;
+                            }
+                        }
+                        builder.addTransition(ControlLocation.for(work), ControlLocation.for(termState), ProgramOperation.for(op));
+                        worklist.push(termState);
+                    }
+                }
+            }
+        }
+
+        return builder.build();
     }
 
 }
