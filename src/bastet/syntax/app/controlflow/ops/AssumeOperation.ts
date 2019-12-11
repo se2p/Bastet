@@ -18,7 +18,12 @@
  */
 
 import {ProgramOperation} from './ProgramOperation'
+import {RuleNode} from "antlr4ts/tree";
 
 export class AssumeOperation extends ProgramOperation {
+
+    constructor(ast: RuleNode) {
+        super(ast);
+    }
 
 }

@@ -48,32 +48,52 @@ import {Preconditions} from "../../../utils/Preconditions";
 
 export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelation> {
 
+    private readonly _stack: string[];
+
+    constructor() {
+        this._stack = [];
+    }
+
     visitCallStmt (ctx: CallStmtContext): TransitionRelation {
-        // ATTENTION: The inter-procedural transition relation
-        // is built in a different step.
-        const op: ProgramOperation = ProgramOperationFactory.createFor(ctx);
-        return TransitionRelations.forOpSeq(op);
+        this._stack.push("visitCallStmt");
+        try {
+            // ATTENTION: The inter-procedural transition relation
+            // is built in a different step.
+            const op: ProgramOperation = ProgramOperationFactory.createFor(ctx);
+            return TransitionRelations.forOpSeq(op);
+        } finally {
+            this._stack.pop();
+        }
     }
 
     visitIfStmt (ctx: IfStmtContext): TransitionRelation {
-        const thenAssumeOp = ProgramOperationFactory.assumeOpFrom(ctx.boolExpr());
-        const elseAssumeOp = ProgramOperationFactory.negatedAssumeOpFrom(ctx.boolExpr());
-        const thenStatements: TransitionRelation = ctx.stmtList().accept(this);
+        this._stack.push("visitCallStmt");
+        try {
+            const thenAssumeOp = ProgramOperationFactory.assumeOpFrom(ctx.boolExpr());
+            const elseAssumeOp = ProgramOperationFactory.negatedAssumeOpFrom(ctx.boolExpr());
+            const thenStatements: TransitionRelation = ctx.stmtList().accept(this);
 
-        let elseStatements: TransitionRelation;
-        if (ctx.elseCase().stmtList()) {
-            elseStatements = ctx.stmtList().accept(this);
-        } else {
-            elseStatements = TransitionRelations.epsilon();
+            let elseStatements: TransitionRelation;
+            if (ctx.elseCase().stmtList()) {
+                elseStatements = ctx.stmtList().accept(this);
+            } else {
+                elseStatements = TransitionRelations.epsilon();
+            }
+
+            const exitLocation = ControlLocation.fresh();
+            const thenCaseGuarded = TransitionRelations.concat(
+                TransitionRelations.forOpSeq(thenAssumeOp), thenStatements);
+            const elseCaseGuarded = TransitionRelations.concat(
+                TransitionRelations.forOpSeq(elseAssumeOp), elseStatements);
+
+            return TransitionRelations.branching(thenCaseGuarded, elseCaseGuarded, exitLocation);
+        } finally {
+            this._stack.pop();
         }
+    }
 
-        const exitLocation = ControlLocation.fresh();
-        const thenCaseGuarded = TransitionRelations.concat(
-            TransitionRelations.forOpSeq(thenAssumeOp), thenStatements);
-        const elseCaseGuarded = TransitionRelations.concat(
-            TransitionRelations.forOpSeq(elseAssumeOp), elseStatements);
-
-        return TransitionRelations.branching(thenCaseGuarded, elseCaseGuarded, exitLocation);
+    visitNonCtrlStmt (ctx: NonCtrlStmtContext) : TransitionRelation {
+        return this.buildForOpNode(ctx);
     }
 
     visitRepeatForeverStmt (ctx: RepeatForeverStmtContext) : TransitionRelation {
@@ -88,14 +108,19 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
     }
 
     visitUntilStmt (ctx: UntilStmtContext) : TransitionRelation {
-        const loopHead: ControlLocation = ControlLocation.fresh();
-        const loopBody: TransitionRelation = ctx.stmtList().accept(this);
-        const condAssumeOp = ProgramOperationFactory.assumeOpFrom(ctx.boolExpr());
+        this._stack.push("visitUntilStmt");
+        try {
+            const loopHead: ControlLocation = ControlLocation.fresh();
+            const loopBody: TransitionRelation = ctx.stmtList().accept(this);
+            const condAssumeOp = ProgramOperationFactory.assumeOpFrom(ctx.boolExpr());
 
-        return TransitionRelations.concatAndGoto(
-            TransitionRelations.singleton(loopHead),
-            TransitionRelations.concat(TransitionRelations.forOpSeq(condAssumeOp), loopBody),
-            loopHead);
+            return TransitionRelations.concatAndGoto(
+                TransitionRelations.singleton(loopHead),
+                TransitionRelations.concat(TransitionRelations.forOpSeq(condAssumeOp), loopBody),
+                loopHead);
+        } finally {
+            this._stack.pop();
+        }
     }
 
     visitCommonStmt (ctx: CommonStmtContext) : TransitionRelation {
@@ -107,19 +132,24 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
     }
 
     visitStmtList (ctx: StmtListContext) : TransitionRelation {
-        let result: TransitionRelation = TransitionRelations.epsilon();
+        this._stack.push("visitStmtList");
+        try {
+            let result: TransitionRelation = TransitionRelations.epsilon();
 
-        for (let stmt of ctx.stmtListPlain().stmt()) {
-            let stmtTR: TransitionRelation = stmt.accept(this);
-            result = TransitionRelations.concat(result, stmtTR);
+            for (let stmt of ctx.stmtListPlain().stmt()) {
+                let stmtTR: TransitionRelation = stmt.accept(this);
+                result = TransitionRelations.concat(result, stmtTR);
+            }
+
+            if (ctx.terminationStmt()) {
+                let stmtTR: TransitionRelation = ctx.terminationStmt().accept(this);
+                result = TransitionRelations.concat(result, stmtTR);
+            }
+
+            return result;
+        } finally {
+            this._stack.pop();
         }
-
-        if (ctx.terminationStmt()) {
-            let stmtTR: TransitionRelation = ctx.terminationStmt().accept(this);
-            result = TransitionRelations.concat(result, stmtTR);
-        }
-
-        return result;
     }
 
     visitTerminationStmt (ctx: TerminationStmtContext) : TransitionRelation {
@@ -130,25 +160,36 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
         throw new ImplementMeException();
     }
 
-    private isLeafStatement(node: RuleNode): boolean {
-        if (node.constructor.name.startsWith("Core")) {
-            return false;
+    visitChildren(node: RuleNode): TransitionRelation {
+        this._stack.push("visitChildren");
+        try {
+            if (node.childCount == 1) {
+                return node.getChild(0).accept(this);
+            } else {
+                let parent = node.parent;
+                while (parent) {
+                    const visitMethodName = "visit" + RelationBuildingVisitor.nonTerminalName(parent);
+                    if (this[visitMethodName]) {
+                        if (this._stack.indexOf(visitMethodName) == -1) {
+                            return this[visitMethodName](parent);
+                        } else {
+                            throw new Error("Implement for " + node.constructor.name);
+                        }
+                    }
+                    parent = parent.parent;
+                }
+                throw new Error("Implement for " + node.constructor.name);
+            }
+        } finally {
+            this._stack.pop();
         }
-        else if (node.constructor.name.endsWith("StatementContext")) {
-            return true;
-        }
-        return false;
     }
 
-    visitChildren(node: RuleNode): TransitionRelation {
-        const isLeaf = this.isLeafStatement(node);
-        if (isLeaf) {
-            return this.buildForOpNode(node);
-        } else if (node.childCount == 1) {
-            return node.getChild(0).accept(this);
-        } else {
-            throw new Error("Implement for " + node.constructor.name);
-        }
+    private static nonTerminalName(node: RuleNode) : string {
+        let result: string = node.constructor.name;
+        const search = "Context$";
+        const replacement = "";
+        return result.replace(new RegExp(search, 'g'), replacement);
     }
 
     visitErrorNode(node: ErrorNode): TransitionRelation {
@@ -177,14 +218,19 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
     }
 
     visitResourceList(node: ResourceListContext): TransitionRelation {
-        let result: TransitionRelation = TransitionRelations.epsilon();
+        this._stack.push("visitResourceList");
+        try {
+            let result: TransitionRelation = TransitionRelations.epsilon();
 
-        for (let res of node.resource()) {
-            let stmtTR: TransitionRelation = res.accept(this);
-            result = TransitionRelations.concat(result, stmtTR);
+            for (let res of node.resource()) {
+                let stmtTR: TransitionRelation = res.accept(this);
+                result = TransitionRelations.concat(result, stmtTR);
+            }
+
+            return result;
+        } finally {
+            this._stack.pop();
         }
-
-        return result;
     }
 
     visitResource(node: ResourceContext): TransitionRelation {

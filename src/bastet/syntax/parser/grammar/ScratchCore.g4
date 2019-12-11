@@ -122,14 +122,14 @@ stmtListPlain : stmt* ;
 
 // The control flow of Scratch program is controlled by
 // designated control-flow statements.
-controlStmt : coreControlStmt ;
+controlStmt : coreControlStmt;
 
 coreControlStmt :
-    ifStmt # IfStatement
- |  untilStmt # UntilStatement
- |  repeatTimesStmt # RepeatTimeStatement
- |  repeatForeverStmt # RepeatForeverStatement
- |  callStmt # CallStatement
+    ifStmt
+ |  untilStmt
+ |  repeatTimesStmt
+ |  repeatForeverStmt
+ |  callStmt
  ;
 
 // A conditional statement. Either in the form of an 'if ... then ...'
@@ -191,7 +191,8 @@ commonStmt  :
  |  'change'  variable 'by' expression # ChangeVarByStatement
  |  'change' 'attribute' stringExpr 'by' numExpr # ChagenAttributeByStatement
  |  'epsilon' # EpsilonStatement
- |  setStmt # SetStatement;
+ |  setStmt # SetStatement
+ ;
 
 listStmt :
     'delete' 'all' 'of' variable # DeleteAllFromStatement
@@ -238,31 +239,28 @@ unspecifiedStringExpr : '?string' ;
 boolExpr : coreBoolExpr ;
 
 coreBoolExpr  :
-    Boolean
- |  variable
- |  '(' coreBoolExpr ')'
+    Boolean # BoolLiteralExpression
+ |  variable # BoolVariableExpression
+ |  '(' coreBoolExpr ')' # BoolParanthExpression
 
- |  'not'  coreBoolExpr
- |  coreBoolExpr  'and'  numExpr
- |  coreBoolExpr  'or'  coreBoolExpr
+ |  'not'  coreBoolExpr # NegatedBoolExpression
+ |  coreBoolExpr  'and'  numExpr # BoolAndExpression
+ |  coreBoolExpr  'or'  coreBoolExpr # BoolOrExpression
 
- |  stringExpr  '>'  stringExpr
- |  stringExpr  '<'  stringExpr
- |  stringExpr  '='  stringExpr
+ |  stringExpr  '>'  stringExpr # StrGreaterThanExpression
+ |  stringExpr  '<'  stringExpr # StrLessThanExpression
+ |  stringExpr  '='  stringExpr # StrEqualsExpression
 
- |  numExpr  '>'  numExpr
- |  numExpr  '<'  numExpr
- |  numExpr  '='  numExpr
+ |  numExpr  '>'  numExpr # NumGreaterThanExpression
+ |  numExpr  '<'  numExpr # NumLessThanExpression
+ |  numExpr  '='  numExpr # NumEqualsExpression
 
- |  stringExpr  'contains'  stringExpr
- |  variable  'contains'  stringExpr
+ |  stringExpr  'contains'  stringExpr # StrContainsExpression
+ |  variable  'contains'  stringExpr # VarContainsExpression
 
- |  defaultBoolExpr
- |  unspecifiedBoolExpr ;
-
-defaultBoolExpr : 'default' Boolean 'for' coreBoolExpr ;
-
-unspecifiedBoolExpr : '?bool' ;
+ |  'default' Boolean 'for' coreBoolExpr # DefaultBoolExpression
+ |  '?bool' # UnspecifiedBoolExpression
+ ;
 
 numExpr : coreNumExpr ;
 

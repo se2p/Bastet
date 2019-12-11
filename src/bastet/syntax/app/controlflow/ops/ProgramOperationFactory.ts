@@ -19,27 +19,28 @@
 
 import {RuleNode} from "antlr4ts/tree";
 import {RawOperation} from "./RawOperation";
-import {NoopProgramOperation, ProgramOperation} from "./ProgramOperation";
-import {BoolExprContext} from "../../../parser/grammar/ScratchParser";
+import {NoopProgramOperation, ProgramOperation, ProgramOperations} from "./ProgramOperation";
+import {BoolExprContext, NegatedBoolExpressionContext} from "../../../parser/grammar/ScratchParser";
 import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
 import {AssumeOperation} from "./AssumeOperation";
 
 export class ProgramOperationFactory {
 
     public static createFor(ast: RuleNode): ProgramOperation {
-        let result = new RawOperation(ast);
-        return result;
+        return new RawOperation(ast);
     }
 
     static assumeOpFrom(boolExprContext: BoolExprContext): AssumeOperation {
-        throw new ImplementMeException();
+        return new AssumeOperation(boolExprContext);
     }
 
     static negatedAssumeOpFrom(boolExprContext: BoolExprContext): AssumeOperation {
-        throw new ImplementMeException();
+        const negation = new NegatedBoolExpressionContext(boolExprContext.coreBoolExpr());
+        return new AssumeOperation(negation);
     }
 
     static epsilon(): NoopProgramOperation {
-        throw new ImplementMeException();
+        return ProgramOperations.epsilon();
     }
+
 }
