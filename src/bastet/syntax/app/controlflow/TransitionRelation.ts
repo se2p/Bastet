@@ -22,6 +22,7 @@ import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgument
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ControlLocation, LocationID} from "./ControlLocation";
 import {Map as ImmMap, Set as ImmSet} from "immutable"
+import {Preconditions} from "../../../utils/Preconditions";
 
 export type TargetId = LocationID;
 export type SourceId = LocationID;
@@ -43,23 +44,24 @@ export class TransitionRelationBuilder {
         this._locations = new Map();
     }
 
-    public addEntryLocation(loc: ControlLocation): TransitionRelationBuilder {
+    public addEntryLocation(loc: ControlLocation): this {
         this._entryLocations.add(loc.ident);
         this.addLocation(loc);
         return this;
     }
 
-    public addExitLocation(loc: ControlLocation): TransitionRelationBuilder {
+    public addExitLocation(loc: ControlLocation): this {
         this._exitLocations.add(loc.ident);
         this.addLocation(loc);
         return this;
     }
 
-    private addLocation(loc: ControlLocation) {
+    private addLocation(loc: ControlLocation): this {
         this._locations.set(loc.ident, loc);
+        return this;
     }
 
-    public addTransition(from: ControlLocation, to: ControlLocation, op: ProgramOperation): TransitionRelationBuilder {
+    public addTransition(from: ControlLocation, to: ControlLocation, op: ProgramOperation): this {
         // Add the transition
         let fromMap: Map<LocationID, Set<OperationID>> = this._transitions.get(from.ident);
         if (!fromMap) {
@@ -78,6 +80,21 @@ export class TransitionRelationBuilder {
         // Add the control locations
         this.addLocation(from);
         this.addLocation(to);
+
+        return this;
+    }
+
+    public addAllTransitionsOf(input: TransitionRelation): this {
+        // Check disjointness of the locations
+        const locIntersection = input.locationSet.intersect(this._locations.keys());
+        Preconditions.checkArgument(locIntersection.isEmpty(), "The set of locations must be disjoint");
+
+        // Add all transitions
+        for (let from of input.locationSet) {
+            for (let [op, to] of input.transitionsFrom(from)) {
+                this.addTransition(ControlLocation.for(from), ControlLocation.for(to), ProgramOperation.for(op));
+            }
+        }
 
         return this;
     }
@@ -116,12 +133,15 @@ export class TransitionRelation {
 
     private _backwards: TransitionRelation = null;
 
+    private readonly _closureTerminators: Map<LocationID, ImmSet<LocationID>>;
+
     constructor(transitions: TransitionTable, locations: ImmSet<LocationID>,
                 entryLocs: ImmSet<LocationID>, exitLocs: ImmSet<LocationID>) {
         this._transitions = transitions;
         this._locations = locations;
         this._entryLocations = entryLocs;
         this._exitLocations = exitLocs;
+        this._closureTerminators = new Map();
     }
 
     public toString() {
@@ -186,6 +206,45 @@ export class TransitionRelation {
 
     get exitLocationSet(): ImmSet<LocationID> {
         return this._exitLocations;
+    }
+
+    private computeClosureTerminationStates(of: LocationID): Set<LocationID> {
+        const result: Set<LocationID> = new Set();
+
+        const visited: Set<LocationID> = new Set();
+        const worklist: Array<LocationID>  = new Array<LocationID>();
+
+        worklist.push(of);
+        while (worklist.length > 0) {
+            const work: LocationID = worklist.pop();
+            if (!visited.has(work)) {
+                visited.add(work);
+                let isTerminationState = this.transitionsFrom(work).length == 0;
+                for (let [op, target] of this.transitionsFrom(work)) {
+                    if (op == ProgramOperations.epsilon().ident) {
+                        worklist.push(target);
+                    } else {
+                        isTerminationState = true;
+                    }
+                }
+                if (isTerminationState) {
+                    result.add(work);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public closureTerminationStates(of: LocationID): ImmSet<LocationID> {
+        let result: ImmSet<LocationID> = this._closureTerminators.get(of);
+        if (!result) {
+            let termstates: Set<LocationID> = this.computeClosureTerminationStates(of);
+            result = ImmSet(termstates);
+            this._closureTerminators.set(of, result);
+        }
+
+        return result;
     }
 
     public transitionsFrom(from: LocationID): [OperationID, LocationID][] {
@@ -268,17 +327,30 @@ export class TransitionRelations {
         return result;
     }
 
-    static branching(thenCaseGuarded: TransitionRelation, elseCaseGuarded: TransitionRelation, exitLocation: ControlLocation): TransitionRelation {
-        throw new ImplementMeException();
+    static branching(thenCaseGuarded: TransitionRelation, elseCaseGuarded: TransitionRelation, resultExitLoc: ControlLocation): TransitionRelation {
+        let builder = TransitionRelation.builder()
+            .addAllTransitionsOf(thenCaseGuarded)
+            .addAllTransitionsOf(elseCaseGuarded);
+
+        const resultEntryLoc: ControlLocation = ControlLocation.fresh();
+        const casesEntryLocs = thenCaseGuarded.entryLocationSet.union(elseCaseGuarded.entryLocationSet);
+        const casesExitLocs = thenCaseGuarded.exitLocationSet.union(elseCaseGuarded.exitLocationSet);
+
+        for (let centry of casesEntryLocs) {
+            builder.addTransition(resultEntryLoc, ControlLocation.for(centry), ProgramOperations.epsilon());
+        }
+
+        for (let cexit of casesExitLocs) {
+            builder.addTransition(ControlLocation.for(cexit), resultExitLoc, ProgramOperations.epsilon());
+        }
+
+        return builder.addExitLocation(resultExitLoc)
+            .addEntryLocation(resultEntryLoc)
+            .build();
     }
 
     static concatTrOpGoto(tr: TransitionRelation, op: ProgramOperation, goto: ControlLocation): TransitionRelation {
-        if (tr.locationSet.has(goto.ident)) {
-            throw new IllegalArgumentException("Circular references not yet supported! Implement me");
-        }
-        if (tr.entryLocationSet.has(goto.ident)) {
-            throw new IllegalArgumentException("Circular references not yet supported! Implement me");
-        }
+        // TODO: Add tests regarding circular references
 
         let locs = tr.locationSet.add(goto.ident);
 
@@ -321,7 +393,10 @@ export class TransitionRelations {
     }
 
     static concatAndGoto(headRelation: TransitionRelation, loopBody: TransitionRelation, loopHead: ControlLocation): TransitionRelation {
-        throw new ImplementMeException();
+        return this.concatTrOpGoto(
+            this.concat(headRelation, loopBody),
+            ProgramOperations.epsilon(),
+            loopHead);
     }
 
     static singleTransition(from: ControlLocation, to: ControlLocation, op: ProgramOperation): TransitionRelation {
@@ -342,6 +417,40 @@ export class TransitionRelations {
 
     static continueFrom(loopHead: ControlLocation, transitionRelation: TransitionRelation) {
         throw new ImplementMeException();
+    }
+
+    static eliminateEpsilons(tr: TransitionRelation): TransitionRelation {
+        return tr;
+        // const builder = TransitionRelation.builder();
+        //
+        // const visited: Set<LocationID> = new Set();
+        // const worklist: Array<LocationID>  = new Array<LocationID>();
+        //
+        // for (let l of tr.entryLocationSet.values()) {
+        //     worklist.push(l);
+        //     builder.addEntryLocation(ControlLocation.for(l));
+        // }
+        //
+        // while (worklist.length > 0) {
+        //     const work: LocationID = worklist.pop();
+        //     if (!visited.has(work)) {
+        //         visited.add(work);
+        //         for (let [op, target] of tr.transitionsFrom(work)) {
+        //             let termStates = tr.closureTerminationStates(target);
+        //             for (let termState of termStates) {
+        //                 if (op === ProgramOperations.epsilon().ident) {
+        //                     if (work == target) {
+        //                         continue;
+        //                     }
+        //                 }
+        //                 builder.addTransition(ControlLocation.for(work), ControlLocation.for(termState), ProgramOperation.for(op));
+        //                 worklist.push(termState);
+        //             }
+        //         }
+        //     }
+        // }
+        //
+        // return builder.build();
     }
 
 }

@@ -26,4 +26,8 @@ export class AssumeOperation extends ProgramOperation {
         super(ast);
     }
 
+    toString(): string {
+        return `[${this.ast.toStringTree()}]`;
+    }
+
 }

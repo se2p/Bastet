@@ -115,7 +115,9 @@ export class AppBuilder {
         for (let scriptContext of scriptListContext.script()) {
             const event = AppBuilder.buildEvent(scriptContext.event());
             const visitor = new RelationBuildingVisitor();
-            const transRelation = scriptContext.stmtList().accept(visitor);
+            const transRelation = TransitionRelations.eliminateEpsilons(
+                scriptContext.stmtList().accept(visitor));
+
             result.push(new Script(event, transRelation));
         }
         return result;

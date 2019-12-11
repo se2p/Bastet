@@ -26,4 +26,8 @@ export class RawOperation extends ProgramOperation {
          super(ast);
      }
 
+     toString(): string {
+         return this.ast.text;
+     }
+
 }

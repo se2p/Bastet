@@ -49,10 +49,17 @@ export abstract class ProgramOperation implements WithIdent {
         }
     }
 
+    public static for(id: OperationID): ProgramOperation {
+        return ProgramOperations.withID(id);
+    }
+
 }
 
 export class NoopProgramOperation extends ProgramOperation {
 
+    toString(): string {
+        return "epsilon";
+    }
 }
 
 export class ProgramOperations {

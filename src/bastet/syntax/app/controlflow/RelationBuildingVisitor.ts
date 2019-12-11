@@ -75,7 +75,7 @@ export class RelationBuildingVisitor implements ScratchVisitor<TransitionRelatio
 
             let elseStatements: TransitionRelation;
             if (ctx.elseCase().stmtList()) {
-                elseStatements = ctx.stmtList().accept(this);
+                elseStatements = ctx.elseCase().stmtList().accept(this);
             } else {
                 elseStatements = TransitionRelations.epsilon();
             }
