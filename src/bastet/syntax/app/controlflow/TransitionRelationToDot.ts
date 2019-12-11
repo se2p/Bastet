@@ -32,6 +32,7 @@ export class TransitionRelationToDot {
         tr.entryLocationSet.forEach((e) => worklist.push(e));
 
         output.push(`digraph relation {`);
+        output.push(`    node [shape=circle, style=filled];`);
 
         while (worklist.length > 0) {
             let fromlocid: LocationID = worklist.pop();
