@@ -29,16 +29,27 @@ import {StatementList} from "./statements/Statement";
 
 export class ActorDefinition extends AbstractNode {
 
-    private static readonly _ident: Identifier;
-    private static readonly _inheritsFrom: Identifier|null;
-    private static readonly _resourceDefs: ResourceDefinitionList;
-    private static readonly _declarationStmts: StatementList;
-    private static readonly _initStmts: StatementList;
-    private static readonly _methodDefs: MethodDefinitionList;
-    private static readonly _scriptList: ScriptDefinitionList;
+    private readonly _ident: Identifier;
+    private readonly _inheritsFrom: Identifier | null;
+    private readonly _resourceDefs: ResourceDefinitionList;
+    private readonly _declarationStmts: StatementList;
+    private readonly _initStmts: StatementList;
+    private readonly _methodDefs: MethodDefinitionList;
+    private readonly _scriptList: ScriptDefinitionList;
 
-    constructor(ident, inheritsFrom, resourceDefs, declarations, inits, methods, scripts) {
-        super([]);
+    constructor(ident: Identifier, inheritsFrom: Identifier | null,
+                resourceDefs: ResourceDefinitionList, declarationStmts: StatementList,
+                initStmts: StatementList, methodDefs: MethodDefinitionList,
+                scriptList: ScriptDefinitionList) {
+        super([ident, inheritsFrom, resourceDefs, declarationStmts,
+            initStmts, methodDefs, scriptList]);
+        this._ident = ident;
+        this._inheritsFrom = inheritsFrom;
+        this._resourceDefs = resourceDefs;
+        this._declarationStmts = declarationStmts;
+        this._initStmts = initStmts;
+        this._methodDefs = methodDefs;
+        this._scriptList = scriptList;
     }
 
 }

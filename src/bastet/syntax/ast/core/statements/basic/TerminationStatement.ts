@@ -19,3 +19,20 @@
  *
  */
 
+import {Statement} from "../Statement";
+
+export interface TerminationStatement  {
+
+}
+
+export class StopAllStatement extends Statement implements TerminationStatement {
+
+}
+
+export class StopThisStatement extends Statement implements  TerminationStatement {
+
+}
+
+export class DelteThisCloneStatement extends Statement implements  TerminationStatement {
+
+}

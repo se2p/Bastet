@@ -26,7 +26,7 @@ export class UnaryExpression<A extends AstNode> extends AbstractNode {
     private readonly _operand1: A;
 
     constructor(op1: A) {
-        super(op1);
+        super([op1]);
         this._operand1 = op1;
     }
 

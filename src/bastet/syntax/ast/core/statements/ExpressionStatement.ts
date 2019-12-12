@@ -19,6 +19,16 @@
  *
  */
 
-import {AstNode} from "../../AstNode";
+import {Statement} from "./Statement";
+import {Expression} from "../expressions/Expression";
 
-export class ExpressionStatement implements AstNode {}
+export class ExpressionStatement extends Statement {
+
+    private readonly _expression: Expression;
+
+    constructor(expression: Expression) {
+        super([expression]);
+        this._expression = expression;
+    }
+
+}

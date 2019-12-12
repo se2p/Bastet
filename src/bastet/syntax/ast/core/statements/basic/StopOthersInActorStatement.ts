@@ -19,3 +19,9 @@
  *
  */
 
+
+import {Statement} from "../Statement";
+
+export class StopOthersInActorStatement extends Statement {
+
+}

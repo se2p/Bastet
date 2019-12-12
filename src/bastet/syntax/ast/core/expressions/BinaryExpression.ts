@@ -32,7 +32,7 @@ export class BinaryExpression<A extends AstNode, B extends AstNode> extends Abst
     private readonly _type: ScratchType;
 
     constructor(expressionType: ScratchType, op1: A, op2: B) {
-        super(op1, op2);
+        super([op1, op2]);
         this._type = expressionType;
         this._operand1 = op1;
         this._operand2 = op2;

@@ -19,3 +19,16 @@
  *
  */
 
+import {Statement} from "../Statement";
+import {NumberExpression} from "../../expressions/NumberExpression";
+
+export class WaitUntilStatement extends Statement {
+
+    private readonly _seconds: NumberExpression;
+
+    constructor(seconds: NumberExpression) {
+        super([seconds]);
+        this._seconds = seconds;
+    }
+
+}

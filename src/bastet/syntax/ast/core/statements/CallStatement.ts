@@ -19,3 +19,22 @@
  *
  */
 
+import {Statement} from "./Statement";
+import {Identifier} from "../Identifier";
+import {ExpressionList} from "../expressions/ExpressionList";
+import {OptionalAstNode} from "../../AstNode";
+
+export class CallStatement extends Statement {
+
+    private readonly _calledMethod: Identifier;
+    private readonly _args: ExpressionList;
+    private readonly _assignResultTo: OptionalAstNode<Identifier>;
+
+    constructor(calledMethod: Identifier, args: ExpressionList, assignResultTo: Identifier) {
+        super([calledMethod, args, assignResultTo]);
+        this._calledMethod = calledMethod;
+        this._args = args;
+        this._assignResultTo = assignResultTo;
+    }
+
+}

@@ -19,3 +19,21 @@
  *
  */
 
+import {Expression} from "./Expression";
+import {AbstractNode, AstNode} from "../../AstNode";
+import {ScratchType} from "../ScratchType";
+
+export abstract class AbstractExpression extends AbstractNode implements Expression {
+
+    private readonly _type: ScratchType;
+
+    protected constructor(type: ScratchType, childs: AstNode[]) {
+        super(childs);
+        this._type = type;
+    }
+
+    get type(): ScratchType {
+        return this._type;
+    }
+
+}

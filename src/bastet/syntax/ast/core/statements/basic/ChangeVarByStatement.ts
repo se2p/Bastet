@@ -19,3 +19,19 @@
  *
  */
 
+import {Statement} from "../Statement";
+import {Identifier} from "../../Identifier";
+import {Expression} from "../../expressions/Expression";
+
+export class ChangeVarByStatement extends Statement {
+
+    private readonly _variable: Identifier;
+    private readonly _value: Expression;
+
+    constructor(variable: Identifier, value: Expression) {
+        super([variable, value]);
+        this._variable = variable;
+        this._value = value;
+    }
+
+}

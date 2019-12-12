@@ -19,3 +19,9 @@
  *
  */
 
+import {AstNodeList} from "../../AstNodeList";
+import {Expression} from "./Expression";
+
+export class ExpressionList extends AstNodeList<Expression> {
+
+}

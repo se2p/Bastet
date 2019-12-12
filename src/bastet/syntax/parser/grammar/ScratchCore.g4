@@ -218,23 +218,20 @@ terminationStmt :
 stringExpr : coreStringExpr ;
 
 coreStringExpr  :
-   String
- |  variable
- |  'as' 'string' numExpr
- |  'as' 'string' boolExpr
+   String # StringLiteralExpression
+ |  variable # StringVariableExpression
+ |  'as' 'string' numExpr # NumAsStringExpression
+ |  'as' 'string' boolExpr # BoolAsStringExpression
 
- |  'attribute'  stringExpr  'of'  Ident                 // query an attribute value of an actor (sprites, the stage)
- |  'resource' 'attribute'  stringExpr 'of'  variable    // query attributes of ressources, for example, the original size
- |  'join'  stringExpr stringExpr
- |  'letter'  numExpr 'of'  stringExpr
- |  'item'  numExpr 'of'  variable
+ |  'attribute'  stringExpr  'of'  Ident  # StringAttributeOfExpression               // query an attribute value of an actor (sprites, the stage)
+ |  'resource' 'attribute'  stringExpr 'of'  variable  # ResourceAttributeOfExpression  // query attributes of ressources, for example, the original size
+ |  'join'  stringExpr stringExpr # JoinStringsExpression
+ |  'letter'  numExpr 'of'  stringExpr # IthLetterOfStringExpression
+ |  'item'  numExpr 'of'  variable # IthStringItemOfExpression
 
- |  defaultStringExpr
- |  unspecifiedStringExpr ;
-
-defaultStringExpr : 'default' String 'for' stringExpr ;
-
-unspecifiedStringExpr : '?string' ;
+ |  'default' String 'for' stringExpr # DefaultStringExpression
+ |  '?string' # UnspecifiedStringExpression
+ ;
 
 boolExpr : coreBoolExpr ;
 

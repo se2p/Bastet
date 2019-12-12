@@ -44,25 +44,41 @@ export abstract class ScratchType extends AbstractNode {
 
 export class VoidType extends ScratchType {
 
-    private static readonly VOID_TYPE = new VoidType();
+    private static readonly INSTANCE = new VoidType();
 
-    static instance() {
-        return this.VOID_TYPE;
+    static instance(): VoidType {
+        return this.INSTANCE;
     }
 
 }
 
 export class NumberType extends ScratchType {
 
+    private static readonly INSTANCE = new NumberType();
+
+    static instance() : StringType {
+        return this.INSTANCE;
+    }
 
 }
 
 export class BooleanType extends ScratchType {
 
+    private static readonly INSTANCE = new BooleanType();
+
+    static instance() : StringType {
+        return this.INSTANCE;
+    }
+
 }
 
 export class StringType extends ScratchType {
 
+    private static readonly INSTANCE = new StringType();
+
+    static instance() : StringType {
+        return this.INSTANCE;
+    }
 
 }
 

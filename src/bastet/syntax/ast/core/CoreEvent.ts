@@ -20,7 +20,45 @@
  */
 
 import {AbstractNode} from "../AstNode";
+import {StringExpression} from "./expressions/StringExpression";
+import {BooleanExpression} from "./expressions/BooleanExpression";
 
-export class CoreEvent extends AbstractNode {
+export abstract class CoreEvent extends AbstractNode {
 
 }
+
+export class NeverEvent extends CoreEvent {
+
+}
+
+export class StartupEvent extends CoreEvent {
+
+}
+
+export class CloneStartEvent extends CoreEvent {
+
+}
+
+export class MessageReceivedEvent extends CoreEvent {
+
+    private readonly _message: StringExpression;
+
+    constructor(message: StringExpression) {
+        super([message]);
+        this._message = message;
+    }
+
+}
+
+export class ConditionReachedEvent extends CoreEvent {
+
+    private readonly _cond: BooleanExpression;
+
+    constructor(cond: BooleanExpression) {
+        super([cond]);
+        this._cond = cond;
+    }
+
+}
+
+

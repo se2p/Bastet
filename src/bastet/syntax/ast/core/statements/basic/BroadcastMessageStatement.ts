@@ -19,3 +19,8 @@
  *
  */
 
+import {Statement} from "../Statement";
+
+export class BroadcastMessageStatement extends Statement {
+
+}

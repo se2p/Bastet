@@ -20,3 +20,53 @@
  */
 
 
+import {Statement} from "../Statement";
+import {Expression} from "../../expressions/Expression";
+import {StringExpression} from "../../expressions/StringExpression";
+import {Identifier} from "../../Identifier";
+
+export abstract class SetStatement extends Statement {
+
+}
+
+export class SetAttributeToStatement extends SetStatement {
+
+    private readonly _attrib: StringExpression;
+    private readonly _toValue: Expression;
+
+    constructor(attrib: StringExpression, toValue: Expression) {
+        super([attrib, toValue]);
+        this._attrib = attrib;
+        this._toValue = toValue;
+    }
+
+}
+
+export class SetAttributeOfToStatement extends SetStatement {
+
+    private readonly _attrib: StringExpression;
+    private readonly _ofEntity: Identifier;
+    private readonly _toValue: Expression;
+
+    constructor(attrib: StringExpression, ofEntity: Identifier, toValue: Expression) {
+        super([attrib, ofEntity, toValue]);
+        this._attrib = attrib;
+        this._ofEntity = ofEntity;
+        this._toValue = toValue;
+    }
+
+}
+
+export class SetVariableToStatement extends SetStatement {
+
+    private readonly _variable: Identifier;
+    private readonly _toValue: Expression;
+
+    constructor(variable: Identifier, toValue: Expression) {
+        super([variable, toValue]);
+        this._variable = variable;
+        this._toValue = toValue;
+    }
+
+}
+

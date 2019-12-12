@@ -63,4 +63,32 @@ export abstract class AbstractNode implements AstNode {
 
 }
 
+export abstract class OptionalAstNode<T extends AstNode> extends AbstractNode {
+
+}
+
+export class PresentAstNode<T extends AstNode> extends OptionalAstNode<T> {
+
+    private readonly _node: T;
+
+    constructor(node: T) {
+        super([node]);
+        this._node = node;
+    }
+
+    get node(): T {
+        return this._node;
+    }
+
+}
+
+export class AbsentAstNode<T extends AstNode>  extends OptionalAstNode<T> {
+
+    constructor() {
+        super([]);
+    }
+
+}
+
+
 
