@@ -1,5 +1,5 @@
 /*
- *   BASTET Program Analysis Framework
+ *   BASTET Program Analysis and Verification Framework
  *
  *   Copyright 2019 by University of Passau (uni-passau.de)
  *
