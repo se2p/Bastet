@@ -2,7 +2,7 @@
 /*
  *   BASTET Program Analysis Framework
  *
- *   Copyright 2019 by University of Passau
+ *   Copyright 2019 by University of Passau (uni-passau.de)
  *
  *   Maintained by Andreas Stahlbauer (firstname@lastname.net)
  *
