@@ -19,3 +19,31 @@
  *
  */
 
+import {AbstractNode} from "../AstNode";
+import {Identifier} from "./Identifier";
+import {ImportDefinitionList} from "./ImportDefinition";
+import {ActorDefinitionList} from "./ActorDefinition";
+
+export class ProgramDefinition extends AbstractNode {
+
+    private readonly _ident: Identifier;
+    private readonly _imports: ImportDefinitionList;
+    private readonly _actors: ActorDefinitionList;
+
+    constructor(ident: Identifier, imports: ImportDefinitionList, actors: ActorDefinitionList) {
+        super([ident, imports, actors]);
+    }
+
+    get ident(): Identifier {
+        return this._ident;
+    }
+
+    get imports(): ImportDefinitionList {
+        return this._imports;
+    }
+
+    get actors(): ActorDefinitionList {
+        return this._actors;
+    }
+
+}

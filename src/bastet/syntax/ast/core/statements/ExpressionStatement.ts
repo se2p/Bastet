@@ -19,4 +19,6 @@
  *
  */
 
+import {AstNode} from "../../AstNode";
+
 export class ExpressionStatement implements AstNode {}

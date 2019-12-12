@@ -19,3 +19,13 @@
  *
  */
 
+import {AbstractNode} from "../AstNode";
+import {StringLiteral} from "./expressions/StringExpression";
+
+export class ResourceLocation extends AbstractNode {
+
+    constructor(uri: StringLiteral) {
+        super([uri]);
+    }
+
+}

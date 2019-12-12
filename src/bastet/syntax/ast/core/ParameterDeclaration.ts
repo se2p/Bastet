@@ -19,3 +19,24 @@
  *
  */
 
+import {AbstractNode} from "../AstNode";
+import {AstNodeList} from "../AstNodeList";
+import {Identifier} from "./Identifier";
+import {ScratchType} from "./ScratchType";
+
+export class ParameterDeclaration extends AbstractNode {
+
+    private readonly _ident : Identifier;
+    private readonly _type : ScratchType;
+
+    constructor(ident: Identifier, type: ScratchType) {
+        super([ident, type]);
+        this._ident = ident;
+        this._type = type;
+    }
+
+}
+
+export class ParameterDeclarationList extends AstNodeList<ParameterDeclaration> {
+
+}

@@ -28,7 +28,13 @@
 // | 'map' indexType ;
 
 
-export abstract class ScratchType {
+import {AbstractNode} from "../AstNode";
+
+export abstract class ScratchType extends AbstractNode {
+
+    protected constructor() {
+        super([]);
+    }
 
     public static registerType(typeIdent: string, type: ScratchType) {
 
@@ -37,10 +43,6 @@ export abstract class ScratchType {
 }
 
 export class VoidType extends ScratchType {
-
-    constructor() {
-        super();
-    }
 
     private static readonly VOID_TYPE = new VoidType();
 
@@ -52,49 +54,30 @@ export class VoidType extends ScratchType {
 
 export class NumberType extends ScratchType {
 
-    constructor() {
-        super();
-    }
 
 }
 
 export class BooleanType extends ScratchType {
 
-    constructor() {
-        super();
-    }
-
 }
 
 export class StringType extends ScratchType {
 
-    constructor() {
-        super();
-    }
 
 }
 
 export class StringEnumType extends ScratchType {
 
-    constructor() {
-        super();
-    }
 
 }
 
 export class ListType extends ScratchType {
 
-    constructor() {
-        super();
-    }
 
 }
 
 export class MapType extends ScratchType {
 
-    constructor() {
-        super();
-    }
 
 }
 

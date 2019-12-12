@@ -19,3 +19,24 @@
  *
  */
 
+import {AbstractNode} from "../AstNode";
+import {AstNodeList} from "../AstNodeList";
+import {Identifier} from "./Identifier";
+import {ResourceLocation} from "./ResourceLocation";
+
+export class ImportDefinition extends AbstractNode {
+
+    private readonly _toImport: Identifier;
+    private readonly _importFrom: ResourceLocation;
+
+    constructor(toImport: Identifier, importFrom: ResourceLocation) {
+        super([toImport, importFrom]);
+        this._toImport = toImport;
+        this._importFrom = importFrom;
+    }
+
+}
+
+export class ImportDefinitionList extends AstNodeList<ImportDefinition> {
+
+}

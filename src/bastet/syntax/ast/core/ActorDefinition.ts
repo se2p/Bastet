@@ -19,3 +19,30 @@
  *
  */
 
+import {AbstractNode} from "../AstNode";
+import {AstNodeList} from "../AstNodeList";
+import {Identifier} from "./Identifier";
+import {ResourceDefinitionList} from "./ResourceDefinition";
+import {MethodDefinitionList} from "./MethodDefinition";
+import {ScriptDefinitionList} from "./ScriptDefinition";
+import {StatementList} from "./statements/Statement";
+
+export class ActorDefinition extends AbstractNode {
+
+    private static readonly _ident: Identifier;
+    private static readonly _inheritsFrom: Identifier|null;
+    private static readonly _resourceDefs: ResourceDefinitionList;
+    private static readonly _declarationStmts: StatementList;
+    private static readonly _initStmts: StatementList;
+    private static readonly _methodDefs: MethodDefinitionList;
+    private static readonly _scriptList: ScriptDefinitionList;
+
+    constructor(ident, inheritsFrom, resourceDefs, declarations, inits, methods, scripts) {
+        super([]);
+    }
+
+}
+
+export class ActorDefinitionList extends AstNodeList<ActorDefinition> {
+
+}

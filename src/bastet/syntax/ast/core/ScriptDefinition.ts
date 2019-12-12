@@ -30,7 +30,7 @@ export class ScriptDefinition extends AbstractNode {
     private readonly _stmtList: AstNodeList<Statement>;
 
     constructor(event: CoreEvent, stmtList: AstNodeList<Statement>) {
-        super(event, stmtList);
+        super([event, stmtList]);
     }
 
     get event(): CoreEvent {
@@ -40,5 +40,9 @@ export class ScriptDefinition extends AbstractNode {
     get stmtList(): CoreEvent {
         return this._stmtList;
     }
+
+}
+
+export class ScriptDefinitionList extends AstNodeList<ScriptDefinition> {
 
 }

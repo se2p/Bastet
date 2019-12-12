@@ -19,3 +19,16 @@
  *
  */
 
+import {AbstractNode} from "../AstNode";
+import {StringLiteral} from "./expressions/StringExpression";
+
+export class Identifier extends AbstractNode {
+
+    private readonly _name: StringLiteral;
+
+    constructor(name: StringLiteral) {
+        super([name]);
+        this._name = name;
+    }
+
+}

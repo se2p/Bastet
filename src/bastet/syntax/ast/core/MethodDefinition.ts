@@ -19,3 +19,44 @@
  *
  */
 
+import {AbstractNode} from "../AstNode";
+import {AstNodeList} from "../AstNodeList";
+import {Identifier} from "./Identifier";
+import {ParameterDeclarationList} from "./ParameterDeclaration";
+import {StatementList} from "./statements/Statement";
+import {ScratchType} from "./ScratchType";
+
+
+export class ResultDeclaration extends AbstractNode {
+
+    private readonly _ident: Identifier;
+    private readonly _type: ScratchType;
+
+    constructor(ident: Identifier, type: ScratchType) {
+        super([ident, type]);
+        this._ident = ident;
+        this._type = type;
+    }
+
+}
+
+export class MethodDefinition extends AbstractNode {
+
+    private readonly _ident: Identifier;
+    private readonly _params: ParameterDeclarationList;
+    private readonly _statements: StatementList;
+    private readonly _returns: ResultDeclaration;
+
+    constructor(ident: Identifier, params: ParameterDeclarationList, statements: StatementList, returns: ResultDeclaration) {
+        super([ident, params, statements, returns]);
+        this._ident = ident;
+        this._params = params;
+        this._statements = statements;
+        this._returns = returns;
+    }
+
+}
+
+export class MethodDefinitionList extends AstNodeList<MethodDefinition> {
+
+}

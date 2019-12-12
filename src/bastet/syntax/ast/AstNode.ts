@@ -20,6 +20,8 @@
  */
 
 import {CoreVisitor} from "./CoreVisitor";
+import {List as ImmList, Record as ImmRecord} from "immutable"
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
 export interface AstNode {
 
@@ -29,13 +31,16 @@ export interface AstNode {
 
     uniqueName: string;
 
+    // @ts-ignore
+    toRecord(): ImmList;
+
 }
 
 export abstract class AbstractNode implements AstNode {
 
     private readonly _children: AstNode[];
 
-    protected constructor(... childs: AstNode[]) {
+    protected constructor(childs: AstNode[]) {
         this._children = childs;
     }
 
@@ -49,6 +54,11 @@ export abstract class AbstractNode implements AstNode {
 
     accept<R>(visitor: CoreVisitor<R>): R {
         return visitor.visit(this);
+    }
+
+    // @ts-ignore
+    toRecord(): ImmList {
+        throw new ImplementMeException();
     }
 
 }

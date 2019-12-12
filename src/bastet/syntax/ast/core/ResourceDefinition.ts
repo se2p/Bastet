@@ -19,3 +19,38 @@
  *
  */
 
+import {AbstractNode} from "../AstNode";
+import {AstNodeList} from "../AstNodeList";
+import {Identifier} from "./Identifier";
+import {ResourceLocation} from "./ResourceLocation";
+
+export abstract class ResourceType extends AbstractNode {
+
+}
+
+export class SoundResourceType extends ResourceType {
+
+}
+
+export class ImageResourceType extends ResourceType {
+
+}
+
+export class ResourceDefinition extends AbstractNode {
+
+    private readonly _resourceType: ResourceType;
+    private readonly _ident: Identifier;
+    private readonly _resourceLocator: ResourceLocation;
+
+    constructor(resType: ResourceType, ident: Identifier, locator: ResourceLocation) {
+        super([resType, ident, locator]);
+        this._resourceType = resType;
+        this._ident = ident;
+        this._resourceLocator = locator;
+    }
+
+}
+
+export class ResourceDefinitionList extends AstNodeList<ResourceDefinition> {
+
+}

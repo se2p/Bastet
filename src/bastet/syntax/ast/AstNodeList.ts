@@ -23,4 +23,15 @@ import {AbstractNode, AstNode} from "./AstNode";
 
 export class AstNodeList<E extends AstNode> extends AbstractNode {
 
+    private readonly _elements: E[];
+
+    constructor(elements: E[]) {
+        super(elements);
+        this._elements = elements;
+    }
+
+    get elements(): E[] {
+        return this._elements;
+    }
+
 }

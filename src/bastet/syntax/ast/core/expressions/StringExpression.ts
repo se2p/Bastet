@@ -20,6 +20,11 @@
  */
 
 import {Expression} from "./Expression";
+import {AbstractNode} from "../../AstNode";
+
+export class StringLiteral extends AbstractNode {
+
+}
 
 export interface StringExpression extends Expression {
 
