@@ -80,7 +80,7 @@ scriptList : script* ;
 
 // Scratch programs are written in an event-driven manner.
 // The different events that can trigger the execution
-// of a script are defined by the non-terminal `Event`.
+// of a script are defined by the non-terminal `CoreEvent`.
 event : coreEvent ;
 
 coreEvent :

@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright 2019 University of Passau
@@ -18,6 +17,4 @@
  *    limitations under the License.
  */
 
-export class UnaryExpression {
 
-}

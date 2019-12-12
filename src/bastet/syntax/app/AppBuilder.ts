@@ -48,7 +48,7 @@ import {MethodDefinition, MethodDefinitionMap} from "./MethodDefinition";
 import {Script} from "./controlflow/Script";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
-import {BooleanType, ListType, MapType, NumberType, ScratchType, StringEnumType, StringType} from "../ast/ScratchType";
+import {BooleanType, ListType, MapType, NumberType, ScratchType, StringEnumType, StringType} from "../ast/core/ScratchType";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {AppEvent, AppEvents, NeverEvent, StartupEvent} from "./AppEvent";

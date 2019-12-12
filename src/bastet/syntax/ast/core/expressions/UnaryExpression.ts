@@ -17,6 +17,19 @@
  *    limitations under the License.
  */
 
-export class BinaryExpression {
+import {AbstractNode, AstNode} from "../../AstNode";
+
+export class UnaryExpression<A extends AstNode> extends AbstractNode {
+
+    private readonly _operand1: A;
+
+    constructor(op1: A) {
+        super(op1);
+        this._operand1 = op1;
+    }
+
+    get operand1(): A {
+        return this._operand1;
+    }
 
 }

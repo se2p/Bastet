@@ -17,6 +17,11 @@
  *    limitations under the License.
  */
 
-export class Expression {
+import {ScratchType} from "../ScratchType";
+import {AstNode} from "../../AstNode";
+
+export interface Expression extends AstNode {
+
+    type: ScratchType;
 
 }

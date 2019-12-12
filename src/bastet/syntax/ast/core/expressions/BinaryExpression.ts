@@ -17,38 +17,35 @@
  *    limitations under the License.
  */
 
-import {CoreVisitor} from "./CoreVisitor";
+import {AbstractNode, AstNode} from "../../AstNode";
+import {Expression} from "./Expression";
+import {ScratchType} from "../ScratchType";
 
-export interface AstNode {
+export class BinaryExpression<A extends AstNode, B extends AstNode> extends AbstractNode implements Expression {
 
-    accept<R>(visitor: CoreVisitor<R>): R;
+    private readonly _operand1: A;
 
-    children: AstNode[];
+    private readonly _operand2: B;
 
-    uniqueName: string;
+    private readonly _type: ScratchType;
+
+    constructor(expressionType: ScratchType, op1: A, op2: B) {
+        super(op1, op2);
+        this._type = expressionType;
+        this._operand1 = op1;
+        this._operand2 = op2;
+    }
+
+    get operand1(): A {
+        return this._operand1;
+    }
+
+    get operand2(): B {
+        return this._operand2;
+    }
+
+    get type(): ScratchType {
+        return this._type;
+    }
 
 }
-
-export abstract class AbstractNode implements AstNode {
-
-    private readonly _children: AstNode[];
-
-    protected constructor(... childs: AstNode[]) {
-        this._children = childs;
-    }
-
-    get children(): AstNode[] {
-        return this._children;
-    }
-
-    get uniqueName(): string {
-        return this.constructor.name;
-    }
-
-    accept<R>(visitor: CoreVisitor<R>): R {
-        return visitor.visit(this);
-    }
-
-}
-
-

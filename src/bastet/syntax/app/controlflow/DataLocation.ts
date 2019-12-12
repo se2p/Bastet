@@ -17,7 +17,7 @@
  *    limitations under the License.
  */
 
-import {ScratchType, VoidType} from "../../ast/ScratchType";
+import {ScratchType, VoidType} from "../../ast/core/ScratchType";
 import {RuleNode} from "antlr4ts/tree";
 
 export type DataLocationID = string;
