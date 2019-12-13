@@ -29,7 +29,7 @@ export interface ListExpression extends Expression {
 
 }
 
-export class ListVariableExpression extends AbstractExpression {
+export class ListVariableExpression extends AbstractExpression implements ListExpression {
 
     private readonly _list: Identifier;
 
@@ -39,7 +39,7 @@ export class ListVariableExpression extends AbstractExpression {
     }
 }
 
-export class ExpressionListExpression extends AbstractExpression {
+export class ExpressionListExpression extends AbstractExpression implements ListExpression {
 
     private readonly _elements: ExpressionList;
 

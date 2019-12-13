@@ -53,7 +53,12 @@ export abstract class AbstractNode implements AstNode {
     }
 
     accept<R>(visitor: CoreVisitor<R>): R {
-        return visitor.visit(this);
+        const visitMethod: string = `visit${this.constructor.name}`;
+        if (visitor[visitMethod]) {
+            return visitor[visitMethod](this);
+        } else {
+            return visitor.visit(this);
+        }
     }
 
     // @ts-ignore

@@ -44,6 +44,16 @@ export abstract class AbstractStringExpression extends AbstractExpression implem
 
 }
 
+export class StringVariableExpression extends AbstractStringExpression {
+
+    private readonly _variable: Identifier;
+
+    constructor(variable: Identifier) {
+        super([variable]);
+        this._variable = variable;
+    }
+}
+
 export class NumAsStringExpression extends AbstractStringExpression {
 
     private readonly _num: NumberExpression;
