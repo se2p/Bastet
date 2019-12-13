@@ -27,12 +27,24 @@ export interface TerminationStatement  {
 
 export class StopAllStatement extends Statement implements TerminationStatement {
 
+    constructor() {
+        super([]);
+    }
+
 }
 
 export class StopThisStatement extends Statement implements  TerminationStatement {
 
+    constructor() {
+        super([]);
+    }
+
 }
 
 export class DelteThisCloneStatement extends Statement implements  TerminationStatement {
+
+    constructor() {
+        super([]);
+    }
 
 }

@@ -29,14 +29,23 @@ export abstract class CoreEvent extends AbstractNode {
 
 export class NeverEvent extends CoreEvent {
 
+    constructor() {
+        super([]);
+    }
 }
 
 export class StartupEvent extends CoreEvent {
 
+    constructor() {
+        super([]);
+    }
 }
 
 export class CloneStartEvent extends CoreEvent {
 
+    constructor() {
+        super([]);
+    }
 }
 
 export class MessageReceivedEvent extends CoreEvent {

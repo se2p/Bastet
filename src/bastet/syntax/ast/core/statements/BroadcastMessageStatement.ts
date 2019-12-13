@@ -20,7 +20,15 @@
  */
 
 import {Statement} from "./Statement";
+import {StringExpression} from "../expressions/StringExpression";
 
 export class BroadcastMessageStatement extends Statement {
+
+    private readonly _msg: StringExpression;
+
+    constructor(msg: StringExpression) {
+        super([msg]);
+        this._msg = msg;
+    }
 
 }

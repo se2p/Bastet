@@ -30,10 +30,16 @@ export abstract class ResourceType extends AbstractNode {
 
 export class SoundResourceType extends ResourceType {
 
+    constructor() {
+        super([]);
+    }
 }
 
 export class ImageResourceType extends ResourceType {
 
+    constructor() {
+        super([]);
+    }
 }
 
 export class ResourceDefinition extends AbstractNode {

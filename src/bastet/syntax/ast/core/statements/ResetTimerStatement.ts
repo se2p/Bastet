@@ -23,4 +23,7 @@ import {Statement} from "./Statement";
 
 export class ResetTimerStatement extends Statement {
 
+    constructor() {
+        super([]);
+    }
 }

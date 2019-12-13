@@ -20,7 +20,14 @@
  */
 
 import {Statement} from "./Statement";
+import {StringExpression} from "../expressions/StringExpression";
 
 export class BroadcastAndWaitStatement extends Statement {
 
+    private readonly _msg: StringExpression;
+
+    constructor(msg: StringExpression) {
+        super([msg]);
+        this._msg = msg;
+    }
 }

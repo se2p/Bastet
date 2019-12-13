@@ -23,4 +23,7 @@ import {Statement} from "./Statement";
 
 export class EpsilonStatement extends Statement {
 
+    constructor() {
+        super([]);
+    }
 }
