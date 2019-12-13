@@ -29,6 +29,7 @@
 
 
 import {AbstractNode} from "../AstNode";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export abstract class ScratchType extends AbstractNode {
 
@@ -89,6 +90,9 @@ export class StringEnumType extends ScratchType {
 
 export class ListType extends ScratchType {
 
+    public static withElementType(elementType: ScratchType): ScratchType {
+        throw new ImplementMeException();
+    }
 
 }
 

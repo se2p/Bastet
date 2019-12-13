@@ -24,4 +24,7 @@ import {Expression} from "./Expression";
 
 export class ExpressionList extends AstNodeList<Expression> {
 
+    constructor(elements: Expression[]) {
+        super(elements);
+    }
 }

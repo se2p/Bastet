@@ -19,6 +19,32 @@
  *
  */
 
-export interface ListExpression {
+import {Expression} from "./Expression";
+import {AbstractExpression} from "./AbstractExpression";
+import {Identifier} from "../Identifier";
+import {ListType, ScratchType, StringType} from "../ScratchType";
+import {ExpressionList} from "./ExpressionList";
 
+export interface ListExpression extends Expression {
+
+}
+
+export class ListVariableExpression extends AbstractExpression {
+
+    private readonly _list: Identifier;
+
+    constructor(list: Identifier) {
+        super(ListType.withElementType(StringType.instance()), [list]);
+        this._list = list;
+    }
+}
+
+export class ExpressionListExpression extends AbstractExpression {
+
+    private readonly _elements: ExpressionList;
+
+    constructor(elementType: ScratchType, elements: ExpressionList) {
+        super(ListType.withElementType(elementType), [elements]);
+        this._elements = elements;
+    }
 }

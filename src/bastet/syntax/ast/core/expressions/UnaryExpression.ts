@@ -20,18 +20,26 @@
  */
 
 import {AbstractNode, AstNode} from "../../AstNode";
+import {Expression} from "./Expression";
+import {ScratchType} from "../ScratchType";
 
-export class UnaryExpression<A extends AstNode> extends AbstractNode {
+export class UnaryExpression<A extends AstNode> extends AbstractNode implements Expression {
 
     private readonly _operand1: A;
+    private readonly _type: ScratchType;
 
-    constructor(op1: A) {
+    constructor(type: ScratchType, op1: A) {
         super([op1]);
         this._operand1 = op1;
+        this._type = type;
     }
 
     get operand1(): A {
         return this._operand1;
+    }
+
+    get type(): ScratchType {
+        return this._type;
     }
 
 }
