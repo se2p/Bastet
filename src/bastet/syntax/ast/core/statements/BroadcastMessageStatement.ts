@@ -19,16 +19,8 @@
  *
  */
 
-import {Statement} from "../Statement";
-import {BooleanExpression} from "../../expressions/BooleanExpression";
+import {Statement} from "./Statement";
 
-export class WaitUntilStatement extends Statement {
-
-    private readonly _until: BooleanExpression;
-
-    constructor(until: BooleanExpression) {
-        super([until]);
-        this._until = until;
-    }
+export class BroadcastMessageStatement extends Statement {
 
 }

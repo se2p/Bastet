@@ -19,8 +19,9 @@
  *
  */
 
-import {Statement} from "../Statement";
 
-export class BroadcastMessageStatement extends Statement {
+import {Statement} from "./Statement";
+
+export class StopOthersInActorStatement extends Statement {
 
 }

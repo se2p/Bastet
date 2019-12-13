@@ -19,19 +19,16 @@
  *
  */
 
-import {Statement} from "../Statement";
-import {Identifier} from "../../Identifier";
-import {Expression} from "../../expressions/Expression";
+import {Statement} from "./Statement";
+import {StringExpression} from "../expressions/StringExpression";
 
-export class ChangeVarByStatement extends Statement {
+export class CreateCloneOfStatement extends Statement {
 
-    private readonly _variable: Identifier;
-    private readonly _value: Expression;
+    private readonly _cloneOf: StringExpression;
 
-    constructor(variable: Identifier, value: Expression) {
-        super([variable, value]);
-        this._variable = variable;
-        this._value = value;
+    constructor(cloneOf: StringExpression) {
+        super([cloneOf]);
+        this._cloneOf = cloneOf;
     }
 
 }

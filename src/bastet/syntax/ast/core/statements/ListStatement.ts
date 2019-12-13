@@ -19,10 +19,10 @@
  *
  */
 
-import {Identifier} from "../../Identifier";
-import {Statement} from "../Statement";
-import {NumberExpression} from "../../expressions/NumberExpression";
-import {StringExpression} from "../../expressions/StringExpression";
+import {Identifier} from "../Identifier";
+import {Statement} from "./Statement";
+import {NumberExpression} from "../expressions/NumberExpression";
+import {StringExpression} from "../expressions/StringExpression";
 
 export interface ListStatement {
 

@@ -19,16 +19,8 @@
  *
  */
 
-import {Statement} from "../Statement";
-import {StringExpression} from "../../expressions/StringExpression";
+import {Statement} from "./Statement";
 
-export class CreateCloneOfStatement extends Statement {
-
-    private readonly _cloneOf: StringExpression;
-
-    constructor(cloneOf: StringExpression) {
-        super([cloneOf]);
-        this._cloneOf = cloneOf;
-    }
+export class BroadcastAndWaitStatement extends Statement {
 
 }

@@ -19,8 +19,8 @@
  *
  */
 
-import {Statement} from "../Statement";
+import {Statement} from "./Statement";
 
-export class ChangeAttributeByStatement extends Statement {
+export class ResetTimerStatement extends Statement {
 
 }

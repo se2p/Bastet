@@ -20,10 +20,10 @@
  */
 
 
-import {Statement} from "../Statement";
-import {Expression} from "../../expressions/Expression";
-import {StringExpression} from "../../expressions/StringExpression";
-import {Identifier} from "../../Identifier";
+import {Statement} from "./Statement";
+import {Expression} from "../expressions/Expression";
+import {StringExpression} from "../expressions/StringExpression";
+import {Identifier} from "../Identifier";
 
 export abstract class SetStatement extends Statement {
 

@@ -19,16 +19,20 @@
  *
  */
 
-import {Statement} from "../Statement";
-import {NumberExpression} from "../../expressions/NumberExpression";
+import {Statement} from "./Statement";
 
-export class WaitUntilStatement extends Statement {
+export interface TerminationStatement  {
 
-    private readonly _seconds: NumberExpression;
+}
 
-    constructor(seconds: NumberExpression) {
-        super([seconds]);
-        this._seconds = seconds;
-    }
+export class StopAllStatement extends Statement implements TerminationStatement {
+
+}
+
+export class StopThisStatement extends Statement implements  TerminationStatement {
+
+}
+
+export class DelteThisCloneStatement extends Statement implements  TerminationStatement {
 
 }
