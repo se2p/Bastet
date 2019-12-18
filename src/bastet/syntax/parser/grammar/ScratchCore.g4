@@ -5,13 +5,13 @@ import ScratchLiterals;
 // A program has a name and is composed of a list of actors.
 // The term 'actor' is used to describe one entity in the Scratch world.
 // We use the terms 'script group' and 'entity' as synonyms for 'actor'.
-program : fileType Ident importDefinitionList actorDefinitionList ;
+program : fileType ident importDefinitionList actorDefinitionList ;
 
 fileType : 'program' | 'module' ;
 
 importDefinitionList : importDefinition* ;
 
-importDefinition : 'import' Ident 'from' resourceLocator ;
+importDefinition : 'import' ident 'from' resourceLocator ;
 
 // Actors in a list of actors are separated by whitespace
 actorDefinitionList : actorDefinition* ;
@@ -22,8 +22,8 @@ actorDefinitionList : actorDefinition* ;
 // and definitions, and a list of scripts.
 // Along to the (user defined) set of variables, an actor has
 // *attributes* that influence its representation and behavior.
-actorDefinition : 'actor' Ident inheritsFrom 'begin' actorComponentsDefinition 'end' ;
-inheritsFrom : 'is' Ident | ;
+actorDefinition : 'actor' ident inheritsFrom 'begin' actorComponentsDefinition 'end' ;
+inheritsFrom : 'is' ident | ;
 
 // Whe distinguish between three types of actors:
 // A generic actor type ('actor'), the stage, and a type for sprites.
@@ -39,7 +39,7 @@ actorComponentsDefinition : resourceList declarationStmtList setStmtList methodD
 // define the static UI content to compose a Scratch program.
 // The type 'image' is used both for the *backdrops* of the stage
 // and for the *costumes* of the sprites.
-resource : resourceType Ident resourceLocator ;
+resource : resourceType ident resourceLocator ;
 
 resourceType : 'image' | 'sound' ;
 
@@ -50,9 +50,9 @@ resourceList : resource* ;
 // declaration statement, the variable is either local to the actor
 // or local to the current stack of a script execution.
 declarationStmt :
-        'declare' Ident 'as' type # DeclareVariable
+        'declare' ident 'as' type # DeclareVariable
      |  'declare' 'attribute' stringExpr 'as' type # DeclareAttribute
-     |  'declare' 'attribute' stringExpr 'of' Ident 'as' type # DeclareAttributeOf
+     |  'declare' 'attribute' stringExpr 'of' ident 'as' type # DeclareAttributeOf
      ;
 
 // A list of variable declarations.
@@ -61,7 +61,7 @@ declarationStmtList : declarationStmt* ;
 // The list of datatypes that are allowed for the declaration
 // of variables and attributes.
 type :
-   'number' # NumerType
+   'number' # NumberType
  | 'boolean' # BooleanType
  | 'string' # StringType
  | 'enum' '[' expressionListPlain ']' # EnumType
@@ -94,14 +94,17 @@ coreEvent :
 // reusable code blocks (also known as 'custom blocks').
 // A procedure is identified by a name and is parameterized
 // to take a number of arguments.
-methodDefinition : 'define' Ident parameterList stmtList methodResultDeclaration ;
-methodResultDeclaration : 'returns' Ident ':' type | ;
+methodDefinition : 'define' ident parameterList stmtList methodResultDeclaration ;
+methodResultDeclaration :
+    'returns' ident ':' type # FunctionReturnDefinition
+    | # VoidReturnDefinition
+    ;
 
 // A list of procedure definitions.
 methodDefinitionList : methodDefinition* ;
 
 // A procedure parameter.
-parameter : Ident ':' type ;
+parameter : ident ':' type ;
 
 // A list of method parameters in brackets.
 parameterList : '(' parameterListPlain ')' ;
@@ -149,7 +152,7 @@ repeatTimesStmt : 'repeat' numExpr 'times' stmtList   ;
 repeatForeverStmt : 'repeat' 'forever' stmtList ;
 
 // A statement to call user-defined procedures (custom blocks).
-callStmt : Ident expressionList ;
+callStmt : ident expressionList ;
 
 // A list of expressions that encapsulates, for example, the arguments
 // for procedure calls.
@@ -204,7 +207,7 @@ listStmt :
 
 setStmt :
     'set' 'attribute' String 'to' expression # SetAttributeToStatement
- |  'set' 'attribute' String 'of' Ident 'to' expression # SetAttributeOfToStatement
+ |  'set' 'attribute' String 'of' ident 'to' expression # SetAttributeOfToStatement
  |  'set' variable 'to' expression  # SetVariableToStatement;
 
 setStmtList : setStmt* ;
@@ -223,7 +226,7 @@ coreStringExpr  :
  |  'as' 'string' numExpr # NumAsStringExpression
  |  'as' 'string' boolExpr # BoolAsStringExpression
 
- |  'attribute'  stringExpr  'of'  Ident  # StringAttributeOfExpression               // query an attribute value of an actor (sprites, the stage)
+ |  'attribute'  stringExpr  'of'  ident  # StringAttributeOfExpression               // query an attribute value of an actor (sprites, the stage)
  |  'resource' 'attribute'  stringExpr 'of'  variable  # ResourceAttributeOfExpression  // query attributes of ressources, for example, the original size
  |  'join'  stringExpr stringExpr # JoinStringsExpression
  |  'letter'  numExpr 'of'  stringExpr # IthLetterOfStringExpression
@@ -322,17 +325,18 @@ coreExpression :
 unspecifiedExpr : '?expr' ;
 
 variable :
-      Ident # FlatVariable
-    | Ident '.' Ident # QualifiedVariable;
+      ident # FlatVariable
+    | ident '.' ident # QualifiedVariable;
 
 color :
     'rgba' numExpr numExpr numExpr numExpr # RGBAColorExpression
  |  'from' 'number' numExpr # ColorFromNumExpression
  ;
 
-Ident :
-    Identifier
-    | 'strid' String ;
+ident :
+    Identifier # IdentExpression
+    | 'strid' String # StrIdentExpression
+    ;
 
 number : DecimalLiteral ;
 

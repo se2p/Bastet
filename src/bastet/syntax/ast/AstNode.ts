@@ -70,6 +70,10 @@ export abstract class AbstractNode implements AstNode {
 
 export abstract class OptionalAstNode<T extends AstNode> extends AbstractNode {
 
+    protected constructor(childs: AstNode[]) {
+        super(childs);
+    }
+
 }
 
 export class PresentAstNode<T extends AstNode> extends OptionalAstNode<T> {

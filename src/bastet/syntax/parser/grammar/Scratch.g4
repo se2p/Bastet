@@ -5,7 +5,7 @@ import ScratchCore;
 event :
     coreEvent # InCoreEvent
  |  'value' 'of' variable 'above' numExpr # VariableValueEvent
- |  'backdrop' 'switched' 'to' Ident # BackdropChangeEvent
+ |  'backdrop' 'switched' 'to' ident # BackdropChangeEvent
  |  key 'pressed' # KeyEvent
  |  'clicked' # ClickEvent
  ;

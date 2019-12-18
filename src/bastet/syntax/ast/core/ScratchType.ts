@@ -30,6 +30,7 @@
 
 import {AbstractNode} from "../AstNode";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {ExpressionList} from "./expressions/ExpressionList";
 
 export abstract class ScratchType extends AbstractNode {
 
@@ -85,6 +86,20 @@ export class StringType extends ScratchType {
 
 export class StringEnumType extends ScratchType {
 
+    private readonly _values: ExpressionList;
+
+    constructor(values: ExpressionList) {
+        super();
+        this._values = values;
+    }
+
+    get values(): ExpressionList {
+        return this._values;
+    }
+
+    public static withValues(values: ExpressionList): StringEnumType {
+        return new StringEnumType(values);
+    }
 
 }
 

@@ -24,7 +24,8 @@ import {AstNodeList} from "../AstNodeList";
 import {Identifier} from "./Identifier";
 import {ParameterDeclarationList} from "./ParameterDeclaration";
 import {StatementList} from "./statements/Statement";
-import {ScratchType} from "./ScratchType";
+import {ScratchType, VoidType} from "./ScratchType";
+import {StringLiteral} from "./expressions/StringExpression";
 
 
 export class ResultDeclaration extends AbstractNode {
@@ -36,6 +37,12 @@ export class ResultDeclaration extends AbstractNode {
         super([ident, type]);
         this._ident = ident;
         this._type = type;
+    }
+
+    private static readonly VOID = new ResultDeclaration(new Identifier(new StringLiteral("")), VoidType.instance());
+
+    public static void(): ResultDeclaration {
+        return this.VOID;
     }
 
 }

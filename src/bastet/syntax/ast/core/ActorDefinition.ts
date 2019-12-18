@@ -56,4 +56,8 @@ export class ActorDefinition extends AbstractNode {
 
 export class ActorDefinitionList extends AstNodeList<ActorDefinition> {
 
+    constructor(elements: ActorDefinition[]) {
+        super(elements);
+    }
+
 }

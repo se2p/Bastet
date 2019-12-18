@@ -22,7 +22,11 @@
 import {AbstractNode, AstNode} from "../../AstNode";
 import {AstNodeList} from "../../AstNodeList";
 
-export abstract class StatementList extends AstNodeList<Statement> {
+export class StatementList extends AstNodeList<Statement> {
+
+    constructor(elements: Statement[]) {
+        super(elements);
+    }
 
 }
 

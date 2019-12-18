@@ -28,10 +28,6 @@ import {BooleanExpression} from "./BooleanExpression";
 import {Identifier} from "../Identifier";
 import {BinaryExpression} from "./BinaryExpression";
 
-export class StringLiteral extends AbstractNode {
-
-}
-
 export interface StringExpression extends Expression {
 
 }
@@ -40,6 +36,25 @@ export abstract class AbstractStringExpression extends AbstractExpression implem
 
     protected constructor(childs: AstNode[]) {
         super(StringType.instance(), childs);
+    }
+
+}
+
+export class StringLiteral extends AbstractStringExpression {
+
+    private readonly _text: string;
+
+    constructor(text: string) {
+        super([]);
+        this._text = text;
+    }
+
+    public static from(text: string): StringLiteral {
+        return new StringLiteral(text);
+    }
+
+    get text(): string {
+        return this._text;
     }
 
 }

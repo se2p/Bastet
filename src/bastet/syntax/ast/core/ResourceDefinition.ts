@@ -59,4 +59,8 @@ export class ResourceDefinition extends AbstractNode {
 
 export class ResourceDefinitionList extends AstNodeList<ResourceDefinition> {
 
+    constructor(elements: ResourceDefinition[]) {
+        super(elements);
+    }
+
 }

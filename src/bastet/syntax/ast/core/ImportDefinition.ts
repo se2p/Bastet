@@ -39,4 +39,8 @@ export class ImportDefinition extends AbstractNode {
 
 export class ImportDefinitionList extends AstNodeList<ImportDefinition> {
 
+    constructor(elements: ImportDefinition[]) {
+        super(elements);
+    }
+
 }

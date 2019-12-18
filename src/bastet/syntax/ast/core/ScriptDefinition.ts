@@ -20,24 +20,26 @@
  */
 
 import {AbstractNode} from "../AstNode";
-import {Statement} from "./statements/Statement";
+import {Statement, StatementList} from "./statements/Statement";
 import {AstNodeList} from "../AstNodeList";
 import {CoreEvent} from "./CoreEvent";
 
 export class ScriptDefinition extends AbstractNode {
 
     private readonly _event: CoreEvent;
-    private readonly _stmtList: AstNodeList<Statement>;
+    private readonly _stmtList: StatementList;
 
-    constructor(event: CoreEvent, stmtList: AstNodeList<Statement>) {
+    constructor(event: CoreEvent, stmtList: StatementList) {
         super([event, stmtList]);
+        this._event = event;
+        this._stmtList = stmtList;
     }
 
     get event(): CoreEvent {
         return this._event;
     }
 
-    get stmtList(): CoreEvent {
+    get stmtList(): StatementList {
         return this._stmtList;
     }
 

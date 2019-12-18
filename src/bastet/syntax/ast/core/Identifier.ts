@@ -19,7 +19,7 @@
  *
  */
 
-import {AbstractNode} from "../AstNode";
+import {AbsentAstNode, AbstractNode, OptionalAstNode, PresentAstNode} from "../AstNode";
 import {StringLiteral} from "./expressions/StringExpression";
 
 export class Identifier extends AbstractNode {
@@ -29,6 +29,14 @@ export class Identifier extends AbstractNode {
     constructor(name: StringLiteral) {
         super([name]);
         this._name = name;
+    }
+
+    public static optional(val: Identifier|null): OptionalAstNode<Identifier> {
+        if (!val) {
+            return new AbsentAstNode();
+        } else {
+            return new PresentAstNode<Identifier>(val);
+        }
     }
 
 }
