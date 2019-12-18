@@ -218,9 +218,18 @@ import {SetStatement} from "../ast/core/statements/SetStatement";
 import {Expression} from "../ast/core/expressions/Expression";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {ParameterDeclaration, ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
-import {BooleanType, NumberType, ScratchType, StringEnumType, StringType} from "../ast/core/ScratchType";
+import {
+    BooleanType,
+    ListType,
+    MapType,
+    NumberType,
+    ScratchType,
+    StringEnumType,
+    StringType
+} from "../ast/core/ScratchType";
 import {Scripts} from "../app/controlflow/Scripts";
 import {CoreEvent} from "../ast/core/CoreEvent";
+import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 
 class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
 
@@ -393,34 +402,57 @@ class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
         return new StatementList(elems);
     }
 
-    visitBooleanType(ctx: BooleanTypeContext): AstNode {
+    public visitBooleanType(ctx: BooleanTypeContext): AstNode {
         return BooleanType.instance();
     }
 
-    visitEnumType(ctx: EnumTypeContext): AstNode {
+    public visitEnumType(ctx: EnumTypeContext): AstNode {
         return StringEnumType.withValues(ctx.expressionListPlain().accept(this) as ExpressionList);
     }
 
-    visitStringType(ctx: StringTypeContext): AstNode {
+    public visitStringType(ctx: StringTypeContext): AstNode {
         return StringType.instance();
     }
 
-    visitListType(ctx: ListTypeContext): AstNode {
-
+    public visitListType(ctx: ListTypeContext): AstNode {
+        return ListType.withElementType(ctx.type().accept(this) as ScratchType);
     }
 
-    visitNumberType (ctx: NumberTypeContext): AstNode {
+    public visitNumberType (ctx: NumberTypeContext): AstNode {
         return NumberType.instance();
     }
 
-    visitMapType: (ctx: MapTypeContext) => AstNode;
+    public visitMapType (ctx: MapTypeContext): AstNode {
+        return MapType.withIndexType(ctx.indexType().accept(this) as ScratchType);
+    }
 
-    visitActorComponentsDefinition: (ctx: ActorComponentsDefinitionContext) => AstNode;
-    visitActorLookStmt: (ctx: ActorLookStmtContext) => AstNode;
-    visitActorSoundStmt: (ctx: ActorSoundStmtContext) => AstNode;
-    visitAddElementToStatement: (ctx: AddElementToStatementContext) => AstNode;
-    visitAskAndWaitStatement: (ctx: AskAndWaitStatementContext) => AstNode;
-    visitBackdropChangeEvent: (ctx: BackdropChangeEventContext) => AstNode;
+    public visitActorComponentsDefinition (ctx: ActorComponentsDefinitionContext): AstNode {
+        throw new IllegalStateException("Not expected to be needed.");
+    }
+
+    visitUntilStmt: (ctx: UntilStmtContext) => AstNode;
+    visitIfStmt: (ctx: IfStmtContext) => AstNode;
+    visitRepeatForeverStmt: (ctx: RepeatForeverStmtContext) => AstNode;
+    visitRepeatTimesStmt: (ctx: RepeatTimesStmtContext) => AstNode;
+
+    visitNumBrackets: (ctx: NumBracketsContext) => AstNode;
+    visitNumDivExpression: (ctx: NumDivExpressionContext) => AstNode;
+    visitNumEqualsExpression: (ctx: NumEqualsExpressionContext) => AstNode;
+    visitNumExpr: (ctx: NumExprContext) => AstNode;
+    visitNumFunct: (ctx: NumFunctContext) => AstNode;
+    visitNumFunctExpression: (ctx: NumFunctExpressionContext) => AstNode;
+    visitNumGreaterThanExpression: (ctx: NumGreaterThanExpressionContext) => AstNode;
+    visitNumLessThanExpression: (ctx: NumLessThanExpressionContext) => AstNode;
+    visitNumLiteralExpression: (ctx: NumLiteralExpressionContext) => AstNode;
+    visitNumMinusExpression: (ctx: NumMinusExpressionContext) => AstNode;
+    visitNumModExpression: (ctx: NumModExpressionContext) => AstNode;
+    visitNumMulExpression: (ctx: NumMulExpressionContext) => AstNode;
+    visitNumPlusExpression: (ctx: NumPlusExpressionContext) => AstNode;
+    visitNumRandomExpression: (ctx: NumRandomExpressionContext) => AstNode;
+    visitNumRoundExpression: (ctx: NumRoundExpressionContext) => AstNode;
+    visitNumVariableExpression: (ctx: NumVariableExpressionContext) => AstNode;
+    visitNumber: (ctx: NumberContext) => AstNode;
+
     visitBoolAndExpression: (ctx: BoolAndExpressionContext) => AstNode;
     visitBoolAsNumExpression: (ctx: BoolAsNumExpressionContext) => AstNode;
     visitBoolAsStringExpression: (ctx: BoolAsStringExpressionContext) => AstNode;
@@ -429,25 +461,18 @@ class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
     visitBoolOrExpression: (ctx: BoolOrExpressionContext) => AstNode;
     visitBoolParanthExpression: (ctx: BoolParanthExpressionContext) => AstNode;
     visitBoolVariableExpression: (ctx: BoolVariableExpressionContext) => AstNode;
+
+    visitAddElementToStatement: (ctx: AddElementToStatementContext) => AstNode;
+    visitAskAndWaitStatement: (ctx: AskAndWaitStatementContext) => AstNode;
     visitBroadcastAndWaitStatement: (ctx: BroadcastAndWaitStatementContext) => AstNode;
     visitBroadcastMessageStatement: (ctx: BroadcastMessageStatementContext) => AstNode;
     visitCallStmt: (ctx: CallStmtContext) => AstNode;
     visitChagenAttributeByStatement: (ctx: ChagenAttributeByStatementContext) => AstNode;
-    visitChagenGraphicEffectsByStatement: (ctx: ChagenGraphicEffectsByStatementContext) => AstNode;
-    visitChagenLayerByStatement: (ctx: ChagenLayerByStatementContext) => AstNode;
-    visitChagenSizeByStatement: (ctx: ChagenSizeByStatementContext) => AstNode;
-    visitChangePenAttributeByStement: (ctx: ChangePenAttributeByStementContext) => AstNode;
-    visitChangeSoundEffectStatement: (ctx: ChangeSoundEffectStatementContext) => AstNode;
     visitChangeVarByStatement: (ctx: ChangeVarByStatementContext) => AstNode;
-    visitChangeXbyStatement: (ctx: ChangeXbyStatementContext) => AstNode;
-    visitChangeYbyStatement: (ctx: ChangeYbyStatementContext) => AstNode;
-    visitClearGraphicEffectsStatement: (ctx: ClearGraphicEffectsStatementContext) => AstNode;
-    visitCleareSoundEffectsStatement: (ctx: CleareSoundEffectsStatementContext) => AstNode;
     visitClickEvent: (ctx: ClickEventContext) => AstNode;
     visitCloneStartEvent: (ctx: CloneStartEventContext) => AstNode;
     visitColor: (ctx: ColorContext) => AstNode;
     visitColorFromNumExpression: (ctx: ColorFromNumExpressionContext) => AstNode;
-    visitColorTouchesColorExpression: (ctx: ColorTouchesColorExpressionContext) => AstNode;
     visitCommonStmt: (ctx: CommonStmtContext) => AstNode;
     visitConditionReachedEvent: (ctx: ConditionReachedEventContext) => AstNode;
     visitControlStatement: (ctx: ControlStatementContext) => AstNode;
@@ -486,16 +511,7 @@ class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
     visitExpressionStmt: (ctx: ExpressionStmtContext) => AstNode;
     visitFileType: (ctx: FileTypeContext) => AstNode;
     visitFlatVariable: (ctx: FlatVariableContext) => AstNode;
-    visitGlideNumSecsToStatement: (ctx: GlideNumSecsToStatementContext) => AstNode;
-    visitGoToPositionStatement: (ctx: GoToPositionStatementContext) => AstNode;
-    visitGotoBackLayerStatement: (ctx: GotoBackLayerStatementContext) => AstNode;
-    visitGotoFrontLayerStatement: (ctx: GotoFrontLayerStatementContext) => AstNode;
-    visitGotoLayerStatement: (ctx: GotoLayerStatementContext) => AstNode;
-    visitHideSpriteStatement: (ctx: HideSpriteStatementContext) => AstNode;
-    visitHideVariableStatement: (ctx: HideVariableStatementContext) => AstNode;
     visitHourComp: (ctx: HourCompContext) => AstNode;
-    visitIfOnEdgeBounceStatement: (ctx: IfOnEdgeBounceStatementContext) => AstNode;
-    visitIfStmt: (ctx: IfStmtContext) => AstNode;
     visitInCoreEvent: (ctx: InCoreEventContext) => AstNode;
     visitIndexOfExpression: (ctx: IndexOfExpressionContext) => AstNode;
     visitIndexType: (ctx: IndexTypeContext) => AstNode;
@@ -530,67 +546,27 @@ class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
     visitNonControlStatement: (ctx: NonControlStatementContext) => AstNode;
     visitNonCtrlStmt: (ctx: NonCtrlStmtContext) => AstNode;
     visitNumAsStringExpression: (ctx: NumAsStringExpressionContext) => AstNode;
-    visitNumBrackets: (ctx: NumBracketsContext) => AstNode;
-    visitNumDivExpression: (ctx: NumDivExpressionContext) => AstNode;
-    visitNumEqualsExpression: (ctx: NumEqualsExpressionContext) => AstNode;
-    visitNumExpr: (ctx: NumExprContext) => AstNode;
-    visitNumFunct: (ctx: NumFunctContext) => AstNode;
-    visitNumFunctExpression: (ctx: NumFunctExpressionContext) => AstNode;
-    visitNumGreaterThanExpression: (ctx: NumGreaterThanExpressionContext) => AstNode;
-    visitNumLessThanExpression: (ctx: NumLessThanExpressionContext) => AstNode;
-    visitNumLiteralExpression: (ctx: NumLiteralExpressionContext) => AstNode;
-    visitNumMinusExpression: (ctx: NumMinusExpressionContext) => AstNode;
-    visitNumModExpression: (ctx: NumModExpressionContext) => AstNode;
-    visitNumMulExpression: (ctx: NumMulExpressionContext) => AstNode;
-    visitNumPlusExpression: (ctx: NumPlusExpressionContext) => AstNode;
-    visitNumRandomExpression: (ctx: NumRandomExpressionContext) => AstNode;
-    visitNumRoundExpression: (ctx: NumRoundExpressionContext) => AstNode;
-    visitNumVariableExpression: (ctx: NumVariableExpressionContext) => AstNode;
-    visitNumber: (ctx: NumberContext) => AstNode;
     visitNumberedElement: (ctx: NumberedElementContext) => AstNode;
     visitNumerType: (ctx: NumerTypeContext) => AstNode;
     visitParameter: (ctx: ParameterContext) => AstNode;
-    visitPenDownStatement: (ctx: PenDownStatementContext) => AstNode;
-    visitPenStmt: (ctx: PenStmtContext) => AstNode;
-    visitPenUpStatement: (ctx: PenUpStatementContext) => AstNode;
     visitPivotPosition: (ctx: PivotPositionContext) => AstNode;
-    visitPlaySoundUntilStatement: (ctx: PlaySoundUntilStatementContext) => AstNode;
-    visitPointInDirStatement: (ctx: PointInDirStatementContext) => AstNode;
-    visitPointTowardsPosStatement: (ctx: PointTowardsPosStatementContext) => AstNode;
     visitPosition: (ctx: PositionContext) => AstNode;
     visitPrevElement: (ctx: PrevElementContext) => AstNode;
     visitQualifiedVariable: (ctx: QualifiedVariableContext) => AstNode;
     visitRGBAColorExpression: (ctx: RGBAColorExpressionContext) => AstNode;
     visitRandomElement: (ctx: RandomElementContext) => AstNode;
     visitRandomPosition: (ctx: RandomPositionContext) => AstNode;
-    visitRepeatForeverStmt: (ctx: RepeatForeverStmtContext) => AstNode;
-    visitRepeatTimesStmt: (ctx: RepeatTimesStmtContext) => AstNode;
     visitReplaceElementAtStatement: (ctx: ReplaceElementAtStatementContext) => AstNode;
     visitResetTimerStatement: (ctx: ResetTimerStatementContext) => AstNode;
     visitResourceAttributeOfExpression: (ctx: ResourceAttributeOfExpressionContext) => AstNode;
     visitResourceType: (ctx: ResourceTypeContext) => AstNode;
-    visitSayForStatement: (ctx: SayForStatementContext) => AstNode;
     visitSecondComp: (ctx: SecondCompContext) => AstNode;
     visitSetAttributeOfToStatement: (ctx: SetAttributeOfToStatementContext) => AstNode;
     visitSetAttributeToStatement: (ctx: SetAttributeToStatementContext) => AstNode;
-    visitSetGraphicEffectToStatement: (ctx: SetGraphicEffectToStatementContext) => AstNode;
-    visitSetPenAttributeStatement: (ctx: SetPenAttributeStatementContext) => AstNode;
-    visitSetPenColorStatement: (ctx: SetPenColorStatementContext) => AstNode;
-    visitSetSizeToPercStatement: (ctx: SetSizeToPercStatementContext) => AstNode;
-    visitSetSoundEffectStatement: (ctx: SetSoundEffectStatementContext) => AstNode;
     visitSetVariableToStatement: (ctx: SetVariableToStatementContext) => AstNode;
-    visitSetXtoStatement: (ctx: SetXtoStatementContext) => AstNode;
-    visitSetYtoStatement: (ctx: SetYtoStatementContext) => AstNode;
-    visitShowSpriteStatement: (ctx: ShowSpriteStatementContext) => AstNode;
-    visitShowVariableStatement: (ctx: ShowVariableStatementContext) => AstNode;
-    visitSpriteLookStmt: (ctx: SpriteLookStmtContext) => AstNode;
-    visitSpriteMotionStmt: (ctx: SpriteMotionStmtContext) => AstNode;
-    visitStampStatement: (ctx: StampStatementContext) => AstNode;
-    visitStartSoundStatement: (ctx: StartSoundStatementContext) => AstNode;
     visitStartupEvent: (ctx: StartupEventContext) => AstNode;
     visitStmt: (ctx: StmtContext) => AstNode;
     visitStopAll: (ctx: StopAllContext) => AstNode;
-    visitStopAllSoundsStatement: (ctx: StopAllSoundsStatementContext) => AstNode;
     visitStopOthersInActorStatement: (ctx: StopOthersInActorStatementContext) => AstNode;
     visitStopThis: (ctx: StopThisContext) => AstNode;
     visitStrContainsExpression: (ctx: StrContainsExpressionContext) => AstNode;
@@ -602,11 +578,7 @@ class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
     visitStringExpr: (ctx: StringExprContext) => AstNode;
     visitStringLiteralExpression: (ctx: StringLiteralExpressionContext) => AstNode;
     visitStringVariableExpression: (ctx: StringVariableExpressionContext) => AstNode;
-    visitSwitchBackdropAndWaitStatement: (ctx: SwitchBackdropAndWaitStatementContext) => AstNode;
-    visitSwitchBackdropToStatement: (ctx: SwitchBackdropToStatementContext) => AstNode;
-    visitSwitchCostumeStatement: (ctx: SwitchCostumeStatementContext) => AstNode;
     visitTerminationStmt: (ctx: TerminationStmtContext) => AstNode;
-    visitThinkForStatement: (ctx: ThinkForStatementContext) => AstNode;
     visitTimeComp: (ctx: TimeCompContext) => AstNode;
     visitTimerExpression: (ctx: TimerExpressionContext) => AstNode;
     visitTouchable: (ctx: TouchableContext) => AstNode;
@@ -615,13 +587,10 @@ class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
     visitTouchableMousePointer: (ctx: TouchableMousePointerContext) => AstNode;
     visitTouchableSprite: (ctx: TouchableSpriteContext) => AstNode;
     visitTouchingBoolExpression: (ctx: TouchingBoolExpressionContext) => AstNode;
-    visitTurnLeftDegreeStatement: (ctx: TurnLeftDegreeStatementContext) => AstNode;
-    visitTurnRightDegreeStatement: (ctx: TurnRightDegreeStatementContext) => AstNode;
     visitUnspecifiedBoolExpression: (ctx: UnspecifiedBoolExpressionContext) => AstNode;
     visitUnspecifiedExpr: (ctx: UnspecifiedExprContext) => AstNode;
     visitUnspecifiedNumExpr: (ctx: UnspecifiedNumExprContext) => AstNode;
     visitUnspecifiedStringExpression: (ctx: UnspecifiedStringExpressionContext) => AstNode;
-    visitUntilStmt: (ctx: UntilStmtContext) => AstNode;
     visitUsernameExpression: (ctx: UsernameExpressionContext) => AstNode;
     visitVarContainsExpression: (ctx: VarContainsExpressionContext) => AstNode;
     visitVariable: (ctx: VariableContext) => AstNode;

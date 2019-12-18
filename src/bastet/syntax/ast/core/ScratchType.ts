@@ -113,6 +113,9 @@ export class ListType extends ScratchType {
 
 export class MapType extends ScratchType {
 
+    static withIndexType(indexType: ScratchType): ScratchType {
+        throw new ImplementMeException();
+    }
 
 }
 

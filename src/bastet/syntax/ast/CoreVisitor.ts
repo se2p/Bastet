@@ -84,13 +84,13 @@ import {
 } from "./core/statements/SetStatement";
 import {DelteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
 
-export interface BasicCoreVisitor<R> {
+export interface CoreVisitor<R> {
 
     visit<R>(node: AstNode): R;
 
 }
 
-export interface CoreNumberExpressionVisitor<R> extends BasicCoreVisitor<R>{
+export interface CoreNumberExpressionVisitor<R> extends CoreVisitor<R>{
 
     visitNumberLiteral<R>(node: NumberLiteral): R;
 
@@ -126,7 +126,7 @@ export interface CoreNumberExpressionVisitor<R> extends BasicCoreVisitor<R>{
 
 }
 
-export interface CoreBoolExpressionVisitor<R> extends BasicCoreVisitor<R> {
+export interface CoreBoolExpressionVisitor<R> extends CoreVisitor<R> {
 
     visitAndExpression<R>(node: AndExpression): R;
 
@@ -154,7 +154,7 @@ export interface CoreBoolExpressionVisitor<R> extends BasicCoreVisitor<R> {
 
 }
 
-export interface CoreStringExpressionVisitor<R> extends BasicCoreVisitor<R> {
+export interface CoreStringExpressionVisitor<R> extends CoreVisitor<R> {
 
     visitNumAsStringExpression<R>(node: NumAsStringExpression): R;
 
@@ -176,7 +176,7 @@ export interface CoreStringExpressionVisitor<R> extends BasicCoreVisitor<R> {
 
 }
 
-export interface CoreListExpressionVisitor<R> extends BasicCoreVisitor<R> {
+export interface CoreListExpressionVisitor<R> extends CoreVisitor<R> {
 
     visitListVariableExpression<R>(node: ListVariableExpression): R;
 
@@ -184,7 +184,7 @@ export interface CoreListExpressionVisitor<R> extends BasicCoreVisitor<R> {
 
 }
 
-export interface CoreCtrlStatementnVisitor<R> extends BasicCoreVisitor<R> {
+export interface CoreCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
     visitIfStatement<R>(node: IfStatement): R;
 
@@ -200,7 +200,7 @@ export interface CoreCtrlStatementnVisitor<R> extends BasicCoreVisitor<R> {
 
 }
 
-export interface CoreNonCtrlStatementnVisitor<R> extends BasicCoreVisitor<R> {
+export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
     visit<R>(node: DeclareVariableStatement): R;
 
