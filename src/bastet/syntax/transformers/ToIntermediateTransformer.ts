@@ -21,6 +21,12 @@
 
 import {SyntaxTreeTransformer} from "./SyntaxTreeTransformer";
 import {RuleNode} from "antlr4ts/tree";
+import {ScratchVisitor} from "../parser/grammar/ScratchVisitor";
+import {AstNode} from "../ast/AstNode";
+
+class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
+
+}
 
 export class ToIntermediateTransformer implements SyntaxTreeTransformer {
 

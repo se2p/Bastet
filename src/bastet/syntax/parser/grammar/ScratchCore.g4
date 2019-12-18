@@ -262,32 +262,28 @@ coreBoolExpr  :
 numExpr : coreNumExpr ;
 
 coreNumExpr  :
-    number
- |  variable
- | '(' coreNumExpr ')'
- |  'as' 'number'  stringExpr
- |  'as' 'number'  boolExpr
+    number # NumLiteralExpression
+ |  variable # NumVariableExpression
+ | '(' coreNumExpr ')' # NumBrackets
+ |  'as' 'number'  stringExpr # StringAsNumExpression
+ |  'as' 'number'  boolExpr # BoolAsNumExpression
 
- |  'timer'
- |  'length' 'of' stringExpr
- |  'length' 'of' 'list' variable
- |  'index' 'of' expression 'in' variable
- |  'pick' 'random'  coreNumExpr  'to'  coreNumExpr
- |  'round'  coreNumExpr
+ |  'timer' # TimerExpression
+ |  'length' 'of' stringExpr # LengthOfStringExpression
+ |  'length' 'of' 'list' variable # LengthOfListExpression
+ |  'index' 'of' expression 'in' variable # IndexOfExpression
+ |  'pick' 'random'  coreNumExpr  'to'  coreNumExpr # NumRandomExpression
+ |  'round'  coreNumExpr # NumRoundExpression
 
- |  numFunct  'of'  coreNumExpr
- |  coreNumExpr  '*'  coreNumExpr
- |  coreNumExpr  '/'  coreNumExpr
- |  coreNumExpr  'mod'  coreNumExpr
- |  coreNumExpr  '+'  coreNumExpr
- |  coreNumExpr  '-'  coreNumExpr
+ |  numFunct  'of'  coreNumExpr # NumFunctExpression
+ |  coreNumExpr  '*'  coreNumExpr # NumMulExpression
+ |  coreNumExpr  '/'  coreNumExpr # NumDivExpression
+ |  coreNumExpr  'mod'  coreNumExpr # NumModExpression
+ |  coreNumExpr  '+'  coreNumExpr # NumPlusExpression
+ |  coreNumExpr  '-'  coreNumExpr # NumMinusExpression
 
- | defaultNumExpr
- | unspecifiedNumExpr ;
-
-defaultNumExpr : 'default' number 'for' coreNumExpr ;
-
-unspecifiedNumExpr : '?number' ;
+ | 'default' number 'for' coreNumExpr # DefaultNumExpr
+ | '?number' # UnspecifiedNumExpr ;
 
 numFunct :
    'abs'
@@ -306,8 +302,9 @@ numFunct :
 |  'powten' ;
 
 listExpr :
-    variable
- |  '[' expressionListPlain ']' ;
+    variable # ListVariableExpression
+ |  '[' expressionListPlain ']' # ListWithElementsExpression
+ ;
 
 expression : coreExpression ;
 
@@ -329,8 +326,9 @@ variable :
     | Ident '.' Ident # QualifiedVariable;
 
 color :
-    'rgba' numExpr numExpr numExpr numExpr
- |  'from' 'number' numExpr ;
+    'rgba' numExpr numExpr numExpr numExpr # RGBAColorExpression
+ |  'from' 'number' numExpr # ColorFromNumExpression
+ ;
 
 Ident :
     Identifier

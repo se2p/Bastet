@@ -78,51 +78,57 @@ penStmt :
  ;
 
 stringExpr  :
-    coreStringExpr
- |  'username' ;
+    coreStringExpr # CoreStringExpression
+ |  'username' # UsernameExpression
+ ;
 
 boolExpr  :
-    coreBoolExpr
- |  'touching'  touchable
- |  'color'  color  'touches'  color
- |  'key'  key  'pressed'
- |  'mouse' 'down' ;
+    coreBoolExpr # CoreBoolExpression
+ |  'touching'  touchable # TouchingBoolExpression
+ |  'color'  color  'touches'  color # ColorTouchesColorExpression
+ |  'key'  key  'pressed' # KeyPressedExpression
+ |  'mouse' 'down' # MouseDownExpression
+ ;
 
 numExpr  :
- coreNumExpr
- |  'timer'
- |  'days' 'since' 'milenium'
- |  'current' timeComp
- |  'distanceto' position
- |  'mousex'
- |  'mousey'
- |  'loudness';
+ coreNumExpr # CoreNumExpression
+ |  'days' 'since' 'milenium' # DaysSinceMileniumExpression
+ |  'current' timeComp # CurrentTimeCompExpression
+ |  'distanceto' position # DistanceToExpression
+ |  'mousex' # MouseXExpression
+ |  'mousey' # MouseYExpression
+ |  'loudness' # LoudnessExpression
+ ;
 
 touchable :
- 'mousepointer'  |  'edge'  |  'sprite' stringExpr | color ;
+    'mousepointer' # TouchableMousePointer
+ |  'edge' # TouchableEdge
+ |  'sprite' stringExpr # TouchableSprite
+ | color # TouchableColor
+ ;
 
 elementChoice :
-   'next'
- | 'prev'
- | 'random'
- | 'with_number' numExpr
- | 'with_name' stringExpr
+   'next' # NextElement
+ | 'prev' # PrevElement
+ | 'random' # RandomElement
+ | 'with_number' numExpr # NumberedElement
+ | 'with_name' stringExpr # NamedElement
  ;
 
 timeComp :
-    'year'
- |  'month'
- |  'date'
- |  'day' 'of' 'week'
- |  'hour'
- |  'minute'
- |  'second'
+    'year' # YearComp
+ |  'month' # MonthComp
+ |  'date' # DateComp
+ |  'day' 'of' 'week' # WeekdayComp
+ |  'hour' # HourComp
+ |  'minute' # MinuteComp
+ |  'second' # SecondComp
  ;
 
 position  :
-    'pivot_of' stringExpr
- |  'random_pos'
- |  'mouse_pos'
- |  '('  numExpr ',' numExpr  ')'
+    'pivot_of' stringExpr # PivotPosition
+ |  'random_pos' # RandomPosition
+ |  'mouse_pos' # MousePosition
+ |  '('  numExpr ',' numExpr  ')' # ExplicitPosition
  ;
 
