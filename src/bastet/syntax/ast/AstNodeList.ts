@@ -34,4 +34,8 @@ export class AstNodeList<E extends AstNode> extends AbstractNode {
         return this._elements;
     }
 
+    [Symbol.iterator](): IterableIterator<E> {
+        return this._elements[Symbol.iterator]();
+    }
+
 }

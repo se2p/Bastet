@@ -19,8 +19,8 @@
  *
  */
 
-import {AppEvent} from '../AppEvent'
 import {TransitionRelation} from "./TransitionRelation";
+import {CoreEvent} from "../../ast/core/CoreEvent";
 
 /**
  * A single script, which represents the control flow
@@ -29,12 +29,12 @@ import {TransitionRelation} from "./TransitionRelation";
 export class Script {
 
     /** This script is triggered by the following event */
-    private readonly _event: AppEvent;
+    private readonly _event: CoreEvent;
 
     /** The transition relation of the script */
     private readonly _transitions: TransitionRelation;
 
-    constructor(event: AppEvent, transitions: TransitionRelation) {
+    constructor(event: CoreEvent, transitions: TransitionRelation) {
         this._event = event;
         this._transitions = transitions;
     }
@@ -43,7 +43,7 @@ export class Script {
         return this._transitions;
     }
 
-    get event(): AppEvent {
+    get event(): CoreEvent {
         return this._event;
     }
 

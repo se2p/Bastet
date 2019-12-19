@@ -19,17 +19,17 @@
  *
  */
 
-import {RuleNode} from "antlr4ts/tree/RuleNode"
+import {AstNode} from "./ast/AstNode";
 
 export abstract class FromParseTree {
 
-    private readonly _astnode: RuleNode;
+    private readonly _astnode: AstNode;
 
-    protected constructor(astnode: RuleNode) {
+    protected constructor(astnode: AstNode) {
         this._astnode = astnode;
     }
 
-    get astnode(): RuleNode {
+    get astnode(): AstNode {
         return this._astnode;
     }
 

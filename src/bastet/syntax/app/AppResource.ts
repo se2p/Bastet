@@ -20,9 +20,9 @@
  */
 
 import {FromParseTree} from "../FromParseTree";
-import {RuleNode} from "antlr4ts/tree";
 import {WithIdent} from "../../utils/WithIdent";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {AstNode} from "../ast/AstNode";
 
 export type AppResourceMap = { [id:string]: AppResource } ;
 
@@ -37,7 +37,7 @@ export class AppResource extends FromParseTree implements WithIdent {
     private readonly _type : AppResourceType;
     private readonly _uri : string;
 
-    constructor(node: RuleNode, ident: string, type: AppResourceType, uri: string) {
+    constructor(node: AstNode, ident: string, type: AppResourceType, uri: string) {
         super(node);
         this._ident = ident;
         this._type = type;

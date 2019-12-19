@@ -52,6 +52,33 @@ export class ActorDefinition extends AbstractNode {
         this._scriptList = scriptList;
     }
 
+    get ident(): Identifier {
+        return this._ident;
+    }
+
+    get inheritsFrom(): Identifier | null {
+        return this._inheritsFrom;
+    }
+
+    get resourceDefs(): ResourceDefinitionList {
+        return this._resourceDefs;
+    }
+
+    get declarationStmts(): StatementList {
+        return this._declarationStmts;
+    }
+
+    get initStmts(): StatementList {
+        return this._initStmts;
+    }
+
+    get methodDefs(): MethodDefinitionList {
+        return this._methodDefs;
+    }
+
+    get scriptList(): ScriptDefinitionList {
+        return this._scriptList;
+    }
 }
 
 export class ActorDefinitionList extends AstNodeList<ActorDefinition> {

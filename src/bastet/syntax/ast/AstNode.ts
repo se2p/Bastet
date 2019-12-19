@@ -31,14 +31,23 @@ export interface AstNode {
 
     uniqueName: string;
 
+    childCount: number;
+
+    getChild(index: number): AstNode;
+
     // @ts-ignore
     toRecord(): ImmList;
 
+    [Symbol.iterator](): IterableIterator<AstNode>;
+
+    toTreeString(): string;
 }
 
 export abstract class AbstractNode implements AstNode {
 
     private readonly _children: AstNode[];
+
+    private treeString: string = null;
 
     protected constructor(childs: AstNode[]) {
         this._children = childs;
@@ -50,6 +59,14 @@ export abstract class AbstractNode implements AstNode {
 
     get uniqueName(): string {
         return this.constructor.name;
+    }
+
+    get childCount(): number {
+        return this._children.length;
+    }
+
+    public getChild(index: number): AstNode {
+        return this._children[index];
     }
 
     accept<R>(visitor: CoreVisitor<R>): R {
@@ -64,6 +81,23 @@ export abstract class AbstractNode implements AstNode {
     // @ts-ignore
     toRecord(): ImmList {
         throw new ImplementMeException();
+    }
+
+    [Symbol.iterator](): IterableIterator<AstNode> {
+        return this._children[Symbol.iterator]();
+    }
+
+    toTreeString(): string {
+        if (!this.treeString) {
+            let result: string[] = [this.constructor.name];
+            for (let c of this) {
+                result.push("{")
+                result.push(c.toTreeString())
+                result.push("}")
+            }
+            this.treeString = result.join(" ");
+        }
+        return this.treeString;
     }
 
 }

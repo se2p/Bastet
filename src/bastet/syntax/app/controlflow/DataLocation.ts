@@ -21,6 +21,7 @@
 
 import {ScratchType, VoidType} from "../../ast/core/ScratchType";
 import {RuleNode} from "antlr4ts/tree";
+import {AstNode} from "../../ast/AstNode";
 
 export type DataLocationID = string;
 
@@ -28,7 +29,7 @@ export type DataLocationMap = { [id:string]: DataLocation } ;
 
 export default class DataLocation {
 
-    constructor(stmt: RuleNode|null, id: string, type: ScratchType) {
+    constructor(stmt: AstNode|null, id: string, type: ScratchType) {
 
     }
 

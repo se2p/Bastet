@@ -41,6 +41,17 @@ export class IfStatement extends Statement implements ControlStatement {
         this._elseStmts = elseStmts;
     }
 
+    get cond(): BooleanExpression {
+        return this._cond;
+    }
+
+    get thenStmts(): StatementList {
+        return this._thenStmts;
+    }
+
+    get elseStmts(): StatementList {
+        return this._elseStmts;
+    }
 }
 
 export class UntilStatement extends Statement implements ControlStatement {
@@ -55,6 +66,13 @@ export class UntilStatement extends Statement implements ControlStatement {
         this._body = body;
     }
 
+    get cond(): BooleanExpression {
+        return this._cond;
+    }
+
+    get body(): StatementList {
+        return this._body;
+    }
 }
 
 export class RepeatTimesStatement extends Statement implements ControlStatement {
@@ -68,6 +86,13 @@ export class RepeatTimesStatement extends Statement implements ControlStatement 
         this._body = body;
     }
 
+    get times(): NumberExpression {
+        return this._times;
+    }
+
+    get body(): StatementList {
+        return this._body;
+    }
 }
 
 export class RepeatForeverStatement extends Statement implements ControlStatement {
@@ -77,5 +102,9 @@ export class RepeatForeverStatement extends Statement implements ControlStatemen
     constructor(body: StatementList) {
         super([body]);
         this._body = body;
+    }
+
+    get body(): StatementList {
+        return this._body;
     }
 }

@@ -48,4 +48,8 @@ export class Identifier extends AbstractNode {
         return new Identifier(StringLiteral.from(`${this.FRESH_PREFIX}${num}`));
     }
 
+    get text(): string {
+        return this._name.text;
+    }
+
 }

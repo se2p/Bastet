@@ -20,16 +20,23 @@
  */
 
 import {ProgramOperation} from './ProgramOperation'
-import {RuleNode} from "antlr4ts/tree";
+import {BooleanExpression} from "../../../ast/core/expressions/BooleanExpression";
 
 export class AssumeOperation extends ProgramOperation {
 
-    constructor(ast: RuleNode) {
+    private readonly _expression: BooleanExpression;
+
+    constructor(ast: BooleanExpression) {
         super(ast);
+        this._expression = ast;
+    }
+
+    get expression(): BooleanExpression {
+        return this._expression;
     }
 
     toString(): string {
-        return `[${this.ast.toStringTree()}]`;
+        return `[${this.ast.toTreeString()}]`;
     }
 
 }

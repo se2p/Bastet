@@ -19,25 +19,24 @@
  *
  */
 
-import {RuleNode} from "antlr4ts/tree";
 import {RawOperation} from "./RawOperation";
 import {NoopProgramOperation, ProgramOperation, ProgramOperations} from "./ProgramOperation";
-import {BoolExprContext, NegatedBoolExpressionContext} from "../../../parser/grammar/ScratchParser";
-import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
 import {AssumeOperation} from "./AssumeOperation";
+import {BooleanExpression, NegationExpression} from "../../../ast/core/expressions/BooleanExpression";
+import {AstNode} from "../../../ast/AstNode";
 
 export class ProgramOperationFactory {
 
-    public static createFor(ast: RuleNode): ProgramOperation {
+    public static createFor(ast: AstNode): ProgramOperation {
         return new RawOperation(ast);
     }
 
-    static assumeOpFrom(boolExprContext: BoolExprContext): AssumeOperation {
-        return new AssumeOperation(boolExprContext);
+    static assumeOpFrom(boolExpr: BooleanExpression): AssumeOperation {
+        return new AssumeOperation(boolExpr);
     }
 
-    static negatedAssumeOpFrom(boolExprContext: BoolExprContext): AssumeOperation {
-        const negation = new NegatedBoolExpressionContext(boolExprContext.coreBoolExpr());
+    static negatedAssumeOpFrom(boolExpr: BooleanExpression): AssumeOperation {
+        const negation = new NegationExpression(boolExpr);
         return new AssumeOperation(negation);
     }
 

@@ -45,6 +45,13 @@ export class ResultDeclaration extends AbstractNode {
         return this.VOID;
     }
 
+    get ident(): Identifier {
+        return this._ident;
+    }
+
+    get type(): ScratchType {
+        return this._type;
+    }
 }
 
 export class MethodDefinition extends AbstractNode {
@@ -62,6 +69,21 @@ export class MethodDefinition extends AbstractNode {
         this._returns = returns;
     }
 
+    get ident(): Identifier {
+        return this._ident;
+    }
+
+    get params(): ParameterDeclarationList {
+        return this._params;
+    }
+
+    get statements(): StatementList {
+        return this._statements;
+    }
+
+    get returns(): ResultDeclaration {
+        return this._returns;
+    }
 }
 
 export class MethodDefinitionList extends AstNodeList<MethodDefinition> {

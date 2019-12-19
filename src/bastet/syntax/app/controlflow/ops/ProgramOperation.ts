@@ -19,17 +19,17 @@
  *
  */
 
-import {RuleNode} from "antlr4ts/tree";
 import {WithIdent} from "../../../../utils/WithIdent";
+import {AstNode} from "../../../ast/AstNode";
 
 export type OperationID = number;
 
 export abstract class ProgramOperation implements WithIdent {
 
-    private readonly _ast: RuleNode|null;
+    private readonly _ast: AstNode|null;
     private readonly _id: OperationID;
 
-    constructor(ast: RuleNode|null) {
+    constructor(ast: AstNode|null) {
         this._ast = ast;
         this._id = ProgramOperations.constructOp(ast);
         ProgramOperations.register(this);
@@ -45,7 +45,7 @@ export abstract class ProgramOperation implements WithIdent {
 
     public toString(): string {
         if (this._ast) {
-            return this._ast.toStringTree();
+            return this._ast.toTreeString();
         } else {
             return this.constructor.name;
         }
@@ -78,11 +78,11 @@ export class ProgramOperations {
         return ProgramOperations.idSequencePos++;
     }
 
-    public static constructOp(ast: RuleNode): OperationID {
+    public static constructOp(ast: AstNode): OperationID {
         if (ast == null) {
             return this.fresh();
         } else {
-            let opStr: string = ast.toStringTree();
+            let opStr: string = ast.toTreeString();
             let result: OperationID = this.opCodeToIdMap.get(opStr);
             if (!result) {
                 result = this.fresh();

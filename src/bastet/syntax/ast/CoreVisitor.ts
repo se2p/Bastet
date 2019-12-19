@@ -62,7 +62,6 @@ import {
     DeclareVariableStatement
 } from "./core/statements/DeclarationStatement";
 import {ExpressionStatement} from "./core/statements/ExpressionStatement";
-import {WaitUntilStatement} from "./core/statements/WaitSecsStatement";
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {CreateCloneOfStatement} from "./core/statements/CreateCloneOfStatement";
 import {BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
@@ -82,172 +81,171 @@ import {
     SetAttributeToStatement,
     SetVariableToStatement
 } from "./core/statements/SetStatement";
-import {DelteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
+import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
+import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
 
 export interface CoreVisitor<R> {
 
-    visit<R>(node: AstNode): R;
+    visit(node: AstNode): R;
 
 }
 
 export interface CoreNumberExpressionVisitor<R> extends CoreVisitor<R>{
 
-    visitNumberLiteral<R>(node: NumberLiteral): R;
+    visitNumberLiteral(node: NumberLiteral): R;
 
-    visitNumberVariableExpression<R>(node: NumberVariableExpression): R;
+    visitNumberVariableExpression(node: NumberVariableExpression): R;
 
-    visitStringAsNumberExpression<R>(node: StringAsNumberExpression): R;
+    visitStringAsNumberExpression(node: StringAsNumberExpression): R;
 
-    visitBoolAsNumberExpression<R>(node: BoolAsNumberExpression): R;
+    visitBoolAsNumberExpression(node: BoolAsNumberExpression): R;
 
-    visitTimerExpression<R>(node: TimerExpression): R;
+    visitTimerExpression(node: TimerExpression): R;
 
-    visitLengthOfStringExpression<R>(node: LengthOfStringExpression): R;
+    visitLengthOfStringExpression(node: LengthOfStringExpression): R;
 
-    visitLengthOListExpression<R>(node: LengthOListExpression): R;
+    visitLengthOListExpression(node: LengthOListExpression): R;
 
-    visitIndexOfExpression<R>(node: IndexOfExpression): R;
+    visitIndexOfExpression(node: IndexOfExpression): R;
 
-    visitPickRandomFromExpression<R>(node: PickRandomFromExpression): R;
+    visitPickRandomFromExpression(node: PickRandomFromExpression): R;
 
-    visitRoundExpression<R>(node: RoundExpression): R;
+    visitRoundExpression(node: RoundExpression): R;
 
-    visitNumFunctExpression<R>(node: NumFunctExpression): R;
+    visitNumFunctExpression(node: NumFunctExpression): R;
 
-    visitMultiplyExpression<R>(node: MultiplyExpression): R;
+    visitMultiplyExpression(node: MultiplyExpression): R;
 
-    visitDivideExpression<R>(node: DivideExpression): R;
+    visitDivideExpression(node: DivideExpression): R;
 
-    visitModuloExpression<R>(node: ModuloExpression): R;
+    visitModuloExpression(node: ModuloExpression): R;
 
-    visitPlusExpression<R>(node: PlusExpression): R;
+    visitPlusExpression(node: PlusExpression): R;
 
-    visitMinusExpression<R>(node: MinusExpression): R;
+    visitMinusExpression(node: MinusExpression): R;
 
 }
 
 export interface CoreBoolExpressionVisitor<R> extends CoreVisitor<R> {
 
-    visitAndExpression<R>(node: AndExpression): R;
+    visitAndExpression(node: AndExpression): R;
 
-    visitOrExpression<R>(node: OrExpression): R;
+    visitOrExpression(node: OrExpression): R;
 
-    visitNegationExpression<R>(node: NegationExpression): R;
+    visitNegationExpression(node: NegationExpression): R;
 
-    visitBooleanLiteral<R>(node: BooleanLiteral): R;
+    visitBooleanLiteral(node: BooleanLiteral): R;
 
-    visitBooleanVariableExpression<R>(node: BooleanVariableExpression): R;
+    visitBooleanVariableExpression(node: BooleanVariableExpression): R;
 
-    visitStrGreaterThanExpression<R>(node: StrGreaterThanExpression): R;
+    visitStrGreaterThanExpression(node: StrGreaterThanExpression): R;
 
-    visitStrLessThanExpression<R>(node: StrLessThanExpression): R;
+    visitStrLessThanExpression(node: StrLessThanExpression): R;
 
-    visitStrEqualsExpression<R>(node: StrEqualsExpression): R;
+    visitStrEqualsExpression(node: StrEqualsExpression): R;
 
-    visitNumGreaterThanExpression<R>(node: NumGreaterThanExpression): R;
+    visitNumGreaterThanExpression(node: NumGreaterThanExpression): R;
 
-    visitNumLessThanExpression<R>(node: NumLessThanExpression): R;
+    visitNumLessThanExpression(node: NumLessThanExpression): R;
 
-    visitNumEqualsExpression<R>(node: NumEqualsExpression): R;
+    visitNumEqualsExpression(node: NumEqualsExpression): R;
 
-    visitStrContainsExpression<R>(node: StrContainsExpression): R;
+    visitStrContainsExpression(node: StrContainsExpression): R;
 
 }
 
 export interface CoreStringExpressionVisitor<R> extends CoreVisitor<R> {
 
-    visitNumAsStringExpression<R>(node: NumAsStringExpression): R;
+    visitNumAsStringExpression(node: NumAsStringExpression): R;
 
-    visitBoolAsStringExpression<R>(node: BoolAsStringExpression): R;
+    visitBoolAsStringExpression(node: BoolAsStringExpression): R;
 
-    visitStringAttributeOfExpression<R>(node: StringAttributeOfExpression): R;
+    visitStringAttributeOfExpression(node: StringAttributeOfExpression): R;
 
-    visitResourceAttributeOfExpression<R>(node: ResourceAttributeOfExpression): R;
+    visitResourceAttributeOfExpression(node: ResourceAttributeOfExpression): R;
 
-    visitIthLetterOfStringExpression<R>(node: IthLetterOfStringExpression): R;
+    visitIthLetterOfStringExpression(node: IthLetterOfStringExpression): R;
 
-    visitIthStringItemOfExpression<R>(node: IthStringItemOfExpression): R;
+    visitIthStringItemOfExpression(node: IthStringItemOfExpression): R;
 
-    visitJoinStringsExpression<R>(node: JoinStringsExpression): R;
+    visitJoinStringsExpression(node: JoinStringsExpression): R;
 
-    visitStringLiteral<R>(node: StringLiteral): R;
+    visitStringLiteral(node: StringLiteral): R;
 
-    visitStringVariableExpression<R>(node: StringVariableExpression): R;
+    visitStringVariableExpression(node: StringVariableExpression): R;
 
 }
 
 export interface CoreListExpressionVisitor<R> extends CoreVisitor<R> {
 
-    visitListVariableExpression<R>(node: ListVariableExpression): R;
+    visitListVariableExpression(node: ListVariableExpression): R;
 
-    visitExpressionListExpression<R>(node: ExpressionListExpression): R;
+    visitExpressionListExpression(node: ExpressionListExpression): R;
 
 }
 
 export interface CoreCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
-    visitIfStatement<R>(node: IfStatement): R;
+    visitIfStatement(node: IfStatement): R;
 
-    visitUntilStatement<R>(node: UntilStatement): R;
+    visitUntilStatement(node: UntilStatement): R;
 
-    visitRepeatForeverStatement<R>(node: RepeatForeverStatement): R;
+    visitRepeatForeverStatement(node: RepeatForeverStatement): R;
 
-    visitRepeatTimesStatement<R>(node: RepeatTimesStatement): R;
+    visitCallStatement(node: CallStatement): R;
 
-    visitCallStatement<R>(node: CallStatement): R;
-
-    visitStatementList<R>(node: StatementList): R;
+    visitStatementList(node: StatementList): R;
 
 }
 
 export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
-    visit<R>(node: DeclareVariableStatement): R;
+    visit(node: DeclareVariableStatement): R;
 
-    visit<R>(node: DeclareAttributeStatement): R;
+    visit(node: DeclareAttributeStatement): R;
 
-    visit<R>(node: DeclareAttributeOfStatement): R;
+    visit(node: DeclareAttributeOfStatement): R;
 
-    visit<R>(node: ExpressionStatement): R;
+    visit(node: ExpressionStatement): R;
 
-    visit<R>(node: WaitUntilStatement): R;
+    visit(node: WaitUntilStatement): R;
 
-    visit<R>(node: StopOthersInActorStatement): R;
+    visit(node: StopOthersInActorStatement): R;
 
-    visit<R>(node: CreateCloneOfStatement): R;
+    visit(node: CreateCloneOfStatement): R;
 
-    visit<R>(node: BroadcastMessageStatement): R;
+    visit(node: BroadcastMessageStatement): R;
 
-    visit<R>(node: BroadcastAndWaitStatement): R;
+    visit(node: BroadcastAndWaitStatement): R;
 
-    visit<R>(node: ResetTimerStatement): R;
+    visit(node: ResetTimerStatement): R;
 
-    visit<R>(node: ChangeVarByStatement): R;
+    visit(node: ChangeVarByStatement): R;
 
-    visit<R>(node: ChangeAttributeByStatement): R;
+    visit(node: ChangeAttributeByStatement): R;
 
-    visit<R>(node: EpsilonStatement): R;
+    visit(node: EpsilonStatement): R;
 
-    visit<R>(node: DeleteAllFromStatement): R;
+    visit(node: DeleteAllFromStatement): R;
 
-    visit<R>(node: DeleteIthFromStatement): R;
+    visit(node: DeleteIthFromStatement): R;
 
-    visit<R>(node: AddElementToStatement): R;
+    visit(node: AddElementToStatement): R;
 
-    visit<R>(node: InsertAtStatement): R;
+    visit(node: InsertAtStatement): R;
 
-    visit<R>(node: ReplaceElementAtStatement): R;
+    visit(node: ReplaceElementAtStatement): R;
 
-    visit<R>(node: SetAttributeOfToStatement): R;
+    visit(node: SetAttributeOfToStatement): R;
 
-    visit<R>(node: SetAttributeToStatement): R;
+    visit(node: SetAttributeToStatement): R;
 
-    visit<R>(node: SetVariableToStatement): R;
+    visit(node: SetVariableToStatement): R;
 
-    visit<R>(node: StopAllStatement): R;
+    visit(node: StopAllStatement): R;
 
-    visit<R>(node: StopThisStatement): R;
+    visit(node: StopThisStatement): R;
 
-    visit<R>(node: DelteThisCloneStatement): R;
+    visit(node: DeleteThisCloneStatement): R;
 
 }

@@ -31,9 +31,10 @@ import {ProgramParser} from "./syntax/parser/ProgramParser";
 import {Preconditions} from "./utils/Preconditions";
 import {AppBuilder} from "./syntax/app/AppBuilder";
 import {ProgramContext} from "./syntax/parser/grammar/ScratchParser";
-import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
+import {RawAstToDotVisitor} from "./syntax/parser/RawAstToDotVisitor";
 import {RuleNode} from "antlr4ts/tree";
 import {AstNode} from "./syntax/ast/AstNode";
+import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
 
 const commander = require('commander');
 
@@ -105,21 +106,29 @@ export class Bastet {
         // Create the RAW AST (no simplifications or generalizations were applied)
         const rawAST: RuleNode = scratchParser.parseFile(filepath);
 
+        {
+            const rawToDotVisitor = new RawAstToDotVisitor();
+            rawAST.accept(rawToDotVisitor);
+            rawToDotVisitor.writeToFile(`output/ast_raw_${ident}.dot`);
+        }
+
         // Transform the AST: Replaces specific statements or expressions
         // by generic constructs.
         const transformer = new ToIntermediateTransformer();
         const intermediateAST: AstNode = transformer.transform(rawAST);
 
-        Preconditions.checkState(intermediateAST instanceof ProgramContext);
+        {
+            const astToDotVisitor = new AstToDotVisitor();
+            intermediateAST.accept(astToDotVisitor);
+            astToDotVisitor.writeToFile(`output/ast_interm_${ident}.dot`);
+        }
 
-        const toDotVisitor = new AstToDotVisitor();
-        intermediateAST.accept(toDotVisitor);
-        toDotVisitor.writeToFile(`output/ast_${ident}.dot`);
+        Preconditions.checkState(intermediateAST instanceof ProgramContext);
 
         return intermediateAST as AstNode;
     }
 
-    private createControlFlowFrom(programOrigin: string, intermediateSpecAST: ProgramContext, actorNamePrefix?: string): App {
+    private createControlFlowFrom(programOrigin: string, intermediateSpecAST: AstNode, actorNamePrefix?: string): App {
         return AppBuilder.buildControlFlowsFromSyntaxTree(programOrigin, intermediateSpecAST, actorNamePrefix);
     }
 }

@@ -19,10 +19,10 @@
  *
  */
 
-import {CoreVisitor} from "./CoreVisitor";
-import {AstNode} from "./AstNode";
+import {ScratchVisitor} from "./grammar/ScratchVisitor";
+import {ErrorNode, ParseTree, RuleNode, TerminalNode} from "antlr4ts/tree";
 
-export class AstToDotVisitor implements CoreVisitor<number> {
+export class RawAstToDotVisitor implements ScratchVisitor<void> {
 
     private _dot: string[];
     private _idseq: number;
@@ -32,16 +32,36 @@ export class AstToDotVisitor implements CoreVisitor<number> {
         this._idseq = 0;
     }
 
-    public visit(node: AstNode): number {
-        const nodeNo = this._idseq++;
+    visit(tree: ParseTree): void {
+        return;
+    }
+
+    visitChildren(node: RuleNode): void {
+        const nodeNo = node["nodeNo"] || 0;
         this._dot.push(`    ${nodeNo} [label="${node.constructor.name}"];`);
 
-        for (let child of node) {
-            const childNo = child.accept(this);
+        let i = 0;
+        while (i < node.childCount) {
+            const child = node.getChild(i);
+            child["nodeNo"] = this._idseq++;
+            let childNo = child["nodeNo"];
             this._dot.push(`    ${nodeNo} -> ${childNo};`);
+            child.accept(this);
+            i = i + 1;
         }
+        return;
+    }
 
-        return nodeNo;
+    visitErrorNode(node: ErrorNode): void {
+        const nodeNo = this._idseq;
+        this._dot.push(`    ${nodeNo} [label="ERROR"];`);
+        return;
+    }
+
+    visitTerminal(node: TerminalNode): void {
+        const nodeNo = this._idseq;
+        this._dot.push(`    ${nodeNo} [label="${RawAstToDotVisitor.escpace(node.text)}"];`);
+        return;
     }
 
     public writeToFile(filepath: string): void {

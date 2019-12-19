@@ -20,16 +20,16 @@
  */
 
 import {ProgramOperation} from "./ProgramOperation";
-import {RuleNode} from "antlr4ts/tree";
+import {AstNode} from "../../../ast/AstNode";
 
 export class RawOperation extends ProgramOperation {
 
-     constructor(ast: RuleNode) {
+     constructor(ast: AstNode) {
          super(ast);
      }
 
      toString(): string {
-         return this.ast.text;
+         return this.ast.toTreeString();
      }
 
 }

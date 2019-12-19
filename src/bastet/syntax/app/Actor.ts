@@ -30,6 +30,7 @@ import {ImmutableList} from "../../utils/ImmutableList";
 import {ImmutableMap} from "../../utils/ImmutableMap";
 import {Scripts} from "./controlflow/Scripts";
 import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
+import {AstNode} from "../ast/AstNode";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -59,7 +60,7 @@ export class Actor extends FromParseTree {
     /** List of scripts that define the behavior of the actor. */
     private readonly _scripts: ImmutableList<Script>;
 
-    constructor(node: RuleNode, ident: string, inheritFrom: Actor|null,
+    constructor(node: AstNode, ident: string, inheritFrom: Actor|null,
                 resources: AppResourceMap, datalocs: DataLocationMap,
                 initScript: Script, methods: MethodDefinitionMap, scripts: Script[]) {
         super(node);

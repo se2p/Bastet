@@ -70,6 +70,15 @@ export class BooleanLiteral extends AbstractBooleanExpression {
     public static fromString(text: string): BooleanLiteral {
         throw new ImplementMeException();
     }
+
+    toTreeString(): string {
+        if (this._literal) {
+            return "true";
+        } else {
+            return "false";
+        }
+    }
+
 }
 
 export class BooleanVariableExpression extends AbstractBooleanExpression {

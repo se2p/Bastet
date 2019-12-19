@@ -73,6 +73,10 @@ export class NumberLiteral extends AbstractNumberExpression {
         return this._numLiteral;
     }
 
+    toTreeString(): string {
+        return this.num.toString();
+    }
+
 }
 
 export class NumberVariableExpression extends AbstractNumberExpression {

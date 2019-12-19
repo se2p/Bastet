@@ -19,30 +19,6 @@
  *
  */
 
-import {
-    ActorDefinitionContext,
-    BooleanTypeContext,
-    DeclarationStmtListContext,
-    DeclareVariableContext,
-    EnumTypeContext,
-    EventContext,
-    InCoreEventContext,
-    ListTypeContext,
-    MapTypeContext,
-    MethodDefinitionListContext,
-    MethodResultDeclarationContext,
-    NeverEventContext,
-    NumerTypeContext,
-    ParameterContext,
-    ParameterListContext,
-    ProgramContext,
-    ResourceListContext,
-    ScriptListContext,
-    SetStmtListContext,
-    StartupEventContext,
-    StringTypeContext,
-    TypeContext
-} from "../parser/grammar/ScratchParser";
 import {Actor, ActorMap} from "./Actor";
 import {App} from "./App";
 import {AppResource, AppResourceMap, AppResourceType} from "./AppResource";
@@ -50,32 +26,53 @@ import {MethodDefinition, MethodDefinitionMap} from "./MethodDefinition";
 import {Script} from "./controlflow/Script";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
-import {BooleanType, ListType, MapType, NumberType, ScratchType, StringEnumType, StringType} from "../ast/core/ScratchType";
+import {
+    BooleanType,
+    ListType,
+    MapType,
+    NumberType,
+    ScratchType,
+    StringEnumType,
+    StringType,
+    VoidType
+} from "../ast/core/ScratchType";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {AppEvent, AppEvents, NeverEvent, StartupEvent} from "./AppEvent";
 import {TransitionRelations} from "./controlflow/TransitionRelation";
 import {TransitionRelationToDot} from "./controlflow/TransitionRelationToDot";
+import {AstNode} from "../ast/AstNode";
+import {Preconditions} from "../../utils/Preconditions";
+import {ProgramDefinition} from "../ast/core/ModuleDefinition";
+import {ActorDefinition} from "../ast/core/ActorDefinition";
+import {CoreEvent} from "../ast/core/CoreEvent";
+import {ScriptDefinitionList} from "../ast/core/ScriptDefinition";
+import {MethodDefinitionList, ResultDeclaration} from "../ast/core/MethodDefinition";
+import {ParameterDeclaration, ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
+import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
 
 export class AppBuilder {
 
-    public static buildControlFlowsFromSyntaxTree(programOrigin: string, programAST: ProgramContext, actorNamePrefix: string): App {
+    public static buildControlFlowsFromSyntaxTree(programOrigin: string, ast: AstNode, actorNamePrefix: string): App {
+        Preconditions.checkArgument(ast instanceof ProgramDefinition);
+        const programNode: ProgramDefinition = ast as ProgramDefinition;
+
         // Phase 1: Build the actors WITHOUT taking the INHERITANCE of actors into account.
-        const flatActors: ActorMap = AppBuilder.buildActorsFlat(programAST, actorNamePrefix);
+        const flatActors: ActorMap = AppBuilder.buildActorsFlat(programNode, actorNamePrefix);
 
         // Phase 2: Rebuild the actors AND TAKE INHERITANCE into account.
         const appActors: ActorMap = AppBuilder.rebuildWithActorInheritance(flatActors);
 
-        return new App(programOrigin, programAST.Ident().text, appActors);
+        return new App(programOrigin, programNode.ident.text, appActors);
     }
 
     private static rebuildWithActorInheritance(flatActors: ActorMap): ActorMap {
         throw new ImplementMeException();
     }
 
-    private static buildActorsFlat(programAST: ProgramContext, actorNamePrefix: string): ActorMap {
+    private static buildActorsFlat(programAST: ProgramDefinition, actorNamePrefix: string): ActorMap {
         let result: ActorMap = {};
-        const actorDefinitions : ActorDefinitionContext[] = programAST.actorDefinitionList().actorDefinition();
+        const actorDefinitions : ActorDefinition[] = programAST.actors.elements;
 
         for (let actorDefinition of actorDefinitions) {
             const actor: Actor = AppBuilder.buildActorFlat(actorDefinition, actorNamePrefix);
@@ -99,79 +96,74 @@ export class AppBuilder {
         toDotWriter.export(actor.initScript.transitions, target);
     }
 
-    private static buildActorFlat(actorDefinition: ActorDefinitionContext, actorNamePrefix: string) {
-        const actorIdent = actorNamePrefix + "_" + actorDefinition.Ident().toString();
-        const acd = actorDefinition.actorComponentsDefinition();
+    private static buildActorFlat(actorDefinition: ActorDefinition, actorNamePrefix: string) {
+        const actorIdent = actorNamePrefix + "_" + actorDefinition.ident.text;
+        const acd = actorDefinition;
 
-        const resources = AppBuilder.buildResources(acd.resourceList());
-        const datalocs = AppBuilder.buildDatalocs(acd.resourceList(), acd.declarationStmtList());
-        const initScript = AppBuilder.buildInitScript(acd.resourceList(), acd.declarationStmtList(), acd.setStmtList());
-        const methodDefs = AppBuilder.buildMethodDefs(acd.methodDefinitionList());
-        const scripts = AppBuilder.buildScripts(acd.scriptList());
+        const resources = AppBuilder.buildResources(acd.resourceDefs);
+        const datalocs = AppBuilder.buildDatalocs(acd.resourceDefs, acd.declarationStmts);
+        const initScript = AppBuilder.buildInitScript(acd.resourceDefs, acd.declarationStmts, acd.initStmts);
+        const methodDefs = AppBuilder.buildMethodDefs(acd.methodDefs);
+        const scripts = AppBuilder.buildScripts(acd.scriptList);
 
-        return new Actor(actorDefinition, actorIdent, null, resources, datalocs, initScript, methodDefs, scripts);
+        return new Actor(actorDefinition, acd.ident.text, null, resources, datalocs, initScript, methodDefs, scripts);
     }
 
-    private static buildScripts(scriptListContext: ScriptListContext): Script[] {
+    private static buildScripts(scriptList: ScriptDefinitionList): Script[] {
         let result: Script[] = [];
-        for (let scriptContext of scriptListContext.script()) {
-            const event = AppBuilder.buildEvent(scriptContext.event());
+        for (let script of scriptList) {
+            const event = AppBuilder.buildEvent(script.event);
             const visitor = new RelationBuildingVisitor();
             const transRelation = TransitionRelations.eliminateEpsilons(
-                scriptContext.stmtList().accept(visitor));
+                script.stmtList.accept(visitor));
 
             result.push(new Script(event, transRelation));
         }
         return result;
     }
 
-    private static buildEvent(eventContext: EventContext): AppEvent {
-        if (eventContext instanceof InCoreEventContext) {
-            eventContext = (eventContext as InCoreEventContext).coreEvent();
-        }
-
-        if (eventContext instanceof NeverEventContext) {
+    private static buildEvent(eventContext: CoreEvent): AppEvent {
+        if (eventContext instanceof NeverEvent) {
             return NeverEvent.instance();
-        } else if (eventContext instanceof StartupEventContext) {
+        } else if (eventContext instanceof StartupEvent) {
             return StartupEvent.instance();
         }
 
         throw new ImplementMeException();
     }
 
-    private static buildMethodDefs(methodDefinitionListContext: MethodDefinitionListContext): MethodDefinitionMap {
+    private static buildMethodDefs(methodDefinitionListContext: MethodDefinitionList): MethodDefinitionMap {
         let result: MethodDefinitionMap = {};
-        for (let methodDef of methodDefinitionListContext.methodDefinition()) {
-            const methodName = methodDef.Ident().toString();
-            const paramDecls = AppBuilder.buildParameterDeclarations(methodDef.parameterList());
-            const resultDecl = AppBuilder.buildMethodResultDef(methodDef.methodResultDeclaration());
+        for (let methodDef of methodDefinitionListContext) {
+            const methodName = methodDef.ident.text;
+            const paramDecls = AppBuilder.buildParameterDeclarations(methodDef.params);
+            const resultDecl = AppBuilder.buildMethodResultDef(methodDef.returns);
             result[methodName] = new MethodDefinition(methodDef, methodName, paramDecls, resultDecl);
         }
         return result;
     }
 
-    private static buildMethodResultDef(methodResultDeclarationContext: MethodResultDeclarationContext): DataLocation {
-        if (methodResultDeclarationContext.Ident()) {
-            const id: string = methodResultDeclarationContext.Ident().text;
-            const t: ScratchType = this.buildType(methodResultDeclarationContext.type());
-            return new DataLocation(methodResultDeclarationContext, id, t);
-        } else {
+    private static buildMethodResultDef(resultDecl: ResultDeclaration): DataLocation {
+        if (resultDecl.type == VoidType.instance()) {
             return DataLocation.void();
+        } else {
+            const id: string = resultDecl.ident.text;
+            const t: ScratchType = resultDecl.type;
+            return new DataLocation(resultDecl, id, t);
         }
     }
 
-    private static buildParameterDeclarations(parameterListContext: ParameterListContext): DataLocationMap {
+    private static buildParameterDeclarations(parameterListContext: ParameterDeclarationList): DataLocationMap {
         let result: DataLocationMap = {};
-        const params: ParameterContext[] = parameterListContext.parameterListPlain().parameter();
-        for (let p of params) {
-            const id: string = p.Ident().text;
-            const t: ScratchType = this.buildType(p.type());
+        for (let p of parameterListContext.elements) {
+            const id: string = p.ident.text;
+            const t: ScratchType = p.type;
             result[id] = new DataLocation(p, id, t);
         }
         return result;
     }
 
-    private static buildInitScript(resourceListContext: ResourceListContext, declarationStmtListContext: DeclarationStmtListContext, stmtList: SetStmtListContext): Script {
+    private static buildInitScript(resourceListContext: ResourceDefinitionList, declarationStmtListContext: DeclarationStmtListContext, stmtList: SetStmtListContext): Script {
         const visitor = new RelationBuildingVisitor();
         const transrelRes = resourceListContext.accept(visitor);
         const transrelLocs = declarationStmtListContext.accept(visitor);
@@ -210,24 +202,6 @@ export class AppBuilder {
         // Data locations based on the resources
         console.warn("Resource declarations ignored");
         return result;
-    }
-
-    private static buildType(typeContext: TypeContext) {
-        if (typeContext instanceof BooleanTypeContext) {
-            return new BooleanType();
-        } else if (typeContext instanceof NumerTypeContext) {
-            return new NumberType();
-        } else if (typeContext instanceof StringTypeContext) {
-            return new StringType();
-        } else if (typeContext instanceof ListTypeContext) {
-            return new ListType();
-        } else if (typeContext instanceof MapTypeContext) {
-            return new MapType();
-        } else if (typeContext instanceof EnumTypeContext) {
-            return new StringEnumType();
-        } else {
-            throw new IllegalArgumentException("Type not supported: " + typeContext.constructor.name);
-        }
     }
 
 }
