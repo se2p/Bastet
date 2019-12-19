@@ -32,6 +32,8 @@ import {Preconditions} from "./utils/Preconditions";
 import {AppBuilder} from "./syntax/app/AppBuilder";
 import {ProgramContext} from "./syntax/parser/grammar/ScratchParser";
 import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
+import {RuleNode} from "antlr4ts/tree";
+import {AstNode} from "./syntax/ast/AstNode";
 
 const commander = require('commander');
 
@@ -94,19 +96,19 @@ export class Bastet {
      *
      * @param filepath
      */
-    private parseIntoIntermediateAST(ident: string, filepath: string): ProgramContext {
+    private parseIntoIntermediateAST(ident: string, filepath: string): AstNode {
         Preconditions.checkNotEmpty(filepath);
 
         // Create the parser for the file format
         const scratchParser : ProgramParser = ProgramParserFactory.createParserFor(filepath);
 
         // Create the RAW AST (no simplifications or generalizations were applied)
-        const rawAST = scratchParser.parseFile(filepath);
+        const rawAST: RuleNode = scratchParser.parseFile(filepath);
 
         // Transform the AST: Replaces specific statements or expressions
         // by generic constructs.
         const transformer = new ToIntermediateTransformer();
-        const intermediateAST = transformer.transform(rawAST);
+        const intermediateAST: AstNode = transformer.transform(rawAST);
 
         Preconditions.checkState(intermediateAST instanceof ProgramContext);
 
@@ -114,7 +116,7 @@ export class Bastet {
         intermediateAST.accept(toDotVisitor);
         toDotVisitor.writeToFile(`output/ast_${ident}.dot`);
 
-        return intermediateAST as ProgramContext;
+        return intermediateAST as AstNode;
     }
 
     private createControlFlowFrom(programOrigin: string, intermediateSpecAST: ProgramContext, actorNamePrefix?: string): App {

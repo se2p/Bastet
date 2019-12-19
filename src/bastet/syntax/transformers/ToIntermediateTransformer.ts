@@ -1019,10 +1019,11 @@ class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
 
 }
 
-export class ToIntermediateTransformer implements SyntaxTreeTransformer {
+export class ToIntermediateTransformer {
 
-    transform(origin: RuleNode): RuleNode {
-        return origin;
+    transform(origin: RuleNode): AstNode {
+        const visitor = new ToIntermediateVisitor();
+        return origin.accept(visitor);
     }
 
 }
