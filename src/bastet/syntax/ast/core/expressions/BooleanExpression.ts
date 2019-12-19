@@ -28,6 +28,7 @@ import {Identifier} from "../Identifier";
 import {UnaryExpression} from "./UnaryExpression";
 import {StringExpression} from "./StringExpression";
 import {NumberExpression} from "./NumberExpression";
+import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
 
 export interface BooleanExpression extends Expression {
 
@@ -66,6 +67,9 @@ export class BooleanLiteral extends AbstractBooleanExpression {
         this._literal = literal;
     }
 
+    public static fromString(text: string): BooleanLiteral {
+        throw new ImplementMeException();
+    }
 }
 
 export class BooleanVariableExpression extends AbstractBooleanExpression {

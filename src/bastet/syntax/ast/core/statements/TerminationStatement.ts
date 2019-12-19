@@ -41,7 +41,7 @@ export class StopThisStatement extends Statement implements  TerminationStatemen
 
 }
 
-export class DelteThisCloneStatement extends Statement implements  TerminationStatement {
+export class DeleteThisCloneStatement extends Statement implements  TerminationStatement {
 
     constructor() {
         super([]);

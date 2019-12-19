@@ -33,6 +33,12 @@ export class SoundResourceType extends ResourceType {
     constructor() {
         super([]);
     }
+
+    private static readonly INSTANCE = new SoundResourceType();
+
+    public static instance(): SoundResourceType {
+        return this.INSTANCE;
+    }
 }
 
 export class ImageResourceType extends ResourceType {
@@ -40,6 +46,13 @@ export class ImageResourceType extends ResourceType {
     constructor() {
         super([]);
     }
+
+    private static readonly INSTANCE = new ImageResourceType();
+
+    public static instance(): ImageResourceType {
+        return this.INSTANCE;
+    }
+
 }
 
 export class ResourceDefinition extends AbstractNode {

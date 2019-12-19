@@ -28,6 +28,12 @@ export class StatementList extends AstNodeList<Statement> {
         super(elements);
     }
 
+    private static readonly EMPTY_STATEMENTLIST: StatementList = new StatementList([]);
+
+    public static empty(): StatementList {
+        return this.EMPTY_STATEMENTLIST;
+    }
+
 }
 
 

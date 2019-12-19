@@ -20,17 +20,17 @@
  */
 
 import {Statement} from "./Statement";
-import {Identifier} from "../Identifier";
 import {Expression} from "../expressions/Expression";
+import {StringExpression} from "../expressions/StringExpression";
 
 export class ChangeAttributeByStatement extends Statement {
 
-    private readonly _variable: Identifier;
+    private readonly _attrib: StringExpression;
     private readonly _expr: Expression;
 
-    constructor(variable: Identifier, expr: Expression) {
+    constructor(variable: StringExpression, expr: Expression) {
         super([variable, expr]);
-        this._variable = variable;
+        this._attrib = variable;
         this._expr = expr;
     }
 }

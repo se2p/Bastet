@@ -27,107 +27,81 @@ import {
     ActorComponentsDefinitionContext,
     ActorDefinitionContext,
     ActorDefinitionListContext,
-    ActorLookStmtContext,
-    ActorSoundStmtContext,
     AddElementToStatementContext,
-    AskAndWaitStatementContext,
-    BackdropChangeEventContext,
+    AppMessageContext,
     BoolAndExpressionContext,
-    BoolAsNumExpressionContext, BoolAsStringExpressionContext, BooleanTypeContext,
-    BoolExprContext,
+    BoolAsNumExpressionContext,
+    BoolAsStringExpressionContext,
+    BooleanTypeContext,
     BoolLiteralExpressionContext,
     BoolOrExpressionContext,
     BoolParanthExpressionContext,
     BoolVariableExpressionContext,
-    BroadcastAndWaitStatementContext, BroadcastMessageStatementContext,
+    BroadcastAndWaitStatementContext,
+    BroadcastMessageStatementContext,
     CallStmtContext,
     ChagenAttributeByStatementContext,
-    ChagenGraphicEffectsByStatementContext,
-    ChagenLayerByStatementContext,
-    ChagenSizeByStatementContext, ChangePenAttributeByStementContext,
-    ChangeSoundEffectStatementContext, ChangeVarByStatementContext, ChangeXbyStatementContext,
-    ChangeYbyStatementContext,
-    CleareSoundEffectsStatementContext,
-    ClearGraphicEffectsStatementContext,
+    ChangeVarByStatementContext,
     ClickEventContext,
     CloneStartEventContext,
-    ColorContext,
     ColorFromNumExpressionContext,
-    ColorTouchesColorExpressionContext,
-    CommonStmtContext,
     ConditionReachedEventContext,
-    ControlStatementContext, ControlStmtContext,
-    CoreBoolExprContext,
-    CoreBoolExpressionContext, CoreControlStmtContext,
-    CoreEventContext,
-    CoreExpressionContext, CoreNonCtrlStmtContext,
-    CoreNumExprContext, CoreNumExpressionContext,
-    CoreStringExprContext,
-    CoreStringExpressionContext,
     CreateCloneOfStatementContext,
-    CurrentTimeCompExpressionContext, DateCompContext,
-    DaysSinceMileniumExpressionContext,
-    DeclarationStmtContext, DeclarationStmtListContext,
+    CurrentTimeCompExpressionContext,
+    DateCompContext,
+    DeclarationStmtListContext,
     DeclareAttributeContext,
-    DeclareAttributeOfContext, DeclareVariableContext, DefaultBoolExpressionContext,
+    DeclareAttributeOfContext,
+    DeclareVariableContext,
+    DefaultBoolExpressionContext,
     DefaultNumExprContext,
     DefaultStringExpressionContext,
     DeleteAllFromStatementContext,
     DeleteIthFromStatementContext,
     DeleteThisCloneContext,
     DistanceToExpressionContext,
-    ElementChoiceContext,
-    ElseCaseContext,
-    EnumTypeContext, EpsilonStatementContext, EraseAllStatementContext,
-    EventContext, ExplicitPositionContext,
-    ExpressionContext,
+    EnumTypeContext,
+    EpsilonStatementContext,
     ExpressionListContext,
-    ExpressionListPlainContext, ExpressionStmtContext,
-    FileTypeContext,
-    FlatVariableContext, FunctionReturnDefinitionContext,
-    GlideNumSecsToStatementContext,
-    GotoBackLayerStatementContext,
-    GotoFrontLayerStatementContext,
-    GotoLayerStatementContext, GoToPositionStatementContext,
-    HideSpriteStatementContext,
-    HideVariableStatementContext, HourCompContext, IdentContext, IdentExpressionContext,
-    IfOnEdgeBounceStatementContext, IfStmtContext, ImportDefinitionContext,
+    ExpressionListPlainContext,
+    ExpressionStmtContext,
+    FunctionReturnDefinitionContext,
+    IdentContext,
+    IdentExpressionContext,
+    IfStmtContext,
+    ImportDefinitionContext,
     ImportDefinitionListContext,
-    InCoreEventContext,
     IndexOfExpressionContext,
-    IndexTypeContext, InheritsFromContext,
-    InsertAtStatementContext, IthLetterOfStringExpressionContext,
+    IndexTypeContext,
+    InheritsFromContext,
+    InsertAtStatementContext,
+    IthLetterOfStringExpressionContext,
     IthStringItemOfExpressionContext,
-    JoinStringsExpressionContext, KeyContext, KeyEventContext,
-    KeyPressedExpressionContext,
+    JoinStringsExpressionContext,
+    KeyContext,
+    KeyEventContext,
     LengthOfListExpressionContext,
     LengthOfStringExpressionContext,
-    ListExprContext, ListStmtContext,
     ListTypeContext,
     ListVariableExpressionContext,
     ListWithElementsExpressionContext,
-    LoudnessExpressionContext,
-    MapTypeContext, MessageContext, MessageReceivedEventContext,
-    MethodDefinitionContext, MethodDefinitionListContext,
-    MethodResultDeclarationContext,
-    MinuteCompContext,
-    MonthCompContext, MouseDownExpressionContext, MousePositionContext,
-    MouseXExpressionContext, MouseYExpressionContext,
-    MoveNumStepsStatementContext,
-    NamedElementContext,
+    MapTypeContext,
+    MessageReceivedEventContext,
+    MethodDefinitionContext,
+    MethodDefinitionListContext,
     NegatedBoolExpressionContext,
     NeverEventContext,
-    NextElementContext,
-    NonControlStatementContext,
-    NonCtrlStmtContext,
     NumAsStringExpressionContext,
     NumberContext,
-    NumberedElementContext, NumberTypeContext, NumBracketsContext,
+    NumberTypeContext,
+    NumBracketsContext,
     NumDivExpressionContext,
-    NumEqualsExpressionContext, NumerTypeContext,
-    NumExprContext, NumFunctContext,
-    NumFunctExpressionContext, NumGreaterThanExpressionContext,
-    NumLessThanExpressionContext, NumLiteralExpressionContext,
+    NumEqualsExpressionContext,
+    NumFunctContext,
+    NumFunctExpressionContext,
+    NumGreaterThanExpressionContext,
+    NumLessThanExpressionContext,
+    NumLiteralExpressionContext,
     NumMinusExpressionContext,
     NumModExpressionContext,
     NumMulExpressionContext,
@@ -135,86 +109,90 @@ import {
     NumRandomExpressionContext,
     NumRoundExpressionContext,
     NumVariableExpressionContext,
-    ParameterContext, ParameterListContext,
+    ParameterContext,
+    ParameterListContext,
     ParameterListPlainContext,
-    PenDownStatementContext, PenStmtContext,
-    PenUpStatementContext,
-    PivotPositionContext, PlaySoundUntilStatementContext,
-    PointInDirStatementContext, PointTowardsPosStatementContext,
-    PositionContext, PrevElementContext, ProgramContext,
+    ProgramContext,
     QualifiedVariableContext,
-    RandomElementContext,
-    RandomPositionContext, RepeatForeverStmtContext,
+    RepeatForeverStmtContext,
     RepeatTimesStmtContext,
     ReplaceElementAtStatementContext,
-    ResetTimerStatementContext,
-    ResourceAttributeOfExpressionContext,
     ResourceContext,
     ResourceListContext,
-    ResourceLocatorContext, ResourceTypeContext,
-    RGBAColorExpressionContext,
-    SayForStatementContext,
-    ScriptContext, ScriptListContext, SecondCompContext,
+    ResourceLocatorContext,
+    ScriptContext,
+    ScriptListContext,
     SetAttributeOfToStatementContext,
-    SetAttributeToStatementContext, SetGraphicEffectToStatementContext,
-    SetPenAttributeStatementContext, SetPenColorStatementContext,
-    SetSizeToPercStatementContext,
-    SetSoundEffectStatementContext,
+    SetAttributeToStatementContext,
     SetStatementContext,
-    SetStmtContext, SetStmtListContext, SetVariableToStatementContext,
-    SetXtoStatementContext,
-    SetYtoStatementContext, ShowSpriteStatementContext,
-    ShowVariableStatementContext,
-    SpriteLookStmtContext, SpriteMotionStmtContext,
-    StampStatementContext,
-    StartSoundStatementContext, StartupEventContext,
-    StmtContext, StmtListContext,
+    SetStmtListContext,
+    SetVariableToStatementContext,
+    SoundResourceContext,
+    StartupEventContext,
+    StmtContext,
+    StmtListContext,
     StmtListPlainContext,
     StopAllContext,
-    StopAllSoundsStatementContext, StopOthersInActorStatementContext, StopThisContext, StrContainsExpressionContext,
+    StopOthersInActorStatementContext,
+    StopThisContext,
+    StrContainsExpressionContext,
     StrEqualsExpressionContext,
-    StrGreaterThanExpressionContext, StrIdentExpressionContext,
+    StrGreaterThanExpressionContext,
+    StrIdentExpressionContext,
     StringAsNumExpressionContext,
     StringAttributeOfExpressionContext,
-    StringExprContext, StringLiteralExpressionContext,
-    StringTypeContext, StringVariableExpressionContext,
-    StrLessThanExpressionContext, SwitchBackdropAndWaitStatementContext, SwitchBackdropToStatementContext,
-    SwitchCostumeStatementContext,
-    TerminationStmtContext, ThinkForStatementContext,
-    TimeCompContext,
+    StringLiteralExpressionContext,
+    StringTypeContext,
+    StringVariableExpressionContext,
+    StrLessThanExpressionContext,
+    SystemMessageContext,
     TimerExpressionContext,
-    TouchableColorContext,
-    TouchableContext,
-    TouchableEdgeContext,
-    TouchableMousePointerContext,
-    TouchableSpriteContext,
-    TouchingBoolExpressionContext, TurnLeftDegreeStatementContext,
-    TurnRightDegreeStatementContext, TypeContext,
     UnspecifiedBoolExpressionContext,
     UnspecifiedExprContext,
     UnspecifiedNumExprContext,
-    UnspecifiedStringExpressionContext, UntilStmtContext,
-    UsernameExpressionContext,
+    UnspecifiedStringExpressionContext,
+    UntilStmtContext,
     VarContainsExpressionContext,
     VariableContext,
-    VariableValueEventContext, VoidReturnDefinitionContext,
-    WaitSecsStatementContext, WaitUntilStatementContext,
-    WeekdayCompContext,
-    YearCompContext
+    VariableValueEventContext,
+    VoidReturnDefinitionContext,
+    WaitSecsStatementContext,
+    WaitUntilStatementContext
 } from "../parser/grammar/ScratchParser";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {Identifier} from "../ast/core/Identifier";
 import {ImportDefinition, ImportDefinitionList} from "../ast/core/ImportDefinition";
 import {ActorDefinition, ActorDefinitionList} from "../ast/core/ActorDefinition";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {StringLiteral} from "../ast/core/expressions/StringExpression";
+import {
+    BoolAsStringExpression,
+    IthLetterOfStringExpression,
+    IthStringItemOfExpression,
+    JoinStringsExpression,
+    NumAsStringExpression,
+    StringAttributeOfExpression,
+    StringExpression,
+    StringLiteral,
+    StringVariableExpression
+} from "../ast/core/expressions/StringExpression";
 import {ResourceLocation} from "../ast/core/ResourceLocation";
-import {ResourceDefinition, ResourceDefinitionList, ResourceType} from "../ast/core/ResourceDefinition";
+import {
+    ImageResourceType,
+    ResourceDefinition,
+    ResourceDefinitionList,
+    ResourceType,
+    SoundResourceType
+} from "../ast/core/ResourceDefinition";
 import {Statement, StatementList} from "../ast/core/statements/Statement";
 import {MethodDefinition, MethodDefinitionList, ResultDeclaration} from "../ast/core/MethodDefinition";
 import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
-import {DeclarationStatement} from "../ast/core/statements/DeclarationStatement";
-import {SetStatement} from "../ast/core/statements/SetStatement";
+import {
+    DeclarationStatement,
+    DeclareAttributeOfStatement,
+    DeclareAttributeStatement,
+    DeclareVariableStatement
+} from "../ast/core/statements/DeclarationStatement";
+import {SetAttributeToStatement, SetStatement, SetVariableToStatement} from "../ast/core/statements/SetStatement";
 import {Expression} from "../ast/core/expressions/Expression";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {ParameterDeclaration, ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
@@ -227,11 +205,83 @@ import {
     StringEnumType,
     StringType
 } from "../ast/core/ScratchType";
-import {Scripts} from "../app/controlflow/Scripts";
-import {CoreEvent} from "../ast/core/CoreEvent";
+import {
+    CloneStartEvent,
+    ConditionReachedEvent,
+    CoreEvent,
+    MessageReceivedEvent,
+    NeverEvent,
+    StartupEvent
+} from "../ast/core/CoreEvent";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
+import {IfStatement, RepeatForeverStatement, UntilStatement} from "../ast/core/statements/ControlStatement";
+import {
+    AndExpression,
+    BooleanExpression,
+    BooleanLiteral,
+    BooleanVariableExpression,
+    NegationExpression,
+    NumEqualsExpression,
+    NumLessThanExpression,
+    OrExpression,
+    StrContainsExpression,
+    StrEqualsExpression,
+    StrGreaterThanExpression,
+    StrLessThanExpression
+} from "../ast/core/expressions/BooleanExpression";
+import {
+    BoolAsNumberExpression,
+    DivideExpression,
+    IndexOfExpression,
+    LengthOfStringExpression,
+    LengthOListExpression,
+    MinusExpression,
+    ModuloExpression,
+    MultiplyExpression,
+    NumberExpression,
+    NumberLiteral,
+    NumberVariableExpression,
+    NumFunctExpression,
+    PickRandomFromExpression,
+    PlusExpression,
+    RoundExpression,
+    StringAsNumberExpression,
+    TimerExpression
+} from "../ast/core/expressions/NumberExpression";
+import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
+import {ExpressionStatement} from "../ast/core/statements/ExpressionStatement";
+import {
+    AddElementToStatement,
+    DeleteAllFromStatement,
+    DeleteIthFromStatement,
+    InsertAtStatement,
+    ReplaceElementAtStatement
+} from "../ast/core/statements/ListStatement";
+import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
+import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
+import {CallStatement} from "../ast/core/statements/CallStatement";
+import {ChangeAttributeByStatement} from "../ast/core/statements/ChangeAttributeByStatement";
+import {ChangeVarByStatement} from "../ast/core/statements/ChangeVarByStatement";
+import {CreateCloneOfStatement} from "../ast/core/statements/CreateCloneOfStatement";
+import {
+    DeleteThisCloneStatement,
+    StopAllStatement,
+    StopThisStatement
+} from "../ast/core/statements/TerminationStatement";
+import {SystemMessage} from "../ast/core/Message";
+import {StopOthersInActorStatement} from "../ast/core/statements/StopOthersInActorStatement";
+import {WaitSecsStatement} from "../ast/core/statements/WaitSecsStatement";
+import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 
 class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
+
+    private getOperand1(ctx: RuleNode): RuleNode {
+        throw new ImplementMeException();
+    }
+
+    private getOperand2(ctx: RuleNode): RuleNode {
+        throw new ImplementMeException();
+    }
 
     public visitProgram(ctx: ProgramContext): AstNode {
         const ident: AstNode = ctx.ident().accept(this);
@@ -389,11 +439,32 @@ class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
         return new ParameterDeclarationList(elems);
     }
 
-    public visitStmtList(ctx: StmtListContext): AstNode {
-        const elems: Statement[] = this.buildArrayFrom(ctx.stmtListPlain().stmt());
-        if (ctx.terminationStmt()) {
-            elems.push(ctx.terminationStmt().accept(this) as Statement);
+    private asListOfStatements(ctx: StmtContext): Statement[] {
+        let result: Statement[];
+        let visitResult = ctx.accept(this);
+
+        if (visitResult instanceof StatementList) {
+            result = (visitResult as StatementList).elements;
+        } else if (visitResult instanceof Statement) {
+            result = [ visitResult ];
+        } else {
+            throw new IllegalStateException("Unsupported return type");
         }
+
+        return result;
+    }
+
+    public visitStmtList(ctx: StmtListContext): AstNode {
+        let elems: Statement[] = [];
+
+        for (let idc of ctx.stmtListPlain().stmt()) {
+            elems = elems.concat(this.asListOfStatements(idc));
+        }
+
+        if (ctx.terminationStmt()) {
+            elems = elems.concat(this.asListOfStatements(ctx.terminationStmt()));
+        }
+
         return new StatementList(elems);
     }
 
@@ -430,175 +501,505 @@ class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
         throw new IllegalStateException("Not expected to be needed.");
     }
 
-    visitUntilStmt: (ctx: UntilStmtContext) => AstNode;
-    visitIfStmt: (ctx: IfStmtContext) => AstNode;
-    visitRepeatForeverStmt: (ctx: RepeatForeverStmtContext) => AstNode;
-    visitRepeatTimesStmt: (ctx: RepeatTimesStmtContext) => AstNode;
+    public visitUntilStmt (ctx: UntilStmtContext): AstNode {
+        return new UntilStatement(
+            ctx.boolExpr().accept(this) as BooleanExpression,
+            ctx.stmtList().accept(this) as StatementList);
+    }
 
-    visitNumBrackets: (ctx: NumBracketsContext) => AstNode;
-    visitNumDivExpression: (ctx: NumDivExpressionContext) => AstNode;
-    visitNumEqualsExpression: (ctx: NumEqualsExpressionContext) => AstNode;
-    visitNumExpr: (ctx: NumExprContext) => AstNode;
-    visitNumFunct: (ctx: NumFunctContext) => AstNode;
-    visitNumFunctExpression: (ctx: NumFunctExpressionContext) => AstNode;
-    visitNumGreaterThanExpression: (ctx: NumGreaterThanExpressionContext) => AstNode;
-    visitNumLessThanExpression: (ctx: NumLessThanExpressionContext) => AstNode;
-    visitNumLiteralExpression: (ctx: NumLiteralExpressionContext) => AstNode;
-    visitNumMinusExpression: (ctx: NumMinusExpressionContext) => AstNode;
-    visitNumModExpression: (ctx: NumModExpressionContext) => AstNode;
-    visitNumMulExpression: (ctx: NumMulExpressionContext) => AstNode;
-    visitNumPlusExpression: (ctx: NumPlusExpressionContext) => AstNode;
-    visitNumRandomExpression: (ctx: NumRandomExpressionContext) => AstNode;
-    visitNumRoundExpression: (ctx: NumRoundExpressionContext) => AstNode;
-    visitNumVariableExpression: (ctx: NumVariableExpressionContext) => AstNode;
-    visitNumber: (ctx: NumberContext) => AstNode;
+    private statementListFrom(ctx: StmtListContext|undefined) {
+        if (ctx) {
+            return ctx.accept(this) as StatementList;
+        } else {
+            return StatementList.empty();
+        }
+    }
 
-    visitBoolAndExpression: (ctx: BoolAndExpressionContext) => AstNode;
-    visitBoolAsNumExpression: (ctx: BoolAsNumExpressionContext) => AstNode;
-    visitBoolAsStringExpression: (ctx: BoolAsStringExpressionContext) => AstNode;
-    visitBoolExpr: (ctx: BoolExprContext) => AstNode;
-    visitBoolLiteralExpression: (ctx: BoolLiteralExpressionContext) => AstNode;
-    visitBoolOrExpression: (ctx: BoolOrExpressionContext) => AstNode;
-    visitBoolParanthExpression: (ctx: BoolParanthExpressionContext) => AstNode;
-    visitBoolVariableExpression: (ctx: BoolVariableExpressionContext) => AstNode;
+    public visitIfStmt (ctx: IfStmtContext): AstNode {
+        return new IfStatement(
+            ctx.boolExpr().accept(this) as BooleanExpression,
+            ctx.stmtList().accept(this) as StatementList,
+            this.statementListFrom(ctx.elseCase().stmtList()));
+    }
 
-    visitAddElementToStatement: (ctx: AddElementToStatementContext) => AstNode;
-    visitAskAndWaitStatement: (ctx: AskAndWaitStatementContext) => AstNode;
-    visitBroadcastAndWaitStatement: (ctx: BroadcastAndWaitStatementContext) => AstNode;
-    visitBroadcastMessageStatement: (ctx: BroadcastMessageStatementContext) => AstNode;
-    visitCallStmt: (ctx: CallStmtContext) => AstNode;
-    visitChagenAttributeByStatement: (ctx: ChagenAttributeByStatementContext) => AstNode;
-    visitChangeVarByStatement: (ctx: ChangeVarByStatementContext) => AstNode;
-    visitClickEvent: (ctx: ClickEventContext) => AstNode;
-    visitCloneStartEvent: (ctx: CloneStartEventContext) => AstNode;
-    visitColor: (ctx: ColorContext) => AstNode;
-    visitColorFromNumExpression: (ctx: ColorFromNumExpressionContext) => AstNode;
-    visitCommonStmt: (ctx: CommonStmtContext) => AstNode;
-    visitConditionReachedEvent: (ctx: ConditionReachedEventContext) => AstNode;
-    visitControlStatement: (ctx: ControlStatementContext) => AstNode;
-    visitControlStmt: (ctx: ControlStmtContext) => AstNode;
-    visitCoreBoolExpr: (ctx: CoreBoolExprContext) => AstNode;
-    visitCoreBoolExpression: (ctx: CoreBoolExpressionContext) => AstNode;
-    visitCoreControlStmt: (ctx: CoreControlStmtContext) => AstNode;
-    visitCoreEvent: (ctx: CoreEventContext) => AstNode;
-    visitCoreExpression: (ctx: CoreExpressionContext) => AstNode;
-    visitCoreNonCtrlStmt: (ctx: CoreNonCtrlStmtContext) => AstNode;
-    visitCoreNumExpr: (ctx: CoreNumExprContext) => AstNode;
-    visitCoreNumExpression: (ctx: CoreNumExpressionContext) => AstNode;
-    visitCoreStringExpr: (ctx: CoreStringExprContext) => AstNode;
-    visitCoreStringExpression: (ctx: CoreStringExpressionContext) => AstNode;
-    visitCreateCloneOfStatement: (ctx: CreateCloneOfStatementContext) => AstNode;
-    visitCurrentTimeCompExpression: (ctx: CurrentTimeCompExpressionContext) => AstNode;
-    visitDateComp: (ctx: DateCompContext) => AstNode;
-    visitDaysSinceMileniumExpression: (ctx: DaysSinceMileniumExpressionContext) => AstNode;
-    visitDeclareAttribute: (ctx: DeclareAttributeContext) => AstNode;
-    visitDeclareAttributeOf: (ctx: DeclareAttributeOfContext) => AstNode;
-    visitDeclareVariable: (ctx: DeclareVariableContext) => AstNode;
-    visitDefaultBoolExpression: (ctx: DefaultBoolExpressionContext) => AstNode;
-    visitDefaultNumExpr: (ctx: DefaultNumExprContext) => AstNode;
-    visitDefaultStringExpression: (ctx: DefaultStringExpressionContext) => AstNode;
-    visitDeleteAllFromStatement: (ctx: DeleteAllFromStatementContext) => AstNode;
-    visitDeleteIthFromStatement: (ctx: DeleteIthFromStatementContext) => AstNode;
-    visitDeleteThisClone: (ctx: DeleteThisCloneContext) => AstNode;
-    visitDistanceToExpression: (ctx: DistanceToExpressionContext) => AstNode;
-    visitElementChoice: (ctx: ElementChoiceContext) => AstNode;
-    visitElseCase: (ctx: ElseCaseContext) => AstNode;
-    visitEpsilonStatement: (ctx: EpsilonStatementContext) => AstNode;
-    visitEraseAllStatement: (ctx: EraseAllStatementContext) => AstNode;
-    visitEvent: (ctx: EventContext) => AstNode;
-    visitExplicitPosition: (ctx: ExplicitPositionContext) => AstNode;
-    visitExpression: (ctx: ExpressionContext) => AstNode;
-    visitExpressionStmt: (ctx: ExpressionStmtContext) => AstNode;
-    visitFileType: (ctx: FileTypeContext) => AstNode;
-    visitFlatVariable: (ctx: FlatVariableContext) => AstNode;
-    visitHourComp: (ctx: HourCompContext) => AstNode;
-    visitInCoreEvent: (ctx: InCoreEventContext) => AstNode;
-    visitIndexOfExpression: (ctx: IndexOfExpressionContext) => AstNode;
-    visitIndexType: (ctx: IndexTypeContext) => AstNode;
-    visitInheritsFrom: (ctx: InheritsFromContext) => AstNode;
-    visitInsertAtStatement: (ctx: InsertAtStatementContext) => AstNode;
-    visitIthLetterOfStringExpression: (ctx: IthLetterOfStringExpressionContext) => AstNode;
-    visitIthStringItemOfExpression: (ctx: IthStringItemOfExpressionContext) => AstNode;
-    visitJoinStringsExpression: (ctx: JoinStringsExpressionContext) => AstNode;
-    visitKey: (ctx: KeyContext) => AstNode;
-    visitKeyEvent: (ctx: KeyEventContext) => AstNode;
-    visitKeyPressedExpression: (ctx: KeyPressedExpressionContext) => AstNode;
-    visitLengthOfListExpression: (ctx: LengthOfListExpressionContext) => AstNode;
-    visitLengthOfStringExpression: (ctx: LengthOfStringExpressionContext) => AstNode;
-    visitListExpr: (ctx: ListExprContext) => AstNode;
-    visitListStmt: (ctx: ListStmtContext) => AstNode;
-    visitListVariableExpression: (ctx: ListVariableExpressionContext) => AstNode;
-    visitListWithElementsExpression: (ctx: ListWithElementsExpressionContext) => AstNode;
-    visitLoudnessExpression: (ctx: LoudnessExpressionContext) => AstNode;
-    visitMessage: (ctx: MessageContext) => AstNode;
-    visitMessageReceivedEvent: (ctx: MessageReceivedEventContext) => AstNode;
-    visitMinuteComp: (ctx: MinuteCompContext) => AstNode;
-    visitMonthComp: (ctx: MonthCompContext) => AstNode;
-    visitMouseDownExpression: (ctx: MouseDownExpressionContext) => AstNode;
-    visitMousePosition: (ctx: MousePositionContext) => AstNode;
-    visitMouseXExpression: (ctx: MouseXExpressionContext) => AstNode;
-    visitMouseYExpression: (ctx: MouseYExpressionContext) => AstNode;
-    visitMoveNumStepsStatement: (ctx: MoveNumStepsStatementContext) => AstNode;
-    visitNamedElement: (ctx: NamedElementContext) => AstNode;
-    visitNegatedBoolExpression: (ctx: NegatedBoolExpressionContext) => AstNode;
-    visitNeverEvent: (ctx: NeverEventContext) => AstNode;
-    visitNextElement: (ctx: NextElementContext) => AstNode;
-    visitNonControlStatement: (ctx: NonControlStatementContext) => AstNode;
-    visitNonCtrlStmt: (ctx: NonCtrlStmtContext) => AstNode;
-    visitNumAsStringExpression: (ctx: NumAsStringExpressionContext) => AstNode;
-    visitNumberedElement: (ctx: NumberedElementContext) => AstNode;
-    visitNumerType: (ctx: NumerTypeContext) => AstNode;
-    visitParameter: (ctx: ParameterContext) => AstNode;
-    visitPivotPosition: (ctx: PivotPositionContext) => AstNode;
-    visitPosition: (ctx: PositionContext) => AstNode;
-    visitPrevElement: (ctx: PrevElementContext) => AstNode;
-    visitQualifiedVariable: (ctx: QualifiedVariableContext) => AstNode;
-    visitRGBAColorExpression: (ctx: RGBAColorExpressionContext) => AstNode;
-    visitRandomElement: (ctx: RandomElementContext) => AstNode;
-    visitRandomPosition: (ctx: RandomPositionContext) => AstNode;
-    visitReplaceElementAtStatement: (ctx: ReplaceElementAtStatementContext) => AstNode;
-    visitResetTimerStatement: (ctx: ResetTimerStatementContext) => AstNode;
-    visitResourceAttributeOfExpression: (ctx: ResourceAttributeOfExpressionContext) => AstNode;
-    visitResourceType: (ctx: ResourceTypeContext) => AstNode;
-    visitSecondComp: (ctx: SecondCompContext) => AstNode;
-    visitSetAttributeOfToStatement: (ctx: SetAttributeOfToStatementContext) => AstNode;
-    visitSetAttributeToStatement: (ctx: SetAttributeToStatementContext) => AstNode;
-    visitSetVariableToStatement: (ctx: SetVariableToStatementContext) => AstNode;
-    visitStartupEvent: (ctx: StartupEventContext) => AstNode;
-    visitStmt: (ctx: StmtContext) => AstNode;
-    visitStopAll: (ctx: StopAllContext) => AstNode;
-    visitStopOthersInActorStatement: (ctx: StopOthersInActorStatementContext) => AstNode;
-    visitStopThis: (ctx: StopThisContext) => AstNode;
-    visitStrContainsExpression: (ctx: StrContainsExpressionContext) => AstNode;
-    visitStrEqualsExpression: (ctx: StrEqualsExpressionContext) => AstNode;
-    visitStrGreaterThanExpression: (ctx: StrGreaterThanExpressionContext) => AstNode;
-    visitStrLessThanExpression: (ctx: StrLessThanExpressionContext) => AstNode;
-    visitStringAsNumExpression: (ctx: StringAsNumExpressionContext) => AstNode;
-    visitStringAttributeOfExpression: (ctx: StringAttributeOfExpressionContext) => AstNode;
-    visitStringExpr: (ctx: StringExprContext) => AstNode;
-    visitStringLiteralExpression: (ctx: StringLiteralExpressionContext) => AstNode;
-    visitStringVariableExpression: (ctx: StringVariableExpressionContext) => AstNode;
-    visitTerminationStmt: (ctx: TerminationStmtContext) => AstNode;
-    visitTimeComp: (ctx: TimeCompContext) => AstNode;
-    visitTimerExpression: (ctx: TimerExpressionContext) => AstNode;
-    visitTouchable: (ctx: TouchableContext) => AstNode;
-    visitTouchableColor: (ctx: TouchableColorContext) => AstNode;
-    visitTouchableEdge: (ctx: TouchableEdgeContext) => AstNode;
-    visitTouchableMousePointer: (ctx: TouchableMousePointerContext) => AstNode;
-    visitTouchableSprite: (ctx: TouchableSpriteContext) => AstNode;
-    visitTouchingBoolExpression: (ctx: TouchingBoolExpressionContext) => AstNode;
-    visitUnspecifiedBoolExpression: (ctx: UnspecifiedBoolExpressionContext) => AstNode;
-    visitUnspecifiedExpr: (ctx: UnspecifiedExprContext) => AstNode;
-    visitUnspecifiedNumExpr: (ctx: UnspecifiedNumExprContext) => AstNode;
-    visitUnspecifiedStringExpression: (ctx: UnspecifiedStringExpressionContext) => AstNode;
-    visitUsernameExpression: (ctx: UsernameExpressionContext) => AstNode;
-    visitVarContainsExpression: (ctx: VarContainsExpressionContext) => AstNode;
-    visitVariable: (ctx: VariableContext) => AstNode;
-    visitVariableValueEvent: (ctx: VariableValueEventContext) => AstNode;
-    visitWaitSecsStatement: (ctx: WaitSecsStatementContext) => AstNode;
-    visitWaitUntilStatement: (ctx: WaitUntilStatementContext) => AstNode;
-    visitWeekdayComp: (ctx: WeekdayCompContext) => AstNode;
-    visitYearComp: (ctx: YearCompContext) => AstNode;
+    public visitRepeatForeverStmt (ctx: RepeatForeverStmtContext): AstNode {
+        return new RepeatForeverStatement(ctx.stmtList().accept(this) as StatementList);
+    }
+
+    /**
+     * Replaces a `RepeatTimesStatement` by an `UntilStatement`
+     */
+    public visitRepeatTimesStmt (ctx: RepeatTimesStmtContext): AstNode {
+        const counterIdent: Identifier = Identifier.fresh();
+        const counterVar = new NumberVariableExpression(counterIdent);
+        const declaration = new DeclareVariableStatement(counterIdent, NumberType.instance());
+        const init = new SetVariableToStatement(counterIdent, NumberLiteral.of(0));
+        const times = ctx.numExpr().accept(this) as NumberExpression;
+        const untilCond = new NegationExpression(new NumLessThanExpression(counterVar, times));
+
+        const untilStatement = new UntilStatement(untilCond, ctx.stmtList().accept(this) as StatementList);
+        const stmts: Statement[] = [ declaration, init, untilStatement ];
+
+        return new StatementList(stmts);
+    }
+
+    public visitNumBrackets(ctx: NumBracketsContext) : AstNode {
+        return ctx.accept(this);
+    }
+
+    public visitNumDivExpression(ctx: NumDivExpressionContext) : AstNode {
+        return new DivideExpression(
+            this.getOperand1(ctx).accept(this) as NumberExpression,
+            this.getOperand2((ctx)).accept(this) as NumberExpression);
+    }
+
+    public visitNumEqualsExpression(ctx: NumEqualsExpressionContext) : AstNode {
+        return new NumEqualsExpression(
+            this.getOperand1(ctx).accept(this) as NumberExpression,
+            this.getOperand2((ctx)).accept(this) as NumberExpression);
+    }
+
+    public visitNumFunct(ctx: NumFunctContext) : AstNode {
+        return new StringLiteral(ctx.text);
+    }
+
+    public visitNumFunctExpression(ctx: NumFunctExpressionContext) : AstNode {
+        return new NumFunctExpression(
+            ctx.numFunct().accept(this) as StringLiteral,
+            ctx.coreNumExpr().accept(this) as NumberExpression);
+    }
+
+    public visitNumGreaterThanExpression(ctx: NumGreaterThanExpressionContext) : AstNode {
+        return new NumEqualsExpression(
+            this.getOperand1(ctx).accept(this) as NumberExpression,
+            this.getOperand2((ctx)).accept(this) as NumberExpression);
+
+    }
+    public visitNumLessThanExpression(ctx: NumLessThanExpressionContext) : AstNode {
+        return new NumLessThanExpression(
+            this.getOperand1(ctx).accept(this) as NumberExpression,
+            this.getOperand2((ctx)).accept(this) as NumberExpression);
+
+    }
+    public visitNumLiteralExpression(ctx: NumLiteralExpressionContext) : AstNode {
+        return NumberLiteral.fromFloatString(ctx.number().text);
+    }
+
+    public visitNumMinusExpression(ctx: NumMinusExpressionContext) : AstNode {
+        return new MinusExpression(
+            this.getOperand1(ctx).accept(this) as NumberExpression,
+            this.getOperand2(ctx).accept(this) as NumberExpression);
+    }
+
+    public visitNumModExpression(ctx: NumModExpressionContext) : AstNode {
+        return new ModuloExpression(
+            this.getOperand1(ctx).accept(this) as NumberExpression,
+            this.getOperand2(ctx).accept(this) as NumberExpression);
+    }
+
+    public visitNumMulExpression(ctx: NumMulExpressionContext) : AstNode {
+        return new MultiplyExpression(
+            this.getOperand1(ctx).accept(this) as NumberExpression,
+            this.getOperand2(ctx).accept(this) as NumberExpression);
+    }
+
+    public visitNumPlusExpression(ctx: NumPlusExpressionContext) : AstNode {
+        return new PlusExpression(
+            this.getOperand1(ctx).accept(this) as NumberExpression,
+            this.getOperand2(ctx).accept(this) as NumberExpression);
+    }
+
+    public visitNumRandomExpression(ctx: NumRandomExpressionContext) : AstNode {
+        return new PickRandomFromExpression(
+            this.getOperand1(ctx).accept(this) as NumberExpression,
+            this.getOperand2(ctx).accept(this) as NumberExpression);
+    }
+
+    public visitNumRoundExpression(ctx: NumRoundExpressionContext) : AstNode {
+        return new RoundExpression(ctx.coreNumExpr().accept(this) as NumberExpression);
+    }
+
+    public visitNumVariableExpression(ctx: NumVariableExpressionContext) : AstNode {
+        return new NumberVariableExpression(ctx.variable().accept(this) as Identifier);
+    }
+
+    public visitNumber(ctx: NumberContext) : AstNode {
+        return NumberLiteral.fromFloatString(ctx.DecimalLiteral().text);
+    }
+
+    public visitBoolAndExpression(ctx: BoolAndExpressionContext) : AstNode {
+        return new AndExpression(
+            this.getOperand1(ctx).accept(this) as BooleanExpression,
+            this.getOperand2(ctx).accept(this) as BooleanExpression);
+    }
+
+    public visitBoolAsNumExpression(ctx: BoolAsNumExpressionContext) : AstNode {
+        return new BoolAsNumberExpression(ctx.boolExpr().accept(this) as BooleanExpression);
+    }
+
+    public visitBoolAsStringExpression(ctx: BoolAsStringExpressionContext) : AstNode {
+        return new BoolAsStringExpression(ctx.boolExpr().accept(this) as BooleanExpression);
+    }
+
+    public visitBoolLiteralExpression(ctx: BoolLiteralExpressionContext) : AstNode {
+        return BooleanLiteral.fromString(ctx.Boolean().text);
+    }
+
+    public visitBoolOrExpression(ctx: BoolOrExpressionContext) : AstNode {
+        return new OrExpression(
+            this.getOperand1(ctx).accept(this) as BooleanExpression,
+            this.getOperand2(ctx).accept(this) as BooleanExpression);
+    }
+
+    public visitBoolParanthExpression(ctx: BoolParanthExpressionContext) : AstNode {
+        return ctx.coreBoolExpr().accept(this);
+    }
+
+    public visitBoolVariableExpression(ctx: BoolVariableExpressionContext) : AstNode {
+        return new BooleanVariableExpression(ctx.variable().accept(this) as Identifier);
+    }
+
+    public visitStrContainsExpression(ctx: StrContainsExpressionContext) : AstNode {
+        return new StrContainsExpression(
+          this.getOperand1(ctx).accept(this) as StringExpression,
+          this.getOperand2(ctx).accept(this) as StringExpression);
+    }
+
+    public visitStrEqualsExpression(ctx: StrEqualsExpressionContext) : AstNode {
+        return new StrEqualsExpression(
+            this.getOperand1(ctx).accept(this) as StringExpression,
+            this.getOperand2(ctx).accept(this) as StringExpression);
+    }
+
+    public visitStrGreaterThanExpression(ctx: StrGreaterThanExpressionContext) : AstNode {
+        return new StrGreaterThanExpression(
+            this.getOperand1(ctx).accept(this) as StringExpression,
+            this.getOperand2(ctx).accept(this) as StringExpression);
+    }
+
+    public visitStrLessThanExpression(ctx: StrLessThanExpressionContext) : AstNode {
+        return new StrLessThanExpression(
+            this.getOperand1(ctx).accept(this) as StringExpression,
+            this.getOperand2(ctx).accept(this) as StringExpression);
+    }
+
+    public visitAddElementToStatement(ctx: AddElementToStatementContext) : AstNode {
+        return new AddElementToStatement(
+            ctx.variable().accept(this) as Identifier,
+            ctx.stringExpr().accept(this) as StringExpression);
+    }
+
+    public visitBroadcastAndWaitStatement(ctx: BroadcastAndWaitStatementContext) : AstNode {
+        return new BroadcastAndWaitStatement(ctx.message().accept(this) as StringExpression);
+    }
+
+    public visitBroadcastMessageStatement(ctx: BroadcastMessageStatementContext) : AstNode {
+        return new BroadcastMessageStatement(ctx.message().accept(this) as StringExpression);
+    }
+
+    public visitCallStmt(ctx: CallStmtContext) : AstNode {
+        return new CallStatement(ctx.ident().accept(this) as Identifier,
+            ctx.expressionList().accept(this) as ExpressionList, OptionalAstNode.absent<Identifier>());
+    }
+
+    public visitChagenAttributeByStatement(ctx: ChagenAttributeByStatementContext) : AstNode {
+        return new ChangeAttributeByStatement(
+            ctx.stringExpr().accept(this) as StringExpression,
+            ctx.numExpr().accept(this) as NumberExpression);
+    }
+
+    public visitChangeVarByStatement(ctx: ChangeVarByStatementContext) : AstNode {
+        return new ChangeVarByStatement(ctx.variable().accept(this) as Identifier,
+            ctx.expression().accept(this) as Expression);
+    }
+
+    public visitClickEvent(ctx: ClickEventContext) : AstNode {
+        return new MessageReceivedEvent(StringLiteral.from("mouse"), StringLiteral.from("click"));
+    }
+
+    public visitCloneStartEvent(ctx: CloneStartEventContext) : AstNode {
+        return new CloneStartEvent();
+    }
+
+    public visitColorFromNumExpression(ctx: ColorFromNumExpressionContext) : AstNode {
+        // Colors are mapped to numbers
+        return ctx.numExpr().accept(this);
+    }
+
+    public visitConditionReachedEvent(ctx: ConditionReachedEventContext) : AstNode {
+        return new ConditionReachedEvent(ctx.boolExpr().accept(this) as BooleanExpression);
+    }
+
+    public visitCreateCloneOfStatement(ctx: CreateCloneOfStatementContext) : AstNode {
+        return new CreateCloneOfStatement(ctx.stringExpr().accept(this) as StringExpression);
+    }
+
+    public visitCurrentTimeCompExpression(ctx: CurrentTimeCompExpressionContext) : AstNode {
+        throw new ImplementMeException();
+    }
+
+    public visitDateComp(ctx: DateCompContext) : AstNode {
+        throw new ImplementMeException();
+    }
+
+    public visitDeclareAttribute(ctx: DeclareAttributeContext) : AstNode {
+        return new DeclareAttributeStatement(ctx.stringExpr().accept(this) as StringExpression,
+            ctx.type().accept(this) as ScratchType);
+    }
+
+    public visitDeclareAttributeOf(ctx: DeclareAttributeOfContext) : AstNode {
+        return new DeclareAttributeOfStatement(ctx.stringExpr().accept(this) as StringExpression,
+            ctx.type().accept(this) as ScratchType, ctx.ident().accept(this) as Identifier);
+    }
+
+    public visitDeclareVariable(ctx: DeclareVariableContext) : AstNode {
+        return new DeclareVariableStatement(ctx.ident().accept(this) as Identifier,
+            ctx.type().accept(this) as ScratchType);
+    }
+
+    public visitDefaultBoolExpression(ctx: DefaultBoolExpressionContext) : AstNode {
+        return ctx.coreBoolExpr().accept(this);
+    }
+
+    public visitDefaultNumExpr(ctx: DefaultNumExprContext) : AstNode {
+        return ctx.coreNumExpr().accept(this);
+    }
+
+    public visitDefaultStringExpression(ctx: DefaultStringExpressionContext) : AstNode {
+        return ctx.stringExpr().accept(this);
+    }
+
+    public visitDeleteAllFromStatement(ctx: DeleteAllFromStatementContext) : AstNode {
+        return new DeleteAllFromStatement(ctx.variable().accept(this) as Identifier);
+    }
+
+    public visitDeleteIthFromStatement(ctx: DeleteIthFromStatementContext) : AstNode {
+        return new DeleteIthFromStatement(ctx.variable().accept(this) as Identifier,
+            ctx.numExpr().accept(this) as NumberExpression);
+    }
+
+    public visitDeleteThisClone(ctx: DeleteThisCloneContext) : AstNode {
+        return new DeleteThisCloneStatement();
+    }
+
+    public visitDistanceToExpression(ctx: DistanceToExpressionContext) : AstNode {
+        throw new ImplementMeException();
+    }
+
+    public visitEpsilonStatement(ctx: EpsilonStatementContext) : AstNode {
+        return new EpsilonStatement();
+    }
+
+    public visitExpressionStmt(ctx: ExpressionStmtContext) : AstNode {
+        return new ExpressionStatement(ctx.expression().accept(this) as Expression);
+    }
+
+    public visitIndexOfExpression(ctx: IndexOfExpressionContext) : AstNode {
+        return new IndexOfExpression(ctx.expression().accept(this) as Expression,
+            ctx.variable().accept(this) as Identifier);
+    }
+
+    public visitNumberIndexType(ctx: IndexTypeContext) : AstNode {
+        return NumberType.instance();
+    }
+
+    public visitStringIndexType(ctx: IndexTypeContext) : AstNode {
+        return StringType.instance();
+    }
+
+    public visitInheritsFrom(ctx: InheritsFromContext) : AstNode {
+        if (ctx.ident()) {
+            return new PresentAstNode<Identifier>(ctx.ident().accept(this) as Identifier);
+        } else {
+            return OptionalAstNode.absent<Identifier>();
+        }
+    }
+
+    public visitInsertAtStatement(ctx: InsertAtStatementContext) : AstNode {
+        return new InsertAtStatement(ctx.variable().accept(this) as Identifier,
+            ctx.numExpr().accept(this) as NumberExpression,
+            ctx.stringExpr().accept(this) as StringExpression);
+    }
+
+    public visitIthLetterOfStringExpression(ctx: IthLetterOfStringExpressionContext) : AstNode {
+        return new IthLetterOfStringExpression(ctx.numExpr().accept(this) as NumberExpression,
+            ctx.stringExpr().accept(this) as StringExpression);
+    }
+
+    public visitIthStringItemOfExpression(ctx: IthStringItemOfExpressionContext) : AstNode {
+        return new IthStringItemOfExpression(ctx.numExpr().accept(this) as NumberExpression,
+            ctx.variable().accept(this) as Identifier);
+    }
+
+    public visitJoinStringsExpression(ctx: JoinStringsExpressionContext) : AstNode {
+        return new JoinStringsExpression(this.getOperand1(ctx).accept(this) as StringExpression,
+            this.getOperand2(ctx).accept(this) as StringExpression);
+    }
+
+    public visitKey(ctx: KeyContext) : AstNode {
+        // Keys are mapped to numbers
+        return ctx.numExpr().accept(this);
+    }
+
+    public visitKeyEvent(ctx: KeyEventContext) : AstNode {
+        return new MessageReceivedEvent(
+            StringLiteral.from("key"), StringLiteral.from(ctx.key().numExpr().text));
+    }
+
+    public visitAppMessage(ctx: AppMessageContext) : AstNode {
+        return new SystemMessage(StringLiteral.from("app"),
+            ctx.stringExpr().accept(this) as StringExpression,
+            OptionalAstNode.absent());
+    }
+
+    public visitSystemMessage(ctx: SystemMessageContext) : AstNode {
+        return new SystemMessage(StringLiteral.from(ctx.String().text),
+            ctx.stringExpr().accept(this) as StringExpression,
+            OptionalAstNode.absent());
+    }
+
+    public visitLengthOfListExpression(ctx: LengthOfListExpressionContext) : AstNode {
+        return new LengthOListExpression(ctx.variable().accept(this) as Identifier);
+    }
+
+    public visitLengthOfStringExpression(ctx: LengthOfStringExpressionContext) : AstNode {
+        return new LengthOfStringExpression(ctx.stringExpr().accept(this) as StringExpression);
+    }
+
+    public visitListVariableExpression(ctx: ListVariableExpressionContext) : AstNode {
+        return ctx.variable().accept(this);
+    }
+
+    public visitListWithElementsExpression(ctx: ListWithElementsExpressionContext) : AstNode {
+        return ctx.expressionListPlain().accept(this);
+    }
+
+    public visitMessageReceivedEvent(ctx: MessageReceivedEventContext) : AstNode {
+        return new MessageReceivedEvent(StringLiteral.from(ctx.String().text),
+            ctx.stringExpr().accept(this) as StringExpression);
+    }
+
+    public visitNegatedBoolExpression(ctx: NegatedBoolExpressionContext) : AstNode {
+        return new NegationExpression(ctx.coreBoolExpr().accept(this) as BooleanExpression);
+    }
+
+    public visitNeverEvent(ctx: NeverEventContext) : AstNode {
+        return new NeverEvent();
+    }
+
+    public visitNumAsStringExpression(ctx: NumAsStringExpressionContext) : AstNode {
+        return new NumAsStringExpression(ctx.numExpr().accept(this) as NumberExpression);
+    }
+
+    public visitParameter(ctx: ParameterContext) : AstNode {
+        return new ParameterDeclaration(ctx.ident().accept(this) as Identifier,
+            ctx.type().accept(this) as ScratchType);
+    }
+
+    public visitQualifiedVariable(ctx: QualifiedVariableContext) : AstNode {
+        throw new ImplementMeException();
+    }
+
+    public visitReplaceElementAtStatement(ctx: ReplaceElementAtStatementContext) : AstNode {
+        return new ReplaceElementAtStatement(ctx.variable().accept(this) as Identifier,
+            ctx.numExpr().accept(this) as NumberExpression,
+            ctx.stringExpr().accept(this) as StringExpression);
+    }
+
+    public visitSoundResource(ctx: SoundResourceContext): AstNode {
+        return SoundResourceType.instance();
+    }
+
+    public visitImageResource(ctx: SoundResourceContext): AstNode {
+        return ImageResourceType.instance();
+    }
+
+    public visitSetAttributeOfToStatement(ctx: SetAttributeOfToStatementContext) : AstNode {
+        throw new ImplementMeException();
+    }
+
+    public visitSetAttributeToStatement(ctx: SetAttributeToStatementContext) : AstNode {
+        return new SetAttributeToStatement(ctx.String().accept(this) as StringExpression,
+            ctx.expression().accept(this) as Expression);
+    }
+
+    public visitSetVariableToStatement(ctx: SetVariableToStatementContext) : AstNode {
+        return new SetVariableToStatement(ctx.variable().accept(this) as Identifier,
+            ctx.expression().accept(this) as Expression);
+    }
+
+    public visitStartupEvent(ctx: StartupEventContext) : AstNode {
+        return new StartupEvent();
+    }
+
+    public visitStopAll(ctx: StopAllContext) : AstNode {
+        return new StopAllStatement();
+    }
+
+    public visitStopOthersInActorStatement(ctx: StopOthersInActorStatementContext) : AstNode {
+        return new StopOthersInActorStatement();
+    }
+
+    public visitStopThis(ctx: StopThisContext) : AstNode {
+        return new StopThisStatement();
+    }
+
+    public visitStringAsNumExpression(ctx: StringAsNumExpressionContext) : AstNode {
+        return new StringAsNumberExpression(ctx.stringExpr().accept(this) as StringExpression);
+    }
+
+    public visitStringAttributeOfExpression(ctx: StringAttributeOfExpressionContext) : AstNode {
+        return new StringAttributeOfExpression(ctx.stringExpr().accept(this) as StringExpression,
+            ctx.ident().accept(this) as Identifier);
+    }
+
+    public visitStringLiteralExpression(ctx: StringLiteralExpressionContext) : AstNode {
+        return StringLiteral.from(ctx.text);
+    }
+
+    public visitStringVariableExpression(ctx: StringVariableExpressionContext) : AstNode {
+        return new StringVariableExpression(ctx.variable().accept(this) as Identifier);
+    }
+
+    public visitTimerExpression(ctx: TimerExpressionContext) : AstNode {
+        return new TimerExpression();
+    }
+
+    public visitUnspecifiedBoolExpression(ctx: UnspecifiedBoolExpressionContext) : AstNode {
+        throw new ImplementMeException();
+    }
+
+    public visitUnspecifiedExpr(ctx: UnspecifiedExprContext) : AstNode {
+        throw new ImplementMeException();
+    }
+
+    public visitUnspecifiedNumExpr(ctx: UnspecifiedNumExprContext) : AstNode {
+        throw new ImplementMeException();
+    }
+
+    public visitUnspecifiedStringExpression(ctx: UnspecifiedStringExpressionContext) : AstNode {
+        throw new ImplementMeException();
+    }
+
+    public visitVarContainsExpression(ctx: VarContainsExpressionContext) : AstNode {
+        throw new ImplementMeException();
+    }
+
+    public visitVariable(ctx: VariableContext) : AstNode {
+        return new Identifier(StringLiteral.from(ctx.text));
+    }
+
+    public visitVariableValueEvent(ctx: VariableValueEventContext) : AstNode {
+        throw new ImplementMeException();
+    }
+
+    public visitWaitSecsStatement(ctx: WaitSecsStatementContext) : AstNode {
+        return new WaitSecsStatement(ctx.numExpr().accept(this) as NumberExpression);
+    }
+
+    public visitWaitUntilStatement(ctx: WaitUntilStatementContext) : AstNode {
+        return new WaitUntilStatement(ctx.boolExpr().accept(this) as BooleanExpression);
+    }
 
     visit(tree: ParseTree): AstNode {
         throw new ImplementMeException();

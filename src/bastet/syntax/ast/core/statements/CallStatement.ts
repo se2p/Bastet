@@ -30,7 +30,7 @@ export class CallStatement extends Statement {
     private readonly _args: ExpressionList;
     private readonly _assignResultTo: OptionalAstNode<Identifier>;
 
-    constructor(calledMethod: Identifier, args: ExpressionList, assignResultTo: Identifier) {
+    constructor(calledMethod: Identifier, args: ExpressionList, assignResultTo: OptionalAstNode<Identifier>) {
         super([calledMethod, args, assignResultTo]);
         this._calledMethod = calledMethod;
         this._args = args;

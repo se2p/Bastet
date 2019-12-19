@@ -50,10 +50,12 @@ export class CloneStartEvent extends CoreEvent {
 
 export class MessageReceivedEvent extends CoreEvent {
 
+    private readonly _namespace: StringExpression;
     private readonly _message: StringExpression;
 
-    constructor(message: StringExpression) {
-        super([message]);
+    constructor(namespace: StringExpression, message: StringExpression) {
+        super([namespace, message]);
+        this._namespace = namespace;
         this._message = message;
     }
 
@@ -69,5 +71,6 @@ export class ConditionReachedEvent extends CoreEvent {
     }
 
 }
+
 
 

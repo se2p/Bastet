@@ -24,6 +24,8 @@ import {StringLiteral} from "./expressions/StringExpression";
 
 export class Identifier extends AbstractNode {
 
+    private static readonly FRESH_PREFIX = "__tmp_"
+
     private readonly _name: StringLiteral;
 
     constructor(name: StringLiteral) {
@@ -37,6 +39,13 @@ export class Identifier extends AbstractNode {
         } else {
             return new PresentAstNode<Identifier>(val);
         }
+    }
+
+    private static FRESH_SEQ: number = 0;
+
+    public static fresh(): Identifier {
+        const num: number = this.FRESH_SEQ++;
+        return new Identifier(StringLiteral.from(`${this.FRESH_PREFIX}${num}`));
     }
 
 }

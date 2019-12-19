@@ -57,6 +57,22 @@ export class NumberLiteral extends AbstractNumberExpression {
         this._numLiteral = num;
     }
 
+    public static of(num: number) {
+        return new NumberLiteral(num);
+    }
+
+    public static fromIntString(str: string) {
+        return new NumberLiteral(parseInt(str));
+    }
+
+    public static fromFloatString(str: string) {
+        return new NumberLiteral(parseFloat(str));
+    }
+
+    get num() {
+        return this._numLiteral;
+    }
+
 }
 
 export class NumberVariableExpression extends AbstractNumberExpression {

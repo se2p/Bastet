@@ -21,14 +21,15 @@
 
 import {Statement} from "./Statement";
 import {BooleanExpression} from "../expressions/BooleanExpression";
+import {NumberExpression} from "../expressions/NumberExpression";
 
-export class WaitUntilStatement extends Statement {
+export class WaitSecsStatement extends Statement {
 
-    private readonly _until: BooleanExpression;
+    private readonly _secs: NumberExpression;
 
-    constructor(until: BooleanExpression) {
-        super([until]);
-        this._until = until;
+    constructor(secs: NumberExpression) {
+        super([secs]);
+        this._secs = secs;
     }
 
 }

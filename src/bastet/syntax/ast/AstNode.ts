@@ -74,6 +74,10 @@ export abstract class OptionalAstNode<T extends AstNode> extends AbstractNode {
         super(childs);
     }
 
+    public static absent<T extends AstNode>(): AbsentAstNode<T> {
+        return new AbsentAstNode<T>();
+    }
+
 }
 
 export class PresentAstNode<T extends AstNode> extends OptionalAstNode<T> {

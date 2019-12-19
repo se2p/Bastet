@@ -41,7 +41,10 @@ actorComponentsDefinition : resourceList declarationStmtList setStmtList methodD
 // and for the *costumes* of the sprites.
 resource : resourceType ident resourceLocator ;
 
-resourceType : 'image' | 'sound' ;
+resourceType :
+  'image' # ImageResource
+| 'sound' # SoundResource
+;
 
 // A list of resources is separated by whitespaces.
 resourceList : resource* ;
@@ -69,7 +72,9 @@ type :
  | 'map' indexType # MapType;
 
 // Maps and lists can be indexed either by numbers or strings.
-indexType : 'number' | 'string' ;
+indexType : 'number' # NumberIndexType
+    | 'string' # StringIndexType
+    ;
 
 // A script is the central unit that of a Scratch program that
 // defines the behavior (and with it the control and data flow).
@@ -87,7 +92,7 @@ coreEvent :
     'never' # NeverEvent
  |  'startup' # StartupEvent
  |  'started' 'as' 'clone' # CloneStartEvent
- |  'received' 'message' message # MessageReceivedEvent
+ |  'received' 'message' stringExpr 'in' String # MessageReceivedEvent
  |  'reached condition' boolExpr # ConditionReachedEvent ;
 
 // Scratch allows to define procedures, that is,
@@ -346,4 +351,6 @@ key : 'key' numExpr ;
 
 resourceLocator : String ;
 
-message : stringExpr ;
+message : stringExpr # AppMessage
+    | String '/' stringExpr # SystemMessage
+    ;
