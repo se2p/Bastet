@@ -22,7 +22,7 @@
 import {Script} from "./Script";
 import {TransitionRelation, TransitionRelations} from "./TransitionRelation";
 import {ProgramOperationFactory} from "./ops/ProgramOperationFactory";
-import {ProgramOperation} from "./ops/ProgramOperation";
+import {OperationID, ProgramOperation, ProgramOperations} from "./ops/ProgramOperation";
 import {ControlLocation} from "./ControlLocation";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {Preconditions} from "../../../utils/Preconditions";
@@ -35,6 +35,7 @@ import {
 } from "../../ast/core/statements/ControlStatement";
 import {StatementList} from "../../ast/core/statements/Statement";
 import {AstNode} from "../../ast/AstNode";
+import {RawOperation} from "./ops/RawOperation";
 
 
 export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>, CoreCtrlStatementnVisitor<TransitionRelation> {
@@ -119,23 +120,8 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
     visit(node: AstNode): TransitionRelation {
         this._stack.push("visit");
         try {
-            if (node.childCount == 1) {
-                return node.getChild(0).accept(this);
-            } else {
-                let parent = node.parent;
-                while (parent) {
-                    const visitMethodName = "visit" + RelationBuildingVisitor.nonTerminalName(parent);
-                    if (this[visitMethodName]) {
-                        if (this._stack.indexOf(visitMethodName) == -1) {
-                            return this[visitMethodName](parent);
-                        } else {
-                            throw new Error("Implement for " + node.constructor.name);
-                        }
-                    }
-                    parent = parent.parent;
-                }
-                throw new Error("Implement for " + node.constructor.name);
-            }
+            const opid: OperationID = ProgramOperations.constructOp(node);
+            return TransitionRelations.forOpSeq(ProgramOperation.for(opid));
         } finally {
             this._stack.pop();
         }

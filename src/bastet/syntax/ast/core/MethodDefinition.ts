@@ -54,18 +54,16 @@ export class ResultDeclaration extends AbstractNode {
     }
 }
 
-export class MethodDefinition extends AbstractNode {
+export class MethodSignature extends AbstractNode {
 
     private readonly _ident: Identifier;
     private readonly _params: ParameterDeclarationList;
-    private readonly _statements: StatementList;
     private readonly _returns: ResultDeclaration;
 
-    constructor(ident: Identifier, params: ParameterDeclarationList, statements: StatementList, returns: ResultDeclaration) {
-        super([ident, params, statements, returns]);
+    constructor(ident: Identifier, params: ParameterDeclarationList, returns: ResultDeclaration) {
+        super([ident, params, returns]);
         this._ident = ident;
         this._params = params;
-        this._statements = statements;
         this._returns = returns;
     }
 
@@ -77,13 +75,24 @@ export class MethodDefinition extends AbstractNode {
         return this._params;
     }
 
+    get returns(): ResultDeclaration {
+        return this._returns;
+    }
+}
+
+export class MethodDefinition extends MethodSignature {
+
+    private readonly _statements: StatementList;
+
+    constructor(ident: Identifier, params: ParameterDeclarationList, statements: StatementList, returns: ResultDeclaration) {
+        super(ident, params, returns);
+        this._statements = statements;
+    }
+
     get statements(): StatementList {
         return this._statements;
     }
 
-    get returns(): ResultDeclaration {
-        return this._returns;
-    }
 }
 
 export class MethodDefinitionList extends AstNodeList<MethodDefinition> {

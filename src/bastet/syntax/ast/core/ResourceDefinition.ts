@@ -68,6 +68,17 @@ export class ResourceDefinition extends AbstractNode {
         this._resourceLocator = locator;
     }
 
+    get resourceType(): ResourceType {
+        return this._resourceType;
+    }
+
+    get ident(): Identifier {
+        return this._ident;
+    }
+
+    get resourceLocator(): ResourceLocation {
+        return this._resourceLocator;
+    }
 }
 
 export class ResourceDefinitionList extends AstNodeList<ResourceDefinition> {

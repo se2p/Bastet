@@ -23,6 +23,7 @@ import {FromParseTree} from "../FromParseTree";
 import {WithIdent} from "../../utils/WithIdent";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {AstNode} from "../ast/AstNode";
+import {ImageResourceType, ResourceType, SoundResourceType} from "../ast/core/ResourceDefinition";
 
 export type AppResourceMap = { [id:string]: AppResource } ;
 
@@ -34,20 +35,21 @@ export enum AppResourceType {
 export class AppResource extends FromParseTree implements WithIdent {
 
     private readonly _ident : string;
-    private readonly _type : AppResourceType;
+    private readonly _type : ResourceType;
     private readonly _uri : string;
 
-    constructor(node: AstNode, ident: string, type: AppResourceType, uri: string) {
+    constructor(node: AstNode, ident: string, type: ResourceType, uri: string) {
         super(node);
         this._ident = ident;
         this._type = type;
+        this._uri = uri;
     }
 
     get ident(): string {
         return this._ident;
     }
 
-    get type(): AppResourceType {
+    get type(): ResourceType {
         return this._type;
     }
 
@@ -55,12 +57,12 @@ export class AppResource extends FromParseTree implements WithIdent {
         return this._uri;
     }
 
-    public static typeFromString(text: string):AppResourceType {
+    public static typeFromString(text: string): ResourceType {
         switch(text) {
             case "image":
-                return AppResourceType.IMAGE;
+                return ImageResourceType.instance();
             case "sound":
-                return AppResourceType.SOUND;
+                return SoundResourceType.instance();
             default:
                 throw new IllegalArgumentException("Unsupported type of resource");
         }

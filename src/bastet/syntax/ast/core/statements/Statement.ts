@@ -22,6 +22,10 @@
 import {AbstractNode, AstNode} from "../../AstNode";
 import {AstNodeList} from "../../AstNodeList";
 
+export abstract class Statement extends AbstractNode {
+
+}
+
 export class StatementList extends AstNodeList<Statement> {
 
     constructor(elements: Statement[]) {
@@ -36,7 +40,38 @@ export class StatementList extends AstNodeList<Statement> {
 
 }
 
+export interface NonPreemptive {
 
-export abstract class Statement extends AbstractNode {
+}
+
+/**
+ * The execution of the statements in supposed to be not interleaved
+ * with other statements from other scripts.
+ */
+export class NonPreemptiveBlockStatement extends AbstractNode implements Statement, NonPreemptive {
+
+    private readonly _statements: StatementList;
+
+    constructor(statements: StatementList) {
+        super([statements]);
+        this._statements = statements;
+    }
+
+    get statements(): StatementList {
+        return this._statements;
+    }
+
+}
+
+/**
+ * All statements that are combined by this statement into
+ * one are supposed to be executed in one time step on
+ * the machine and READ the SAME DATA, also from VOLATILE variables!
+ */
+export class SingleStepBlockStatement extends NonPreemptiveBlockStatement {
+
+    constructor(statements: StatementList) {
+        super(statements);
+    }
 
 }

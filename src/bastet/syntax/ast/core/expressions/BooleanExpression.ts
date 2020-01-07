@@ -67,8 +67,35 @@ export class BooleanLiteral extends AbstractBooleanExpression {
         this._literal = literal;
     }
 
+    private static TRUE: BooleanLiteral;
+
+    public static true(): BooleanLiteral {
+        if (!this.TRUE) {
+            this.TRUE = new BooleanLiteral(true);
+        }
+        return this.TRUE;
+    }
+
+    private static FALSE: BooleanLiteral;
+
+    public static false(): BooleanLiteral {
+        if (!this.FALSE) {
+            this.FALSE = new BooleanLiteral(true);
+        }
+        return this.FALSE;
+    }
+
     public static fromString(text: string): BooleanLiteral {
-        throw new ImplementMeException();
+        switch(text.toLowerCase()) {
+            case "true":
+            case "1":
+            case "yes":
+            case "on":
+            case "t":
+                return BooleanLiteral.true();
+            default:
+                return BooleanLiteral.false();
+        }
     }
 
     toTreeString(): string {

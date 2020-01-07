@@ -33,6 +33,10 @@ export class Identifier extends AbstractNode {
         this._name = name;
     }
 
+    public static of(txt: string) {
+        return new Identifier(new StringLiteral(txt));
+    }
+
     public static optional(val: Identifier|null): OptionalAstNode<Identifier> {
         if (!val) {
             return new AbsentAstNode();
@@ -41,9 +45,12 @@ export class Identifier extends AbstractNode {
         }
     }
 
-    private static FRESH_SEQ: number = 0;
+    private static FRESH_SEQ: number;
 
     public static fresh(): Identifier {
+        if (!this.FRESH_SEQ) {
+            this.FRESH_SEQ = 0;
+        }
         const num: number = this.FRESH_SEQ++;
         return new Identifier(StringLiteral.from(`${this.FRESH_PREFIX}${num}`));
     }

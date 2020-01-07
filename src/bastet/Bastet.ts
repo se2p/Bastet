@@ -50,28 +50,33 @@ export class Bastet {
      */
     public runAnalysis() : {} {
         // Parsing of command line options
-        let programArguments = this.parseProgramArguments();
+        const programArguments = this.parseProgramArguments();
         if (!programArguments) {
             return {};
         }
 
-        let programFilepath: string = programArguments.program;
-        let specFilepath: string = programArguments.specification;
+        const programFilepath: string = programArguments.program;
+        const specFilepath: string = programArguments.specification;
+
+        // Build the set of methods for translating into the intermediate AST
+        const intermLibFilepath: string = programArguments.intermediateLibrary;
+        const intermediateMethodLib = this.parseIntermediateMethodLib(intermLibFilepath);
 
         // Parse the program (a Scratch program) into an intermediate AST
-        let intermediateProgramAST = this.parseIntoIntermediateAST("program", programFilepath);
+        const intermediateProgramAST = this.parseIntoIntermediateAST("program", programFilepath);
 
         // Parse the specification (also a Scratch program) into an intermediate AST
-        let intermediateSpecAST = this.parseIntoIntermediateAST("spec", specFilepath);
+        const intermediateSpecAST = this.parseIntoIntermediateAST("spec", specFilepath);
 
         // Create the control-flow structure of the verification task
-        let programControlFlow = this.createControlFlowFrom(programFilepath, intermediateProgramAST, "");
-        let specControlFlow = this.createControlFlowFrom(specFilepath, intermediateSpecAST, "__spec");
-        let taskControlFlow = ControlFlows.unionOf(programControlFlow, specControlFlow);
+        const programControlFlow = this.createControlFlowFrom(programFilepath, intermediateProgramAST, "");
+        const specControlFlow = this.createControlFlowFrom(specFilepath, intermediateSpecAST, "__spec");
+        const taskControlFlow = ControlFlows.unionOf(programControlFlow, specControlFlow);
 
         // TODO: Allow for sequences of analysis procedures that can built on the respective previous results.
+
         // Create the program analysis and program analysis algorithms
-        let analysisProcedure = this.createAnalysisProcedure(programArguments);
+        const analysisProcedure = this.createAnalysisProcedure(programArguments);
 
         // Run the program analysis and return the result
         return analysisProcedure.run(taskControlFlow);
@@ -86,6 +91,7 @@ export class Bastet {
         return program
             .version('0.0.1')
             .option('-d, --debug', 'Debugging mode')
+            .option('-il, --intermediateLibrary', 'Program file that defines the intermediate functions', './public/intermediate.sc')
             .requiredOption('-P, --program <required>', 'Program file')
             .requiredOption('-S, --specification <required>', 'Specification file')
             .parse(process.argv);
@@ -130,6 +136,16 @@ export class Bastet {
 
     private createControlFlowFrom(programOrigin: string, intermediateSpecAST: AstNode, actorNamePrefix?: string): App {
         return AppBuilder.buildControlFlowsFromSyntaxTree(programOrigin, intermediateSpecAST, actorNamePrefix);
+    }
+
+    /**
+     * Build the collection of methods that can be used for translating into the
+     * intermediate language.
+     *
+     * @param intermLibFilepath     Path to the file that defines the library of methods in the intermediate language.
+     */
+    private parseIntermediateMethodLib(intermLibFilepath: string) {
+
     }
 }
 

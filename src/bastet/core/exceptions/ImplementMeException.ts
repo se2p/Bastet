@@ -26,3 +26,11 @@ export class ImplementMeException extends Error {
     }
 
 }
+
+export class ImplementMeForException extends Error {
+
+    constructor(forCase: string) {
+        super(`Not yet implemented for ${forCase}. Implement me!`);
+    }
+
+}

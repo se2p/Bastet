@@ -39,6 +39,13 @@ export class DeclareVariableStatement extends DeclarationStatement {
         this._type = type;
     }
 
+    get ident(): Identifier {
+        return this._ident;
+    }
+
+    get type(): ScratchType {
+        return this._type;
+    }
 }
 
 export class DeclareAttributeStatement extends DeclarationStatement {

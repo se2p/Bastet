@@ -32,6 +32,16 @@ export class NeverEvent extends CoreEvent {
     constructor() {
         super([]);
     }
+
+    private static INSTANCE: NeverEvent;
+
+    public static instance(): NeverEvent {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new NeverEvent();
+        }
+        return this.INSTANCE;
+    }
+
 }
 
 export class StartupEvent extends CoreEvent {
@@ -39,6 +49,16 @@ export class StartupEvent extends CoreEvent {
     constructor() {
         super([]);
     }
+
+    private static INSTANCE: StartupEvent;
+
+    public static instance(): StartupEvent {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new StartupEvent();
+        }
+        return this.INSTANCE;
+    }
+
 }
 
 export class CloneStartEvent extends CoreEvent {
@@ -46,6 +66,16 @@ export class CloneStartEvent extends CoreEvent {
     constructor() {
         super([]);
     }
+
+    private static INSTANCE: CloneStartEvent;
+
+    public static instance(): CloneStartEvent {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new CloneStartEvent();
+        }
+        return this.INSTANCE;
+    }
+
 }
 
 export class MessageReceivedEvent extends CoreEvent {

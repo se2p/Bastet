@@ -163,7 +163,7 @@ import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {Identifier} from "../ast/core/Identifier";
 import {ImportDefinition, ImportDefinitionList} from "../ast/core/ImportDefinition";
 import {ActorDefinition, ActorDefinitionList} from "../ast/core/ActorDefinition";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {
     BoolAsStringExpression,
     IthLetterOfStringExpression,
@@ -272,6 +272,7 @@ import {SystemMessage} from "../ast/core/Message";
 import {StopOthersInActorStatement} from "../ast/core/statements/StopOthersInActorStatement";
 import {WaitSecsStatement} from "../ast/core/statements/WaitSecsStatement";
 import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
+import {Preconditions} from "../../utils/Preconditions";
 
 class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
 
@@ -919,7 +920,8 @@ class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
     }
 
     public visitSetAttributeToStatement(ctx: SetAttributeToStatementContext) : AstNode {
-        return new SetAttributeToStatement(ctx.String().accept(this) as StringExpression,
+        return new SetAttributeToStatement(
+            StringLiteral.from(ctx.String().text) as StringExpression,
             ctx.expression().accept(this) as Expression);
     }
 
@@ -1005,8 +1007,32 @@ class ToIntermediateVisitor implements ScratchVisitor<AstNode> {
         throw new ImplementMeException();
     }
 
+    private identifyIntermediateMethodName(node: RuleNode) : string|null {
+        let result: string = node.constructor.name;
+        return result;
+    }
+
     visitChildren(node: RuleNode): AstNode {
-        throw new ImplementMeException();
+        if (node.childCount == 1) {
+            return node.getChild(0).accept(this);
+        }
+        throw new ImplementMeForException(node.constructor.name);
+
+        const methodName = this.identifyIntermediateMethodName(node);
+        let args: Expression[] = [];
+        let i = 0;
+        while (i < node.childCount) {
+            const c = node.getChild(i);
+            const childResult: AstNode = c.accept(this);
+            args.push(childResult as Expression);
+            i++;
+        }
+
+        // If the node is an expression, or if the corresponding
+        // method produces a result
+
+        return new CallStatement(Identifier.of(methodName),
+            new ExpressionList(args), assignResultTo);
     }
 
     visitErrorNode(node: ErrorNode): AstNode {

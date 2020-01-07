@@ -21,35 +21,26 @@
 
 import {Actor, ActorMap} from "./Actor";
 import {App} from "./App";
-import {AppResource, AppResourceMap, AppResourceType} from "./AppResource";
+import {AppResource, AppResourceMap} from "./AppResource";
 import {MethodDefinition, MethodDefinitionMap} from "./MethodDefinition";
 import {Script} from "./controlflow/Script";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
-import {
-    BooleanType,
-    ListType,
-    MapType,
-    NumberType,
-    ScratchType,
-    StringEnumType,
-    StringType,
-    VoidType
-} from "../ast/core/ScratchType";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {ScratchType, VoidType} from "../ast/core/ScratchType";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
-import {AppEvent, AppEvents, NeverEvent, StartupEvent} from "./AppEvent";
 import {TransitionRelations} from "./controlflow/TransitionRelation";
 import {TransitionRelationToDot} from "./controlflow/TransitionRelationToDot";
 import {AstNode} from "../ast/AstNode";
 import {Preconditions} from "../../utils/Preconditions";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {ActorDefinition} from "../ast/core/ActorDefinition";
-import {CoreEvent} from "../ast/core/CoreEvent";
+import {CoreEvent, NeverEvent, StartupEvent} from "../ast/core/CoreEvent";
 import {ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {MethodDefinitionList, ResultDeclaration} from "../ast/core/MethodDefinition";
-import {ParameterDeclaration, ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
+import {ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
+import {StatementList} from "../ast/core/statements/Statement";
+import {DeclareVariableStatement} from "../ast/core/statements/DeclarationStatement";
 
 export class AppBuilder {
 
@@ -122,7 +113,7 @@ export class AppBuilder {
         return result;
     }
 
-    private static buildEvent(eventContext: CoreEvent): AppEvent {
+    private static buildEvent(eventContext: CoreEvent): CoreEvent {
         if (eventContext instanceof NeverEvent) {
             return NeverEvent.instance();
         } else if (eventContext instanceof StartupEvent) {
@@ -163,37 +154,37 @@ export class AppBuilder {
         return result;
     }
 
-    private static buildInitScript(resourceListContext: ResourceDefinitionList, declarationStmtListContext: DeclarationStmtListContext, stmtList: SetStmtListContext): Script {
+    private static buildInitScript(resourceListContext: ResourceDefinitionList, declarationStmtList: StatementList,
+                                   stmtList: StatementList): Script {
         const visitor = new RelationBuildingVisitor();
         const transrelRes = resourceListContext.accept(visitor);
-        const transrelLocs = declarationStmtListContext.accept(visitor);
+        const transrelLocs = declarationStmtList.accept(visitor);
         const transrelSet = stmtList.accept(visitor);
         const compundTransRel = TransitionRelations.concat(transrelRes,
             TransitionRelations.concat(transrelLocs, transrelSet));
-        return new Script(AppEvents.never(), compundTransRel);
+        return new Script(NeverEvent.instance(), compundTransRel);
     }
-ß
-    private static buildResources(resourceListContext: ResourceListContext): AppResourceMap {
+
+    private static buildResources(resourceListContext: ResourceDefinitionList): AppResourceMap {
         let result: AppResourceMap = {};
-        for (let rc of resourceListContext.resource()) {
-            const id: string = rc.Ident().text;
-            const rt: AppResourceType = AppResource.typeFromString(rc.resourceType().text);
-            const uri: string = rc.resourceLocator().text;
-            result[id] = new AppResource(rc, id, rt, uri);
+        for (let rc of resourceListContext) {
+            const id: string = rc.ident.text
+            result[id] = new AppResource(rc, id, rc.resourceType, rc.resourceLocator.uri);
         }
+
         return result;
     }
 
-    private static buildDatalocs(resourceListContext: ResourceListContext, declarationStmtListContext: DeclarationStmtListContext): DataLocationMap {
+    private static buildDatalocs(resourceListContext: ResourceDefinitionList,
+                                 declarationStmtList: StatementList): DataLocationMap {
         let result: DataLocationMap = {};
 
         // Data locations based on the declaration statements
-        for (let stmt of declarationStmtListContext.declarationStmt()) {
-            if (stmt instanceof DeclareVariableContext) {
-                const declStmt: DeclareVariableContext = stmt as DeclareVariableContext;
-                const id: string = declStmt.Ident().text;
-                const type: ScratchType = AppBuilder.buildType(declStmt.type());
-                result[id] = new DataLocation(declStmt, id, type);
+        for (let stmt of declarationStmtList) {
+            if (stmt instanceof DeclareVariableStatement) {
+                const declStmt: DeclareVariableStatement = stmt as DeclareVariableStatement;
+                const id: string = declStmt.ident.text;
+                result[id] = new DataLocation(declStmt, id, declStmt.type);
             } else {
                 throw new ImplementMeException();
             }

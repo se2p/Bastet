@@ -24,8 +24,15 @@ import {StringLiteral} from "./expressions/StringExpression";
 
 export class ResourceLocation extends AbstractNode {
 
+    private readonly _uri: StringLiteral;
+
     constructor(uri: StringLiteral) {
         super([uri]);
+        this._uri = uri;
+    }
+
+    get uri(): string {
+        return this._uri.text;
     }
 
 }
