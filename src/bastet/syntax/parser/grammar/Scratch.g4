@@ -74,7 +74,7 @@ penStmt :
  |  'pen up' # PenUpStatement
  |  'set' 'pen' 'color' color # SetPenColorStatement
  |  'set' 'pen' stringExpr 'to' numExpr # SetPenAttributeStatement
- |  'change' 'pen' stringExpr 'by' numExpr # ChangePenAttributeByStement
+ |  'change' 'pen' stringExpr 'by' numExpr # ChangePenAttributeByStatement
  ;
 
 stringExpr  :
