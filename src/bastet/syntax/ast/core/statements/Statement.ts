@@ -26,6 +26,14 @@ export abstract class Statement extends AbstractNode {
 
 }
 
+export class StatementLists {
+
+    public static concat(list1: StatementList, list2: StatementList): StatementList {
+        return new StatementList(list1.elements.concat(list2.elements));
+    }
+
+}
+
 export class StatementList extends AstNodeList<Statement> {
 
     constructor(elements: Statement[]) {
@@ -38,6 +46,9 @@ export class StatementList extends AstNodeList<Statement> {
         return this.EMPTY_STATEMENTLIST;
     }
 
+    static from(statements: Statement[]) {
+        return new StatementList(statements);
+    }
 }
 
 export interface NonPreemptive {

@@ -21,14 +21,18 @@
 
 import {Statement} from "./Statement";
 import {NumberExpression} from "../expressions/NumberExpression";
+import {BooleanExpression} from "../expressions/BooleanExpression";
 
 export class WaitUntilStatement extends Statement {
 
-    private readonly _seconds: NumberExpression;
+    private readonly _cond: BooleanExpression;
 
-    constructor(seconds: NumberExpression) {
-        super([seconds]);
-        this._seconds = seconds;
+    constructor(cond: BooleanExpression) {
+        super([cond]);
+        this._cond = cond;
     }
 
+    get cond(): BooleanExpression {
+        return this._cond;
+    }
 }

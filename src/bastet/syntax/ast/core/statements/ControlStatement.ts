@@ -23,6 +23,8 @@ import {AbstractNode} from "../../AstNode";
 import {Statement, StatementList} from "./Statement";
 import {BooleanExpression} from "../expressions/BooleanExpression";
 import {NumberExpression} from "../expressions/NumberExpression";
+import {Identifier} from "../Identifier";
+import {Expression} from "../expressions/Expression";
 
 export interface ControlStatement extends AbstractNode {
 
@@ -74,6 +76,33 @@ export class UntilStatement extends Statement implements ControlStatement {
         return this._body;
     }
 }
+
+export class UntilQueriedConditionStatement extends Statement implements ControlStatement {
+
+    private readonly _condition: BooleanExpression;
+    private readonly _conditionQueryStatements: StatementList;
+    private readonly _body: StatementList;
+
+    constructor(condition: BooleanExpression, conditionQueryStatements: StatementList, body: StatementList) {
+        super([conditionQueryStatements, condition, body]);
+        this._condition = condition;
+        this._conditionQueryStatements = conditionQueryStatements;
+        this._body = body;
+    }
+
+    get condition(): BooleanExpression {
+        return this._condition;
+    }
+
+    get conditionQueryStatements(): StatementList {
+        return this._conditionQueryStatements;
+    }
+
+    get body(): StatementList {
+        return this._body;
+    }
+}
+
 
 export class RepeatTimesStatement extends Statement implements ControlStatement {
 

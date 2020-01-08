@@ -85,6 +85,14 @@ export class BooleanLiteral extends AbstractBooleanExpression {
         return this.FALSE;
     }
 
+    public static from(value: boolean): BooleanLiteral {
+        if (value) {
+            return BooleanLiteral.true();
+        } else {
+            return BooleanLiteral.false();
+        }
+    }
+
     public static fromString(text: string): BooleanLiteral {
         switch(text.toLowerCase()) {
             case "true":
@@ -117,6 +125,9 @@ export class BooleanVariableExpression extends AbstractBooleanExpression {
         this._variable = variable;
     }
 
+    get ident(): Identifier {
+        return this._variable;
+    }
 }
 
 export class NegationExpression extends AbstractBooleanExpression {

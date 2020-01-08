@@ -22,6 +22,7 @@
 import {AbstractNode} from "../AstNode";
 import {StringExpression} from "./expressions/StringExpression";
 import {BooleanExpression} from "./expressions/BooleanExpression";
+import {StatementList, StatementLists} from "./statements/Statement";
 
 export abstract class CoreEvent extends AbstractNode {
 
@@ -93,13 +94,36 @@ export class MessageReceivedEvent extends CoreEvent {
 
 export class ConditionReachedEvent extends CoreEvent {
 
+    /**
+     * A sequence of statements that are used to compute
+     * the boolean expression.
+     *
+     * Background: The translation of a complex boolean expression
+     *  into the intermediate language might break down a given
+     *  expression into several statements, which might, for example,
+     *  reflect the evaluation order of the different operands.
+     */
+    private readonly _condCalculations: StatementList;
+
+    /**
+     * The actual boolean expression. Please note that `_condCalculations`
+     * mist be conducted before this expression can be evaluated!
+     */
     private readonly _cond: BooleanExpression;
 
-    constructor(cond: BooleanExpression) {
-        super([cond]);
+    constructor(condCalcs: StatementList, cond: BooleanExpression) {
+        super([condCalcs, cond]);
+        this._condCalculations = condCalcs;
         this._cond = cond;
     }
 
+    get condCalculations(): StatementList {
+        return this._condCalculations;
+    }
+
+    get cond(): BooleanExpression {
+        return this._cond;
+    }
 }
 
 

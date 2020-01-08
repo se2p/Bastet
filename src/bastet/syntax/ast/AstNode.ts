@@ -112,6 +112,10 @@ export abstract class OptionalAstNode<T extends AstNode> extends AbstractNode {
         return new AbsentAstNode<T>();
     }
 
+    public static with<T extends AstNode>(node: T): PresentAstNode<T> {
+        return new PresentAstNode<T>(node);
+    }
+
 }
 
 export class PresentAstNode<T extends AstNode> extends OptionalAstNode<T> {

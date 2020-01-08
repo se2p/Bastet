@@ -29,7 +29,9 @@ import {StatementList} from "./statements/Statement";
 
 export class ActorDefinition extends AbstractNode {
 
+    /** The name of the actor based on which it can be identified or addressed */
     private readonly _ident: Identifier;
+
     private readonly _inheritsFrom: Identifier | null;
     private readonly _resourceDefs: ResourceDefinitionList;
     private readonly _declarationStmts: StatementList;
