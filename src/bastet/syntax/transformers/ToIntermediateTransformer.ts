@@ -278,6 +278,7 @@ import {StopOthersInActorStatement} from "../ast/core/statements/StopOthersInAct
 import {WaitSecsStatement} from "../ast/core/statements/WaitSecsStatement";
 import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
+import {debuglog} from "util";
 
 class TTransformerResult<T extends AstNode> {
 
@@ -311,6 +312,8 @@ class TTransformerResult<T extends AstNode> {
 class TransformerResult extends TTransformerResult<AstNode> {
 
 }
+const STATEMENT_MATCHER = /(?<method>[A-Za-z0-9_]*)StatementContext/;
+const EXPRESSION_MATCHER = /(?<method>[A-Za-z0-9_]*)ExpressionContext/;
 
 class TransformerResultList<E extends AstNode> {
 
@@ -1317,16 +1320,45 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         throw new ImplementMeException();
     }
 
+    private identifyProcedureCall(node: RuleNode) : string|null {
+        let result: string = node.constructor.name;
+        const stmtMatch = STATEMENT_MATCHER.exec(result);
+        if (stmtMatch) {
+            return stmtMatch.groups.method;
+        }
+        return null;
+    }
+
+    private identifyFunctionCall(node: RuleNode) : string|null {
+        let result: string = node.constructor.name;
+        const exprMatch = EXPRESSION_MATCHER.exec(result);
+        if (exprMatch) {
+            return exprMatch.groups.method;
+        } else {
+            return null;
+        }
+    }
+
     private identifyIntermediateMethodName(node: RuleNode) : string|null {
         let result: string = node.constructor.name;
-        return result;
+        const stmtMatch = STATEMENT_MATCHER.exec(result);
+        if (stmtMatch) {
+            return stmtMatch.groups.method;
+        } else {
+            const exprMatch = EXPRESSION_MATCHER.exec(result);
+            if (exprMatch) {
+                return exprMatch.groups.method;
+            } else {
+                return null;
+            }
+        }
     }
 
     visitChildren(node: RuleNode): TransformerResult {
         if (node.childCount == 1) {
             return node.getChild(0).accept(this);
         }
-        throw new ImplementMeForException(node.constructor.name);
+        throw new ImplementMeForException(this.identifyIntermediateMethodName(node));
         //
         // const methodName = this.identifyIntermediateMethodName(node);
         // let args: Expression[] = [];
