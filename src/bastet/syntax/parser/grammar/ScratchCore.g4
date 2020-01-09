@@ -11,7 +11,11 @@ fileType : 'program' | 'module' ;
 
 importDefinitionList : importDefinition* ;
 
-importDefinition : 'import' ident 'from' resourceLocator ;
+importDefinition : 'import' importSelector 'from' resourceLocator ;
+
+importSelector :
+    ident # ImportSelectedActor
+    | '*' # ImportAllActors ;
 
 // Actors in a list of actors are separated by whitespace
 actorDefinitionList : actorDefinition* ;
@@ -68,7 +72,7 @@ type :
  | 'boolean' # BooleanType
  | 'string' # StringType
  | 'enum' '[' expressionListPlain ']' # EnumType
- | 'list' type # ListType
+ | 'list' 'of' type # ListType
  | 'map' indexType # MapType;
 
 // Maps and lists can be indexed either by numbers or strings.
@@ -99,7 +103,7 @@ coreEvent :
 // reusable code blocks (also known as 'custom blocks').
 // A procedure is identified by a name and is parameterized
 // to take a number of arguments.
-methodDefinition : 'define' ident parameterList stmtList methodResultDeclaration ;
+methodDefinition : 'define' methodAttributeList ident parameterList stmtList methodResultDeclaration ;
 methodResultDeclaration :
     'returns' ident ':' type # FunctionReturnDefinition
     | # VoidReturnDefinition
@@ -107,6 +111,10 @@ methodResultDeclaration :
 
 // A list of procedure definitions.
 methodDefinitionList : methodDefinition* ;
+
+// Attributes that can be assinged to a method
+methodAttributeList : methodAttribute* ;
+methodAttribute : 'atomic' ;
 
 // A procedure parameter.
 parameter : ident ':' type ;
@@ -122,7 +130,7 @@ parameterListPlain : parameter (',' parameter)* | ;
 // Some statements that terminate the control flow
 // are only allowed at the end of the list to
 // make their semantics clearer for the programmer.
-stmtList : 'begin' stmtListPlain (terminationStmt)? 'end';
+stmtList : 'begin' stmtListPlain (terminationStmt)? 'end' ;
 
 // A plain list of program statements.
 // Statements are separated by whitespace.
@@ -186,7 +194,8 @@ coreNonCtrlStmt :
  expressionStmt
  |  commonStmt
  |  listStmt
- |  declarationStmt  ;
+ |  declarationStmt
+ ;
 
 commonStmt  :
     'wait' numExpr 'seconds' # WaitSecsStatement
@@ -213,7 +222,9 @@ listStmt :
 setStmt :
     'set' 'attribute' String 'to' expression # SetAttributeToStatement
  |  'set' 'attribute' String 'of' ident 'to' expression # SetAttributeOfToStatement
- |  'set' variable 'to' expression  # SetVariableToStatement;
+ |  'store' expression 'to' variable  # StoreEvalResultStatement
+ |  'store' callStmt 'to' variable # StoreCallResultStatement
+ ;
 
 setStmtList : setStmt* ;
 

@@ -1,20 +1,20 @@
-module StageModule;
+module StageModule
 
 import Entity from "entity-actor.sc"
 
-actor Stage is Entity {
+actor Stage is Entity begin
 
-    define (switch backdrop to <string as id>) as {
-        change image to (id);
-    }
+    define switchBackdropTo (id: string) begin
+        changeActiveImageTo(id)
+    end
 
-    define (switch backdrop to <string as id>) and wait) as {
+    define switchBackdropToAndWait (id: string) begin
 
-    }
+    end
 
-    define (next backdrop) as {
+    define nextBackdrop () begin
 
-    }
+    end
 
-}
+end
 

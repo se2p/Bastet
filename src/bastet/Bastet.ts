@@ -30,11 +30,18 @@ import {AnalysisProcedure} from "./analyses/AnalysisProcedure";
 import {ProgramParser} from "./syntax/parser/ProgramParser";
 import {Preconditions} from "./utils/Preconditions";
 import {AppBuilder} from "./syntax/app/AppBuilder";
-import {ProgramContext} from "./syntax/parser/grammar/ScratchParser";
+import {
+    ActorDefinitionContext,
+    ImportAllActorsContext,
+    ImportSelectedActorContext, MethodDefinitionContext,
+    ProgramContext, ResourceLocatorContext
+} from "./syntax/parser/grammar/ScratchParser";
 import {RawAstToDotVisitor} from "./syntax/parser/RawAstToDotVisitor";
 import {RuleNode} from "antlr4ts/tree";
 import {AstNode} from "./syntax/ast/AstNode";
 import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
+import {RawAstQuery} from "./syntax/parser/RawAstQuery";
+import * as path from "path";
 
 const commander = require('commander');
 
@@ -63,10 +70,10 @@ export class Bastet {
         const intermediateMethodLib = this.parseIntermediateMethodLib(intermLibFilepath);
 
         // Parse the program (a Scratch program) into an intermediate AST
-        const intermediateProgramAST = this.parseIntoIntermediateAST("program", programFilepath);
+        const intermediateProgramAST = this.parseIntoIntermediateAST("program", programFilepath, intermediateMethodLib);
 
         // Parse the specification (also a Scratch program) into an intermediate AST
-        const intermediateSpecAST = this.parseIntoIntermediateAST("spec", specFilepath);
+        const intermediateSpecAST = this.parseIntoIntermediateAST("spec", specFilepath, intermediateMethodLib);
 
         // Create the control-flow structure of the verification task
         const programControlFlow = this.createControlFlowFrom(programFilepath, intermediateProgramAST, "");
@@ -91,7 +98,7 @@ export class Bastet {
         return program
             .version('0.0.1')
             .option('-d, --debug', 'Debugging mode')
-            .option('-il, --intermediateLibrary', 'Program file that defines the intermediate functions', './public/intermediate.sc')
+            .option('-I, --intermediateLibrary', 'Program file that defines the intermediate functions', './src/public/intermediate.sc')
             .requiredOption('-P, --program <required>', 'Program file')
             .requiredOption('-S, --specification <required>', 'Specification file')
             .parse(process.argv);
@@ -103,7 +110,7 @@ export class Bastet {
      *
      * @param filepath
      */
-    private parseIntoIntermediateAST(ident: string, filepath: string): AstNode {
+    private parseIntoIntermediateAST(ident: string, filepath: string, intermediateMethodLib: Set<string>): AstNode {
         Preconditions.checkNotEmpty(filepath);
 
         // Create the parser for the file format
@@ -121,7 +128,7 @@ export class Bastet {
         // Transform the AST: Replaces specific statements or expressions
         // by generic constructs.
         const transformer = new ToIntermediateTransformer();
-        const intermediateAST: AstNode = transformer.transform(rawAST);
+        const intermediateAST: AstNode = transformer.transform(intermediateMethodLib, rawAST);
 
         {
             const astToDotVisitor = new AstToDotVisitor();
@@ -144,9 +151,67 @@ export class Bastet {
      *
      * @param intermLibFilepath     Path to the file that defines the library of methods in the intermediate language.
      */
-    private parseIntermediateMethodLib(intermLibFilepath: string) {
+    private parseIntermediateMethodLib(intermLibFilepath: string): Set<string> {
+        Preconditions.checkNotEmpty(intermLibFilepath);
 
+        // ATTENTION: This method results in a rough approximation.
+        // FIXME: Reimplement if time.
+
+        const scratchParser : ProgramParser = ProgramParserFactory.createParserFor(intermLibFilepath);
+        const rawAST: RuleNode = scratchParser.parseFile(intermLibFilepath);
+
+        let importQueryPred = (r: RuleNode) => {
+            return (r.constructor.name == "ImportDefinitionContext")
+        };
+
+        let actorDefPred = (r: RuleNode) => {
+            return (r.constructor.name == "ActorDefinitionContext");
+        };
+
+        let methodDefPred = (r: RuleNode) => {
+            return (r.constructor.name == "MethodDefinitionContext");
+        };
+
+        let resourceLocPred = (r: RuleNode) => {
+            return (r.constructor.name == "ResourceLocatorContext");
+        };
+
+        let moduleASTs: RuleNode[] = [];
+
+        const baseDir = path.dirname(intermLibFilepath);
+        const imports = RawAstQuery.queryFor(importQueryPred, rawAST);
+        for (let imp of imports) {
+            for (let rl of RawAstQuery.queryFor(resourceLocPred, imp)) {
+                const rlc = rl as ResourceLocatorContext;
+                const impBasename: string = path.basename(rlc.String().text.replace(/['"]+/g, ''));
+                const moduleAST: RuleNode = scratchParser.parseFile(path.join(baseDir, impBasename));
+                moduleASTs.push(moduleAST);
+            }
+        }
+
+        let allMethods: Set<string> = new Set();
+        let actorMethods = {};
+        for (let mod of moduleASTs) {
+            for (let act of RawAstQuery.queryFor(actorDefPred, mod)) {
+                const actc = act as ActorDefinitionContext;
+                const actorName = actc.ident().text;
+                for (let md of RawAstQuery.queryFor(methodDefPred, mod)) {
+                    const mdc = md as MethodDefinitionContext;
+                    const methodName = mdc.ident().text;
+                    allMethods.add(methodName);
+                    if (!actorMethods[actorName]) {
+                        actorMethods[actorName] = new Set();
+                    }
+                    let methodSet: Set<String> = actorMethods[actorName];
+                    methodSet.add(methodName);
+                }
+            }
+        }
+
+        console.log(allMethods);
+        return allMethods;
     }
+
 }
 
 

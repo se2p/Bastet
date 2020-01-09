@@ -79,7 +79,7 @@ import {
 import {
     SetAttributeOfToStatement,
     SetAttributeToStatement,
-    SetVariableToStatement
+    StoreEvalResultToVariableStatement
 } from "./core/statements/SetStatement";
 import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
@@ -240,7 +240,7 @@ export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
     visit(node: SetAttributeToStatement): R;
 
-    visit(node: SetVariableToStatement): R;
+    visit(node: StoreEvalResultToVariableStatement): R;
 
     visit(node: StopAllStatement): R;
 

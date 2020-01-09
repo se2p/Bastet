@@ -55,4 +55,13 @@ export class Preconditions {
         return text;
     }
 
+    static checkNotUndefined(obj, message?: string) {
+       if (!obj) {
+           if (message) {
+               throw new IllegalArgumentException(message);
+           } else {
+               throw new IllegalArgumentException("Reference must not be undefined.");
+           }
+       }
+    }
 }

@@ -24,6 +24,7 @@ import {Statement} from "./Statement";
 import {Expression} from "../expressions/Expression";
 import {StringExpression} from "../expressions/StringExpression";
 import {Identifier} from "../Identifier";
+import {ExpressionList} from "../expressions/ExpressionList";
 
 export abstract class SetStatement extends Statement {
 
@@ -57,7 +58,7 @@ export class SetAttributeOfToStatement extends SetStatement {
 
 }
 
-export class SetVariableToStatement extends SetStatement {
+export class StoreEvalResultToVariableStatement extends SetStatement {
 
     private readonly _variable: Identifier;
     private readonly _toValue: Expression;
@@ -66,6 +67,21 @@ export class SetVariableToStatement extends SetStatement {
         super([variable, toValue]);
         this._variable = variable;
         this._toValue = toValue;
+    }
+
+}
+
+export class StoreCallResultToVariableStatement extends SetStatement {
+
+    private readonly _method: Identifier;
+    private readonly _arguments: ExpressionList;
+    private readonly _toVariable: Identifier;
+
+    constructor(method: Identifier, args: ExpressionList, toVariable: Identifier) {
+        super([method, args, toVariable]);
+        this._method = method;
+        this._arguments = args;
+        this._toVariable = toVariable;
     }
 
 }

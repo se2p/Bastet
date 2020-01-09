@@ -4,7 +4,7 @@
   "description": "Program Analysis Framework",
   "main": "main.js",
   "scripts": {
-    "antlr4ts": "antlr4ts -visitor src/bastet/syntax/parser/grammar/Scratch.g4",
+    "antlr4ts": "antlr4ts -visitor src/bastet/syntax/parser/grammar/Scratch.g4 -visitor src/bastet/syntax/parser/grammar/ScratchCore.g4",
     "start": "npm run serve",
     "build": "npm run build-ts && npm run lint && npm run copy-static-assets",
     "serve": "node dist/main.js",
@@ -53,7 +53,7 @@
   "dependencies": {
     "acorn": "^7.1.0",
     "antlr4ts": "^0.5.0-alpha.3",
-    "commander": "^4.0.1",
+    "commander": "^4.1.0",
     "immutable": "^4.0.0-rc.12",
     "typescript-logging": "^0.6.4"
   }

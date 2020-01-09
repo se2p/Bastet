@@ -68,9 +68,9 @@ import {
     FunctionReturnDefinitionContext,
     IdentContext,
     IdentExpressionContext,
-    IfStmtContext,
+    IfStmtContext, ImportAllActorsContext,
     ImportDefinitionContext,
-    ImportDefinitionListContext,
+    ImportDefinitionListContext, ImportSelectedActorContext, ImportSelectorContext,
     IndexOfExpressionContext,
     IndexTypeContext,
     InheritsFromContext,
@@ -126,7 +126,6 @@ import {
     SetAttributeToStatementContext,
     SetStatementContext,
     SetStmtListContext,
-    SetVariableToStatementContext,
     SoundResourceContext,
     StartupEventContext,
     StmtContext,
@@ -134,7 +133,7 @@ import {
     StmtListPlainContext,
     StopAllContext,
     StopOthersInActorStatementContext,
-    StopThisContext,
+    StopThisContext, StoreCallResultStatementContext, StoreEvalResultStatementContext,
     StrContainsExpressionContext,
     StrEqualsExpressionContext,
     StrGreaterThanExpressionContext,
@@ -161,7 +160,12 @@ import {
 } from "../parser/grammar/ScratchParser";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {Identifier} from "../ast/core/Identifier";
-import {ImportDefinition, ImportDefinitionList} from "../ast/core/ImportDefinition";
+import {
+    ImportAllActors,
+    ImportDefinition,
+    ImportDefinitionList,
+    ImportSelectedActor, ImportSelector
+} from "../ast/core/ImportDefinition";
 import {ActorDefinition, ActorDefinitionList} from "../ast/core/ActorDefinition";
 import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {
@@ -192,7 +196,12 @@ import {
     DeclareAttributeStatement,
     DeclareVariableStatement
 } from "../ast/core/statements/DeclarationStatement";
-import {SetAttributeToStatement, SetStatement, SetVariableToStatement} from "../ast/core/statements/SetStatement";
+import {
+    SetAttributeToStatement,
+    SetStatement,
+    StoreCallResultToVariableStatement,
+    StoreEvalResultToVariableStatement
+} from "../ast/core/statements/SetStatement";
 import {Expression} from "../ast/core/expressions/Expression";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {ParameterDeclaration, ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
@@ -279,6 +288,7 @@ import {WaitSecsStatement} from "../ast/core/statements/WaitSecsStatement";
 import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
 import {debuglog} from "util";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 class TTransformerResult<T extends AstNode> {
 
@@ -336,6 +346,15 @@ class TransformerResultList<E extends AstNode> {
 
 class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
+    private readonly _methodLibrary: Set<string>;
+    private readonly _typeStack: Array<ScratchType>;
+
+    constructor(methodLibrary: Set<string>) {
+        Preconditions.checkNotUndefined(methodLibrary);
+        this._methodLibrary = methodLibrary;
+        this._typeStack = new Array<ScratchType>();
+    }
+
     private getOperand1(ctx: RuleNode): RuleNode {
         throw new ImplementMeException();
     }
@@ -383,11 +402,20 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             new ImportDefinitionList(importDefs.nodeList));
     }
 
+    public visitImportSelector(ctx: ImportSelectedActorContext): TransformerResult {
+        return TransformerResult.withNode(
+            new ImportSelectedActor(ctx.ident().accept(this).nodeOnly() as Identifier));
+    }
+
+    public visitImportAllActors(ctx: ImportAllActorsContext): TransformerResult {
+        return TransformerResult.withNode(new ImportAllActors());
+    }
+
     public visitImportDefinition(ctx: ImportDefinitionContext): TransformerResult {
-        const toImport: AstNode = ctx.ident().accept(this).node;
+        const toImportTr = ctx.importSelector().accept(this);
         const importFrom: AstNode = ctx.resourceLocator().accept(this).node;
-        return TransformerResult.withNode(new ImportDefinition(toImport as Identifier,
-            importFrom as ResourceLocation));
+        return TransformerResult.withNode(
+            new ImportDefinition(toImportTr.nodeOnly() as ImportSelector, importFrom as ResourceLocation));
     }
 
     public visitResourceLocator(ctx: ResourceLocatorContext): TransformerResult {
@@ -625,7 +653,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const counterIdent: Identifier = Identifier.fresh();
         const counterVar = new NumberVariableExpression(counterIdent);
         const declarationStmt = new DeclareVariableStatement(counterIdent, NumberType.instance());
-        const initStmt: Statement = new SetVariableToStatement(counterIdent, NumberLiteral.of(0));
+        const initStmt: Statement = new StoreEvalResultToVariableStatement(counterIdent, NumberLiteral.of(0));
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt, initStmt]));
 
         // Determine the number of iterations
@@ -676,7 +704,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const resultVarIdent: Identifier = Identifier.fresh();
         const resultVarExpr = new NumberVariableExpression(resultVarIdent);
         const declarationStmt = new DeclareVariableStatement(resultVarIdent, NumberType.instance());
-        const initStmt: Statement = new SetVariableToStatement(resultVarIdent, NumberLiteral.of(0));
+        const initStmt: Statement = new StoreEvalResultToVariableStatement(resultVarIdent, NumberLiteral.of(0));
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt, initStmt]));
 
         // Function call
@@ -780,7 +808,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const resultVarIdent: Identifier = Identifier.fresh();
         const resultVarExpr = new BooleanVariableExpression(resultVarIdent);
         const declareVarStmt = new DeclareVariableStatement(resultVarIdent, BooleanType.instance());
-        const initStmt: Statement = new SetVariableToStatement(resultVarIdent, BooleanLiteral.from(value));
+        const initStmt: Statement = new StoreEvalResultToVariableStatement(resultVarIdent, BooleanLiteral.from(value));
 
         let prepend: StatementList = StatementList.empty();
         prepend = StatementLists.concat(prepend, StatementList.from([declareVarStmt, initStmt]));
@@ -794,7 +822,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         let prepend: StatementList = StatementList.empty();
         prepend = StatementLists.concat(prepend, tr1.statementsToPrepend);
 
-        const initStmt: Statement = new SetVariableToStatement(variable.ident, tr1.node as BooleanExpression);
+        const initStmt: Statement = new StoreEvalResultToVariableStatement(variable.ident, tr1.node as BooleanExpression);
         prepend = StatementLists.concat(prepend, StatementList.from([initStmt]));
 
         return new TTransformerResult(prepend, variable);
@@ -1224,12 +1252,20 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 tr.node as Expression));
     }
 
-    public visitSetVariableToStatement(ctx: SetVariableToStatementContext) : TransformerResult {
+    public visitStoreEvalResultStatement(ctx: StoreEvalResultStatementContext) : TransformerResult {
         const tr = ctx.expression().accept(this);
         return  new TransformerResult(
             tr.statementsToPrepend,
-            new SetVariableToStatement(ctx.variable().accept(this).nodeOnly() as Identifier,
+            new StoreEvalResultToVariableStatement(ctx.variable().accept(this).nodeOnly() as Identifier,
                 tr.node as Expression));
+    }
+
+    public visitStoreCallResultStatement(ctx: StoreCallResultStatementContext) : TransformerResult {
+        const exprListTr = ctx.callStmt().expressionList().expressionListPlain().accept(this);
+        const methodIdent = ctx.callStmt().ident().accept(this).nodeOnly() as Identifier;
+        const toVar = ctx.variable().accept(this).nodeOnly() as Identifier;
+        return new TransformerResult(exprListTr.statementsToPrepend,
+            new StoreCallResultToVariableStatement(methodIdent, exprListTr.node as ExpressionList, toVar));
     }
 
     public visitStartupEvent(ctx: StartupEventContext) : TransformerResult {
@@ -1324,7 +1360,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         let result: string = node.constructor.name;
         const stmtMatch = STATEMENT_MATCHER.exec(result);
         if (stmtMatch) {
-            return stmtMatch.groups.method;
+            return this.toCamelCase(stmtMatch.groups.method);
         }
         return null;
     }
@@ -1333,7 +1369,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         let result: string = node.constructor.name;
         const exprMatch = EXPRESSION_MATCHER.exec(result);
         if (exprMatch) {
-            return exprMatch.groups.method;
+            return this.toCamelCase(exprMatch.groups.method);
         } else {
             return null;
         }
@@ -1347,18 +1383,82 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         } else {
             const exprMatch = EXPRESSION_MATCHER.exec(result);
             if (exprMatch) {
-                return exprMatch.groups.method;
+                return this.toCamelCase(exprMatch.groups.method);
             } else {
                 return null;
             }
         }
     }
 
+    private toCamelCase(str: string): string {
+        // https://stackoverflow.com/questions/2970525/converting-any-string-into-camel-case
+        return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
+            return index == 0 ? word.toLowerCase() : word.toUpperCase();
+        }).replace(/\s+/g, '');
+    }
+
+    private createVariableExpression(type: ScratchType, ident: Identifier): Expression {
+        if (type.constructor.name == NumberType.constructor.name) {
+            return new NumberVariableExpression(ident);
+        } else if (type.constructor.name == StringType.constructor.name) {
+            return new StringVariableExpression(ident);
+        } else if (type.constructor.name == BooleanType.constructor.name) {
+            return new BooleanVariableExpression(ident);
+        }
+        throw new ImplementMeException();
+    }
+
+    private childsAsExpressionList(node: RuleNode): TTransformerResult<ExpressionList> {
+        throw new ImplementMeException();
+    }
+
+    private determineResultType(node: RuleNode): ScratchType {
+        throw new ImplementMeException();
+    }
+
     visitChildren(node: RuleNode): TransformerResult {
         if (node.childCount == 1) {
             return node.getChild(0).accept(this);
         }
-        throw new ImplementMeForException(this.identifyIntermediateMethodName(node));
+
+        const functionCandidateName: string = this.identifyFunctionCall(node);
+        if (this._methodLibrary.has(functionCandidateName)) {
+            let prepend = StatementList.empty();
+
+            const resultVarIdent: Identifier = Identifier.fresh();
+            const resultVarType = this.determineResultType(node);
+            const resultVarExpr = this.createVariableExpression(resultVarType, resultVarIdent);
+            const declarationStmt = new DeclareVariableStatement(resultVarIdent, resultVarType);
+            prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
+
+            const argsTr: TTransformerResult<ExpressionList> = this.childsAsExpressionList(node);
+            prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
+
+            prepend = StatementLists.concat(prepend, StatementList.from([
+                new CallStatement(
+                    Identifier.of(functionCandidateName),
+                    argsTr.node,
+                    OptionalAstNode.with(resultVarIdent))
+            ]));
+
+            return new TransformerResult(prepend, resultVarExpr);
+        }
+
+        const procedureCandidateName: string = this.identifyProcedureCall(node);
+        if (this._methodLibrary.has(procedureCandidateName)) {
+            let prepend = StatementList.empty();
+
+            const argsTr: TTransformerResult<ExpressionList> = this.childsAsExpressionList(node);
+            prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
+
+            return new TransformerResult(prepend,
+                new CallStatement(
+                    Identifier.of(procedureCandidateName),
+                    argsTr.node,
+                    OptionalAstNode.absent()));
+        }
+
+        throw new IllegalArgumentException("Unkown node type. Add a library function?: " + node.constructor.name);
         //
         // const methodName = this.identifyIntermediateMethodName(node);
         // let args: Expression[] = [];
@@ -1369,12 +1469,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         //     args.push(childResult as Expression);
         //     i++;
         // }
-
-        // If the node is an expression, or if the corresponding
-        // method produces a result
-
-        // return new CallStatement(Identifier.of(methodName),
-        //    new ExpressionList(args), assignResultTo);
     }
 
     visitErrorNode(node: ErrorNode): TransformerResult {
@@ -1389,8 +1483,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
 export class ToIntermediateTransformer {
 
-    transform(origin: RuleNode): AstNode {
-        const visitor = new ToIntermediateVisitor();
+    transform(methodLib: Set<string>, origin: RuleNode): AstNode {
+        const visitor = new ToIntermediateVisitor(methodLib);
         return origin.accept(visitor).nodeOnly();
     }
 
