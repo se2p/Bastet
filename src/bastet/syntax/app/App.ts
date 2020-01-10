@@ -21,6 +21,7 @@
 
 import {ActorMap} from './Actor'
 import {Maps} from "../../utils/Maps";
+import {MethodDefinition, MethodDefinitionList} from "../ast/core/MethodDefinition";
 
 export class App {
 
@@ -50,6 +51,24 @@ export class App {
 
     get actors() {
         return Maps.values(this._actors);
+    }
+
+    public getMethodDefinition(methodName: string): MethodDefinitionList {
+        let result: MethodDefinition[] = [];
+        for (let ac of Maps.values(this._actors)) {
+            const methodDef = ac.methodMap.get(methodName);
+            result.push(methodDef);
+        }
+        return new MethodDefinitionList(result);
+    }
+
+    private static EMPTY_APP: App = null;
+
+    public static empty(): App {
+       if (App.EMPTY_APP == null) {
+           App.EMPTY_APP = new App("", "", {});
+       }
+       return App.EMPTY_APP;
     }
 
 }

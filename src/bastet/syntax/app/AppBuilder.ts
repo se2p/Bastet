@@ -22,7 +22,6 @@
 import {Actor, ActorMap} from "./Actor";
 import {App} from "./App";
 import {AppResource, AppResourceMap} from "./AppResource";
-import {MethodDefinition, MethodDefinitionMap} from "./MethodDefinition";
 import {Script} from "./controlflow/Script";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
@@ -36,11 +35,17 @@ import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {ActorDefinition} from "../ast/core/ActorDefinition";
 import {CoreEvent, NeverEvent, StartupEvent} from "../ast/core/CoreEvent";
 import {ScriptDefinitionList} from "../ast/core/ScriptDefinition";
-import {MethodDefinitionList, ResultDeclaration} from "../ast/core/MethodDefinition";
+import {
+    MethodDefinition,
+    MethodDefinitionList,
+    MethodDefinitionMap,
+    ResultDeclaration
+} from "../ast/core/MethodDefinition";
 import {ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
 import {StatementList} from "../ast/core/statements/Statement";
 import {DeclareVariableStatement} from "../ast/core/statements/DeclarationStatement";
+import {Identifier} from "../ast/core/Identifier";
 
 export class AppBuilder {
 
@@ -88,6 +93,7 @@ export class AppBuilder {
     }
 
     private static buildActorFlat(actorDefinition: ActorDefinition, actorNamePrefix: string) {
+        // TODO: Prepend the prefix
         const actorIdent = actorNamePrefix + "_" + actorDefinition.ident.text;
         const acd = actorDefinition;
 
@@ -123,13 +129,11 @@ export class AppBuilder {
         throw new ImplementMeException();
     }
 
-    private static buildMethodDefs(methodDefinitionListContext: MethodDefinitionList): MethodDefinitionMap {
+    private static buildMethodDefs(methodDefs: MethodDefinitionList): MethodDefinitionMap {
         let result: MethodDefinitionMap = {};
-        for (let methodDef of methodDefinitionListContext) {
+        for (let methodDef of methodDefs) {
             const methodName = methodDef.ident.text;
-            const paramDecls = AppBuilder.buildParameterDeclarations(methodDef.params);
-            const resultDecl = AppBuilder.buildMethodResultDef(methodDef.returns);
-            result[methodName] = new MethodDefinition(methodDef, methodName, paramDecls, resultDecl);
+            result[methodName] = methodDef;
         }
         return result;
     }

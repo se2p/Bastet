@@ -45,7 +45,7 @@ import {
     ClickEventContext,
     CloneStartEventContext,
     ColorFromNumExpressionContext,
-    ConditionReachedEventContext,
+    ConditionReachedEventContext, CoreBoolExprContext, CoreBoolExpressionContext, CoreStringExprContext,
     CreateCloneOfStatementContext,
     CurrentTimeCompExpressionContext,
     DateCompContext,
@@ -289,6 +289,8 @@ import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
 import {debuglog} from "util";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {App} from "../app/App";
+const toposort = require('toposort')
 
 class TTransformerResult<T extends AstNode> {
 
@@ -346,10 +348,10 @@ class TransformerResultList<E extends AstNode> {
 
 class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
-    private readonly _methodLibrary: Set<string>;
+    private readonly _methodLibrary: App;
     private readonly _typeStack: Array<ScratchType>;
 
-    constructor(methodLibrary: Set<string>) {
+    constructor(methodLibrary: App) {
         Preconditions.checkNotUndefined(methodLibrary);
         this._methodLibrary = methodLibrary;
         this._typeStack = new Array<ScratchType>();
@@ -469,8 +471,31 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             scripts.node as ScriptDefinitionList));
     }
 
+    private buildActorInheritanceRelation(ctx: ActorDefinitionListContext): Array<[string, string]> {
+        let result = new Array<[string, string]>();
+        for (let e of ctx.actorDefinition()) {
+           const adc: ActorDefinitionContext = e as ActorDefinitionContext;
+           const actorName = adc.ident().text;
+           if (adc.inheritsFrom().ident()) {
+               const inheritsFrom = adc.inheritsFrom().ident().text;
+               result.push([actorName, inheritsFrom]);
+           }
+        }
+        return result;
+    }
+
+    private orderActorsByInheritance(ctx: ActorDefinitionListContext): ActorDefinitionContext[] {
+        const inheritance = this.buildActorInheritanceRelation(ctx);
+        const sorted = toposort(inheritance);
+        const nameToActorMap = ctx.actorDefinition().reduce((map, obj) => {
+            map[obj.ident().text] = obj;
+            return map;
+        });
+        return sorted.map((name) => nameToActorMap[name]);
+    }
+
     public visitActorDefinitionList(ctx: ActorDefinitionListContext): TransformerResult {
-        const actorDefs = this.buildArrayFrom<ActorDefinition>(ctx.actorDefinition());
+        const actorDefs = this.buildArrayFrom<ActorDefinition>(this.orderActorsByInheritance(ctx));
         return new TransformerResult(actorDefs.statementsToPrepend, new ActorDefinitionList(actorDefs.nodeList));
     }
 
@@ -1416,13 +1441,50 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         throw new ImplementMeException();
     }
 
-    visitChildren(node: RuleNode): TransformerResult {
-        if (node.childCount == 1) {
-            return node.getChild(0).accept(this);
+    private isMethodInLib(methodName: string): boolean {
+        const defs = this._methodLibrary.getMethodDefinition(methodName);
+        if (defs.elements.length == 1) {
+            return true;
         }
 
+        if (defs.elements.length > 1) {
+            throw new IllegalArgumentException("Method library has ambiguous method names");
+        }
+
+        return false;
+    }
+
+    private visitSingleChild(ctx: RuleNode): TransformerResult {
+        if (ctx.childCount == 1) {
+            return ctx.getChild(0).accept(this);
+        }
+
+        if (ctx.childCount > 0) {
+            throw new IllegalArgumentException(ctx.constructor.name + " not a single-child node!");
+        }
+
+        throw new IllegalArgumentException(ctx.constructor.name + " is a terminal node!");
+    }
+
+    visitCoreStringExpression(ctx: CoreStringExprContext): TransformerResult {
+        return this.visitSingleChild(ctx);
+    }
+
+    visitCoreBoolExpression(ctx: CoreStringExprContext): TransformerResult {
+        return this.visitSingleChild(ctx);
+    }
+
+    visitCoreBoolExpr(ctx: CoreBoolExprContext): TransformerResult {
+        return this.visitSingleChild(ctx);
+    }
+
+    visitCoreNumExpression(ctx: CoreStringExprContext): TransformerResult {
+        return this.visitSingleChild(ctx);
+    }
+
+    visitChildren(node: RuleNode): TransformerResult {
         const functionCandidateName: string = this.identifyFunctionCall(node);
-        if (this._methodLibrary.has(functionCandidateName)) {
+        if (this.isMethodInLib(functionCandidateName)) {
             let prepend = StatementList.empty();
 
             const resultVarIdent: Identifier = Identifier.fresh();
@@ -1445,7 +1507,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         }
 
         const procedureCandidateName: string = this.identifyProcedureCall(node);
-        if (this._methodLibrary.has(procedureCandidateName)) {
+        if (this.isMethodInLib(procedureCandidateName)) {
             let prepend = StatementList.empty();
 
             const argsTr: TTransformerResult<ExpressionList> = this.childsAsExpressionList(node);
@@ -1458,17 +1520,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                     OptionalAstNode.absent()));
         }
 
-        throw new IllegalArgumentException("Unkown node type. Add a library function?: " + node.constructor.name);
-        //
-        // const methodName = this.identifyIntermediateMethodName(node);
-        // let args: Expression[] = [];
-        // let i = 0;
-        // while (i < node.childCount) {
-        //     const c = node.getChild(i);
-        //     const childResult: AstNode = c.accept(this);
-        //     args.push(childResult as Expression);
-        //     i++;
-        // }
+        return this.visitSingleChild(node);
+        // throw new IllegalArgumentException("Unkown node type. Add a library function?: " + node.constructor.name);
     }
 
     visitErrorNode(node: ErrorNode): TransformerResult {
@@ -1483,7 +1536,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
 export class ToIntermediateTransformer {
 
-    transform(methodLib: Set<string>, origin: RuleNode): AstNode {
+    transform(methodLib: App, origin: RuleNode): AstNode {
         const visitor = new ToIntermediateVisitor(methodLib);
         return origin.accept(visitor).nodeOnly();
     }

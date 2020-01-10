@@ -30,6 +30,10 @@ export class AstNodeList<E extends AstNode> extends AbstractNode {
         this._elements = elements;
     }
 
+    public isEmpty(): boolean {
+        return this._elements.length == 0;
+    }
+
     get elements(): E[] {
         return this._elements;
     }

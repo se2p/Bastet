@@ -80,6 +80,8 @@ export class MethodSignature extends AbstractNode {
     }
 }
 
+export type MethodDefinitionMap = { [id:string]: MethodDefinition } ;
+
 export class MethodDefinition extends MethodSignature {
 
     private readonly _statements: StatementList;
@@ -96,5 +98,9 @@ export class MethodDefinition extends MethodSignature {
 }
 
 export class MethodDefinitionList extends AstNodeList<MethodDefinition> {
+
+    constructor(elements: MethodDefinition[]) {
+        super(elements);
+    }
 
 }
