@@ -191,11 +191,11 @@ actor Sprite is Entity begin
         // ...
     end returns result : number
 
-    define sayFor (msg: string, scs: number) begin
+    define sayTextFor (msg: string, scs: number) begin
 
     end
 
-    define say (msg: string) begin
+    define sayText (msg: string) begin
 
     end
 

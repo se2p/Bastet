@@ -44,37 +44,32 @@ import {
 import {ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
 import {StatementList} from "../ast/core/statements/Statement";
-import {DeclareVariableStatement} from "../ast/core/statements/DeclarationStatement";
-import {Identifier} from "../ast/core/Identifier";
 
 export class AppBuilder {
 
-    public static buildControlFlowsFromSyntaxTree(programOrigin: string, ast: AstNode, actorNamePrefix: string): App {
+    public static buildControlFlowsFromSyntaxTree(programOrigin: string, ast: AstNode,
+                                                  libraryModule: App, actorNamePrefix: string): App {
+
         Preconditions.checkArgument(ast instanceof ProgramDefinition);
         const programNode: ProgramDefinition = ast as ProgramDefinition;
+        const actorMap: ActorMap = AppBuilder.buildActors(programNode, actorNamePrefix);
 
-        // Phase 1: Build the actors WITHOUT taking the INHERITANCE of actors into account.
-        const flatActors: ActorMap = AppBuilder.buildActorsFlat(programNode, actorNamePrefix);
-
-        // Phase 2: Rebuild the actors AND TAKE INHERITANCE into account.
-        const appActors: ActorMap = AppBuilder.rebuildWithActorInheritance(flatActors);
-
-        return new App(programOrigin, programNode.ident.text, appActors);
+        return new App(programOrigin, programNode.ident.text, actorMap);
     }
 
-    private static rebuildWithActorInheritance(flatActors: ActorMap): ActorMap {
-        throw new ImplementMeException();
-    }
-
-    private static buildActorsFlat(programAST: ProgramDefinition, actorNamePrefix: string): ActorMap {
+    private static buildActors(programAST: ProgramDefinition, actorNamePrefix: string): ActorMap {
         let result: ActorMap = {};
         const actorDefinitions : ActorDefinition[] = programAST.actors.elements;
 
         for (let actorDefinition of actorDefinitions) {
-            const actor: Actor = AppBuilder.buildActorFlat(actorDefinition, actorNamePrefix);
-            result[actor.ident] = actor;
+            // Flat actor
+            const flatActor: Actor = AppBuilder.buildActorFlat(actorDefinition, actorNamePrefix);
 
-            this.exportScriptsToDoT(actor);
+            // Add as result
+            result[flatActor.ident] = flatActor;
+
+            // Dot file export
+            this.exportScriptsToDoT(flatActor);
         }
 
         return result;
@@ -93,8 +88,10 @@ export class AppBuilder {
     }
 
     private static buildActorFlat(actorDefinition: ActorDefinition, actorNamePrefix: string) {
-        // TODO: Prepend the prefix
-        const actorIdent = actorNamePrefix + "_" + actorDefinition.ident.text;
+        let actorName: string = actorDefinition.ident.text;
+        if (actorNamePrefix) {
+            actorName = actorNamePrefix + "_" + actorName;
+        }
         const acd = actorDefinition;
 
         const resources = AppBuilder.buildResources(acd.resourceDefs);
@@ -103,7 +100,7 @@ export class AppBuilder {
         const methodDefs = AppBuilder.buildMethodDefs(acd.methodDefs);
         const scripts = AppBuilder.buildScripts(acd.scriptList);
 
-        return new Actor(actorDefinition, acd.ident.text, null, resources, datalocs, initScript, methodDefs, scripts);
+        return new Actor(actorDefinition, actorName, null, resources, datalocs, initScript, methodDefs, scripts);
     }
 
     private static buildScripts(scriptList: ScriptDefinitionList): Script[] {
@@ -184,18 +181,18 @@ export class AppBuilder {
         let result: DataLocationMap = {};
 
         // Data locations based on the declaration statements
-        for (let stmt of declarationStmtList) {
-            if (stmt instanceof DeclareVariableStatement) {
-                const declStmt: DeclareVariableStatement = stmt as DeclareVariableStatement;
-                const id: string = declStmt.ident.text;
-                result[id] = new DataLocation(declStmt, id, declStmt.type);
-            } else {
-                throw new ImplementMeException();
-            }
-        }
+        // for (let stmt of declarationStmtList) {
+        //     if (stmt instanceof DeclareVariableStatement) {
+        //         const declStmt: DeclareVariableStatement = stmt as DeclareVariableStatement;
+        //         const id: string = declStmt.ident.text;
+        //         result[id] = new DataLocation(declStmt, id, declStmt.type);
+        //     } else {
+        //         throw new ImplementMeException();
+        //     }
+        // }
 
         // Data locations based on the resources
-        console.warn("Resource declarations ignored");
+        console.warn("Declarations ignored");
         return result;
     }
 

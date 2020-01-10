@@ -487,10 +487,10 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     private orderActorsByInheritance(ctx: ActorDefinitionListContext): ActorDefinitionContext[] {
         const inheritance = this.buildActorInheritanceRelation(ctx);
         const sorted = toposort(inheritance);
-        const nameToActorMap = ctx.actorDefinition().reduce((map, obj) => {
-            map[obj.ident().text] = obj;
-            return map;
-        });
+        let nameToActorMap = {};
+        for (let acd of ctx.actorDefinition()) {
+            nameToActorMap[acd.ident().text] = acd;
+        }
         return sorted.map((name) => nameToActorMap[name]);
     }
 

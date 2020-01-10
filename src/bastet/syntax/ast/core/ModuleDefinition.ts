@@ -32,6 +32,9 @@ export class ProgramDefinition extends AbstractNode {
 
     constructor(ident: Identifier, imports: ImportDefinitionList, actors: ActorDefinitionList) {
         super([ident, imports, actors]);
+        this._ident = ident;
+        this._imports = imports;
+        this._actors = actors;
     }
 
     get ident(): Identifier {

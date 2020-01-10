@@ -125,7 +125,7 @@ export class Bastet {
             astToDotVisitor.writeToFile(`output/ast_library_interm_${ident}.dot`);
         }
 
-        return this.createControlFlowFrom(filepath, intermediateAST, "");
+        return this.createControlFlowFrom(filepath, intermediateAST, App.empty(), "");
     }
 
     /**
@@ -162,11 +162,11 @@ export class Bastet {
 
         Preconditions.checkState(intermediateAST instanceof ProgramContext);
 
-        return this.createControlFlowFrom(filepath, intermediateAST, actorNamePrefix);
+        return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, actorNamePrefix);
     }
 
-    private createControlFlowFrom(programOrigin: string, intermediateSpecAST: AstNode, actorNamePrefix?: string): App {
-        return AppBuilder.buildControlFlowsFromSyntaxTree(programOrigin, intermediateSpecAST, actorNamePrefix);
+    private createControlFlowFrom(programOrigin: string, intermediateSpecAST: AstNode, libraryModule: App, actorNamePrefix?: string): App {
+        return AppBuilder.buildControlFlowsFromSyntaxTree(programOrigin, intermediateSpecAST, libraryModule, actorNamePrefix);
     }
 
 }

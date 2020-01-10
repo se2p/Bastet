@@ -34,7 +34,7 @@ import {ExpressionList} from "./expressions/ExpressionList";
 
 export abstract class ScratchType extends AbstractNode {
 
-    protected constructor() {
+    protected constructor(childs) {
         super([]);
     }
 
@@ -46,9 +46,16 @@ export abstract class ScratchType extends AbstractNode {
 
 export class VoidType extends ScratchType {
 
-    private static readonly INSTANCE = new VoidType();
+    private static INSTANCE: VoidType;
+
+    constructor() {
+        super([]);
+    }
 
     static instance(): VoidType {
+        if (this.INSTANCE == null) {
+            this.INSTANCE = new VoidType();
+        }
         return this.INSTANCE;
     }
 
@@ -56,9 +63,16 @@ export class VoidType extends ScratchType {
 
 export class NumberType extends ScratchType {
 
-    private static readonly INSTANCE = new NumberType();
+    private static INSTANCE: NumberType;
 
-    static instance() : StringType {
+    constructor() {
+        super([]);
+    }
+
+    static instance(): VoidType {
+        if (this.INSTANCE == null) {
+            this.INSTANCE = new NumberType();
+        }
         return this.INSTANCE;
     }
 
@@ -66,9 +80,16 @@ export class NumberType extends ScratchType {
 
 export class BooleanType extends ScratchType {
 
-    private static readonly INSTANCE = new BooleanType();
+    private static INSTANCE: BooleanType;
 
-    static instance() : StringType {
+    constructor() {
+        super([]);
+    }
+
+    static instance(): VoidType {
+        if (this.INSTANCE == null) {
+            this.INSTANCE = new BooleanType();
+        }
         return this.INSTANCE;
     }
 
@@ -76,9 +97,16 @@ export class BooleanType extends ScratchType {
 
 export class StringType extends ScratchType {
 
-    private static readonly INSTANCE = new StringType();
+    private static INSTANCE: StringType;
 
-    static instance() : StringType {
+    constructor() {
+        super([]);
+    }
+
+    static instance(): VoidType {
+        if (this.INSTANCE == null) {
+            this.INSTANCE = new StringType();
+        }
         return this.INSTANCE;
     }
 
@@ -89,7 +117,7 @@ export class StringEnumType extends ScratchType {
     private readonly _values: ExpressionList;
 
     constructor(values: ExpressionList) {
-        super();
+        super([values]);
         this._values = values;
     }
 
@@ -105,8 +133,28 @@ export class StringEnumType extends ScratchType {
 
 export class ListType extends ScratchType {
 
+    private static TYPE_INSTANCES: {[id:string]: ListType};
+
+    private readonly _elementType: ScratchType;
+
+    constructor(elementType: ScratchType) {
+        super([elementType]);
+        this._elementType = elementType;
+    }
+
     public static withElementType(elementType: ScratchType): ScratchType {
-        throw new ImplementMeException();
+        if (this.TYPE_INSTANCES == null) {
+            this.TYPE_INSTANCES = {};
+        }
+
+        const elementTypeName: string = elementType.constructor.name;
+        let result: ScratchType = this.TYPE_INSTANCES[elementTypeName];
+        if (!result) {
+            result = new ListType(elementType);
+            this.TYPE_INSTANCES[elementTypeName]
+        }
+
+        return result;
     }
 
 }

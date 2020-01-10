@@ -21,6 +21,8 @@
 
 import {WithIdent} from "../../../../utils/WithIdent";
 import {AstNode} from "../../../ast/AstNode";
+import {Preconditions} from "../../../../utils/Preconditions";
+import {BooleanExpression, NegationExpression} from "../../../ast/core/expressions/BooleanExpression";
 
 export type OperationID = number;
 
@@ -57,6 +59,41 @@ export abstract class ProgramOperation implements WithIdent {
 
 }
 
+export class AssignementOperation extends ProgramOperation {
+
+}
+
+export class AssumeOperation extends ProgramOperation {
+
+    private readonly _expression: BooleanExpression;
+
+    constructor(ast: BooleanExpression) {
+        super(ast);
+        this._expression = ast;
+    }
+
+    get expression(): BooleanExpression {
+        return this._expression;
+    }
+
+    toString(): string {
+        return `[${this.ast.toTreeString()}]`;
+    }
+
+}
+
+export class RawOperation extends ProgramOperation {
+
+    constructor(ast: AstNode) {
+        super(ast);
+    }
+
+    toString(): string {
+        return this.ast.toTreeString();
+    }
+
+}
+
 export class NoopProgramOperation extends ProgramOperation {
 
     toString(): string {
@@ -67,6 +104,7 @@ export class NoopProgramOperation extends ProgramOperation {
 export class ProgramOperations {
 
     private static opCodeToIdMap: Map<string, OperationID> = new Map();
+    private static idToAstMap: Map<OperationID, AstNode> = new Map();
     private static opMap: Map<OperationID, ProgramOperation> = new Map();
     private static readonly EPSILON_OP = new NoopProgramOperation(null);
     private static idSequencePos: OperationID;
@@ -83,29 +121,59 @@ export class ProgramOperations {
             return this.fresh();
         } else {
             let opStr: string = ast.toTreeString();
-            let result: OperationID = this.opCodeToIdMap.get(opStr);
+            let result: OperationID = ProgramOperations.opCodeToIdMap.get(opStr);
             if (!result) {
                 result = this.fresh();
-                this.opCodeToIdMap.set(opStr, result);
+                ProgramOperations.idToAstMap.set(result, ast);
+                ProgramOperations.opCodeToIdMap.set(opStr, result);
             }
             return result;
         }
     }
 
     public static withID(id: OperationID): ProgramOperation|null {
-        return this.opMap.get(id) || null;
+        let result: ProgramOperation = ProgramOperations.opMap.get(id) || null;
+        if (result == null) {
+            const ast: AstNode = ProgramOperations.idToAstMap.get(id);
+            result = ProgramOperationFactory.createFor(ast);
+            ProgramOperations.opMap[id] = result;
+        }
+        return result;
     }
 
     public static register(op: ProgramOperation): void {
-        if (this.opMap.has(op.ident)) {
+        Preconditions.checkNotUndefined(op);
+        if (ProgramOperations.opMap.has(op.ident)) {
             return;
             // throw new IllegalStateException(`Operation with ID ${op.ident} already registered!`);
         }
-        this.opMap.set(op.ident, op);
+        ProgramOperations.opMap.set(op.ident, op);
     }
 
     public static epsilon(): ProgramOperation {
-        return this.EPSILON_OP;
+        return ProgramOperations.EPSILON_OP;
     }
 
 }
+
+export class ProgramOperationFactory {
+
+    public static createFor(ast: AstNode): ProgramOperation {
+        return new RawOperation(ast);
+    }
+
+    static assumeOpFrom(boolExpr: BooleanExpression): AssumeOperation {
+        return new AssumeOperation(boolExpr);
+    }
+
+    static negatedAssumeOpFrom(boolExpr: BooleanExpression): AssumeOperation {
+        const negation = new NegationExpression(boolExpr);
+        return new AssumeOperation(negation);
+    }
+
+    static epsilon(): NoopProgramOperation {
+        return ProgramOperations.epsilon();
+    }
+
+}
+

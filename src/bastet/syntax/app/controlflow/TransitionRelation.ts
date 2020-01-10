@@ -310,6 +310,11 @@ export class TransitionRelations {
     }
 
     private static addTransition(tx: TransitionTable, from: LocationID, to: LocationID, op: ProgramOperation): TransitionTable {
+        Preconditions.checkNotUndefined(tx);
+        Preconditions.checkNotUndefined(from);
+        Preconditions.checkNotUndefined(to);
+        Preconditions.checkNotUndefined(op);
+
         const oldTargets: ImmMap<LocationID, ImmSet<OperationID>> = tx.get(from) || ImmMap();
         const oldReachingOps: ImmSet<OperationID> = oldTargets.get(to) || ImmSet();
         const newReachingOps: ImmSet<OperationID> = oldReachingOps.add(op.ident);
@@ -335,6 +340,7 @@ export class TransitionRelations {
     static forOpSeq(...ops: ProgramOperation[]): TransitionRelation {
         let result: TransitionRelation = this.epsilon();
         for (let op of ops) {
+            Preconditions.checkArgument(op != null);
             let succLoc: ControlLocation = ControlLocation.fresh();
             result = this.concatTrOpGoto(result, op, succLoc);
         }
@@ -364,6 +370,9 @@ export class TransitionRelations {
     }
 
     static concatTrOpGoto(tr: TransitionRelation, op: ProgramOperation, goto: ControlLocation): TransitionRelation {
+        Preconditions.checkNotUndefined(tr);
+        Preconditions.checkNotUndefined(op);
+        Preconditions.checkNotUndefined(goto);
         // TODO: Add tests regarding circular references
 
         let locs = tr.locationSet.add(goto.ident);

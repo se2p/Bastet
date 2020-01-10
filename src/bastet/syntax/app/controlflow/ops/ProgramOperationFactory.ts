@@ -25,23 +25,3 @@ import {AssumeOperation} from "./AssumeOperation";
 import {BooleanExpression, NegationExpression} from "../../../ast/core/expressions/BooleanExpression";
 import {AstNode} from "../../../ast/AstNode";
 
-export class ProgramOperationFactory {
-
-    public static createFor(ast: AstNode): ProgramOperation {
-        return new RawOperation(ast);
-    }
-
-    static assumeOpFrom(boolExpr: BooleanExpression): AssumeOperation {
-        return new AssumeOperation(boolExpr);
-    }
-
-    static negatedAssumeOpFrom(boolExpr: BooleanExpression): AssumeOperation {
-        const negation = new NegationExpression(boolExpr);
-        return new AssumeOperation(negation);
-    }
-
-    static epsilon(): NoopProgramOperation {
-        return ProgramOperations.epsilon();
-    }
-
-}

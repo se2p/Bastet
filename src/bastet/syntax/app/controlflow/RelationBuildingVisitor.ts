@@ -19,13 +19,9 @@
  *
  */
 
-import {Script} from "./Script";
 import {TransitionRelation, TransitionRelations} from "./TransitionRelation";
-import {ProgramOperationFactory} from "./ops/ProgramOperationFactory";
-import {OperationID, ProgramOperation, ProgramOperations} from "./ops/ProgramOperation";
+import {OperationID, ProgramOperation, ProgramOperationFactory, ProgramOperations} from "./ops/ProgramOperation";
 import {ControlLocation} from "./ControlLocation";
-import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {Preconditions} from "../../../utils/Preconditions";
 import {CoreCtrlStatementnVisitor, CoreVisitor} from "../../ast/CoreVisitor";
 import {CallStatement} from "../../ast/core/statements/CallStatement";
 import {
@@ -35,7 +31,6 @@ import {
 } from "../../ast/core/statements/ControlStatement";
 import {StatementList} from "../../ast/core/statements/Statement";
 import {AstNode} from "../../ast/AstNode";
-import {RawOperation} from "./ops/RawOperation";
 
 
 export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>, CoreCtrlStatementnVisitor<TransitionRelation> {
