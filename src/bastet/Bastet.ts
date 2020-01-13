@@ -55,7 +55,7 @@ export class Bastet {
         return program
             .version('0.0.1')
             .option('-d, --debug', 'Debugging mode')
-            .option('-I, --intermediateLibrary', 'Program file that defines the intermediate functions', './src/public/intermediate.sc')
+            .requiredOption('-I, --intermediateLibrary <required>', 'Program file that defines the intermediate functions')
             .requiredOption('-P, --program <required>', 'Program file')
             .requiredOption('-S, --specification <required>', 'Specification file')
             .parse(process.argv);
