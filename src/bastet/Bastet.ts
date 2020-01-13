@@ -115,7 +115,7 @@ export class Bastet {
 
     private buildAnalysisProcedure(programArguments) : AnalysisProcedure {
         // TODO: Allow for sequences of analysis procedures that can built on the respective previous results.
-        throw new NotSupportedException("Implement 'createAnalysisProcedure'");
+        throw new ImplementMeException();
     }
 
     private parseFromIntermediateCode(ident: string, filepath: string): App {

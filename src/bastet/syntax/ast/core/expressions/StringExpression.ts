@@ -58,7 +58,6 @@ export class StringLiteral extends AbstractStringExpression {
     }
 
     toTreeString(): string {
-        // FIXME: Escape the text?
         return this.text;
     }
 }

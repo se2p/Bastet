@@ -197,6 +197,7 @@ export class AppBuilder {
     }
 
     static dissolveInheritance(taskModel: App): App {
-        throw new ImplementMeException();
+        console.log("FIXME: Implement this procedure, for dissolving the inheritance relation.")
+        return taskModel;
     }
 }

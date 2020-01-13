@@ -27,17 +27,17 @@ export class ControlFlows {
 
     public static unionOf(controlflow1: App, controlflow2: App, ident: string) : App {
         const unionActors = controlflow1.actors.concat(controlflow2.actors);
-        let unionActorsMap = {};
+        let resultActorsMap = {};
 
         for (let a of unionActors) {
-            if (unionActorsMap[a.ident]) {
+            if (resultActorsMap[a.ident]) {
                 throw new IllegalArgumentException("Duplicated actor name! " + a.ident);
             }
-            unionActorsMap[a.ident] = a;
+            resultActorsMap[a.ident] = a;
         }
 
         return new App("union_of_" + controlflow1.origin + "_and_" + controlflow2.origin,
-            ident, unionActorsMap);
+            ident, resultActorsMap);
     }
 
 }

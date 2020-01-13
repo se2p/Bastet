@@ -43,7 +43,7 @@ export class TransitionRelationToDot {
                 let fromWork: [OperationID, LocationID][] = tr.transitionsFrom(fromlocid);
                 for (let [opid, tolocid] of fromWork) {
                     let op = ProgramOperations.withID(opid);
-                    output.push(`    ${fromlocid} -> ${tolocid} [label="${escape(op.toString())}"];`);
+                    output.push(`    ${fromlocid} -> ${tolocid} [label="${this.escapeLabel(op.toString())}"];`);
                     worklist.push(tolocid);
                 }
             }
@@ -55,8 +55,8 @@ export class TransitionRelationToDot {
         fs.writeFileSync(filepath, output.join("\n"));
     }
 
-    private escpape(text: string): string {
-        return text;
+    private escapeLabel(text: string): string {
+        return text.replace(/"/g, "\\\"");
     }
 
 }

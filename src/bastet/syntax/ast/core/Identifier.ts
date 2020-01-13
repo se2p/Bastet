@@ -33,6 +33,10 @@ export class Identifier extends AbstractNode {
         this._name = name;
     }
 
+    toTreeString(): string {
+        return this._name.text;
+    }
+
     public static of(txt: string) {
         return new Identifier(new StringLiteral(txt));
     }
