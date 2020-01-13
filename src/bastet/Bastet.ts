@@ -40,8 +40,8 @@ import {RawAstToDotVisitor} from "./syntax/parser/RawAstToDotVisitor";
 import {RuleNode} from "antlr4ts/tree";
 import {AstNode} from "./syntax/ast/AstNode";
 import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
-import {RawAstQuery} from "./syntax/parser/RawAstQuery";
 import * as path from "path";
+import {ImplementMeException} from "./core/exceptions/ImplementMeException";
 
 const commander = require('commander');
 
@@ -49,47 +49,6 @@ const commander = require('commander');
  * The main class of the Main program analysis framework.
  */
 export class Bastet {
-
-    /**
-     * Runs the requested analysis on a given analysis task.
-     *
-     * @returns a JSON object with the analysis result.
-     */
-    public runAnalysis() : {} {
-        // Parsing of command line options
-        const programArguments = this.parseProgramArguments();
-        if (!programArguments) {
-            return {};
-        }
-
-        const intermLibFilepath: string = programArguments.intermediateLibrary;
-        const programFilepath: string = programArguments.program;
-        const specFilepath: string = programArguments.specification;
-
-        // Build the set of methods for translating into the intermediate AST
-        const staticLibraryModel: App = this.parseFromIntermediateCode("library", intermLibFilepath);
-
-        // Parse the program (a Scratch program) into an intermediate AST
-        const staticProgramModel: App = this.parseFromRawCode("program", "", programFilepath, staticLibraryModel);
-
-        // Parse the specification (also a Scratch program) into an intermediate AST
-        const staticSpecModel: App = this.parseFromRawCode("spec", "__spec", specFilepath, staticLibraryModel);
-
-        // Create the control-flow structure of the verification task
-        const staticTaskModel: App = ControlFlows.unionOf(staticLibraryModel, ControlFlows.unionOf(staticProgramModel, staticSpecModel));
-
-        // TODO: Allow for sequences of analysis procedures that can built on the respective previous results.
-
-        // Create the program analysis and program analysis algorithms
-        const analysisProcedure = this.createAnalysisProcedure(programArguments);
-
-        // Run the program analysis and return the result
-        return analysisProcedure.run(staticTaskModel);
-    }
-
-    private createAnalysisProcedure(programArguments) : AnalysisProcedure {
-        throw new NotSupportedException("Implement 'createAnalysisProcedure'");
-    }
 
     private parseProgramArguments() : any {
         const program = new commander.Command();
@@ -100,6 +59,63 @@ export class Bastet {
             .requiredOption('-P, --program <required>', 'Program file')
             .requiredOption('-S, --specification <required>', 'Specification file')
             .parse(process.argv);
+    }
+
+    /**
+     * Runs the requested analysis on a given analysis task.
+     *
+     * @returns a JSON object with the analysis result.
+     */
+    public run() : {} {
+        // Parsing of command line options
+        const cmdlineArguments = this.parseProgramArguments();
+        if (!cmdlineArguments) {
+            return {};
+        }
+
+        const intermLibFilepath: string = cmdlineArguments.intermediateLibrary;
+        const programFilepath: string = cmdlineArguments.program;
+        const specFilepath: string = cmdlineArguments.specification;
+
+        // Build the static task model
+        const staticTaskModel: App = this.buildTaskModel(intermLibFilepath, programFilepath, specFilepath);
+
+        // Build the analysis procedure as defined by the configuration
+        const analysisProcedure = this.buildAnalysisProcedure(cmdlineArguments);
+
+        // Run the analysis procedure on the task and return the result
+        return this.runAnalysis(staticTaskModel, analysisProcedure);
+    }
+
+    private runAnalysis(staticTaskModel: App, analysisProcedure: AnalysisProcedure) : {} {
+        return analysisProcedure.run(staticTaskModel);
+    }
+
+    private buildTaskModel(libraryFilepath: string, programFilepath: string, specFilepath: string): App {
+        // Build the set of methods for translating into the intermediate AST
+        const staticLibraryModel: App = this.parseFromIntermediateCode("library", libraryFilepath);
+
+        // Parse the program (a Scratch program) into an intermediate AST
+        const staticProgramModel: App = this.parseFromRawCode("program", "", programFilepath, staticLibraryModel);
+
+        // Parse the specification (also a Scratch program) into an intermediate AST
+        const staticSpecModel: App = this.parseFromRawCode("spec", "__spec", specFilepath, staticLibraryModel);
+
+        // Create the control-flow structure of the verification task
+        const staticTaskModelWithInheritance: App = ControlFlows.unionOf(staticLibraryModel,
+            ControlFlows.unionOf(staticProgramModel, staticSpecModel, "task"), "task_and_library");
+
+        // The intermediate language supports a (simple) version of prototypical inheritance.
+        // Dissolve all inheritance relations now such the later analysis steps must not
+        // care about handling inheritance.
+        const staticTaskModel: App = AppBuilder.dissolveInheritance(staticTaskModelWithInheritance);
+
+        return staticTaskModel;
+    }
+
+    private buildAnalysisProcedure(programArguments) : AnalysisProcedure {
+        // TODO: Allow for sequences of analysis procedures that can built on the respective previous results.
+        throw new NotSupportedException("Implement 'createAnalysisProcedure'");
     }
 
     private parseFromIntermediateCode(ident: string, filepath: string): App {
@@ -159,8 +175,6 @@ export class Bastet {
             intermediateAST.accept(astToDotVisitor);
             astToDotVisitor.writeToFile(`output/ast_${ident}_interm.dot`);
         }
-
-        Preconditions.checkState(intermediateAST instanceof ProgramContext);
 
         return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, actorNamePrefix);
     }
