@@ -196,4 +196,7 @@ export class AppBuilder {
         return result;
     }
 
+    static dissolveInheritance(taskModel: App): App {
+        throw new ImplementMeException();
+    }
 }
