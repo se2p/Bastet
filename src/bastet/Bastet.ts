@@ -26,7 +26,7 @@ import {ToIntermediateTransformer} from "./syntax/transformers/ToIntermediateTra
 import {ControlFlows} from "./syntax/app/ControlFlows";
 import {NotSupportedException} from "./core/exceptions/NotSupportedException";
 import {App} from "./syntax/app/App";
-import {AnalysisProcedure} from "./analyses/AnalysisProcedure";
+import {AnalysisProcedure} from "./procedures/AnalysisProcedure";
 import {ProgramParser} from "./syntax/parser/ProgramParser";
 import {Preconditions} from "./utils/Preconditions";
 import {AppBuilder} from "./syntax/app/AppBuilder";
@@ -46,7 +46,7 @@ import {ImplementMeException} from "./core/exceptions/ImplementMeException";
 const commander = require('commander');
 
 /**
- * The main class of the Main program analysis framework.
+ * The main class of the Main program analyses framework.
  */
 export class Bastet {
 
@@ -62,9 +62,9 @@ export class Bastet {
     }
 
     /**
-     * Runs the requested analysis on a given analysis task.
+     * Runs the requested analyses on a given analyses task.
      *
-     * @returns a JSON object with the analysis result.
+     * @returns a JSON object with the analyses result.
      */
     public run() : {} {
         // Parsing of command line options
@@ -80,10 +80,10 @@ export class Bastet {
         // Build the static task model
         const staticTaskModel: App = this.buildTaskModel(intermLibFilepath, programFilepath, specFilepath);
 
-        // Build the analysis procedure as defined by the configuration
+        // Build the analyses procedure as defined by the configuration
         const analysisProcedure = this.buildAnalysisProcedure(cmdlineArguments);
 
-        // Run the analysis procedure on the task and return the result
+        // Run the analyses procedure on the task and return the result
         return this.runAnalysis(staticTaskModel, analysisProcedure);
     }
 
@@ -106,7 +106,7 @@ export class Bastet {
             ControlFlows.unionOf(staticProgramModel, staticSpecModel, "task"), "task_and_library");
 
         // The intermediate language supports a (simple) version of prototypical inheritance.
-        // Dissolve all inheritance relations now such the later analysis steps must not
+        // Dissolve all inheritance relations now such the later analyses steps must not
         // care about handling inheritance.
         const staticTaskModel: App = AppBuilder.dissolveInheritance(staticTaskModelWithInheritance);
 
@@ -114,7 +114,7 @@ export class Bastet {
     }
 
     private buildAnalysisProcedure(programArguments) : AnalysisProcedure {
-        // TODO: Allow for sequences of analysis procedures that can built on the respective previous results.
+        // TODO: Allow for sequences of analyses procedures that can built on the respective previous results.
         throw new ImplementMeException();
     }
 

@@ -19,41 +19,10 @@
  *
  */
 
-export interface AbstractElement {
+import {App} from "../syntax/app/App";
 
-}
+export interface AnalysisProcedure {
 
-export interface Lattice<E extends AbstractElement> {
-
-    /**
-     * The lattice's inclusion relation (is-less-or-equal).
-     * @param element1
-     * @param element2
-     */
-    isIncuded(element1: E, element2: E): boolean;
-
-    /**
-     * Determines the greatest lower bound (glb) of two given elements.
-     * @param element1
-     * @param element2
-     */
-    meet(element1: E, element2: E): E;
-
-    /**
-     * Determines the least upper bound (lub) of two given elements.
-     * @param element1
-     * @param element2
-     */
-    join(element1: E, element2: E): E;
-
-    /**
-     * Returns the bottom element of the lattice.
-     */
-    bottom(): E;
-
-    /**
-     * Returns the top element of the lattice.
-     */
-    top(): E;
+    run(task: App) : {};
 
 }

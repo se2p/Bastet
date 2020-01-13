@@ -19,41 +19,32 @@
  *
  */
 
-export interface AbstractElement {
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {AbstractElement} from "../../lattices/Lattice";
 
-}
+export class ReachedSet<E extends AbstractElement> {
 
-export interface Lattice<E extends AbstractElement> {
+    isEmpty(): boolean {
+        throw new ImplementMeException();
+    }
 
-    /**
-     * The lattice's inclusion relation (is-less-or-equal).
-     * @param element1
-     * @param element2
-     */
-    isIncuded(element1: E, element2: E): boolean;
+    getReached(inPartitionOf: E): ReachedSet<E> {
+        throw new ImplementMeException();
+    }
 
-    /**
-     * Determines the greatest lower bound (glb) of two given elements.
-     * @param element1
-     * @param element2
-     */
-    meet(element1: E, element2: E): E;
+    public [Symbol.iterator](): IterableIterator<E> {
+        throw new ImplementMeException();
+    }
 
-    /**
-     * Determines the least upper bound (lub) of two given elements.
-     * @param element1
-     * @param element2
-     */
-    join(element1: E, element2: E): E;
+    removeAll(elements: Set<E>) {
+       throw new ImplementMeException();
+    }
 
-    /**
-     * Returns the bottom element of the lattice.
-     */
-    bottom(): E;
+    addAll(elements: Set<E>) {
+        throw new ImplementMeException();
+    }
 
-    /**
-     * Returns the top element of the lattice.
-     */
-    top(): E;
-
+    add(element: E) {
+        throw new ImplementMeException();
+    }
 }

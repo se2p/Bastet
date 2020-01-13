@@ -19,3 +19,25 @@
  *
  */
 
+import {AbstractDomain} from "./AbstractDomain";
+import {AbstractElement} from "../../lattices/Lattice";
+import {ReachedSet} from "../algorithms/ReachedSet";
+
+export interface ProgramAnalysis<E extends AbstractElement> {
+
+    abstractDomain: AbstractDomain<E>;
+
+    abstractSucc(fromState: E): Iterable<E>;
+
+    merge(state1: E, state2: E): boolean;
+
+    /** Delegates to `join` of the abstract domain */
+    join(state1: E, state2: E): E;
+
+    stop(state: E, reached: ReachedSet<E>): E;
+
+    widen(state: E): E;
+
+    target(state: E): boolean;
+
+}

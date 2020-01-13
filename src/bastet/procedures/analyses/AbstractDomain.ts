@@ -19,10 +19,24 @@
  *
  */
 
-import {App} from "../syntax/app/App";
+import {AbstractElement, Lattice} from "../../lattices/Lattice";
 
-export interface AnalysisProcedure {
+export interface ConcreteElement {
 
-    run(taskControlFlow: App) : {};
+}
+
+export interface AbstractionPrecision {
+
+}
+
+export interface AbstractDomain<E extends AbstractElement> {
+
+    lattice: Lattice<E>;
+
+    abstract(elements: Iterable<ConcreteElement>): E;
+
+    concretize(element: E): Iterable<ConcreteElement>;
+
+    widen(element: E, precision: AbstractionPrecision): E;
 
 }
