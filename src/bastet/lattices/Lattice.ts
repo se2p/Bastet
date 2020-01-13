@@ -30,7 +30,7 @@ export interface Lattice<E extends AbstractElement> {
      * @param element1
      * @param element2
      */
-    isIncuded(element1: E, element2: E): boolean;
+    isIncluded(element1: E, element2: E): boolean;
 
     /**
      * Determines the greatest lower bound (glb) of two given elements.
