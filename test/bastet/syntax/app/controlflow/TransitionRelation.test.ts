@@ -24,10 +24,8 @@ import {
 } from "../../../../../src/bastet/syntax/app/controlflow/TransitionRelation";
 import {ControlLocation} from "../../../../../src/bastet/syntax/app/controlflow/ControlLocation";
 import {
-    ProgramOperation,
     ProgramOperations, RawOperation
 } from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
-import {StopAllContext, TerminationStmtContext} from "../../../../../src/bastet/syntax/parser/grammar/ScratchParser";
 import {StopAllStatement} from "../../../../../src/bastet/syntax/ast/core/statements/TerminationStatement";
 
 describe("TransitionRelation", () => {
