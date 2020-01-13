@@ -25,10 +25,10 @@ import {
 import {ControlLocation} from "../../../../../src/bastet/syntax/app/controlflow/ControlLocation";
 import {
     ProgramOperation,
-    ProgramOperations
+    ProgramOperations, RawOperation
 } from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
 import {StopAllContext, TerminationStmtContext} from "../../../../../src/bastet/syntax/parser/grammar/ScratchParser";
-import {RawOperation} from "../../../../../src/bastet/syntax/app/controlflow/ops/RawOperation";
+import {StopAllStatement} from "../../../../../src/bastet/syntax/ast/core/statements/TerminationStatement";
 
 describe("TransitionRelation", () => {
 
@@ -135,7 +135,7 @@ describe("TransitionRelations", () => {
 
         describe("case: no epsilon moves", () => {
 
-            const op = new RawOperation(new StopAllContext(new TerminationStmtContext(undefined, 0)));
+            const op = new RawOperation(new StopAllStatement());
 
             const tr = TransitionRelation.builder()
                 .addTransitionByIDs(0, 1, op)
