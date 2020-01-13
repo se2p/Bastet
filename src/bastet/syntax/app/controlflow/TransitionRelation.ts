@@ -443,40 +443,43 @@ export class TransitionRelations {
     }
 
     static eliminateEpsilons(tr: TransitionRelation): TransitionRelation {
-        const builder = TransitionRelation.builder();
-
-        const visited: Set<LocationID> = new Set();
-        const worklist: Array<LocationID>  = new Array<LocationID>();
-
-        for (let l of tr.entryLocationSet.values()) {
-            worklist.push(l);
-            builder.addEntryLocation(ControlLocation.for(l));
-        }
-
-        for (let l of tr.exitLocationSet.values()) {
-            builder.addExitLocation(ControlLocation.for(l));
-        }
-
-        while (worklist.length > 0) {
-            const work: LocationID = worklist.pop();
-            if (!visited.has(work)) {
-                visited.add(work);
-                for (let [op, target] of tr.transitionsFrom(work)) {
-                    let termStates = tr.closureTerminationStates(target);
-                    for (let termState of termStates) {
-                        if (op === ProgramOperations.epsilon().ident) {
-                            if (work == target) {
-                                continue;
-                            }
-                        }
-                        builder.addTransition(ControlLocation.for(work), ControlLocation.for(termState), ProgramOperation.for(op));
-                        worklist.push(termState);
-                    }
-                }
-            }
-        }
-
-        return builder.build();
+        console.log("FIXME: Implement an epsilon elimination for the transition relation.")
+        return tr;
+        //
+        // const builder = TransitionRelation.builder();
+        //
+        // const visited: Set<LocationID> = new Set();
+        // const worklist: Array<LocationID>  = new Array<LocationID>();
+        //
+        // for (let l of tr.entryLocationSet.values()) {
+        //     worklist.push(l);
+        //     builder.addEntryLocation(ControlLocation.for(l));
+        // }
+        //
+        // for (let l of tr.exitLocationSet.values()) {
+        //     builder.addExitLocation(ControlLocation.for(l));
+        // }
+        //
+        // while (worklist.length > 0) {
+        //     const work: LocationID = worklist.pop();
+        //     if (!visited.has(work)) {
+        //         visited.add(work);
+        //         for (let [op, target] of tr.transitionsFrom(work)) {
+        //             let termStates = tr.closureTerminationStates(target);
+        //             for (let termState of termStates) {
+        //                 if (op === ProgramOperations.epsilon().ident) {
+        //                     if (work == target) {
+        //                         continue;
+        //                     }
+        //                 }
+        //                 builder.addTransition(ControlLocation.for(work), ControlLocation.for(termState), ProgramOperation.for(op));
+        //                 worklist.push(termState);
+        //             }
+        //         }
+        //     }
+        // }
+        //
+        // return builder.build();
     }
 
 }
