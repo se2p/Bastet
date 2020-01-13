@@ -21,11 +21,23 @@
 
 import {App} from "./App";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 export class ControlFlows {
 
-    public static unionOf(controlflow1: App, controlflow2: App) : App {
-        throw new ImplementMeException();
+    public static unionOf(controlflow1: App, controlflow2: App, ident: string) : App {
+        const unionActors = controlflow1.actors.concat(controlflow2.actors);
+        let unionActorsMap = {};
+
+        for (let a of unionActors) {
+            if (unionActorsMap[a.ident]) {
+                throw new IllegalArgumentException("Duplicated actor name! " + a.ident);
+            }
+            unionActorsMap[a.ident] = a;
+        }
+
+        return new App("union_of_" + controlflow1.origin + "_and_" + controlflow2.origin,
+            ident, unionActorsMap);
     }
 
 }

@@ -57,7 +57,9 @@ export class App {
         let result: MethodDefinition[] = [];
         for (let ac of Maps.values(this._actors)) {
             const methodDef = ac.methodMap.get(methodName);
-            result.push(methodDef);
+            if (methodDef) {
+                result.push(methodDef);
+            }
         }
         return new MethodDefinitionList(result);
     }

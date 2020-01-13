@@ -47,7 +47,7 @@ actorLookStmt :
 spriteLookStmt  :
     'show' # ShowSpriteStatement
  |  'hide' # HideSpriteStatement
- |  'say' stringExpr ('for' numExpr  'secs')? # SayForStatement
+ |  'say' stringExpr ('for' numExpr  'secs')? # SayTextForStatement
  |  'think' stringExpr ('for' numExpr  'secs')? # ThinkForStatement
  |  'switch' 'costume' 'to' elementChoice # SwitchCostumeStatement
  |  'change' 'size' 'by'  numExpr # ChagenSizeByStatement

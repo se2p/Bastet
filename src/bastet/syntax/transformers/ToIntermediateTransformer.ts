@@ -357,12 +357,23 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         this._typeStack = new Array<ScratchType>();
     }
 
+    private getArgumentNodes(ctx: RuleNode): RuleNode[] {
+        let result: RuleNode[] = [];
+        for (let i = 0; i<ctx.childCount; i++) {
+            const child = ctx.getChild(i);
+            if (!(child instanceof TerminalNode)) {
+                result.push(child as RuleNode);
+            }
+        }
+        return result;
+    }
+
     private getOperand1(ctx: RuleNode): RuleNode {
-        throw new ImplementMeException();
+        return this.getArgumentNodes(ctx)[0];
     }
 
     private getOperand2(ctx: RuleNode): RuleNode {
-        throw new ImplementMeException();
+        return this.getArgumentNodes(ctx)[1];
     }
 
     public visitProgram(ctx: ProgramContext): TransformerResult {
@@ -491,7 +502,9 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         for (let acd of ctx.actorDefinition()) {
             nameToActorMap[acd.ident().text] = acd;
         }
-        return sorted.map((name) => nameToActorMap[name]);
+        return sorted
+            .filter((name) => nameToActorMap[name])
+            .map((name) => nameToActorMap[name]);
     }
 
     public visitActorDefinitionList(ctx: ActorDefinitionListContext): TransformerResult {
@@ -1433,8 +1446,23 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         throw new ImplementMeException();
     }
 
+    /**
+     * Constructs a list of arguments for a method call.
+     * @param node
+     */
     private childsAsExpressionList(node: RuleNode): TTransformerResult<ExpressionList> {
-        throw new ImplementMeException();
+        let prepend: StatementList = StatementList.empty();
+        let result: Expression[] = [];
+        for (let i = 0; i<node.childCount; i++) {
+            const child = node.getChild(i);
+            if (!(child instanceof TerminalNode)) {
+                const childTr: TransformerResult = child.accept(this);
+                prepend = StatementLists.concat(prepend, childTr.statementsToPrepend);
+                result.push(childTr.node as Expression);
+            }
+        }
+        return new TTransformerResult(prepend,
+            new ExpressionList(result));
     }
 
     private determineResultType(node: RuleNode): ScratchType {
@@ -1442,15 +1470,27 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     private isMethodInLib(methodName: string): boolean {
+        Preconditions.checkNotUndefined(methodName);
+
         const defs = this._methodLibrary.getMethodDefinition(methodName);
         if (defs.elements.length == 1) {
             return true;
         }
 
         if (defs.elements.length > 1) {
-            throw new IllegalArgumentException("Method library has ambiguous method names");
+            throw new IllegalArgumentException(`Method library has ambiguous method defs for "${methodName}"`);
         }
 
+        return false;
+    }
+
+    private hasErrorChilds(node: RuleNode) {
+        for (let i = 0; i<node.childCount; i++) {
+            const child = node.getChild(i);
+            if (child instanceof ErrorNode) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -1484,40 +1524,44 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     visitChildren(node: RuleNode): TransformerResult {
         const functionCandidateName: string = this.identifyFunctionCall(node);
-        if (this.isMethodInLib(functionCandidateName)) {
-            let prepend = StatementList.empty();
+        if (functionCandidateName) {
+            if (this.isMethodInLib(functionCandidateName)) {
+                let prepend = StatementList.empty();
 
-            const resultVarIdent: Identifier = Identifier.fresh();
-            const resultVarType = this.determineResultType(node);
-            const resultVarExpr = this.createVariableExpression(resultVarType, resultVarIdent);
-            const declarationStmt = new DeclareVariableStatement(resultVarIdent, resultVarType);
-            prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
+                const resultVarIdent: Identifier = Identifier.fresh();
+                const resultVarType = this.determineResultType(node);
+                const resultVarExpr = this.createVariableExpression(resultVarType, resultVarIdent);
+                const declarationStmt = new DeclareVariableStatement(resultVarIdent, resultVarType);
+                prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
 
-            const argsTr: TTransformerResult<ExpressionList> = this.childsAsExpressionList(node);
-            prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
+                const argsTr: TTransformerResult<ExpressionList> = this.childsAsExpressionList(node);
+                prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
 
-            prepend = StatementLists.concat(prepend, StatementList.from([
-                new CallStatement(
-                    Identifier.of(functionCandidateName),
-                    argsTr.node,
-                    OptionalAstNode.with(resultVarIdent))
-            ]));
+                prepend = StatementLists.concat(prepend, StatementList.from([
+                    new CallStatement(
+                        Identifier.of(functionCandidateName),
+                        argsTr.node,
+                        OptionalAstNode.with(resultVarIdent))
+                ]));
 
-            return new TransformerResult(prepend, resultVarExpr);
+                return new TransformerResult(prepend, resultVarExpr);
+            }
         }
 
         const procedureCandidateName: string = this.identifyProcedureCall(node);
-        if (this.isMethodInLib(procedureCandidateName)) {
-            let prepend = StatementList.empty();
+        if (procedureCandidateName) {
+            if (this.isMethodInLib(procedureCandidateName)) {
+                let prepend = StatementList.empty();
 
-            const argsTr: TTransformerResult<ExpressionList> = this.childsAsExpressionList(node);
-            prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
+                const argsTr: TTransformerResult<ExpressionList> = this.childsAsExpressionList(node);
+                prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
 
-            return new TransformerResult(prepend,
-                new CallStatement(
-                    Identifier.of(procedureCandidateName),
-                    argsTr.node,
-                    OptionalAstNode.absent()));
+                return new TransformerResult(prepend,
+                    new CallStatement(
+                        Identifier.of(procedureCandidateName),
+                        argsTr.node,
+                        OptionalAstNode.absent()));
+            }
         }
 
         return this.visitSingleChild(node);
