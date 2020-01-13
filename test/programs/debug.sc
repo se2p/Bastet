@@ -5,16 +5,12 @@ actor Foo is ScratchStage begin
 
     script on startup do begin
         if true then begin
-            say "Hello"
+            say "AAA"
         end else begin
-            say "Bye"
+            say "BBB"
             if false then begin
-                say "Foo"
+                say "CCC"
             end
         end
-        until 1 = 2 repeat begin
-            say "Loop"
-        end
-        say "End"
     end
 end

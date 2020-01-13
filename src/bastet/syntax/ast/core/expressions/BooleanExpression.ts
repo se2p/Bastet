@@ -80,7 +80,7 @@ export class BooleanLiteral extends AbstractBooleanExpression {
 
     public static false(): BooleanLiteral {
         if (!this.FALSE) {
-            this.FALSE = new BooleanLiteral(true);
+            this.FALSE = new BooleanLiteral(false);
         }
         return this.FALSE;
     }
