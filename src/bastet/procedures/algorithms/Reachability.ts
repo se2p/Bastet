@@ -21,18 +21,9 @@
 
 import {AbstractElement} from "../../lattices/Lattice";
 import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
-import {ReachedSet} from "./ReachedSet";
+import {ChooseOperator, StateSet} from "./StateSet";
 import {Preconditions} from "../../utils/Preconditions";
 
-export class ChooseOpConfig {
-
-}
-
-export interface ChooseOperator<E extends AbstractElement> {
-
-    choose(from: ReachedSet<E>): E;
-
-}
 
 /**
  * The implementation of this algorithm is inspired by the
@@ -53,11 +44,11 @@ export class ReachabilityAlgorithm<E extends AbstractElement> {
         return this._analysis;
     }
 
-    public run(frontier: ReachedSet<E>, reached: ReachedSet<E>): [ReachedSet<E>, ReachedSet<E>] {
+    public run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
         while (!frontier.isEmpty()) {
             // CHOOSE: Choose the next state to compute successors for.
             //      This step determines the state-space traversal strategy.
-            const e: E = this._chooseOp.choose(frontier);
+            const e: E = this._chooseOp.choose();
 
             // SUCC: Compute the set of successor states
             for (const ePrime of this._analysis.abstractSucc(e)) {
@@ -71,7 +62,7 @@ export class ReachabilityAlgorithm<E extends AbstractElement> {
                 // MERGE: If desired, merge certain states
                 const removeFromReached: Set<E> = new Set<E>();
                 const addToReached: Set<E> = new Set<E>();
-                const relevantReached: ReachedSet<E> = reached.getReached(ePrimePrime);
+                const relevantReached: StateSet<E> = reached.getStateSet(ePrimePrime);
                 for (let r of relevantReached) {
                     if (this._analysis.merge(ePrimePrime, r)) {
                         const ePrimePrimePrime = this._analysis.join(ePrimePrime, r);

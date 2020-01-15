@@ -21,7 +21,8 @@
 
 import {AbstractDomain} from "./AbstractDomain";
 import {AbstractElement} from "../../lattices/Lattice";
-import {ReachedSet} from "../algorithms/ReachedSet";
+import {StateSet} from "../algorithms/StateSet";
+import {App} from "../../syntax/app/App";
 
 export interface ProgramAnalysis<E extends AbstractElement> {
 
@@ -34,12 +35,13 @@ export interface ProgramAnalysis<E extends AbstractElement> {
     /** Delegates to `join` of the abstract domain */
     join(state1: E, state2: E): E;
 
-    stop(state: E, reached: ReachedSet<E>): E;
+    stop(state: E, reached: StateSet<E>): E;
 
     widen(state: E): E;
 
     target(state: E): boolean;
 
+    initialStatesFor(task: App): E[];
 }
 
 export interface WrappingProgramAnalysis<E extends AbstractElement> extends ProgramAnalysis<E> {

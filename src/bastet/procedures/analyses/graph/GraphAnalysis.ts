@@ -21,9 +21,10 @@
 
 import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
 import {AbstractDomain} from "../AbstractDomain";
-import {ReachedSet} from "../../algorithms/ReachedSet";
+import {StateSet} from "../../algorithms/StateSet";
 import {GraphAbstractDomain, GraphAbstractState} from "./GraphAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {App} from "../../../syntax/app/App";
 
 export class GraphAnalysis implements WrappingProgramAnalysis<GraphAbstractState> {
 
@@ -48,12 +49,12 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphAbstractState
         throw new ImplementMeException();
     }
 
-    stop(state: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): GraphAbstractState {
+    stop(state: GraphAbstractState, reached: StateSet<GraphAbstractState>): GraphAbstractState {
         throw new ImplementMeException();
     }
 
     target(state: GraphAbstractState): boolean {
-        throw new ImplementMeException();
+        return this._wrappedAnalysis.target(state.wrappedState);
     }
 
     widen(state: GraphAbstractState): GraphAbstractState {
@@ -66,6 +67,11 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphAbstractState
 
     get wrappedAnalysis(): ProgramAnalysis<any> {
         return this._wrappedAnalysis;
+    }
+
+    initialStatesFor(task: App): GraphAbstractState[] {
+        const wrappedInitialStates = this._wrappedAnalysis.initialStatesFor(task);
+        throw new ImplementMeException();
     }
 
 }

@@ -28,8 +28,8 @@ import {ScheduleAbstractState} from "./analyses/schedule/ScheduleAbstractDomain"
 import {MemAbstractState} from "./analyses/mem/MemAbstractDomain";
 import {MemAnalysis} from "./analyses/mem/MemAnalysis";
 import {GraphAbstractState} from "./analyses/graph/GraphAbstractDomain";
-import {ChooseOpConfig, ReachabilityAlgorithm} from "./algorithms/Reachability";
-import {ReachedSet} from "./algorithms/ReachedSet";
+import {ReachabilityAlgorithm} from "./algorithms/Reachability";
+import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
 
 export class AnalysisProcedureConfig {
 
@@ -48,12 +48,16 @@ export class AnalysisProcedureFactory {
                 const schedAnalysis: ProgramAnalysis<ScheduleAbstractState> = new ScheduleAnalysis(memAnalysis);
                 const graphAnalysis: ProgramAnalysis<GraphAbstractState> = new GraphAnalysis(schedAnalysis);
 
-                const frontier = new ReachedSet<GraphAbstractState>();
-                const reached = new ReachedSet<GraphAbstractState>();
+                const frontier: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
+                const reached: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
 
                 const chooseOpConfig = new ChooseOpConfig();
                 const chooseOp = frontier.createChooseOp(chooseOpConfig);
                 const reachabilityAlgorithm = new ReachabilityAlgorithm(graphAnalysis, chooseOp);
+
+                const initialStates: GraphAbstractState[] = graphAnalysis.initialStatesFor(task);
+                frontier.addAll(initialStates);
+                reached.addAll(initialStates);
 
                 reachabilityAlgorithm.run(frontier, reached);
 

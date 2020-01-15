@@ -23,7 +23,8 @@
 import {ProgramAnalysis} from "../ProgramAnalysis";
 import {MemAbstractState} from "./MemAbstractDomain";
 import {AbstractDomain} from "../AbstractDomain";
-import {ReachedSet} from "../../algorithms/ReachedSet";
+import {StateSet} from "../../algorithms/StateSet";
+import {App} from "../../../syntax/app/App";
 
 export class MemAnalysis implements ProgramAnalysis<MemAbstractState> {
 
@@ -41,7 +42,7 @@ export class MemAnalysis implements ProgramAnalysis<MemAbstractState> {
         return false;
     }
 
-    stop(state: MemAbstractState, reached: ReachedSet<MemAbstractState>): MemAbstractState {
+    stop(state: MemAbstractState, reached: StateSet<MemAbstractState>): MemAbstractState {
         return undefined;
     }
 
@@ -51,6 +52,10 @@ export class MemAnalysis implements ProgramAnalysis<MemAbstractState> {
 
     widen(state: MemAbstractState): MemAbstractState {
         return undefined;
+    }
+
+    initialStatesFor(task: App): MemAbstractState[] {
+        return [];
     }
 
 }

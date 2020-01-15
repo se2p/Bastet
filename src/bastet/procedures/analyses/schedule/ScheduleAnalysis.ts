@@ -22,7 +22,9 @@
 import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
 import {ScheduleAbstractDomain, ScheduleAbstractState} from "./ScheduleAbstractDomain";
 import {AbstractDomain} from "../AbstractDomain";
-import {ReachedSet} from "../../algorithms/ReachedSet";
+import {StateSet} from "../../algorithms/StateSet";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {App} from "../../../syntax/app/App";
 
 export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleAbstractState> {
 
@@ -46,12 +48,12 @@ export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleAbstrac
         return false;
     }
 
-    stop(state: ScheduleAbstractState, reached: ReachedSet<ScheduleAbstractState>): ScheduleAbstractState {
+    stop(state: ScheduleAbstractState, reached: StateSet<ScheduleAbstractState>): ScheduleAbstractState {
         return undefined;
     }
 
     target(state: ScheduleAbstractState): boolean {
-        return false;
+        return this._wrappedAnalysis.target(state.wrappedState);
     }
 
     widen(state: ScheduleAbstractState): ScheduleAbstractState {
@@ -64,6 +66,11 @@ export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleAbstrac
 
     get abstractDomain(): AbstractDomain<any> {
         return this._abstractDomain;
+    }
+
+    initialStatesFor(task: App): ScheduleAbstractState[] {
+        const wrappedInitialStates = this._wrappedAnalysis.initialStatesFor(task);
+        throw new ImplementMeException();
     }
 
 }

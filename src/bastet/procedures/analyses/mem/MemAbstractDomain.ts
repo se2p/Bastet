@@ -20,7 +20,20 @@
  */
 
 import {AbstractElement} from "../../../lattices/Lattice";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export interface MemAbstractState extends AbstractElement {
+
+}
+
+export class MemAbstractStates {
+
+}
+
+export class MemAbstractStateBuilder {
+
+    public build(): MemAbstractState {
+        throw new ImplementMeException();
+    }
 
 }
