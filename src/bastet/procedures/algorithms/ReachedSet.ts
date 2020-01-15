@@ -21,6 +21,7 @@
 
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {AbstractElement} from "../../lattices/Lattice";
+import {ChooseOpConfig, ChooseOperator} from "./Reachability";
 
 export class ReachedSet<E extends AbstractElement> {
 
@@ -45,6 +46,10 @@ export class ReachedSet<E extends AbstractElement> {
     }
 
     add(element: E) {
+        throw new ImplementMeException();
+    }
+
+    public createChooseOp(config: ChooseOpConfig): ChooseOperator<E> {
         throw new ImplementMeException();
     }
 }

@@ -24,6 +24,10 @@ import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 import {ReachedSet} from "./ReachedSet";
 import {Preconditions} from "../../utils/Preconditions";
 
+export class ChooseOpConfig {
+
+}
+
 export interface ChooseOperator<E extends AbstractElement> {
 
     choose(from: ReachedSet<E>): E;

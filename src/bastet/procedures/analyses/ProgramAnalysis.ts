@@ -41,3 +41,9 @@ export interface ProgramAnalysis<E extends AbstractElement> {
     target(state: E): boolean;
 
 }
+
+export interface WrappingProgramAnalysis<E extends AbstractElement> extends ProgramAnalysis<E> {
+
+    wrappedAnalysis: ProgramAnalysis<any>;
+
+}

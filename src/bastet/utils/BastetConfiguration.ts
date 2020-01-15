@@ -19,15 +19,6 @@
  *
  */
 
-import {AbstractElement} from "../Lattice";
-
-export interface StringMapElement<V extends AbstractElement> {
-
-    getValue(key: string): V;
+export class BastetConfiguration {
 
 }
-
-export interface MapElement<V extends AbstractElement> {
-
-}
-

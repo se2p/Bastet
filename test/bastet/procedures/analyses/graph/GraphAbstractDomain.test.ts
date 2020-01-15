@@ -19,15 +19,23 @@
  *
  */
 
-import {AbstractElement} from "../Lattice";
+import {Set as ImmSet} from "immutable";
+import {
+    GraphAbstractDomain,
+    GraphAbstractStateBuilder
+} from "../../../../../src/bastet/procedures/analyses/graph/GraphAbstractDomain";
 
-export interface StringMapElement<V extends AbstractElement> {
+describe('Functionality of the graph abstract domain', function() {
 
-    getValue(key: string): V;
+    it('State creation constructs intended objects', function() {
+        const state = new GraphAbstractStateBuilder()
+            .setId(7)
+            .addPredecessors(5)
+            .addPredecessors(6).build();
 
-}
+        expect(state.id).toEqual(7);
+        expect(state.predecessors).toContain(5);
+    })
 
-export interface MapElement<V extends AbstractElement> {
-
-}
+});
 

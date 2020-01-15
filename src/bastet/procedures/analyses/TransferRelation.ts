@@ -19,15 +19,10 @@
  *
  */
 
-import {AbstractElement} from "../Lattice";
+import {AbstractElement} from "../../lattices/Lattice";
 
-export interface StringMapElement<V extends AbstractElement> {
+export interface TransferRelation<E extends AbstractElement> {
 
-    getValue(key: string): V;
-
-}
-
-export interface MapElement<V extends AbstractElement> {
+    abstractSucc(fromState: E): Iterable<E>;
 
 }
-

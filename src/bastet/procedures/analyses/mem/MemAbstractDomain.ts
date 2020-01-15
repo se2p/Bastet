@@ -19,3 +19,8 @@
  *
  */
 
+import {AbstractElement} from "../../../lattices/Lattice";
+
+export interface MemAbstractState extends AbstractElement {
+
+}

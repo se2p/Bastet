@@ -19,15 +19,22 @@
  *
  */
 
-import {ProgramAnalysis} from "../ProgramAnalysis";
+import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
 import {AbstractDomain} from "../AbstractDomain";
 import {ReachedSet} from "../../algorithms/ReachedSet";
-import {GraphAbstractState} from "./GraphAbstractDomain";
+import {GraphAbstractDomain, GraphAbstractState} from "./GraphAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
-export class GraphAnalysis implements ProgramAnalysis<GraphAbstractState> {
+export class GraphAnalysis implements WrappingProgramAnalysis<GraphAbstractState> {
 
-    abstractDomain: AbstractDomain<GraphAbstractState>;
+    private _abstractDomain: AbstractDomain<GraphAbstractState>;
+
+    private _wrappedAnalysis: ProgramAnalysis<any>;
+
+    constructor(wrappedAnalysis: ProgramAnalysis<any>) {
+        this._wrappedAnalysis = wrappedAnalysis;
+        this._abstractDomain = new GraphAbstractDomain();
+    }
 
     abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
         throw new ImplementMeException();
@@ -51,6 +58,14 @@ export class GraphAnalysis implements ProgramAnalysis<GraphAbstractState> {
 
     widen(state: GraphAbstractState): GraphAbstractState {
         throw new ImplementMeException();
+    }
+
+    get abstractDomain(): AbstractDomain<GraphAbstractState> {
+        return this._abstractDomain;
+    }
+
+    get wrappedAnalysis(): ProgramAnalysis<any> {
+        return this._wrappedAnalysis;
     }
 
 }

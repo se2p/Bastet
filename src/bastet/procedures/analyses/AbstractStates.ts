@@ -19,3 +19,11 @@
  *
  */
 
+
+import {AbstractElement} from "../../lattices/Lattice";
+
+export interface SingletonStateWrapper {
+
+    wrappedState: AbstractElement;
+
+}

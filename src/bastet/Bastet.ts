@@ -42,6 +42,7 @@ import {AstNode} from "./syntax/ast/AstNode";
 import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
 import * as path from "path";
 import {ImplementMeException} from "./core/exceptions/ImplementMeException";
+import {AnalysisProcedureConfig, AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
 
 const commander = require('commander');
 
@@ -115,7 +116,8 @@ export class Bastet {
 
     private buildAnalysisProcedure(programArguments) : AnalysisProcedure {
         // TODO: Allow for sequences of analyses procedures that can built on the respective previous results.
-        throw new ImplementMeException();
+        const config: AnalysisProcedureConfig = AnalysisProcedureConfig.createFromCmdLineArgs(programArguments);
+        return AnalysisProcedureFactory.createAnalysisProcedure(config);
     }
 
     private parseFromIntermediateCode(ident: string, filepath: string): App {

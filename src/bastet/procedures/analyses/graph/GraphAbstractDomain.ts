@@ -19,14 +19,64 @@
  *
  */
 
-
 import {AbstractDomain, AbstractionPrecision, ConcreteElement} from "../AbstractDomain";
 import {AbstractElement, Lattice} from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {Record as ImmRec, Map as ImmMap, Set as ImmSet} from "immutable"
+import {SingletonStateWrapper} from "../AbstractStates";
 
-export class GraphAbstractState implements AbstractElement {
+export type GraphStateId = number;
 
-    // TODO: Make use of Immutability.js
+export interface GraphAbstractState extends AbstractElement, SingletonStateWrapper {
+    id: GraphStateId;
+    predecessors: ImmSet<GraphStateId>;
+}
+
+const GraphAbstractStateRecord = ImmRec({
+    id: 0,
+    predecessors: ImmSet<GraphStateId>([]),
+});
+
+export class GraphAbstractStateImpl extends GraphAbstractStateRecord implements AbstractElement {
+
+    id: GraphStateId;
+    wrappedState: AbstractElement;
+    predecessors: ImmSet<GraphStateId>;
+
+    constructor(args: any = {}) {
+        super(Object.assign({}, args, {}));
+    }
+}
+
+export class GraphAbstractStateBuilder {
+
+    private _id: GraphStateId;
+    private _wrappedState: AbstractElement;
+    private _predecessors: GraphStateId[];
+
+    constructor() {
+        this._predecessors = [];
+    }
+
+    public setId(id: GraphStateId): GraphAbstractStateBuilder {
+        this._id = id;
+        return this;
+    }
+
+    public addPredecessors(id: GraphStateId): GraphAbstractStateBuilder {
+        this._predecessors.push(id);
+        return this;
+    }
+
+    public setWrappedState(state: AbstractElement) : GraphAbstractStateBuilder {
+        this._wrappedState = state;
+        return this;
+    }
+
+    public build(): GraphAbstractState {
+        return new GraphAbstractStateImpl({id: this._id,
+            wrappedState: this._wrappedState, predecessors: ImmSet(this._predecessors)});
+    }
 }
 
 export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
@@ -50,7 +100,6 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
     top(): GraphAbstractState {
         throw new ImplementMeException();
     }
-
 }
 
 export class GraphAbstractDomain implements AbstractDomain<GraphAbstractState> {
@@ -72,5 +121,4 @@ export class GraphAbstractDomain implements AbstractDomain<GraphAbstractState> {
     widen(element: GraphAbstractState, precision: AbstractionPrecision): GraphAbstractState {
         throw new ImplementMeException();
     }
-
 }

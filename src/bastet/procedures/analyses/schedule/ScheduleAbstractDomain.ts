@@ -19,15 +19,28 @@
  *
  */
 
-import {AbstractElement} from "../Lattice";
+import {SingletonStateWrapper} from "../AbstractStates";
+import {AbstractDomain, AbstractionPrecision, ConcreteElement} from "../AbstractDomain";
+import {Lattice} from "../../../lattices/Lattice";
 
-export interface StringMapElement<V extends AbstractElement> {
-
-    getValue(key: string): V;
-
-}
-
-export interface MapElement<V extends AbstractElement> {
+export interface ScheduleAbstractState extends SingletonStateWrapper {
 
 }
 
+export class ScheduleAbstractDomain implements AbstractDomain<ScheduleAbstractState> {
+
+    lattice: Lattice<ScheduleAbstractState>;
+
+    abstract(elements: Iterable<ConcreteElement>): ScheduleAbstractState {
+        return undefined;
+    }
+
+    concretize(element: ScheduleAbstractState): Iterable<ConcreteElement> {
+        return undefined;
+    }
+
+    widen(element: ScheduleAbstractState, precision: AbstractionPrecision): ScheduleAbstractState {
+        return undefined;
+    }
+
+}

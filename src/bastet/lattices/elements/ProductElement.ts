@@ -20,7 +20,8 @@
  */
 
 import {AbstractElement} from './AbstractElement'
-import {Record} from 'immutable'
+import {Record as ImmRec, Map as ImmMap, Set as ImmSet} from "immutable"
+
 
 export interface ProductElementAttributes {
     readonly elements: AbstractElement[]
@@ -30,7 +31,7 @@ export const bottomElementAttributes: ProductElementAttributes = {
     elements: [],
 }
 
-export class ProductElement extends Record(bottomElementAttributes)
+export class ProductElement extends ImmRec(bottomElementAttributes)
     implements ProductElementAttributes, AbstractElement {
     constructor(elements: AbstractElement[]) {
         super({ elements: elements })
