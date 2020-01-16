@@ -33,6 +33,8 @@ import {MethodDefinition, MethodDefinitionMap} from "../ast/core/MethodDefinitio
 
 export type ActorMap = { [id:string]: Actor } ;
 
+export type ActorId = string;
+
 /**
  * Represents an actor.
  */
@@ -42,7 +44,7 @@ export class Actor extends FromParseTree {
     private readonly _inheritsFrom: Actor|null;
 
     /** Unique identifier of the actor */
-    private readonly _ident: string;
+    private readonly _ident: ActorId;
 
     /** Set of the actor's resources */
     private readonly _resources: ImmutableMap<string, AppResource>;

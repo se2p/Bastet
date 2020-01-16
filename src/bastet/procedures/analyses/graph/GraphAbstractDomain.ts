@@ -22,7 +22,7 @@
 import {AbstractDomain, AbstractionPrecision, ConcreteElement} from "../AbstractDomain";
 import {AbstractElement, Lattice} from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {Record as ImmRec, Map as ImmMap, Set as ImmSet} from "immutable"
+import {Record as ImmRec, Set as ImmSet} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
 
 export type GraphStateId = number;
@@ -30,18 +30,20 @@ export type GraphStateId = number;
 export interface GraphAbstractState extends AbstractElement, SingletonStateWrapper {
     id: GraphStateId;
     predecessors: ImmSet<GraphStateId>;
+    wrappedState: any;
 }
 
 const GraphAbstractStateRecord = ImmRec({
     id: 0,
     predecessors: ImmSet<GraphStateId>([]),
+    wrappedState: ImmRec<any>({})
 });
 
-export class GraphAbstractStateImpl extends GraphAbstractStateRecord implements AbstractElement {
+export class GraphAbstractStateImpl extends GraphAbstractStateRecord implements GraphAbstractState {
 
     id: GraphStateId;
-    wrappedState: AbstractElement;
     predecessors: ImmSet<GraphStateId>;
+    wrappedState: any;
 
     constructor(args: any = {}) {
         super(Object.assign({}, args, {}));

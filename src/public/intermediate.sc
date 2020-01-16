@@ -192,7 +192,7 @@ actor Sprite is Entity begin
     end returns result : number
 
     define sayTextFor (msg: string, scs: number) begin
-
+        // msgBounded = substr(msg, 0, 330)
     end
 
     define sayText (msg: string) begin

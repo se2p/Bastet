@@ -21,6 +21,10 @@
 
 import {TransitionRelation} from "./TransitionRelation";
 import {CoreEvent} from "../../ast/core/CoreEvent";
+import {Preconditions} from "../../../utils/Preconditions";
+
+
+export type ScriptId = number;
 
 /**
  * A single script, which represents the control flow
@@ -28,13 +32,19 @@ import {CoreEvent} from "../../ast/core/CoreEvent";
  */
 export class Script {
 
+    /** A unique identifier of this script */
+    private readonly _id: ScriptId;
+
     /** This script is triggered by the following event */
     private readonly _event: CoreEvent;
 
     /** The transition relation of the script */
     private readonly _transitions: TransitionRelation;
 
-    constructor(event: CoreEvent, transitions: TransitionRelation) {
+    constructor(id: ScriptId, event: CoreEvent, transitions: TransitionRelation) {
+        Preconditions.checkNotUndefined(event);
+        Preconditions.checkNotUndefined(transitions);
+        this._id = id;
         this._event = event;
         this._transitions = transitions;
     }
@@ -47,4 +57,7 @@ export class Script {
         return this._event;
     }
 
+    get id(): number {
+        return this._id;
+    }
 }

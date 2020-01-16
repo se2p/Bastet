@@ -20,9 +20,16 @@
  */
 
 import {AbstractElement} from "../../lattices/Lattice";
+import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
 
 export interface TransferRelation<E extends AbstractElement> {
 
     abstractSucc(fromState: E): Iterable<E>;
+
+}
+
+export interface LabeledTransferRelation<E> extends TransferRelation<E>{
+
+    abstractSuccFor(fromState: E, op: ProgramOperation): Iterable<E>;
 
 }

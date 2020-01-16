@@ -19,11 +19,16 @@
  *
  */
 
-import {Script} from "./Script";
+import {Script, ScriptId} from "./Script";
 import {TransitionRelations} from "./TransitionRelation";
 import {Preconditions} from "../../../utils/Preconditions";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export class Scripts {
+
+    public static freshScriptId(): ScriptId {
+        throw new ImplementMeException();
+    }
 
     /**
      * Sequential composition of the control flows that are
@@ -35,7 +40,7 @@ export class Scripts {
     public static concat(script1: Script, script2: Script) : Script {
         Preconditions.checkArgument(script1.event === script2.event);
         const newTR = TransitionRelations.concat(script1.transitions, script2.transitions);
-        return new Script(script1.event, newTR);
+        return new Script(this.freshScriptId(), script1.event, newTR);
     }
 
 }

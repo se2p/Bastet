@@ -44,6 +44,7 @@ import {
 import {ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
 import {StatementList} from "../ast/core/statements/Statement";
+import {Scripts} from "./controlflow/Scripts";
 
 export class AppBuilder {
 
@@ -111,7 +112,7 @@ export class AppBuilder {
             const transRelation = TransitionRelations.eliminateEpsilons(
                 script.stmtList.accept(visitor));
 
-            result.push(new Script(event, transRelation));
+            result.push(new Script(Scripts.freshScriptId(), event, transRelation));
         }
         return result;
     }
@@ -163,7 +164,7 @@ export class AppBuilder {
         const transrelSet = stmtList.accept(visitor);
         const compundTransRel = TransitionRelations.concat(transrelRes,
             TransitionRelations.concat(transrelLocs, transrelSet));
-        return new Script(NeverEvent.instance(), compundTransRel);
+        return new Script(Scripts.freshScriptId(), NeverEvent.instance(), compundTransRel);
     }
 
     private static buildResources(resourceListContext: ResourceDefinitionList): AppResourceMap {

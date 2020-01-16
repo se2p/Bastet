@@ -25,37 +25,49 @@ import {MemAbstractState} from "./MemAbstractDomain";
 import {AbstractDomain} from "../AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
+import {LabeledTransferRelation} from "../TransferRelation";
+import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {MemTransferRelation} from "./MemTransferRelation";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
-export class MemAnalysis implements ProgramAnalysis<MemAbstractState> {
+export class MemAnalysis implements ProgramAnalysis<MemAbstractState>, LabeledTransferRelation<MemAbstractState> {
 
-    abstractDomain: AbstractDomain<MemAbstractState>;
+    private readonly _abstractDomain: AbstractDomain<MemAbstractState>;
+    private readonly _transferRelation: MemTransferRelation;
 
     abstractSucc(fromState: MemAbstractState): Iterable<MemAbstractState> {
-        return undefined;
+        return this._transferRelation.abstractSucc(fromState);
     }
 
     join(state1: MemAbstractState, state2: MemAbstractState): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     merge(state1: MemAbstractState, state2: MemAbstractState): boolean {
-        return false;
+        throw new ImplementMeException();
     }
 
     stop(state: MemAbstractState, reached: StateSet<MemAbstractState>): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     target(state: MemAbstractState): boolean {
-        return false;
+        throw new ImplementMeException();
     }
 
     widen(state: MemAbstractState): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     initialStatesFor(task: App): MemAbstractState[] {
-        return [];
+        throw new ImplementMeException();
     }
 
+    abstractSuccFor(fromState: MemAbstractState, op: ProgramOperation): Iterable<MemAbstractState> {
+        return this._transferRelation.abstractSuccFor(fromState, op);
+    }
+
+    get abstractDomain(): AbstractDomain<MemAbstractState> {
+        return this._abstractDomain;
+    }
 }

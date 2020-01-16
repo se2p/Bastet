@@ -21,11 +21,56 @@
 
 import {SingletonStateWrapper} from "../AbstractStates";
 import {AbstractDomain, AbstractionPrecision, ConcreteElement} from "../AbstractDomain";
-import {Lattice} from "../../../lattices/Lattice";
+import {AbstractElement, Lattice} from "../../../lattices/Lattice";
+import {Record as ImmRec, Set as ImmSet, List as ImmList} from "immutable";
+import {ActorId} from "../../../syntax/app/Actor";
+import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
+import {ScriptId} from "../../../syntax/app/controlflow/Script";
 
-export interface ScheduleAbstractState extends SingletonStateWrapper {
+export const THREAD_STATE_RUNNING = 1;
+export const THREAD_STATE_WAIT = 2;
+export const THREAD_STATE_DONE = 3;
+export const THREAD_STATE_UNKNOWN = 0;
 
+export type ScriptComputationState = number;
+
+export interface ThreadState {
+    actorId: ActorId;
+    scriptId: ScriptId;
+    locationId: LocationID;
+    computationState: ScriptComputationState;
 }
+
+const ThreadStateRecord = ImmRec({
+    actorId: -1,
+    scriptId: -1,
+    locationId: -1,
+    computationState: THREAD_STATE_UNKNOWN,
+});
+
+export interface ScheduleAbstractState extends AbstractElement, SingletonStateWrapper {
+    threadStates: ImmList<ThreadState>;
+    wrappedState: any;
+}
+
+const ScheduleAbstractStateRecord = ImmRec({
+    threadStates: ImmList<ThreadState>([]),
+    wrappedState: ImmRec<any>({}),
+});
+
+/**
+ * A state with SHARED MEMORY
+ */
+export class ScheduleAbstractStateImpl extends ScheduleAbstractStateRecord implements AbstractElement {
+
+    threadStates: ImmList<ThreadState>;
+    wrappedState: any;
+
+    constructor(args: any = {}) {
+        super(Object.assign({}, args, {}));
+    }
+}
+
 
 export class ScheduleAbstractDomain implements AbstractDomain<ScheduleAbstractState> {
 
