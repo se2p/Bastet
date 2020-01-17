@@ -1,0 +1,3 @@
+[submodule "lib/litterbox"]
+	path = lib/litterbox
+	url = git@gitlab.infosun.fim.uni-passau.de:se2/litterbox.git
