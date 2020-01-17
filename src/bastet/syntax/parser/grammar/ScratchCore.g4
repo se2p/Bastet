@@ -35,7 +35,7 @@ inheritsFrom : 'is' ident | ;
 // A Scratch program must have at most (and typically at least) one
 // actor of type 'stage' and consists of arbitrary many sprites.
 
-actorComponentsDefinition : resourceList declarationStmtList setStmtList methodDefinitionList scriptList ;
+actorComponentsDefinition : resourceList declarationStmtList setStmtList externMethodDefinitionList methodDefinitionList scriptList ;
 
 // The Scratch programming language is typically used to
 // write small games that take produce graphics and sounds as output.
@@ -68,15 +68,22 @@ declarationStmtList : declarationStmt* ;
 // The list of datatypes that are allowed for the declaration
 // of variables and attributes.
 type :
+ primitiveType # Primitive
+ | 'list' 'of' type # ListType
+ | 'map' 'from' valueType # MapType
+ ;
+
+primitiveType:
    'number' # NumberType
  | 'boolean' # BooleanType
  | 'string' # StringType
  | 'enum' '[' expressionListPlain ']' # EnumType
- | 'list' 'of' type # ListType
- | 'map' indexType # MapType;
+ ;
 
-// Maps and lists can be indexed either by numbers or strings.
-indexType : 'number' # NumberIndexType
+// Maps can be indexed either by numbers or strings.
+// Values can have different types (a map is simular
+// to an actor with its attributes).
+valueType : 'number' # NumberIndexType
     | 'string' # StringIndexType
     ;
 
@@ -97,17 +104,29 @@ coreEvent :
  |  'startup' # StartupEvent
  |  'started' 'as' 'clone' # CloneStartEvent
  |  'received' 'message' stringExpr 'in' String # MessageReceivedEvent
- |  'reached condition' boolExpr # ConditionReachedEvent ;
+ |  'reached condition' boolExpr # ConditionReachedEvent
+ |  'rendered' # RenderedMonitoringEvent
+ |  'startup' 'finished' # AfterStartupMonitoringEvent
+ |  'statement' 'finished' # AfterStatementMonitoringEvent
+ ;
 
 // Scratch allows to define procedures, that is,
 // reusable code blocks (also known as 'custom blocks').
 // A procedure is identified by a name and is parameterized
 // to take a number of arguments.
+externMethodDefinition : 'extern' ident parameterList externMethodResultDeclaration ;
+externMethodResultDeclaration :
+    'returns' type # ExternFunctionReturnDefinition
+    | # ExternVoidReturnDefinition
+    ;
+externMethodDefinitionList : externMethodDefinition* ;
+
 methodDefinition : 'define' methodAttributeList ident parameterList stmtList methodResultDeclaration ;
 methodResultDeclaration :
     'returns' ident ':' type # FunctionReturnDefinition
     | # VoidReturnDefinition
     ;
+
 
 // A list of procedure definitions.
 methodDefinitionList : methodDefinition* ;

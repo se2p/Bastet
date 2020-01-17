@@ -19,7 +19,6 @@
  *
  */
 
-
 import {ProgramAnalysis} from "../ProgramAnalysis";
 import {MemAbstractState} from "./MemAbstractDomain";
 import {AbstractDomain} from "../AbstractDomain";

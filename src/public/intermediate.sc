@@ -1,6 +1,23 @@
 module IntermediateModule
 
-actor Entity begin
+actor RuntimeEntity begin
+
+    extern _RUNTIME_getInitialActors () returns list of string
+
+    extern _RUNTIME_getClonesOf (actor: string) returns list of string
+
+    extern _RUNTIME_getAllActors () returns list of string
+
+    extern _RUNTIME_isActorTypeOf (actor: string, actorType: string) returns boolean
+
+    /**
+    *
+    */
+    extern _RUNTIME_restart ()
+
+end
+
+actor Entity is RuntimeEntity begin
 
     // 480 * 360 = 172800 pixels
     declare attribute "active_graphic_pixels" as list of number
@@ -149,14 +166,40 @@ end
 
 actor Sprite is Entity begin
 
+    // x-coordinate in [-240,+240]
+    // See https://en.scratch-wiki.info/wiki/Coordinate_System
     declare attribute "x" as number
+
+    // y-coordinate in [-180,+180]
+    // See https://en.scratch-wiki.info/wiki/Coordinate_System
     declare attribute "y" as number
+
+    // Percent of the original size in [3,54000]
+    // See https://en.scratch-wiki.info/wiki/Size_(value)
     declare attribute "size" as number
-    declare attribute "zindex" as number
+
+    // The current layer of a sprite
+    // See https://en.scratch-wiki.info/wiki/Layer_(value)
+    declare attribute "layer" as number
+
+    // The rotation of the sprite in [-360,+360]
+    // See https://en.scratch-wiki.info/wiki/Direction_(value)
     declare attribute "direction" as number
+
+    // Whether or not the sprite is visible (difference to ghost mode!)
+    // See https://en.scratch-wiki.info/wiki/Hide_(block)
     declare attribute "visible" as boolean
+
     declare attribute "rotation_style" as enum [ "left_right", "do_not_rotate", "all_arround" ]
     declare attribute "drag_mode" as enum [ "draggable", "not_draggable" ]
+
+    // Initialize the variables with their default values
+    set attribute "x" to 0
+    set attribute "y" to 0
+    set attribute "size" to 100
+    set attribute "layer" to 0
+    set attribute "direction" to 90
+    set attribute "visible" to true
 
     define changeXBy (increment: number) begin
        // set attribute "x" to (attribute "x" + increment)
