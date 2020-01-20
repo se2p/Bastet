@@ -15,6 +15,8 @@ actor RuntimeEntity begin
     */
     extern _RUNTIME_restart ()
 
+    extern _RUNTIME_signalFailure ()
+
 end
 
 actor Entity is RuntimeEntity begin

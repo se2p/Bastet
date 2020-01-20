@@ -70,7 +70,7 @@ declarationStmtList : declarationStmt* ;
 type :
  primitiveType # Primitive
  | 'list' 'of' type # ListType
- | 'map' 'from' valueType # MapType
+ | 'map' 'from' indexType # MapType
  ;
 
 primitiveType:
@@ -83,7 +83,7 @@ primitiveType:
 // Maps can be indexed either by numbers or strings.
 // Values can have different types (a map is simular
 // to an actor with its attributes).
-valueType : 'number' # NumberIndexType
+indexType : 'number' # NumberIndexType
     | 'string' # StringIndexType
     ;
 

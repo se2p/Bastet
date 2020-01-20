@@ -1,4 +1,4 @@
-program Scenario1Program
+program Task6Program
 
 actor ScratchStage begin
 
