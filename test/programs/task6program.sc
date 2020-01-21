@@ -42,27 +42,27 @@ actor ScratchSprite begin
     define direction as 90
     define visible as true
 
-    define mathSin(n: number) begin
+    define atomic mathSin(n: number) begin
         // TODO
     end returns result: number
 
-    define mathCos(n: number) begin
+    define atomic mathCos(n: number) begin
         // TODO
     end returns result: number
 
-    define mathAtan2(n1: number, n2: number) begin
+    define atomic mathAtan2(n1: number, n2: number) begin
         // TODO
     end returns result: number
 
-    define degToRad(n: number) begin
+    define atomic degToRad(n: number) begin
         // TODO
     end returns result: number
 
-    define radToDeg(n: number) begin
+    define atomic radToDeg(n: number) begin
         // TODO
     end returns result: number
 
-    define pointTowards (s: string) begin
+    define atomic pointTowards (s: string) begin
         declare targetX as number
         declare targetY as number
 
@@ -77,7 +77,7 @@ actor ScratchSprite begin
         define direction as (90 - radToDeg(mathAtan2(dy, dx)))
     end
 
-    define moveSteps (n: number) begin
+    define atomic moveSteps (n: number) begin
         declare dx as number
         declare dy as number
         declare radians as number

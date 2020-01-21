@@ -33,7 +33,7 @@ program Task6Spec
 
 actor Observer is RuntimeEntity begin
 
-    define assert (condition: boolean) begin
+    define atomic assert (condition: boolean) begin
         if not condition then begin
             _RUNTIME_signalFailure()
         end
@@ -62,7 +62,7 @@ actor DirectorObserver is Observer begin
     // TODO: Store attributes as 'normal' variables of the actor?
     // TODO: Is the map datatype really needed?
 
-    define checkBehaviorSatisfied () begin
+    define atomic checkBehaviorSatisfied () begin
         define result as false
 
         // (a) Attributes of the first actor
@@ -138,7 +138,7 @@ actor DirectorObserver is Observer begin
         assert (actor_1_moving_towards_2 or actor_2_moving_towards_1)
     end returns result: boolean
 
-    define storeRelevantStateInfosForNext () begin
+    define atomic storeRelevantStateInfosForNext () begin
         // Actor 1
         define actor_1_last_x as attribute "x" of actor_1_id
         define actor_1_last_y as attribute "y" of actor_1_id
