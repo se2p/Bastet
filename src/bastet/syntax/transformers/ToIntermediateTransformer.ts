@@ -61,7 +61,7 @@ import {
     EpsilonStatementContext,
     ExpressionListContext,
     ExpressionListPlainContext,
-    ExpressionStmtContext,
+    ExpressionStmtContext, ExternMethodDefinitionListContext,
     FunctionReturnDefinitionContext,
     IdentContext,
     IdentExpressionContext,
@@ -183,13 +183,13 @@ import {
     SoundResourceType
 } from "../ast/core/ResourceDefinition";
 import {Statement, StatementList, StatementLists} from "../ast/core/statements/Statement";
-import {MethodDefinition, MethodDefinitionList, ResultDeclaration} from "../ast/core/MethodDefinition";
+import {MethodDefinition, MethodDefinitionList, MethodSignature, ResultDeclaration} from "../ast/core/MethodDefinition";
 import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
     DeclarationStatement,
     DeclareAttributeOfStatement,
     DeclareAttributeStatement,
-    DeclareVariableStatement
+    DeclareVariableStatement, VariableDeclaration
 } from "../ast/core/statements/DeclarationStatement";
 import {
     SetAttributeToStatement,
@@ -341,8 +341,45 @@ class TransformerResultList<E extends AstNode> {
     }
 }
 
+class ActorTypeInformation {
+
+    private readonly actor: Identifier;
+
+    private methods: {[id: string]: MethodSignature};
+
+    private actorVariables: {[id: string]: VariableDeclaration};
+
+    constructor(actor: Identifier) {
+        this.actor = actor;
+        this.methods = {};
+        this.actorVariables = {};
+    }
+
+    public putMethod(signature: MethodSignature) {
+        this.methods[signature.ident.text] = signature;
+    }
+
+    public putVariable(v: VariableDeclaration) {
+        this.actorVariables[v.ident.text] = v;
+    }
+
+    public getMethodResultType(ident: Identifier): ScratchType {
+        return this.getMethodSignature(ident).returns.type;
+    }
+
+    public getMethodSignature(ident: Identifier): MethodSignature {
+        let result: MethodSignature = this.methods[ident.text];
+        if (!result) {
+            throw new IllegalArgumentException("No method signature for the given identifier");
+        }
+        return result;
+    }
+
+}
+
 class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
+    private _activeActorTypes: ActorTypeInformation;
     private readonly _methodLibrary: App;
     private readonly _typeStack: Array<ScratchType>;
 
@@ -350,6 +387,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         Preconditions.checkNotUndefined(methodLibrary);
         this._methodLibrary = methodLibrary;
         this._typeStack = new Array<ScratchType>();
+        this._activeActorTypes = null;
     }
 
     private getArgumentNodes(ctx: RuleNode): RuleNode[] {
@@ -439,42 +477,69 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         }
     }
 
+    private precollectMethodSignatures(actorIdent: Identifier, ctx: MethodDefinitionListContext,
+                                       ectx: ExternMethodDefinitionListContext) {
+
+        for (let md of ctx.methodDefinition()) {
+            const identTr = md.ident().accept(this);
+            const paramsTr = md.parameterList().accept(this);
+            const resultTr = md.methodResultDeclaration().accept(this);
+
+            this._activeActorTypes.putMethod(new MethodSignature(
+                identTr.nodeOnly(),
+                paramsTr.node as ParameterDeclarationList,
+                resultTr.nodeOnly()
+            ));
+        }
+    }
+
     public visitActorDefinition(ctx: ActorDefinitionContext): TransformerResult {
         let initStatements: StatementList = StatementList.empty();
 
         // Identifier and inheritance information
-        const ident = ctx.ident().accept(this).node;
+        const ident = ctx.ident().accept(this).nodeOnly() as Identifier;
         const inheritesFrom = this.optionalIdentifier(ctx.inheritsFrom());
 
-        // Resource declarations and definitions
-        const resouceDefs: TransformerResult = ctx.actorComponentsDefinition().resourceList().accept(this);
-        initStatements = StatementLists.concat(initStatements, resouceDefs.statementsToPrepend);
+        this._activeActorTypes = new ActorTypeInformation(ident);
+        try {
+            // Before parsing the body of the methods, collect type information
+            // on all available methods
+            this.precollectMethodSignatures(ident, ctx.actorComponentsDefinition().methodDefinitionList(),
+                ctx.actorComponentsDefinition().externMethodDefinitionList());
 
-        // Variable declarations and initializations
-        const declarations: TransformerResult = ctx.actorComponentsDefinition().declarationStmtList().accept(this);
-        initStatements = StatementLists.concat(initStatements, declarations.statementsToPrepend);
+            // Resource declarations and definitions
+            const resouceDefs: TransformerResult = ctx.actorComponentsDefinition().resourceList().accept(this);
+            initStatements = StatementLists.concat(initStatements, resouceDefs.statementsToPrepend);
 
-        // Method declarations and definitions
-        const methods = ctx.actorComponentsDefinition().methodDefinitionList().accept(this);
-        Preconditions.checkState(methods.statementsToPrepend.elements.length == 0);
+            // Variable declarations and initializations
+            const declarations: TransformerResult = ctx.actorComponentsDefinition().declarationStmtList().accept(this);
+            initStatements = StatementLists.concat(initStatements, declarations.statementsToPrepend);
 
-        // Script definitions
-        const scripts = ctx.actorComponentsDefinition().scriptList().accept(this);
-        Preconditions.checkState(scripts.statementsToPrepend.elements.length == 0);
+            // Method declarations and definitions
+            const methods = ctx.actorComponentsDefinition().methodDefinitionList().accept(this);
+            Preconditions.checkState(methods.statementsToPrepend.elements.length == 0);
 
-        // Initialization statements
-        const inits = ctx.actorComponentsDefinition().setStmtList().accept(this);
-        Preconditions.checkState(inits.statementsToPrepend.elements.length == 0);
-        initStatements = StatementLists.concat(initStatements, inits.node as StatementList);
+            // Script definitions
+            const scripts = ctx.actorComponentsDefinition().scriptList().accept(this);
+            Preconditions.checkState(scripts.statementsToPrepend.elements.length == 0);
 
-        return TransformerResult.withNode(new ActorDefinition(
-            ident as Identifier,
-            inheritesFrom as Identifier,
-            resouceDefs.node as ResourceDefinitionList,
-            declarations.node as StatementList,
-            initStatements,
-            methods.node as MethodDefinitionList,
-            scripts.node as ScriptDefinitionList));
+            // Initialization statements
+            const inits = ctx.actorComponentsDefinition().setStmtList().accept(this);
+            Preconditions.checkState(inits.statementsToPrepend.elements.length == 0);
+            initStatements = StatementLists.concat(initStatements, inits.node as StatementList);
+
+            return TransformerResult.withNode(new ActorDefinition(
+                ident as Identifier,
+                inheritesFrom as Identifier,
+                resouceDefs.node as ResourceDefinitionList,
+                declarations.node as StatementList,
+                initStatements,
+                methods.node as MethodDefinitionList,
+                scripts.node as ScriptDefinitionList));
+
+        } finally {
+            this._activeActorTypes = null;
+        }
     }
 
     private buildActorInheritanceRelation(ctx: ActorDefinitionListContext): Array<[string, string]> {
@@ -1493,15 +1558,18 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         throw new IllegalArgumentException(ctx.constructor.name + " is a terminal node!");
     }
 
-    private transformCallStatementToVariable(ctx: CallStmtContext, resultVarType: ScratchType): TransformerResult {
+    private transformCallStatementToVariable(ctx: CallStmtContext): TransformerResult {
         let prepend: StatementList = StatementList.empty();
+
+        const methodIdent = ctx.ident().accept(this).nodeOnly() as Identifier;
+        const methodSig = this._activeActorTypes.getMethodSignature(methodIdent);
+        const resultVarType: ScratchType = methodSig.returns.type;
 
         const resultVarIdent: Identifier = Identifier.fresh();
         const resultVarExpr = this.createVariableExpression(resultVarType, resultVarIdent);
         const declarationStmt = new DeclareVariableStatement(resultVarIdent, resultVarType);
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
 
-        const methodIdent = ctx.ident().accept(this).nodeOnly() as Identifier;
         const argsTr = ctx.expressionList().accept(this);
         const storeCallResultStmt = new StoreCallResultToVariableStatement(methodIdent,
             argsTr.node as ExpressionList, resultVarIdent);
@@ -1512,15 +1580,15 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     visitNumCallStatementExpression(ctx: NumCallStatementExpressionContext): TransformerResult {
-        return this.transformCallStatementToVariable(ctx.callStmt(), NumberType.instance());
+        return this.transformCallStatementToVariable(ctx.callStmt());
     }
 
     visitStringCallStatementExpression(ctx: StringCallStatementExpressionContext): TransformerResult {
-        return this.transformCallStatementToVariable(ctx.callStmt(), StringType.instance());
+        return this.transformCallStatementToVariable(ctx.callStmt());
     }
 
     visitBoolCallStatementExpression(ctx: BoolCallStatementExpressionContext): TransformerResult {
-        return this.transformCallStatementToVariable(ctx.callStmt(), BooleanType.instance());
+        return this.transformCallStatementToVariable(ctx.callStmt());
     }
 
     visitCoreStringExpression(ctx: CoreStringExprContext): TransformerResult {

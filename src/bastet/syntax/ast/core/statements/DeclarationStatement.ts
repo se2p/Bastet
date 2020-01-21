@@ -28,7 +28,14 @@ export abstract class DeclarationStatement extends Statement {
 
 }
 
-export class DeclareVariableStatement extends DeclarationStatement {
+export interface VariableDeclaration {
+
+    ident: Identifier;
+    type: ScratchType;
+
+}
+
+export class DeclareVariableStatement extends DeclarationStatement implements VariableDeclaration {
 
     private readonly _ident: Identifier;
     private readonly _type: ScratchType;
