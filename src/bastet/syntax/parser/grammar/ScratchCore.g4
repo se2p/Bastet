@@ -258,6 +258,9 @@ stringExpr : coreStringExpr ;
 coreStringExpr  :
    String # StringLiteralExpression
  |  variable # StringVariableExpression
+ |  '(' coreStringExpr ')' # StringParanthExpression
+ |  callStmt # StringCallStatementExpression
+
  |  'as' 'string' numExpr # NumAsStringExpression
  |  'as' 'string' boolExpr # BoolAsStringExpression
 
@@ -277,6 +280,7 @@ coreBoolExpr  :
     Boolean # BoolLiteralExpression
  |  variable # BoolVariableExpression
  |  '(' coreBoolExpr ')' # BoolParanthExpression
+ |  callStmt # BoolCallStatementExpression
 
  |  'not'  coreBoolExpr # NegatedBoolExpression
  |  coreBoolExpr  'and'  numExpr # BoolAndExpression
@@ -302,7 +306,8 @@ numExpr : coreNumExpr ;
 coreNumExpr  :
     number # NumLiteralExpression
  |  variable # NumVariableExpression
- | '(' coreNumExpr ')' # NumBrackets
+ |  '(' coreNumExpr ')' # NumBrackets
+ |  callStmt # NumCallStatementExpression
  |  'as' 'number'  stringExpr # StringAsNumExpression
  |  'as' 'number'  boolExpr # BoolAsNumExpression
 

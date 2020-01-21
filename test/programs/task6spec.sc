@@ -89,22 +89,22 @@ actor DirectorObserver is Observer begin
             declare actor_1_x_move_towards_2 as boolean
             define actor_1_x_move_towards_2 as (actor_1_last_x = actor_2_last_x)
             if actor_2_last_x < actor_1_last_x then begin
-               actor_1_x_move_towards_2  = (actor1_x < actor_1_last_x) or (actor1_x = actor_1_last_x)
+               define actor_1_x_move_towards_2 as (actor1_x < actor_1_last_x) or (actor1_x = actor_1_last_x)
             end
             if actor_2_last_x > actor_1_last_x then begin
-               actor_1_x_move_towards_2  = (actor1_x > actor_1_last_x) or (actor1_x = actor_1_last_x)
+               define actor_1_x_move_towards_2 as (actor1_x > actor_1_last_x) or (actor1_x = actor_1_last_x)
             end
 
             declare actor_1_y_move_towards_2 as boolean
             define actor_1_y_move_towards_2 as (actor_1_last_y = actor_2_last_y)
             if actor_2_last_y < actor_1_last_y then begin
-               actor_1_y_move_towards_2  = (actor1_y < actor_1_last_y) or (actor1_y = actor_1_last_y)
+               define actor_1_y_move_towards_2  as (actor1_y < actor_1_last_y) or (actor1_y = actor_1_last_y)
             end
             if actor_2_last_y > actor_1_last_y then begin
-               actor_1_y_move_towards_2  = (actor1_y > actor_1_last_y) or (actor1_y = actor_1_last_y)
+               define actor_1_y_move_towards_2  as (actor1_y > actor_1_last_y) or (actor1_y = actor_1_last_y)
             end
 
-            actor_1_moving_towards_2 = actor_1_x_move_towards_2 or actor_1_y_move_towards_2
+            define actor_1_moving_towards_2 as actor_1_x_move_towards_2 or actor_1_y_move_towards_2
         end
 
         // Is actor 2 moving monotonously to actor 1?
@@ -116,22 +116,22 @@ actor DirectorObserver is Observer begin
             declare actor_2_x_move_towards_1 as boolean
             define actor_2_x_move_towards_1 as (actor_2_last_x = actor_1_last_x)
             if actor_1_last_x < actor_2_last_x then begin
-               actor_2_x_move_towards_1  = (actor2_x < actor_2_last_x) or (actor2_x = actor_2_last_x)
+               define actor_2_x_move_towards_1  as (actor2_x < actor_2_last_x) or (actor2_x = actor_2_last_x)
             end
             if actor_1_last_x > actor_2_last_x then begin
-               actor_2_x_move_towards_1  = (actor2_x > actor_2_last_x) or (actor2_x = actor_2_last_x)
+               define actor_2_x_move_towards_1 as (actor2_x > actor_2_last_x) or (actor2_x = actor_2_last_x)
             end
 
             declare actor_2_y_move_towards_1 as boolean
             define actor_2_y_move_towards_1 as (actor_2_last_y = actor_1_last_y)
             if actor_1_last_y < actor_2_last_y then begin
-               actor_2_y_move_towards_1  = (actor2_y < actor_2_last_y) or (actor2_y = actor_2_last_y)
+               define actor_2_y_move_towards_1 as (actor2_y < actor_2_last_y) or (actor2_y = actor_2_last_y)
             end
             if actor_1_last_y > actor_2_last_y then begin
-               actor_2_y_move_towards_1  = (actor2_y > actor_2_last_y) or (actor2_y = actor_2_last_y)
+               define actor_2_y_move_towards_1 as (actor2_y > actor_2_last_y) or (actor2_y = actor_2_last_y)
             end
 
-            actor_2_moving_towards_1 = actor_2_x_move_towards_1 or actor_2_y_move_towards_1
+            define actor_2_moving_towards_1 as actor_2_x_move_towards_1 or actor_2_y_move_towards_1
         end
 
         // The actual invariant check
@@ -148,7 +148,7 @@ actor DirectorObserver is Observer begin
         define actor_2_last_y as attribute "y" of actor_2_id
     end
 
-    scrip on startup do begin
+    script on startup do begin
 
     end
 

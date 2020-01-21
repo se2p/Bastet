@@ -26,8 +26,14 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 
 export class Scripts {
 
+    private static SCRIPT_ID_SEQ: number;
+
     public static freshScriptId(): ScriptId {
-        throw new ImplementMeException();
+        if (!Scripts.SCRIPT_ID_SEQ) {
+            Scripts.SCRIPT_ID_SEQ = 0;
+        }
+        Scripts.SCRIPT_ID_SEQ = Scripts.SCRIPT_ID_SEQ + 1;
+        return Scripts.SCRIPT_ID_SEQ;
     }
 
     /**

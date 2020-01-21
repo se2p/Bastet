@@ -71,10 +71,10 @@ actor ScratchSprite begin
 
         declare dx as number
         declare dy as number
-        define dx as targetX - util.target.x
-        define dy as targetY - util.target.y
+        define dx as targetX - x
+        define dy as targetY - y
 
-        define direction as 90 - radToDeg(mathAtan2(dy, dx))
+        define direction as (90 - radToDeg(mathAtan2(dy, dx)))
     end
 
     define moveSteps (n: number) begin
@@ -83,11 +83,11 @@ actor ScratchSprite begin
         declare radians as number
 
         define radians as degToRad(90 - direction)
-        define dx as store n * mathCos(radians)
-        define dy as store n * mathSin(radians)
+        define dx as n * mathCos(radians)
+        define dy as n * mathSin(radians)
 
-        define x as store (x + dx)
-        define y as store (y + dy)
+        define x as (x + dx)
+        define y as (y + dy)
     end
 
 end
@@ -98,7 +98,7 @@ end
 
 actor CircusDirector is ScratchSprite begin
 
-    script on green flag do begin
+    script on startup do begin
         repeat forever begin
             pointTowards("Monkey")
             moveSteps(1)
