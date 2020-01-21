@@ -35,12 +35,12 @@ actor ScratchSprite begin
     declare visible as boolean
 
     // Initialize the variables with their default values
-    store 0 to x
-    store 0 to y
-    store 100 to size
-    store 0 to layer
-    store 90 to direction
-    store true to visible
+    define x as 0
+    define y as 0
+    define size as 100
+    define layer as 0
+    define direction as 90
+    define visible as true
 
     define mathSin(n: number) begin
         // TODO
@@ -66,15 +66,15 @@ actor ScratchSprite begin
         declare targetX as number
         declare targetY as number
 
-        store (attribute "x" of s) to targetX
-        store (attribute "y" of s) to targetY
+        define targetX as (attribute "x" of s)
+        define targetY as (attribute "y" of s)
 
         declare dx as number
         declare dy as number
-        store targetX - util.target.x to dx
-        store targetY - util.target.y to dy
+        define dx as targetX - util.target.x
+        define dy as targetY - util.target.y
 
-        store 90 - radToDeg(mathAtan2(dy, dx)) to direction
+        define direction as 90 - radToDeg(mathAtan2(dy, dx))
     end
 
     define moveSteps (n: number) begin
@@ -82,12 +82,12 @@ actor ScratchSprite begin
         declare dy as number
         declare radians as number
 
-        store degToRad(90 - direction) to radians
-        store n * mathCos(radians) to dx
-        store n * mathSin(radians) to dy
+        define radians as degToRad(90 - direction)
+        define dx as store n * mathCos(radians)
+        define dy as store n * mathSin(radians)
 
-        store (x + dx) to x
-        store (y + dy) to y
+        define x as store (x + dx)
+        define y as store (y + dy)
     end
 
 end

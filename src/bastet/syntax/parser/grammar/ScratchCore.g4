@@ -58,8 +58,8 @@ resourceList : resource* ;
 // or local to the current stack of a script execution.
 declarationStmt :
         'declare' ident 'as' type # DeclareVariable
-     |  'declare' 'attribute' stringExpr 'as' type # DeclareAttribute
-     |  'declare' 'attribute' stringExpr 'of' ident 'as' type # DeclareAttributeOf
+     |  'declare' stringExpr 'as' type 'attribute' # DeclareAttribute
+     |  'declare' stringExpr 'as' type 'attribute' 'of' ident # DeclareAttributeOf
      ;
 
 // A list of variable declarations.
@@ -241,8 +241,8 @@ listStmt :
 setStmt :
     'set' 'attribute' String 'to' expression # SetAttributeToStatement
  |  'set' 'attribute' String 'of' ident 'to' expression # SetAttributeOfToStatement
- |  'store' expression 'to' variable  # StoreEvalResultStatement
- |  'store' callStmt 'to' variable # StoreCallResultStatement
+ |  'define' variable 'as' expression # StoreEvalResultStatement
+ |  'define' variable 'as' callStmt # StoreCallResultStatement
  ;
 
 setStmtList : setStmt* ;
