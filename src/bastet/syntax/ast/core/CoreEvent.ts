@@ -45,6 +45,57 @@ export class NeverEvent extends CoreEvent {
 
 }
 
+export class RenderedMonitoringEvent extends CoreEvent {
+
+    constructor() {
+        super([]);
+    }
+
+    private static INSTANCE: RenderedMonitoringEvent;
+
+    public static instance(): RenderedMonitoringEvent {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new RenderedMonitoringEvent();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
+export class AfterStartupMonitoringEvent extends CoreEvent {
+
+    constructor() {
+        super([]);
+    }
+
+    private static INSTANCE: AfterStartupMonitoringEvent;
+
+    public static instance(): AfterStartupMonitoringEvent {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new AfterStartupMonitoringEvent();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
+export class AfterStatementMonitoringEvent extends CoreEvent {
+
+    constructor() {
+        super([]);
+    }
+
+    private static INSTANCE: AfterStatementMonitoringEvent;
+
+    public static instance(): AfterStatementMonitoringEvent {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new AfterStatementMonitoringEvent();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
 export class StartupEvent extends CoreEvent {
 
     constructor() {

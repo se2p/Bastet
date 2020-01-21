@@ -27,11 +27,11 @@ import {
     ActorComponentsDefinitionContext,
     ActorDefinitionContext,
     ActorDefinitionListContext,
-    AddElementToStatementContext,
+    AddElementToStatementContext, AfterStartupMonitoringEventContext, AfterStatementMonitoringEventContext,
     AppMessageContext,
     BoolAndExpressionContext,
     BoolAsNumExpressionContext,
-    BoolAsStringExpressionContext,
+    BoolAsStringExpressionContext, BoolCallStatementExpressionContext,
     BooleanTypeContext,
     BoolLiteralExpressionContext,
     BoolOrExpressionContext,
@@ -42,13 +42,11 @@ import {
     CallStmtContext,
     ChagenAttributeByStatementContext,
     ChangeVarByStatementContext,
-    ClickEventContext,
     CloneStartEventContext,
     ColorFromNumExpressionContext,
-    ConditionReachedEventContext, CoreBoolExprContext, CoreBoolExpressionContext, CoreStringExprContext,
+    ConditionReachedEventContext, CoreBoolExprContext,
+    CoreStringExprContext,
     CreateCloneOfStatementContext,
-    CurrentTimeCompExpressionContext,
-    DateCompContext,
     DeclarationStmtListContext,
     DeclareAttributeContext,
     DeclareAttributeOfContext,
@@ -59,7 +57,6 @@ import {
     DeleteAllFromStatementContext,
     DeleteIthFromStatementContext,
     DeleteThisCloneContext,
-    DistanceToExpressionContext,
     EnumTypeContext,
     EpsilonStatementContext,
     ExpressionListContext,
@@ -79,7 +76,6 @@ import {
     IthStringItemOfExpressionContext,
     JoinStringsExpressionContext,
     KeyContext,
-    KeyEventContext,
     LengthOfListExpressionContext,
     LengthOfStringExpressionContext,
     ListTypeContext,
@@ -94,7 +90,7 @@ import {
     NumAsStringExpressionContext,
     NumberContext,
     NumberTypeContext,
-    NumBracketsContext,
+    NumBracketsContext, NumCallStatementExpressionContext,
     NumDivExpressionContext,
     NumEqualsExpressionContext,
     NumFunctContext,
@@ -113,7 +109,7 @@ import {
     ParameterListContext,
     ParameterListPlainContext,
     ProgramContext,
-    QualifiedVariableContext,
+    QualifiedVariableContext, RenderedMonitoringEventContext,
     RepeatForeverStmtContext,
     RepeatTimesStmtContext,
     ReplaceElementAtStatementContext,
@@ -139,8 +135,8 @@ import {
     StrGreaterThanExpressionContext,
     StrIdentExpressionContext,
     StringAsNumExpressionContext,
-    StringAttributeOfExpressionContext,
-    StringLiteralExpressionContext,
+    StringAttributeOfExpressionContext, StringCallStatementExpressionContext,
+    StringLiteralExpressionContext, StringParanthExpressionContext,
     StringTypeContext,
     StringVariableExpressionContext,
     StrLessThanExpressionContext,
@@ -153,7 +149,6 @@ import {
     UntilStmtContext,
     VarContainsExpressionContext,
     VariableContext,
-    VariableValueEventContext,
     VoidReturnDefinitionContext,
     WaitSecsStatementContext,
     WaitUntilStatementContext
@@ -215,11 +210,12 @@ import {
     StringType
 } from "../ast/core/ScratchType";
 import {
+    AfterStartupMonitoringEvent, AfterStatementMonitoringEvent,
     CloneStartEvent,
     ConditionReachedEvent,
     CoreEvent,
     MessageReceivedEvent,
-    NeverEvent,
+    NeverEvent, RenderedMonitoringEvent,
     StartupEvent
 } from "../ast/core/CoreEvent";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
@@ -708,7 +704,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitNumBrackets(ctx: NumBracketsContext) : TransformerResult {
-        return ctx.accept(this);
+        return ctx.coreNumExpr().accept(this);
     }
 
     public visitNumDivExpression(ctx: NumDivExpressionContext) : TransformerResult {
@@ -1013,10 +1009,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 exprTr.node as Expression));
     }
 
-    public visitClickEvent(ctx: ClickEventContext) : TransformerResult {
-        return TransformerResult.withNode(new MessageReceivedEvent(StringLiteral.from("mouse"), StringLiteral.from("click")));
-    }
-
     public visitCloneStartEvent(ctx: CloneStartEventContext) : TransformerResult {
         return TransformerResult.withNode(new CloneStartEvent());
     }
@@ -1038,14 +1030,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TransformerResult(
             strTr.statementsToPrepend,
             new CreateCloneOfStatement(strTr.node as StringExpression));
-    }
-
-    public visitCurrentTimeCompExpression(ctx: CurrentTimeCompExpressionContext) : TransformerResult {
-        throw new ImplementMeException();
-    }
-
-    public visitDateComp(ctx: DateCompContext) : TransformerResult {
-        throw new ImplementMeException();
     }
 
     public visitDeclareAttribute(ctx: DeclareAttributeContext) : TransformerResult {
@@ -1100,10 +1084,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitDeleteThisClone(ctx: DeleteThisCloneContext) : TransformerResult {
         return TransformerResult.withNode(new DeleteThisCloneStatement());
-    }
-
-    public visitDistanceToExpression(ctx: DistanceToExpressionContext) : TransformerResult {
-        throw new ImplementMeException();
     }
 
     public visitEpsilonStatement(ctx: EpsilonStatementContext) : TransformerResult {
@@ -1183,11 +1163,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return ctx.numExpr().accept(this);
     }
 
-    public visitKeyEvent(ctx: KeyEventContext) : TransformerResult {
-        return TransformerResult.withNode(new MessageReceivedEvent(
-            StringLiteral.from("key"), StringLiteral.from(ctx.key().numExpr().text)));
-    }
-
     public visitAppMessage(ctx: AppMessageContext) : TransformerResult {
         const strTr = ctx.stringExpr().accept(this);
         return new TransformerResult(strTr.statementsToPrepend,
@@ -1239,6 +1214,18 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitNeverEvent(ctx: NeverEventContext) : TransformerResult {
         return TransformerResult.withNode(new NeverEvent());
+    }
+
+    public visitRenderedMonitoringEvent(ctx: RenderedMonitoringEventContext) : TransformerResult {
+        return TransformerResult.withNode(new RenderedMonitoringEvent());
+    }
+
+    public visitAfterStartupMonitoringEvent(ctx: AfterStartupMonitoringEventContext) : TransformerResult {
+        return TransformerResult.withNode(new AfterStartupMonitoringEvent());
+    }
+
+    public visitAfterStatementMonitoringEvent(ctx: AfterStatementMonitoringEventContext) : TransformerResult {
+        return TransformerResult.withNode(new AfterStatementMonitoringEvent());
     }
 
     public visitNumAsStringExpression(ctx: NumAsStringExpressionContext) : TransformerResult {
@@ -1322,6 +1309,10 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(new StopThisStatement());
     }
 
+    public visitStringParanthExpression(ctx: StringParanthExpressionContext): TransformerResult {
+        return ctx.coreStringExpr().accept(this);
+    }
+
     public visitStringAsNumExpression(ctx: StringAsNumExpressionContext) : TransformerResult {
         const tr = ctx.stringExpr().accept(this);
         return new TransformerResult(
@@ -1370,10 +1361,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitVariable(ctx: VariableContext) : TransformerResult {
         return TransformerResult.withNode(new Identifier(StringLiteral.from(ctx.text)));
-    }
-
-    public visitVariableValueEvent(ctx: VariableValueEventContext) : TransformerResult {
-        throw new ImplementMeException();
     }
 
     public visitWaitSecsStatement(ctx: WaitSecsStatementContext) : TransformerResult {
@@ -1436,11 +1423,11 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     private createVariableExpression(type: ScratchType, ident: Identifier): Expression {
-        if (type.constructor.name == NumberType.constructor.name) {
+        if (type.constructor.name == "NumberType") {
             return new NumberVariableExpression(ident);
-        } else if (type.constructor.name == StringType.constructor.name) {
+        } else if (type.constructor.name == "StringType") {
             return new StringVariableExpression(ident);
-        } else if (type.constructor.name == BooleanType.constructor.name) {
+        } else if (type.constructor.name == "BooleanType") {
             return new BooleanVariableExpression(ident);
         }
         throw new ImplementMeException();
@@ -1504,6 +1491,36 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         }
 
         throw new IllegalArgumentException(ctx.constructor.name + " is a terminal node!");
+    }
+
+    private transformCallStatementToVariable(ctx: CallStmtContext, resultVarType: ScratchType): TransformerResult {
+        let prepend: StatementList = StatementList.empty();
+
+        const resultVarIdent: Identifier = Identifier.fresh();
+        const resultVarExpr = this.createVariableExpression(resultVarType, resultVarIdent);
+        const declarationStmt = new DeclareVariableStatement(resultVarIdent, resultVarType);
+        prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
+
+        const methodIdent = ctx.ident().accept(this).nodeOnly() as Identifier;
+        const argsTr = ctx.expressionList().accept(this);
+        const storeCallResultStmt = new StoreCallResultToVariableStatement(methodIdent,
+            argsTr.node as ExpressionList, resultVarIdent);
+        prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
+        prepend = StatementLists.concat(prepend, StatementList.from([storeCallResultStmt]));
+
+        return new TransformerResult(prepend, resultVarExpr);
+    }
+
+    visitNumCallStatementExpression(ctx: NumCallStatementExpressionContext): TransformerResult {
+        return this.transformCallStatementToVariable(ctx.callStmt(), NumberType.instance());
+    }
+
+    visitStringCallStatementExpression(ctx: StringCallStatementExpressionContext): TransformerResult {
+        return this.transformCallStatementToVariable(ctx.callStmt(), StringType.instance());
+    }
+
+    visitBoolCallStatementExpression(ctx: BoolCallStatementExpressionContext): TransformerResult {
+        return this.transformCallStatementToVariable(ctx.callStmt(), BooleanType.instance());
     }
 
     visitCoreStringExpression(ctx: CoreStringExprContext): TransformerResult {

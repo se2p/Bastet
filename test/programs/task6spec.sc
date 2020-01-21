@@ -56,26 +56,26 @@ actor DirectorObserver is Observer begin
     declare actor_1_moving_towards_2 as boolean
     declare actor_2_moving_towards_1 as boolean
 
-    store true to actor_1_moving_towards_2
-    store true to actor_2_moving_towards_1
+    define actor_1_moving_towards_2 as true
+    define actor_2_moving_towards_1 as true
 
     // TODO: Store attributes as 'normal' variables of the actor?
     // TODO: Is the map datatype really needed?
 
     define checkBehaviorSatisfied () begin
-        store false to result
+        define result as false
 
         // (a) Attributes of the first actor
         declare actor_1_x as number
         declare actor_1_y as number
-        store attribute "x" of actor_1_id to actor_1_x
-        store attribute "y" of actor_1_id to actor_1_y
+        define actor_1_x as attribute "x" of actor_1_id
+        define actor_1_y as attribute "y" of actor_1_id
 
         // (b) Attributes of the second actor
         declare actor_2_x as number
         declare actor_2_y as number
-        store attribute "x" of actor_2_id to actor_2_x
-        store attribute "y" of actor_2_id to actor_2_y
+        define actor_2_x as attribute "x" of actor_2_id
+        define actor_2_y as attribute "y" of actor_2_id
 
         // TODO: Parameterize the code / move to a method.
         //      Map data type needed for this.
@@ -87,24 +87,24 @@ actor DirectorObserver is Observer begin
             // If actor 2 is right of actor 1:
             //   actor1.x' >= actor1.x (right move)
             declare actor_1_x_move_towards_2 as boolean
-            store (actor_1_last_x = actor_2_last_x) to actor_1_x_move_towards_2
+            define actor_1_x_move_towards_2 as (actor_1_last_x = actor_2_last_x)
             if actor_2_last_x < actor_1_last_x then begin
-               actor_1_x_move_towards_2  = (actor1_x < actor_1_last_x) or (actor1_x = actor_1_last_x)
+               define actor_1_x_move_towards_2 as (actor1_x < actor_1_last_x) or (actor1_x = actor_1_last_x)
             end
             if actor_2_last_x > actor_1_last_x then begin
-               actor_1_x_move_towards_2  = (actor1_x > actor_1_last_x) or (actor1_x = actor_1_last_x)
+               define actor_1_x_move_towards_2 as (actor1_x > actor_1_last_x) or (actor1_x = actor_1_last_x)
             end
 
             declare actor_1_y_move_towards_2 as boolean
-            store (actor_1_last_y = actor_2_last_y) to actor_1_y_move_towards_2
+            define actor_1_y_move_towards_2 as (actor_1_last_y = actor_2_last_y)
             if actor_2_last_y < actor_1_last_y then begin
-               actor_1_y_move_towards_2  = (actor1_y < actor_1_last_y) or (actor1_y = actor_1_last_y)
+               define actor_1_y_move_towards_2  as (actor1_y < actor_1_last_y) or (actor1_y = actor_1_last_y)
             end
             if actor_2_last_y > actor_1_last_y then begin
-               actor_1_y_move_towards_2  = (actor1_y > actor_1_last_y) or (actor1_y = actor_1_last_y)
+               define actor_1_y_move_towards_2  as (actor1_y > actor_1_last_y) or (actor1_y = actor_1_last_y)
             end
 
-            actor_1_moving_towards_2 = actor_1_x_move_towards_2 or actor_1_y_move_towards_2
+            define actor_1_moving_towards_2 as actor_1_x_move_towards_2 or actor_1_y_move_towards_2
         end
 
         // Is actor 2 moving monotonously to actor 1?
@@ -114,24 +114,24 @@ actor DirectorObserver is Observer begin
             // If actor 1 is right of actor 2:
             //   actor2.x' >= actor2.x (right move)
             declare actor_2_x_move_towards_1 as boolean
-            store (actor_2_last_x = actor_1_last_x) to actor_2_x_move_towards_1
+            define actor_2_x_move_towards_1 as (actor_2_last_x = actor_1_last_x)
             if actor_1_last_x < actor_2_last_x then begin
-               actor_2_x_move_towards_1  = (actor2_x < actor_2_last_x) or (actor2_x = actor_2_last_x)
+               define actor_2_x_move_towards_1  as (actor2_x < actor_2_last_x) or (actor2_x = actor_2_last_x)
             end
             if actor_1_last_x > actor_2_last_x then begin
-               actor_2_x_move_towards_1  = (actor2_x > actor_2_last_x) or (actor2_x = actor_2_last_x)
+               define actor_2_x_move_towards_1 as (actor2_x > actor_2_last_x) or (actor2_x = actor_2_last_x)
             end
 
             declare actor_2_y_move_towards_1 as boolean
-            store (actor_2_last_y = actor_1_last_y) to actor_2_y_move_towards_1
+            define actor_2_y_move_towards_1 as (actor_2_last_y = actor_1_last_y)
             if actor_1_last_y < actor_2_last_y then begin
-               actor_2_y_move_towards_1  = (actor2_y < actor_2_last_y) or (actor2_y = actor_2_last_y)
+               define actor_2_y_move_towards_1 as (actor2_y < actor_2_last_y) or (actor2_y = actor_2_last_y)
             end
             if actor_1_last_y > actor_2_last_y then begin
-               actor_2_y_move_towards_1  = (actor2_y > actor_2_last_y) or (actor2_y = actor_2_last_y)
+               define actor_2_y_move_towards_1 as (actor2_y > actor_2_last_y) or (actor2_y = actor_2_last_y)
             end
 
-            actor_2_moving_towards_1 = actor_2_x_move_towards_1 or actor_2_y_move_towards_1
+            define actor_2_moving_towards_1 as actor_2_x_move_towards_1 or actor_2_y_move_towards_1
         end
 
         // The actual invariant check
@@ -140,15 +140,15 @@ actor DirectorObserver is Observer begin
 
     define storeRelevantStateInfosForNext () begin
         // Actor 1
-        store attribute "x" of actor_1_id to actor_1_last_x
-        store attribute "y" of actor_1_id to actor_1_last_y
+        define actor_1_last_x as attribute "x" of actor_1_id
+        define actor_1_last_y as attribute "y" of actor_1_id
 
         // Actor 2
-        store attribute "x" of actor_2_id to actor_2_last_x
-        store attribute "y" of actor_2_id to actor_2_last_y
+        define actor_2_last_x as attribute "x" of actor_2_id
+        define actor_2_last_y as attribute "y" of actor_2_id
     end
 
-    scrip on startup do begin
+    script on startup do begin
 
     end
 
