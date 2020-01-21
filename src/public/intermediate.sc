@@ -170,38 +170,35 @@ actor Sprite is Entity begin
 
     // x-coordinate in [-240,+240]
     // See https://en.scratch-wiki.info/wiki/Coordinate_System
-    declare attribute "x" as number
+    declare x as number
 
     // y-coordinate in [-180,+180]
     // See https://en.scratch-wiki.info/wiki/Coordinate_System
-    declare attribute "y" as number
+    declare y as number
 
     // Percent of the original size in [3,54000]
     // See https://en.scratch-wiki.info/wiki/Size_(value)
-    declare attribute "size" as number
+    declare size as number
 
     // The current layer of a sprite
     // See https://en.scratch-wiki.info/wiki/Layer_(value)
-    declare attribute "layer" as number
+    declare layer as number
 
     // The rotation of the sprite in [-360,+360]
     // See https://en.scratch-wiki.info/wiki/Direction_(value)
-    declare attribute "direction" as number
+    declare direction as number
 
     // Whether or not the sprite is visible (difference to ghost mode!)
     // See https://en.scratch-wiki.info/wiki/Hide_(block)
-    declare attribute "visible" as boolean
-
-    declare attribute "rotation_style" as enum [ "left_right", "do_not_rotate", "all_arround" ]
-    declare attribute "drag_mode" as enum [ "draggable", "not_draggable" ]
+    declare visible as boolean
 
     // Initialize the variables with their default values
-    set attribute "x" to 0
-    set attribute "y" to 0
-    set attribute "size" to 100
-    set attribute "layer" to 0
-    set attribute "direction" to 90
-    set attribute "visible" to true
+    store 0 to x
+    store 0 to y
+    store 100 to size
+    store 0 to layer
+    store 90 to direction
+    store true to visible
 
     define changeXBy (increment: number) begin
        // set attribute "x" to (attribute "x" + increment)
