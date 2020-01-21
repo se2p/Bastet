@@ -283,7 +283,6 @@ import {StopOthersInActorStatement} from "../ast/core/statements/StopOthersInAct
 import {WaitSecsStatement} from "../ast/core/statements/WaitSecsStatement";
 import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
-import {debuglog} from "util";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {App} from "../app/App";
 const toposort = require('toposort')
@@ -1423,6 +1422,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     private createVariableExpression(type: ScratchType, ident: Identifier): Expression {
+        // FIXME: Magic strings
         if (type.constructor.name == "NumberType") {
             return new NumberVariableExpression(ident);
         } else if (type.constructor.name == "StringType") {
@@ -1582,7 +1582,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         }
 
         return this.visitSingleChild(node);
-        // throw new IllegalArgumentException("Unkown node type. Add a library function?: " + node.constructor.name);
     }
 
     visitErrorNode(node: ErrorNode): TransformerResult {
