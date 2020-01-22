@@ -27,9 +27,46 @@ import {MethodDefinitionList, MethodSignatureList} from "./MethodDefinition";
 import {ScriptDefinitionList} from "./ScriptDefinition";
 import {StatementList} from "./statements/Statement";
 
+export abstract class ActorMode extends AbstractNode {
+
+}
+
+export class ConcreteActorMode extends ActorMode {
+
+    private static INSTANCE: ConcreteActorMode;
+
+    private constructor() {
+        super([]);
+    }
+
+    public static instance() {
+        if (!ConcreteActorMode.INSTANCE) {
+            ConcreteActorMode.INSTANCE = new ConcreteActorMode();
+        }
+        return ConcreteActorMode.INSTANCE;
+    }
+}
+
+export class ActorRoleMode extends ActorMode {
+
+    private static INSTANCE: ActorRoleMode;
+
+    private constructor() {
+        super([]);
+    }
+
+    public static instance() {
+        if (!ActorRoleMode.INSTANCE) {
+            ActorRoleMode.INSTANCE = new ActorRoleMode();
+        }
+        return ActorRoleMode.INSTANCE;
+    }
+}
+
 export class ActorDefinition extends AbstractNode {
 
     /** The name of the actor based on which it can be identified or addressed */
+    private readonly _mode: ActorMode;
     private readonly _ident: Identifier;
     private readonly _inheritsFrom: OptionalAstNode<Identifier>;
     private readonly _resourceDefs: ResourceDefinitionList;
@@ -39,13 +76,14 @@ export class ActorDefinition extends AbstractNode {
     private readonly _externalMethodDecls: MethodSignatureList;
     private readonly _scriptList: ScriptDefinitionList;
 
-    constructor(ident: Identifier, inheritsFrom: OptionalAstNode<Identifier>,
+    constructor(mode: ActorMode, ident: Identifier, inheritsFrom: OptionalAstNode<Identifier>,
                 resourceDefs: ResourceDefinitionList, declarationStmts: StatementList,
                 initStmts: StatementList, methodDefs: MethodDefinitionList,
                 externalMethodDecls: MethodSignatureList,
                 scriptList: ScriptDefinitionList) {
-        super([ident, inheritsFrom, resourceDefs, declarationStmts,
+        super([mode, ident, inheritsFrom, resourceDefs, declarationStmts,
             initStmts, methodDefs, externalMethodDecls, scriptList]);
+        this._mode = mode;
         this._ident = ident;
         this._inheritsFrom = inheritsFrom;
         this._resourceDefs = resourceDefs;
@@ -54,6 +92,14 @@ export class ActorDefinition extends AbstractNode {
         this._methodDefs = methodDefs;
         this._externalMethodDecls = externalMethodDecls;
         this._scriptList = scriptList;
+    }
+
+    get mode(): ActorMode {
+        return this._mode;
+    }
+
+    get externalMethodDecls(): MethodSignatureList {
+        return this._externalMethodDecls;
     }
 
     get ident(): Identifier {

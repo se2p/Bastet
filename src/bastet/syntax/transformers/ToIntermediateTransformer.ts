@@ -26,7 +26,7 @@ import {AbsentAstNode, AstNode, OptionalAstNode, PresentAstNode} from "../ast/As
 import {
     ActorComponentsDefinitionContext,
     ActorDefinitionContext,
-    ActorDefinitionListContext,
+    ActorDefinitionListContext, ActorModeContext, ActorRoleModeContext,
     AddElementToStatementContext,
     AfterStartupMonitoringEventContext,
     AfterStatementMonitoringEventContext,
@@ -46,7 +46,7 @@ import {
     ChagenAttributeByStatementContext,
     ChangeVarByStatementContext,
     CloneStartEventContext,
-    ColorFromNumExpressionContext,
+    ColorFromNumExpressionContext, ConcreteActorModeContext,
     ConditionReachedEventContext,
     CoreBoolExprContext,
     CoreStringExprContext,
@@ -177,7 +177,13 @@ import {
     ImportDefinitionList,
     ImportSelectedActor, ImportSelector
 } from "../ast/core/ImportDefinition";
-import {ActorDefinition, ActorDefinitionList} from "../ast/core/ActorDefinition";
+import {
+    ActorDefinition,
+    ActorDefinitionList,
+    ActorMode,
+    ActorRoleMode,
+    ConcreteActorMode
+} from "../ast/core/ActorDefinition";
 import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {
     BoolAsStringExpression,
@@ -315,6 +321,9 @@ class TTransformerResult<T extends AstNode> {
     private readonly _node: T;
 
     constructor(statementsToPrepend: StatementList, node: T) {
+        Preconditions.checkNotUndefined(statementsToPrepend);
+        Preconditions.checkNotUndefined(node);
+
         this._statementsToPrepend = statementsToPrepend;
         this._node = node;
     }
@@ -329,7 +338,8 @@ class TTransformerResult<T extends AstNode> {
 
     public nodeOnly<E extends T>(): E {
         Preconditions.checkState(this._statementsToPrepend.elements.length == 0);
-        return this.node as E;
+        Preconditions.checkNotUndefined(this._node);
+        return this._node as E;
     }
 
     public static withNode<T extends AstNode>(node: T): TTransformerResult<T> {
@@ -607,12 +617,28 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TransformerResult(defs.statementsToPrepend, new MethodSignatureList(defs.nodeList));
     }
 
+    public visitConcreteActorMode(ctx: ConcreteActorModeContext): TransformerResult {
+        return TransformerResult.withNode(ConcreteActorMode.instance());
+    }
+
+    public visitActorRoleMode(ctx: ActorRoleModeContext): TransformerResult {
+        return TransformerResult.withNode(ActorRoleMode.instance());
+    }
+
+    public visitActorMode(ctx: ActorModeContext): TransformerResult {
+        return this.visitSingleChild(ctx);
+    }
+
     public visitActorDefinition(ctx: ActorDefinitionContext): TransformerResult {
         let initStatements: StatementList = StatementList.empty();
 
         // Identifier and inheritance information
         const ident = ctx.ident().accept(this).nodeOnly() as Identifier;
         const inheritesFrom: OptionalAstNode<Identifier> = ctx.inheritsFrom().accept(this).nodeOnly();
+
+        // Role
+        const actorMode: ActorMode = ctx.actorMode().accept(this).nodeOnly();
+        Preconditions.checkNotUndefined(actorMode);
 
         this._activeActorTypes = new ActorTypeInformation(ident);
         try {
@@ -657,6 +683,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             initStatements = StatementLists.concat(initStatements, inits.node as StatementList);
 
             return TransformerResult.withNode(new ActorDefinition(
+                actorMode,
                 ident as Identifier,
                 inheritesFrom,
                 resouceDefs.node as ResourceDefinitionList,

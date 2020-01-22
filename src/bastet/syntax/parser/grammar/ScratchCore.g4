@@ -14,7 +14,7 @@ importDefinitionList : importDefinition* ;
 importDefinition : 'import' importSelector 'from' resourceLocator ;
 
 importSelector :
-    ident # ImportSelectedActor
+      ident # ImportSelectedActor
     | '*' # ImportAllActors ;
 
 // Actors in a list of actors are separated by whitespace
@@ -26,8 +26,13 @@ actorDefinitionList : actorDefinition* ;
 // and definitions, and a list of scripts.
 // Along to the (user defined) set of variables, an actor has
 // *attributes* that influence its representation and behavior.
-actorDefinition : 'actor' ident inheritsFrom 'begin' actorComponentsDefinition 'end' ;
+actorDefinition : actorMode ident inheritsFrom 'begin' actorComponentsDefinition 'end' ;
 inheritsFrom : 'is' ident | ;
+
+actorMode :
+      'actor' # ConcreteActorMode
+    | 'role' # ActorRoleMode
+    ;
 
 // Whe distinguish between three types of actors:
 // A generic actor type ('actor'), the stage, and a type for sprites.

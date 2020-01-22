@@ -1,6 +1,6 @@
 module IntermediateModule
 
-actor RuntimeEntity begin
+role RuntimeEntity begin
 
     extern _RUNTIME_getInitialActors () returns list of string
 
@@ -20,7 +20,7 @@ actor RuntimeEntity begin
 
 end
 
-actor Observer is RuntimeEntity begin
+role Observer is RuntimeEntity begin
 
     define atomic assert (condition: boolean) begin
         if not condition then begin
@@ -30,7 +30,7 @@ actor Observer is RuntimeEntity begin
 
 end
 
-actor ScratchEntity is RuntimeEntity begin
+role ScratchEntity is RuntimeEntity begin
 
     // 480 * 360 = 172800 pixels
     declare active_graphic_pixels as list of number
@@ -179,7 +179,7 @@ actor ScratchEntity is RuntimeEntity begin
 
 end
 
-actor ScratchSprite is ScratchEntity begin
+role ScratchSprite is ScratchEntity begin
 
     // x-coordinate in [-240,+240]
     // See https://en.scratch-wiki.info/wiki/Coordinate_System
@@ -313,7 +313,7 @@ actor ScratchSprite is ScratchEntity begin
 
 end
 
-actor ScratchStage is ScratchEntity begin
+role ScratchStage is ScratchEntity begin
 
     define switchBackdropTo (id: string) begin
         changeActiveImageTo(id)

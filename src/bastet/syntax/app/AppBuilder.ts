@@ -203,7 +203,15 @@ export class AppBuilder {
     }
 
     static dissolveInheritance(taskModel: App): App {
-        console.log("FIXME: Implement this procedure, for dissolving the inheritance relation.")
-        return taskModel;
+        // Build the inheritance relation
+        // Topological sort
+
+        // Only keep the "leaf actors" (??)
+
+        // Concat the init scripts
+        // Concat the lists of methods
+        // Concat the lists of external methods
+        // Concat the lists of variables (and attributes)
+        throw new ImplementMeException();
     }
 }
