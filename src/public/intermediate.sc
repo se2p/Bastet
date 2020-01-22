@@ -4,38 +4,52 @@ actor RuntimeEntity begin
 
     extern _RUNTIME_getInitialActors () returns list of string
 
-    extern _RUNTIME_getClonesOf (actor: string) returns list of string
+    extern _RUNTIME_getClonesOf (ac: string) returns list of string
 
     extern _RUNTIME_getAllActors () returns list of string
 
-    extern _RUNTIME_isActorTypeOf (actor: string, actorType: string) returns boolean
+    extern _RUNTIME_isActorTypeOf (ac: string, actorType: string) returns boolean
 
-    /**
-    *
-    */
     extern _RUNTIME_restart ()
 
     extern _RUNTIME_signalFailure ()
 
-    extern _RUNTIME_numberFromInterval(from: number, to: number) returns number
+    extern _RUNTIME_numberFromInterval(from_num: number, to_num: number) returns number
 
-    extern _RUNTIME_integerFromInterval(from: number, to: number) returns number
+    extern _RUNTIME_integerFromInterval(from_num: number, to_num: number) returns number
 
 end
 
-actor Entity is RuntimeEntity begin
+actor Observer is RuntimeEntity begin
+
+    define atomic assert (condition: boolean) begin
+        if not condition then begin
+            _RUNTIME_signalFailure()
+        end
+    end
+
+end
+
+actor ScratchEntity is RuntimeEntity begin
 
     // 480 * 360 = 172800 pixels
-    declare attribute "active_graphic_pixels" as list of number
+    declare active_graphic_pixels as list of number
 
-    declare attribute "volume" as number
+    declare volume as number
 
-    declare attribute "sound_effect" as enum [ "pitch", "pan_left_right" ]
+    declare sound_effect as enum [ "pitch", "pan_left_right" ]
 
-    declare attribute "graphics_effect" as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
+    declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
 
-    // ATTENTION: The 'define' construct is similar to macros found in Lisp.
-    //  See https://en.wikibooks.org/wiki/Scheme_Programming/Macros
+    extern mathSin(n: number) returns number
+
+    extern mathCos(n: number) returns number
+
+    extern mathAtan2(n1: number, n2: number) returns number
+
+    extern degToRad(n: number) returns number
+
+    extern radToDeg(n: number) returns number
 
     // @Category "Looks"
     define changeActiveGraphicTo (id: string) begin
@@ -165,12 +179,7 @@ actor Entity is RuntimeEntity begin
 
 end
 
-actor Observer begin
-
-end
-
-
-actor Sprite is Entity begin
+actor ScratchSprite is ScratchEntity begin
 
     // x-coordinate in [-240,+240]
     // See https://en.scratch-wiki.info/wiki/Coordinate_System
@@ -197,12 +206,41 @@ actor Sprite is Entity begin
     declare visible as boolean
 
     // Initialize the variables with their default values
-    store 0 to x
-    store 0 to y
-    store 100 to size
-    store 0 to layer
-    store 90 to direction
-    store true to visible
+    define x as 0
+    define y as 0
+    define size as 100
+    define layer as 0
+    define direction as 90
+    define visible as true
+
+    define atomic pointTowards (s: string) begin
+        declare targetX as number
+        declare targetY as number
+
+        define targetX as (attribute "x" of s)
+        define targetY as (attribute "y" of s)
+
+        declare dx as number
+        declare dy as number
+        define dx as targetX - x
+        define dy as targetY - y
+
+        define direction as (90 - radToDeg(mathAtan2(dy, dx)))
+    end
+
+    define atomic moveSteps (n: number) begin
+        declare dx as number
+        declare dy as number
+        declare radians as number
+
+        define radians as degToRad(90 - direction)
+        define dx as n * mathCos(radians)
+        define dy as n * mathSin(radians)
+
+        define x as (x + dx)
+        define y as (y + dy)
+    end
+
 
     define changeXBy (increment: number) begin
        // set attribute "x" to (attribute "x" + increment)
@@ -275,7 +313,7 @@ actor Sprite is Entity begin
 
 end
 
-actor Stage is Entity begin
+actor ScratchStage is ScratchEntity begin
 
     define switchBackdropTo (id: string) begin
         changeActiveImageTo(id)

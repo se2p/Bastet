@@ -307,7 +307,6 @@ import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {App} from "../app/App";
-import {Transform} from "stream";
 const toposort = require('toposort')
 
 class TTransformerResult<T extends AstNode> {
@@ -364,26 +363,26 @@ class TransformerResultList<E extends AstNode> {
     }
 }
 
-class ActorTypeInformation {
+export class ActorTypeInformation {
 
-    private readonly actor: Identifier;
+    private readonly _actor: Identifier;
 
-    private methods: {[id: string]: MethodSignature};
+    private _methods: {[id: string]: MethodSignature};
 
-    private actorVariables: {[id: string]: VariableDeclaration};
+    private _actorVariables: {[id: string]: VariableDeclaration};
 
     constructor(actor: Identifier) {
-        this.actor = actor;
-        this.methods = {};
-        this.actorVariables = {};
+        this._actor = actor;
+        this._methods = {};
+        this._actorVariables = {};
     }
 
     public putMethod(signature: MethodSignature) {
-        this.methods[signature.ident.text] = signature;
+        this._methods[signature.ident.text] = signature;
     }
 
     public putVariable(v: VariableDeclaration) {
-        this.actorVariables[v.ident.text] = v;
+        this._actorVariables[v.ident.text] = v;
     }
 
     public getMethodResultType(ident: Identifier): ScratchType {
@@ -391,26 +390,75 @@ class ActorTypeInformation {
     }
 
     public getMethodSignature(ident: Identifier): MethodSignature {
-        let result: MethodSignature = this.methods[ident.text];
+        let result: MethodSignature = this._methods[ident.text];
         if (!result) {
             throw new IllegalArgumentException("No method signature for the given identifier: " + ident.text);
         }
         return result;
     }
 
+    public addAllFrom(infos: ActorTypeInformation) {
+        Preconditions.checkNotUndefined(infos);
+
+        for (let m of Object.values(infos.methods)) {
+            this.putMethod(m);
+        }
+
+        for (let v of Object.values(infos.variables)) {
+            this.putVariable(v);
+        }
+    }
+
+    get variables(): {[id: string]: VariableDeclaration} {
+        return this._actorVariables;
+    }
+
+    get methods(): {[id: string]: MethodSignature} {
+        return this._methods;
+    }
+
+    get actor(): Identifier {
+        return this._actor;
+    }
+}
+
+export class TypeInformationStorage {
+
+    private _actorTypeInfos: {[id: string]: ActorTypeInformation};
+
+    constructor() {
+        this._actorTypeInfos = {};
+    }
+
+    public putActorTypeInformation(ti: ActorTypeInformation) {
+        Preconditions.checkNotUndefined(ti);
+        this._actorTypeInfos[ti.actor.text] = ti;
+    }
+
+    public getInfos(id: Identifier): ActorTypeInformation {
+        Preconditions.checkNotUndefined(id);
+        return this._actorTypeInfos[id.text];
+    }
+
 }
 
 class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
+    private _actorTypeInfos: TypeInformationStorage;
     private _activeActorTypes: ActorTypeInformation;
     private readonly _methodLibrary: App;
     private readonly _typeStack: Array<ScratchType>;
 
-    constructor(methodLibrary: App) {
+    constructor(methodLibrary: App, typeInformationStorage: TypeInformationStorage) {
         Preconditions.checkNotUndefined(methodLibrary);
         this._methodLibrary = methodLibrary;
         this._typeStack = new Array<ScratchType>();
         this._activeActorTypes = null;
+        this._actorTypeInfos = typeInformationStorage;
+    }
+
+    get actorTypeInfos(): TypeInformationStorage {
+        return this._actorTypeInfos;
     }
 
     private getArgumentNodes(ctx: RuleNode): RuleNode[] {
@@ -564,10 +612,20 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
         // Identifier and inheritance information
         const ident = ctx.ident().accept(this).nodeOnly() as Identifier;
-        const inheritesFrom = this.optionalIdentifier(ctx.inheritsFrom());
+        const inheritesFrom: OptionalAstNode<Identifier> = ctx.inheritsFrom().accept(this).nodeOnly();
 
         this._activeActorTypes = new ActorTypeInformation(ident);
         try {
+            this._actorTypeInfos.putActorTypeInformation(this._activeActorTypes);
+            if (inheritesFrom.isPresent()) {
+                const inheritsFromName = inheritesFrom.value().text;
+                const baseActorTypeInfos: ActorTypeInformation = this._actorTypeInfos.getInfos(inheritesFrom.value());
+                if (!baseActorTypeInfos) {
+                    throw new IllegalStateException(`Type infos for ${inheritsFromName} missing`);
+                }
+                this._activeActorTypes.addAllFrom(baseActorTypeInfos);
+            }
+
             // Before parsing the body of the methods, collect type information
             // on all available methods
             this.precollectMethodSignatures(ident, ctx.actorComponentsDefinition().methodDefinitionList(),
@@ -600,7 +658,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
             return TransformerResult.withNode(new ActorDefinition(
                 ident as Identifier,
-                inheritesFrom as Identifier,
+                inheritesFrom,
                 resouceDefs.node as ResourceDefinitionList,
                 declarations.node as StatementList,
                 initStatements,
@@ -628,7 +686,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     private orderActorsByInheritance(ctx: ActorDefinitionListContext): ActorDefinitionContext[] {
         const inheritance = this.buildActorInheritanceRelation(ctx);
-        const sorted = toposort(inheritance);
+        const sorted = toposort(inheritance).reverse();
         let nameToActorMap = {};
         for (let acd of ctx.actorDefinition()) {
             nameToActorMap[acd.ident().text] = acd;
@@ -1735,8 +1793,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
 export class ToIntermediateTransformer {
 
-    transform(methodLib: App, origin: RuleNode): AstNode {
-        const visitor = new ToIntermediateVisitor(methodLib);
+    transform(methodLib: App, origin: RuleNode, typeInformationStorage: TypeInformationStorage): AstNode {
+        const visitor = new ToIntermediateVisitor(methodLib, typeInformationStorage);
         return origin.accept(visitor).nodeOnly();
     }
 

@@ -22,6 +22,7 @@
 import {CoreVisitor} from "./CoreVisitor";
 import {List as ImmList, Record as ImmRecord} from "immutable"
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 
 export interface AstNode {
 
@@ -91,8 +92,8 @@ export abstract class AbstractNode implements AstNode {
         if (!this.treeString) {
             let result: string[] = [this.constructor.name];
             for (let c of this) {
-                result.push("{")
-                result.push(c.toTreeString())
+                result.push("{");
+                result.push(c.toTreeString());
                 result.push("}")
             }
             this.treeString = result.join(" ");
@@ -116,6 +117,10 @@ export abstract class OptionalAstNode<T extends AstNode> extends AbstractNode {
         return new PresentAstNode<T>(node);
     }
 
+    public abstract isPresent(): boolean;
+
+    public abstract value(): T;
+
 }
 
 export class PresentAstNode<T extends AstNode> extends OptionalAstNode<T> {
@@ -131,12 +136,28 @@ export class PresentAstNode<T extends AstNode> extends OptionalAstNode<T> {
         return this._node;
     }
 
+    isPresent(): boolean {
+        return true;
+    }
+
+    value(): T {
+        return this._node;
+    }
+
 }
 
 export class AbsentAstNode<T extends AstNode>  extends OptionalAstNode<T> {
 
     constructor() {
         super([]);
+    }
+
+    isPresent(): boolean {
+        return false;
+    }
+
+    value(): T {
+        throw new IllegalStateException();
     }
 
 }

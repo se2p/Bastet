@@ -31,16 +31,6 @@ program Task6Spec
  *
  */
 
-actor Observer is RuntimeEntity begin
-
-    define atomic assert (condition: boolean) begin
-        if not condition then begin
-            _RUNTIME_signalFailure()
-        end
-    end
-
-end
-
 actor DirectorObserver is Observer begin
 
     declare observer_state as enum ["INIT", "STARTUP_FINISHED"]

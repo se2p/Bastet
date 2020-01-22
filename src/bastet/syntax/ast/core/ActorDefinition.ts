@@ -19,7 +19,7 @@
  *
  */
 
-import {AbstractNode} from "../AstNode";
+import {AbstractNode, OptionalAstNode} from "../AstNode";
 import {AstNodeList} from "../AstNodeList";
 import {Identifier} from "./Identifier";
 import {ResourceDefinitionList} from "./ResourceDefinition";
@@ -31,8 +31,7 @@ export class ActorDefinition extends AbstractNode {
 
     /** The name of the actor based on which it can be identified or addressed */
     private readonly _ident: Identifier;
-
-    private readonly _inheritsFrom: Identifier | null;
+    private readonly _inheritsFrom: OptionalAstNode<Identifier>;
     private readonly _resourceDefs: ResourceDefinitionList;
     private readonly _declarationStmts: StatementList;
     private readonly _initStmts: StatementList;
@@ -40,7 +39,7 @@ export class ActorDefinition extends AbstractNode {
     private readonly _externalMethodDecls: MethodSignatureList;
     private readonly _scriptList: ScriptDefinitionList;
 
-    constructor(ident: Identifier, inheritsFrom: Identifier | null,
+    constructor(ident: Identifier, inheritsFrom: OptionalAstNode<Identifier>,
                 resourceDefs: ResourceDefinitionList, declarationStmts: StatementList,
                 initStmts: StatementList, methodDefs: MethodDefinitionList,
                 externalMethodDecls: MethodSignatureList,
@@ -61,7 +60,7 @@ export class ActorDefinition extends AbstractNode {
         return this._ident;
     }
 
-    get inheritsFrom(): Identifier | null {
+    get inheritsFrom(): OptionalAstNode<Identifier> {
         return this._inheritsFrom;
     }
 
