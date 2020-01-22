@@ -27,11 +27,14 @@ import {
     ActorComponentsDefinitionContext,
     ActorDefinitionContext,
     ActorDefinitionListContext,
-    AddElementToStatementContext, AfterStartupMonitoringEventContext, AfterStatementMonitoringEventContext,
+    AddElementToStatementContext,
+    AfterStartupMonitoringEventContext,
+    AfterStatementMonitoringEventContext,
     AppMessageContext,
     BoolAndExpressionContext,
     BoolAsNumExpressionContext,
-    BoolAsStringExpressionContext, BoolCallStatementExpressionContext,
+    BoolAsStringExpressionContext,
+    BoolCallStatementExpressionContext,
     BooleanTypeContext,
     BoolLiteralExpressionContext,
     BoolOrExpressionContext,
@@ -44,7 +47,8 @@ import {
     ChangeVarByStatementContext,
     CloneStartEventContext,
     ColorFromNumExpressionContext,
-    ConditionReachedEventContext, CoreBoolExprContext,
+    ConditionReachedEventContext,
+    CoreBoolExprContext,
     CoreStringExprContext,
     CreateCloneOfStatementContext,
     DeclarationStmtListContext,
@@ -61,13 +65,19 @@ import {
     EpsilonStatementContext,
     ExpressionListContext,
     ExpressionListPlainContext,
-    ExpressionStmtContext, ExternMethodDefinitionListContext,
+    ExpressionStmtContext,
+    ExternFunctionReturnDefinitionContext, ExternMethodDefinitionContext,
+    ExternMethodDefinitionListContext,
+    ExternMethodResultDeclarationContext, ExternVoidReturnDefinitionContext,
     FunctionReturnDefinitionContext,
     IdentContext,
     IdentExpressionContext,
-    IfStmtContext, ImportAllActorsContext,
+    IfStmtContext,
+    ImportAllActorsContext,
     ImportDefinitionContext,
-    ImportDefinitionListContext, ImportSelectedActorContext, ImportSelectorContext,
+    ImportDefinitionListContext,
+    ImportSelectedActorContext,
+    ImportSelectorContext,
     IndexOfExpressionContext,
     IndexTypeContext,
     InheritsFromContext,
@@ -90,7 +100,8 @@ import {
     NumAsStringExpressionContext,
     NumberContext,
     NumberTypeContext,
-    NumBracketsContext, NumCallStatementExpressionContext,
+    NumBracketsContext,
+    NumCallStatementExpressionContext,
     NumDivExpressionContext,
     NumEqualsExpressionContext,
     NumFunctContext,
@@ -109,7 +120,8 @@ import {
     ParameterListContext,
     ParameterListPlainContext,
     ProgramContext,
-    QualifiedVariableContext, RenderedMonitoringEventContext,
+    QualifiedVariableContext,
+    RenderedMonitoringEventContext,
     RepeatForeverStmtContext,
     RepeatTimesStmtContext,
     ReplaceElementAtStatementContext,
@@ -129,14 +141,18 @@ import {
     StmtListPlainContext,
     StopAllContext,
     StopOthersInActorStatementContext,
-    StopThisContext, StoreCallResultStatementContext, StoreEvalResultStatementContext,
+    StopThisContext,
+    StoreCallResultStatementContext,
+    StoreEvalResultStatementContext,
     StrContainsExpressionContext,
     StrEqualsExpressionContext,
     StrGreaterThanExpressionContext,
     StrIdentExpressionContext,
     StringAsNumExpressionContext,
-    StringAttributeOfExpressionContext, StringCallStatementExpressionContext,
-    StringLiteralExpressionContext, StringParanthExpressionContext,
+    StringAttributeOfExpressionContext,
+    StringCallStatementExpressionContext,
+    StringLiteralExpressionContext,
+    StringParanthExpressionContext,
     StringTypeContext,
     StringVariableExpressionContext,
     StrLessThanExpressionContext,
@@ -183,7 +199,13 @@ import {
     SoundResourceType
 } from "../ast/core/ResourceDefinition";
 import {Statement, StatementList, StatementLists} from "../ast/core/statements/Statement";
-import {MethodDefinition, MethodDefinitionList, MethodSignature, ResultDeclaration} from "../ast/core/MethodDefinition";
+import {
+    ExternMethodDeclaration,
+    MethodDefinition,
+    MethodDefinitionList,
+    MethodSignature, MethodSignatureList,
+    ResultDeclaration
+} from "../ast/core/MethodDefinition";
 import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
     DeclarationStatement,
@@ -207,7 +229,7 @@ import {
     NumberType,
     ScratchType,
     StringEnumType,
-    StringType
+    StringType, VoidType
 } from "../ast/core/ScratchType";
 import {
     AfterStartupMonitoringEvent, AfterStatementMonitoringEvent,
@@ -285,6 +307,7 @@ import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {App} from "../app/App";
+import {Transform} from "stream";
 const toposort = require('toposort')
 
 class TTransformerResult<T extends AstNode> {
@@ -370,7 +393,7 @@ class ActorTypeInformation {
     public getMethodSignature(ident: Identifier): MethodSignature {
         let result: MethodSignature = this.methods[ident.text];
         if (!result) {
-            throw new IllegalArgumentException("No method signature for the given identifier");
+            throw new IllegalArgumentException("No method signature for the given identifier: " + ident.text);
         }
         return result;
     }
@@ -477,6 +500,30 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         }
     }
 
+    public visitExternMethodDefinition(ctx: ExternMethodDefinitionContext): TransformerResult {
+        const identTr = ctx.ident().accept(this);
+        const paramsTr = ctx.parameterList().accept(this);
+        const resultTr = ctx.externMethodResultDeclaration().accept(this);
+        return TransformerResult.withNode(new ExternMethodDeclaration(
+            identTr.nodeOnly() as Identifier,
+            paramsTr.nodeOnly() as ParameterDeclarationList,
+            resultTr.nodeOnly() as ResultDeclaration));
+    }
+
+    public visitExternMethodResultDeclaration(ctx: ExternMethodResultDeclarationContext): TransformerResult {
+        return this.visitSingleChild(ctx);
+    }
+
+    public visitExternFunctionReturnDefinition(ctx: ExternFunctionReturnDefinitionContext): TransformerResult {
+        return TransformerResult.withNode(
+            new ResultDeclaration(Identifier.resultIdentifier(), ctx.type().accept(this).nodeOnly() as ScratchType));
+    }
+
+    public visitExternVoidReturnDefinition(ctx: ExternVoidReturnDefinitionContext): TransformerResult {
+        return TransformerResult.withNode(
+            new ResultDeclaration(Identifier.resultIdentifier(), VoidType.instance()));
+    }
+
     private precollectMethodSignatures(actorIdent: Identifier, ctx: MethodDefinitionListContext,
                                        ectx: ExternMethodDefinitionListContext) {
 
@@ -488,9 +535,28 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             this._activeActorTypes.putMethod(new MethodSignature(
                 identTr.nodeOnly(),
                 paramsTr.node as ParameterDeclarationList,
-                resultTr.nodeOnly()
+                resultTr.nodeOnly(),
+                false
             ));
         }
+
+        for (let md of ectx.externMethodDefinition()) {
+            const identTr = md.ident().accept(this);
+            const paramsTr = md.parameterList().accept(this);
+            const resultTr = md.externMethodResultDeclaration().accept(this);
+
+            this._activeActorTypes.putMethod(new MethodSignature(
+                identTr.nodeOnly(),
+                paramsTr.node as ParameterDeclarationList,
+                resultTr.nodeOnly(),
+                true
+            ));
+        }
+    }
+
+    public visitExternMethodDefinitionList(ctx: ExternMethodDefinitionListContext): TransformerResult {
+        const defs = this.buildArrayFrom<MethodDefinition>(ctx.externMethodDefinition());
+        return new TransformerResult(defs.statementsToPrepend, new MethodSignatureList(defs.nodeList));
     }
 
     public visitActorDefinition(ctx: ActorDefinitionContext): TransformerResult {
@@ -519,6 +585,10 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             const methods = ctx.actorComponentsDefinition().methodDefinitionList().accept(this);
             Preconditions.checkState(methods.statementsToPrepend.elements.length == 0);
 
+            // External method declarations
+            const externalMethods = ctx.actorComponentsDefinition().externMethodDefinitionList().accept(this);
+            Preconditions.checkState(externalMethods.statementsToPrepend.elements.length == 0);
+
             // Script definitions
             const scripts = ctx.actorComponentsDefinition().scriptList().accept(this);
             Preconditions.checkState(scripts.statementsToPrepend.elements.length == 0);
@@ -535,6 +605,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 declarations.node as StatementList,
                 initStatements,
                 methods.node as MethodDefinitionList,
+                externalMethods.nodeOnly() as MethodSignatureList,
                 scripts.node as ScriptDefinitionList));
 
         } finally {

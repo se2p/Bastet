@@ -59,12 +59,14 @@ export class MethodSignature extends AbstractNode {
     private readonly _ident: Identifier;
     private readonly _params: ParameterDeclarationList;
     private readonly _returns: ResultDeclaration;
+    private readonly _isExtern: boolean;
 
-    constructor(ident: Identifier, params: ParameterDeclarationList, returns: ResultDeclaration) {
+    constructor(ident: Identifier, params: ParameterDeclarationList, returns: ResultDeclaration, isExtern: boolean) {
         super([ident, params, returns]);
         this._ident = ident;
         this._params = params;
         this._returns = returns;
+        this._isExtern = isExtern;
     }
 
     get ident(): Identifier {
@@ -78,16 +80,29 @@ export class MethodSignature extends AbstractNode {
     get returns(): ResultDeclaration {
         return this._returns;
     }
+
+    get isExtern(): boolean {
+        return this._isExtern;
+    }
+
 }
 
 export type MethodDefinitionMap = { [id:string]: MethodDefinition } ;
+
+export class ExternMethodDeclaration extends MethodSignature {
+
+    constructor(ident: Identifier, params: ParameterDeclarationList, returns: ResultDeclaration) {
+        super(ident, params, returns, true);
+    }
+
+}
 
 export class MethodDefinition extends MethodSignature {
 
     private readonly _statements: StatementList;
 
     constructor(ident: Identifier, params: ParameterDeclarationList, statements: StatementList, returns: ResultDeclaration) {
-        super(ident, params, returns);
+        super(ident, params, returns, false);
         this._statements = statements;
     }
 
@@ -100,6 +115,14 @@ export class MethodDefinition extends MethodSignature {
 export class MethodDefinitionList extends AstNodeList<MethodDefinition> {
 
     constructor(elements: MethodDefinition[]) {
+        super(elements);
+    }
+
+}
+
+export class MethodSignatureList extends AstNodeList<MethodSignature> {
+
+    constructor(elements: MethodSignature[]) {
         super(elements);
     }
 

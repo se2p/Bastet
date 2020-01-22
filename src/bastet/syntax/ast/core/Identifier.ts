@@ -59,6 +59,15 @@ export class Identifier extends AbstractNode {
         return new Identifier(StringLiteral.from(`${this.FRESH_PREFIX}${num}`));
     }
 
+    private static RESULT_IDENT: Identifier = new Identifier(StringLiteral.from("result"));
+
+    public static resultIdentifier(): Identifier {
+        if (this.RESULT_IDENT === null) {
+            this.RESULT_IDENT = new Identifier(StringLiteral.from("result"));
+        }
+        return this.RESULT_IDENT;
+    }
+
     get text(): string {
         return this._name.text;
     }

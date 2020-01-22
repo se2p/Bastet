@@ -17,6 +17,10 @@ actor RuntimeEntity begin
 
     extern _RUNTIME_signalFailure ()
 
+    extern _RUNTIME_numberFromInterval(from: number, to: number) returns number
+
+    extern _RUNTIME_integerFromInterval(from: number, to: number) returns number
+
 end
 
 actor Entity is RuntimeEntity begin

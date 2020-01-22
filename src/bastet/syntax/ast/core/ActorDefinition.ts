@@ -23,7 +23,7 @@ import {AbstractNode} from "../AstNode";
 import {AstNodeList} from "../AstNodeList";
 import {Identifier} from "./Identifier";
 import {ResourceDefinitionList} from "./ResourceDefinition";
-import {MethodDefinitionList} from "./MethodDefinition";
+import {MethodDefinitionList, MethodSignatureList} from "./MethodDefinition";
 import {ScriptDefinitionList} from "./ScriptDefinition";
 import {StatementList} from "./statements/Statement";
 
@@ -37,20 +37,23 @@ export class ActorDefinition extends AbstractNode {
     private readonly _declarationStmts: StatementList;
     private readonly _initStmts: StatementList;
     private readonly _methodDefs: MethodDefinitionList;
+    private readonly _externalMethodDecls: MethodSignatureList;
     private readonly _scriptList: ScriptDefinitionList;
 
     constructor(ident: Identifier, inheritsFrom: Identifier | null,
                 resourceDefs: ResourceDefinitionList, declarationStmts: StatementList,
                 initStmts: StatementList, methodDefs: MethodDefinitionList,
+                externalMethodDecls: MethodSignatureList,
                 scriptList: ScriptDefinitionList) {
         super([ident, inheritsFrom, resourceDefs, declarationStmts,
-            initStmts, methodDefs, scriptList]);
+            initStmts, methodDefs, externalMethodDecls, scriptList]);
         this._ident = ident;
         this._inheritsFrom = inheritsFrom;
         this._resourceDefs = resourceDefs;
         this._declarationStmts = declarationStmts;
         this._initStmts = initStmts;
         this._methodDefs = methodDefs;
+        this._externalMethodDecls = externalMethodDecls;
         this._scriptList = scriptList;
     }
 

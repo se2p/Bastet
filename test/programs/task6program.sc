@@ -1,6 +1,20 @@
 program Task6Program
 
-actor ScratchStage begin
+actor BaseActor begin
+
+    extern mathSin(n: number) returns number
+
+    extern mathCos(n: number) returns number
+
+    extern mathAtan2(n1: number, n2: number) returns number
+
+    extern degToRad(n: number) returns number
+
+    extern radToDeg(n: number) returns number
+
+end
+
+actor ScratchStage is BaseActor begin
 
 end
 
@@ -8,7 +22,7 @@ actor Stage is ScratchStage begin
 
 end
 
-actor ScratchSprite begin
+actor ScratchSprite is BaseActor begin
 
     // x-coordinate in [-240,+240]
     // See https://en.scratch-wiki.info/wiki/Coordinate_System
@@ -41,26 +55,6 @@ actor ScratchSprite begin
     define layer as 0
     define direction as 90
     define visible as true
-
-    define atomic mathSin(n: number) begin
-        // TODO
-    end returns result: number
-
-    define atomic mathCos(n: number) begin
-        // TODO
-    end returns result: number
-
-    define atomic mathAtan2(n1: number, n2: number) begin
-        // TODO
-    end returns result: number
-
-    define atomic degToRad(n: number) begin
-        // TODO
-    end returns result: number
-
-    define atomic radToDeg(n: number) begin
-        // TODO
-    end returns result: number
 
     define atomic pointTowards (s: string) begin
         declare targetX as number
