@@ -20,7 +20,7 @@
  */
 
 import {AbstractNode} from "../AstNode";
-import {Statement, StatementList} from "./statements/Statement";
+import {StatementList} from "./statements/Statement";
 import {AstNodeList} from "../AstNodeList";
 import {CoreEvent} from "./CoreEvent";
 

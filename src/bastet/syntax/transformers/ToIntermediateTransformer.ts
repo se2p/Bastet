@@ -19,14 +19,15 @@
  *
  */
 
-import {SyntaxTreeTransformer} from "./SyntaxTreeTransformer";
 import {ErrorNode, ParseTree, RuleNode, TerminalNode} from "antlr4ts/tree";
 import {ScratchVisitor} from "../parser/grammar/ScratchVisitor";
 import {AbsentAstNode, AstNode, OptionalAstNode, PresentAstNode} from "../ast/AstNode";
 import {
     ActorComponentsDefinitionContext,
     ActorDefinitionContext,
-    ActorDefinitionListContext, ActorModeContext, ActorRoleModeContext,
+    ActorDefinitionListContext,
+    ActorModeContext,
+    ActorRoleModeContext,
     AddElementToStatementContext,
     AfterStartupMonitoringEventContext,
     AfterStatementMonitoringEventContext,
@@ -46,7 +47,8 @@ import {
     ChagenAttributeByStatementContext,
     ChangeVarByStatementContext,
     CloneStartEventContext,
-    ColorFromNumExpressionContext, ConcreteActorModeContext,
+    ColorFromNumExpressionContext,
+    ConcreteActorModeContext,
     ConditionReachedEventContext,
     CoreBoolExprContext,
     CoreStringExprContext,
@@ -66,9 +68,11 @@ import {
     ExpressionListContext,
     ExpressionListPlainContext,
     ExpressionStmtContext,
-    ExternFunctionReturnDefinitionContext, ExternMethodDefinitionContext,
+    ExternFunctionReturnDefinitionContext,
+    ExternMethodDefinitionContext,
     ExternMethodDefinitionListContext,
-    ExternMethodResultDeclarationContext, ExternVoidReturnDefinitionContext,
+    ExternMethodResultDeclarationContext,
+    ExternVoidReturnDefinitionContext,
     FunctionReturnDefinitionContext,
     IdentContext,
     IdentExpressionContext,
@@ -77,7 +81,6 @@ import {
     ImportDefinitionContext,
     ImportDefinitionListContext,
     ImportSelectedActorContext,
-    ImportSelectorContext,
     IndexOfExpressionContext,
     IndexTypeContext,
     InheritsFromContext,
@@ -114,7 +117,6 @@ import {
     NumMulExpressionContext,
     NumPlusExpressionContext,
     NumRandomExpressionContext,
-    NumRoundExpressionContext,
     NumVariableExpressionContext,
     ParameterContext,
     ParameterListContext,
@@ -136,7 +138,6 @@ import {
     SetStmtListContext,
     SoundResourceContext,
     StartupEventContext,
-    StmtContext,
     StmtListContext,
     StmtListPlainContext,
     StopAllContext,
@@ -175,16 +176,18 @@ import {
     ImportAllActors,
     ImportDefinition,
     ImportDefinitionList,
-    ImportSelectedActor, ImportSelector
+    ImportSelectedActor,
+    ImportSelector
 } from "../ast/core/ImportDefinition";
 import {
     ActorDefinition,
     ActorDefinitionList,
     ActorMode,
     ActorRoleMode,
-    ConcreteActorMode, InheritsFromList
+    ConcreteActorMode,
+    InheritsFromList
 } from "../ast/core/ActorDefinition";
-import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {
     BoolAsStringExpression,
     IthLetterOfStringExpression,
@@ -209,19 +212,19 @@ import {
     ExternMethodDeclaration,
     MethodDefinition,
     MethodDefinitionList,
-    MethodSignature, MethodSignatureList,
+    MethodSignature,
+    MethodSignatureList,
     ResultDeclaration
 } from "../ast/core/MethodDefinition";
 import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
-    DeclarationStatement,
     DeclareAttributeOfStatement,
     DeclareAttributeStatement,
-    DeclareVariableStatement, VariableDeclaration
+    DeclareVariableStatement,
+    VariableDeclaration
 } from "../ast/core/statements/DeclarationStatement";
 import {
     SetAttributeToStatement,
-    SetStatement,
     StoreCallResultToVariableStatement,
     StoreEvalResultToVariableStatement
 } from "../ast/core/statements/SetStatement";
@@ -235,15 +238,18 @@ import {
     NumberType,
     ScratchType,
     StringEnumType,
-    StringType, VoidType
+    StringType,
+    VoidType
 } from "../ast/core/ScratchType";
 import {
-    AfterStartupMonitoringEvent, AfterStatementMonitoringEvent,
+    AfterStartupMonitoringEvent,
+    AfterStatementMonitoringEvent,
     CloneStartEvent,
     ConditionReachedEvent,
     CoreEvent,
     MessageReceivedEvent,
-    NeverEvent, RenderedMonitoringEvent,
+    NeverEvent,
+    RenderedMonitoringEvent,
     StartupEvent
 } from "../ast/core/CoreEvent";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
@@ -254,14 +260,13 @@ import {
     UntilStatement
 } from "../ast/core/statements/ControlStatement";
 import {
-    AndExpression,
     BooleanExpression,
     BooleanLiteral,
     BooleanVariableExpression,
     NegationExpression,
-    NumEqualsExpression, NumGreaterThanExpression,
+    NumEqualsExpression,
+    NumGreaterThanExpression,
     NumLessThanExpression,
-    OrExpression,
     StrContainsExpression,
     StrEqualsExpression,
     StrGreaterThanExpression,
@@ -279,10 +284,8 @@ import {
     NumberExpression,
     NumberLiteral,
     NumberVariableExpression,
-    NumFunctExpression,
     PickRandomFromExpression,
     PlusExpression,
-    RoundExpression,
     StringAsNumberExpression,
     TimerExpression
 } from "../ast/core/expressions/NumberExpression";
@@ -313,6 +316,7 @@ import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {App} from "../app/App";
+
 const toposort = require('toposort')
 
 class TTransformerResult<T extends AstNode> {

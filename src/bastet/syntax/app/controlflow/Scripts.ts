@@ -22,7 +22,6 @@
 import {Script, ScriptId} from "./Script";
 import {TransitionRelations} from "./TransitionRelation";
 import {Preconditions} from "../../../utils/Preconditions";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export class Scripts {
 

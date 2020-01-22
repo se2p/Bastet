@@ -20,7 +20,6 @@
  */
 
 import {Statement} from "./Statement";
-import {BooleanExpression} from "../expressions/BooleanExpression";
 import {NumberExpression} from "../expressions/NumberExpression";
 
 export class WaitSecsStatement extends Statement {

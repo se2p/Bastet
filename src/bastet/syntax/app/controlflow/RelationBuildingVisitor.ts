@@ -24,11 +24,7 @@ import {OperationID, ProgramOperation, ProgramOperationFactory, ProgramOperation
 import {ControlLocation} from "./ControlLocation";
 import {CoreCtrlStatementnVisitor, CoreVisitor} from "../../ast/CoreVisitor";
 import {CallStatement} from "../../ast/core/statements/CallStatement";
-import {
-    IfStatement,
-    RepeatForeverStatement,
-    UntilStatement
-} from "../../ast/core/statements/ControlStatement";
+import {IfStatement, RepeatForeverStatement, UntilStatement} from "../../ast/core/statements/ControlStatement";
 import {StatementList} from "../../ast/core/statements/Statement";
 import {AstNode} from "../../ast/AstNode";
 

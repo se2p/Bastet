@@ -20,7 +20,7 @@
  */
 
 import {CoreVisitor} from "./CoreVisitor";
-import {List as ImmList, Record as ImmRecord} from "immutable"
+import {List as ImmList} from "immutable"
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 

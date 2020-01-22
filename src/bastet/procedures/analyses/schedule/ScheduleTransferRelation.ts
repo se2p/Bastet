@@ -20,12 +20,7 @@
  */
 
 import {LabeledTransferRelation, TransferRelation} from "../TransferRelation";
-import {
-    ScheduleAbstractState,
-    THREAD_STATE_DONE,
-    THREAD_STATE_RUNNING,
-    ThreadState
-} from "./ScheduleAbstractDomain";
+import {ScheduleAbstractState, THREAD_STATE_DONE, THREAD_STATE_RUNNING, ThreadState} from "./ScheduleAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";

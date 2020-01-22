@@ -22,7 +22,7 @@
 import {AbstractNode} from "../AstNode";
 import {StringExpression} from "./expressions/StringExpression";
 import {BooleanExpression} from "./expressions/BooleanExpression";
-import {StatementList, StatementLists} from "./statements/Statement";
+import {StatementList} from "./statements/Statement";
 
 export abstract class CoreEvent extends AbstractNode {
 

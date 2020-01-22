@@ -23,7 +23,6 @@ import {Actor, ActorMap} from "./Actor";
 import {App} from "./App";
 import {AppResource, AppResourceMap} from "./AppResource";
 import {Script} from "./controlflow/Script";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
 import {ScratchType, VoidType} from "../ast/core/ScratchType";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
@@ -32,32 +31,14 @@ import {TransitionRelationToDot} from "./controlflow/TransitionRelationToDot";
 import {AstNode} from "../ast/AstNode";
 import {Preconditions} from "../../utils/Preconditions";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
-import {ActorDefinition, ActorDefinitionList, ConcreteActorMode} from "../ast/core/ActorDefinition";
-import {
-    AfterStartupMonitoringEvent, AfterStatementMonitoringEvent,
-    CoreEvent,
-    NeverEvent,
-    RenderedMonitoringEvent,
-    StartupEvent
-} from "../ast/core/CoreEvent";
+import {ActorDefinition, ConcreteActorMode} from "../ast/core/ActorDefinition";
+import {NeverEvent} from "../ast/core/CoreEvent";
 import {ScriptDefinitionList} from "../ast/core/ScriptDefinition";
-import {
-    MethodDefinition,
-    MethodDefinitionList,
-    MethodDefinitionMap,
-    ResultDeclaration
-} from "../ast/core/MethodDefinition";
+import {MethodDefinitionList, MethodDefinitionMap, ResultDeclaration} from "../ast/core/MethodDefinition";
 import {ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
 import {StatementList} from "../ast/core/statements/Statement";
 import {Scripts} from "./controlflow/Scripts";
-import {
-    ActorDefinitionContext,
-    ActorDefinitionListContext,
-    AfterStartupMonitoringEventContext,
-    AfterStatementMonitoringEventContext,
-    RenderedMonitoringEventContext
-} from "../parser/grammar/ScratchParser";
 
 export class AppBuilder {
 

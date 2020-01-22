@@ -20,7 +20,6 @@
  */
 
 import {ScratchType, VoidType} from "../../ast/core/ScratchType";
-import {RuleNode} from "antlr4ts/tree";
 import {AstNode} from "../../ast/AstNode";
 
 export type DataLocationID = string;

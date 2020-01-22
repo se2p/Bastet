@@ -20,7 +20,7 @@
  */
 
 import {AbstractElement} from './AbstractElement'
-import {Record as ImmRec, Map as ImmMap, Set as ImmSet} from "immutable"
+import {Record as ImmRec} from "immutable"
 
 
 export interface ProductElementAttributes {

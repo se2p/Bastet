@@ -20,9 +20,9 @@
  */
 
 import {Expression} from "./Expression";
-import {AbstractNode, AstNode} from "../../AstNode";
+import {AstNode} from "../../AstNode";
 import {AbstractExpression} from "./AbstractExpression";
-import {ScratchType, StringType} from "../ScratchType";
+import {StringType} from "../ScratchType";
 import {NumberExpression} from "./NumberExpression";
 import {BooleanExpression} from "./BooleanExpression";
 import {Identifier} from "../Identifier";

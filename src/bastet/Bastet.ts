@@ -29,18 +29,11 @@ import {AnalysisProcedure} from "./procedures/AnalysisProcedure";
 import {ProgramParser} from "./syntax/parser/ProgramParser";
 import {Preconditions} from "./utils/Preconditions";
 import {AppBuilder} from "./syntax/app/AppBuilder";
-import {
-    ActorDefinitionContext,
-    ImportAllActorsContext,
-    ImportSelectedActorContext, MethodDefinitionContext,
-    ProgramContext, ResourceLocatorContext
-} from "./syntax/parser/grammar/ScratchParser";
+import {ProgramContext} from "./syntax/parser/grammar/ScratchParser";
 import {RawAstToDotVisitor} from "./syntax/parser/RawAstToDotVisitor";
 import {RuleNode} from "antlr4ts/tree";
 import {AstNode} from "./syntax/ast/AstNode";
 import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
-import * as path from "path";
-import {ImplementMeException} from "./core/exceptions/ImplementMeException";
 import {AnalysisProcedureConfig, AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
 
 const commander = require('commander');

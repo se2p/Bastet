@@ -22,7 +22,7 @@
 import {SingletonStateWrapper} from "../AbstractStates";
 import {AbstractDomain, AbstractionPrecision, ConcreteElement} from "../AbstractDomain";
 import {AbstractElement, Lattice} from "../../../lattices/Lattice";
-import {Record as ImmRec, Set as ImmSet, List as ImmList} from "immutable";
+import {List as ImmList, Record as ImmRec} from "immutable";
 import {ActorId} from "../../../syntax/app/Actor";
 import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
 import {ScriptId} from "../../../syntax/app/controlflow/Script";
