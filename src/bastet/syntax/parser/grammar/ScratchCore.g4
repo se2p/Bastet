@@ -27,7 +27,7 @@ actorDefinitionList : actorDefinition* ;
 // Along to the (user defined) set of variables, an actor has
 // *attributes* that influence its representation and behavior.
 actorDefinition : actorMode ident inheritsFrom 'begin' actorComponentsDefinition 'end' ;
-inheritsFrom : 'is' ident | ;
+inheritsFrom : 'is' ident (',' ident)* | ;
 
 actorMode :
       'actor' # ConcreteActorMode
@@ -156,6 +156,8 @@ parameterListPlain : parameter (',' parameter)* | ;
 // make their semantics clearer for the programmer.
 stmtList : 'begin' stmtListPlain (terminationStmt)? 'end' ;
 
+atomicBlock: 'atomic' stmtList ;
+
 // A plain list of program statements.
 // Statements are separated by whitespace.
 stmtListPlain : stmt* ;
@@ -209,8 +211,10 @@ expressionStmt : 'evaluate' expression ;
 
 // The list of statements that are available in Scratch.
 stmt :
-    controlStmt # ControlStatement
-    | nonCtrlStmt # NonControlStatement ;
+      controlStmt # ControlStatement
+    | nonCtrlStmt # NonControlStatement
+    | atomicBlock # AtomicBlockStatement
+    ;
 
 nonCtrlStmt : coreNonCtrlStmt ;
 

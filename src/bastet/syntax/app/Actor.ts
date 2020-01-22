@@ -30,6 +30,8 @@ import {Scripts} from "./controlflow/Scripts";
 import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
 import {AstNode} from "../ast/AstNode";
 import {MethodDefinition, MethodDefinitionMap} from "../ast/core/MethodDefinition";
+import {ActorMode} from "../ast/core/ActorDefinition";
+import {Preconditions} from "../../utils/Preconditions";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -41,7 +43,10 @@ export type ActorId = string;
 export class Actor extends FromParseTree {
 
     /** An actor can inherit methods or members from another actor. */
-    private readonly _inheritsFrom: Actor|null;
+    private readonly _inheritsFrom: Actor[];
+
+    /** Mode of the actor. Onle concrete actors can be instantiated as processes. */
+    private readonly _actorMode: ActorMode;
 
     /** Unique identifier of the actor */
     private readonly _ident: ActorId;
@@ -61,10 +66,13 @@ export class Actor extends FromParseTree {
     /** List of scripts that define the behavior of the actor. */
     private readonly _scripts: ImmutableList<Script>;
 
-    constructor(node: AstNode, ident: string, inheritFrom: Actor|null,
+    constructor(node: AstNode, mode: ActorMode, ident: string, inheritFrom: Actor[],
                 resources: AppResourceMap, datalocs: DataLocationMap,
                 initScript: Script, methods: MethodDefinitionMap, scripts: Script[]) {
         super(node);
+        Preconditions.checkNotUndefined(inheritFrom);
+
+        this._actorMode = mode;
         this._ident = ident;
         this._inheritsFrom = inheritFrom;
         this._initScript = initScript;
@@ -73,15 +81,17 @@ export class Actor extends FromParseTree {
         this._methodDefinitions = Maps.immutableCopyOf(methods);
         this._scripts = Lists.immutableCopyOf(scripts);
 
-        if (inheritFrom) {
-            // TODO: Handle re-definitions of resources or methods with the same identifier
-            //      Rename the basic versions so that they can be referenced by the
-            //      inheriting actors?
-            this._resources = Maps.mergeImmutableMaps(this.resourceMap, inheritFrom.resourceMap);
-            this._initScript = Scripts.concat(inheritFrom._initScript, this._initScript);
-            this._methodDefinitions = Maps.mergeImmutableMaps(this.methodMap, inheritFrom.methodMap);
-            this._datalocs = Maps.mergeImmutableMaps(this.datalocMap, inheritFrom.datalocMap);
-            this._scripts = Lists.concatImmutableLists(this._scripts, inheritFrom.scripts);
+        if (inheritFrom.length > 0) {
+            for (let base of inheritFrom) {
+                // TODO: Handle re-definitions of resources or methods with the same identifier
+                //      Rename the basic versions so that they can be referenced by the
+                //      inheriting actors?
+                this._resources = Maps.mergeImmutableMaps(this.resourceMap, base.resourceMap);
+                this._initScript = Scripts.concat(base._initScript, this._initScript);
+                this._methodDefinitions = Maps.mergeImmutableMaps(this.methodMap, base.methodMap);
+                this._datalocs = Maps.mergeImmutableMaps(this.datalocMap, base.datalocMap);
+                this._scripts = Lists.concatImmutableLists(this._scripts, base.scripts);
+            }
         }
     }
 
@@ -89,7 +99,7 @@ export class Actor extends FromParseTree {
         return this._ident;
     }
 
-    get inheritsFrom(): Actor|null {
+    get inheritsFrom(): Actor[] {
         return this._inheritsFrom;
     }
 
@@ -125,6 +135,9 @@ export class Actor extends FromParseTree {
         return this._scripts;
     }
 
+    get actorMode(): ActorMode {
+        return this._actorMode;
+    }
 }
 
 

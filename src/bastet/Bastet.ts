@@ -184,7 +184,8 @@ export class Bastet {
     }
 
     private createControlFlowFrom(programOrigin: string, intermediateSpecAST: AstNode, libraryModule: App, actorNamePrefix?: string): App {
-        return AppBuilder.buildControlFlowsFromSyntaxTree(programOrigin, intermediateSpecAST, libraryModule, actorNamePrefix);
+        const ab: AppBuilder = new AppBuilder(libraryModule);
+        return ab.buildControlFlowsFromSyntaxTree(programOrigin, intermediateSpecAST, actorNamePrefix);
     }
 
 }

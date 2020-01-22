@@ -32,7 +32,7 @@ import {TransitionRelationToDot} from "./controlflow/TransitionRelationToDot";
 import {AstNode} from "../ast/AstNode";
 import {Preconditions} from "../../utils/Preconditions";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
-import {ActorDefinition} from "../ast/core/ActorDefinition";
+import {ActorDefinition, ActorDefinitionList, ConcreteActorMode} from "../ast/core/ActorDefinition";
 import {
     AfterStartupMonitoringEvent, AfterStatementMonitoringEvent,
     CoreEvent,
@@ -52,6 +52,8 @@ import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
 import {StatementList} from "../ast/core/statements/Statement";
 import {Scripts} from "./controlflow/Scripts";
 import {
+    ActorDefinitionContext,
+    ActorDefinitionListContext,
     AfterStartupMonitoringEventContext,
     AfterStatementMonitoringEventContext,
     RenderedMonitoringEventContext
@@ -59,23 +61,36 @@ import {
 
 export class AppBuilder {
 
-    public static buildControlFlowsFromSyntaxTree(programOrigin: string, ast: AstNode,
-                                                  libraryModule: App, actorNamePrefix: string): App {
+    private readonly _library: App;
+    private _knownActors: ActorMap;
+
+    constructor(libraryModule: App) {
+        this._library = Preconditions.checkNotUndefined(libraryModule);
+        this._knownActors = {};
+        for (let a of libraryModule.actors) {
+            this._knownActors[a.ident] = a;
+        }
+    }
+
+    public buildControlFlowsFromSyntaxTree(programOrigin: string, ast: AstNode,
+                                           actorNamePrefix: string): App {
 
         Preconditions.checkArgument(ast instanceof ProgramDefinition);
         const programNode: ProgramDefinition = ast as ProgramDefinition;
-        const actorMap: ActorMap = AppBuilder.buildActors(programNode, actorNamePrefix);
+        const actorMap: ActorMap = this.buildActors(programNode, actorNamePrefix);
 
         return new App(programOrigin, programNode.ident.text, actorMap);
     }
 
-    private static buildActors(programAST: ProgramDefinition, actorNamePrefix: string): ActorMap {
+    private buildActors(programAST: ProgramDefinition, actorNamePrefix: string): ActorMap {
         let result: ActorMap = {};
         const actorDefinitions : ActorDefinition[] = programAST.actors.elements;
 
         for (let actorDefinition of actorDefinitions) {
             // Flat actor
-            const flatActor: Actor = AppBuilder.buildActorFlat(actorDefinition, actorNamePrefix);
+            const flatActor: Actor = this.buildActorFlat(actorDefinition, actorNamePrefix);
+
+            this._knownActors[flatActor.ident] = flatActor;
 
             // Add as result
             result[flatActor.ident] = flatActor;
@@ -87,7 +102,7 @@ export class AppBuilder {
         return result;
     }
 
-    private static exportScriptsToDoT(actor: Actor): void {
+    private exportScriptsToDoT(actor: Actor): void {
         const toDotWriter = new TransitionRelationToDot();
         let i: number = 1;
         for (let s of actor.scripts) {
@@ -99,26 +114,34 @@ export class AppBuilder {
         toDotWriter.export(actor.initScript.transitions, target);
     }
 
-    private static buildActorFlat(actorDefinition: ActorDefinition, actorNamePrefix: string) {
+    private buildActorFlat(actorDefinition: ActorDefinition, actorNamePrefix: string) {
         let actorName: string = actorDefinition.ident.text;
         if (actorNamePrefix) {
             actorName = actorNamePrefix + "_" + actorName;
         }
         const acd = actorDefinition;
 
-        const resources = AppBuilder.buildResources(acd.resourceDefs);
-        const datalocs = AppBuilder.buildDatalocs(acd.resourceDefs, acd.declarationStmts);
-        const initScript = AppBuilder.buildInitScript(acd.resourceDefs, acd.declarationStmts, acd.initStmts);
-        const methodDefs = AppBuilder.buildMethodDefs(acd.methodDefs);
-        const scripts = AppBuilder.buildScripts(acd.scriptList);
+        const resources = this.buildResources(acd.resourceDefs);
+        const datalocs = this.buildDatalocs(acd.resourceDefs, acd.declarationStmts);
+        const initScript = this.buildInitScript(acd.resourceDefs, acd.declarationStmts, acd.initStmts);
+        const methodDefs = this.buildMethodDefs(acd.methodDefs);
+        const scripts = this.buildScripts(acd.scriptList);
 
-        return new Actor(actorDefinition, actorName, null, resources, datalocs, initScript, methodDefs, scripts);
+        let inheritsFromActors: Actor[] = [];
+        for (let aid of actorDefinition.inheritsFrom.elements) {
+            const a: Actor = this._knownActors[aid.text];
+            Preconditions.checkNotUndefined(a);
+            inheritsFromActors.push(a);
+        }
+
+        return new Actor(actorDefinition, actorDefinition.mode, actorName,
+            inheritsFromActors, resources, datalocs, initScript, methodDefs, scripts);
     }
 
-    private static buildScripts(scriptList: ScriptDefinitionList): Script[] {
+    private buildScripts(scriptList: ScriptDefinitionList): Script[] {
         let result: Script[] = [];
         for (let script of scriptList) {
-            const event = AppBuilder.buildEvent(script.event);
+            const event = script.event;
             const visitor = new RelationBuildingVisitor();
             const transRelation = TransitionRelations.eliminateEpsilons(
                 script.stmtList.accept(visitor));
@@ -128,11 +151,7 @@ export class AppBuilder {
         return result;
     }
 
-    private static buildEvent(eventContext: CoreEvent): CoreEvent {
-        return eventContext;
-    }
-
-    private static buildMethodDefs(methodDefs: MethodDefinitionList): MethodDefinitionMap {
+    private buildMethodDefs(methodDefs: MethodDefinitionList): MethodDefinitionMap {
         let result: MethodDefinitionMap = {};
         for (let methodDef of methodDefs) {
             const methodName = methodDef.ident.text;
@@ -141,7 +160,7 @@ export class AppBuilder {
         return result;
     }
 
-    private static buildMethodResultDef(resultDecl: ResultDeclaration): DataLocation {
+    private buildMethodResultDef(resultDecl: ResultDeclaration): DataLocation {
         if (resultDecl.type == VoidType.instance()) {
             return DataLocation.void();
         } else {
@@ -151,7 +170,7 @@ export class AppBuilder {
         }
     }
 
-    private static buildParameterDeclarations(parameterListContext: ParameterDeclarationList): DataLocationMap {
+    private buildParameterDeclarations(parameterListContext: ParameterDeclarationList): DataLocationMap {
         let result: DataLocationMap = {};
         for (let p of parameterListContext.elements) {
             const id: string = p.ident.text;
@@ -161,7 +180,7 @@ export class AppBuilder {
         return result;
     }
 
-    private static buildInitScript(resourceListContext: ResourceDefinitionList, declarationStmtList: StatementList,
+    private buildInitScript(resourceListContext: ResourceDefinitionList, declarationStmtList: StatementList,
                                    stmtList: StatementList): Script {
         const visitor = new RelationBuildingVisitor();
         const transrelRes = resourceListContext.accept(visitor);
@@ -172,17 +191,17 @@ export class AppBuilder {
         return new Script(Scripts.freshScriptId(), NeverEvent.instance(), compundTransRel);
     }
 
-    private static buildResources(resourceListContext: ResourceDefinitionList): AppResourceMap {
+    private buildResources(resourceListContext: ResourceDefinitionList): AppResourceMap {
         let result: AppResourceMap = {};
         for (let rc of resourceListContext) {
-            const id: string = rc.ident.text
+            const id: string = rc.ident.text;
             result[id] = new AppResource(rc, id, rc.resourceType, rc.resourceLocator.uri);
         }
 
         return result;
     }
 
-    private static buildDatalocs(resourceListContext: ResourceDefinitionList,
+    private buildDatalocs(resourceListContext: ResourceDefinitionList,
                                  declarationStmtList: StatementList): DataLocationMap {
         let result: DataLocationMap = {};
 
@@ -202,16 +221,36 @@ export class AppBuilder {
         return result;
     }
 
-    static dissolveInheritance(taskModel: App): App {
-        // Build the inheritance relation
-        // Topological sort
+    public dissolveActorInheritance(app: App, actor: Actor): Actor {
+        Preconditions.checkNotUndefined(actor);
+        Preconditions.checkNotUndefined(app);
 
-        // Only keep the "leaf actors" (??)
+        let result: Actor = actor;
+        let worklist: Actor[] = [];
 
-        // Concat the init scripts
-        // Concat the lists of methods
-        // Concat the lists of external methods
-        // Concat the lists of variables (and attributes)
-        throw new ImplementMeException();
+        if (actor.inheritsFrom) {
+            worklist.push(actor);
+        }
+
+        while (worklist.length > 0) {
+            const work: Actor = worklist.pop();
+        }
+
+        return result;
+    }
+
+    public static dissolveInheritance(taskModel: App): App {
+        const ab = new AppBuilder(App.empty());
+
+        const concreteActors: Actor[] = taskModel.actors
+            .filter((a) => a.actorMode == ConcreteActorMode.instance());
+
+        let flatActors: ActorMap = {};
+        for (let a of concreteActors) {
+            const d: Actor = ab.dissolveActorInheritance(taskModel, a);
+            flatActors[d.ident] = d;
+        }
+
+        return new App(taskModel.origin, taskModel.ident, flatActors);
     }
 }

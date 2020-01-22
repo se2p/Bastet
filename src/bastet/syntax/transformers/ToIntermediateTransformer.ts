@@ -182,7 +182,7 @@ import {
     ActorDefinitionList,
     ActorMode,
     ActorRoleMode,
-    ConcreteActorMode
+    ConcreteActorMode, InheritsFromList
 } from "../ast/core/ActorDefinition";
 import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {
@@ -634,7 +634,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
         // Identifier and inheritance information
         const ident = ctx.ident().accept(this).nodeOnly() as Identifier;
-        const inheritesFrom: OptionalAstNode<Identifier> = ctx.inheritsFrom().accept(this).nodeOnly();
+        const inheritesFrom: InheritsFromList = ctx.inheritsFrom().accept(this).nodeOnly();
 
         // Role
         const actorMode: ActorMode = ctx.actorMode().accept(this).nodeOnly();
@@ -643,13 +643,15 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         this._activeActorTypes = new ActorTypeInformation(ident);
         try {
             this._actorTypeInfos.putActorTypeInformation(this._activeActorTypes);
-            if (inheritesFrom.isPresent()) {
-                const inheritsFromName = inheritesFrom.value().text;
-                const baseActorTypeInfos: ActorTypeInformation = this._actorTypeInfos.getInfos(inheritesFrom.value());
-                if (!baseActorTypeInfos) {
-                    throw new IllegalStateException(`Type infos for ${inheritsFromName} missing`);
+            if (!inheritesFrom.isEmpty()) {
+                for (let id of inheritesFrom.elements) {
+                    const inheritsFromName = id.text;
+                    const baseActorTypeInfos: ActorTypeInformation = this._actorTypeInfos.getInfos(id);
+                    if (!baseActorTypeInfos) {
+                        throw new IllegalStateException(`Type infos for ${inheritsFromName} missing`);
+                    }
+                    this._activeActorTypes.addAllFrom(baseActorTypeInfos);
                 }
-                this._activeActorTypes.addAllFrom(baseActorTypeInfos);
             }
 
             // Before parsing the body of the methods, collect type information
@@ -703,9 +705,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         for (let e of ctx.actorDefinition()) {
            const adc: ActorDefinitionContext = e as ActorDefinitionContext;
            const actorName = adc.ident().text;
-           if (adc.inheritsFrom().ident()) {
-               const inheritsFrom = adc.inheritsFrom().ident().text;
-               result.push([actorName, inheritsFrom]);
+           for (let id of adc.inheritsFrom().ident()) {
+               result.push([actorName, id.text]);
            }
         }
         return result;
@@ -1332,13 +1333,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitInheritsFrom(ctx: InheritsFromContext) : TransformerResult {
-        let result: OptionalAstNode<Identifier> = null;
-        if (ctx.ident()) {
-            result = new PresentAstNode<Identifier>(ctx.ident().accept(this).nodeOnly() as Identifier);
-        } else {
-            result = OptionalAstNode.absent<Identifier>();
-        }
-        return TransformerResult.withNode(result);
+        const inheritFromList: Identifier[] = this.buildArrayFrom<Identifier>(ctx.ident()).nodeList;
+        return TransformerResult.withNode(new InheritsFromList(inheritFromList));
     }
 
     public visitInsertAtStatement(ctx: InsertAtStatementContext) : TransformerResult {

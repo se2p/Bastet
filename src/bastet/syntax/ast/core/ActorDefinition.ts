@@ -63,12 +63,20 @@ export class ActorRoleMode extends ActorMode {
     }
 }
 
+export class InheritsFromList extends AstNodeList<Identifier> {
+
+    constructor(elements: Identifier[]) {
+        super(elements);
+    }
+
+}
+
 export class ActorDefinition extends AbstractNode {
 
     /** The name of the actor based on which it can be identified or addressed */
     private readonly _mode: ActorMode;
     private readonly _ident: Identifier;
-    private readonly _inheritsFrom: OptionalAstNode<Identifier>;
+    private readonly _inheritsFrom: InheritsFromList;
     private readonly _resourceDefs: ResourceDefinitionList;
     private readonly _declarationStmts: StatementList;
     private readonly _initStmts: StatementList;
@@ -76,7 +84,7 @@ export class ActorDefinition extends AbstractNode {
     private readonly _externalMethodDecls: MethodSignatureList;
     private readonly _scriptList: ScriptDefinitionList;
 
-    constructor(mode: ActorMode, ident: Identifier, inheritsFrom: OptionalAstNode<Identifier>,
+    constructor(mode: ActorMode, ident: Identifier, inheritsFrom: InheritsFromList,
                 resourceDefs: ResourceDefinitionList, declarationStmts: StatementList,
                 initStmts: StatementList, methodDefs: MethodDefinitionList,
                 externalMethodDecls: MethodSignatureList,
@@ -106,7 +114,7 @@ export class ActorDefinition extends AbstractNode {
         return this._ident;
     }
 
-    get inheritsFrom(): OptionalAstNode<Identifier> {
+    get inheritsFrom(): InheritsFromList {
         return this._inheritsFrom;
     }
 

@@ -55,7 +55,7 @@ export class Preconditions {
         return text;
     }
 
-    static checkNotUndefined(obj, message?: string) {
+    static checkNotUndefined<E>(obj: E, message?: string): E {
        if (!obj) {
            if (message) {
                throw new IllegalArgumentException(message);
@@ -63,5 +63,6 @@ export class Preconditions {
                throw new IllegalArgumentException("Reference must not be undefined.");
            }
        }
+       return obj;
     }
 }
