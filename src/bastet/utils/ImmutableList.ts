@@ -59,4 +59,11 @@ export class ImmutableList<E> implements Iterable<E> {
         return this._list.length;
     }
 
+    createMutable(): E[] {
+        let result: E[] = [];
+        for (let e of this.values()) {
+            result.push(e);
+        }
+        return result;
+    }
 }

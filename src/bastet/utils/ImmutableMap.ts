@@ -52,6 +52,15 @@ export class ImmutableMap<K, V> implements ReadonlyMap<K, V>, Iterable<[K, V]> {
         return this._map.size;
     }
 
+    public createMutable(): {[id: string]: V} {
+        let result = {};
+        for (let [k, v] of this.entries()) {
+            const kid: string = k.toString();
+            result[kid] = v;
+        }
+        return result;
+    }
+
     public [Symbol.iterator](): IterableIterator<[K, V]> {
         return this._map[Symbol.iterator]();
     }

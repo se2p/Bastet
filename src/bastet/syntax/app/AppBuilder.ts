@@ -39,6 +39,10 @@ import {ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
 import {StatementList} from "../ast/core/statements/Statement";
 import {Scripts} from "./controlflow/Scripts";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
+import {Maps} from "../../utils/Maps";
+import {Lists} from "../../utils/Lists";
 
 export class AppBuilder {
 
@@ -207,17 +211,38 @@ export class AppBuilder {
         Preconditions.checkNotUndefined(app);
 
         let result: Actor = actor;
-        let worklist: Actor[] = [];
 
-        if (actor.inheritsFrom) {
-            worklist.push(actor);
-        }
+        let worklist: Actor[] = [];
+        let handled: Set<String> = new Set();
 
         while (worklist.length > 0) {
-            const work: Actor = worklist.pop();
+            const work = worklist.pop();
+            for (let f of work.inheritsFrom) {
+                if (handled.has(f.ident)) {
+                    throw new IllegalStateException("Cycle in the inheritance relation?");
+                }
+                result = this.concatActors(result, f);
+                handled.add(f.ident);
+                worklist.push(f);
+            }
         }
 
         return result;
+    }
+
+    private concatActors(main: Actor, secondary: Actor): Actor {
+        // TODO: Handle re-definitions of resources or methods with the same identifier
+        //      Rename the basic versions so that they can be referenced by the
+        //      inheriting actors?
+        let resources = Maps.mergeImmutableMaps(main.resourceMap, secondary.resourceMap);
+        let initScript = Scripts.concat(secondary.initScript, main.initScript);
+        let methodDefinitions = Maps.mergeImmutableMaps(main.methodMap, secondary.methodMap);
+        let datalocs = Maps.mergeImmutableMaps(main.datalocMap, secondary.datalocMap);
+        let scripts = Lists.concatImmutableLists(main.scripts, secondary.scripts);
+
+        return new Actor(main.astnode, main.actorMode, main.ident, [],
+            resources.createMutable(), datalocs.createMutable(),
+            initScript, methodDefinitions.createMutable(), scripts.createMutable());
     }
 
     public static dissolveInheritance(taskModel: App): App {

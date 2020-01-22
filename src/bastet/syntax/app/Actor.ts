@@ -80,19 +80,6 @@ export class Actor extends FromParseTree {
         this._datalocs = Maps.immutableCopyOf(datalocs);
         this._methodDefinitions = Maps.immutableCopyOf(methods);
         this._scripts = Lists.immutableCopyOf(scripts);
-
-        if (inheritFrom.length > 0) {
-            for (let base of inheritFrom) {
-                // TODO: Handle re-definitions of resources or methods with the same identifier
-                //      Rename the basic versions so that they can be referenced by the
-                //      inheriting actors?
-                this._resources = Maps.mergeImmutableMaps(this.resourceMap, base.resourceMap);
-                this._initScript = Scripts.concat(base._initScript, this._initScript);
-                this._methodDefinitions = Maps.mergeImmutableMaps(this.methodMap, base.methodMap);
-                this._datalocs = Maps.mergeImmutableMaps(this.datalocMap, base.datalocMap);
-                this._scripts = Lists.concatImmutableLists(this._scripts, base.scripts);
-            }
-        }
     }
 
     get ident(): string {
