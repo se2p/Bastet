@@ -39,7 +39,6 @@ import {ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
 import {StatementList} from "../ast/core/statements/Statement";
 import {Scripts} from "./controlflow/Scripts";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {Maps} from "../../utils/Maps";
 import {Lists} from "../../utils/Lists";
@@ -57,12 +56,23 @@ export class AppBuilder {
         }
     }
 
-    public buildControlFlowsFromSyntaxTree(programOrigin: string, ast: AstNode,
-                                           actorNamePrefix: string): App {
+    /**
+     * Build the control flow structure, ... from the program's
+     * abstract syntax tree.
+     *
+     * @param programOrigin: An informal information for the user on the origin of the program.
+     * @param ast: The syntax tree.
+     * @param actorNamePrefix: A prefix to add to the name of all actors.
+     */
+    public buildFromSyntaxTree(programOrigin: string, ast: AstNode,
+                               actorNamePrefix: string): App {
 
         Preconditions.checkArgument(ast instanceof ProgramDefinition);
         const programNode: ProgramDefinition = ast as ProgramDefinition;
         const actorMap: ActorMap = this.buildActors(programNode, actorNamePrefix);
+
+        // TODO/FIXME: Check if adding the prefix to actor names works correctly.
+        //      Also references to the actor must be updated.
 
         return new App(programOrigin, programNode.ident.text, actorMap);
     }
@@ -119,7 +129,7 @@ export class AppBuilder {
             inheritsFromActors.push(a);
         }
 
-        return new Actor(actorDefinition, actorDefinition.mode, actorName,
+        return new Actor(actorDefinition.mode, actorName,
             inheritsFromActors, resources, datalocs, initScript, methodDefs, scripts);
     }
 
@@ -180,7 +190,7 @@ export class AppBuilder {
         let result: AppResourceMap = {};
         for (let rc of resourceListContext) {
             const id: string = rc.ident.text;
-            result[id] = new AppResource(rc, id, rc.resourceType, rc.resourceLocator.uri);
+            result[id] = new AppResource(id, rc.resourceType, rc.resourceLocator.uri);
         }
 
         return result;
@@ -240,7 +250,7 @@ export class AppBuilder {
         let datalocs = Maps.mergeImmutableMaps(main.datalocMap, secondary.datalocMap);
         let scripts = Lists.concatImmutableLists(main.scripts, secondary.scripts);
 
-        return new Actor(main.astnode, main.actorMode, main.ident, [],
+        return new Actor(main.actorMode, main.ident, [],
             resources.createMutable(), datalocs.createMutable(),
             initScript, methodDefinitions.createMutable(), scripts.createMutable());
     }

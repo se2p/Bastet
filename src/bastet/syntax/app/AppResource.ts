@@ -19,10 +19,8 @@
  *
  */
 
-import {FromParseTree} from "../FromParseTree";
 import {WithIdent} from "../../utils/WithIdent";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {AstNode} from "../ast/AstNode";
 import {ImageResourceType, ResourceType, SoundResourceType} from "../ast/core/ResourceDefinition";
 
 export type AppResourceMap = { [id:string]: AppResource } ;
@@ -32,14 +30,13 @@ export enum AppResourceType {
     SOUND = "sound"
 }
 
-export class AppResource extends FromParseTree implements WithIdent {
+export class AppResource implements WithIdent {
 
     private readonly _ident : string;
     private readonly _type : ResourceType;
     private readonly _uri : string;
 
-    constructor(node: AstNode, ident: string, type: ResourceType, uri: string) {
-        super(node);
+    constructor(ident: string, type: ResourceType, uri: string) {
         this._ident = ident;
         this._type = type;
         this._uri = uri;

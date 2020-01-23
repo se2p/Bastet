@@ -19,16 +19,13 @@
  *
  */
 
-import {FromParseTree} from "../FromParseTree";
 import {AppResource, AppResourceMap} from "./AppResource";
 import {Script} from "./controlflow/Script";
 import {Maps} from "../../utils/Maps";
 import {Lists} from "../../utils/Lists";
 import {ImmutableList} from "../../utils/ImmutableList";
 import {ImmutableMap} from "../../utils/ImmutableMap";
-import {Scripts} from "./controlflow/Scripts";
 import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
-import {AstNode} from "../ast/AstNode";
 import {MethodDefinition, MethodDefinitionMap} from "../ast/core/MethodDefinition";
 import {ActorMode} from "../ast/core/ActorDefinition";
 import {Preconditions} from "../../utils/Preconditions";
@@ -40,7 +37,7 @@ export type ActorId = string;
 /**
  * Represents an actor.
  */
-export class Actor extends FromParseTree {
+export class Actor {
 
     /** An actor can inherit methods or members from another actor. */
     private readonly _inheritsFrom: Actor[];
@@ -66,10 +63,9 @@ export class Actor extends FromParseTree {
     /** List of scripts that define the behavior of the actor. */
     private readonly _scripts: ImmutableList<Script>;
 
-    constructor(node: AstNode, mode: ActorMode, ident: string, inheritFrom: Actor[],
+    constructor(mode: ActorMode, ident: string, inheritFrom: Actor[],
                 resources: AppResourceMap, datalocs: DataLocationMap,
                 initScript: Script, methods: MethodDefinitionMap, scripts: Script[]) {
-        super(node);
         Preconditions.checkNotUndefined(inheritFrom);
 
         this._actorMode = mode;
