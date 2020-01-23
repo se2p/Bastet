@@ -26,7 +26,7 @@ import {Script} from "./controlflow/Script";
 import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
 import {ScratchType, VoidType} from "../ast/core/ScratchType";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
-import {TransitionRelations} from "./controlflow/TransitionRelation";
+import {TransitionRelation, TransitionRelations} from "./controlflow/TransitionRelation";
 import {TransitionRelationToDot} from "./controlflow/TransitionRelationToDot";
 import {AstNode} from "../ast/AstNode";
 import {Preconditions} from "../../utils/Preconditions";
@@ -42,11 +42,14 @@ import {
 } from "../ast/core/MethodDefinition";
 import {ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
-import {StatementList} from "../ast/core/statements/Statement";
+import {StatementList, StatementLists} from "../ast/core/statements/Statement";
 import {Scripts} from "./controlflow/Scripts";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {Maps} from "../../utils/Maps";
 import {Lists} from "../../utils/Lists";
+import {Method} from "./controlflow/Method";
+import {DeclareVariableStatement} from "../ast/core/statements/DeclarationStatement";
+import {Identifier} from "../ast/core/Identifier";
 
 export class AppBuilder {
 
@@ -127,6 +130,7 @@ export class AppBuilder {
         const methodDefs = this.buildMethodDefs(acd.methodDefs);
         const externalMethodSigs = this.buildExternalMethodSigs(acd.externalMethodDecls);
         const scripts = this.buildScripts(acd.scriptList);
+        const methods = this.buildMethods(acd.methodDefs);
 
         let inheritsFromActors: Actor[] = [];
         for (let aid of actorDefinition.inheritsFrom.elements) {
@@ -136,7 +140,38 @@ export class AppBuilder {
         }
 
         return new Actor(actorDefinition.mode, actorName, inheritsFromActors,
-            resources, datalocs, initScript, methodDefs, externalMethodSigs, scripts);
+            resources, datalocs, initScript, methodDefs, externalMethodSigs, scripts, methods);
+    }
+
+    private buildMethods(methodDefs: MethodDefinitionList): Method[] {
+        let result: Method[] = [];
+        for (let m of methodDefs) {
+            const visitor = new RelationBuildingVisitor();
+            let methodTr: TransitionRelation = TransitionRelations.epsilon();
+
+            // ATTENTION: Parameter declarations get added in a different step,
+            // when calling the method with actual arguments.
+
+            // 1. Declare the result variable
+            if (!ScratchType.isVoid(m.returns.type)) {
+                const resultVarIdent: Identifier = m.returns.ident;
+                const resultVarType: ScratchType = m.returns.type;
+                const declarationStmt = new DeclareVariableStatement(resultVarIdent, resultVarType);
+                const dclStmtList = StatementList.from([declarationStmt]);
+
+                methodTr = TransitionRelations.concat(methodTr, dclStmtList.accept(visitor));
+            }
+
+            // 2. Concat the body
+            methodTr = TransitionRelations.concat(methodTr, m.statements.accept(visitor));
+
+            // 3. Eliminate epsilon transitions
+            methodTr = TransitionRelations.eliminateEpsilons(methodTr);
+
+            result.push(new Method(m, methodTr));
+        }
+
+        return result;
     }
 
     private buildScripts(scriptList: ScriptDefinitionList): Script[] {
@@ -272,11 +307,12 @@ export class AppBuilder {
         const externalMethods = Maps.mergeImmutableMaps(main.externalMethodMap, secondary.externalMethodMap);
         const datalocs = Maps.mergeImmutableMaps(main.datalocMap, secondary.datalocMap);
         const scripts = Lists.concatImmutableLists(main.scripts, secondary.scripts);
+        const methods = Lists.concatImmutableLists(main.methods, secondary.methods);
 
         return new Actor(main.actorMode, main.ident, [],
             resources.createMutable(), datalocs.createMutable(),
             initScript, methodDefinitions.createMutable(), externalMethods.createMutable(),
-            scripts.createMutable());
+            scripts.createMutable(), methods.createMutable());
     }
 
     public static dissolveInheritance(taskModel: App): App {

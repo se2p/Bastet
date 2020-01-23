@@ -42,6 +42,9 @@ export abstract class ScratchType extends AbstractNode {
 
     }
 
+    static isVoid(type: ScratchType) {
+        return type === VoidType.instance();
+    }
 }
 
 export class VoidType extends ScratchType {

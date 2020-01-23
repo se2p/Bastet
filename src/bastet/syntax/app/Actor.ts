@@ -29,6 +29,7 @@ import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
 import {MethodDefinition, MethodDefinitionMap, MethodSignature, MethodSignatureMap} from "../ast/core/MethodDefinition";
 import {ActorMode} from "../ast/core/ActorDefinition";
 import {Preconditions} from "../../utils/Preconditions";
+import {Method} from "./controlflow/Method";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -66,10 +67,14 @@ export class Actor {
     /** List of scripts that define the behavior of the actor. */
     private readonly _scripts: ImmutableList<Script>;
 
+    /** List of methods that are defined in the actor. */
+    private readonly _methods: ImmutableList<Method>;
+
     constructor(mode: ActorMode, ident: string, inheritFrom: Actor[],
                 resources: AppResourceMap, datalocs: DataLocationMap,
-                initScript: Script, methods: MethodDefinitionMap,
-                externalMethods: MethodSignatureMap, scripts: Script[]) {
+                initScript: Script, methodDefs: MethodDefinitionMap,
+                externalMethods: MethodSignatureMap,
+                scripts: Script[], methods: Method[]) {
         Preconditions.checkNotUndefined(inheritFrom);
 
         this._actorMode = mode;
@@ -78,9 +83,10 @@ export class Actor {
         this._initScript = initScript;
         this._resources = Maps.immutableCopyOf(resources);
         this._datalocs = Maps.immutableCopyOf(datalocs);
-        this._methodDefinitions = Maps.immutableCopyOf(methods);
+        this._methodDefinitions = Maps.immutableCopyOf(methodDefs);
         this._externalMethodSignatures = Maps.immutableCopyOf(externalMethods);
         this._scripts = Lists.immutableCopyOf(scripts);
+        this._methods = Lists.immutableCopyOf(methods);
     }
 
     get ident(): string {
@@ -111,7 +117,7 @@ export class Actor {
         return this._initScript;
     }
 
-    get methods(): IterableIterator<MethodDefinition> {
+    get methodDefs(): IterableIterator<MethodDefinition> {
         return this._methodDefinitions.values();
     }
 
@@ -125,6 +131,10 @@ export class Actor {
 
     get scripts(): ImmutableList<Script> {
         return this._scripts;
+    }
+
+    get methods(): ImmutableList<Method> {
+        return this._methods;
     }
 
     get actorMode(): ActorMode {
