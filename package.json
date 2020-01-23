@@ -4,7 +4,7 @@
   "description": "Program Analysis Framework",
   "main": "main.js",
   "scripts": {
-    "antlr4ts": "antlr4ts -visitor src/bastet/syntax/parser/grammar/Scratch.g4 -visitor src/bastet/syntax/parser/grammar/ScratchCore.g4",
+    "antlr4ts": "antlr4ts -visitor src/bastet/syntax/parser/grammar/Scratch.g4",
     "start": "npm run serve",
     "build": "npm run antlr4ts && npm run build-ts && npm run lint && npm run copy-static-assets",
     "serve": "node dist/main.js",
