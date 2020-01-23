@@ -35,6 +35,7 @@ import {RuleNode} from "antlr4ts/tree";
 import {AstNode} from "./syntax/ast/AstNode";
 import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
 import {AnalysisProcedureConfig, AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
+import {AppToDot} from "./syntax/app/AppToDot";
 
 const commander = require('commander');
 
@@ -104,6 +105,8 @@ export class Bastet {
         // Dissolve all inheritance relations now such the later analyses steps must not
         // care about handling inheritance.
         const staticTaskModel: App = AppBuilder.dissolveInheritance(staticTaskModelWithInheritance);
+        const add: AppToDot = new AppToDot();
+        add.exportApp(staticTaskModel, "static");
 
         return staticTaskModel;
     }
