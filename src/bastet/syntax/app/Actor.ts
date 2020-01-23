@@ -26,7 +26,7 @@ import {Lists} from "../../utils/Lists";
 import {ImmutableList} from "../../utils/ImmutableList";
 import {ImmutableMap} from "../../utils/ImmutableMap";
 import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
-import {MethodDefinition, MethodDefinitionMap} from "../ast/core/MethodDefinition";
+import {MethodDefinition, MethodDefinitionMap, MethodSignature, MethodSignatureMap} from "../ast/core/MethodDefinition";
 import {ActorMode} from "../ast/core/ActorDefinition";
 import {Preconditions} from "../../utils/Preconditions";
 
@@ -57,15 +57,19 @@ export class Actor {
     /** List of initialization statements. Includes declarations and initializations. */
     private readonly _initScript: Script;
 
-    /** Set of the actor's methods */
+    /** Set of the actor's methods with bodies (not external ones) */
     private readonly _methodDefinitions: ImmutableMap<string, MethodDefinition>;
+
+    /** Set of the actor's methods with bodies (not external ones) */
+    private readonly _externalMethodSignatures: ImmutableMap<string, MethodSignature>;
 
     /** List of scripts that define the behavior of the actor. */
     private readonly _scripts: ImmutableList<Script>;
 
     constructor(mode: ActorMode, ident: string, inheritFrom: Actor[],
                 resources: AppResourceMap, datalocs: DataLocationMap,
-                initScript: Script, methods: MethodDefinitionMap, scripts: Script[]) {
+                initScript: Script, methods: MethodDefinitionMap,
+                externalMethods: MethodSignatureMap, scripts: Script[]) {
         Preconditions.checkNotUndefined(inheritFrom);
 
         this._actorMode = mode;
@@ -75,6 +79,7 @@ export class Actor {
         this._resources = Maps.immutableCopyOf(resources);
         this._datalocs = Maps.immutableCopyOf(datalocs);
         this._methodDefinitions = Maps.immutableCopyOf(methods);
+        this._externalMethodSignatures = Maps.immutableCopyOf(externalMethods);
         this._scripts = Lists.immutableCopyOf(scripts);
     }
 
@@ -112,6 +117,10 @@ export class Actor {
 
     get methodMap(): ImmutableMap<string, MethodDefinition> {
         return this._methodDefinitions;
+    }
+
+    get externalMethodMap(): ImmutableMap<string, MethodSignature> {
+        return this._externalMethodSignatures;
     }
 
     get scripts(): ImmutableList<Script> {

@@ -19,9 +19,11 @@
  *
  */
 
-import {ActorMap} from './Actor'
+import {Actor, ActorMap} from './Actor'
 import {Maps} from "../../utils/Maps";
 import {MethodDefinition, MethodDefinitionList} from "../ast/core/MethodDefinition";
+import {Preconditions} from "../../utils/Preconditions";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 export class App {
 
@@ -29,33 +31,44 @@ export class App {
 
     private readonly _ident: string;
 
-    private readonly _actors: ActorMap;
+    private readonly _actorMap: ActorMap;
 
-    constructor(origin: string, ident: string, actors: ActorMap) {
-        this._origin = origin;
-        this._ident = ident;
-        this._actors = actors;
+    constructor(origin: string, ident: string, actorMap: ActorMap) {
+        this._origin = Preconditions.checkNotUndefined(origin);
+        this._ident = Preconditions.checkNotEmpty(ident);
+        this._actorMap = Preconditions.checkIsDic(actorMap);
     }
 
-    get origin() {
+    get origin(): string {
         return this._origin;
     }
 
-    get ident() {
+    get ident(): string {
         return this._ident;
     }
 
-    get actorMap() {
-        return this.actors;
+    get actorMap(): ActorMap {
+        return this._actorMap;
     }
 
-    get actors() {
-        return Maps.values(this._actors);
+    get actors(): Actor[] {
+        return Maps.values(this._actorMap);
+    }
+
+    get actorNames(): string[] {
+        return Object.keys(this._actorMap);
+    }
+
+    public getActorByName(name: string): Actor {
+        if (!this._actorMap[name]) {
+            throw new IllegalArgumentException(`Actor with name "${name}" is unknown!`);
+        }
+        return this._actorMap[name];
     }
 
     public getMethodDefinition(methodName: string): MethodDefinitionList {
         let result: MethodDefinition[] = [];
-        for (let ac of Maps.values(this._actors)) {
+        for (let ac of Maps.values(this._actorMap)) {
             const methodDef = ac.methodMap.get(methodName);
             if (methodDef) {
                 result.push(methodDef);
@@ -68,7 +81,7 @@ export class App {
 
     public static empty(): App {
        if (App.EMPTY_APP == null) {
-           App.EMPTY_APP = new App("", "", {});
+           App.EMPTY_APP = new App("", "empty", {});
        }
        return App.EMPTY_APP;
     }

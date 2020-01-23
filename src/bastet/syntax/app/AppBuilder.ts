@@ -34,7 +34,12 @@ import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {ActorDefinition, ConcreteActorMode} from "../ast/core/ActorDefinition";
 import {NeverEvent} from "../ast/core/CoreEvent";
 import {ScriptDefinitionList} from "../ast/core/ScriptDefinition";
-import {MethodDefinitionList, MethodDefinitionMap, ResultDeclaration} from "../ast/core/MethodDefinition";
+import {
+    MethodDefinitionList,
+    MethodDefinitionMap,
+    MethodSignatureList, MethodSignatureMap,
+    ResultDeclaration
+} from "../ast/core/MethodDefinition";
 import {ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
 import {StatementList} from "../ast/core/statements/Statement";
@@ -120,6 +125,7 @@ export class AppBuilder {
         const datalocs = this.buildDatalocs(acd.resourceDefs, acd.declarationStmts);
         const initScript = this.buildInitScript(acd.resourceDefs, acd.declarationStmts, acd.initStmts);
         const methodDefs = this.buildMethodDefs(acd.methodDefs);
+        const externalMethodSigs = this.buildExternalMethodSigs(acd.externalMethodDecls);
         const scripts = this.buildScripts(acd.scriptList);
 
         let inheritsFromActors: Actor[] = [];
@@ -129,8 +135,8 @@ export class AppBuilder {
             inheritsFromActors.push(a);
         }
 
-        return new Actor(actorDefinition.mode, actorName,
-            inheritsFromActors, resources, datalocs, initScript, methodDefs, scripts);
+        return new Actor(actorDefinition.mode, actorName, inheritsFromActors,
+            resources, datalocs, initScript, methodDefs, externalMethodSigs, scripts);
     }
 
     private buildScripts(scriptList: ScriptDefinitionList): Script[] {
@@ -143,6 +149,7 @@ export class AppBuilder {
 
             result.push(new Script(Scripts.freshScriptId(), event, transRelation));
         }
+
         return result;
     }
 
@@ -152,6 +159,17 @@ export class AppBuilder {
             const methodName = methodDef.ident.text;
             result[methodName] = methodDef;
         }
+
+        return result;
+    }
+
+    private buildExternalMethodSigs(methodSigs: MethodSignatureList): MethodSignatureMap {
+        let result: MethodSignatureMap = {};
+        for (let methodDef of methodSigs) {
+            const methodName = methodDef.ident.text;
+            result[methodName] = methodDef;
+        }
+
         return result;
     }
 
@@ -222,12 +240,16 @@ export class AppBuilder {
 
         let result: Actor = actor;
 
-        let worklist: Actor[] = [];
-        let handled: Set<String> = new Set();
+        const worklist: Actor[] = [];
+        const handled: Set<String> = new Set();
+
+        if (actor.inheritsFrom.length > 0) {
+            worklist.push(actor);
+        }
 
         while (worklist.length > 0) {
             const work = worklist.pop();
-            for (let f of work.inheritsFrom) {
+            for (const f of work.inheritsFrom) {
                 if (handled.has(f.ident)) {
                     throw new IllegalStateException("Cycle in the inheritance relation?");
                 }
@@ -244,25 +266,28 @@ export class AppBuilder {
         // TODO: Handle re-definitions of resources or methods with the same identifier
         //      Rename the basic versions so that they can be referenced by the
         //      inheriting actors?
-        let resources = Maps.mergeImmutableMaps(main.resourceMap, secondary.resourceMap);
-        let initScript = Scripts.concat(secondary.initScript, main.initScript);
-        let methodDefinitions = Maps.mergeImmutableMaps(main.methodMap, secondary.methodMap);
-        let datalocs = Maps.mergeImmutableMaps(main.datalocMap, secondary.datalocMap);
-        let scripts = Lists.concatImmutableLists(main.scripts, secondary.scripts);
+        const resources = Maps.mergeImmutableMaps(main.resourceMap, secondary.resourceMap);
+        const initScript = Scripts.concat(secondary.initScript, main.initScript);
+        const methodDefinitions = Maps.mergeImmutableMaps(main.methodMap, secondary.methodMap);
+        const externalMethods = Maps.mergeImmutableMaps(main.externalMethodMap, secondary.externalMethodMap);
+        const datalocs = Maps.mergeImmutableMaps(main.datalocMap, secondary.datalocMap);
+        const scripts = Lists.concatImmutableLists(main.scripts, secondary.scripts);
 
         return new Actor(main.actorMode, main.ident, [],
             resources.createMutable(), datalocs.createMutable(),
-            initScript, methodDefinitions.createMutable(), scripts.createMutable());
+            initScript, methodDefinitions.createMutable(), externalMethods.createMutable(),
+            scripts.createMutable());
     }
 
     public static dissolveInheritance(taskModel: App): App {
         const ab = new AppBuilder(App.empty());
 
-        const concreteActors: Actor[] = taskModel.actors
+        const concreteActors: Actor[] = taskModel
+            .actors
             .filter((a) => a.actorMode == ConcreteActorMode.instance());
 
-        let flatActors: ActorMap = {};
-        for (let a of concreteActors) {
+        const flatActors: ActorMap = {};
+        for (const a of concreteActors) {
             const d: Actor = ab.dissolveActorInheritance(taskModel, a);
             flatActors[d.ident] = d;
         }

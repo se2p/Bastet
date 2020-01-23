@@ -34,6 +34,26 @@ export class Preconditions {
         }
     }
 
+    /**
+     * We cannot always trust TypeScript's type system. Thus we have
+     * some preconditions on types, for example, this one which checks
+     * if a given entity is an dictionary.
+     *
+     * @param obj
+     */
+    public static checkIsDic<E>(v: E): E {
+        const isDict: boolean = typeof v==='object'
+            && v!==null
+            && !(v instanceof Array)
+            && !(v instanceof Date);
+
+        if (!isDict) {
+            throw new IllegalArgumentException("The given object is not a dictionary!");
+        }
+
+        return v;
+    }
+
     public static checkState(condition: boolean, message?: string) {
         if (!condition) {
             if (message) {
@@ -52,17 +72,24 @@ export class Preconditions {
                 throw new IllegalArgumentException("String must not be empty");
             }
         }
+
         return text;
     }
 
     static checkNotUndefined<E>(obj: E, message?: string): E {
-       if (!obj) {
+        if (typeof obj === 'string' || obj instanceof String) {
+            // To deal with the case that obj === ""
+            return obj;
+        }
+
+        if (!obj) {
            if (message) {
                throw new IllegalArgumentException(message);
            } else {
                throw new IllegalArgumentException("Reference must not be undefined.");
            }
        }
+
        return obj;
     }
 }

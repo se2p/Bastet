@@ -21,11 +21,12 @@
 
 import {App} from "./App";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {Actor} from "./Actor";
 
 export class ControlFlows {
 
     public static unionOf(controlflow1: App, controlflow2: App, ident: string) : App {
-        const unionActors = controlflow1.actors.concat(controlflow2.actors);
+        const unionActors: Actor[] = controlflow1.actors.concat(controlflow2.actors);
         let resultActorsMap = {};
 
         for (let a of unionActors) {

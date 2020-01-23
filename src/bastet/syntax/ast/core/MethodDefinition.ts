@@ -89,6 +89,8 @@ export class MethodSignature extends AbstractNode {
 
 export type MethodDefinitionMap = { [id:string]: MethodDefinition } ;
 
+export type MethodSignatureMap = { [id:string]: MethodSignature } ;
+
 export class ExternMethodDeclaration extends MethodSignature {
 
     constructor(ident: Identifier, params: ParameterDeclarationList, returns: ResultDeclaration) {
