@@ -51,6 +51,7 @@ export class TransitionRelationBuilder {
     }
 
     public addEntryLocation(loc: ControlLocation): this {
+        Preconditions.checkNotUndefined(loc);
         this._entryLocations.add(loc.ident);
         this.addLocation(loc);
         return this;
@@ -162,7 +163,7 @@ export class TransitionRelation {
         let lines: string[] = [];
         for (let fromId of this._locations) {
             for (let [op, toId] of this.transitionsFrom(fromId)) {
-                lines.push(`${fromId} ${op} ${toId}`);
+                lines.push(`(${fromId}) ${op} (${toId})`);
             }
         }
         return lines.join("\n");
@@ -442,44 +443,116 @@ export class TransitionRelations {
         throw new ImplementMeException();
     }
 
+    private static buildEquivalenceClasses(tr: TransitionRelation): Map<LocationID, Set<LocationID>> {
+        const result: Map<LocationID, Set<LocationID>> = new Map();
+        const todo: Set<LocationID> = new Set();
+        tr.locationSet.forEach((l) => todo.add(l));
+
+        while (todo.size > 0) {
+            const l: LocationID = todo.values().next().value;
+            todo.delete(l);
+
+            const closure: Set<LocationID> = TransitionRelations.getBiDirClosure(tr, l);
+            closure.forEach((l) => todo.delete(l));
+
+            let classLocId: LocationID;
+            if (closure.size > 1) {
+                //  Map a fresh location identifier to each equivalence class
+                //   with more than one element, otherwise, use the original
+                //   location identifier.
+                let classLoc = ControlLocation.fresh();
+                classLocId = classLoc.ident;
+            } else {
+                Preconditions.checkState(closure.size == 1);
+                classLocId = closure.values().next().value;
+            }
+
+            result.set(classLocId, closure);
+
+            for (const c of closure) {
+                todo.delete(c);
+            }
+        }
+
+        return result;
+    }
+
+    private static getDirClosure(l: LocationID,
+                                 nextOp: (l) => [OperationID, LocationID][]): Set<LocationID> {
+        const result: Set<LocationID> = new Set();
+
+        // Forwards reachable
+        const forwardsDone: Set<LocationID> = new Set<LocationID>();
+        const worklist: LocationID[] = [l];
+
+        while (worklist.length > 0) {
+            const work: LocationID = worklist.pop();
+            result.add(work);
+            forwardsDone.add(work);
+            nextOp(work).forEach(([op, target]) => {
+                if (ProgramOperations.epsilon().ident == op) {
+                    if (!forwardsDone.has(target)) {
+                        worklist.push(target);
+                    }
+                }
+            });
+        }
+
+        return result;
+    }
+
+    private static getBiDirClosure(tr: TransitionRelation, l: LocationID): Set<LocationID> {
+        const result: Set<LocationID> = new Set();
+
+        // Forwards reachable
+        const forwardsClosure: Set<LocationID> = this.getDirClosure(l, (l) => tr.transitionsFrom(l));
+        Preconditions.checkState(forwardsClosure.size > 0);
+
+        // Backwards reachable
+        const backwardsClosure: Set<LocationID> = this.getDirClosure(l, (l) => tr.transitionsTo(l));
+        Preconditions.checkState(backwardsClosure.size > 0);
+
+        return new Set([...forwardsClosure, ...backwardsClosure]);
+    }
+
     static eliminateEpsilons(tr: TransitionRelation): TransitionRelation {
-        console.log("FIXME: Implement an epsilon elimination for the transition relation.")
-        return tr;
-        //
-        // const builder = TransitionRelation.builder();
-        //
-        // const visited: Set<LocationID> = new Set();
-        // const worklist: Array<LocationID>  = new Array<LocationID>();
-        //
-        // for (let l of tr.entryLocationSet.values()) {
-        //     worklist.push(l);
-        //     builder.addEntryLocation(ControlLocation.for(l));
-        // }
-        //
-        // for (let l of tr.exitLocationSet.values()) {
-        //     builder.addExitLocation(ControlLocation.for(l));
-        // }
-        //
-        // while (worklist.length > 0) {
-        //     const work: LocationID = worklist.pop();
-        //     if (!visited.has(work)) {
-        //         visited.add(work);
-        //         for (let [op, target] of tr.transitionsFrom(work)) {
-        //             let termStates = tr.closureTerminationStates(target);
-        //             for (let termState of termStates) {
-        //                 if (op === ProgramOperations.epsilon().ident) {
-        //                     if (work == target) {
-        //                         continue;
-        //                     }
-        //                 }
-        //                 builder.addTransition(ControlLocation.for(work), ControlLocation.for(termState), ProgramOperation.for(op));
-        //                 worklist.push(termState);
-        //             }
-        //         }
-        //     }
-        // }
-        //
-        // return builder.build();
+        // 1. Build equivalence classes
+        const equivMap: Map<LocationID, Set<LocationID>> = this.buildEquivalenceClasses(tr);
+
+        const inverseEquiv: Map<LocationID, LocationID> = new Map<LocationID, LocationID>();
+        for (const key of equivMap.keys()) {
+            const value = equivMap.get(key);
+            for (let l of value) {
+                inverseEquiv.set(l, key);
+            }
+        }
+
+        Preconditions.checkState(inverseEquiv.size == tr.locationSet.size);
+
+        // 3. Rebuild the transition relation
+        const builder = TransitionRelation.builder();
+        // - Transitions
+        tr.transitionTable.forEach((targets: ImmMap<LocationID, ImmSet<OperationID>>, from: LocationID) => {
+            for (const to of targets.keys()) {
+                for (const op of targets.get(to)) {
+                    if (op === ProgramOperations.epsilon().ident) {
+                        // Epsilon transitions can now be skipped
+                        continue;
+                    }
+                    builder.addTransitionByIDs(inverseEquiv.get(from), inverseEquiv.get(to), ProgramOperation.for(op));
+                }
+            }
+        });
+        // - Entry locations
+        tr.entryLocationSet.forEach((l: LocationID) => {
+            builder.addEntryLocationWithID(inverseEquiv.get(l));
+        });
+        // - Exit locations
+        tr.exitLocationSet.forEach((l: LocationID) => {
+            builder.addExitLocationWithID(inverseEquiv.get(l));
+        });
+
+        return builder.build();
     }
 
 }

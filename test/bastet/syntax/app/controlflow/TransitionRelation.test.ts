@@ -153,7 +153,34 @@ describe("TransitionRelations", () => {
         });
 
         describe("case: with epsilon moves", () => {
+            const op = new RawOperation(new StopAllStatement());
 
+            const tr = TransitionRelation.builder()
+                .addTransitionByIDs(207, 207, ProgramOperations.epsilon())
+                .addTransitionByIDs(207, 213, ProgramOperations.epsilon())
+                .addTransitionByIDs(213, 213, ProgramOperations.epsilon())
+                .addTransitionByIDs(213, 208, ProgramOperations.epsilon())
+                .addTransitionByIDs(208, 209, ProgramOperations.epsilon())
+                .addTransitionByIDs(209, 210, op)
+                .addTransitionByIDs(210, 211, ProgramOperations.epsilon())
+                .addTransitionByIDs(211, 211, ProgramOperations.epsilon())
+                .addTransitionByIDs(211, 212, op)
+                .addTransitionByIDs(212, 213, ProgramOperations.epsilon())
+                .addEntryLocationWithID(207)
+                .addExitLocationWithID(213)
+                .build();
+
+            const te = TransitionRelations.eliminateEpsilons(tr);
+
+            it("does not lead to an empty transition relation", () => {
+               expect(te.entryLocationSet.isEmpty()).not.toBeTruthy();
+               expect(te.exitLocationSet.isEmpty()).not.toBeTruthy();
+               expect(te.locationSet.isEmpty()).not.toBeTruthy();
+
+               for (const e of te.entryLocationSet) {
+                   expect(te.transitionsFrom(e).length).toBeGreaterThan(0);
+               }
+            });
         });
 
     });
