@@ -83,4 +83,13 @@ export class ControlLocation implements WithIdent {
         return this.for(this.newLocationID());
     }
 
+    /**
+     * Used in tests if location ids do not get generated based on ControlLocation.fresh()
+     *
+     * @param offset
+     */
+    public static setFreshLocationIdOffset(offset: LocationID): void {
+        ControlLocation.locationSequence = Math.max(offset, ControlLocation.locationSequence);
+    }
+
 }

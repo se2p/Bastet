@@ -156,18 +156,11 @@ describe("TransitionRelations", () => {
             const op = new RawOperation(new StopAllStatement());
 
             const tr = TransitionRelation.builder()
-                .addTransitionByIDs(207, 207, ProgramOperations.epsilon())
-                .addTransitionByIDs(207, 213, ProgramOperations.epsilon())
-                .addTransitionByIDs(213, 213, ProgramOperations.epsilon())
-                .addTransitionByIDs(213, 208, ProgramOperations.epsilon())
-                .addTransitionByIDs(208, 209, ProgramOperations.epsilon())
-                .addTransitionByIDs(209, 210, op)
-                .addTransitionByIDs(210, 211, ProgramOperations.epsilon())
-                .addTransitionByIDs(211, 211, ProgramOperations.epsilon())
-                .addTransitionByIDs(211, 212, op)
-                .addTransitionByIDs(212, 213, ProgramOperations.epsilon())
-                .addEntryLocationWithID(207)
-                .addExitLocationWithID(213)
+                .addTransitionByIDs(1, 7, ProgramOperations.epsilon())
+                .addTransitionByIDs(7, 6, op)
+                .addTransitionByIDs(6, 7, ProgramOperations.epsilon())
+                .addEntryLocationWithID(1)
+                .addExitLocationWithID(7)
                 .build();
 
             const te = TransitionRelations.eliminateEpsilons(tr);

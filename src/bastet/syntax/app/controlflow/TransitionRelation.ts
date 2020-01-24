@@ -68,6 +68,7 @@ export class TransitionRelationBuilder {
     }
 
     private addLocation(loc: ControlLocation): this {
+        ControlLocation.setFreshLocationIdOffset(loc.ident);
         this._locations.set(loc.ident, loc);
         return this;
     }
@@ -285,6 +286,38 @@ export class TransitionRelation {
 
 }
 
+export class LocationEquivalence {
+
+    private _classid: LocationID;
+    private readonly _equivalent: Set<LocationID>;
+
+    constructor(equivalent: Set<LocationID>) {
+        this._equivalent = Preconditions.checkNotUndefined(equivalent);
+
+        if (equivalent.size > 1) {
+            this._classid = ControlLocation.fresh().ident;
+        } else {
+            Preconditions.checkArgument(equivalent.size == 1);
+            this._classid = equivalent.values().next().value;
+        }
+    }
+
+    public addAllFrom(eq: LocationEquivalence) {
+        const sizeBefore: number = this._equivalent.size;
+        for (const l of eq._equivalent) {
+            this._equivalent.add(l);
+        }
+
+        if (this._equivalent.size > sizeBefore && sizeBefore == 1) {
+            this._classid = ControlLocation.fresh().ident;
+        }
+    }
+
+    get classid(): number {
+        return this._classid;
+    }
+}
+
 export class TransitionRelations {
 
     /**
@@ -443,8 +476,12 @@ export class TransitionRelations {
         throw new ImplementMeException();
     }
 
-    private static buildEquivalenceClasses(tr: TransitionRelation): Map<LocationID, Set<LocationID>> {
-        const result: Map<LocationID, Set<LocationID>> = new Map();
+    private static buildEquivalenceClasses(tr: TransitionRelation): Map<LocationID, LocationEquivalence> {
+        const result: Map<LocationID, LocationEquivalence> = new Map();
+
+        // 1. Each location is in its own equivalence class
+        tr.locationSet.forEach((l) => result.set(l, new LocationEquivalence(new Set([l]))));
+
         const todo: Set<LocationID> = new Set();
         tr.locationSet.forEach((l) => todo.add(l));
 
@@ -455,19 +492,13 @@ export class TransitionRelations {
             const closure: Set<LocationID> = TransitionRelations.getBiDirClosure(tr, l);
             closure.forEach((l) => todo.delete(l));
 
-            let classLocId: LocationID;
-            if (closure.size > 1) {
-                //  Map a fresh location identifier to each equivalence class
-                //   with more than one element, otherwise, use the original
-                //   location identifier.
-                let classLoc = ControlLocation.fresh();
-                classLocId = classLoc.ident;
-            } else {
-                Preconditions.checkState(closure.size == 1);
-                classLocId = closure.values().next().value;
+            const newClass = new LocationEquivalence(closure);
+            for (const l of closure) {
+                const locEquiv: LocationEquivalence = result.get(l);
+                Preconditions.checkNotUndefined(locEquiv);
+                newClass.addAllFrom(locEquiv);
+                result.set(l, newClass);
             }
-
-            result.set(classLocId, closure);
 
             for (const c of closure) {
                 todo.delete(c);
@@ -517,14 +548,12 @@ export class TransitionRelations {
 
     static eliminateEpsilons(tr: TransitionRelation): TransitionRelation {
         // 1. Build equivalence classes
-        const equivMap: Map<LocationID, Set<LocationID>> = this.buildEquivalenceClasses(tr);
+        const equivMap: Map<LocationID, LocationEquivalence> = this.buildEquivalenceClasses(tr);
 
         const inverseEquiv: Map<LocationID, LocationID> = new Map<LocationID, LocationID>();
         for (const key of equivMap.keys()) {
-            const value = equivMap.get(key);
-            for (let l of value) {
-                inverseEquiv.set(l, key);
-            }
+            const value: LocationEquivalence = equivMap.get(key);
+            inverseEquiv.set(key, value.classid);
         }
 
         Preconditions.checkState(inverseEquiv.size == tr.locationSet.size);
