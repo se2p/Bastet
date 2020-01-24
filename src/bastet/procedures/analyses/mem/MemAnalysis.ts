@@ -20,7 +20,7 @@
  */
 
 import {ProgramAnalysis} from "../ProgramAnalysis";
-import {MemAbstractState} from "./MemAbstractDomain";
+import {MemAbstractState, MemAbstractStateBuilder, MemAbstractStates} from "./MemAbstractDomain";
 import {AbstractDomain} from "../AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
@@ -59,7 +59,7 @@ export class MemAnalysis implements ProgramAnalysis<MemAbstractState>, LabeledTr
     }
 
     initialStatesFor(task: App): MemAbstractState[] {
-        throw new ImplementMeException();
+        return [MemAbstractStates.builder(MemAbstractStates.empty()).build()];
     }
 
     abstractSuccFor(fromState: MemAbstractState, op: ProgramOperation): Iterable<MemAbstractState> {

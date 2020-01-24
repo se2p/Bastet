@@ -20,20 +20,39 @@
  */
 
 import {AbstractElement} from "../../../lattices/Lattice";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {Preconditions} from "../../../utils/Preconditions";
+import {Record as ImmRec, Set as ImmSet, Map as ImmMap} from "immutable"
 
-export interface MemAbstractState extends AbstractElement {
-
-}
+// TODO: Also implement based on ImmRec that has a map-field with the data
+export type MemAbstractState = ImmMap<string, any>;
 
 export class MemAbstractStates {
+
+    private static EMPTY: MemAbstractState;
+
+    public static empty(): MemAbstractState {
+        if (!MemAbstractStates.EMPTY) {
+            MemAbstractStates.EMPTY = ImmMap();
+        }
+        return MemAbstractStates.EMPTY;
+    }
+
+    public static builder(baseState: MemAbstractState): MemAbstractStateBuilder {
+       return new MemAbstractStateBuilder(baseState);
+    }
 
 }
 
 export class MemAbstractStateBuilder {
 
+    private _state: MemAbstractState;
+
+    constructor(state: MemAbstractState) {
+        this._state = Preconditions.checkNotUndefined(state);
+    }
+
     public build(): MemAbstractState {
-        throw new ImplementMeException();
+        return this._state;
     }
 
 }
