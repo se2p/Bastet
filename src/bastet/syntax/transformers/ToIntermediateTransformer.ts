@@ -218,9 +218,10 @@ import {
 } from "../ast/core/MethodDefinition";
 import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
+    DeclareActorVariableStatement,
     DeclareAttributeOfStatement,
     DeclareAttributeStatement,
-    DeclareVariableStatement,
+    DeclareStackVariableStatement,
     VariableDeclaration
 } from "../ast/core/statements/DeclarationStatement";
 import {
@@ -462,6 +463,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     private _activeActorTypes: ActorTypeInformation;
     private readonly _methodLibrary: App;
     private readonly _typeStack: Array<ScratchType>;
+    private _actorScope : boolean;
 
     constructor(methodLibrary: App, typeInformationStorage: TypeInformationStorage) {
         Preconditions.checkNotUndefined(methodLibrary);
@@ -469,6 +471,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         this._typeStack = new Array<ScratchType>();
         this._activeActorTypes = null;
         this._actorTypeInfos = typeInformationStorage;
+        this._actorScope = false;
     }
 
     get actorTypeInfos(): TypeInformationStorage {
@@ -663,13 +666,23 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             this.precollectMethodSignatures(ident, ctx.actorComponentsDefinition().methodDefinitionList(),
                 ctx.actorComponentsDefinition().externMethodDefinitionList());
 
-            // Resource declarations and definitions
-            const resouceDefs: TransformerResult = ctx.actorComponentsDefinition().resourceList().accept(this);
-            initStatements = StatementLists.concat(initStatements, resouceDefs.statementsToPrepend);
+            // All variable declarations should be on the scope of the
+            // actor, and not on the stack.
+            let resouceDefs: TransformerResult;
+            let declarations: TransformerResult;
 
-            // Variable declarations and initializations
-            const declarations: TransformerResult = ctx.actorComponentsDefinition().declarationStmtList().accept(this);
-            initStatements = StatementLists.concat(initStatements, declarations.statementsToPrepend);
+            this._actorScope = true;
+            try {
+                // Resource declarations and definitions
+                resouceDefs = ctx.actorComponentsDefinition().resourceList().accept(this);
+                initStatements = StatementLists.concat(initStatements, resouceDefs.statementsToPrepend);
+
+                // Variable declarations and initializations
+                declarations = ctx.actorComponentsDefinition().declarationStmtList().accept(this);
+                initStatements = StatementLists.concat(initStatements, declarations.statementsToPrepend);
+            } finally {
+                this._actorScope = false;
+            }
 
             // Method declarations and definitions
             const methods = ctx.actorComponentsDefinition().methodDefinitionList().accept(this);
@@ -911,7 +924,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         // Declare and initialize a counter variable
         const counterIdent: Identifier = Identifier.fresh();
         const counterVar = new NumberVariableExpression(counterIdent);
-        const declarationStmt = new DeclareVariableStatement(counterIdent, NumberType.instance());
+        const declarationStmt = new DeclareStackVariableStatement(counterIdent, NumberType.instance());
         const initStmt: Statement = new StoreEvalResultToVariableStatement(counterIdent, NumberLiteral.of(0));
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt, initStmt]));
 
@@ -962,7 +975,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         // Declare and initialize a fresh variable for the result
         const resultVarIdent: Identifier = Identifier.fresh();
         const resultVarExpr = new NumberVariableExpression(resultVarIdent);
-        const declarationStmt = new DeclareVariableStatement(resultVarIdent, NumberType.instance());
+        const declarationStmt = new DeclareStackVariableStatement(resultVarIdent, NumberType.instance());
         const initStmt: Statement = new StoreEvalResultToVariableStatement(resultVarIdent, NumberLiteral.of(0));
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt, initStmt]));
 
@@ -1066,7 +1079,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     private declareFreshBooleanVariable(value: boolean): TTransformerResult<BooleanVariableExpression> {
         const resultVarIdent: Identifier = Identifier.fresh();
         const resultVarExpr = new BooleanVariableExpression(resultVarIdent);
-        const declareVarStmt = new DeclareVariableStatement(resultVarIdent, BooleanType.instance());
+        const declareVarStmt = new DeclareStackVariableStatement(resultVarIdent, BooleanType.instance());
         const initStmt: Statement = new StoreEvalResultToVariableStatement(resultVarIdent, BooleanLiteral.from(value));
 
         let prepend: StatementList = StatementList.empty();
@@ -1276,10 +1289,17 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitDeclareVariable(ctx: DeclareVariableContext) : TransformerResult {
-        return TransformerResult.withNode(
-            new DeclareVariableStatement(
-                ctx.ident().accept(this).nodeOnly() as Identifier,
-                ctx.type().accept(this).nodeOnly() as ScratchType));
+        if (this._actorScope) {
+            return TransformerResult.withNode(
+                new DeclareActorVariableStatement(
+                    ctx.ident().accept(this).nodeOnly() as Identifier,
+                    ctx.type().accept(this).nodeOnly() as ScratchType));
+        } else {
+            return TransformerResult.withNode(
+                new DeclareStackVariableStatement(
+                    ctx.ident().accept(this).nodeOnly() as Identifier,
+                    ctx.type().accept(this).nodeOnly() as ScratchType));
+        }
     }
 
     public visitDefaultBoolExpression(ctx: DefaultBoolExpressionContext) : TransformerResult {
@@ -1723,7 +1743,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
         const resultVarIdent: Identifier = Identifier.fresh();
         const resultVarExpr = this.createVariableExpression(resultVarType, resultVarIdent);
-        const declarationStmt = new DeclareVariableStatement(resultVarIdent, resultVarType);
+        const declarationStmt = new DeclareStackVariableStatement(resultVarIdent, resultVarType);
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
 
         const argsTr = ctx.expressionList().accept(this);
@@ -1772,7 +1792,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 const resultVarIdent: Identifier = Identifier.fresh();
                 const resultVarType = this.determineResultType(node);
                 const resultVarExpr = this.createVariableExpression(resultVarType, resultVarIdent);
-                const declarationStmt = new DeclareVariableStatement(resultVarIdent, resultVarType);
+                const declarationStmt = new DeclareStackVariableStatement(resultVarIdent, resultVarType);
                 prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
 
                 const argsTr: TTransformerResult<ExpressionList> = this.childsAsExpressionList(node);

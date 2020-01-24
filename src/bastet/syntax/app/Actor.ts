@@ -30,6 +30,14 @@ import {MethodDefinition, MethodDefinitionMap, MethodSignature, MethodSignatureM
 import {ActorMode} from "../ast/core/ActorDefinition";
 import {Preconditions} from "../../utils/Preconditions";
 import {Method} from "./controlflow/Method";
+import {BootstrapEvent, NeverEvent} from "../ast/core/CoreEvent";
+import {TransitionRelation, TransitionRelationBuilder} from "./controlflow/TransitionRelation";
+import {Scripts} from "./controlflow/Scripts";
+import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
+import {GREENFLAG_MESSAGE, INIT_MESSAGE} from "../ast/core/Message";
+import {StatementList} from "../ast/core/statements/Statement";
+import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
+import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -77,16 +85,19 @@ export class Actor {
                 scripts: Script[], methods: Method[]) {
         Preconditions.checkNotUndefined(inheritFrom);
 
-        this._actorMode = mode;
-        this._ident = ident;
-        this._inheritsFrom = inheritFrom;
-        this._initScript = initScript;
+        this._actorMode = Preconditions.checkNotUndefined(mode);
+        this._ident = Preconditions.checkNotUndefined(ident);
+        this._inheritsFrom = Preconditions.checkNotUndefined(inheritFrom);
+        this._initScript = Preconditions.checkNotUndefined(initScript);
         this._resources = Maps.immutableCopyOf(resources);
         this._datalocs = Maps.immutableCopyOf(datalocs);
         this._methodDefinitions = Maps.immutableCopyOf(methodDefs);
         this._externalMethodSignatures = Maps.immutableCopyOf(externalMethods);
         this._scripts = Lists.immutableCopyOf(scripts);
         this._methods = Lists.immutableCopyOf(methods);
+
+        Preconditions.checkArgument(initScript.event === NeverEvent.instance()
+            || initScript.event === BootstrapEvent.instance());
     }
 
     get ident(): string {
@@ -140,6 +151,30 @@ export class Actor {
     get actorMode(): ActorMode {
         return this._actorMode;
     }
+}
+
+export class Actors {
+
+    private static _DEFAULT_BOOTSTRAPPER: Actor;
+
+    public static defaultBoostraper(): Actor {
+        if (!Actors._DEFAULT_BOOTSTRAPPER) {
+            const bootstrapStmts = new StatementList([
+                new BroadcastAndWaitStatement(INIT_MESSAGE.messageid),
+                new BroadcastMessageStatement(GREENFLAG_MESSAGE.messageid),
+            ]);
+            const visitor: RelationBuildingVisitor = new RelationBuildingVisitor();
+            const bootstrapTransitions: TransitionRelation = bootstrapStmts.accept(visitor);
+            const bootstrapScript: Script = new Script(Scripts.freshScriptId(),
+                BootstrapEvent.instance(), bootstrapTransitions);
+            Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [],
+                {}, {}, Scripts.empty(), {}, {},
+                [bootstrapScript], []);
+        }
+
+        return Actors._DEFAULT_BOOTSTRAPPER;
+    }
+
 }
 
 

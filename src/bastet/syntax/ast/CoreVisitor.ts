@@ -70,7 +70,7 @@ import {StatementList} from "./core/statements/Statement";
 import {
     DeclareAttributeOfStatement,
     DeclareAttributeStatement,
-    DeclareVariableStatement
+    DeclareStackVariableStatement
 } from "./core/statements/DeclarationStatement";
 import {ExpressionStatement} from "./core/statements/ExpressionStatement";
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
@@ -212,7 +212,7 @@ export interface CoreCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
 export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
-    visit(node: DeclareVariableStatement): R;
+    visit(node: DeclareStackVariableStatement): R;
 
     visit(node: DeclareAttributeStatement): R;
 

@@ -35,7 +35,7 @@ export interface VariableDeclaration {
 
 }
 
-export class DeclareVariableStatement extends DeclarationStatement implements VariableDeclaration {
+export abstract class DeclareVariableStatement extends DeclarationStatement implements VariableDeclaration {
 
     private readonly _ident: Identifier;
     private readonly _type: ScratchType;
@@ -52,6 +52,21 @@ export class DeclareVariableStatement extends DeclarationStatement implements Va
 
     get type(): ScratchType {
         return this._type;
+    }
+
+}
+
+export class DeclareStackVariableStatement extends DeclareVariableStatement {
+
+    constructor(ident: Identifier, type: ScratchType) {
+        super(ident, type);
+    }
+}
+
+export class DeclareActorVariableStatement extends DeclareVariableStatement {
+
+    constructor(ident: Identifier, type: ScratchType) {
+        super(ident, type);
     }
 }
 

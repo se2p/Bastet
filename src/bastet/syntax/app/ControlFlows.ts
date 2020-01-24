@@ -37,7 +37,7 @@ export class ControlFlows {
         }
 
         return new App("union_of_" + controlflow1.origin + "_and_" + controlflow2.origin,
-            ident, resultActorsMap);
+            ident, resultActorsMap, controlflow1.bootstrapper);
     }
 
 }

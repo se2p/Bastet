@@ -29,6 +29,14 @@ import {StatementList} from "./statements/Statement";
 
 export abstract class ActorMode extends AbstractNode {
 
+    static concrete(): ActorMode {
+        return ConcreteActorMode.instance();
+    }
+
+    static role(): ActorMode {
+        return ActorRoleMode.instance();
+    }
+
 }
 
 export class ConcreteActorMode extends ActorMode {

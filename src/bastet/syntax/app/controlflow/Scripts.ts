@@ -22,6 +22,7 @@
 import {Script, ScriptId} from "./Script";
 import {TransitionRelations} from "./TransitionRelation";
 import {Preconditions} from "../../../utils/Preconditions";
+import {NeverEvent} from "../../ast/core/CoreEvent";
 
 export class Scripts {
 
@@ -48,4 +49,13 @@ export class Scripts {
         return new Script(this.freshScriptId(), script1.event, newTR);
     }
 
+    private static EMPTY_SCRIPT: Script;
+
+    static empty() {
+        if (!Scripts.EMPTY_SCRIPT) {
+            Scripts.EMPTY_SCRIPT = new Script(Scripts.freshScriptId(),
+                NeverEvent.instance(), TransitionRelations.epsilon());
+        }
+        return Scripts.EMPTY_SCRIPT;
+    }
 }

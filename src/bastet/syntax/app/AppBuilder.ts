@@ -19,7 +19,7 @@
  *
  */
 
-import {Actor, ActorMap} from "./Actor";
+import {Actor, ActorMap, Actors} from "./Actor";
 import {App} from "./App";
 import {AppResource, AppResourceMap} from "./AppResource";
 import {Script} from "./controlflow/Script";
@@ -48,7 +48,7 @@ import {IllegalStateException} from "../../core/exceptions/IllegalStateException
 import {Maps} from "../../utils/Maps";
 import {Lists} from "../../utils/Lists";
 import {Method} from "./controlflow/Method";
-import {DeclareVariableStatement} from "../ast/core/statements/DeclarationStatement";
+import {DeclareStackVariableStatement} from "../ast/core/statements/DeclarationStatement";
 import {Identifier} from "../ast/core/Identifier";
 
 export class AppBuilder {
@@ -82,7 +82,7 @@ export class AppBuilder {
         // TODO/FIXME: Check if adding the prefix to actor names works correctly.
         //      Also references to the actor must be updated.
 
-        return new App(programOrigin, programNode.ident.text, actorMap);
+        return new App(programOrigin, programNode.ident.text, actorMap, Actors.defaultBoostraper());
     }
 
     private buildActors(programAST: ProgramDefinition, actorNamePrefix: string): ActorMap {
@@ -156,7 +156,7 @@ export class AppBuilder {
             if (!ScratchType.isVoid(m.returns.type)) {
                 const resultVarIdent: Identifier = m.returns.ident;
                 const resultVarType: ScratchType = m.returns.type;
-                const declarationStmt = new DeclareVariableStatement(resultVarIdent, resultVarType);
+                const declarationStmt = new DeclareStackVariableStatement(resultVarIdent, resultVarType);
                 const dclStmtList = StatementList.from([declarationStmt]);
 
                 methodTr = TransitionRelations.concat(methodTr, dclStmtList.accept(visitor));
@@ -328,6 +328,6 @@ export class AppBuilder {
             flatActors[d.ident] = d;
         }
 
-        return new App(taskModel.origin, taskModel.ident, flatActors);
+        return new App(taskModel.origin, taskModel.ident, flatActors, taskModel.bootstrapper);
     }
 }

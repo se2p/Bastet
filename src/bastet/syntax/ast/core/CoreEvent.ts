@@ -28,6 +28,23 @@ export abstract class CoreEvent extends AbstractNode {
 
 }
 
+export class BootstrapEvent extends CoreEvent {
+
+    constructor() {
+        super([]);
+    }
+
+    private static INSTANCE: BootstrapEvent;
+
+    public static instance(): BootstrapEvent {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new BootstrapEvent();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
 export class NeverEvent extends CoreEvent {
 
     constructor() {
