@@ -236,6 +236,7 @@ role ScratchSprite is ScratchEntity begin
         define radians as degToRad(90 - direction)
         define dx as n * mathCos(radians)
         define dy as n * mathSin(radians)
+        define dy as n * mathSin(radians)
 
         define x as (x + dx)
         define y as (y + dy)

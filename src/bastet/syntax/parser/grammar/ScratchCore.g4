@@ -215,6 +215,7 @@ stmt :
       controlStmt # ControlStatement
     | nonCtrlStmt # NonControlStatement
     | atomicBlock # AtomicBlockStatement
+    | '@' Identifier expressionList stmt # AttributedStatement
     ;
 
 nonCtrlStmt : coreNonCtrlStmt ;
@@ -271,8 +272,8 @@ coreStringExpr  :
  |  '(' coreStringExpr ')' # StringParanthExpression
  |  callStmt # StringCallStatementExpression
 
- |  'as' 'string' numExpr # NumAsStringExpression
- |  'as' 'string' boolExpr # BoolAsStringExpression
+ |  'cast' numExpr 'to' 'string' # NumAsStringExpression
+ |  'cast' boolExpr 'to' 'string' # BoolAsStringExpression
 
  |  'attribute'  stringExpr  'of'  ident  # StringAttributeOfExpression               // query an attribute value of an actor (sprites, the stage)
  |  'resource' 'attribute'  stringExpr 'of'  variable  # ResourceAttributeOfExpression  // query attributes of ressources, for example, the original size
@@ -318,8 +319,8 @@ coreNumExpr  :
  |  variable # NumVariableExpression
  |  '(' coreNumExpr ')' # NumBrackets
  |  callStmt # NumCallStatementExpression
- |  'as' 'number'  stringExpr # StringAsNumExpression
- |  'as' 'number'  boolExpr # BoolAsNumExpression
+ |  'cast' stringExpr 'to' 'number' # StringAsNumExpression
+ |  'cast' boolExpr 'to' 'number' # BoolAsNumExpression
 
  |  'timer' # TimerExpression
  |  'length' 'of' stringExpr # LengthOfStringExpression

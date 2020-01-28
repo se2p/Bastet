@@ -26,6 +26,7 @@ import {ScratchType} from "../../../syntax/ast/core/ScratchType";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {AbstractDomain, AbstractionPrecision, ConcreteElement} from "../AbstractDomain";
+import {Identifier} from "../../../syntax/ast/core/Identifier";
 
 /**
  * Separated by type, similar to the variables in the
@@ -82,6 +83,106 @@ export class MemAbstractStates {
     public static builder(baseState: MemAbstractState): MemAbstractStateBuilder {
        return new MemAbstractStateBuilder(baseState);
     }
+
+}
+
+export class AbstractString {
+
+}
+
+export class ConcreteString {
+
+}
+
+export class AbstractBoolean {
+
+}
+
+export class ConcreteBoolean {
+
+}
+
+export class AbstractNumber {
+
+}
+
+export class ConcreteNumber {
+
+}
+
+export interface StringTheory {
+
+    fromConcreteString(str: ConcreteString): AbstractString;
+
+    abstractStringValue(id: Identifier): AbstractString;
+
+    emptyString(): AbstractString;
+
+    topString(): AbstractString;
+
+    bottomString(): AbstractString;
+
+    lengthOf(str: AbstractString): AbstractNumber;
+
+    castNumberAsString(num: AbstractNumber): AbstractString;
+
+    castBoolAsString(num: AbstractBoolean): AbstractString;
+
+    joinStrings(str1: AbstractString, str2: AbstractString): AbstractString;
+
+    ithLetterOf(index: AbstractNumber, str: AbstractString): AbstractString;
+
+}
+
+export interface RationalNumberTheory {
+
+    fromConcreteNumber(str: ConcreteNumber): AbstractNumber;
+
+    abstractNumberValue(id: Identifier): AbstractNumber;
+
+    zero(): AbstractNumber;
+
+    one(): AbstractNumber;
+
+    topNumber(): AbstractNumber;
+
+    bottomNumber(): AbstractNumber;
+
+    castStringAsNumber(str: AbstractString): AbstractNumber;
+
+    castBoolAsNumber(val: AbstractBoolean): AbstractNumber;
+
+    multiply(op1: AbstractNumber, op2: AbstractNumber): AbstractNumber;
+
+    divide(op1: AbstractNumber, op2: AbstractNumber): AbstractNumber;
+
+    modulo(op1: AbstractNumber, op2: AbstractNumber): AbstractNumber;
+
+    plus(op1: AbstractNumber, op2: AbstractNumber): AbstractNumber;
+
+    minus(op1: AbstractNumber, op2: AbstractNumber): AbstractNumber;
+
+}
+
+export interface BooleanTheory {
+
+    fromConcreteBoolean(str: ConcreteBoolean): AbstractBoolean;
+
+    abstractBooleanValue(id: Identifier): AbstractBoolean;
+
+    falseBool(): AbstractBoolean;
+
+    trueBool(): AbstractBoolean;
+
+    topBoolean(): AbstractBoolean;
+
+    bottomBoolean(): AbstractBoolean;
+
+    not(op1: AbstractBoolean): AbstractBoolean;
+
+    and(op1: AbstractBoolean, op2: AbstractBoolean): AbstractBoolean;
+
+    or(op1: AbstractBoolean, op2: AbstractBoolean): AbstractBoolean;
 
 }
 
