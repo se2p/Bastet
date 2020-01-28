@@ -19,12 +19,54 @@
  *
  */
 
-import {AbstractElement} from "../../../lattices/Lattice";
+import {AbstractElement, Lattice} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
-import {Record as ImmRec, Set as ImmSet, Map as ImmMap} from "immutable"
+import {Record as ImmRec, Map as ImmMap} from "immutable"
+import {ScratchType} from "../../../syntax/ast/core/ScratchType";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+import {AbstractDomain, AbstractionPrecision, ConcreteElement} from "../AbstractDomain";
 
-// TODO: Also implement based on ImmRec that has a map-field with the data
-export type MemAbstractState = ImmMap<string, any>;
+/**
+ * Separated by type, similar to the variables in the
+ * different background theories of a solver.
+ */
+export interface MemAbstractState extends AbstractElement {
+
+    types: ImmMap<string, ScratchType>;
+
+    numData: ImmMap<string, AbstractElement>;
+
+    boolData: ImmMap<string, AbstractElement>;
+
+    stringData: ImmMap<string, AbstractElement>;
+
+    listData: ImmMap<string, AbstractElement>;
+
+}
+
+const MemAbstractStateRecord = ImmRec({
+
+    types: ImmMap({}),
+    numData: ImmMap({}),
+    boolData: ImmMap({}),
+    stringData: ImmMap({}),
+    listData: ImmMap({}),
+
+});
+
+export class MemAbstractStateImpl extends MemAbstractStateRecord implements MemAbstractState {
+
+    types: ImmMap<string, ScratchType>;
+    numData: ImmMap<string, AbstractElement>;
+    boolData: ImmMap<string, AbstractElement>;
+    stringData: ImmMap<string, AbstractElement>;
+    listData: ImmMap<string, AbstractElement>;
+
+    constructor(args: any = {}) {
+        super(Object.assign({}, args, {}));
+    }
+}
 
 export class MemAbstractStates {
 
@@ -32,7 +74,7 @@ export class MemAbstractStates {
 
     public static empty(): MemAbstractState {
         if (!MemAbstractStates.EMPTY) {
-            MemAbstractStates.EMPTY = ImmMap();
+            MemAbstractStates.EMPTY = new MemAbstractStateImpl({});
         }
         return MemAbstractStates.EMPTY;
     }
@@ -47,8 +89,40 @@ export class MemAbstractStateBuilder {
 
     private _state: MemAbstractState;
 
-    constructor(state: MemAbstractState) {
-        this._state = Preconditions.checkNotUndefined(state);
+    constructor(base: MemAbstractState) {
+        this._state = Preconditions.checkNotUndefined(base);
+    }
+
+    public declare(ident: string, type: ScratchType): this {
+        throw new ImplementMeException();
+    }
+
+    public assignAbstractValue(ident: string, value: AbstractElement): this {
+        const type: ScratchType = this._state.types.get(ident);
+        if (!type) {
+            throw new IllegalArgumentException(`Type of variable ${ident} is unknown!`);
+        }
+        throw new ImplementMeException();
+    }
+
+    public assignAbstractNumValue(ident: string, value: AbstractElement): this {
+        throw new ImplementMeException();
+    }
+
+    public assignAbstractBoolValue(ident: string, value: AbstractElement): this {
+        throw new ImplementMeException();
+    }
+
+    public assignAbstractStringValue(ident: string, value: AbstractElement): this {
+        throw new ImplementMeException();
+    }
+
+    public assignAbstractListValue(ident: string, value: AbstractElement): this {
+        throw new ImplementMeException();
+    }
+
+    public free(ident: string): this {
+        throw new ImplementMeException();
     }
 
     public build(): MemAbstractState {
@@ -56,3 +130,94 @@ export class MemAbstractStateBuilder {
     }
 
 }
+
+export class TypePartitionedMapLattice implements Lattice<MemAbstractState> {
+
+    private readonly _numLattice: Lattice<AbstractElement>;
+
+    private readonly _boolLattice: Lattice<AbstractElement>;
+
+    private readonly _stringLattice: Lattice<AbstractElement>;
+
+    private readonly _listLattice: Lattice<AbstractElement>;
+
+    private readonly _mapLattice: Lattice<AbstractElement>;
+
+    constructor(numLattice: Lattice<AbstractElement>, boolLattice: Lattice<AbstractElement>,
+                stringLattice: Lattice<AbstractElement>, listLattice: Lattice<AbstractElement>,
+                mapLattice: Lattice<AbstractElement>) {
+        this._numLattice = Preconditions.checkNotUndefined(numLattice);
+        this._boolLattice = Preconditions.checkNotUndefined(boolLattice);
+        this._stringLattice = Preconditions.checkNotUndefined(stringLattice);
+        this._listLattice = Preconditions.checkNotUndefined(listLattice);
+        this._mapLattice = Preconditions.checkNotUndefined(mapLattice);
+    }
+
+    bottom(): MemAbstractState {
+        throw new ImplementMeException();
+    }
+
+    isIncluded(element1: MemAbstractState, element2: MemAbstractState): boolean {
+        throw new ImplementMeException();
+    }
+
+    join(element1: MemAbstractState, element2: MemAbstractState): MemAbstractState {
+        throw new ImplementMeException();
+    }
+
+    meet(element1: MemAbstractState, element2: MemAbstractState): MemAbstractState {
+        throw new ImplementMeException();
+    }
+
+    top(): MemAbstractState {
+        throw new ImplementMeException();
+    }
+
+}
+
+export class MemAbstractDomain implements AbstractDomain<MemAbstractState> {
+
+    private readonly _lattice: Lattice<MemAbstractState>;
+
+    private readonly _numDomain: AbstractDomain<AbstractElement>;
+
+    private readonly _boolDomain: AbstractDomain<AbstractElement>;
+
+    private readonly _stringDomain: AbstractDomain<AbstractElement>;
+
+    private readonly _listDomain: AbstractDomain<AbstractElement>;
+
+    private readonly _mapDomain: AbstractDomain<AbstractElement>;
+
+    constructor(numDomain: AbstractDomain<AbstractElement>, boolDomain: AbstractDomain<AbstractElement>,
+                stringDomain: AbstractDomain<AbstractElement>, listDomain: AbstractDomain<AbstractElement>,
+                mapDomain: AbstractDomain<AbstractElement>) {
+        this._numDomain = Preconditions.checkNotUndefined(numDomain);
+        this._boolDomain = Preconditions.checkNotUndefined(boolDomain);
+        this._stringDomain = Preconditions.checkNotUndefined(stringDomain);
+        this._listDomain = Preconditions.checkNotUndefined(listDomain);
+        this._mapDomain = Preconditions.checkNotUndefined(mapDomain);
+        this._lattice = new TypePartitionedMapLattice(numDomain.lattice,
+            boolDomain.lattice, stringDomain.lattice, listDomain.lattice,
+            mapDomain.lattice);
+    }
+
+    abstract(elements: Iterable<ConcreteElement>): MemAbstractState {
+        return undefined;
+    }
+
+    concretize(element: MemAbstractState): Iterable<ConcreteElement> {
+        return undefined;
+    }
+
+    widen(element: MemAbstractState, precision: AbstractionPrecision): MemAbstractState {
+        return undefined;
+    }
+
+    get lattice(): Lattice<MemAbstractState> {
+        return this._lattice;
+    }
+
+}
+
+

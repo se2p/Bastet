@@ -19,44 +19,16 @@
  *
  */
 
-import {AbstractElement, Lattice} from "../../lattices/Lattice";
+describe("MemAbstractStateImpl", () => {});
 
-export interface ConcreteElement {
+describe("MemAbstractStateBuilder", () => {
 
-}
+    describe("dissolveInheritance", () => {
 
-export class ConcreteNumberElement implements ConcreteElement {
+        it("", () => {
 
-}
+        });
 
-export class ConcreteBoolElement implements ConcreteElement {
+    });
 
-}
-
-export class ConcreteStringElement implements ConcreteElement {
-
-}
-
-export class ConcreteListElement implements ConcreteElement {
-
-}
-
-export class ConcreteMapElement implements ConcreteElement {
-
-}
-
-export interface AbstractionPrecision {
-
-}
-
-export interface AbstractDomain<E extends AbstractElement> {
-
-    lattice: Lattice<E>;
-
-    abstract(elements: Iterable<ConcreteElement>): E;
-
-    concretize(element: E): Iterable<ConcreteElement>;
-
-    widen(element: E, precision: AbstractionPrecision): E;
-
-}
+});
