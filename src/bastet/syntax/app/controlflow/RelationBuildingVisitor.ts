@@ -68,7 +68,7 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
     visitIfStatement(node: IfStatement): TransitionRelation {
         this._stack.push("visitIfStatement");
         try {
-            const thenAssumeOp = ProgramOperationFactory.assumeOpFrom(node.cond);
+            const thenAssumeOp = ProgramOperationFactory.createAssumeOpFrom(node.cond);
             const elseAssumeOp = ProgramOperationFactory.negatedAssumeOpFrom(node.cond);
             const thenStatements: TransitionRelation = node.thenStmts.accept(this);
             const elseStatements: TransitionRelation = node.elseStmts.accept(this);
@@ -97,7 +97,7 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
         try {
             const loopHead: ControlLocation = ControlLocation.fresh();
             const loopBody: TransitionRelation = node.body.accept(this);
-            const condAssumeOp = ProgramOperationFactory.assumeOpFrom(node.cond);
+            const condAssumeOp = ProgramOperationFactory.createAssumeOpFrom(node.cond);
 
             return TransitionRelations.concatAndGoto(
                 TransitionRelations.singleton(loopHead),

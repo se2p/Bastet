@@ -281,6 +281,8 @@ export interface MemoryTheory {
 
     /** Booleans */
 
+    assignBoolean(assignTo: BooleanVariable, b: AbstractBoolean): AbstractMemory;
+
     assignAnd(assignTo: BooleanVariable, b1: AbstractBoolean, b2: AbstractBoolean): AbstractMemory;
 
     assignOr(assignTo: BooleanVariable, b1: AbstractBoolean, b2: AbstractBoolean): AbstractMemory;
@@ -294,8 +296,12 @@ export interface MemoryTheory {
 
     assumeFalse(boolVar: BooleanVariable): AbstractMemory;
 
+    assumeTruth(boolVal: AbstractBoolean): AbstractMemory;
+
 
     /** Strings */
+
+    assignString(assignTo: StringVariable, b: AbstractString): AbstractMemory;
 
     assignJoinedStrings(assignTo: StringVariable, s1: AbstractString, s2: AbstractString): AbstractMemory;
 
@@ -314,6 +320,8 @@ export interface MemoryTheory {
 
 
     /** Numbers */
+
+    assignNumber(assignTo: NumberVariable, b: AbstractNumber): AbstractMemory;
 
     assignMultiply(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
 
@@ -465,6 +473,22 @@ export class MemoryTransformer implements MemoryTheory {
     }
 
     queryAbstractString(id: StringVariable): AbstractString {
+        return undefined;
+    }
+
+    assignBoolean(assignTo: BooleanVariable, b: AbstractBoolean): MemAbstractState {
+        return undefined;
+    }
+
+    assignNumber(assignTo: NumberVariable, b: AbstractNumber): MemAbstractState {
+        return undefined;
+    }
+
+    assignString(assignTo: StringVariable, b: AbstractString): MemAbstractState {
+        return undefined;
+    }
+
+    assumeTruth(boolVal: AbstractBoolean): MemAbstractState {
         return undefined;
     }
 

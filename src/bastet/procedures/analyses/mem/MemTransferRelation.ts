@@ -20,10 +20,10 @@
  */
 
 import {LabeledTransferRelation} from "../TransferRelation";
-import {MemAbstractState} from "./MemAbstractDomain";
+import {AbstractBoolean, AbstractMemory, MemAbstractState, MemoryTheory, MemoryTransformer} from "./MemAbstractDomain";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {MemBoolExpressionVisitor, MemTransformerVisitor} from "./MemTransformerVisitor";
 
 export class MemTransferRelation implements LabeledTransferRelation<MemAbstractState> {
 
@@ -32,7 +32,17 @@ export class MemTransferRelation implements LabeledTransferRelation<MemAbstractS
     }
 
     abstractSuccFor(fromState: MemAbstractState, op: ProgramOperation): Iterable<MemAbstractState> {
-        throw new ImplementMeException();
+        if (op instanceof AssumeOperation) {
+            const visitor = new MemBoolExpressionVisitor(fromState);
+            const assume: AssumeOperation = op as AssumeOperation;
+            const assumeValue: AbstractBoolean = assume.expression.accept(visitor);
+            return [new MemoryTransformer(fromState).assumeTruth(assumeValue)];
+        } else {
+            const visitor = new MemTransformerVisitor(fromState);
+            const succ: AbstractMemory = op.ast.accept(visitor);
+            return [succ];
+        }
+
     }
 
 }

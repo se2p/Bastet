@@ -29,7 +29,10 @@ import {
     ProgramOperation, ProgramOperationFactory
 } from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
 import {AstNode} from "../../../../../src/bastet/syntax/ast/AstNode";
-import {NumLessThanExpression} from "../../../../../src/bastet/syntax/ast/core/expressions/BooleanExpression";
+import {
+    BooleanExpression,
+    NumLessThanExpression
+} from "../../../../../src/bastet/syntax/ast/core/expressions/BooleanExpression";
 import {
     NumberVariableExpression,
     PlusExpression
@@ -47,12 +50,12 @@ describe("MemTransferRelation", () => {
             describe("c < a + b", () => {
 
                 const e: MemAbstractState = MemAbstractStates.empty();
-                const opAst: AstNode = new NumLessThanExpression(
+                const opAst: BooleanExpression = new NumLessThanExpression(
                     new NumberVariableExpression(Identifier.of("c")),
                     new PlusExpression(
                         new NumberVariableExpression(Identifier.of("a")),
                         new NumberVariableExpression(Identifier.of("b"))));
-                const op: ProgramOperation = ProgramOperationFactory.createFor(opAst);
+                const op: ProgramOperation = ProgramOperationFactory.createAssumeOpFrom(opAst);
                 const result = tr.abstractSuccFor(e, op);
 
                 it("TODO", () => {

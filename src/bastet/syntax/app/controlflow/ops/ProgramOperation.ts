@@ -162,7 +162,7 @@ export class ProgramOperationFactory {
         return new RawOperation(ast);
     }
 
-    static assumeOpFrom(boolExpr: BooleanExpression): AssumeOperation {
+    static createAssumeOpFrom(boolExpr: BooleanExpression): AssumeOperation {
         return new AssumeOperation(boolExpr);
     }
 

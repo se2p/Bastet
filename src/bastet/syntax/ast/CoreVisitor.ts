@@ -212,52 +212,52 @@ export interface CoreCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
 export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
-    visit(node: DeclareStackVariableStatement): R;
+    visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): R;
 
-    visit(node: DeclareAttributeStatement): R;
+    visitDeclareAttributeStatement(node: DeclareAttributeStatement): R;
 
-    visit(node: DeclareAttributeOfStatement): R;
+    visitDeclareAttributeOfStatement(node: DeclareAttributeOfStatement): R;
 
-    visit(node: ExpressionStatement): R;
+    visitExpressionStatement(node: ExpressionStatement): R;
 
-    visit(node: WaitUntilStatement): R;
+    visitWaitUntilStatement(node: WaitUntilStatement): R;
 
-    visit(node: StopOthersInActorStatement): R;
+    visitStopOthersInActorStatement(node: StopOthersInActorStatement): R;
 
-    visit(node: CreateCloneOfStatement): R;
+    visitCreateCloneOfStatement(node: CreateCloneOfStatement): R;
 
-    visit(node: BroadcastMessageStatement): R;
+    visitBroadcastMessageStatement(node: BroadcastMessageStatement): R;
 
-    visit(node: BroadcastAndWaitStatement): R;
+    visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): R;
 
-    visit(node: ResetTimerStatement): R;
+    visitResetTimerStatement(node: ResetTimerStatement): R;
 
-    visit(node: ChangeVarByStatement): R;
+    visitChangeVarByStatement(node: ChangeVarByStatement): R;
 
-    visit(node: ChangeAttributeByStatement): R;
+    visitChangeAttributeByStatement(node: ChangeAttributeByStatement): R;
 
-    visit(node: EpsilonStatement): R;
+    visitEpsilonStatement(node: EpsilonStatement): R;
 
-    visit(node: DeleteAllFromStatement): R;
+    visitDeleteFromAllStatement(node: DeleteAllFromStatement): R;
 
-    visit(node: DeleteIthFromStatement): R;
+    visitDeleteIthFromStatement(node: DeleteIthFromStatement): R;
 
-    visit(node: AddElementToStatement): R;
+    visitAddElementToStatement(node: AddElementToStatement): R;
 
-    visit(node: InsertAtStatement): R;
+    visitInsertAtStatement(node: InsertAtStatement): R;
 
-    visit(node: ReplaceElementAtStatement): R;
+    visitReplaceElementAtStatement(node: ReplaceElementAtStatement): R;
 
-    visit(node: SetAttributeOfToStatement): R;
+    visitSetAttributeOfToStatement(node: SetAttributeOfToStatement): R;
 
-    visit(node: SetAttributeToStatement): R;
+    visitSetAttributeToStatement(node: SetAttributeToStatement): R;
 
-    visit(node: StoreEvalResultToVariableStatement): R;
+    visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): R;
 
-    visit(node: StopAllStatement): R;
+    visitStopAllStatement(node: StopAllStatement): R;
 
-    visit(node: StopThisStatement): R;
+    visitStopThisStatement(node: StopThisStatement): R;
 
-    visit(node: DeleteThisCloneStatement): R;
+    visitDeleteThisCloneStatement(node: DeleteThisCloneStatement): R;
 
 }
