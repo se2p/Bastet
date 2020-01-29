@@ -24,9 +24,10 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {Record as ImmRec, Map as ImmMap} from "immutable"
 import {ScratchType} from "../../../syntax/ast/core/ScratchType";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {AbstractDomain, AbstractionPrecision, ConcreteElement} from "../AbstractDomain";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
+
+export type AbstractMemory = MemAbstractState;
 
 /**
  * Separated by type, similar to the variables in the
@@ -80,13 +81,17 @@ export class MemAbstractStates {
         return MemAbstractStates.EMPTY;
     }
 
-    public static builder(baseState: MemAbstractState): MemAbstractStateBuilder {
-       return new MemAbstractStateBuilder(baseState);
+    public static transform(baseState: MemAbstractState): MemoryTransformer {
+       return new MemoryTransformer(baseState);
     }
 
 }
 
-export class AbstractString {
+export abstract class AbstractValue {
+
+}
+
+export class AbstractString extends AbstractValue {
 
 }
 
@@ -94,7 +99,7 @@ export class ConcreteString {
 
 }
 
-export class AbstractBoolean {
+export class AbstractBoolean extends AbstractValue {
 
 }
 
@@ -102,11 +107,43 @@ export class ConcreteBoolean {
 
 }
 
-export class AbstractNumber {
+export class AbstractNumber extends AbstractValue {
 
 }
 
 export class ConcreteNumber {
+
+}
+
+export class ConcreteMemory {
+
+}
+
+export class AbstractList {
+
+}
+
+export class AbstractMap {
+
+}
+
+export class BooleanVariable {
+
+}
+
+export class StringVariable {
+
+}
+
+export class NumberVariable {
+
+}
+
+export class MapVariable {
+
+}
+
+export class ListVariable {
 
 }
 
@@ -131,6 +168,30 @@ export interface StringTheory {
     joinStrings(str1: AbstractString, str2: AbstractString): AbstractString;
 
     ithLetterOf(index: AbstractNumber, str: AbstractString): AbstractString;
+
+}
+
+export interface StringTheoryAssumes {
+
+    assumeStringGreaterThan(s1: AbstractString, s2: AbstractString): AbstractString;
+
+    assumeIsStringLessThan(s1: AbstractString, s2: AbstractString): AbstractString;
+
+    assumeIsStringEqualTo(s1: AbstractString, s2: AbstractString): AbstractString;
+
+    assumeIsStringContained(s: AbstractString, containedIn: AbstractString): AbstractString;
+
+}
+
+export interface StringTheoryQueries {
+
+    queryIsStringGreaterThan(s1: AbstractString, s2: AbstractString): AbstractBoolean;
+
+    queryIsStringLessThan(s1: AbstractString, s2: AbstractString): AbstractBoolean;
+
+    queryIsStringEqualTo(s1: AbstractString, s2: AbstractString): AbstractBoolean;
+
+    queryIsStringContained(s: AbstractString, containedIn: AbstractString): AbstractBoolean;
 
 }
 
@@ -186,48 +247,225 @@ export interface BooleanTheory {
 
 }
 
-export class MemAbstractStateBuilder {
+export interface MemoryTheory {
 
-    private _state: MemAbstractState;
+    /** Variable Declarations */
 
-    constructor(base: MemAbstractState) {
-        this._state = Preconditions.checkNotUndefined(base);
+    declareVariable(id: Identifier, type: ScratchType): AbstractMemory;
+
+    freeVariable(id: Identifier): AbstractMemory;
+
+    getStringVariable(id: Identifier): StringVariable;
+
+    getNumberVariable(id: Identifier): NumberVariable;
+
+    getBooleanVariable(id: Identifier): BooleanVariable;
+
+    getListVariable(id: Identifier): ListVariable;
+
+    getMapVariable(id: Identifier): MapVariable;
+
+
+    /** Querying Variable Values */
+
+    queryAbstractString(id: StringVariable): AbstractString;
+
+    queryAbstractNumber(id: NumberVariable): AbstractNumber;
+
+    queryAbstractBoolean(id: BooleanVariable): AbstractBoolean;
+
+    queryAbstractMap(id: MapVariable): AbstractMap;
+
+    queryAbstractList(id: ListVariable): AbstractList;
+
+
+    /** Booleans */
+
+    assignAnd(assignTo: BooleanVariable, b1: AbstractBoolean, b2: AbstractBoolean): AbstractMemory;
+
+    assignOr(assignTo: BooleanVariable, b1: AbstractBoolean, b2: AbstractBoolean): AbstractMemory;
+
+    assignNot(assignTo: BooleanVariable, b1: AbstractBoolean): AbstractMemory;
+
+
+    /** Boolean Assumes */
+
+    assumeTrue(boolVar: BooleanVariable): AbstractMemory;
+
+    assumeFalse(boolVar: BooleanVariable): AbstractMemory;
+
+
+    /** Strings */
+
+    assignJoinedStrings(assignTo: StringVariable, s1: AbstractString, s2: AbstractString): AbstractMemory;
+
+    assignIthLetterOf(assignTo: StringVariable, index: AbstractNumber, str: AbstractString): AbstractMemory;
+
+
+    /** Strings --> Boolean */
+
+    assignStringGreaterThan(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): AbstractMemory;
+
+    assignIsStringLessThan(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): AbstractMemory;
+
+    assignIsStringEqualTo(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): AbstractMemory;
+
+    assignIsStringContained(assignTo: BooleanVariable, s: AbstractString, containedIn: AbstractString): AbstractMemory;
+
+
+    /** Numbers */
+
+    assignMultiply(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
+
+    assignDivide(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
+
+    assignModulo(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
+
+    assignPlus(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
+
+    assignMinus(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
+
+
+    /** Numbers --> Boolean */
+
+    assignNumberGreaterThan(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): AbstractMemory;
+
+    assignIsNumberLessThan(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): AbstractMemory;
+
+    assignIsNumberEqualTo(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): AbstractMemory;
+
+}
+
+export class MemoryTransformer implements MemoryTheory {
+
+    private readonly _state: AbstractMemory;
+
+    constructor(state: AbstractMemory) {
+        this._state = Preconditions.checkNotUndefined(state);
     }
 
-    public declare(ident: string, type: ScratchType): this {
-        throw new ImplementMeException();
+    assignAnd(assignTo: BooleanVariable, b1: AbstractBoolean, b2: AbstractBoolean): AbstractMemory {
+        return undefined;
     }
 
-    public assignAbstractValue(ident: string, value: AbstractElement): this {
-        const type: ScratchType = this._state.types.get(ident);
-        if (!type) {
-            throw new IllegalArgumentException(`Type of variable ${ident} is unknown!`);
-        }
-        throw new ImplementMeException();
+    assignDivide(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory {
+        return undefined;
     }
 
-    public assignAbstractNumValue(ident: string, value: AbstractElement): this {
-        throw new ImplementMeException();
+    assignIsNumberEqualTo(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): AbstractMemory {
+        return undefined;
     }
 
-    public assignAbstractBoolValue(ident: string, value: AbstractElement): this {
-        throw new ImplementMeException();
+    assignIsNumberLessThan(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): AbstractMemory {
+        return undefined;
     }
 
-    public assignAbstractStringValue(ident: string, value: AbstractElement): this {
-        throw new ImplementMeException();
+    assignIsStringContained(assignTo: BooleanVariable, s: AbstractString, containedIn: AbstractString): AbstractMemory {
+        return undefined;
     }
 
-    public assignAbstractListValue(ident: string, value: AbstractElement): this {
-        throw new ImplementMeException();
+    assignIsStringEqualTo(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): AbstractMemory {
+        return undefined;
     }
 
-    public free(ident: string): this {
-        throw new ImplementMeException();
+    assignIsStringLessThan(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): AbstractMemory {
+        return undefined;
     }
 
-    public build(): MemAbstractState {
-        return this._state;
+    assignIthLetterOf(assignTo: StringVariable, index: AbstractNumber, str: AbstractString): AbstractMemory {
+        return undefined;
+    }
+
+    assignJoinedStrings(assignTo: StringVariable, s1: AbstractString, s2: AbstractString): AbstractMemory {
+        return undefined;
+    }
+
+    assignMinus(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory {
+        return undefined;
+    }
+
+    assignModulo(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory {
+        return undefined;
+    }
+
+    assignMultiply(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory {
+        return undefined;
+    }
+
+    assignNot(assignTo: BooleanVariable, b1: AbstractBoolean): AbstractMemory {
+        return undefined;
+    }
+
+    assignNumberGreaterThan(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): AbstractMemory {
+        return undefined;
+    }
+
+    assignOr(assignTo: BooleanVariable, b1: AbstractBoolean, b2: AbstractBoolean): AbstractMemory {
+        return undefined;
+    }
+
+    assignPlus(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory {
+        return undefined;
+    }
+
+    assignStringGreaterThan(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): AbstractMemory {
+        return undefined;
+    }
+
+    assumeFalse(boolVar: BooleanVariable): AbstractMemory {
+        return undefined;
+    }
+
+    assumeTrue(boolVar: BooleanVariable): AbstractMemory {
+        return undefined;
+    }
+
+    declareVariable(id: Identifier, type: ScratchType): AbstractMemory {
+        return undefined;
+    }
+
+    freeVariable(id: Identifier): AbstractMemory {
+        return undefined;
+    }
+
+    getBooleanVariable(id: Identifier): BooleanVariable {
+        return undefined;
+    }
+
+    getListVariable(id: Identifier): ListVariable {
+        return undefined;
+    }
+
+    getMapVariable(id: Identifier): MapVariable {
+        return undefined;
+    }
+
+    getNumberVariable(id: Identifier): NumberVariable {
+        return undefined;
+    }
+
+    getStringVariable(id: Identifier): StringVariable {
+        return undefined;
+    }
+
+    queryAbstractBoolean(id: BooleanVariable): AbstractBoolean {
+        return undefined;
+    }
+
+    queryAbstractList(id: ListVariable): AbstractList {
+        return undefined;
+    }
+
+    queryAbstractMap(id: MapVariable): AbstractMap {
+        return undefined;
+    }
+
+    queryAbstractNumber(id: NumberVariable): AbstractNumber {
+        return undefined;
+    }
+
+    queryAbstractString(id: StringVariable): AbstractString {
+        return undefined;
     }
 
 }
