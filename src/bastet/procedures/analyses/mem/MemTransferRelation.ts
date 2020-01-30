@@ -42,7 +42,6 @@ export class MemTransferRelation implements LabeledTransferRelation<MemAbstractS
             const succ: AbstractMemory = op.ast.accept(visitor);
             return [succ];
         }
-
     }
 
 }
