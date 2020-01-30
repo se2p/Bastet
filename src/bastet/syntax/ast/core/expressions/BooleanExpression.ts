@@ -29,6 +29,8 @@ import {UnaryExpression} from "./UnaryExpression";
 import {StringExpression} from "./StringExpression";
 import {NumberExpression} from "./NumberExpression";
 
+export type BooleanLiteralExpression = BooleanExpression;
+
 export interface BooleanExpression extends Expression {
 
 }
