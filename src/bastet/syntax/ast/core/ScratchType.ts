@@ -32,10 +32,16 @@ import {AbstractNode} from "../AstNode";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ExpressionList} from "./expressions/ExpressionList";
 
+export type ScratchTypeID = number;
+let SCRATCH_TYPE_ID_SEQ: ScratchTypeID = 0;
+
 export abstract class ScratchType extends AbstractNode {
 
-    protected constructor(childs) {
+    private readonly _typeId: ScratchTypeID;
+
+    protected constructor(childs, typeid: ScratchTypeID) {
         super([]);
+        this._typeId = typeid;
     }
 
     public static registerType(typeIdent: string, type: ScratchType) {
@@ -45,6 +51,10 @@ export abstract class ScratchType extends AbstractNode {
     static isVoid(type: ScratchType) {
         return type === VoidType.instance();
     }
+
+    get typeId(): number {
+        return this._typeId;
+    }
 }
 
 export class VoidType extends ScratchType {
@@ -52,7 +62,7 @@ export class VoidType extends ScratchType {
     private static INSTANCE: VoidType;
 
     constructor() {
-        super([]);
+        super([], SCRATCH_TYPE_ID_SEQ++);
     }
 
     static instance(): VoidType {
@@ -69,7 +79,7 @@ export class NumberType extends ScratchType {
     private static INSTANCE: NumberType;
 
     constructor() {
-        super([]);
+        super([], SCRATCH_TYPE_ID_SEQ++);
     }
 
     static instance(): VoidType {
@@ -86,7 +96,7 @@ export class BooleanType extends ScratchType {
     private static INSTANCE: BooleanType;
 
     constructor() {
-        super([]);
+        super([], SCRATCH_TYPE_ID_SEQ++);
     }
 
     static instance(): VoidType {
@@ -103,7 +113,7 @@ export class StringType extends ScratchType {
     private static INSTANCE: StringType;
 
     constructor() {
-        super([]);
+        super([], SCRATCH_TYPE_ID_SEQ++);
     }
 
     static instance(): VoidType {
@@ -120,7 +130,7 @@ export class StringEnumType extends ScratchType {
     private readonly _values: ExpressionList;
 
     constructor(values: ExpressionList) {
-        super([values]);
+        super([values], SCRATCH_TYPE_ID_SEQ++);
         this._values = values;
     }
 
@@ -141,7 +151,7 @@ export class ListType extends ScratchType {
     private readonly _elementType: ScratchType;
 
     constructor(elementType: ScratchType) {
-        super([elementType]);
+        super([elementType], SCRATCH_TYPE_ID_SEQ++);
         this._elementType = elementType;
     }
 

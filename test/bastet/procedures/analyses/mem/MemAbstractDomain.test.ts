@@ -19,7 +19,15 @@
  *
  */
 
-describe("MemAbstractStateImpl", () => {});
+import {MemAbstractStateImpl} from "../../../../../src/bastet/procedures/analyses/mem/MemAbstractDomain";
+
+describe("MemAbstractStateImpl", () => {
+
+    describe("", () => {
+        const mem: MemAbstractStateImpl = new MemAbstractStateImpl();
+    });
+
+});
 
 describe("MemAbstractStateBuilder", () => {
 

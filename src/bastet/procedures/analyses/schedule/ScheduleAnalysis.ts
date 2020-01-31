@@ -20,18 +20,18 @@
  */
 
 import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
-import {ScheduleAbstractDomain, ScheduleAbstractState} from "./ScheduleAbstractDomain";
-import {AbstractDomain} from "../AbstractDomain";
+import {ScheduleAbstractDomain, ScheduleAbstractState, ScheduleConcreteState} from "./ScheduleAbstractDomain";
+import {AbstractDomain} from "../../domains/AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {App} from "../../../syntax/app/App";
 
-export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleAbstractState> {
+export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState> {
 
-    private readonly _abstractDomain: AbstractDomain<ScheduleAbstractState>;
-    private readonly _wrappedAnalysis: ProgramAnalysis<any>;
+    private readonly _abstractDomain: AbstractDomain<ScheduleConcreteState, ScheduleAbstractState>;
+    private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
 
-    constructor(wrappedAnalysis: ProgramAnalysis<any>) {
+    constructor(wrappedAnalysis: ProgramAnalysis<any, any>) {
         this._abstractDomain = new ScheduleAbstractDomain();
         this._wrappedAnalysis = wrappedAnalysis;
     }
@@ -60,11 +60,11 @@ export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleAbstrac
         return undefined;
     }
 
-    get wrappedAnalysis(): ProgramAnalysis<any> {
+    get wrappedAnalysis(): ProgramAnalysis<any, any> {
         return this._wrappedAnalysis;
     }
 
-    get abstractDomain(): AbstractDomain<any> {
+    get abstractDomain(): AbstractDomain<any, any> {
         return this._abstractDomain;
     }
 

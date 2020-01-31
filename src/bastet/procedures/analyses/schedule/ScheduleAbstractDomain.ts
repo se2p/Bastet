@@ -20,7 +20,7 @@
  */
 
 import {SingletonStateWrapper} from "../AbstractStates";
-import {AbstractDomain, AbstractionPrecision, ConcreteElement} from "../AbstractDomain";
+import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
 import {AbstractElement, Lattice} from "../../../lattices/Lattice";
 import {List as ImmList, Record as ImmRec} from "immutable";
 import {ActorId} from "../../../syntax/app/Actor";
@@ -33,6 +33,10 @@ export const THREAD_STATE_DONE = 3;
 export const THREAD_STATE_UNKNOWN = 0;
 
 export type ScriptComputationState = number;
+
+export interface ScheduleConcreteState {
+
+}
 
 export interface ThreadState {
     actorId: ActorId;
@@ -72,15 +76,15 @@ export class ScheduleAbstractStateImpl extends ScheduleAbstractStateRecord imple
 }
 
 
-export class ScheduleAbstractDomain implements AbstractDomain<ScheduleAbstractState> {
+export class ScheduleAbstractDomain implements AbstractDomain<ScheduleConcreteState, ScheduleAbstractState> {
 
     lattice: Lattice<ScheduleAbstractState>;
 
-    abstract(elements: Iterable<ConcreteElement>): ScheduleAbstractState {
+    abstract(elements: Iterable<ScheduleConcreteState>): ScheduleAbstractState {
         return undefined;
     }
 
-    concretize(element: ScheduleAbstractState): Iterable<ConcreteElement> {
+    concretize(element: ScheduleAbstractState): Iterable<ScheduleConcreteState> {
         return undefined;
     }
 

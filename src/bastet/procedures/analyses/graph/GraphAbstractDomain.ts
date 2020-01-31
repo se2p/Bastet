@@ -19,13 +19,18 @@
  *
  */
 
-import {AbstractDomain, AbstractionPrecision, ConcreteElement} from "../AbstractDomain";
+import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
 import {AbstractElement, Lattice} from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Record as ImmRec, Set as ImmSet} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
+import {ConcreteElement} from "../../domains/ConcreteElements";
 
 export type GraphStateId = number;
+
+export interface GraphConcreteState extends ConcreteElement {
+
+}
 
 export interface GraphAbstractState extends AbstractElement, SingletonStateWrapper {
     id: GraphStateId;
@@ -104,7 +109,7 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
     }
 }
 
-export class GraphAbstractDomain implements AbstractDomain<GraphAbstractState> {
+export class GraphAbstractDomain implements AbstractDomain<GraphConcreteState, GraphAbstractState> {
 
     private readonly _lattice: GraphAbstractStateLattice;
 
@@ -112,11 +117,11 @@ export class GraphAbstractDomain implements AbstractDomain<GraphAbstractState> {
         return this._lattice;
     }
 
-    abstract(elements: Iterable<ConcreteElement>): GraphAbstractState {
+    abstract(elements: Iterable<GraphConcreteState>): GraphAbstractState {
         throw new ImplementMeException();
     }
 
-    concretize(element: GraphAbstractState): Iterable<ConcreteElement> {
+    concretize(element: GraphAbstractState): Iterable<GraphConcreteState> {
         throw new ImplementMeException();
     }
 

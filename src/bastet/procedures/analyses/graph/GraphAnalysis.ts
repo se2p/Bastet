@@ -20,19 +20,19 @@
  */
 
 import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
-import {AbstractDomain} from "../AbstractDomain";
+import {AbstractDomain} from "../../domains/AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
-import {GraphAbstractDomain, GraphAbstractState} from "./GraphAbstractDomain";
+import {GraphConcreteState, GraphAbstractDomain, GraphAbstractState} from "./GraphAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {App} from "../../../syntax/app/App";
 
-export class GraphAnalysis implements WrappingProgramAnalysis<GraphAbstractState> {
+export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState> {
 
-    private _abstractDomain: AbstractDomain<GraphAbstractState>;
+    private _abstractDomain: AbstractDomain<GraphConcreteState, GraphAbstractState>;
 
-    private _wrappedAnalysis: ProgramAnalysis<any>;
+    private _wrappedAnalysis: ProgramAnalysis<any, any>;
 
-    constructor(wrappedAnalysis: ProgramAnalysis<any>) {
+    constructor(wrappedAnalysis: ProgramAnalysis<any, any>) {
         this._wrappedAnalysis = wrappedAnalysis;
         this._abstractDomain = new GraphAbstractDomain();
     }
@@ -61,11 +61,11 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphAbstractState
         throw new ImplementMeException();
     }
 
-    get abstractDomain(): AbstractDomain<GraphAbstractState> {
+    get abstractDomain(): AbstractDomain<GraphConcreteState, GraphAbstractState> {
         return this._abstractDomain;
     }
 
-    get wrappedAnalysis(): ProgramAnalysis<any> {
+    get wrappedAnalysis(): ProgramAnalysis<any, any> {
         return this._wrappedAnalysis;
     }
 

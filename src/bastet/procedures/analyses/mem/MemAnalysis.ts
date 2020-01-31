@@ -20,18 +20,19 @@
  */
 
 import {ProgramAnalysis} from "../ProgramAnalysis";
-import {MemAbstractState, MemAbstractStates} from "./MemAbstractDomain";
-import {AbstractDomain} from "../AbstractDomain";
+import {AbstractMemory, MemAbstractState, MemAbstractStates} from "./MemAbstractDomain";
+import {AbstractDomain} from "../../domains/AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {MemTransferRelation} from "./MemTransferRelation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {ConcreteMemory} from "../../domains/ConcreteElements";
 
-export class MemAnalysis implements ProgramAnalysis<MemAbstractState>, LabeledTransferRelation<MemAbstractState> {
+export class MemAnalysis implements ProgramAnalysis<ConcreteMemory, AbstractMemory>, LabeledTransferRelation<MemAbstractState> {
 
-    private readonly _abstractDomain: AbstractDomain<MemAbstractState>;
+    private readonly _abstractDomain: AbstractDomain<ConcreteMemory, AbstractMemory>;
     private readonly _transferRelation: MemTransferRelation;
 
     abstractSucc(fromState: MemAbstractState): Iterable<MemAbstractState> {
@@ -66,7 +67,7 @@ export class MemAnalysis implements ProgramAnalysis<MemAbstractState>, LabeledTr
         return this._transferRelation.abstractSuccFor(fromState, op);
     }
 
-    get abstractDomain(): AbstractDomain<MemAbstractState> {
+    get abstractDomain(): AbstractDomain<ConcreteMemory, AbstractMemory> {
         return this._abstractDomain;
     }
 }

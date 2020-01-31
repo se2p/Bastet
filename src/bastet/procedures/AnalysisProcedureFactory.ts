@@ -24,12 +24,13 @@ import {App} from "../syntax/app/App";
 import {GraphAnalysis} from "./analyses/graph/GraphAnalysis";
 import {ProgramAnalysis} from "./analyses/ProgramAnalysis";
 import {ScheduleAnalysis} from "./analyses/schedule/ScheduleAnalysis";
-import {ScheduleAbstractState} from "./analyses/schedule/ScheduleAbstractDomain";
-import {MemAbstractState} from "./analyses/mem/MemAbstractDomain";
+import {ScheduleAbstractState, ScheduleConcreteState} from "./analyses/schedule/ScheduleAbstractDomain";
+import {AbstractMemory, MemAbstractState} from "./analyses/mem/MemAbstractDomain";
 import {MemAnalysis} from "./analyses/mem/MemAnalysis";
-import {GraphAbstractState} from "./analyses/graph/GraphAbstractDomain";
+import {GraphConcreteState, GraphAbstractState} from "./analyses/graph/GraphAbstractDomain";
 import {ReachabilityAlgorithm} from "./algorithms/Reachability";
 import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
+import {ConcreteMemory} from "./domains/ConcreteElements";
 
 export class AnalysisProcedureConfig {
 
@@ -44,9 +45,9 @@ export class AnalysisProcedureFactory {
     public static createAnalysisProcedure(config: AnalysisProcedureConfig): AnalysisProcedure {
         return new class implements AnalysisProcedure {
             run(task: App): {} {
-                const memAnalysis: ProgramAnalysis<MemAbstractState> = new MemAnalysis();
-                const schedAnalysis: ProgramAnalysis<ScheduleAbstractState> = new ScheduleAnalysis(memAnalysis);
-                const graphAnalysis: ProgramAnalysis<GraphAbstractState> = new GraphAnalysis(schedAnalysis);
+                const memAnalysis: ProgramAnalysis<ConcreteMemory, AbstractMemory> = new MemAnalysis();
+                const schedAnalysis: ProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState> = new ScheduleAnalysis(memAnalysis);
+                const graphAnalysis: ProgramAnalysis<GraphConcreteState, GraphAbstractState> = new GraphAnalysis(schedAnalysis);
 
                 const frontier: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
                 const reached: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
