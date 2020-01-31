@@ -23,8 +23,9 @@
 import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {Map as ImmMap, Record as ImmRec} from "immutable";
-import {ConcreteElementFactory, ConcreteNumber, ConcreteNumberOrderLattice} from "./ConcreteElements";
+import {ConcreteDomain, ConcreteElementFactory, ConcreteNumber, ConcreteNumberOrderLattice} from "./ConcreteElements";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {Preconditions} from "../../utils/Preconditions";
 
 export interface NumIntervalValue extends AbstractElement {
 
@@ -42,11 +43,16 @@ const NumIntervalValueRecord = ImmRec({
 
 export class NumIntervalValueImpl extends NumIntervalValueRecord implements NumIntervalValue {
 
-    minValue: ConcreteNumber;
-    maxValue: ConcreteNumber;
+    constructor(min: ConcreteNumber, max: ConcreteNumber) {
+        super({minValue: min, maxValue: max});
+    }
 
-    constructor(args: any = {}) {
-        super(Object.assign({}, args, {}));
+    get minValue(): ConcreteNumber {
+        return this.get('minValue');
+    }
+
+    get maxValue(): ConcreteNumber {
+        return this.get('maxValue');
     }
 }
 
@@ -55,7 +61,9 @@ export class NumIntervalLattice implements Lattice<NumIntervalValue> {
     private readonly _concreteElementLattice: ConcreteNumberOrderLattice;
 
     constructor() {
-        this._concreteElementLattice = new ConcreteNumberOrderLattice();
+        this._concreteElementLattice = new ConcreteNumberOrderLattice(
+            new ConcreteNumber(Number.NEGATIVE_INFINITY),
+            new ConcreteNumber(Number.POSITIVE_INFINITY));
     }
 
     bottom(): NumIntervalValue {
@@ -63,7 +71,12 @@ export class NumIntervalLattice implements Lattice<NumIntervalValue> {
     }
 
     isIncluded(element1: NumIntervalValue, element2: NumIntervalValue): boolean {
-        throw new ImplementMeException();
+        if (element1.minValue.value >= element2.minValue.value) {
+            if (element1.maxValue.value <= element2.maxValue.value) {
+                return true;
+            }
+        }
+        return false;
     }
 
     join(element1: NumIntervalValue, element2: NumIntervalValue): NumIntervalValue {
@@ -86,17 +99,27 @@ export class NumIntervalLattice implements Lattice<NumIntervalValue> {
 export class NumIntervalValueDomain implements AbstractDomain<ConcreteNumber, NumIntervalValue> {
 
     private readonly _lattice: NumIntervalLattice;
-    private readonly _valuelattice: Lattice<ConcreteNumber>;
+    private readonly _concreteDomain: ConcreteDomain<ConcreteNumber>;
+    private readonly _concreteValuelattice: Lattice<ConcreteNumber>;
 
-    constructor() {
+    constructor(concreteDomain: ConcreteDomain<ConcreteNumber>) {
         this._lattice = new NumIntervalLattice();
-        this._valuelattice = this._lattice.concreteElementLattice;
+        this._concreteDomain = Preconditions.checkNotUndefined(concreteDomain);
+        this._concreteValuelattice = this._lattice.concreteElementLattice;
     }
 
     abstract(elements: Iterable<ConcreteNumber>): NumIntervalValue {
-        let minElement: ConcreteNumber = this._valuelattice.top();
-        let maxElement: ConcreteNumber = this._valuelattice.bottom();
-        throw new ImplementMeException();
+        let minElement: ConcreteNumber = this._concreteValuelattice.top();
+        let maxElement: ConcreteNumber = this._concreteValuelattice.bottom();
+        for (const e of elements) {
+            if (this._concreteValuelattice.isIncluded(e, minElement)) {
+                minElement = e;
+            }
+            if (this._concreteValuelattice.isIncluded(maxElement, e)) {
+                maxElement = e;
+            }
+        }
+        return new NumIntervalValueImpl(minElement, maxElement);
     }
 
     concretize(element: NumIntervalValue): Iterable<ConcreteNumber> {
@@ -109,6 +132,10 @@ export class NumIntervalValueDomain implements AbstractDomain<ConcreteNumber, Nu
 
     get lattice(): Lattice<NumIntervalValue> {
         return this._lattice;
+    }
+
+    get concreteDomain(): ConcreteDomain<ConcreteNumber> {
+        return this._concreteDomain;
     }
 
 }

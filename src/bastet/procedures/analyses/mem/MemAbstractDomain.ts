@@ -26,7 +26,7 @@ import {ScratchType, ScratchTypeID} from "../../../syntax/ast/core/ScratchType";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
 import {CNFFormula} from "../../../utils/ConjunctiveNormalForm";
-import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
+import {ConcreteDomain, ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
 import {AbstractBoolean, AbstractList, AbstractNumber, AbstractString} from "../../domains/MemoryTransformer";
 
 export type AbstractMemory = MemAbstractState;
@@ -117,7 +117,7 @@ export class MemAbstractStateImpl extends MemAbstractStateRecord implements MemA
         return this.listData.get(ident);
     }
 
-    public declare(ident: string, type: ScratchType) {
+    public withDeclaration(ident: string, type: ScratchType) {
         return this.set('types', this.types.set(ident, type.typeId));
     }
 
@@ -220,6 +220,10 @@ export class MemAbstractDomain implements AbstractDomain<ConcreteMemory, Abstrac
 
     get lattice(): Lattice<MemAbstractState> {
         return this._lattice;
+    }
+
+    get concreteDomain(): ConcreteDomain<ConcreteMemory> {
+        throw new ImplementMeException();
     }
 
 }

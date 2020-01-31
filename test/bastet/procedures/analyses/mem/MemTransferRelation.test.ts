@@ -46,7 +46,7 @@ import {ListValueDomain} from "../../../../../src/bastet/procedures/domains/List
 describe("MemTransferRelation", () => {
 
     const dom: MemAbstractDomain = new MemAbstractDomain(
-        new NumIntervalValueDomain(),
+        new NumIntervalValueDomain(concreteDomain),
         new FlatBooleanValueDomain(),
         new FlatStringValueDomain(),
         new ListValueDomain());

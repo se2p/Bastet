@@ -20,11 +20,33 @@
  */
 
 import {MemAbstractStateImpl} from "../../../../../src/bastet/procedures/analyses/mem/MemAbstractDomain";
+import {
+    NumIntervalValue,
+    NumIntervalValueDomain
+} from "../../../../../src/bastet/procedures/domains/NumIntervalValueDomain";
+import {ConcreteNumberDomain} from "../../../../../src/bastet/procedures/domains/ConcreteElements";
+import {NumberType, ScratchType} from "../../../../../src/bastet/syntax/ast/core/ScratchType";
 
 describe("MemAbstractStateImpl", () => {
 
-    describe("", () => {
-        const mem: MemAbstractStateImpl = new MemAbstractStateImpl();
+    describe("Number declaration and assignment", () => {
+        const numConcDom = new ConcreteNumberDomain();
+        const numAbstDom = new NumIntervalValueDomain(numConcDom);
+        const e = numAbstDom.abstract([numAbstDom.concreteDomain.createElement({value: 5}),
+            numAbstDom.concreteDomain.createElement({value: 3})]);
+
+        const m0: MemAbstractStateImpl = new MemAbstractStateImpl();
+        const m1 = m0.withDeclaration("a", NumberType.instance());
+        const m2 = m1.withNum("a", e);
+
+        it("Resulting element has 4 in the interval, and not 7", () => {
+            const intervalWithOnly4 = numAbstDom.abstract([numAbstDom.concreteDomain.createElement({value: 4}) ]);
+            const intervalWithOnly7 = numAbstDom.abstract([numAbstDom.concreteDomain.createElement({value: 7}) ]);
+            const stored = m2.getNum("a") as NumIntervalValue;
+
+            expect(numAbstDom.lattice.isIncluded(intervalWithOnly4, stored)).toBeTruthy();
+            expect(numAbstDom.lattice.isIncluded(intervalWithOnly7, stored)).not.toBeTruthy();
+        });
     });
 
 });

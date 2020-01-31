@@ -21,7 +21,7 @@
  */
 
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
-import {ConcreteElement} from "./ConcreteElements";
+import {ConcreteDomain, ConcreteElement} from "./ConcreteElements";
 
 export class ConcreteNumberElement implements ConcreteElement {
 
@@ -56,5 +56,7 @@ export interface AbstractDomain<C extends ConcreteElement, E extends AbstractEle
     concretize(element: E): Iterable<C>;
 
     widen(element: E, precision: AbstractionPrecision): E;
+
+    concreteDomain: ConcreteDomain<C>;
 
 }

@@ -25,6 +25,7 @@ import {ImmutableMap} from "../../utils/ImmutableMap";
 import {ImmutableList} from "../../utils/ImmutableList";
 import {Preconditions} from "../../utils/Preconditions";
 import {Record as ImmRec} from "immutable";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
 export interface ConcreteElement {
 
@@ -32,24 +33,32 @@ export interface ConcreteElement {
 
 export class ConcreteNumberOrderLattice implements Lattice<ConcreteNumber> {
 
+    private readonly _bottom: ConcreteNumber;
+    private readonly _top: ConcreteNumber;
+
+    constructor(bottomElement: ConcreteNumber, topElement: ConcreteNumber) {
+        this._bottom = Preconditions.checkNotUndefined(bottomElement);
+        this._top = Preconditions.checkNotUndefined(topElement);
+    }
+
     bottom(): ConcreteNumber {
-        return undefined;
+        return this._bottom;
     }
 
     isIncluded(element1: ConcreteNumber, element2: ConcreteNumber): boolean {
-        return false;
+        return element1.value <= element2.value;
     }
 
     join(element1: ConcreteNumber, element2: ConcreteNumber): ConcreteNumber {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     meet(element1: ConcreteNumber, element2: ConcreteNumber): ConcreteNumber {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     top(): ConcreteNumber {
-        return undefined;
+        return this._top;
     }
 
 }
@@ -68,10 +77,12 @@ const ConcretePrimitiveValueRecord = ImmRec({
 
 export class ConcretePrimitive<T> extends ConcretePrimitiveValueRecord implements ConcretePrimitiveValue<T> {
 
-    value: T;
-
     constructor(args: any = {}) {
         super(Object.assign({}, args, {}));
+    }
+
+    get value(): T {
+        return this.get('value');
     }
 }
 
@@ -94,6 +105,24 @@ export class ConcreteNumber extends ConcretePrimitive<number> {
     constructor(value: number) {
         super({value: value});
     }
+}
+
+export interface ConcreteDomain<T extends ConcreteElement> {
+
+    createElement(attrs: {}): T;
+
+}
+
+export class ConcreteNumberDomain implements ConcreteDomain<ConcreteNumber> {
+
+    createElement(attrs: {}): ConcreteNumber {
+        return new ConcreteNumber(attrs['value']);
+    }
+
+    elementFomPrimitive(num: number): ConcreteNumber {
+        return new ConcreteNumber(num);
+    }
+
 }
 
 
