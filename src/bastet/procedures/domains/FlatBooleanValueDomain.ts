@@ -24,11 +24,12 @@
 import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {AbstractBoolean} from "./MemoryTransformer";
 import {Lattice} from "../../lattices/Lattice";
-import {ConcreteBoolean} from "./ConcreteElements";
+import {ConcreteBoolean, ConcreteDomain} from "./ConcreteElements";
 
 export class FlatBooleanValueDomain implements AbstractDomain<AbstractBoolean, ConcreteBoolean> {
 
     lattice: Lattice<ConcreteBoolean>;
+    private readonly _concreteDomain: ConcreteDomain<ConcreteBoolean>;
 
     abstract(elements: Iterable<AbstractBoolean>): ConcreteBoolean {
         return undefined;
@@ -40,6 +41,10 @@ export class FlatBooleanValueDomain implements AbstractDomain<AbstractBoolean, C
 
     widen(element: ConcreteBoolean, precision: AbstractionPrecision): ConcreteBoolean {
         return undefined;
+    }
+
+    get concreteDomain(): ConcreteDomain<ConcreteBoolean> {
+        return this._concreteDomain;
     }
 
 }

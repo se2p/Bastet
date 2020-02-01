@@ -22,7 +22,7 @@
 
 import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
-import {ConcreteList, ConcreteString} from "./ConcreteElements";
+import {ConcreteDomain, ConcreteList, ConcreteString} from "./ConcreteElements";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
 
@@ -44,6 +44,10 @@ export class ListValueDomain implements AbstractDomain<ConcreteList<ConcreteStri
     }
 
     widen(element: AbstractList, precision: AbstractionPrecision): AbstractList {
+        throw new ImplementMeException();
+    }
+
+    get concreteDomain(): ConcreteDomain<ConcreteList<ConcreteString>> {
         throw new ImplementMeException();
     }
 

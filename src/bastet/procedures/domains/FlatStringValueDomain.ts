@@ -24,7 +24,7 @@ import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {AbstractString} from "./MemoryTransformer";
 import {Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {ConcreteString} from "./ConcreteElements";
+import {ConcreteDomain, ConcreteString} from "./ConcreteElements";
 
 export class FlatStringValueDomain implements AbstractDomain<ConcreteString, AbstractString> {
 
@@ -39,6 +39,10 @@ export class FlatStringValueDomain implements AbstractDomain<ConcreteString, Abs
     }
 
     widen(element: AbstractString, precision: AbstractionPrecision): AbstractString {
+        throw new ImplementMeException();
+    }
+
+    get concreteDomain(): ConcreteDomain<ConcreteString> {
         throw new ImplementMeException();
     }
 

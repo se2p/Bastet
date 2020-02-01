@@ -24,7 +24,7 @@ import {AbstractElement, Lattice} from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Record as ImmRec, Set as ImmSet} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
-import {ConcreteElement} from "../../domains/ConcreteElements";
+import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 
 export type GraphStateId = number;
 
@@ -126,6 +126,10 @@ export class GraphAbstractDomain implements AbstractDomain<GraphConcreteState, G
     }
 
     widen(element: GraphAbstractState, precision: AbstractionPrecision): GraphAbstractState {
+        throw new ImplementMeException();
+    }
+
+    get concreteDomain(): ConcreteDomain<GraphConcreteState> {
         throw new ImplementMeException();
     }
 }

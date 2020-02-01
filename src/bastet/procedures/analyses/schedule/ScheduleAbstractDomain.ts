@@ -26,6 +26,8 @@ import {List as ImmList, Record as ImmRec} from "immutable";
 import {ActorId} from "../../../syntax/app/Actor";
 import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
 import {ScriptId} from "../../../syntax/app/controlflow/Script";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {ConcreteDomain} from "../../domains/ConcreteElements";
 
 export const THREAD_STATE_RUNNING = 1;
 export const THREAD_STATE_WAIT = 2;
@@ -90,6 +92,10 @@ export class ScheduleAbstractDomain implements AbstractDomain<ScheduleConcreteSt
 
     widen(element: ScheduleAbstractState, precision: AbstractionPrecision): ScheduleAbstractState {
         return undefined;
+    }
+
+    get concreteDomain(): ConcreteDomain<ScheduleConcreteState> {
+        throw new ImplementMeException();
     }
 
 }
