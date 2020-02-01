@@ -20,7 +20,7 @@
  */
 
 import {ProgramAnalysis} from "../ProgramAnalysis";
-import {AbstractMemory, MemAbstractState, MemAbstractStates} from "./MemAbstractDomain";
+import {AbstractMemory, MemAbstractDomain, MemAbstractState, MemAbstractStates} from "./MemAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
@@ -28,12 +28,24 @@ import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {MemTransferRelation} from "./MemTransferRelation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {ConcreteMemory} from "../../domains/ConcreteElements";
+import {ConcreteMemory, ConcreteNumberDomain} from "../../domains/ConcreteElements";
+import {NumIntervalValueDomain} from "../../domains/NumIntervalValueDomain";
+import {FlatBooleanValueDomain} from "../../domains/FlatBooleanValueDomain";
+import {StringListAbstractDomain} from "../../domains/StringListAbstractDomain";
+import {StringAbstractDomain} from "../../domains/StringAbstractDomain";
 
 export class MemAnalysis implements ProgramAnalysis<ConcreteMemory, AbstractMemory>, LabeledTransferRelation<MemAbstractState> {
 
     private readonly _abstractDomain: AbstractDomain<ConcreteMemory, AbstractMemory>;
     private readonly _transferRelation: MemTransferRelation;
+
+    constructor() {
+        const numDomain = new NumIntervalValueDomain(new ConcreteNumberDomain());
+        const boolDomain = new FlatBooleanValueDomain();
+        const stringDomain = new StringAbstractDomain();
+        const stringListDomain = new StringListAbstractDomain();
+        this._abstractDomain = new MemAbstractDomain(numDomain, boolDomain, stringDomain, stringListDomain);
+    }
 
     abstractSucc(fromState: MemAbstractState): Iterable<MemAbstractState> {
         return this._transferRelation.abstractSucc(fromState);

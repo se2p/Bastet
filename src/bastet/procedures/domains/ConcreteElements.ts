@@ -161,17 +161,24 @@ export class ConcreteMemory implements ConcreteElement {
     }
 }
 
-export class ConcreteList<O> implements ConcreteElement {
+export class ConcreteList<Of> implements ConcreteElement {
 
-    private readonly _elements: ImmutableList<O>;
+    private readonly _elements: ImmutableList<Of>;
 
-    constructor(elements: O[]) {
+    constructor(elements: Of[]) {
         Preconditions.checkNotUndefined(elements);
         this._elements = new ImmutableList(elements);
     }
 
-    get elements(): ImmutableList<O> {
+    get elements(): ImmutableList<Of> {
         return this._elements;
+    }
+}
+
+export class ConcreteStringList extends ConcreteList<ConcreteString> {
+
+    constructor(elements: ConcreteString[]) {
+        super(elements);
     }
 }
 
