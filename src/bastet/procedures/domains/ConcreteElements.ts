@@ -125,6 +125,24 @@ export class ConcreteNumberDomain implements ConcreteDomain<ConcreteNumber> {
 
 }
 
+export class ConcreteBoundedStringDomain implements ConcreteDomain<ConcreteString> {
+
+    private readonly _bound: number;
+
+    constructor(bound: number) {
+        this._bound = bound;
+    }
+
+    createElement(attrs: {}): ConcreteString {
+        return this.createFrom(attrs['value']);
+    }
+
+    createFrom(str: string): ConcreteString {
+        return new ConcreteString(str.substr(0, this._bound));
+    }
+
+}
+
 
 export class ConcreteMemory implements ConcreteElement {
 

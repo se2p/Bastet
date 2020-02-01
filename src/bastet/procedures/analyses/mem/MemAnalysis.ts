@@ -28,7 +28,7 @@ import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {MemTransferRelation} from "./MemTransferRelation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {ConcreteMemory, ConcreteNumberDomain} from "../../domains/ConcreteElements";
+import {ConcreteBoundedStringDomain, ConcreteMemory, ConcreteNumberDomain} from "../../domains/ConcreteElements";
 import {NumIntervalValueDomain} from "../../domains/NumIntervalValueDomain";
 import {FlatBooleanValueDomain} from "../../domains/FlatBooleanValueDomain";
 import {StringListAbstractDomain} from "../../domains/StringListAbstractDomain";
@@ -42,7 +42,7 @@ export class MemAnalysis implements ProgramAnalysis<ConcreteMemory, AbstractMemo
     constructor() {
         const numDomain = new NumIntervalValueDomain(new ConcreteNumberDomain());
         const boolDomain = new FlatBooleanValueDomain();
-        const stringDomain = new StringAbstractDomain();
+        const stringDomain = new StringAbstractDomain(new ConcreteBoundedStringDomain(42));
         const stringListDomain = new StringListAbstractDomain();
         this._abstractDomain = new MemAbstractDomain(numDomain, boolDomain, stringDomain, stringListDomain);
     }

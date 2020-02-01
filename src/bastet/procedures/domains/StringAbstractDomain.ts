@@ -25,13 +25,40 @@ import {ConcreteDomain, ConcreteString} from "./ConcreteElements";
 import {AbstractString} from "./MemoryTransformer";
 import {Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {Preconditions} from "../../utils/Preconditions";
+
+export class AbstractStringLattice implements Lattice<AbstractString> {
+
+    bottom(): AbstractString {
+        return undefined;
+    }
+
+    isIncluded(element1: AbstractString, element2: AbstractString): boolean {
+        return false;
+    }
+
+    join(element1: AbstractString, element2: AbstractString): AbstractString {
+        return undefined;
+    }
+
+    meet(element1: AbstractString, element2: AbstractString): AbstractString {
+        return undefined;
+    }
+
+    top(): AbstractString {
+        return undefined;
+    }
+
+}
 
 export class StringAbstractDomain implements AbstractDomain<ConcreteString, AbstractString> {
 
     private readonly _concreteDomain: ConcreteDomain<ConcreteString>;
     private readonly _lattice: Lattice<AbstractString>;
 
-    constructor() {
+    constructor(concreteDomain: ConcreteDomain<ConcreteString>) {
+        this._concreteDomain = Preconditions.checkNotUndefined(concreteDomain);
+        this._lattice = new AbstractStringLattice();
     }
 
     abstract(elements: Iterable<ConcreteString>): AbstractString {
