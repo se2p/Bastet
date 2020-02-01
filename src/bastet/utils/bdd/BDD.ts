@@ -28,7 +28,7 @@ import {Preconditions} from "../Preconditions";
  * The paper "Binary Decision Diagrams with Edge-Specified Reductions" by
  * Babar et al. (2019) presented a now generalized form of BDDs.
  *
- * This is our implementation of their approach.
+ * This is our implementation of their approach. See the issue #25.
  */
 export class BDD {
 
