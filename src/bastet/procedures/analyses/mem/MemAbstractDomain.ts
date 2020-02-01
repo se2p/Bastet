@@ -54,6 +54,7 @@ export interface MemAbstractState extends AbstractElement {
 
     /** Constraints on the state (a formula in predicate logic) */
     constraint: CNFFormula;
+    // TODO: Separate constraint by data types???
 
 }
 
