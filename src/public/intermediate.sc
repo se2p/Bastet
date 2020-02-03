@@ -12,6 +12,10 @@ role RuntimeEntity begin
 
     extern _RUNTIME_restart ()
 
+    // Returns the number of milliseconds that
+    // elapsed since the VM started.
+    extern _RUNTIME_millis () returns number
+
     extern _RUNTIME_signalFailure ()
 
     extern _RUNTIME_numberFromInterval(from_num: number, to_num: number) returns number
