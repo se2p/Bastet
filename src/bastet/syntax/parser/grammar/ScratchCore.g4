@@ -107,12 +107,12 @@ event : coreEvent ;
 coreEvent :
     'never' # NeverEvent
  |  'bootstrap' # BootstapEvent
+ |  'boostrap' 'finished' # AfterBootstrapMonitoringEvent
  |  'startup' # StartupEvent
  |  'started' 'as' 'clone' # CloneStartEvent
  |  'received' 'message' stringExpr 'in' String # MessageReceivedEvent
  |  'reached condition' boolExpr # ConditionReachedEvent
  |  'rendered' # RenderedMonitoringEvent
- |  'startup' 'finished' # AfterStartupMonitoringEvent
  |  'statement' 'finished' # AfterStatementMonitoringEvent
  ;
 

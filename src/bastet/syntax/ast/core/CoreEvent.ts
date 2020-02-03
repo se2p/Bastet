@@ -79,17 +79,17 @@ export class RenderedMonitoringEvent extends CoreEvent {
 
 }
 
-export class AfterStartupMonitoringEvent extends CoreEvent {
+export class AfterBootstrapMonitoringEvent extends CoreEvent {
 
     constructor() {
         super([]);
     }
 
-    private static INSTANCE: AfterStartupMonitoringEvent;
+    private static INSTANCE: AfterBootstrapMonitoringEvent;
 
-    public static instance(): AfterStartupMonitoringEvent {
+    public static instance(): AfterBootstrapMonitoringEvent {
         if (!this.INSTANCE) {
-            this.INSTANCE = new AfterStartupMonitoringEvent();
+            this.INSTANCE = new AfterBootstrapMonitoringEvent();
         }
         return this.INSTANCE;
     }
