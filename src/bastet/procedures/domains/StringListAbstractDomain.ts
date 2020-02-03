@@ -24,6 +24,7 @@ import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {ConcreteDomain, ConcreteList, ConcreteString, ConcreteStringList} from "./ConcreteElements";
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {Preconditions} from "../../utils/Preconditions";
 
 export interface AbstractStringList extends AbstractElement {
 
@@ -55,8 +56,13 @@ export class StringListLattice implements Lattice<AbstractStringList> {
 
 export class StringListAbstractDomain implements AbstractDomain<ConcreteStringList, AbstractStringList> {
 
-    concreteDomain: ConcreteDomain<ConcreteStringList>;
-    lattice: Lattice<AbstractStringList>;
+    private readonly _concreteDomain: ConcreteDomain<ConcreteStringList>;
+    private readonly _lattice: Lattice<AbstractStringList>;
+
+    constructor(concreteDomain: ConcreteDomain<ConcreteStringList>) {
+        this._concreteDomain = Preconditions.checkNotUndefined(concreteDomain);
+        this._lattice = new StringListLattice();
+    }
 
     abstract(elements: Iterable<ConcreteStringList>): AbstractStringList {
         throw new ImplementMeException();
@@ -70,4 +76,11 @@ export class StringListAbstractDomain implements AbstractDomain<ConcreteStringLi
         throw new ImplementMeException();
     }
 
+    get concreteDomain(): ConcreteDomain<ConcreteStringList> {
+        return this._concreteDomain;
+    }
+
+    get lattice(): Lattice<AbstractStringList> {
+        return this._lattice;
+    }
 }

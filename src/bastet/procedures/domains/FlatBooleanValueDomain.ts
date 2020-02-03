@@ -25,26 +25,60 @@ import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {AbstractBoolean} from "./MemoryTransformer";
 import {Lattice} from "../../lattices/Lattice";
 import {ConcreteBoolean, ConcreteDomain} from "./ConcreteElements";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
-export class FlatBooleanValueDomain implements AbstractDomain<AbstractBoolean, ConcreteBoolean> {
+export class FlatBoolLattice implements Lattice<AbstractBoolean> {
 
-    lattice: Lattice<ConcreteBoolean>;
+    bottom(): AbstractBoolean {
+        throw new ImplementMeException();
+    }
+
+    isIncluded(element1: AbstractBoolean, element2: AbstractBoolean): boolean {
+        throw new ImplementMeException();
+    }
+
+    join(element1: AbstractBoolean, element2: AbstractBoolean): AbstractBoolean {
+        throw new ImplementMeException();
+    }
+
+    meet(element1: AbstractBoolean, element2: AbstractBoolean): AbstractBoolean {
+        throw new ImplementMeException();
+    }
+
+    top(): AbstractBoolean {
+        throw new ImplementMeException();
+    }
+
+}
+
+export class FlatBooleanValueDomain implements AbstractDomain<ConcreteBoolean, AbstractBoolean> {
+
     private readonly _concreteDomain: ConcreteDomain<ConcreteBoolean>;
+    private readonly _lattice: FlatBoolLattice;
+
+    constructor(concreteDomain: ConcreteDomain<ConcreteBoolean>) {
+        this._concreteDomain = concreteDomain;
+        this._lattice = new FlatBoolLattice();
+    }
 
     abstract(elements: Iterable<AbstractBoolean>): ConcreteBoolean {
         return undefined;
     }
 
-    concretize(element: ConcreteBoolean): Iterable<AbstractBoolean> {
+    concretize(element: AbstractBoolean): Iterable<ConcreteBoolean> {
         return undefined;
     }
 
-    widen(element: ConcreteBoolean, precision: AbstractionPrecision): ConcreteBoolean {
+    widen(element: AbstractBoolean, precision: AbstractionPrecision): AbstractBoolean {
         return undefined;
     }
 
     get concreteDomain(): ConcreteDomain<ConcreteBoolean> {
         return this._concreteDomain;
+    }
+
+    get lattice(): Lattice<AbstractBoolean> {
+        return this._lattice;
     }
 
 }

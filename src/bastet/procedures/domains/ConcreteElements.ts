@@ -125,6 +125,18 @@ export class ConcreteNumberDomain implements ConcreteDomain<ConcreteNumber> {
 
 }
 
+export class ConcreteBooleanDomain implements ConcreteDomain<ConcreteBoolean> {
+
+    createElement(attrs: {}): ConcreteBoolean {
+        return new ConcreteBoolean(attrs['value']);
+    }
+
+    elementFomPrimitive(val: boolean): ConcreteBoolean {
+        return new ConcreteBoolean(val);
+    }
+
+}
+
 export class ConcreteBoundedStringDomain implements ConcreteDomain<ConcreteString> {
 
     private readonly _bound: number;
@@ -139,6 +151,25 @@ export class ConcreteBoundedStringDomain implements ConcreteDomain<ConcreteStrin
 
     createFrom(str: string): ConcreteString {
         return new ConcreteString(str.substr(0, this._bound));
+    }
+
+}
+
+export class ConcreteBoundedStringListDomain implements ConcreteDomain<ConcreteStringList> {
+
+    private readonly _bound: number;
+
+    constructor(bound: number) {
+        this._bound = bound;
+    }
+
+    createElement(attrs: {}): ConcreteStringList {
+        throw new ImplementMeException();
+    }
+
+    createFrom(lst: ConcreteString[]) {
+        Preconditions.checkNotUndefined(lst);
+        return new ConcreteStringList(lst.slice(0, this._bound)); // `slice`: excluding the end
     }
 
 }
