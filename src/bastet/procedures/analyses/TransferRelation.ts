@@ -33,3 +33,24 @@ export interface LabeledTransferRelation<E> extends TransferRelation<E>{
     abstractSuccFor(fromState: E, op: ProgramOperation): Iterable<E>;
 
 }
+
+export class LabeledTransferRelationImpl<E extends AbstractElement> implements LabeledTransferRelation<any> {
+
+    private readonly _abstractSucc: (fromState: E) => Iterable<E>;
+
+    private readonly _abstractSuccFor: (fromState: E, op: ProgramOperation) => Iterable<E>;
+
+    constructor(abstractSucc: (fromState: E) => Iterable<E>, abstractSuccFor: (fromState: E, op: ProgramOperation) => Iterable<E>) {
+        this._abstractSucc = abstractSucc;
+        this._abstractSuccFor = abstractSuccFor;
+    }
+
+    abstractSucc(fromState: E): Iterable<E> {
+        return this._abstractSucc(fromState);
+    }
+
+    abstractSuccFor(fromState: E, op: ProgramOperation): Iterable<E> {
+        return this._abstractSuccFor(fromState, op);
+    }
+
+}

@@ -20,7 +20,13 @@
  */
 
 import {LabeledTransferRelation, TransferRelation} from "../TransferRelation";
-import {ScheduleAbstractStateAttributes, THREAD_STATE_DONE, THREAD_STATE_RUNNING, ThreadStateAttributes} from "./ScheduleAbstractDomain";
+import {
+    ScheduleAbstractState,
+    ScheduleAbstractStateAttributes,
+    THREAD_STATE_DONE,
+    THREAD_STATE_RUNNING, ThreadState,
+    ThreadStateAttributes
+} from "./ScheduleAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
@@ -28,7 +34,7 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
 import {AbstractElement} from "../../../lattices/Lattice";
 
-export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstractStateAttributes> {
+export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstractState> {
 
     private readonly _wrappedTransferRelation: LabeledTransferRelation<AbstractElement>;
 
@@ -41,16 +47,17 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
      *
      * @param fromState
      */
-    abstractSucc(fromState: ScheduleAbstractStateAttributes): Iterable<ScheduleAbstractStateAttributes> {
+    abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
         Preconditions.checkState(fromState.threadStates.size <= 1, "More than one thread not yet supported");
 
         if (fromState.threadStates.size == 0) {
             return [fromState];
         } else if (fromState.threadStates.size == 1) {
-            const t: ThreadStateAttributes = fromState.threadStates[0];
-            if (t.computationState === THREAD_STATE_DONE) {
+            const t: ThreadState = fromState.threadStates.get(0);
+            Preconditions.checkNotUndefined(t);
+            if (t.getComputationState() === THREAD_STATE_DONE) {
                 return [fromState];
-            } else if (t.computationState === THREAD_STATE_RUNNING) {
+            } else if (t.getComputationState() === THREAD_STATE_RUNNING) {
                 // Determine the (sequences of) control-flow transition(s) to execute in this step
                 // ATTENTION: We assume that each sequence corresponds to an atomic
                 //      statement in the input programming language (Scratch)
@@ -79,15 +86,15 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         return result;
     }
 
-    private resolveStepOpSeqs(t: ThreadStateAttributes): [ProgramOperation[], LocationID][] {
+    private resolveStepOpSeqs(t: ThreadState): [ProgramOperation[], LocationID][] {
         throw new ImplementMeException();
     }
 
-    private reastartThread(state: ScheduleAbstractStateAttributes): ScheduleAbstractStateAttributes {
+    private reastartThread(state: ScheduleAbstractState): ScheduleAbstractState {
         throw new ImplementMeException();
     }
 
-    private stopThisScript(state: ScheduleAbstractStateAttributes): ScheduleAbstractStateAttributes {
+    private stopThisScript(state: ScheduleAbstractState): ScheduleAbstractState {
         throw new ImplementMeException();
     }
 

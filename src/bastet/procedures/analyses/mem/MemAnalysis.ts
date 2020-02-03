@@ -19,7 +19,7 @@
  *
  */
 
-import {ProgramAnalysis} from "../ProgramAnalysis";
+import {ProgramAnalysis, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
 import {AbstractMemory, MemAbstractDomain, MemAbstractState, MemAbstractStates} from "./MemAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
@@ -39,7 +39,7 @@ import {FlatBooleanValueDomain} from "../../domains/FlatBooleanValueDomain";
 import {StringListAbstractDomain} from "../../domains/StringListAbstractDomain";
 import {StringAbstractDomain} from "../../domains/StringAbstractDomain";
 
-export class MemAnalysis implements ProgramAnalysis<ConcreteMemory, AbstractMemory>, LabeledTransferRelation<MemAbstractState> {
+export class MemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, AbstractMemory>, LabeledTransferRelation<MemAbstractState> {
 
     private readonly _abstractDomain: AbstractDomain<ConcreteMemory, AbstractMemory>;
     private readonly _transferRelation: MemTransferRelation;
