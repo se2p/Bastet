@@ -20,7 +20,7 @@
  */
 
 import {TransferRelation} from "../TransferRelation";
-import {GraphAbstractState, GraphAbstractStateAttribs, GraphAbstractStateFactory} from "./GraphAbstractDomain";
+import {GraphAbstractState, GraphAbstractStateFactory} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 
 export class GraphTransferRelation implements TransferRelation<GraphAbstractState> {

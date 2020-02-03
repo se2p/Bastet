@@ -20,8 +20,6 @@
  *
  */
 
-import {GraphAbstractState} from "./GraphAbstractDomain";
-
 export class GraphToDotVisitor  {
 
     private _dot: string[];

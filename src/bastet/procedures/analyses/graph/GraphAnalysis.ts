@@ -23,10 +23,10 @@ import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
 import {
-    GraphConcreteState,
     GraphAbstractDomain,
     GraphAbstractState,
-    GraphAbstractStateFactory
+    GraphAbstractStateFactory,
+    GraphConcreteState
 } from "./GraphAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {App} from "../../../syntax/app/App";

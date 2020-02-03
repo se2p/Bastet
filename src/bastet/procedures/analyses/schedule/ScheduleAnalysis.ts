@@ -21,8 +21,8 @@
 
 import {ProgramAnalysis, ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
 import {
-    ScheduleAbstractDomain, ScheduleAbstractState,
-    ScheduleAbstractStateAttributes,
+    ScheduleAbstractDomain,
+    ScheduleAbstractState,
     ScheduleAbstractStateFactory,
     ScheduleConcreteState
 } from "./ScheduleAbstractDomain";
