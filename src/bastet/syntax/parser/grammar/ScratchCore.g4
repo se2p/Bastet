@@ -107,7 +107,7 @@ event : coreEvent ;
 coreEvent :
     'never' # NeverEvent
  |  'bootstrap' # BootstapEvent
- |  'boostrap' 'finished' # AfterBootstrapMonitoringEvent
+ |  'bootstrap' 'finished' # AfterBootstrapMonitoringEvent
  |  'startup' # StartupEvent
  |  'started' 'as' 'clone' # CloneStartEvent
  |  'received' 'message' stringExpr 'in' String # MessageReceivedEvent
