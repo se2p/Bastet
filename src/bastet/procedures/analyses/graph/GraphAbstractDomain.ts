@@ -32,34 +32,46 @@ export interface GraphConcreteState extends ConcreteElement {
 
 }
 
-export interface GraphAbstractState extends AbstractElement, SingletonStateWrapper {
+export interface GraphAbstractStateAttribs extends AbstractElement, SingletonStateWrapper {
+
     id: GraphStateId;
+
     predecessors: ImmSet<GraphStateId>;
-    wrappedState: any;
+
+    wrappedState: ImmRec<any>;
+
 }
 
 const GraphAbstractStateRecord = ImmRec({
     id: 0,
     predecessors: ImmSet<GraphStateId>([]),
-    wrappedState: ImmRec<any>({})
+    wrappedState: null
 });
 
-export class GraphAbstractStateImpl extends GraphAbstractStateRecord implements GraphAbstractState {
+export class GraphAbstractState extends GraphAbstractStateRecord implements GraphAbstractStateAttribs {
 
-    id: GraphStateId;
-    predecessors: ImmSet<GraphStateId>;
-    wrappedState: any;
+    constructor(id: GraphStateId, preds: ImmSet<GraphStateId>, wrapped: ImmRec<any>) {
+        super({id: id, predecessors: preds, wrappedState: wrapped});
+    }
 
-    constructor(args: any = {}) {
-        super(Object.assign({}, args, {}));
+    public getId(): number {
+        return this.get('id');
+    }
+
+    public getPredecessors(): ImmSet<GraphStateId> {
+        return this.get('predecessors');
+    }
+
+    public getWrappedState(): ImmRec<any> {
+        return this.get('wrappedState');
     }
 }
 
 export class GraphAbstractStateBuilder {
 
     private _id: GraphStateId;
-    private _wrappedState: AbstractElement;
     private _predecessors: GraphStateId[];
+    private _wrappedState: ImmRec<any>;
 
     constructor() {
         this._predecessors = [];
@@ -75,57 +87,56 @@ export class GraphAbstractStateBuilder {
         return this;
     }
 
-    public setWrappedState(state: AbstractElement) : GraphAbstractStateBuilder {
+    public setWrappedState(state: ImmRec<any>) : GraphAbstractStateBuilder {
         this._wrappedState = state;
         return this;
     }
 
-    public build(): GraphAbstractState {
-        return new GraphAbstractStateImpl({id: this._id,
-            wrappedState: this._wrappedState, predecessors: ImmSet(this._predecessors)});
+    public build(): GraphAbstractStateAttribs {
+        return new GraphAbstractState(this._id, ImmSet(this._predecessors), this._wrappedState);
     }
 }
 
-export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
+export class GraphAbstractStateLattice implements Lattice<GraphAbstractStateAttribs> {
 
-    bottom(): GraphAbstractState {
+    bottom(): GraphAbstractStateAttribs {
         throw new ImplementMeException();
     }
 
-    isIncluded(element1: GraphAbstractState, element2: GraphAbstractState): boolean {
+    isIncluded(element1: GraphAbstractStateAttribs, element2: GraphAbstractStateAttribs): boolean {
         throw new ImplementMeException();
     }
 
-    join(element1: GraphAbstractState, element2: GraphAbstractState): GraphAbstractState {
+    join(element1: GraphAbstractStateAttribs, element2: GraphAbstractStateAttribs): GraphAbstractStateAttribs {
         throw new ImplementMeException();
     }
 
-    meet(element1: GraphAbstractState, element2: GraphAbstractState): GraphAbstractState {
+    meet(element1: GraphAbstractStateAttribs, element2: GraphAbstractStateAttribs): GraphAbstractStateAttribs {
         throw new ImplementMeException();
     }
 
-    top(): GraphAbstractState {
+    top(): GraphAbstractStateAttribs {
         throw new ImplementMeException();
     }
 }
 
-export class GraphAbstractDomain implements AbstractDomain<GraphConcreteState, GraphAbstractState> {
+export class GraphAbstractDomain implements AbstractDomain<GraphConcreteState, GraphAbstractStateAttribs> {
 
     private readonly _lattice: GraphAbstractStateLattice;
 
-    get lattice(): Lattice<GraphAbstractState> {
+    get lattice(): Lattice<GraphAbstractStateAttribs> {
         return this._lattice;
     }
 
-    abstract(elements: Iterable<GraphConcreteState>): GraphAbstractState {
+    abstract(elements: Iterable<GraphConcreteState>): GraphAbstractStateAttribs {
         throw new ImplementMeException();
     }
 
-    concretize(element: GraphAbstractState): Iterable<GraphConcreteState> {
+    concretize(element: GraphAbstractStateAttribs): Iterable<GraphConcreteState> {
         throw new ImplementMeException();
     }
 
-    widen(element: GraphAbstractState, precision: AbstractionPrecision): GraphAbstractState {
+    widen(element: GraphAbstractStateAttribs, precision: AbstractionPrecision): GraphAbstractStateAttribs {
         throw new ImplementMeException();
     }
 

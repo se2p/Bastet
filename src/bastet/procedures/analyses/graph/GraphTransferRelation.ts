@@ -20,11 +20,11 @@
  */
 
 import {TransferRelation} from "../TransferRelation";
-import {GraphAbstractState} from "./GraphAbstractDomain";
+import {GraphAbstractStateAttribs} from "./GraphAbstractDomain";
 
-export class GraphTransferRelation implements TransferRelation<GraphAbstractState> {
+export class GraphTransferRelation implements TransferRelation<GraphAbstractStateAttribs> {
 
-    abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
+    abstractSucc(fromState: GraphAbstractStateAttribs): Iterable<GraphAbstractStateAttribs> {
         return undefined;
     }
 

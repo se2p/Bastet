@@ -22,13 +22,13 @@
 import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
-import {GraphConcreteState, GraphAbstractDomain, GraphAbstractState} from "./GraphAbstractDomain";
+import {GraphConcreteState, GraphAbstractDomain, GraphAbstractStateAttribs} from "./GraphAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {App} from "../../../syntax/app/App";
 
-export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState> {
+export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractStateAttribs> {
 
-    private _abstractDomain: AbstractDomain<GraphConcreteState, GraphAbstractState>;
+    private _abstractDomain: AbstractDomain<GraphConcreteState, GraphAbstractStateAttribs>;
 
     private _wrappedAnalysis: ProgramAnalysis<any, any>;
 
@@ -37,31 +37,31 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         this._abstractDomain = new GraphAbstractDomain();
     }
 
-    abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
+    abstractSucc(fromState: GraphAbstractStateAttribs): Iterable<GraphAbstractStateAttribs> {
         throw new ImplementMeException();
     }
 
-    join(state1: GraphAbstractState, state2: GraphAbstractState): GraphAbstractState {
+    join(state1: GraphAbstractStateAttribs, state2: GraphAbstractStateAttribs): GraphAbstractStateAttribs {
         throw new ImplementMeException();
     }
 
-    merge(state1: GraphAbstractState, state2: GraphAbstractState): boolean {
+    merge(state1: GraphAbstractStateAttribs, state2: GraphAbstractStateAttribs): boolean {
         throw new ImplementMeException();
     }
 
-    stop(state: GraphAbstractState, reached: StateSet<GraphAbstractState>): GraphAbstractState {
+    stop(state: GraphAbstractStateAttribs, reached: StateSet<GraphAbstractStateAttribs>): GraphAbstractStateAttribs {
         throw new ImplementMeException();
     }
 
-    target(state: GraphAbstractState): boolean {
+    target(state: GraphAbstractStateAttribs): boolean {
         return this._wrappedAnalysis.target(state.wrappedState);
     }
 
-    widen(state: GraphAbstractState): GraphAbstractState {
+    widen(state: GraphAbstractStateAttribs): GraphAbstractStateAttribs {
         throw new ImplementMeException();
     }
 
-    get abstractDomain(): AbstractDomain<GraphConcreteState, GraphAbstractState> {
+    get abstractDomain(): AbstractDomain<GraphConcreteState, GraphAbstractStateAttribs> {
         return this._abstractDomain;
     }
 
@@ -69,7 +69,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         return this._wrappedAnalysis;
     }
 
-    initialStatesFor(task: App): GraphAbstractState[] {
+    initialStatesFor(task: App): GraphAbstractStateAttribs[] {
         const wrappedInitialStates = this._wrappedAnalysis.initialStatesFor(task);
         throw new ImplementMeException();
     }

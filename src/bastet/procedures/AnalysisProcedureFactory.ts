@@ -27,7 +27,7 @@ import {ScheduleAnalysis} from "./analyses/schedule/ScheduleAnalysis";
 import {ScheduleAbstractState, ScheduleConcreteState} from "./analyses/schedule/ScheduleAbstractDomain";
 import {AbstractMemory, MemAbstractState} from "./analyses/mem/MemAbstractDomain";
 import {MemAnalysis} from "./analyses/mem/MemAnalysis";
-import {GraphConcreteState, GraphAbstractState} from "./analyses/graph/GraphAbstractDomain";
+import {GraphConcreteState, GraphAbstractStateAttribs} from "./analyses/graph/GraphAbstractDomain";
 import {ReachabilityAlgorithm} from "./algorithms/Reachability";
 import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
 import {ConcreteMemory} from "./domains/ConcreteElements";
@@ -47,16 +47,16 @@ export class AnalysisProcedureFactory {
             run(task: App): {} {
                 const memAnalysis: ProgramAnalysis<ConcreteMemory, AbstractMemory> = new MemAnalysis();
                 const schedAnalysis: ProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState> = new ScheduleAnalysis(memAnalysis);
-                const graphAnalysis: ProgramAnalysis<GraphConcreteState, GraphAbstractState> = new GraphAnalysis(schedAnalysis);
+                const graphAnalysis: ProgramAnalysis<GraphConcreteState, GraphAbstractStateAttribs> = new GraphAnalysis(schedAnalysis);
 
-                const frontier: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
-                const reached: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
+                const frontier: StateSet<GraphAbstractStateAttribs> = StateSetFactory.createStateSet<GraphAbstractStateAttribs>();
+                const reached: StateSet<GraphAbstractStateAttribs> = StateSetFactory.createStateSet<GraphAbstractStateAttribs>();
 
                 const chooseOpConfig = new ChooseOpConfig();
                 const chooseOp = frontier.createChooseOp(chooseOpConfig);
                 const reachabilityAlgorithm = new ReachabilityAlgorithm(graphAnalysis, chooseOp);
 
-                const initialStates: GraphAbstractState[] = graphAnalysis.initialStatesFor(task);
+                const initialStates: GraphAbstractStateAttribs[] = graphAnalysis.initialStatesFor(task);
                 frontier.addAll(initialStates);
                 reached.addAll(initialStates);
 
