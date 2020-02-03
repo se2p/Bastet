@@ -24,7 +24,7 @@ import {App} from "../syntax/app/App";
 import {GraphAnalysis} from "./analyses/graph/GraphAnalysis";
 import {ProgramAnalysis} from "./analyses/ProgramAnalysis";
 import {ScheduleAnalysis} from "./analyses/schedule/ScheduleAnalysis";
-import {ScheduleAbstractState, ScheduleConcreteState} from "./analyses/schedule/ScheduleAbstractDomain";
+import {ScheduleAbstractStateAttributes, ScheduleConcreteState} from "./analyses/schedule/ScheduleAbstractDomain";
 import {AbstractMemory, MemAbstractState} from "./analyses/mem/MemAbstractDomain";
 import {MemAnalysis} from "./analyses/mem/MemAnalysis";
 import {GraphConcreteState, GraphAbstractStateAttribs} from "./analyses/graph/GraphAbstractDomain";
@@ -46,7 +46,7 @@ export class AnalysisProcedureFactory {
         return new class implements AnalysisProcedure {
             run(task: App): {} {
                 const memAnalysis: ProgramAnalysis<ConcreteMemory, AbstractMemory> = new MemAnalysis();
-                const schedAnalysis: ProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState> = new ScheduleAnalysis(memAnalysis);
+                const schedAnalysis: ProgramAnalysis<ScheduleConcreteState, ScheduleAbstractStateAttributes> = new ScheduleAnalysis(memAnalysis);
                 const graphAnalysis: ProgramAnalysis<GraphConcreteState, GraphAbstractStateAttribs> = new GraphAnalysis(schedAnalysis);
 
                 const frontier: StateSet<GraphAbstractStateAttribs> = StateSetFactory.createStateSet<GraphAbstractStateAttribs>();

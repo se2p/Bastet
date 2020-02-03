@@ -20,7 +20,7 @@
  */
 
 import {LabeledTransferRelation, TransferRelation} from "../TransferRelation";
-import {ScheduleAbstractState, THREAD_STATE_DONE, THREAD_STATE_RUNNING, ThreadState} from "./ScheduleAbstractDomain";
+import {ScheduleAbstractStateAttributes, THREAD_STATE_DONE, THREAD_STATE_RUNNING, ThreadStateAttributes} from "./ScheduleAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
@@ -28,7 +28,7 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
 import {AbstractElement} from "../../../lattices/Lattice";
 
-export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstractState> {
+export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstractStateAttributes> {
 
     private readonly _wrappedTransferRelation: LabeledTransferRelation<AbstractElement>;
 
@@ -41,13 +41,13 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
      *
      * @param fromState
      */
-    abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
+    abstractSucc(fromState: ScheduleAbstractStateAttributes): Iterable<ScheduleAbstractStateAttributes> {
         Preconditions.checkState(fromState.threadStates.size <= 1, "More than one thread not yet supported");
 
         if (fromState.threadStates.size == 0) {
             return [fromState];
         } else if (fromState.threadStates.size == 1) {
-            const t: ThreadState = fromState.threadStates[0];
+            const t: ThreadStateAttributes = fromState.threadStates[0];
             if (t.computationState === THREAD_STATE_DONE) {
                 return [fromState];
             } else if (t.computationState === THREAD_STATE_RUNNING) {
@@ -79,15 +79,15 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         return result;
     }
 
-    private resolveStepOpSeqs(t: ThreadState): [ProgramOperation[], LocationID][] {
+    private resolveStepOpSeqs(t: ThreadStateAttributes): [ProgramOperation[], LocationID][] {
         throw new ImplementMeException();
     }
 
-    private reastartThread(state: ScheduleAbstractState): ScheduleAbstractState {
+    private reastartThread(state: ScheduleAbstractStateAttributes): ScheduleAbstractStateAttributes {
         throw new ImplementMeException();
     }
 
-    private stopThisScript(state: ScheduleAbstractState): ScheduleAbstractState {
+    private stopThisScript(state: ScheduleAbstractStateAttributes): ScheduleAbstractStateAttributes {
         throw new ImplementMeException();
     }
 

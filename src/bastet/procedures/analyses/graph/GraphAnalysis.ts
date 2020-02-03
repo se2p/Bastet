@@ -22,7 +22,12 @@
 import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
-import {GraphConcreteState, GraphAbstractDomain, GraphAbstractStateAttribs} from "./GraphAbstractDomain";
+import {
+    GraphConcreteState,
+    GraphAbstractDomain,
+    GraphAbstractStateAttribs,
+    GraphAbstractState, GraphAbstractStateBuilder, GraphAbstractStateFactory
+} from "./GraphAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {App} from "../../../syntax/app/App";
 
@@ -70,8 +75,9 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     initialStatesFor(task: App): GraphAbstractStateAttribs[] {
-        const wrappedInitialStates = this._wrappedAnalysis.initialStatesFor(task);
-        throw new ImplementMeException();
+        return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
+            return GraphAbstractStateFactory.withFreshID([], w);
+        } );
     }
 
 }

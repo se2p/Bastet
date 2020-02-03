@@ -20,15 +20,22 @@
  */
 
 import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
-import {ScheduleAbstractDomain, ScheduleAbstractState, ScheduleConcreteState} from "./ScheduleAbstractDomain";
+import {
+    ScheduleAbstractDomain,
+    ScheduleAbstractStateAttributes,
+    ScheduleAbstractStateFactory,
+    ScheduleConcreteState
+} from "./ScheduleAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {App} from "../../../syntax/app/App";
+import {Script} from "../../../syntax/app/controlflow/Script";
+import {Actor} from "../../../syntax/app/Actor";
 
-export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState> {
+export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractStateAttributes> {
 
-    private readonly _abstractDomain: AbstractDomain<ScheduleConcreteState, ScheduleAbstractState>;
+    private readonly _abstractDomain: AbstractDomain<ScheduleConcreteState, ScheduleAbstractStateAttributes>;
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
 
     constructor(wrappedAnalysis: ProgramAnalysis<any, any>) {
@@ -36,27 +43,27 @@ export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcret
         this._wrappedAnalysis = wrappedAnalysis;
     }
 
-    abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
+    abstractSucc(fromState: ScheduleAbstractStateAttributes): Iterable<ScheduleAbstractStateAttributes> {
         return undefined;
     }
 
-    join(state1: ScheduleAbstractState, state2: ScheduleAbstractState): ScheduleAbstractState {
+    join(state1: ScheduleAbstractStateAttributes, state2: ScheduleAbstractStateAttributes): ScheduleAbstractStateAttributes {
         return undefined;
     }
 
-    merge(state1: ScheduleAbstractState, state2: ScheduleAbstractState): boolean {
+    merge(state1: ScheduleAbstractStateAttributes, state2: ScheduleAbstractStateAttributes): boolean {
         return false;
     }
 
-    stop(state: ScheduleAbstractState, reached: StateSet<ScheduleAbstractState>): ScheduleAbstractState {
+    stop(state: ScheduleAbstractStateAttributes, reached: StateSet<ScheduleAbstractStateAttributes>): ScheduleAbstractStateAttributes {
         return undefined;
     }
 
-    target(state: ScheduleAbstractState): boolean {
+    target(state: ScheduleAbstractStateAttributes): boolean {
         return this._wrappedAnalysis.target(state.wrappedState);
     }
 
-    widen(state: ScheduleAbstractState): ScheduleAbstractState {
+    widen(state: ScheduleAbstractStateAttributes): ScheduleAbstractStateAttributes {
         return undefined;
     }
 
@@ -68,9 +75,12 @@ export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcret
         return this._abstractDomain;
     }
 
-    initialStatesFor(task: App): ScheduleAbstractState[] {
-        const wrappedInitialStates = this._wrappedAnalysis.initialStatesFor(task);
-        throw new ImplementMeException();
+    initialStatesFor(task: App): ScheduleAbstractStateAttributes[] {
+        const bootstrapper: Actor = task.bootstrapper;
+        const initScript: Script = task.getInitScript();
+        return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
+            return ScheduleAbstractStateFactory.createInitialState(bootstrapper, initScript, w);
+        });
     }
 
 }

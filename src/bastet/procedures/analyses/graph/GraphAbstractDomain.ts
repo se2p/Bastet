@@ -67,6 +67,20 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
     }
 }
 
+export class GraphAbstractStateFactory {
+
+    private static STATE_ID_SEQ: number;
+
+    public static withFreshID(preds: Iterable<GraphStateId>, wrapped: ImmRec<any>): GraphAbstractState {
+        if (!GraphAbstractStateFactory.STATE_ID_SEQ) {
+            GraphAbstractStateFactory.STATE_ID_SEQ = 0;
+        }
+        const freshId = GraphAbstractStateFactory.STATE_ID_SEQ++;
+        return new GraphAbstractState(freshId, ImmSet(preds), wrapped);
+    }
+
+}
+
 export class GraphAbstractStateBuilder {
 
     private _id: GraphStateId;

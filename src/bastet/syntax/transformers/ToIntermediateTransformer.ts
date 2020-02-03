@@ -39,7 +39,7 @@ import {
     BoolLiteralExpressionContext,
     BoolOrExpressionContext,
     BoolParanthExpressionContext,
-    BoolVariableExpressionContext,
+    BoolVariableExpressionContext, BootstapEventContext,
     BroadcastAndWaitStatementContext,
     BroadcastMessageStatementContext,
     CallStmtContext,
@@ -243,7 +243,7 @@ import {
 } from "../ast/core/ScratchType";
 import {
     AfterBootstrapMonitoringEvent,
-    AfterStatementMonitoringEvent,
+    AfterStatementMonitoringEvent, BootstrapEvent,
     CloneStartEvent,
     ConditionReachedEvent,
     CoreEvent,
@@ -1457,6 +1457,10 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitRenderedMonitoringEvent(ctx: RenderedMonitoringEventContext) : TransformerResult {
         return TransformerResult.withNode(new RenderedMonitoringEvent());
+    }
+
+    public visitBootstapEvent(ctx: BootstapEventContext) : TransformerResult {
+        return TransformerResult.withNode(new BootstrapEvent());
     }
 
     public visitAfterBootstrapMonitoringEvent(ctx: AfterBootstrapMonitoringEventContext) : TransformerResult {
