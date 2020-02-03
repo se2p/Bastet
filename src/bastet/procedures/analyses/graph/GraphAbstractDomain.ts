@@ -111,46 +111,46 @@ export class GraphAbstractStateBuilder {
     }
 }
 
-export class GraphAbstractStateLattice implements Lattice<GraphAbstractStateAttribs> {
+export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
 
-    bottom(): GraphAbstractStateAttribs {
+    bottom(): GraphAbstractState {
         throw new ImplementMeException();
     }
 
-    isIncluded(element1: GraphAbstractStateAttribs, element2: GraphAbstractStateAttribs): boolean {
+    isIncluded(element1: GraphAbstractState, element2: GraphAbstractState): boolean {
         throw new ImplementMeException();
     }
 
-    join(element1: GraphAbstractStateAttribs, element2: GraphAbstractStateAttribs): GraphAbstractStateAttribs {
+    join(element1: GraphAbstractState, element2: GraphAbstractState): GraphAbstractState {
         throw new ImplementMeException();
     }
 
-    meet(element1: GraphAbstractStateAttribs, element2: GraphAbstractStateAttribs): GraphAbstractStateAttribs {
+    meet(element1: GraphAbstractState, element2: GraphAbstractState): GraphAbstractState {
         throw new ImplementMeException();
     }
 
-    top(): GraphAbstractStateAttribs {
+    top(): GraphAbstractState {
         throw new ImplementMeException();
     }
 }
 
-export class GraphAbstractDomain implements AbstractDomain<GraphConcreteState, GraphAbstractStateAttribs> {
+export class GraphAbstractDomain implements AbstractDomain<GraphConcreteState, GraphAbstractState> {
 
     private readonly _lattice: GraphAbstractStateLattice;
 
-    get lattice(): Lattice<GraphAbstractStateAttribs> {
+    get lattice(): Lattice<GraphAbstractState> {
         return this._lattice;
     }
 
-    abstract(elements: Iterable<GraphConcreteState>): GraphAbstractStateAttribs {
+    abstract(elements: Iterable<GraphConcreteState>): GraphAbstractState {
         throw new ImplementMeException();
     }
 
-    concretize(element: GraphAbstractStateAttribs): Iterable<GraphConcreteState> {
+    concretize(element: GraphAbstractState): Iterable<GraphConcreteState> {
         throw new ImplementMeException();
     }
 
-    widen(element: GraphAbstractStateAttribs, precision: AbstractionPrecision): GraphAbstractStateAttribs {
+    widen(element: GraphAbstractState, precision: AbstractionPrecision): GraphAbstractState {
         throw new ImplementMeException();
     }
 

@@ -20,12 +20,26 @@
  */
 
 import {TransferRelation} from "../TransferRelation";
-import {GraphAbstractStateAttribs} from "./GraphAbstractDomain";
+import {GraphAbstractState, GraphAbstractStateFactory} from "./GraphAbstractDomain";
+import {Preconditions} from "../../../utils/Preconditions";
 
-export class GraphTransferRelation implements TransferRelation<GraphAbstractStateAttribs> {
+export class GraphTransferRelation implements TransferRelation<GraphAbstractState> {
 
-    abstractSucc(fromState: GraphAbstractStateAttribs): Iterable<GraphAbstractStateAttribs> {
-        return undefined;
+    private readonly _wrappedAbstractSucc: (GraphAbstractState) => Iterable<GraphAbstractState>;
+
+    constructor(wrappedAbstractSucc: (GraphAbstractState) => Iterable<GraphAbstractState>) {
+        this._wrappedAbstractSucc = Preconditions.checkNotUndefined(wrappedAbstractSucc);
+    }
+
+    abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
+        Preconditions.checkNotUndefined(fromState);
+        const result = [];
+        const wrappedSuccs = this._wrappedAbstractSucc(fromState.getWrappedState());
+        for (const w of wrappedSuccs) {
+            result.push(GraphAbstractStateFactory.withFreshID([fromState.getId()], w));
+        }
+
+        return result;;
     }
 
 }

@@ -42,15 +42,20 @@ import {NumIntervalValueDomain} from "../../../../../src/bastet/procedures/domai
 import {FlatBooleanValueDomain} from "../../../../../src/bastet/procedures/domains/FlatBooleanValueDomain";
 import {FlatStringValueDomain} from "../../../../../src/bastet/procedures/domains/FlatStringValueDomain";
 import {ListValueDomain} from "../../../../../src/bastet/procedures/domains/ListValueDomain";
-import {ConcreteNumberDomain} from "../../../../../src/bastet/procedures/domains/ConcreteElements";
+import {
+    ConcreteBooleanDomain, ConcreteBoundedStringDomain, ConcreteBoundedStringListDomain,
+    ConcreteNumberDomain
+} from "../../../../../src/bastet/procedures/domains/ConcreteElements";
+import {StringAbstractDomain} from "../../../../../src/bastet/procedures/domains/StringAbstractDomain";
+import {StringListAbstractDomain} from "../../../../../src/bastet/procedures/domains/StringListAbstractDomain";
 
 describe("MemTransferRelation", () => {
 
     const dom: MemAbstractDomain = new MemAbstractDomain(
         new NumIntervalValueDomain(new ConcreteNumberDomain()),
-        new FlatBooleanValueDomain(),
-        new FlatStringValueDomain(),
-        new ListValueDomain());
+        new FlatBooleanValueDomain(new ConcreteBooleanDomain()),
+        new StringAbstractDomain(new ConcreteBoundedStringDomain(23)),
+        new StringListAbstractDomain(new ConcreteBoundedStringListDomain(42)));
 
     const tr = new MemTransferRelation(dom);
 

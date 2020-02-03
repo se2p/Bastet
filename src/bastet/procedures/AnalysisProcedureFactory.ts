@@ -22,7 +22,7 @@
 import {AnalysisProcedure} from "./AnalysisProcedure";
 import {App} from "../syntax/app/App";
 import {GraphAnalysis} from "./analyses/graph/GraphAnalysis";
-import {ProgramAnalysis} from "./analyses/ProgramAnalysis";
+import {ProgramAnalysis, ProgramAnalysisWithLabels} from "./analyses/ProgramAnalysis";
 import {ScheduleAnalysis} from "./analyses/schedule/ScheduleAnalysis";
 import {ScheduleAbstractStateAttributes, ScheduleConcreteState} from "./analyses/schedule/ScheduleAbstractDomain";
 import {AbstractMemory, MemAbstractState} from "./analyses/mem/MemAbstractDomain";
@@ -45,7 +45,7 @@ export class AnalysisProcedureFactory {
     public static createAnalysisProcedure(config: AnalysisProcedureConfig): AnalysisProcedure {
         return new class implements AnalysisProcedure {
             run(task: App): {} {
-                const memAnalysis: ProgramAnalysis<ConcreteMemory, AbstractMemory> = new MemAnalysis();
+                const memAnalysis: ProgramAnalysisWithLabels<ConcreteMemory, AbstractMemory> = new MemAnalysis();
                 const schedAnalysis: ProgramAnalysis<ScheduleConcreteState, ScheduleAbstractStateAttributes> = new ScheduleAnalysis(memAnalysis);
                 const graphAnalysis: ProgramAnalysis<GraphConcreteState, GraphAbstractStateAttribs> = new GraphAnalysis(schedAnalysis);
 

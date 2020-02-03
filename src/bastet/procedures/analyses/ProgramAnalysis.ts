@@ -24,6 +24,7 @@ import {AbstractElement} from "../../lattices/Lattice";
 import {StateSet} from "../algorithms/StateSet";
 import {App} from "../../syntax/app/App";
 import {ConcreteElement} from "../domains/ConcreteElements";
+import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
 
 export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement> {
 
@@ -43,6 +44,12 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
     target(state: E): boolean;
 
     initialStatesFor(task: App): E[];
+}
+
+export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends AbstractElement> extends ProgramAnalysis<C, E> {
+
+    abstractSuccFor(fromState: E, op: ProgramOperation): Iterable<E>;
+
 }
 
 export interface WrappingProgramAnalysis<C extends ConcreteElement, E extends AbstractElement>
