@@ -2,8 +2,9 @@
  *   BASTET Program Analysis and Verification Framework
  *
  *   Copyright 2019 by University of Passau (uni-passau.de)
- *
- *   Maintained by Andreas Stahlbauer (firstname@lastname.net)
+ *    
+ *   Maintained by Andreas Stahlbauer (firstname@lastname.net),
+ *   see the file CONTRIBUTORS.md for the list of contributors.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -16,18 +17,10 @@
  *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
- *
+ *   
  */
 
-import {AbstractElement} from "../Lattice";
 
-export interface StringMapElement<V extends AbstractElement> {
-
-    getValue(key: string): V;
-
+export interface PropositionalFormula {
+    
 }
-
-export interface MapElement<V extends AbstractElement> {
-
-}
-

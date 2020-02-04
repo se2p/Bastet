@@ -20,12 +20,14 @@
  */
 
 import {SingletonStateWrapper} from "../AbstractStates";
-import {AbstractDomain, AbstractionPrecision, ConcreteElement} from "../AbstractDomain";
+import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
 import {AbstractElement, Lattice} from "../../../lattices/Lattice";
 import {List as ImmList, Record as ImmRec} from "immutable";
-import {ActorId} from "../../../syntax/app/Actor";
+import {Actor, ActorId} from "../../../syntax/app/Actor";
 import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
-import {ScriptId} from "../../../syntax/app/controlflow/Script";
+import {Script, ScriptId} from "../../../syntax/app/controlflow/Script";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {ConcreteDomain} from "../../domains/ConcreteElements";
 
 export const THREAD_STATE_RUNNING = 1;
 export const THREAD_STATE_WAIT = 2;
@@ -34,7 +36,11 @@ export const THREAD_STATE_UNKNOWN = 0;
 
 export type ScriptComputationState = number;
 
-export interface ThreadState {
+export interface ScheduleConcreteState {
+
+}
+
+export interface ThreadStateAttributes {
     actorId: ActorId;
     scriptId: ScriptId;
     locationId: LocationID;
@@ -42,50 +48,100 @@ export interface ThreadState {
 }
 
 const ThreadStateRecord = ImmRec({
-    actorId: -1,
+    actorId: "",
     scriptId: -1,
     locationId: -1,
     computationState: THREAD_STATE_UNKNOWN,
 });
 
-export interface ScheduleAbstractState extends AbstractElement, SingletonStateWrapper {
+export class ThreadState extends ThreadStateRecord implements AbstractElement {
+
+    constructor(actorId, scriptId, locationId, compState) {
+        super({actorId: actorId, scriptId: scriptId, locationId: locationId, computationState: compState});
+    }
+
+    public getActorId(): ActorId {
+        return this.get('actorId');
+    }
+
+    public getScriptId(): ScriptId {
+        return this.get('scriptId');
+    }
+
+    public getLocationId(): LocationID {
+        return this.get('locationId');
+    }
+
+    public getComputationState(): ScriptComputationState {
+        return this.get('computationState');
+    }
+
+}
+
+export interface ScheduleAbstractStateAttributes extends AbstractElement, SingletonStateWrapper {
+
     threadStates: ImmList<ThreadState>;
-    wrappedState: any;
+
+    wrappedState: ImmRec<any>;
+
 }
 
 const ScheduleAbstractStateRecord = ImmRec({
+
     threadStates: ImmList<ThreadState>([]),
-    wrappedState: ImmRec<any>({}),
+    wrappedState: null,
+
 });
+
 
 /**
  * A state with SHARED MEMORY
  */
-export class ScheduleAbstractStateImpl extends ScheduleAbstractStateRecord implements AbstractElement {
+export class ScheduleAbstractState extends ScheduleAbstractStateRecord implements AbstractElement {
 
-    threadStates: ImmList<ThreadState>;
-    wrappedState: any;
+    constructor(threadStates: ImmList<ThreadState>, wrappedState: ImmRec<any>) {
+        super({threadStates: threadStates, wrappedState: wrappedState});
+    }
 
-    constructor(args: any = {}) {
-        super(Object.assign({}, args, {}));
+    public getThreadStates(): ImmList<ThreadState> {
+        return this.get("threadStates");
+    }
+
+    public getWrappedState(): ImmList<ThreadState> {
+        return this.get("wrappedState");
     }
 }
 
+export class ScheduleAbstractStateFactory {
 
-export class ScheduleAbstractDomain implements AbstractDomain<ScheduleAbstractState> {
+    public static createState(threadStates: ImmList<ThreadState>, wrappedStated: ImmRec<any>): ScheduleAbstractState {
+        return new ScheduleAbstractState(threadStates, wrappedStated);
+    }
+
+    static createInitialState(bootstrapper: Actor, initScript: Script, wrappedState: ImmRec<any>) {
+        const threadState = new ThreadState(bootstrapper.ident, initScript.id, initScript.getInitialLocation(), THREAD_STATE_RUNNING);
+        return new ScheduleAbstractState(ImmList([threadState]), wrappedState);
+    }
+}
+
+export class ScheduleAbstractDomain implements AbstractDomain<ScheduleConcreteState, ScheduleAbstractState> {
 
     lattice: Lattice<ScheduleAbstractState>;
 
-    abstract(elements: Iterable<ConcreteElement>): ScheduleAbstractState {
+    abstract(elements: Iterable<ScheduleConcreteState>): ScheduleAbstractState {
         return undefined;
     }
 
-    concretize(element: ScheduleAbstractState): Iterable<ConcreteElement> {
+    concretize(element: ScheduleAbstractState): Iterable<ScheduleConcreteState> {
         return undefined;
     }
 
     widen(element: ScheduleAbstractState, precision: AbstractionPrecision): ScheduleAbstractState {
         return undefined;
+    }
+
+    get concreteDomain(): ConcreteDomain<ScheduleConcreteState> {
+        throw new ImplementMeException();
     }
 
 }

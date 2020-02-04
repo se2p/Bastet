@@ -19,42 +19,73 @@
  *
  */
 
-import {AbstractDomain, AbstractionPrecision, ConcreteElement} from "../AbstractDomain";
+import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
 import {AbstractElement, Lattice} from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Record as ImmRec, Set as ImmSet} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
+import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 
 export type GraphStateId = number;
 
-export interface GraphAbstractState extends AbstractElement, SingletonStateWrapper {
+export interface GraphConcreteState extends ConcreteElement {
+
+}
+
+export interface GraphAbstractStateAttribs extends AbstractElement, SingletonStateWrapper {
+
     id: GraphStateId;
+
     predecessors: ImmSet<GraphStateId>;
-    wrappedState: any;
+
+    wrappedState: ImmRec<any>;
+
 }
 
 const GraphAbstractStateRecord = ImmRec({
     id: 0,
     predecessors: ImmSet<GraphStateId>([]),
-    wrappedState: ImmRec<any>({})
+    wrappedState: null
 });
 
-export class GraphAbstractStateImpl extends GraphAbstractStateRecord implements GraphAbstractState {
+export class GraphAbstractState extends GraphAbstractStateRecord implements GraphAbstractStateAttribs {
 
-    id: GraphStateId;
-    predecessors: ImmSet<GraphStateId>;
-    wrappedState: any;
-
-    constructor(args: any = {}) {
-        super(Object.assign({}, args, {}));
+    constructor(id: GraphStateId, preds: ImmSet<GraphStateId>, wrapped: ImmRec<any>) {
+        super({id: id, predecessors: preds, wrappedState: wrapped});
     }
+
+    public getId(): number {
+        return this.get('id');
+    }
+
+    public getPredecessors(): ImmSet<GraphStateId> {
+        return this.get('predecessors');
+    }
+
+    public getWrappedState(): ImmRec<any> {
+        return this.get('wrappedState');
+    }
+}
+
+export class GraphAbstractStateFactory {
+
+    private static STATE_ID_SEQ: number;
+
+    public static withFreshID(preds: Iterable<GraphStateId>, wrapped: ImmRec<any>): GraphAbstractState {
+        if (!GraphAbstractStateFactory.STATE_ID_SEQ) {
+            GraphAbstractStateFactory.STATE_ID_SEQ = 0;
+        }
+        const freshId = GraphAbstractStateFactory.STATE_ID_SEQ++;
+        return new GraphAbstractState(freshId, ImmSet(preds), wrapped);
+    }
+
 }
 
 export class GraphAbstractStateBuilder {
 
     private _id: GraphStateId;
-    private _wrappedState: AbstractElement;
     private _predecessors: GraphStateId[];
+    private _wrappedState: ImmRec<any>;
 
     constructor() {
         this._predecessors = [];
@@ -70,14 +101,13 @@ export class GraphAbstractStateBuilder {
         return this;
     }
 
-    public setWrappedState(state: AbstractElement) : GraphAbstractStateBuilder {
+    public setWrappedState(state: ImmRec<any>) : GraphAbstractStateBuilder {
         this._wrappedState = state;
         return this;
     }
 
-    public build(): GraphAbstractState {
-        return new GraphAbstractStateImpl({id: this._id,
-            wrappedState: this._wrappedState, predecessors: ImmSet(this._predecessors)});
+    public build(): GraphAbstractStateAttribs {
+        return new GraphAbstractState(this._id, ImmSet(this._predecessors), this._wrappedState);
     }
 }
 
@@ -104,7 +134,7 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
     }
 }
 
-export class GraphAbstractDomain implements AbstractDomain<GraphAbstractState> {
+export class GraphAbstractDomain implements AbstractDomain<GraphConcreteState, GraphAbstractState> {
 
     private readonly _lattice: GraphAbstractStateLattice;
 
@@ -112,15 +142,19 @@ export class GraphAbstractDomain implements AbstractDomain<GraphAbstractState> {
         return this._lattice;
     }
 
-    abstract(elements: Iterable<ConcreteElement>): GraphAbstractState {
+    abstract(elements: Iterable<GraphConcreteState>): GraphAbstractState {
         throw new ImplementMeException();
     }
 
-    concretize(element: GraphAbstractState): Iterable<ConcreteElement> {
+    concretize(element: GraphAbstractState): Iterable<GraphConcreteState> {
         throw new ImplementMeException();
     }
 
     widen(element: GraphAbstractState, precision: AbstractionPrecision): GraphAbstractState {
+        throw new ImplementMeException();
+    }
+
+    get concreteDomain(): ConcreteDomain<GraphConcreteState> {
         throw new ImplementMeException();
     }
 }

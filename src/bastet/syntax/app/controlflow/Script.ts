@@ -22,6 +22,7 @@
 import {TransitionRelation} from "./TransitionRelation";
 import {CoreEvent} from "../../ast/core/CoreEvent";
 import {Preconditions} from "../../../utils/Preconditions";
+import {LocationID} from "./ControlLocation";
 
 
 export type ScriptId = number;
@@ -59,5 +60,10 @@ export class Script {
 
     get id(): number {
         return this._id;
+    }
+
+    public getInitialLocation(): LocationID {
+        Preconditions.checkState(this.transitions.entryLocationSet.size === 1);
+        return this.transitions.entryLocationSet.values().next().value;
     }
 }

@@ -24,6 +24,7 @@ import {Maps} from "../../utils/Maps";
 import {MethodDefinition, MethodDefinitionList} from "../ast/core/MethodDefinition";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {Script} from "./controlflow/Script";
 
 export class App {
 
@@ -82,6 +83,12 @@ export class App {
             }
         }
         return new MethodDefinitionList(result);
+    }
+
+    public getInitScript(): Script {
+        Preconditions.checkNotUndefined(this._bootstrapper);
+        Preconditions.checkArgument(this.bootstrapper.scripts.length == 1);
+        return this.bootstrapper.scripts.values().next().value;
     }
 
     private static EMPTY_APP: App = null;

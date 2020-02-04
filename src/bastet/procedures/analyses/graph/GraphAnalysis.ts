@@ -20,25 +20,34 @@
  */
 
 import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
-import {AbstractDomain} from "../AbstractDomain";
+import {AbstractDomain} from "../../domains/AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
-import {GraphAbstractDomain, GraphAbstractState} from "./GraphAbstractDomain";
+import {
+    GraphAbstractDomain,
+    GraphAbstractState,
+    GraphAbstractStateFactory,
+    GraphConcreteState
+} from "./GraphAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {App} from "../../../syntax/app/App";
+import {GraphTransferRelation} from "./GraphTransferRelation";
 
-export class GraphAnalysis implements WrappingProgramAnalysis<GraphAbstractState> {
+export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState> {
 
-    private _abstractDomain: AbstractDomain<GraphAbstractState>;
+    private readonly _abstractDomain: AbstractDomain<GraphConcreteState, GraphAbstractState>;
 
-    private _wrappedAnalysis: ProgramAnalysis<any>;
+    private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
 
-    constructor(wrappedAnalysis: ProgramAnalysis<any>) {
+    private readonly _transferRelation: GraphTransferRelation;
+
+    constructor(wrappedAnalysis: ProgramAnalysis<any, any>) {
         this._wrappedAnalysis = wrappedAnalysis;
         this._abstractDomain = new GraphAbstractDomain();
+        this._transferRelation = new GraphTransferRelation((e) => this._wrappedAnalysis.abstractSucc(e));
     }
 
     abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
-        throw new ImplementMeException();
+        return this._transferRelation.abstractSucc(fromState);
     }
 
     join(state1: GraphAbstractState, state2: GraphAbstractState): GraphAbstractState {
@@ -61,17 +70,18 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphAbstractState
         throw new ImplementMeException();
     }
 
-    get abstractDomain(): AbstractDomain<GraphAbstractState> {
+    get abstractDomain(): AbstractDomain<GraphConcreteState, GraphAbstractState> {
         return this._abstractDomain;
     }
 
-    get wrappedAnalysis(): ProgramAnalysis<any> {
+    get wrappedAnalysis(): ProgramAnalysis<any, any> {
         return this._wrappedAnalysis;
     }
 
     initialStatesFor(task: App): GraphAbstractState[] {
-        const wrappedInitialStates = this._wrappedAnalysis.initialStatesFor(task);
-        throw new ImplementMeException();
+        return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
+            return GraphAbstractStateFactory.withFreshID([], w);
+        } );
     }
 
 }

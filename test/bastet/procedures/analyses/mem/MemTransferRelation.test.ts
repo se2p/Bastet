@@ -22,13 +22,13 @@
 
 import {MemTransferRelation} from "../../../../../src/bastet/procedures/analyses/mem/MemTransferRelation";
 import {
+    MemAbstractDomain,
     MemAbstractState,
     MemAbstractStates
 } from "../../../../../src/bastet/procedures/analyses/mem/MemAbstractDomain";
 import {
     ProgramOperation, ProgramOperationFactory
 } from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
-import {AstNode} from "../../../../../src/bastet/syntax/ast/AstNode";
 import {
     BooleanExpression,
     NumLessThanExpression
@@ -38,10 +38,26 @@ import {
     PlusExpression
 } from "../../../../../src/bastet/syntax/ast/core/expressions/NumberExpression";
 import {Identifier} from "../../../../../src/bastet/syntax/ast/core/Identifier";
+import {NumIntervalValueDomain} from "../../../../../src/bastet/procedures/domains/NumIntervalValueDomain";
+import {FlatBooleanValueDomain} from "../../../../../src/bastet/procedures/domains/FlatBooleanValueDomain";
+import {FlatStringValueDomain} from "../../../../../src/bastet/procedures/domains/FlatStringValueDomain";
+import {ListValueDomain} from "../../../../../src/bastet/procedures/domains/ListValueDomain";
+import {
+    ConcreteBooleanDomain, ConcreteBoundedStringDomain, ConcreteBoundedStringListDomain,
+    ConcreteNumberDomain
+} from "../../../../../src/bastet/procedures/domains/ConcreteElements";
+import {StringAbstractDomain} from "../../../../../src/bastet/procedures/domains/StringAbstractDomain";
+import {StringListAbstractDomain} from "../../../../../src/bastet/procedures/domains/StringListAbstractDomain";
 
 describe("MemTransferRelation", () => {
 
-    const tr = new MemTransferRelation();
+    const dom: MemAbstractDomain = new MemAbstractDomain(
+        new NumIntervalValueDomain(new ConcreteNumberDomain()),
+        new FlatBooleanValueDomain(new ConcreteBooleanDomain()),
+        new StringAbstractDomain(new ConcreteBoundedStringDomain(23)),
+        new StringListAbstractDomain(new ConcreteBoundedStringListDomain(42)));
+
+    const tr = new MemTransferRelation(dom);
 
     describe("abstractSuccFor", () => {
 
@@ -59,12 +75,22 @@ describe("MemTransferRelation", () => {
                 const result = tr.abstractSuccFor(e, op);
 
                 it("TODO", () => {
+                    const e: MemAbstractState = MemAbstractStates.empty();
+                    const opAst: BooleanExpression = new NumLessThanExpression(
+                        new NumberVariableExpression(Identifier.of("c")),
+                        new PlusExpression(
+                            new NumberVariableExpression(Identifier.of("a")),
+                            new NumberVariableExpression(Identifier.of("b"))));
+                    const op: ProgramOperation = ProgramOperationFactory.createAssumeOpFrom(opAst);
+                    const result = tr.abstractSuccFor(e, op);
 
                 });
 
             });
 
-            describe("define c as 41", () => {});
+            describe("define c as 41", () => {
+
+            });
 
             describe("define c as c + 1", () => {});
 

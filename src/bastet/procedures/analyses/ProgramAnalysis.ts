@@ -19,14 +19,16 @@
  *
  */
 
-import {AbstractDomain} from "./AbstractDomain";
+import {AbstractDomain} from "../domains/AbstractDomain";
 import {AbstractElement} from "../../lattices/Lattice";
 import {StateSet} from "../algorithms/StateSet";
 import {App} from "../../syntax/app/App";
+import {ConcreteElement} from "../domains/ConcreteElements";
+import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
 
-export interface ProgramAnalysis<E extends AbstractElement> {
+export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement> {
 
-    abstractDomain: AbstractDomain<E>;
+    abstractDomain: AbstractDomain<C, E>;
 
     abstractSucc(fromState: E): Iterable<E>;
 
@@ -44,8 +46,15 @@ export interface ProgramAnalysis<E extends AbstractElement> {
     initialStatesFor(task: App): E[];
 }
 
-export interface WrappingProgramAnalysis<E extends AbstractElement> extends ProgramAnalysis<E> {
+export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends AbstractElement> extends ProgramAnalysis<C, E> {
 
-    wrappedAnalysis: ProgramAnalysis<any>;
+    abstractSuccFor(fromState: E, op: ProgramOperation): Iterable<E>;
+
+}
+
+export interface WrappingProgramAnalysis<C extends ConcreteElement, E extends AbstractElement>
+    extends ProgramAnalysis<C, E> {
+
+    wrappedAnalysis: ProgramAnalysis<any, any>;
 
 }

@@ -19,3 +19,52 @@
  *
  */
 
+import {List as ImmList, Map as ImmMap, Record as ImmRec} from "immutable";
+
+export type ExpressionId = number;
+
+const LiteralRecord = ImmRec({
+
+    expressionId: -1,
+
+});
+
+export class Literal extends LiteralRecord {
+
+    expressionId: ExpressionId;
+
+    constructor(args: any = {}) {
+        super(Object.assign({}, args, {}));
+    }
+}
+
+const ClauseRecord = ImmRec({
+
+    elements: ImmList([])
+
+});
+
+
+export class Clause extends ClauseRecord {
+
+    constructor(args: any = {}) {
+        super(Object.assign({}, args, {}));
+    }
+
+}
+
+const FormulaRecord = ImmRec({
+
+    elements: ImmList([])
+
+});
+
+
+export class CNFFormula extends FormulaRecord {
+
+    constructor(args: any = {}) {
+        super(Object.assign({}, args, {}));
+    }
+
+}
+

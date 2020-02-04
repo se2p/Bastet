@@ -22,14 +22,15 @@
 import {AnalysisProcedure} from "./AnalysisProcedure";
 import {App} from "../syntax/app/App";
 import {GraphAnalysis} from "./analyses/graph/GraphAnalysis";
-import {ProgramAnalysis} from "./analyses/ProgramAnalysis";
+import {ProgramAnalysis, ProgramAnalysisWithLabels} from "./analyses/ProgramAnalysis";
 import {ScheduleAnalysis} from "./analyses/schedule/ScheduleAnalysis";
-import {ScheduleAbstractState} from "./analyses/schedule/ScheduleAbstractDomain";
-import {MemAbstractState} from "./analyses/mem/MemAbstractDomain";
+import {ScheduleAbstractStateAttributes, ScheduleConcreteState} from "./analyses/schedule/ScheduleAbstractDomain";
+import {AbstractMemory, MemAbstractState} from "./analyses/mem/MemAbstractDomain";
 import {MemAnalysis} from "./analyses/mem/MemAnalysis";
-import {GraphAbstractState} from "./analyses/graph/GraphAbstractDomain";
+import {GraphConcreteState, GraphAbstractStateAttribs} from "./analyses/graph/GraphAbstractDomain";
 import {ReachabilityAlgorithm} from "./algorithms/Reachability";
 import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
+import {ConcreteMemory} from "./domains/ConcreteElements";
 
 export class AnalysisProcedureConfig {
 
@@ -44,18 +45,18 @@ export class AnalysisProcedureFactory {
     public static createAnalysisProcedure(config: AnalysisProcedureConfig): AnalysisProcedure {
         return new class implements AnalysisProcedure {
             run(task: App): {} {
-                const memAnalysis: ProgramAnalysis<MemAbstractState> = new MemAnalysis();
-                const schedAnalysis: ProgramAnalysis<ScheduleAbstractState> = new ScheduleAnalysis(memAnalysis);
-                const graphAnalysis: ProgramAnalysis<GraphAbstractState> = new GraphAnalysis(schedAnalysis);
+                const memAnalysis: ProgramAnalysisWithLabels<ConcreteMemory, AbstractMemory> = new MemAnalysis();
+                const schedAnalysis: ProgramAnalysis<ScheduleConcreteState, ScheduleAbstractStateAttributes> = new ScheduleAnalysis(memAnalysis);
+                const graphAnalysis: ProgramAnalysis<GraphConcreteState, GraphAbstractStateAttribs> = new GraphAnalysis(schedAnalysis);
 
-                const frontier: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
-                const reached: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
+                const frontier: StateSet<GraphAbstractStateAttribs> = StateSetFactory.createStateSet<GraphAbstractStateAttribs>();
+                const reached: StateSet<GraphAbstractStateAttribs> = StateSetFactory.createStateSet<GraphAbstractStateAttribs>();
 
                 const chooseOpConfig = new ChooseOpConfig();
                 const chooseOp = frontier.createChooseOp(chooseOpConfig);
                 const reachabilityAlgorithm = new ReachabilityAlgorithm(graphAnalysis, chooseOp);
 
-                const initialStates: GraphAbstractState[] = graphAnalysis.initialStatesFor(task);
+                const initialStates: GraphAbstractStateAttribs[] = graphAnalysis.initialStatesFor(task);
                 frontier.addAll(initialStates);
                 reached.addAll(initialStates);
 

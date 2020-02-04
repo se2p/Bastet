@@ -47,10 +47,11 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         if (fromState.threadStates.size == 0) {
             return [fromState];
         } else if (fromState.threadStates.size == 1) {
-            const t: ThreadState = fromState.threadStates[0];
-            if (t.computationState === THREAD_STATE_DONE) {
+            const t: ThreadState = fromState.threadStates.get(0);
+            Preconditions.checkNotUndefined(t);
+            if (t.getComputationState() === THREAD_STATE_DONE) {
                 return [fromState];
-            } else if (t.computationState === THREAD_STATE_RUNNING) {
+            } else if (t.getComputationState() === THREAD_STATE_RUNNING) {
                 // Determine the (sequences of) control-flow transition(s) to execute in this step
                 // ATTENTION: We assume that each sequence corresponds to an atomic
                 //      statement in the input programming language (Scratch)

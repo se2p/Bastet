@@ -19,20 +19,38 @@
  *
  */
 
-import {ProgramAnalysis} from "../ProgramAnalysis";
-import {MemAbstractState, MemAbstractStates} from "./MemAbstractDomain";
-import {AbstractDomain} from "../AbstractDomain";
+import {ProgramAnalysis, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
+import {AbstractMemory, MemAbstractDomain, MemAbstractState, MemAbstractStates} from "./MemAbstractDomain";
+import {AbstractDomain} from "../../domains/AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {MemTransferRelation} from "./MemTransferRelation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {
+    ConcreteBooleanDomain,
+    ConcreteBoundedStringDomain, ConcreteBoundedStringListDomain,
+    ConcreteMemory,
+    ConcreteNumberDomain
+} from "../../domains/ConcreteElements";
+import {NumIntervalValueDomain} from "../../domains/NumIntervalValueDomain";
+import {FlatBooleanValueDomain} from "../../domains/FlatBooleanValueDomain";
+import {StringListAbstractDomain} from "../../domains/StringListAbstractDomain";
+import {StringAbstractDomain} from "../../domains/StringAbstractDomain";
 
-export class MemAnalysis implements ProgramAnalysis<MemAbstractState>, LabeledTransferRelation<MemAbstractState> {
+export class MemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, AbstractMemory>, LabeledTransferRelation<MemAbstractState> {
 
-    private readonly _abstractDomain: AbstractDomain<MemAbstractState>;
+    private readonly _abstractDomain: AbstractDomain<ConcreteMemory, AbstractMemory>;
     private readonly _transferRelation: MemTransferRelation;
+
+    constructor() {
+        const numDomain = new NumIntervalValueDomain(new ConcreteNumberDomain());
+        const boolDomain = new FlatBooleanValueDomain(new ConcreteBooleanDomain());
+        const stringDomain = new StringAbstractDomain(new ConcreteBoundedStringDomain(42));
+        const stringListDomain = new StringListAbstractDomain(new ConcreteBoundedStringListDomain(23));
+        this._abstractDomain = new MemAbstractDomain(numDomain, boolDomain, stringDomain, stringListDomain);
+    }
 
     abstractSucc(fromState: MemAbstractState): Iterable<MemAbstractState> {
         return this._transferRelation.abstractSucc(fromState);
@@ -66,7 +84,7 @@ export class MemAnalysis implements ProgramAnalysis<MemAbstractState>, LabeledTr
         return this._transferRelation.abstractSuccFor(fromState, op);
     }
 
-    get abstractDomain(): AbstractDomain<MemAbstractState> {
+    get abstractDomain(): AbstractDomain<ConcreteMemory, AbstractMemory> {
         return this._abstractDomain;
     }
 }

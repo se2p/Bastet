@@ -33,7 +33,7 @@ program Task6Spec
 
 actor DirectorObserver is Observer begin
 
-    declare observer_state as enum ["INIT", "STARTUP_FINISHED"]
+    declare observer_state as enum ["INIT", "BOOTSTRAP_FINISHED"]
 
     declare actor_1_id as string
     declare actor_1_last_y as number
@@ -138,24 +138,22 @@ actor DirectorObserver is Observer begin
         define actor_2_last_y as attribute "y" of actor_2_id
     end
 
-    script on startup do begin
-
+    script on bootstrap do begin
+        define observer_state as "INIT"
     end
 
-    script on startup finished do begin
-        if observer_state = "INIT" then begin
-        end else begin
-            // First specification check (base condition)
-            assert(checkBehaviorSatisfied())
-        end
+    script on bootstrap finished do begin
+        define observer_state as "BOOTSTRAP_FINISHED"
+
+        // First specification check (base condition)
+        assert(checkBehaviorSatisfied())
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
     end
 
     script on statement finished do begin
-        if observer_state = "INIT" then begin
-        end else begin
+        if observer_state = "BOOTSTRAP_FINISHED" then begin
             // The actual specification check
             assert(checkBehaviorSatisfied())
         end

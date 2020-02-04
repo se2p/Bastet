@@ -23,6 +23,7 @@ import {AbstractElement} from "../../lattices/Lattice";
 import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 import {ChooseOperator, StateSet} from "./StateSet";
 import {Preconditions} from "../../utils/Preconditions";
+import {ConcreteElement} from "../domains/ConcreteElements";
 
 
 /**
@@ -30,17 +31,17 @@ import {Preconditions} from "../../utils/Preconditions";
  * reachability algorithm that can be found in the CPA framework;
  * nevertheless, our implementation has important differences.
  */
-export class ReachabilityAlgorithm<E extends AbstractElement> {
+export class ReachabilityAlgorithm<C extends ConcreteElement, E extends AbstractElement> {
 
-    private readonly _analysis: ProgramAnalysis<E>;
+    private readonly _analysis: ProgramAnalysis<C, E>;
     private readonly _chooseOp: ChooseOperator<E>;
 
-    constructor(analysis: ProgramAnalysis<E>, chooseOp: ChooseOperator<E>) {
+    constructor(analysis: ProgramAnalysis<C, E>, chooseOp: ChooseOperator<E>) {
         this._analysis = analysis;
         this._chooseOp = chooseOp;
     }
 
-    get analysis(): ProgramAnalysis<E> {
+    get analysis(): ProgramAnalysis<C, E> {
         return this._analysis;
     }
 

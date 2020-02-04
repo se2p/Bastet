@@ -28,8 +28,7 @@ import {
     ActorDefinitionListContext,
     ActorModeContext,
     ActorRoleModeContext,
-    AddElementToStatementContext,
-    AfterStartupMonitoringEventContext,
+    AddElementToStatementContext, AfterBootstrapMonitoringEventContext,
     AfterStatementMonitoringEventContext,
     AppMessageContext,
     BoolAndExpressionContext,
@@ -40,7 +39,7 @@ import {
     BoolLiteralExpressionContext,
     BoolOrExpressionContext,
     BoolParanthExpressionContext,
-    BoolVariableExpressionContext,
+    BoolVariableExpressionContext, BootstapEventContext,
     BroadcastAndWaitStatementContext,
     BroadcastMessageStatementContext,
     CallStmtContext,
@@ -243,8 +242,8 @@ import {
     VoidType
 } from "../ast/core/ScratchType";
 import {
-    AfterStartupMonitoringEvent,
-    AfterStatementMonitoringEvent,
+    AfterBootstrapMonitoringEvent,
+    AfterStatementMonitoringEvent, BootstrapEvent,
     CloneStartEvent,
     ConditionReachedEvent,
     CoreEvent,
@@ -1460,8 +1459,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(new RenderedMonitoringEvent());
     }
 
-    public visitAfterStartupMonitoringEvent(ctx: AfterStartupMonitoringEventContext) : TransformerResult {
-        return TransformerResult.withNode(new AfterStartupMonitoringEvent());
+    public visitBootstapEvent(ctx: BootstapEventContext) : TransformerResult {
+        return TransformerResult.withNode(new BootstrapEvent());
+    }
+
+    public visitAfterBootstrapMonitoringEvent(ctx: AfterBootstrapMonitoringEventContext) : TransformerResult {
+        return TransformerResult.withNode(new AfterBootstrapMonitoringEvent());
     }
 
     public visitAfterStatementMonitoringEvent(ctx: AfterStatementMonitoringEventContext) : TransformerResult {

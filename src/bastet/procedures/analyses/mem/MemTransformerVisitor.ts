@@ -25,7 +25,7 @@ import {
     CoreStringExpressionVisitor,
     CoreVisitor
 } from "../../../syntax/ast/CoreVisitor";
-import {AbstractBoolean, AbstractList, AbstractMemory, AbstractNumber, AbstractString} from "./MemAbstractDomain";
+import {AbstractMemory} from "./MemAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {
@@ -103,6 +103,7 @@ import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/Bro
 import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {Preconditions} from "../../../utils/Preconditions";
+import {AbstractBoolean, AbstractList, AbstractNumber, AbstractString, MemoryTransformer} from "../../domains/MemoryTransformer";
 
 export class MemNumExpressionVisitor implements CoreNumberExpressionVisitor<AbstractNumber> {
 
@@ -322,7 +323,7 @@ export class MemTransformerVisitor implements
 
     private readonly _mem: AbstractMemory;
 
-    constructor(mem: AbstractMemory) {
+    constructor(transformer: MemoryTransformer<AbstractMemory>, mem: AbstractMemory) {
         this._mem = Preconditions.checkNotUndefined(mem);
     }
 

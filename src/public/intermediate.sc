@@ -12,6 +12,14 @@ role RuntimeEntity begin
 
     extern _RUNTIME_restart ()
 
+    // Signal that the current scene should be rendered,
+    //   or: signal a behavior that should be visible to the user.
+    extern _RUNTIME_render ()
+
+    // Returns the number of milliseconds that
+    // elapsed since the VM started.
+    extern _RUNTIME_millis () returns number
+
     extern _RUNTIME_signalFailure ()
 
     extern _RUNTIME_numberFromInterval(from_num: number, to_num: number) returns number

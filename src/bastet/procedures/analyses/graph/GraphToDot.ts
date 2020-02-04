@@ -3,7 +3,8 @@
  *
  *   Copyright 2019 by University of Passau (uni-passau.de)
  *
- *   Maintained by Andreas Stahlbauer (firstname@lastname.net)
+ *   Maintained by Andreas Stahlbauer (firstname@lastname.net),
+ *   see the file CONTRIBUTORS.md for the list of contributors.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -18,4 +19,27 @@
  *   limitations under the License.
  *
  */
+
+export class GraphToDotVisitor  {
+
+    private _dot: string[];
+    private _idseq: number;
+
+    constructor() {
+        this._dot = [];
+        this._idseq = 0;
+    }
+
+    public writeToFile(filepath: string): void {
+        let fs = require('fs');
+        fs.writeFileSync(filepath, `digraph ast {\n` + this._dot.join("\n") + `\n}\n`);
+    }
+
+    private static escpace(text: string): string {
+        const search = "\"";
+        const replacement = "\\\"";
+        return text.replace(new RegExp(search, 'g'), replacement);
+    }
+
+}
 

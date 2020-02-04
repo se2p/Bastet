@@ -3,7 +3,8 @@
  *
  *   Copyright 2019 by University of Passau (uni-passau.de)
  *
- *   Maintained by Andreas Stahlbauer (firstname@lastname.net)
+ *   Maintained by Andreas Stahlbauer (firstname@lastname.net),
+ *   see the file CONTRIBUTORS.md for the list of contributors.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -20,10 +21,7 @@
  */
 
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
-
-export interface ConcreteElement {
-
-}
+import {ConcreteDomain, ConcreteElement} from "./ConcreteElements";
 
 export class ConcreteNumberElement implements ConcreteElement {
 
@@ -49,14 +47,16 @@ export interface AbstractionPrecision {
 
 }
 
-export interface AbstractDomain<E extends AbstractElement> {
+export interface AbstractDomain<C extends ConcreteElement, E extends AbstractElement> {
 
     lattice: Lattice<E>;
 
-    abstract(elements: Iterable<ConcreteElement>): E;
+    abstract(elements: Iterable<C>): E;
 
-    concretize(element: E): Iterable<ConcreteElement>;
+    concretize(element: E): Iterable<C>;
 
     widen(element: E, precision: AbstractionPrecision): E;
+
+    concreteDomain: ConcreteDomain<C>;
 
 }
