@@ -15,10 +15,12 @@ program Task7Spec
  * Interpretations and considerations:
  *
  * Rewrite without explicit actor names:
- *    Given one actor it always changes its costume after a repaint (?)
+ *    Given at max one actor it always changes its costume after a repaint (?)
  *
  *   EXISTS a in _RUNTIME_getAllActors():
- *      (?)
+ *     FORALL trace in PROGRAM_TRACES:
+ *       IF time_elapsed > 2000:
+ *           changed_costume(b) == TRUE
  *
  */
 
@@ -32,16 +34,23 @@ actor DirectorObserver is Observer begin
     declare actor_1_costume as string
     declare actor_1_prev_costume as string
 
+    declare timestamp as number
+    define timestamp as _RUMTIME_millis()
+
     define atomic checkBehaviorSatisfied () begin
         // (a) Attributes of the first actor
         define actor_1_costume as attribute "currentCostume" of actor_1_id
         define actor_1_switched_costume as false
 
-        if actor_1_costume not actor_1_prev_costume then begin
+        if not actor_1_switched_costume and not actor_1_costume = actor_1_prev_costume then begin
            define actor_1_switched_costume as true
         end
        // The actual invariant check
-        assert (actor_1_switched_costume )
+
+       if timestamp - _RUMTIME_millis > 2000
+            assert (actor_1_switched_costume )
+            define timestamp as _RUMTIME_millis()
+       end
     end returns actor_1_switched_costume: boolean
 
     define atomic storeRelevantStateInfosForNext () begin
