@@ -46,7 +46,7 @@ export class AnalysisProcedureFactory {
         return new class implements AnalysisProcedure {
             run(task: App): {} {
                 const memAnalysis: ProgramAnalysisWithLabels<ConcreteMemory, AbstractMemory> = new MemAnalysis();
-                const schedAnalysis: ProgramAnalysis<ScheduleConcreteState, ScheduleAbstractStateAttributes> = new ScheduleAnalysis(memAnalysis);
+                const schedAnalysis: ProgramAnalysis<ScheduleConcreteState, ScheduleAbstractStateAttributes> = new ScheduleAnalysis({}, task, memAnalysis);
                 const graphAnalysis: ProgramAnalysis<GraphConcreteState, GraphAbstractStateAttribs> = new GraphAnalysis(schedAnalysis);
 
                 const frontier: StateSet<GraphAbstractStateAttribs> = StateSetFactory.createStateSet<GraphAbstractStateAttribs>();
