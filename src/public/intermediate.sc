@@ -270,6 +270,11 @@ role ScratchSprite is ScratchEntity begin
     end returns result : boolean
 
     // @Category "Sensing"
+    define touchingObject (obj: string) begin
+            // ...
+    end returns result : boolean
+
+    // @Category "Sensing"
     define touchingColor (clr: number) begin
         // ...
     end returns result : boolean
@@ -291,6 +296,17 @@ role ScratchSprite is ScratchEntity begin
     define sayText (msg: string) begin
 
     end
+
+    // @Category "looks"
+    define turnLeft(deg: number) begin
+
+    end
+
+    // @Category "looks"
+    define turnRight(deg: number) begin
+
+    end
+
 
     //    looks_show,            //   "show"
     //    looks_hide,            //   |  "hide"
