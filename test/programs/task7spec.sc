@@ -6,7 +6,7 @@ program Task7Spec
  * Task: The `elephant` should `dance`.
  *
  * Rewrite as bounded safety property:
- *      The elephant must always switch costumes.
+ *      The elephant must switch costumes at least every 2 seconds.
  *
  * Precondition:
  *      There exists one actors with the role of
