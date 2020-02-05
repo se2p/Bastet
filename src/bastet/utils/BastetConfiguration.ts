@@ -19,6 +19,43 @@
  *
  */
 
+import {ImplementMeException} from "../core/exceptions/ImplementMeException";
+import {Preconditions} from "./Preconditions";
+
 export class BastetConfiguration {
+
+    private readonly dict: {};
+
+    constructor(dict: {}) {
+        this.dict = Preconditions.checkNotUndefined(dict);
+    }
+
+    public static loadFromFile(filename: string): BastetConfiguration {
+        throw new ImplementMeException();
+    }
+
+    public getProperty(name: string, def?: any): any {
+        return this.dict[name] || def;
+    }
+
+    public getNumberProperty(name: string, def?: number): number {
+        return this.getProperty(name, def) as number;
+    }
+
+    public getBoolProperty(name: string, def?: boolean): boolean {
+        return this.getProperty(name, def) as boolean;
+    }
+
+    public getStringProperty(name: string, def?: string): string {
+        return this.getProperty(name, def) as string;
+    }
+
+    public getStringListProperty(name: string, def?: string[]): string[] {
+        return this.getProperty(name, def) as string[];
+    }
+
+    public getNumberListProperty(name: string, def?: number[]): number[] {
+        return this.getProperty(name, def) as number[];
+    }
 
 }
