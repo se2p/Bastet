@@ -67,7 +67,7 @@ export class StaticTimeProfile {
         throw new ImplementMeException();
     }
 
-    public getOpProfile(op: ProgramOperation) {
+    public getOpProfile(op: ProgramOperation): OperationTimeProfile {
         throw new ImplementMeException();
     }
 
