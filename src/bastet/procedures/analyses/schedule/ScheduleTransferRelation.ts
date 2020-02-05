@@ -91,7 +91,7 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         //
         // APPROACH:
         //    To make only sound propositions about Scratch programs, we throw
-        //    an exception if the WORK_TIME timout would have been reached before
+        //    an exception if the WORK_TIME timeout would have been reached before
         //    all threads in the list were stepped.
 
         if (fromState.threadStates.size == 0) {
