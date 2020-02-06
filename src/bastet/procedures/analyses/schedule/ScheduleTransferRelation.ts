@@ -39,6 +39,9 @@ import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/Bro
 import {WaitSecsStatement} from "../../../syntax/ast/core/statements/WaitSecsStatement";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import {MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
+import {ConcreteString} from "../../domains/ConcreteElements";
+import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressions/StringExpression";
 
 export type Schedule = ImmList<ThreadState>;
 
@@ -252,7 +255,8 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         //
         if (stepOp.ast instanceof BroadcastAndWaitStatement) {
             const stmt: BroadcastAndWaitStatement = stepOp.ast as BroadcastAndWaitStatement;
-            const waitForIndices: number[] = this.getAllMessageReceiverThreadsFrom(threadStates);
+            const msg: string = this.evaluateToConcreteMessage(stmt.msg);
+            const waitForIndices: number[] = this.getAllMessageReceiverThreadsFrom(threadStates, msg);
             const waitFor: ThreadState[] = waitForIndices.map((idx) => threadStates.get(idx));
 
             // Prepare the waiting threads for running
@@ -336,8 +340,21 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         return [resultBase];
     }
 
-    private getAllMessageReceiverThreadsFrom(threadStates: Schedule): number[] {
-        throw new ImplementMeException();
+    private getAllMessageReceiverThreadsFrom(threadStates: Schedule, msg: string): number[] {
+        const result: number[] = [];
+        let index = 0;
+        for (const t of threadStates) {
+            const script = this._task.getActorByName(t.getActorId()).getScript(t.getScriptId());
+            if (script.event instanceof MessageReceivedEvent) {
+                const ev: MessageReceivedEvent = script.event as MessageReceivedEvent;
+                const handled = this.evaluateToConcreteMessage(ev.message);
+                if (msg == handled) {
+                    result.push(index);
+                }
+            }
+            index++;
+        }
+        return result;
     }
 
     private determineNextNonObserverThreadToStep(resultBase: Schedule, steppedThreadIdx: number): number {
@@ -363,5 +380,13 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
     private isNonObserverThread(thread: ThreadState) {
         const actor = this._task.getActorByName(thread.getActorId());
         return !actor.isObserver;
+    }
+
+    private evaluateToConcreteMessage(msg: StringExpression) {
+        if (msg instanceof StringLiteral) {
+            const lit = msg as StringLiteral;
+            return lit.text;
+        }
+        throw new ImplementMeException();
     }
 }

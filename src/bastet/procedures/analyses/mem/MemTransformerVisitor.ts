@@ -336,7 +336,7 @@ export class MemTransformerVisitor implements
     }
 
     visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): AbstractMemory {
-        throw new ImplementMeException();
+        return this._mem;
     }
 
     visitBroadcastMessageStatement(node: BroadcastMessageStatement): AbstractMemory {
