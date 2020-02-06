@@ -20,20 +20,44 @@
  */
 
 import {LabeledTransferRelation, TransferRelation} from "../TransferRelation";
-import {ScheduleAbstractState, THREAD_STATE_DONE, THREAD_STATE_RUNNING, ThreadState} from "./ScheduleAbstractDomain";
+import {
+    ScheduleAbstractState,
+    THREAD_STATE_DONE,
+    THREAD_STATE_RUNNING,
+    THREAD_STATE_RUNNING_ATOMIC,
+    ThreadState
+} from "./ScheduleAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
 import {AbstractElement} from "../../../lattices/Lattice";
+import {App} from "../../../syntax/app/App";
+import {ScheduleAnalysisConfig} from "./ScheduleAnalysis";
 
+/**
+ * Mimics the green-threading of the Scratch VM.
+ * Adds special scheduling of some (types of) threads.
+ */
 export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstractState> {
 
     private readonly _wrappedTransferRelation: LabeledTransferRelation<AbstractElement>;
+    private readonly _config: ScheduleAnalysisConfig;
+    private readonly _task: App;
 
-    constructor(wrappedTransferRelation: LabeledTransferRelation<AbstractElement>) {
-        this._wrappedTransferRelation = wrappedTransferRelation;
+    constructor(config: ScheduleAnalysisConfig, task: App, wrappedTransferRelation: LabeledTransferRelation<AbstractElement>) {
+        this._task = Preconditions.checkNotUndefined(task);
+        this._config = Preconditions.checkNotUndefined(config);
+        this._wrappedTransferRelation = Preconditions.checkNotUndefined(wrappedTransferRelation);
+    }
+
+    abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
+        if (this._config.aggregateAtomicTransitions) {
+            throw new ImplementMeException();
+        } else {
+            return this.abstractSuccSingleStep(fromState);
+        }
     }
 
     /**
@@ -41,25 +65,52 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
      *
      * @param fromState
      */
-    abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
+    abstractSuccSingleStep(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
+        if (this.hasObserverThreadToProcess(fromState)) {
+            // If there is a thread state of the specification in the
+            // state RUNNING, or WAITING, step it until no more of those are left.
+            return this.specificationStep(fromState);
+        } else {
+            return this.programStep(fromState).map(
+                (succ) =>
+                    this.startAfterProgramStatementHandlerThreads(succ) );
+        }
+    }
+
+    programStep(fromState: ScheduleAbstractState): ScheduleAbstractState[] {
         Preconditions.checkState(fromState.threadStates.size <= 1, "More than one thread not yet supported");
 
+        // ATTENTION!!
+        //
+        // PROBLEM:
+        //    The scheduling does not implement all details of the Scratch VM. In general,
+        //    the Scratch VM implements a round-robin scheduling which would lead
+        //    to a deterministic execution order. Nevertheless, there is a WORK_TIME timeout;
+        //    reaching this timeout makes executions non-deterministic, because
+        //    the the scheduling starts from the first thread in the list if this timout is reached.
+        //
+        // APPROACH:
+        //    To make only sound propositions about Scratch programs, we throw
+        //    an exception if the WORK_TIME timeout would have been reached before
+        //    all threads in the list were stepped.
+
         if (fromState.threadStates.size == 0) {
-            return [fromState];
+            return [];
         } else if (fromState.threadStates.size == 1) {
             const t: ThreadState = fromState.threadStates.get(0);
             Preconditions.checkNotUndefined(t);
             if (t.getComputationState() === THREAD_STATE_DONE) {
                 return [fromState];
-            } else if (t.getComputationState() === THREAD_STATE_RUNNING) {
+            } else if (t.getComputationState() === THREAD_STATE_RUNNING || t.getComputationState() === THREAD_STATE_RUNNING_ATOMIC) {
                 // Determine the (sequences of) control-flow transition(s) to execute in this step
                 // ATTENTION: We assume that each sequence corresponds to an atomic
                 //      statement in the input programming language (Scratch)
-                const opSeqs: [ProgramOperation[], LocationID][] = this.resolveStepOpSeqs(t);
+                const opSeq: [ProgramOperation, LocationID, boolean][] = this.resolveStepOp(t);
 
                 // Compute a successor state for each sequence and call the wrapped analysis to do so
-                for (const [opSeq, succLoc] of opSeqs) {
-                    const wrappedSuccState = this.computeWrappedSuccState(fromState.wrappedState, opSeq);
+                for (const [op, succLoc, isInnerAtomic] of opSeq) {
+                    const wrappedSuccState = this._wrappedTransferRelation.abstractSuccFor(fromState.wrappedState, op);
+                    // TODO: Produce a state with THREAD_STATE_RUNNING_ATOMIC if isInnerAtomic
                 }
                 throw new ImplementMeException();
             } else {
@@ -70,21 +121,19 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         }
     }
 
-    private computeWrappedSuccState(wrappedState: any, opSeq: ProgramOperation[]): AbstractElement {
-        let result: AbstractElement = wrappedState;
 
-        for (let op of opSeq) {
-            result = this._wrappedTransferRelation.abstractSuccFor(result, op);
-        }
-
-        return result;
-    }
-
-    private resolveStepOpSeqs(t: ThreadState): [ProgramOperation[], LocationID][] {
+    private startAfterProgramStatementHandlerThreads(onState: ScheduleAbstractState): ScheduleAbstractState {
         throw new ImplementMeException();
     }
 
-    private reastartThread(state: ScheduleAbstractState): ScheduleAbstractState {
+    /**
+     * Returns either a singleton-list or the empty list.
+     */
+    private resolveStepOp(t: ThreadState): [ProgramOperation, LocationID, boolean][] {
+        throw new ImplementMeException();
+    }
+
+    private restartThread(state: ScheduleAbstractState): ScheduleAbstractState {
         throw new ImplementMeException();
     }
 
@@ -92,4 +141,11 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         throw new ImplementMeException();
     }
 
+    private hasObserverThreadToProcess(fromState: ScheduleAbstractState): boolean {
+        throw new ImplementMeException();
+    }
+
+    private specificationStep(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
+        throw new ImplementMeException();
+    }
 }

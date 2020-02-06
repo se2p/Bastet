@@ -33,17 +33,35 @@ import {Script} from "../../../syntax/app/controlflow/Script";
 import {Actor} from "../../../syntax/app/Actor";
 import {ScheduleTransferRelation} from "./ScheduleTransferRelation";
 import {LabeledTransferRelationImpl} from "../TransferRelation";
+import {Preconditions} from "../../../utils/Preconditions";
+import {BastetConfiguration} from "../../../utils/BastetConfiguration";
+
+export class ScheduleAnalysisConfig extends BastetConfiguration {
+
+    constructor(dict: {}) {
+        super(dict);
+    }
+
+    get aggregateAtomicTransitions(): boolean {
+        return this.getBoolProperty('aggregate-atomic-transitions', false);
+    }
+
+}
 
 export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState> {
 
+    private readonly _config: ScheduleAnalysisConfig;
     private readonly _abstractDomain: AbstractDomain<ScheduleConcreteState, ScheduleAbstractState>;
     private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any>;
     private readonly _transferRelation: ScheduleTransferRelation;
+    private readonly _task: App;
 
-    constructor(wrappedAnalysis: ProgramAnalysisWithLabels<any, any>) {
+    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any>) {
+        this._config = new ScheduleAnalysisConfig(config);
+        this._task = Preconditions.checkNotUndefined(task);
+        this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new ScheduleAbstractDomain();
-        this._wrappedAnalysis = wrappedAnalysis;
-        this._transferRelation = new ScheduleTransferRelation(
+        this._transferRelation = new ScheduleTransferRelation(this._config, task,
             new LabeledTransferRelationImpl(this._wrappedAnalysis.abstractSucc,
                 this._wrappedAnalysis.abstractSuccFor));
     }
