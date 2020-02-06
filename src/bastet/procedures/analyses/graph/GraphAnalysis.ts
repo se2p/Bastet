@@ -21,7 +21,6 @@
 
 import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
-import {StateSet} from "../../algorithms/StateSet";
 import {
     GraphAbstractDomain,
     GraphAbstractState,
@@ -31,6 +30,7 @@ import {
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {App} from "../../../syntax/app/App";
 import {GraphTransferRelation} from "./GraphTransferRelation";
+import {AbstractElement} from "../../../lattices/Lattice";
 
 export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState> {
 
@@ -51,15 +51,22 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     join(state1: GraphAbstractState, state2: GraphAbstractState): GraphAbstractState {
-        throw new ImplementMeException();
+        return this._abstractDomain.lattice.join(state1, state2);
     }
 
     merge(state1: GraphAbstractState, state2: GraphAbstractState): boolean {
-        throw new ImplementMeException();
+        // MERGE-SEP
+        return false;
     }
 
-    stop(state: GraphAbstractState, reached: StateSet<GraphAbstractState>): GraphAbstractState {
-        throw new ImplementMeException();
+    stop(state: GraphAbstractState, reached: Iterable<GraphAbstractState>): boolean {
+        for (const r of reached) {
+            const w: AbstractElement = r.getWrappedState();
+            if (this._wrappedAnalysis.stop(w, [r.getWrappedState()])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     target(state: GraphAbstractState): boolean {

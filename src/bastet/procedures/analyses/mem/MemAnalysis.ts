@@ -60,23 +60,29 @@ export class MemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, Ab
     }
 
     join(state1: MemAbstractState, state2: MemAbstractState): MemAbstractState {
-        throw new ImplementMeException();
+        return this._abstractDomain.lattice.join(state1, state2);
     }
 
     merge(state1: MemAbstractState, state2: MemAbstractState): boolean {
-        throw new ImplementMeException();
+        // MERGE-SEP
+        return false;
     }
 
-    stop(state: MemAbstractState, reached: StateSet<MemAbstractState>): MemAbstractState {
-        throw new ImplementMeException();
+    stop(state: MemAbstractState, reached: Iterable<MemAbstractState>): boolean {
+        for (const r of reached) {
+            if (r.equals(state)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     target(state: MemAbstractState): boolean {
-        throw new ImplementMeException();
+        return false;
     }
 
     widen(state: MemAbstractState): MemAbstractState {
-        throw new ImplementMeException();
+        return state;
     }
 
     initialStatesFor(task: App): MemAbstractState[] {

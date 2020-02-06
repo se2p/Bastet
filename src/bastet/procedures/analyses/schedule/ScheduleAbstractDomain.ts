@@ -138,7 +138,7 @@ export interface ScheduleAbstractStateAttributes extends AbstractElement, Single
 
     threadStates: ImmList<ThreadState>;
 
-    wrappedState: ImmRec<any>;
+    wrappedState: AbstractElement;
 
 }
 
@@ -155,7 +155,7 @@ const ScheduleAbstractStateRecord = ImmRec({
  */
 export class ScheduleAbstractState extends ScheduleAbstractStateRecord implements AbstractElement {
 
-    constructor(threadStates: ImmList<ThreadState>, wrappedState: ImmRec<any>) {
+    constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement) {
         super({threadStates: threadStates, wrappedState: wrappedState});
     }
 
@@ -163,7 +163,7 @@ export class ScheduleAbstractState extends ScheduleAbstractStateRecord implement
         return this.get("threadStates");
     }
 
-    public getWrappedState(): ImmList<ThreadState> {
+    public getWrappedState(): AbstractElement {
         return this.get("wrappedState");
     }
 }

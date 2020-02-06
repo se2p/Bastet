@@ -39,7 +39,6 @@ import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/Bro
 import {WaitSecsStatement} from "../../../syntax/ast/core/statements/WaitSecsStatement";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {from} from "immutable/contrib/cursor";
 
 export type Schedule = ImmList<ThreadState>;
 

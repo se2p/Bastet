@@ -27,7 +27,6 @@ import {
     ScheduleConcreteState
 } from "./ScheduleAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
-import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {Script} from "../../../syntax/app/controlflow/Script";
 import {Actor} from "../../../syntax/app/Actor";
@@ -71,15 +70,23 @@ export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcret
     }
 
     join(state1: ScheduleAbstractState, state2: ScheduleAbstractState): ScheduleAbstractState {
-        return undefined;
+        return this._abstractDomain.lattice.join(state1, state2);
     }
 
     merge(state1: ScheduleAbstractState, state2: ScheduleAbstractState): boolean {
         return false;
     }
 
-    stop(state: ScheduleAbstractState, reached: StateSet<ScheduleAbstractState>): ScheduleAbstractState {
-        return undefined;
+    stop(state: ScheduleAbstractState, reached: Iterable<ScheduleAbstractState>): boolean {
+        for (const r of reached) {
+            if (state.getThreadStates().equals(r.getThreadStates())) {
+                const w = state.getWrappedState();
+                if (this._wrappedAnalysis.stop(w, [r.getWrappedState()])) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     target(state: ScheduleAbstractState): boolean {

@@ -62,7 +62,7 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
         return this.get('predecessors');
     }
 
-    public getWrappedState(): ImmRec<any> {
+    public getWrappedState(): AbstractElement {
         return this.get('wrappedState');
     }
 }
