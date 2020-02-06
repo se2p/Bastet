@@ -75,7 +75,7 @@ actor DirectorObserver is Observer begin
         define actor_1_graphics as attribute "active_graphic_pixels" of actor_1_id
         declare result as boolean
         define result as true
-        if item (_RUNTIME_getMouseX () * _RUNTIME_getMouseX () ) of actor_1_id = 0 begin //todo is 0 the default value
+        if item (_RUNTIME_getMouseX () * _RUNTIME_getMouseX () ) of actor_1_graphics = 0 begin //todo is 0 the default value
             define result as false
         end
 
