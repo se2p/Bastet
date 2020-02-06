@@ -28,7 +28,7 @@ export interface TransferRelation<E extends AbstractElement> {
 
 }
 
-export interface LabeledTransferRelation<E> extends TransferRelation<E>{
+export interface LabeledTransferRelation<E extends AbstractElement> extends TransferRelation<E>{
 
     abstractSuccFor(fromState: E, op: ProgramOperation): Iterable<E>;
 

@@ -31,4 +31,7 @@ export class WaitSecsStatement extends Statement {
         this._secs = secs;
     }
 
+    get secs(): NumberExpression {
+        return this._secs;
+    }
 }

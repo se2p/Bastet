@@ -110,7 +110,7 @@ export class OrderedStateSet<E extends AbstractElement> extends StateSet<E> {
 
 export class StateSetFactory {
 
-    public static createStateSet<E>(): StateSet<E> {
+    public static createStateSet<E extends AbstractElement>(): StateSet<E> {
         return new OrderedStateSet();
     }
 

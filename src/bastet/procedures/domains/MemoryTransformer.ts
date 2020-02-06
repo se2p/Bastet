@@ -25,21 +25,29 @@ import {Identifier} from "../../syntax/ast/core/Identifier";
 import {BooleanType, NumberType, ScratchType, StringType} from "../../syntax/ast/core/ScratchType";
 import {AbstractMemory} from "../analyses/mem/MemAbstractDomain";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "./ConcreteElements";
+import {AbstractElement} from "../../lattices/Lattice";
 
-export abstract class AbstractValue {
-
-}
-
-export class AbstractString extends AbstractValue {
+export interface AbstractValue extends AbstractElement {
 
 }
 
-
-export class AbstractBoolean extends AbstractValue {
+export interface AbstractString extends AbstractValue {
 
 }
 
-export class AbstractNumber extends AbstractValue {
+export interface AbstractBoolean extends AbstractValue {
+
+}
+
+export interface AbstractNumber extends AbstractValue {
+
+}
+
+export interface AbstractList extends AbstractValue {
+
+}
+
+export interface AbstractMap extends AbstractValue {
 
 }
 
@@ -63,13 +71,6 @@ export class IdentifiableMemoryCell {
 }
 
 
-export class AbstractList {
-
-}
-
-export class AbstractMap {
-
-}
 
 export class BooleanVariable extends IdentifiableMemoryCell {
 

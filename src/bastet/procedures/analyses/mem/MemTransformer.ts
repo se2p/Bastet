@@ -27,21 +27,21 @@ import {
     MemoryTransformer,
     NumberVariable, StringVariable
 } from "../../domains/MemoryTransformer";
-import {MemAbstractState, MemAbstractStateImpl} from "./MemAbstractDomain";
+import {MemAbstractState} from "./MemAbstractDomain";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {ScratchType} from "../../../syntax/ast/core/ScratchType";
 
-export class AbstMemTransformer extends MemoryTransformer<MemAbstractStateImpl> {
+export class AbstMemTransformer extends MemoryTransformer<MemAbstractState> {
 
     constructor(state: MemAbstractState) {
-        super(state as MemAbstractStateImpl);
+        super(state as MemAbstractState);
     }
 
-    assignString(assignTo: StringVariable, b: AbstractString): MemAbstractStateImpl {
+    assignString(assignTo: StringVariable, b: AbstractString): MemAbstractState {
         return this._state.withString(assignTo.name, b);
     }
 
-    assignNumber(assignTo: NumberVariable, b: AbstractNumber): MemAbstractStateImpl {
+    assignNumber(assignTo: NumberVariable, b: AbstractNumber): MemAbstractState {
         return this._state.withNum(assignTo.name, b);
     }
 

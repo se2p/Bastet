@@ -92,12 +92,24 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement {
         return this.get('locationId');
     }
 
+    public withLocationId(value: LocationID): ThreadState {
+        return this.set('locationId', value);
+    }
+
     public getComputationState(): ScriptComputationState {
         return this.get('computationState');
     }
 
+    public withComputationState(value: ScriptComputationState): ThreadState {
+        return this.set('computationState', value);
+    }
+
     public getWaitingForThreads(): ImmSet<ThreadId> {
         return this.get('waitingForThreads');
+    }
+
+    public withWaitingForThreads(value: ImmSet<ThreadId>): ThreadState {
+        return this.set('waitingForThreads', value);
     }
 
 }

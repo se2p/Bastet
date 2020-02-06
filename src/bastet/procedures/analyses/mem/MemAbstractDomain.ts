@@ -35,7 +35,7 @@ export type AbstractMemory = MemAbstractState;
  * Separated by type, similar to the variables in the
  * different background theories of a solver.
  */
-export interface MemAbstractState extends AbstractElement {
+export interface MemAbstractStateAttributes {
 
     /** All declared variables and their types */
     types: ImmMap<string, ScratchTypeID>;
@@ -69,7 +69,7 @@ const MemAbstractStateRecord = ImmRec({
 
 });
 
-export class MemAbstractStateImpl extends MemAbstractStateRecord implements MemAbstractState {
+export class MemAbstractState extends MemAbstractStateRecord implements MemAbstractStateAttributes {
 
     types: ImmMap<string, ScratchTypeID>;
     numData: ImmMap<string, AbstractNumber>;
@@ -82,23 +82,23 @@ export class MemAbstractStateImpl extends MemAbstractStateRecord implements MemA
         super(Object.assign({}, args, {}));
     }
 
-    public withString(ident: string, value: AbstractString): MemAbstractStateImpl {
+    public withString(ident: string, value: AbstractString): MemAbstractState {
         return this.set('stringData', this.stringData.set(ident, value));
     }
 
-    public withBool(ident: string, value: AbstractBoolean): MemAbstractStateImpl {
+    public withBool(ident: string, value: AbstractBoolean): MemAbstractState {
         return this.set('boolData', this.boolData.set(ident, value));
     }
 
-    public withNum(ident: string, value: AbstractNumber): MemAbstractStateImpl {
+    public withNum(ident: string, value: AbstractNumber): MemAbstractState {
         return this.set('numData', this.numData.set(ident, value));
     }
 
-    public withList(ident: string, value: AbstractList): MemAbstractStateImpl {
+    public withList(ident: string, value: AbstractList): MemAbstractState {
         return this.set('listData', this.listData.set(ident, value));
     }
 
-    public withConstraint(constr: CNFFormula): MemAbstractStateImpl {
+    public withConstraint(constr: CNFFormula): MemAbstractState {
         return this.set('constraint', constr);
     }
 
@@ -136,7 +136,7 @@ export class MemAbstractStates {
 
     public static empty(): MemAbstractState {
         if (!MemAbstractStates.EMPTY) {
-            MemAbstractStates.EMPTY = new MemAbstractStateImpl({});
+            MemAbstractStates.EMPTY = new MemAbstractState({});
         }
         return MemAbstractStates.EMPTY;
     }

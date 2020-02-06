@@ -19,7 +19,9 @@
  *
  */
 
-export interface AbstractElement {
+import {Record as ImmRec} from "immutable";
+
+export interface AbstractElement extends ImmRec<any> {
 
 }
 

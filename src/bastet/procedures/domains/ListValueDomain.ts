@@ -21,15 +21,11 @@
  */
 
 import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
-import {AbstractElement, Lattice} from "../../lattices/Lattice";
+import {Lattice} from "../../lattices/Lattice";
 import {ConcreteDomain, ConcreteList, ConcreteString} from "./ConcreteElements";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {AbstractList} from "./MemoryTransformer";
 
-
-
-class AbstractList implements AbstractElement {
-
-}
 
 export class ListValueDomain implements AbstractDomain<ConcreteList<ConcreteString>, AbstractList> {
 
