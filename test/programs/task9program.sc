@@ -48,7 +48,7 @@ actor Pferd is ScratchSprite begin
                       end
                   end
               else begin
-                      define attribute “color” as (62.0 + attribute "color") //TODO how to say this?
+                      define color as (62.0 + color)
                   end
               wait 1 seconds
           end

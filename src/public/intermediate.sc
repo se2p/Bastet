@@ -2,6 +2,10 @@ module IntermediateModule
 
 role RuntimeEntity begin
 
+    extern _RUNTIME_getMouseX () returns number
+
+    extern _RUNTIME_getMouseY () returns number
+
     extern _RUNTIME_getInitialActors () returns list of string
 
     extern _RUNTIME_getClonesOf (ac: string) returns list of string
