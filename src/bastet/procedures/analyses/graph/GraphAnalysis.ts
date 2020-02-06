@@ -67,7 +67,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     widen(state: GraphAbstractState): GraphAbstractState {
-        throw new ImplementMeException();
+        // TODO: Implement the widening (delegate to wrapped analyses)
+        return state;
     }
 
     get abstractDomain(): AbstractDomain<GraphConcreteState, GraphAbstractState> {

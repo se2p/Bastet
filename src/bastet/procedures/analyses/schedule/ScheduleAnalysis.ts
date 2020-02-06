@@ -62,8 +62,8 @@ export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcret
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new ScheduleAbstractDomain();
         this._transferRelation = new ScheduleTransferRelation(this._config, task,
-            new LabeledTransferRelationImpl(this._wrappedAnalysis.abstractSucc,
-                this._wrappedAnalysis.abstractSuccFor));
+            new LabeledTransferRelationImpl((e) => this._wrappedAnalysis.abstractSucc(e),
+                (e, op) => this._wrappedAnalysis.abstractSuccFor(e, op)));
     }
 
     abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {

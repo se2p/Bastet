@@ -69,6 +69,9 @@ export class App {
 
     public getActorByName(name: string): Actor {
         if (!this._actorMap[name]) {
+            if (this.bootstrapper.ident == name) {
+                return this.bootstrapper;
+            }
             throw new IllegalArgumentException(`Actor with name "${name}" is unknown!`);
         }
         return this._actorMap[name];

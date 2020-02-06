@@ -38,10 +38,11 @@ import {NumIntervalValueDomain} from "../../domains/NumIntervalValueDomain";
 import {FlatBooleanValueDomain} from "../../domains/FlatBooleanValueDomain";
 import {StringListAbstractDomain} from "../../domains/StringListAbstractDomain";
 import {StringAbstractDomain} from "../../domains/StringAbstractDomain";
+import {Preconditions} from "../../../utils/Preconditions";
 
 export class MemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, AbstractMemory>, LabeledTransferRelation<MemAbstractState> {
 
-    private readonly _abstractDomain: AbstractDomain<ConcreteMemory, AbstractMemory>;
+    private readonly _abstractDomain: MemAbstractDomain;
     private readonly _transferRelation: MemTransferRelation;
 
     constructor() {
@@ -49,7 +50,9 @@ export class MemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, Ab
         const boolDomain = new FlatBooleanValueDomain(new ConcreteBooleanDomain());
         const stringDomain = new StringAbstractDomain(new ConcreteBoundedStringDomain(42));
         const stringListDomain = new StringListAbstractDomain(new ConcreteBoundedStringListDomain(23));
+
         this._abstractDomain = new MemAbstractDomain(numDomain, boolDomain, stringDomain, stringListDomain);
+        this._transferRelation = new MemTransferRelation(this._abstractDomain);
     }
 
     abstractSucc(fromState: MemAbstractState): Iterable<MemAbstractState> {
@@ -81,6 +84,7 @@ export class MemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, Ab
     }
 
     abstractSuccFor(fromState: MemAbstractState, op: ProgramOperation): Iterable<MemAbstractState> {
+        Preconditions.checkNotUndefined(this._transferRelation);
         return this._transferRelation.abstractSuccFor(fromState, op);
     }
 

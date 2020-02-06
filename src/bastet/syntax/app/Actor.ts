@@ -20,7 +20,7 @@
  */
 
 import {AppResource, AppResourceMap} from "./AppResource";
-import {Script} from "./controlflow/Script";
+import {Script, ScriptId} from "./controlflow/Script";
 import {Maps} from "../../utils/Maps";
 import {Lists} from "../../utils/Lists";
 import {ImmutableList} from "../../utils/ImmutableList";
@@ -30,7 +30,12 @@ import {MethodDefinition, MethodDefinitionMap, MethodSignature, MethodSignatureM
 import {ActorMode} from "../ast/core/ActorDefinition";
 import {Preconditions} from "../../utils/Preconditions";
 import {Method} from "./controlflow/Method";
-import {BootstrapEvent, NeverEvent} from "../ast/core/CoreEvent";
+import {
+    AfterStatementMonitoringEvent,
+    BootstrapEvent,
+    NeverEvent,
+    RenderedMonitoringEvent
+} from "../ast/core/CoreEvent";
 import {TransitionRelation, TransitionRelationBuilder} from "./controlflow/TransitionRelation";
 import {Scripts} from "./controlflow/Scripts";
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
@@ -75,8 +80,14 @@ export class Actor {
     /** List of scripts that define the behavior of the actor. */
     private readonly _scripts: ImmutableList<Script>;
 
+    /** Map of script id's to scripts for a fast lookup  */
+    private readonly _scriptMap: ImmutableMap<ScriptId, Script>;
+
     /** List of methods that are defined in the actor. */
     private readonly _methods: ImmutableList<Method>;
+
+    /** Is the actor an observer, used to check if the spec is satisfied? */
+    private readonly _isObserver: boolean;
 
     constructor(mode: ActorMode, ident: string, inheritFrom: Actor[],
                 resources: AppResourceMap, datalocs: DataLocationMap,
@@ -95,6 +106,13 @@ export class Actor {
         this._externalMethodSignatures = Maps.immutableCopyOf(externalMethods);
         this._scripts = Lists.immutableCopyOf(scripts);
         this._methods = Lists.immutableCopyOf(methods);
+        this._isObserver = this.deterineIsObserver();
+
+        const scriptMap: Map<ScriptId, Script> = new Map<ScriptId, Script>();
+        for (const s of this._scripts) {
+            scriptMap.set(s.id, s);
+        }
+        this._scriptMap = new ImmutableMap<ScriptId, Script>(scriptMap.entries());
 
         Preconditions.checkArgument(initScript.event === NeverEvent.instance()
             || initScript.event === BootstrapEvent.instance());
@@ -150,6 +168,28 @@ export class Actor {
 
     get actorMode(): ActorMode {
         return this._actorMode;
+    }
+
+    public getScript(id: ScriptId): Script {
+        const result = this._scriptMap.get(id);
+        Preconditions.checkState(result !== null);
+        return result;
+    }
+
+    private deterineIsObserver() {
+        for (const s of this.scripts) {
+            if (s.event instanceof RenderedMonitoringEvent) {
+                return true;
+            }
+            if (s.event instanceof AfterStatementMonitoringEvent) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    get isObserver(): boolean {
+        return this._isObserver;
     }
 }
 

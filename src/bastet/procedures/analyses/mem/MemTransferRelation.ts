@@ -36,11 +36,14 @@ export class MemTransferRelation implements LabeledTransferRelation<MemAbstractS
         this._abstDomain = Preconditions.checkNotUndefined(abstDomain);
     }
 
-    abstractSucc(fromState: MemAbstractState): Iterable<MemAbstractState> {
+    public abstractSucc(fromState: MemAbstractState): Iterable<MemAbstractState> {
         throw new IllegalStateException("Only the labelled transfer is supported by this transfer relation");
     }
 
-    abstractSuccFor(fromState: MemAbstractState, op: ProgramOperation): Iterable<MemAbstractState> {
+    public abstractSuccFor(fromState: MemAbstractState, op: ProgramOperation): Iterable<MemAbstractState> {
+        Preconditions.checkNotUndefined(fromState);
+        Preconditions.checkNotUndefined(op);
+
         const transformer = this.memoryTransformerFor(fromState);
         if (op instanceof AssumeOperation) {
             const visitor = new MemBoolExpressionVisitor(fromState);

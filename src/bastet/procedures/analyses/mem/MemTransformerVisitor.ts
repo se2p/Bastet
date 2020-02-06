@@ -380,7 +380,7 @@ export class MemTransformerVisitor implements
     }
 
     visitEpsilonStatement(node: EpsilonStatement): AbstractMemory {
-        throw new ImplementMeException();
+        return this._mem;
     }
 
     visitExpressionStatement(node: ExpressionStatement): AbstractMemory {
