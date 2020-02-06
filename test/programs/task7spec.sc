@@ -1,7 +1,7 @@
 program Task7Spec
 
 /**
- * ## Task 7 ""Elephant“
+ * ## Task 7 "Elephant“
  *
  * Task: The `elephant` should `dance`.
  *
@@ -10,7 +10,7 @@ program Task7Spec
  *
  * Precondition:
  *      There exists one actors with the role of
- *      the elephant..
+ *      the elephant.
  *
  * Interpretations and considerations:
  *
@@ -42,7 +42,7 @@ actor DirectorObserver is Observer begin
         define actor_1_costume as attribute "currentCostume" of actor_1_id
         define actor_1_switched_costume as false
 
-        if not actor_1_switched_costume and not actor_1_costume = actor_1_prev_costume then begin
+        if not actor_1_costume = actor_1_prev_costume then begin
            define actor_1_switched_costume as true
         end
        // The actual invariant check
