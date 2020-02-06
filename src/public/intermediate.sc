@@ -213,6 +213,13 @@ role ScratchSprite is ScratchEntity begin
     // See https://en.scratch-wiki.info/wiki/Hide_(block)
     declare visible as boolean
 
+    // Bubble above a ScratchSprite for saying or thinking text for a given duration
+    // In Scratch if the bubbleText is empty, the bubble is not visible
+    declare bubbleText as string
+    declare bubbleType as string
+    declare bubbleStart as number
+    declare bubbleDuration as number
+
     // Initialize the variables with their default values
     define x as 0
     define y as 0
@@ -291,10 +298,16 @@ role ScratchSprite is ScratchEntity begin
 
     define sayTextFor (msg: string, scs: number) begin
         // msgBounded = substr(msg, 0, 330)
+        define bubbleText as msg
+        define bubbleStart as _RUNTIME_millis
+        define bubbleType as 'say'
+        define bubbleDuration as scs
     end
 
     define sayText (msg: string) begin
-
+        define bubbleText as msg
+        define bubbleStart as _RUNTIME_millis
+        define bubbleType as 'say'
     end
 
     // @Category "looks"
