@@ -151,6 +151,8 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         for (const [stepOp, succLoc, isInnerAtomic] of leavingOps) {
             const stepToTake: StepInformation = new StepInformation(threadIndexToStep, succLoc, isInnerAtomic, [stepOp]);
 
+            console.log([threadToStep.getActorId(), stepOp.ast.toTreeString()]);
+
             // Determine the new schedule (the next thread to execute)
             //   TODO: Take triggered events into account
             //   TODO: Determine sets of threads to wait for

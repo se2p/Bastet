@@ -36,7 +36,7 @@ import {
     NeverEvent,
     RenderedMonitoringEvent
 } from "../ast/core/CoreEvent";
-import {TransitionRelation, TransitionRelationBuilder} from "./controlflow/TransitionRelation";
+import {TransitionRelation, TransitionRelationBuilder, TransitionRelations} from "./controlflow/TransitionRelation";
 import {Scripts} from "./controlflow/Scripts";
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
 import {GREENFLAG_MESSAGE, INIT_MESSAGE} from "../ast/core/Message";
@@ -204,11 +204,12 @@ export class Actors {
                 new BroadcastMessageStatement(GREENFLAG_MESSAGE.messageid),
             ]);
             const visitor: RelationBuildingVisitor = new RelationBuildingVisitor();
-            const bootstrapTransitions: TransitionRelation = bootstrapStmts.accept(visitor);
+            const bootstrapTransitions: TransitionRelation =
+                TransitionRelations.eliminateEpsilons(bootstrapStmts.accept(visitor));
             const bootstrapScript: Script = new Script(Scripts.freshScriptId(),
                 BootstrapEvent.instance(), bootstrapTransitions);
             Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [],
-                {}, {}, Scripts.empty(), {}, {},
+                {}, {}, bootstrapScript, {}, {},
                 [bootstrapScript], []);
         }
 
