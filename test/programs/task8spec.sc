@@ -66,13 +66,12 @@ actor DirectorObserver is Observer begin
          declare i as number
          define i as 0
 
-         until i = length of actor_1_graphics begin
-            if item i of actor_1_gr
-
-         end
-
-         if item (_RUNTIME_getMouseX () * _RUNTIME_getMouseX () ) of actor_1_id = 0 begin //todo is 0 the default value
-             define result as false
+         until (i = length of actor_1_graphics or result = true) begin
+            if item i of actor_1_graphics > 0 and item i of actor_2_graphics then begin
+                if result = false then begin
+                    result = true
+                end
+            end
          end
 
       end returns result: boolean
