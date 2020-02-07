@@ -88,6 +88,9 @@ export class NumberVariableExpression extends AbstractNumberExpression {
         this._id = id;
     }
 
+    get id(): Identifier {
+        return this._id;
+    }
 }
 
 export class StringAsNumberExpression extends AbstractNumberExpression {

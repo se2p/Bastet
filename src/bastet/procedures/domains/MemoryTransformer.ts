@@ -24,8 +24,10 @@ import {Preconditions} from "../../utils/Preconditions";
 import {Identifier} from "../../syntax/ast/core/Identifier";
 import {BooleanType, NumberType, ScratchType, StringType} from "../../syntax/ast/core/ScratchType";
 import {AbstractMemory} from "../analyses/mem/MemAbstractDomain";
-import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "./ConcreteElements";
+import {ConcreteBoolean, ConcreteNumber, ConcreteString, ConcreteStringList} from "./ConcreteElements";
 import {AbstractElement} from "../../lattices/Lattice";
+import {AbstractDomain} from "./AbstractDomain";
+import {AbstractStringList} from "./StringListAbstractDomain";
 
 export interface AbstractValue extends AbstractElement {
 
@@ -101,6 +103,10 @@ export class ListVariable {
 
 }
 
+export interface ListTheory {
+
+}
+
 export interface StringTheory {
 
     fromConcreteString(str: ConcreteString): AbstractString;
@@ -149,37 +155,62 @@ export interface StringTheoryQueries {
 
 }
 
-export interface RationalNumberTheory {
+export interface RationalNumberTheory<N extends AbstractNumber> {
 
-    fromConcreteNumber(str: ConcreteNumber): AbstractNumber;
+    fromConcreteNumber(str: ConcreteNumber): N;
 
-    abstractNumberValue(id: Identifier): AbstractNumber;
+    abstractNumberValue(id: Identifier): N;
 
-    zero(): AbstractNumber;
+    zero(): N;
 
-    one(): AbstractNumber;
+    one(): N;
 
-    topNumber(): AbstractNumber;
+    topNumber(): N;
 
-    bottomNumber(): AbstractNumber;
+    bottomNumber(): N;
 
-    castStringAsNumber(str: AbstractString): AbstractNumber;
+    castStringAsNumber(str: AbstractString): N;
 
-    castBoolAsNumber(val: AbstractBoolean): AbstractNumber;
+    castBoolAsNumber(val: AbstractBoolean): N;
 
-    multiply(op1: AbstractNumber, op2: AbstractNumber): AbstractNumber;
+    multiply(op1: N, op2: N): N;
 
-    divide(op1: AbstractNumber, op2: AbstractNumber): AbstractNumber;
+    divide(op1: N, op2: N): N;
 
-    modulo(op1: AbstractNumber, op2: AbstractNumber): AbstractNumber;
+    modulo(op1: N, op2: N): N;
 
-    plus(op1: AbstractNumber, op2: AbstractNumber): AbstractNumber;
+    plus(op1: N, op2: N): N;
 
-    minus(op1: AbstractNumber, op2: AbstractNumber): AbstractNumber;
+    minus(op1: N, op2: N): N;
+
+
+    isGreaterThan(s1: N, s2: N): AbstractBoolean;
+
+    isLessThan(s1: N, s2: N): AbstractBoolean;
+
+    isNumberEqualTo(s1: N, s2: N): AbstractBoolean;
+
+}
+
+export interface AbstractNumberDomain extends AbstractDomain<ConcreteNumber, AbstractNumber> {
+
+}
+
+export interface AbstractBooleanDomain extends AbstractDomain<ConcreteBoolean, AbstractBoolean> {
+
+}
+
+export interface AbstractStringDomain extends AbstractDomain<ConcreteString, AbstractString> {
+
+}
+
+export interface AbstractStringListDomain extends AbstractDomain<ConcreteStringList, AbstractStringList> {
 
 }
 
 export interface BooleanTheory {
+
+    fromBoolean(value: boolean): AbstractBoolean;
 
     fromConcreteBoolean(str: ConcreteBoolean): AbstractBoolean;
 

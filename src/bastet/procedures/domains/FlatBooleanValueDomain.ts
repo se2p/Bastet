@@ -22,10 +22,11 @@
 
 
 import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
-import {AbstractBoolean} from "./MemoryTransformer";
+import {AbstractBoolean, AbstractBooleanDomain, BooleanTheory} from "./MemoryTransformer";
 import {Lattice} from "../../lattices/Lattice";
 import {ConcreteBoolean, ConcreteDomain} from "./ConcreteElements";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {Identifier} from "../../syntax/ast/core/Identifier";
 
 export class FlatBoolLattice implements Lattice<AbstractBoolean> {
 
@@ -51,7 +52,66 @@ export class FlatBoolLattice implements Lattice<AbstractBoolean> {
 
 }
 
-export class FlatBooleanValueDomain implements AbstractDomain<ConcreteBoolean, AbstractBoolean> {
+export class FlatBooleanValueTheory implements BooleanTheory {
+
+    private readonly _dom: FlatBooleanValueDomain;
+
+    private readonly _true: AbstractBoolean;
+    private readonly _false: AbstractBoolean;
+
+    constructor(dom: FlatBooleanValueDomain) {
+        this._dom = dom;
+        this._true = this._dom.abstract([this._dom.concreteDomain.createElement({value: true})]);
+        this._false = this._dom.abstract([this._dom.concreteDomain.createElement({value: false})]);
+    }
+
+    abstractBooleanValue(id: Identifier): AbstractBoolean {
+        return undefined;
+    }
+
+    and(op1: AbstractBoolean, op2: AbstractBoolean): AbstractBoolean {
+        return undefined;
+    }
+
+    bottomBoolean(): AbstractBoolean {
+        return undefined;
+    }
+
+    falseBool(): AbstractBoolean {
+        return this.falseBool();
+    }
+
+    fromConcreteBoolean(str: ConcreteBoolean): AbstractBoolean {
+        return undefined;
+    }
+
+    not(op1: AbstractBoolean): AbstractBoolean {
+        return undefined;
+    }
+
+    or(op1: AbstractBoolean, op2: AbstractBoolean): AbstractBoolean {
+        return undefined;
+    }
+
+    topBoolean(): AbstractBoolean {
+        return undefined;
+    }
+
+    trueBool(): AbstractBoolean {
+        return this._true;
+    }
+
+    fromBoolean(value: boolean): AbstractBoolean {
+        if (value) {
+            return this.trueBool()
+        } else {
+            return this.falseBool();
+        }
+    }
+
+}
+
+export class FlatBooleanValueDomain implements AbstractBooleanDomain {
 
     private readonly _concreteDomain: ConcreteDomain<ConcreteBoolean>;
     private readonly _lattice: FlatBoolLattice;
@@ -79,6 +139,10 @@ export class FlatBooleanValueDomain implements AbstractDomain<ConcreteBoolean, A
 
     get lattice(): Lattice<AbstractBoolean> {
         return this._lattice;
+    }
+
+    getTheory(): BooleanTheory {
+        throw new ImplementMeException();
     }
 
 }

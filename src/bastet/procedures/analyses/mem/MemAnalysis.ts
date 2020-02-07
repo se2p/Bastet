@@ -20,7 +20,7 @@
  */
 
 import {ProgramAnalysis, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
-import {AbstractMemory, MemAbstractDomain, MemAbstractState, MemAbstractStates} from "./MemAbstractDomain";
+import {AbstractMemory, MemAbstractDomain, MemAbstractState, MemAbstractStates, Theories} from "./MemAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
@@ -34,14 +34,15 @@ import {
     ConcreteMemory,
     ConcreteNumberDomain
 } from "../../domains/ConcreteElements";
-import {NumIntervalValueDomain} from "../../domains/NumIntervalValueDomain";
-import {FlatBooleanValueDomain} from "../../domains/FlatBooleanValueDomain";
-import {StringListAbstractDomain} from "../../domains/StringListAbstractDomain";
-import {StringAbstractDomain} from "../../domains/StringAbstractDomain";
+import {NumIntervalTheory, NumIntervalValueDomain} from "../../domains/NumIntervalValueDomain";
+import {FlatBooleanValueDomain, FlatBooleanValueTheory} from "../../domains/FlatBooleanValueDomain";
+import {OurStringListTheory, StringListAbstractDomain} from "../../domains/StringListAbstractDomain";
+import {OurStringTheory, StringAbstractDomain} from "../../domains/StringAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 
 export class MemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, AbstractMemory>, LabeledTransferRelation<MemAbstractState> {
 
+    private readonly _theories: Theories;
     private readonly _abstractDomain: MemAbstractDomain;
     private readonly _transferRelation: MemTransferRelation;
 
@@ -51,8 +52,15 @@ export class MemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, Ab
         const stringDomain = new StringAbstractDomain(new ConcreteBoundedStringDomain(42));
         const stringListDomain = new StringListAbstractDomain(new ConcreteBoundedStringListDomain(23));
 
+        const boolTheory = new FlatBooleanValueTheory(boolDomain);
+        const numTheory = new NumIntervalTheory(numDomain, boolTheory);
+        const stringTheory = new OurStringTheory(stringDomain, boolTheory, numTheory);
+        const listTheory = new OurStringListTheory(stringListDomain);
+
+        this._theories = new Theories(boolTheory, numTheory, stringTheory, listTheory);
         this._abstractDomain = new MemAbstractDomain(numDomain, boolDomain, stringDomain, stringListDomain);
-        this._transferRelation = new MemTransferRelation(this._abstractDomain);
+
+        this._transferRelation = new MemTransferRelation(this._abstractDomain, this._theories);
     }
 
     abstractSucc(fromState: MemAbstractState): Iterable<MemAbstractState> {

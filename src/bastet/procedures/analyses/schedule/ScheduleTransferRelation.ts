@@ -149,6 +149,7 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         // ATTENTION: We assume that each sequence corresponds to an atomic
         //      statement in the input programming language (Scratch)
         const leavingOps: [ProgramOperation, LocationID, boolean][] = this.resolveLeavingOps(threadToStep);
+        Preconditions.checkState(leavingOps.length > 0, "A thread with no leaving ops must NOT be in state THREAD_STATE_RUNNING");
 
         const result: ScheduleAbstractState[] = [];
 
@@ -334,10 +335,15 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
 
             // YIELD the current state if it is not yet on a terminating control location
             // of the script.
-            resultBase = resultBase.set(steppedThreadIdx,
-                steppedThread.withComputationState(THREAD_STATE_YIELD));
-
-            //    TODO: Set to THREAD_STATE_DONE if on a terminating location
+            const nextOps = this.resolveLeavingOps(steppedThread);
+            if (nextOps.length == 0) {
+                // Set to THREAD_STATE_DONE if on a terminating location
+                resultBase = resultBase.set(steppedThreadIdx,
+                    steppedThread.withComputationState(THREAD_STATE_DONE));
+            } else {
+                resultBase = resultBase.set(steppedThreadIdx,
+                    steppedThread.withComputationState(THREAD_STATE_YIELD));
+            }
 
             if (nextNonObserverThreadToStep > -1) {
                 resultBase = resultBase.set(nextNonObserverThreadToStep,

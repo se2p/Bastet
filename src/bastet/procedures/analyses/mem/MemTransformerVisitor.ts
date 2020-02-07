@@ -25,7 +25,7 @@ import {
     CoreStringExpressionVisitor,
     CoreVisitor
 } from "../../../syntax/ast/CoreVisitor";
-import {AbstractMemory} from "./MemAbstractDomain";
+import {AbstractMemory, MemAbstractDomain, Theories} from "./MemAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {
@@ -56,7 +56,7 @@ import {
     StringVariableExpression
 } from "../../../syntax/ast/core/expressions/StringExpression";
 import {
-    AndExpression,
+    AndExpression, BooleanExpression,
     BooleanLiteral,
     BooleanVariableExpression,
     NegationExpression,
@@ -104,12 +104,15 @@ import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/Bro
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AbstractBoolean, AbstractList, AbstractNumber, AbstractString, MemoryTransformer} from "../../domains/MemoryTransformer";
+import {NumberType, ScratchType} from "../../../syntax/ast/core/ScratchType";
 
 export class MemNumExpressionVisitor implements CoreNumberExpressionVisitor<AbstractNumber> {
 
     private readonly _mem: AbstractMemory;
+    private readonly _dom: MemAbstractDomain;
 
-    constructor(mem: AbstractMemory) {
+    constructor(dom: MemAbstractDomain, mem: AbstractMemory) {
+        this._dom = Preconditions.checkNotUndefined(dom);
         this._mem = Preconditions.checkNotUndefined(mem);
     }
 
@@ -154,11 +157,13 @@ export class MemNumExpressionVisitor implements CoreNumberExpressionVisitor<Abst
     }
 
     visitNumberLiteral(node: NumberLiteral): AbstractNumber {
-        throw new ImplementMeException();
+        return this._dom.numDomain.abstract([
+            this._dom.numDomain.concreteDomain.createElement({value: node.num})]);
     }
 
     visitNumberVariableExpression(node: NumberVariableExpression): AbstractNumber {
-        throw new ImplementMeException();
+        const result = this._mem.getNum(node.id.text);
+        return Preconditions.checkNotUndefined(result);
     }
 
     visitPickRandomFromExpression(node: PickRandomFromExpression): AbstractNumber {
@@ -186,9 +191,13 @@ export class MemNumExpressionVisitor implements CoreNumberExpressionVisitor<Abst
 export class MemBoolExpressionVisitor implements CoreBoolExpressionVisitor<AbstractBoolean> {
 
     private readonly _mem: AbstractMemory;
+    private readonly _dom: MemAbstractDomain;
+    private readonly _theories: Theories;
 
-    constructor(mem: AbstractMemory) {
+    constructor(dom: MemAbstractDomain, theories: Theories, mem: AbstractMemory) {
+        this._dom = Preconditions.checkNotUndefined(dom);
         this._mem = Preconditions.checkNotUndefined(mem);
+        this._theories = Preconditions.checkNotUndefined(theories);
     }
 
     visit(node: AstNode): AbstractBoolean {
@@ -208,7 +217,8 @@ export class MemBoolExpressionVisitor implements CoreBoolExpressionVisitor<Abstr
     }
 
     visitNegationExpression(node: NegationExpression): AbstractBoolean {
-        throw new ImplementMeException();
+        const toNegate: AbstractBoolean = node.negate.accept(this);
+        return this._theories.boolTheory.not(toNegate);
     }
 
     visitNumEqualsExpression(node: NumEqualsExpression): AbstractBoolean {
@@ -216,7 +226,10 @@ export class MemBoolExpressionVisitor implements CoreBoolExpressionVisitor<Abstr
     }
 
     visitNumGreaterThanExpression(node: NumGreaterThanExpression): AbstractBoolean {
-        throw new ImplementMeException();
+        const numVisitor = new MemNumExpressionVisitor(this._dom, this._mem);
+        const op1: AbstractNumber = node.operand1.accept(numVisitor);
+        const op2: AbstractNumber = node.operand2.accept(numVisitor);
+        return this._theories.numTheory.isGreaterThan(op1, op2);
     }
 
     visitNumLessThanExpression(node: NumLessThanExpression): AbstractBoolean {
@@ -322,8 +335,10 @@ export class MemTransformerVisitor implements
     CoreNonCtrlStatementnVisitor<AbstractMemory> {
 
     private readonly _mem: AbstractMemory;
+    private readonly _dom: MemAbstractDomain;
 
-    constructor(transformer: MemoryTransformer<AbstractMemory>, mem: AbstractMemory) {
+    constructor(dom: MemAbstractDomain, transformer: MemoryTransformer<AbstractMemory>, mem: AbstractMemory) {
+        this._dom = Preconditions.checkNotUndefined(dom);
         this._mem = Preconditions.checkNotUndefined(mem);
     }
 
@@ -364,7 +379,7 @@ export class MemTransformerVisitor implements
     }
 
     visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): AbstractMemory {
-        throw new ImplementMeException();
+        return this._mem.withDeclaration(node.ident.text, node.type);
     }
 
     visitDeleteFromAllStatement(node: DeleteAllFromStatement): AbstractMemory {
@@ -420,7 +435,14 @@ export class MemTransformerVisitor implements
     }
 
     visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): AbstractMemory {
-        throw new ImplementMeException();
+        const declaredType: ScratchType = this._mem.getType(node.variable.text);
+        if (declaredType instanceof NumberType) {
+            const visitor = new MemNumExpressionVisitor(this._dom, this._mem);
+            const value: AbstractNumber = node.toValue.accept(visitor);
+            return this._mem.withNum(node.variable.text, value);
+        } else {
+            throw ImplementMeException;
+        }
     }
 
     visitWaitUntilStatement(node: WaitUntilStatement): AbstractMemory {

@@ -20,7 +20,7 @@
  */
 
 import {LabeledTransferRelation} from "../TransferRelation";
-import {AbstractMemory, MemAbstractDomain, MemAbstractState} from "./MemAbstractDomain";
+import {AbstractMemory, MemAbstractDomain, MemAbstractState, Theories} from "./MemAbstractDomain";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {MemBoolExpressionVisitor, MemTransformerVisitor} from "./MemTransformerVisitor";
@@ -32,8 +32,11 @@ export class MemTransferRelation implements LabeledTransferRelation<MemAbstractS
 
     private readonly _abstDomain: MemAbstractDomain;
 
-    constructor(abstDomain: MemAbstractDomain) {
+    private readonly _theories: Theories;
+
+    constructor(abstDomain: MemAbstractDomain, theories: Theories) {
         this._abstDomain = Preconditions.checkNotUndefined(abstDomain);
+        this._theories = Preconditions.checkNotUndefined(theories);
     }
 
     public abstractSucc(fromState: MemAbstractState): Iterable<MemAbstractState> {
@@ -46,12 +49,12 @@ export class MemTransferRelation implements LabeledTransferRelation<MemAbstractS
 
         const transformer = this.memoryTransformerFor(fromState);
         if (op instanceof AssumeOperation) {
-            const visitor = new MemBoolExpressionVisitor(fromState);
+            const visitor = new MemBoolExpressionVisitor(this._abstDomain, this._theories, fromState);
             const assume: AssumeOperation = op as AssumeOperation;
             const assumeValue: AbstractBoolean = assume.expression.accept(visitor);
             return [transformer.assumeTruth(assumeValue)];
         } else {
-            const visitor = new MemTransformerVisitor(transformer, fromState);
+            const visitor = new MemTransformerVisitor(this._abstDomain, transformer, fromState);
             const succ: AbstractMemory = op.ast.accept(visitor);
             return [succ];
         }

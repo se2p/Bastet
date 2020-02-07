@@ -139,6 +139,10 @@ export class NegationExpression extends AbstractBooleanExpression {
         super([negate]);
         this._negate = negate;
     }
+
+    get negate(): BooleanExpression {
+        return this._negate;
+    }
 }
 
 export class AndExpression extends BinaryBoolExpression {
@@ -181,6 +185,7 @@ export class NumGreaterThanExpression extends BinaryExpression<NumberExpression,
     constructor(op1: NumberExpression, op2: NumberExpression) {
         super(BooleanType.instance(), op1, op2);
     }
+
 }
 
 export class NumLessThanExpression extends BinaryExpression<NumberExpression, NumberExpression> implements BooleanExpression {

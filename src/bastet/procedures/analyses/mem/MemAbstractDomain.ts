@@ -27,7 +27,21 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
 import {CNFFormula} from "../../../utils/ConjunctiveNormalForm";
 import {ConcreteDomain, ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
-import {AbstractBoolean, AbstractList, AbstractNumber, AbstractString} from "../../domains/MemoryTransformer";
+import {
+    AbstractBoolean,
+    AbstractBooleanDomain,
+    AbstractList,
+    AbstractNumber,
+    AbstractNumberDomain,
+    AbstractString,
+    AbstractStringDomain,
+    AbstractStringListDomain,
+    BooleanTheory,
+    ListTheory,
+    RationalNumberTheory,
+    StringTheory
+} from "../../domains/MemoryTransformer";
+import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 
 export type AbstractMemory = MemAbstractState;
 
@@ -118,6 +132,14 @@ export class MemAbstractState extends MemAbstractStateRecord implements MemAbstr
         return this.listData.get(ident);
     }
 
+    public getType(ident: string): ScratchType {
+        const typeId: ScratchTypeID = this.types.get(ident);
+        if (!typeId) {
+            throw new IllegalStateException(`Variable "${ident}" not declared.`);
+        }
+        return ScratchType.fromId(typeId);
+    }
+
     public withDeclaration(ident: string, type: ScratchType) {
         return this.set('types', this.types.set(ident, type.typeId));
     }
@@ -183,22 +205,59 @@ export class TypePartitionedMapLattice implements Lattice<MemAbstractState> {
 
 }
 
+export class Theories {
+
+    private readonly _boolTheory: BooleanTheory;
+
+    private readonly _numTheory: RationalNumberTheory<AbstractNumber>;
+
+    private readonly _stringTheory: StringTheory;
+
+    private readonly _listTheory: ListTheory;
+
+    constructor(boolTheory: BooleanTheory,
+                numTheory: RationalNumberTheory<AbstractNumber>,
+                stringTheory: StringTheory,
+                listTheory: ListTheory) {
+        this._boolTheory = Preconditions.checkNotUndefined(boolTheory);
+        this._numTheory = Preconditions.checkNotUndefined(numTheory);
+        this._stringTheory = Preconditions.checkNotUndefined(stringTheory);
+        this._listTheory = Preconditions.checkNotUndefined(listTheory);
+    }
+
+    get boolTheory(): BooleanTheory {
+        return this._boolTheory;
+    }
+
+    get numTheory(): RationalNumberTheory<AbstractNumber> {
+        return this._numTheory;
+    }
+
+    get stringTheory(): StringTheory {
+        return this._stringTheory;
+    }
+
+    get listTheory(): ListTheory {
+        return this._listTheory;
+    }
+}
+
 export class MemAbstractDomain implements AbstractDomain<ConcreteMemory, AbstractMemory> {
 
     private readonly _lattice: Lattice<MemAbstractState>;
 
-    private readonly _numDomain: AbstractDomain<ConcreteElement, AbstractElement>;
+    private readonly _numDomain: AbstractNumberDomain;
 
-    private readonly _boolDomain: AbstractDomain<ConcreteElement, AbstractElement>;
+    private readonly _boolDomain: AbstractBooleanDomain;
 
-    private readonly _stringDomain: AbstractDomain<ConcreteElement, AbstractElement>;
+    private readonly _stringDomain: AbstractStringDomain;
 
-    private readonly _listDomain: AbstractDomain<ConcreteElement, AbstractElement>;
+    private readonly _listDomain: AbstractStringListDomain;
 
-    constructor(numDomain: AbstractDomain<ConcreteElement, AbstractElement>,
-                boolDomain: AbstractDomain<ConcreteElement, AbstractElement>,
-                stringDomain: AbstractDomain<ConcreteElement, AbstractElement>,
-                listDomain: AbstractDomain<ConcreteElement, AbstractElement>) {
+    constructor(numDomain: AbstractNumberDomain,
+                boolDomain: AbstractBooleanDomain,
+                stringDomain: AbstractStringDomain,
+                listDomain: AbstractStringListDomain) {
         this._numDomain = Preconditions.checkNotUndefined(numDomain);
         this._boolDomain = Preconditions.checkNotUndefined(boolDomain);
         this._stringDomain = Preconditions.checkNotUndefined(stringDomain);
@@ -227,6 +286,21 @@ export class MemAbstractDomain implements AbstractDomain<ConcreteMemory, Abstrac
         throw new ImplementMeException();
     }
 
+    get numDomain(): AbstractNumberDomain {
+        return this._numDomain;
+    }
+
+    get boolDomain(): AbstractBooleanDomain {
+        return this._boolDomain;
+    }
+
+    get stringDomain(): AbstractStringDomain {
+        return this._stringDomain;
+    }
+
+    get listDomain(): AbstractStringListDomain {
+        return this._listDomain;
+    }
 }
 
 
