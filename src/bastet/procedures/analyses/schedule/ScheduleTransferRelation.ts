@@ -343,11 +343,11 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
             } else {
                 resultBase = resultBase.set(steppedThreadIdx,
                     steppedThread.withComputationState(THREAD_STATE_YIELD));
-            }
 
-            if (nextNonObserverThreadToStep > -1) {
-                resultBase = resultBase.set(nextNonObserverThreadToStep,
-                    resultBase.get(nextNonObserverThreadToStep).withComputationState(THREAD_STATE_RUNNING));
+                if (nextNonObserverThreadToStep > -1) {
+                    resultBase = resultBase.set(nextNonObserverThreadToStep,
+                        resultBase.get(nextNonObserverThreadToStep).withComputationState(THREAD_STATE_RUNNING));
+                }
             }
         }
 
