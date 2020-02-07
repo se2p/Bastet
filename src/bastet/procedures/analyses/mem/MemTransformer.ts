@@ -30,6 +30,7 @@ import {
 import {MemAbstractState} from "./MemAbstractDomain";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {ScratchType} from "../../../syntax/ast/core/ScratchType";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export class AbstMemTransformer extends MemoryTransformer<MemAbstractState> {
 
@@ -46,135 +47,135 @@ export class AbstMemTransformer extends MemoryTransformer<MemAbstractState> {
     }
 
     assignAnd(assignTo: BooleanVariable, b1: AbstractBoolean, b2: AbstractBoolean): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignBoolean(assignTo: BooleanVariable, b: AbstractBoolean): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignDivide(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignIsNumberEqualTo(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignIsNumberLessThan(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignIsStringContained(assignTo: BooleanVariable, s: AbstractString, containedIn: AbstractString): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignIsStringEqualTo(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignIsStringLessThan(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignIthLetterOf(assignTo: StringVariable, index: AbstractNumber, str: AbstractString): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignJoinedStrings(assignTo: StringVariable, s1: AbstractString, s2: AbstractString): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignMinus(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignModulo(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignMultiply(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignNot(assignTo: BooleanVariable, b1: AbstractBoolean): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignNumberGreaterThan(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignOr(assignTo: BooleanVariable, b1: AbstractBoolean, b2: AbstractBoolean): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignPlus(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assignStringGreaterThan(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assumeFalse(boolVar: BooleanVariable): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assumeTrue(boolVar: BooleanVariable): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     assumeTruth(boolVal: AbstractBoolean): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     declareVariable(id: Identifier, type: ScratchType): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     freeVariable(id: Identifier): MemAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     getBooleanVariable(id: Identifier): BooleanVariable {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     getListVariable(id: Identifier): ListVariable {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     getMapVariable(id: Identifier): MapVariable {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     getNumberVariable(id: Identifier): NumberVariable {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     getStringVariable(id: Identifier): StringVariable {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     queryAbstractBoolean(id: BooleanVariable): AbstractBoolean {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     queryAbstractList(id: ListVariable): AbstractList {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     queryAbstractMap(id: MapVariable): AbstractMap {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     queryAbstractNumber(id: NumberVariable): AbstractNumber {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     queryAbstractString(id: StringVariable): AbstractString {
-        return undefined;
+        throw new ImplementMeException();
     }
 
 
