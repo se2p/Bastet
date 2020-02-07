@@ -195,7 +195,9 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
             }
             index++;
         }
-        throw new IllegalStateException("Did not expect this");
+
+        // No threads left to be stepped
+        return [];
     }
 
     private startAfterProgramStatementHandlerThreads(onState: ScheduleAbstractState): ScheduleAbstractState {
