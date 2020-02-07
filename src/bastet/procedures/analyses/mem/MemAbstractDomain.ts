@@ -207,7 +207,7 @@ export class TypePartitionedMapLattice implements Lattice<MemAbstractState> {
 
 export class Theories {
 
-    private readonly _boolTheory: BooleanTheory;
+    private readonly _boolTheory: BooleanTheory<AbstractBoolean>;
 
     private readonly _numTheory: RationalNumberTheory<AbstractNumber>;
 
@@ -215,7 +215,7 @@ export class Theories {
 
     private readonly _listTheory: ListTheory;
 
-    constructor(boolTheory: BooleanTheory,
+    constructor(boolTheory: BooleanTheory<AbstractBoolean>,
                 numTheory: RationalNumberTheory<AbstractNumber>,
                 stringTheory: StringTheory,
                 listTheory: ListTheory) {
@@ -225,7 +225,7 @@ export class Theories {
         this._listTheory = Preconditions.checkNotUndefined(listTheory);
     }
 
-    get boolTheory(): BooleanTheory {
+    get boolTheory(): BooleanTheory<AbstractBoolean> {
         return this._boolTheory;
     }
 
@@ -248,14 +248,14 @@ export class MemAbstractDomain implements AbstractDomain<ConcreteMemory, Abstrac
 
     private readonly _numDomain: AbstractNumberDomain;
 
-    private readonly _boolDomain: AbstractBooleanDomain;
+    private readonly _boolDomain: AbstractBooleanDomain<AbstractBoolean>;
 
     private readonly _stringDomain: AbstractStringDomain;
 
     private readonly _listDomain: AbstractStringListDomain;
 
     constructor(numDomain: AbstractNumberDomain,
-                boolDomain: AbstractBooleanDomain,
+                boolDomain: AbstractBooleanDomain<AbstractBoolean>,
                 stringDomain: AbstractStringDomain,
                 listDomain: AbstractStringListDomain) {
         this._numDomain = Preconditions.checkNotUndefined(numDomain);
@@ -290,7 +290,7 @@ export class MemAbstractDomain implements AbstractDomain<ConcreteMemory, Abstrac
         return this._numDomain;
     }
 
-    get boolDomain(): AbstractBooleanDomain {
+    get boolDomain(): AbstractBooleanDomain<AbstractBoolean> {
         return this._boolDomain;
     }
 

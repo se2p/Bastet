@@ -62,10 +62,10 @@ export class AbstractStringLattice implements Lattice<AbstractString> {
 export class OurStringTheory implements StringTheory {
 
     private readonly _dom: AbstractStringDomain;
-    private readonly _boolTheory: BooleanTheory;
+    private readonly _boolTheory: BooleanTheory<AbstractBoolean>;
     private readonly _numTheory: RationalNumberTheory<AbstractNumber>;
 
-    constructor(dom: AbstractStringDomain, boolTheory: BooleanTheory, numTheory: RationalNumberTheory<AbstractNumber>) {
+    constructor(dom: AbstractStringDomain, boolTheory: BooleanTheory<AbstractBoolean>, numTheory: RationalNumberTheory<AbstractNumber>) {
         this._dom = Preconditions.checkNotUndefined(dom);
         this._boolTheory = Preconditions.checkNotUndefined(boolTheory);
         this._numTheory = Preconditions.checkNotUndefined(numTheory);

@@ -196,7 +196,7 @@ export interface AbstractNumberDomain extends AbstractDomain<ConcreteNumber, Abs
 
 }
 
-export interface AbstractBooleanDomain extends AbstractDomain<ConcreteBoolean, AbstractBoolean> {
+export interface AbstractBooleanDomain<E extends AbstractBoolean> extends AbstractDomain<ConcreteBoolean, E> {
 
 }
 
@@ -208,27 +208,27 @@ export interface AbstractStringListDomain extends AbstractDomain<ConcreteStringL
 
 }
 
-export interface BooleanTheory {
+export interface BooleanTheory<B extends AbstractBoolean> {
 
-    fromBoolean(value: boolean): AbstractBoolean;
+    fromBoolean(value: boolean): B;
 
-    fromConcreteBoolean(str: ConcreteBoolean): AbstractBoolean;
+    fromConcreteBoolean(str: ConcreteBoolean): B;
 
-    abstractBooleanValue(id: Identifier): AbstractBoolean;
+    abstractBooleanValue(id: Identifier): B;
 
-    falseBool(): AbstractBoolean;
+    falseBool(): B;
 
-    trueBool(): AbstractBoolean;
+    trueBool(): B;
 
-    topBoolean(): AbstractBoolean;
+    topBoolean(): B;
 
-    bottomBoolean(): AbstractBoolean;
+    bottomBoolean(): B;
 
-    not(op1: AbstractBoolean): AbstractBoolean;
+    not(op1: B): B;
 
-    and(op1: AbstractBoolean, op2: AbstractBoolean): AbstractBoolean;
+    and(op1: B, op2: B): B;
 
-    or(op1: AbstractBoolean, op2: AbstractBoolean): AbstractBoolean;
+    or(op1: B, op2: B): B;
 
 }
 

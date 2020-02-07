@@ -53,6 +53,7 @@ export class MemTransferRelation implements LabeledTransferRelation<MemAbstractS
             const assume: AssumeOperation = op as AssumeOperation;
             const assumeValue: AbstractBoolean = assume.expression.accept(visitor);
             Preconditions.checkNotUndefined(assumeValue);
+            // TODO: Add a shortcut in case the bool evaluates to FALSE
 
             return [transformer.assumeTruth(assumeValue)];
         } else {

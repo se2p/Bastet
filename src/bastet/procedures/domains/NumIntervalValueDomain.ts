@@ -107,9 +107,9 @@ export class NumIntervalLattice implements Lattice<NumIntervalValue> {
 export class NumIntervalTheory implements RationalNumberTheory<NumIntervalValue> {
 
     private readonly _dom: NumIntervalValueDomain;
-    private readonly _boolTheory: BooleanTheory;
+    private readonly _boolTheory: BooleanTheory<AbstractBoolean>;
 
-    constructor(dom: NumIntervalValueDomain, boolTheory: BooleanTheory) {
+    constructor(dom: NumIntervalValueDomain, boolTheory: BooleanTheory<AbstractBoolean>) {
         this._dom = Preconditions.checkNotUndefined(dom);
         this._boolTheory = Preconditions.checkNotUndefined(boolTheory);
     }
