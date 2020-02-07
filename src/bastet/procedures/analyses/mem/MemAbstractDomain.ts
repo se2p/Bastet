@@ -86,14 +86,25 @@ const MemAbstractStateRecord = ImmRec({
 export class MemAbstractState extends MemAbstractStateRecord implements MemAbstractStateAttributes {
 
     types: ImmMap<string, ScratchTypeID>;
+
     numData: ImmMap<string, AbstractNumber>;
+
     boolData: ImmMap<string, AbstractBoolean>;
+
     stringData: ImmMap<string, AbstractString>;
+
     listData: ImmMap<string, AbstractList>;
+
     constraint: CNFFormula;
 
-    constructor(args: any = {}) {
-        super(Object.assign({}, args, {}));
+    constructor(types: ImmMap<string, ScratchTypeID>,
+                numData: ImmMap<string, AbstractNumber>,
+                boolData: ImmMap<string, AbstractBoolean>,
+                stringData: ImmMap<string, AbstractString>,
+                listData: ImmMap<string, AbstractList>,
+                constraint: CNFFormula) {
+        super({types: types, numData: numData, boolData: boolData,
+            stringData: stringData, listData: listData, constraint: constraint});
     }
 
     public withString(ident: string, value: AbstractString): MemAbstractState {
@@ -158,7 +169,7 @@ export class MemAbstractStates {
 
     public static empty(): MemAbstractState {
         if (!MemAbstractStates.EMPTY) {
-            MemAbstractStates.EMPTY = new MemAbstractState({});
+            throw new ImplementMeException();
         }
         return MemAbstractStates.EMPTY;
     }
@@ -175,12 +186,19 @@ export class TypePartitionedMapLattice implements Lattice<MemAbstractState> {
 
     private readonly _listLattice: Lattice<AbstractElement>;
 
+    private readonly _bottom: MemAbstractState;
+
+    private readonly _top: MemAbstractState;
+
     constructor(numLattice: Lattice<AbstractElement>, boolLattice: Lattice<AbstractElement>,
                 stringLattice: Lattice<AbstractElement>, listLattice: Lattice<AbstractElement>) {
         this._numLattice = Preconditions.checkNotUndefined(numLattice);
         this._boolLattice = Preconditions.checkNotUndefined(boolLattice);
         this._stringLattice = Preconditions.checkNotUndefined(stringLattice);
         this._listLattice = Preconditions.checkNotUndefined(listLattice);
+
+        this._bottom = new MemAbstractState(ImmMap(), ImmMap(), ImmMap(),
+            ImmMap(), ImmMap(), new CNFFormula({}));
     }
 
     bottom(): MemAbstractState {

@@ -66,7 +66,7 @@ export class MemTransferRelation implements LabeledTransferRelation<MemAbstractS
     }
 
     private memoryTransformerFor(state: MemAbstractState): MemoryTransformer<MemAbstractState> {
-        return new AbstMemTransformer(state);
+        return new AbstMemTransformer(this._abstDomain, this._theories, state);
     }
 
 }

@@ -20,8 +20,13 @@
  */
 
 import {List as ImmList, Map as ImmMap, Record as ImmRec} from "immutable";
+import {AbstractElement} from "../lattices/Lattice";
 
 export type ExpressionId = number;
+
+export interface FirstOrderFormula extends AbstractElement {
+
+}
 
 const LiteralRecord = ImmRec({
 
@@ -60,11 +65,12 @@ const FormulaRecord = ImmRec({
 });
 
 
-export class CNFFormula extends FormulaRecord {
+export class CNFFormula extends FormulaRecord implements FirstOrderFormula {
 
     constructor(args: any = {}) {
         super(Object.assign({}, args, {}));
     }
 
 }
+
 

@@ -27,15 +27,21 @@ import {
     MemoryTransformer,
     NumberVariable, StringVariable
 } from "../../domains/MemoryTransformer";
-import {MemAbstractState} from "./MemAbstractDomain";
+import {MemAbstractDomain, MemAbstractState, Theories} from "./MemAbstractDomain";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {ScratchType} from "../../../syntax/ast/core/ScratchType";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {Preconditions} from "../../../utils/Preconditions";
 
 export class AbstMemTransformer extends MemoryTransformer<MemAbstractState> {
 
-    constructor(state: MemAbstractState) {
+    private readonly _dom: MemAbstractDomain;
+    private readonly _theories: Theories;
+
+    constructor(dom: MemAbstractDomain, theories: Theories, state: MemAbstractState) {
         super(state as MemAbstractState);
+        this._dom = Preconditions.checkNotUndefined(dom);
+        this._theories = Preconditions.checkNotUndefined(theories);
     }
 
     assignString(assignTo: StringVariable, b: AbstractString): MemAbstractState {
@@ -127,7 +133,11 @@ export class AbstMemTransformer extends MemoryTransformer<MemAbstractState> {
     }
 
     assumeTruth(boolVal: AbstractBoolean): MemAbstractState {
-        throw new ImplementMeException();
+        if (boolVal === this._theories.boolTheory.falseBool()
+         || boolVal === this._theories.boolTheory.bottomBoolean()) {
+            return this._dom.lattice.bottom();
+        }
+        return this._state;
     }
 
     declareVariable(id: Identifier, type: ScratchType): MemAbstractState {
