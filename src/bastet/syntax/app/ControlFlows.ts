@@ -22,6 +22,7 @@
 import {App} from "./App";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {Actor} from "./Actor";
+import {Preconditions} from "../../utils/Preconditions";
 
 export class ControlFlows {
 
@@ -31,13 +32,17 @@ export class ControlFlows {
 
         for (let a of unionActors) {
             if (resultActorsMap[a.ident]) {
+                if (a.isBootstrapper) {
+                    Preconditions.checkState(resultActorsMap[a.ident] === a);
+                    continue;
+                }
                 throw new IllegalArgumentException("Duplicated actor name! " + a.ident);
             }
             resultActorsMap[a.ident] = a;
         }
 
         return new App("union_of_" + controlflow1.origin + "_and_" + controlflow2.origin,
-            ident, resultActorsMap, controlflow1.bootstrapper);
+            ident, resultActorsMap);
     }
 
 }

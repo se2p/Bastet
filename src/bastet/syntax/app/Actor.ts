@@ -191,6 +191,15 @@ export class Actor {
     get isObserver(): boolean {
         return this._isObserver;
     }
+
+    get isBootstrapper(): boolean {
+        for (const s of this.scripts) {
+            if (s.event === BootstrapEvent.instance()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 export class Actors {

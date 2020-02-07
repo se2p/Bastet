@@ -39,7 +39,7 @@ export class GraphTransferRelation implements TransferRelation<GraphAbstractStat
             result.push(GraphAbstractStateFactory.withFreshID([fromState.getId()], w));
         }
 
-        return result;;
+        return result;
     }
 
 }

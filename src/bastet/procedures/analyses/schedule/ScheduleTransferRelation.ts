@@ -42,6 +42,7 @@ import {IllegalStateException} from "../../../core/exceptions/IllegalStateExcept
 import {MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
 import {ConcreteString} from "../../domains/ConcreteElements";
 import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressions/StringExpression";
+import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
 
 export type Schedule = ImmList<ThreadState>;
 
@@ -118,7 +119,7 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
     }
 
     programStep(fromState: ScheduleAbstractState): ScheduleAbstractState[] {
-        Preconditions.checkState(fromState.threadStates.size <= 1, "More than one thread not yet supported");
+        Preconditions.checkNotUndefined(fromState);
 
         // ATTENTION!!
         //
@@ -182,6 +183,9 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
      * @param fromState
      */
     private chooseThreadToStep(fromState: ScheduleAbstractState): number[] {
+        Preconditions.checkNotUndefined(fromState);
+        Preconditions.checkArgument(fromState.getThreadStates().size > 0);
+
         let index = 0;
         for (const t of fromState.getThreadStates()) {
             if (t.getComputationState() === THREAD_STATE_RUNNING
@@ -257,7 +261,19 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         //
         // Handle different statements that start other threads and wait for them
         //
-        if (stepOp.ast instanceof BroadcastAndWaitStatement) {
+        if (stepOp.ast instanceof BroadcastMessageStatement) {
+            const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
+            const msg: string = this.evaluateToConcreteMessage(stmt.msg);
+            const waitForIndices: number[] = this.getAllMessageReceiverThreadsFrom(threadStates, msg);
+
+            // Prepare the waiting threads for running
+            for (const waitForThreadIdx of waitForIndices) {
+                resultBase = resultBase.set(waitForThreadIdx,
+                    resultBase.get(waitForThreadIdx)
+                        .withComputationState(THREAD_STATE_YIELD));
+            }
+
+        } else if (stepOp.ast instanceof BroadcastAndWaitStatement) {
             const stmt: BroadcastAndWaitStatement = stepOp.ast as BroadcastAndWaitStatement;
             const msg: string = this.evaluateToConcreteMessage(stmt.msg);
             const waitForIndices: number[] = this.getAllMessageReceiverThreadsFrom(threadStates, msg);
@@ -265,13 +281,13 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
 
             // Prepare the waiting threads for running
             for (const waitForThreadIdx of waitForIndices) {
-                resultBase.set(waitForThreadIdx,
+                resultBase = resultBase.set(waitForThreadIdx,
                     resultBase.get(waitForThreadIdx)
                         .withComputationState(THREAD_STATE_YIELD));
             }
 
             // Wait for all triggered threads to finish
-            resultBase.set(steppedThreadIdx, steppedThread.withWaitingForThreads(
+            resultBase = resultBase.set(steppedThreadIdx, steppedThread.withWaitingForThreads(
                     steppedThread
                         .getWaitingForThreads()
                         .union(waitFor.map((t) => t.getThreadId()))));
@@ -309,14 +325,20 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
                 resultBase = resultBase.set(steppedThreadIdx, steppedThread.withComputationState(THREAD_STATE_RUNNING_ATOMIC));
             }
         } else {
-            // YIELD the current state if it is not yet on a terminating control location
-            // of the script.
-            //    TODO: Set to THREAD_STATE_DONE if on a terminating location
-            resultBase = resultBase.set(steppedThreadIdx,
-                steppedThread.withComputationState(THREAD_STATE_YIELD));
+            // The current state is either in RUNNING or RUNNING_ATOMIC
+            Preconditions.checkState(steppedThread.getComputationState() == THREAD_STATE_RUNNING
+                || steppedThread.getComputationState() == THREAD_STATE_RUNNING_ATOMIC);
 
             // Determine and set the next thread to step
             const nextNonObserverThreadToStep: number = this.determineNextNonObserverThreadToStep(resultBase, steppedThreadIdx);
+
+            // YIELD the current state if it is not yet on a terminating control location
+            // of the script.
+            resultBase = resultBase.set(steppedThreadIdx,
+                steppedThread.withComputationState(THREAD_STATE_YIELD));
+
+            //    TODO: Set to THREAD_STATE_DONE if on a terminating location
+
             if (nextNonObserverThreadToStep > -1) {
                 resultBase = resultBase.set(nextNonObserverThreadToStep,
                     resultBase.get(nextNonObserverThreadToStep).withComputationState(THREAD_STATE_RUNNING));
@@ -378,7 +400,9 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
             checked++;
         }
 
-        return -1;
+        // Continue to execute the previously stepped thread of no other
+        // is ready to be stepped.
+        return steppedThreadIdx;
     }
 
     private isNonObserverThread(thread: ThreadState) {

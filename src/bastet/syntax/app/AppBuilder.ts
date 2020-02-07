@@ -82,7 +82,7 @@ export class AppBuilder {
         // TODO/FIXME: Check if adding the prefix to actor names works correctly.
         //      Also references to the actor must be updated.
 
-        return new App(programOrigin, programNode.ident.text, actorMap, Actors.defaultBoostraper());
+        return new App(programOrigin, programNode.ident.text, actorMap);
     }
 
     private buildActors(programAST: ProgramDefinition, actorNamePrefix: string): ActorMap {
@@ -101,6 +101,9 @@ export class AppBuilder {
             // Dot file export
             this.exportScriptsToDoT(flatActor);
         }
+
+        const boostrapper = Actors.defaultBoostraper();
+        result[boostrapper.ident] = boostrapper;
 
         return result;
     }
@@ -328,6 +331,6 @@ export class AppBuilder {
             flatActors[d.ident] = d;
         }
 
-        return new App(taskModel.origin, taskModel.ident, flatActors, taskModel.bootstrapper);
+        return new App(taskModel.origin, taskModel.ident, flatActors);
     }
 }

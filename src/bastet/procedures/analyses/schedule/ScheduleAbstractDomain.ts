@@ -28,6 +28,8 @@ import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
 import {Script, ScriptId} from "../../../syntax/app/controlflow/Script";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ConcreteDomain} from "../../domains/ConcreteElements";
+import {App} from "../../../syntax/app/App";
+import {BootstrapEvent} from "../../../syntax/ast/core/CoreEvent";
 
 export const THREAD_STATE_RUNNING = 1;
 export const THREAD_STATE_RUNNING_ATOMIC = 2;
@@ -174,10 +176,22 @@ export class ScheduleAbstractStateFactory {
         return new ScheduleAbstractState(threadStates, wrappedStated);
     }
 
-    static createInitialState(bootstrapper: Actor, initScript: Script, wrappedState: ImmRec<any>) {
-        const threadState = ThreadStateFactory.createRunningThread(bootstrapper.ident,
-            initScript.id, initScript.getInitialLocation());
-        return new ScheduleAbstractState(ImmList([threadState]), wrappedState);
+    static createInitialState(task: App, wrappedState: ImmRec<any>) {
+        let threads = ImmList<ThreadState>([]);
+        for (const actor of task.actors) {
+            for (const script of actor.scripts) {
+                const threadId = ThreadStateFactory.freshId();
+                let threadState = THREAD_STATE_WAIT;
+                if (script.event === BootstrapEvent.instance()) {
+                    threadState = THREAD_STATE_RUNNING;
+                }
+                for (const locId of script.transitions.entryLocationSet) {
+                    threads = threads.push(new ThreadState(threadId, actor.ident, script.id, locId,
+                        threadState, ImmSet()));
+                }
+            }
+        }
+        return new ScheduleAbstractState(threads, wrappedState);
     }
 }
 

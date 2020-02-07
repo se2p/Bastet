@@ -340,7 +340,7 @@ export class MemTransformerVisitor implements
     }
 
     visitBroadcastMessageStatement(node: BroadcastMessageStatement): AbstractMemory {
-        throw new ImplementMeException();
+        return this._mem;
     }
 
     visitChangeAttributeByStatement(node: ChangeAttributeByStatement): AbstractMemory {

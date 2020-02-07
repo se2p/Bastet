@@ -106,10 +106,8 @@ export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcret
     }
 
     initialStatesFor(task: App): ScheduleAbstractState[] {
-        const bootstrapper: Actor = task.bootstrapper;
-        const initScript: Script = task.getInitScript();
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            return ScheduleAbstractStateFactory.createInitialState(bootstrapper, initScript, w);
+            return ScheduleAbstractStateFactory.createInitialState(task, w);
         });
     }
 

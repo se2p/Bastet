@@ -67,6 +67,25 @@ export class BootstrapEvent extends MessageReceivedEvent {
 
 }
 
+export class StartupEvent extends MessageReceivedEvent {
+
+    public static readonly MSG: string = "__STARTUP";
+
+    constructor() {
+        super(StringLiteral.from("RUNTIME"), StringLiteral.from(StartupEvent.MSG));
+    }
+
+    private static INSTANCE: StartupEvent;
+
+    public static instance(): StartupEvent {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new StartupEvent();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
 export class NeverEvent extends CoreEvent {
 
     constructor() {
@@ -129,23 +148,6 @@ export class AfterStatementMonitoringEvent extends CoreEvent {
     public static instance(): AfterStatementMonitoringEvent {
         if (!this.INSTANCE) {
             this.INSTANCE = new AfterStatementMonitoringEvent();
-        }
-        return this.INSTANCE;
-    }
-
-}
-
-export class StartupEvent extends CoreEvent {
-
-    constructor() {
-        super([]);
-    }
-
-    private static INSTANCE: StartupEvent;
-
-    public static instance(): StartupEvent {
-        if (!this.INSTANCE) {
-            this.INSTANCE = new StartupEvent();
         }
         return this.INSTANCE;
     }
