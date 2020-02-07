@@ -61,7 +61,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
 
     stop(state: GraphAbstractState, reached: Iterable<GraphAbstractState>): boolean {
         for (const r of reached) {
-            const w: AbstractElement = r.getWrappedState();
+            const w: AbstractElement = state.getWrappedState();
             if (this._wrappedAnalysis.stop(w, [r.getWrappedState()])) {
                 return true;
             }
