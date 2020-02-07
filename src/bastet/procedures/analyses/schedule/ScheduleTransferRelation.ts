@@ -246,7 +246,11 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
 
         const stepOp = takenStep.ops[0];
         const steppedThreadIdx = takenStep.threadIndex;
-        const steppedThread = threadStates.get(steppedThreadIdx);
+
+        // Set the new control location
+        const steppedThread = threadStates.get(steppedThreadIdx)
+            .withLocationId(takenStep.succLoc);
+        resultBase = resultBase.set(steppedThreadIdx, steppedThread);
 
         // TODO: Where and how to handle the `clone` statement?
 
