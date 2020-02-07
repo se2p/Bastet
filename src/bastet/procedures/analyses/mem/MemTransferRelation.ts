@@ -52,10 +52,14 @@ export class MemTransferRelation implements LabeledTransferRelation<MemAbstractS
             const visitor = new MemBoolExpressionVisitor(this._abstDomain, this._theories, fromState);
             const assume: AssumeOperation = op as AssumeOperation;
             const assumeValue: AbstractBoolean = assume.expression.accept(visitor);
+            Preconditions.checkNotUndefined(assumeValue);
+
             return [transformer.assumeTruth(assumeValue)];
         } else {
             const visitor = new MemTransformerVisitor(this._abstDomain, transformer, fromState);
             const succ: AbstractMemory = op.ast.accept(visitor);
+            Preconditions.checkNotUndefined(succ);
+
             return [succ];
         }
     }

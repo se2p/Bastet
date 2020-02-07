@@ -98,7 +98,8 @@ export class MemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, Ab
     }
 
     abstractSuccFor(fromState: MemAbstractState, op: ProgramOperation): Iterable<MemAbstractState> {
-        Preconditions.checkNotUndefined(this._transferRelation);
+        Preconditions.checkNotUndefined(fromState);
+        Preconditions.checkNotUndefined(op);
         return this._transferRelation.abstractSuccFor(fromState, op);
     }
 
