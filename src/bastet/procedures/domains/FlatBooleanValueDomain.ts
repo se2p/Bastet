@@ -133,7 +133,7 @@ export class FlatBooleanValueTheory implements BooleanTheory<FlatBooleanValue> {
     }
 
     falseBool(): FlatBooleanValue {
-        return this.falseBool();
+        return this._false;
     }
 
     fromConcreteBoolean(str: ConcreteBoolean): FlatBooleanValue {
