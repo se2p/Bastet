@@ -21,6 +21,7 @@
 
 import {List as ImmList, Map as ImmMap, Record as ImmRec} from "immutable";
 import {AbstractElement} from "../lattices/Lattice";
+import {BooleanLiteral} from "../syntax/ast/core/expressions/BooleanExpression";
 
 export type ExpressionId = number;
 
@@ -38,39 +39,58 @@ export class Literal extends LiteralRecord {
 
     expressionId: ExpressionId;
 
-    constructor(args: any = {}) {
-        super(Object.assign({}, args, {}));
+    constructor(literalExpressionId: ExpressionId) {
+        super({expressionId: literalExpressionId});
     }
 }
 
 const ClauseRecord = ImmRec({
 
-    elements: ImmList([])
+    literals: ImmList([])
 
 });
 
-
+/**
+ * Disjunctions (OR) of a list of literals.
+ */
 export class Clause extends ClauseRecord {
 
-    constructor(args: any = {}) {
-        super(Object.assign({}, args, {}));
+    constructor(literals: ImmList<Literal>) {
+        super({literals: literals});
     }
 
 }
 
-const FormulaRecord = ImmRec({
+export interface CNFFormulaAttributes extends FirstOrderFormula {
 
-    elements: ImmList([])
+    clauses: ImmList<Clause>;
+
+}
+
+const CNFFormulaRecord = ImmRec({
+
+    clauses: ImmList([])
 
 });
 
+/**
+ * Conjunction (AND) of a list of clauses.
+ */
+export class CNFFormula extends CNFFormulaRecord implements CNFFormulaAttributes {
 
-export class CNFFormula extends FormulaRecord implements FirstOrderFormula {
-
-    constructor(args: any = {}) {
-        super(Object.assign({}, args, {}));
+    constructor(clauses: ImmList<Clause>) {
+        super({clauses: clauses});
     }
 
 }
 
+export const FALSE_FORMULA: CNFFormula = new CNFFormula(
+    ImmList([
+        new Clause(ImmList([
+            new Literal(BooleanLiteral.false().getRefId())]))]));
+
+export const TRUE_FORMULA: CNFFormula = new CNFFormula(
+    ImmList([
+        new Clause(ImmList([
+            new Literal(BooleanLiteral.true().getRefId())]))]));
 

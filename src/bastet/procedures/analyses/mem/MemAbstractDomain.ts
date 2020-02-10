@@ -21,11 +21,11 @@
 
 import {AbstractElement, Lattice} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
-import {Record as ImmRec, Map as ImmMap} from "immutable"
+import {Record as ImmRec, List as ImmList, Map as ImmMap} from "immutable"
 import {ScratchType, ScratchTypeID} from "../../../syntax/ast/core/ScratchType";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
-import {CNFFormula} from "../../../utils/ConjunctiveNormalForm";
+import {CNFFormula, FALSE_FORMULA, TRUE_FORMULA} from "../../../utils/ConjunctiveNormalForm";
 import {ConcreteDomain, ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
 import {
     AbstractBoolean,
@@ -79,7 +79,7 @@ const MemAbstractStateRecord = ImmRec({
     boolData: ImmMap({}),
     stringData: ImmMap({}),
     listData: ImmMap({}),
-    constraint: new CNFFormula({})
+    constraint: new CNFFormula(ImmList([]))
 
 });
 
@@ -198,11 +198,13 @@ export class TypePartitionedMapLattice implements Lattice<MemAbstractState> {
         this._listLattice = Preconditions.checkNotUndefined(listLattice);
 
         this._bottom = new MemAbstractState(ImmMap(), ImmMap(), ImmMap(),
-            ImmMap(), ImmMap(), new CNFFormula({}));
+            ImmMap(), ImmMap(), FALSE_FORMULA);
+        this._top = new MemAbstractState(ImmMap(), ImmMap(), ImmMap(),
+            ImmMap(), ImmMap(), TRUE_FORMULA);
     }
 
     bottom(): MemAbstractState {
-        throw new ImplementMeException();
+        return this._bottom;
     }
 
     isIncluded(element1: MemAbstractState, element2: MemAbstractState): boolean {
@@ -218,7 +220,7 @@ export class TypePartitionedMapLattice implements Lattice<MemAbstractState> {
     }
 
     top(): MemAbstractState {
-        throw new ImplementMeException();
+        return this._top;
     }
 
 }

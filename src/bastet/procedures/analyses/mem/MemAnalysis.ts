@@ -94,7 +94,7 @@ export class MemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, Ab
     }
 
     initialStatesFor(task: App): MemAbstractState[] {
-        return [MemAbstractStates.empty()];
+        return [this._abstractDomain.lattice.top()];
     }
 
     abstractSuccFor(fromState: MemAbstractState, op: ProgramOperation): Iterable<MemAbstractState> {
