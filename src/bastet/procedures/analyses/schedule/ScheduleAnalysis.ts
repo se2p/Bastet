@@ -19,7 +19,12 @@
  *
  */
 
-import {ProgramAnalysis, ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
+import {
+    ProgramAnalysis,
+    ProgramAnalysisWithLabelProducer,
+    ProgramAnalysisWithLabels,
+    WrappingProgramAnalysis
+} from "../ProgramAnalysis";
 import {
     ScheduleAbstractDomain,
     ScheduleAbstractState,
@@ -28,12 +33,12 @@ import {
 } from "./ScheduleAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
-import {Script} from "../../../syntax/app/controlflow/Script";
-import {Actor} from "../../../syntax/app/Actor";
 import {ScheduleTransferRelation} from "./ScheduleTransferRelation";
 import {LabeledTransferRelationImpl} from "../TransferRelation";
 import {Preconditions} from "../../../utils/Preconditions";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
+import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export class ScheduleAnalysisConfig extends BastetConfiguration {
 
@@ -47,7 +52,8 @@ export class ScheduleAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState> {
+export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<ScheduleConcreteState, ScheduleAbstractState>,
+    WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState> {
 
     private readonly _config: ScheduleAnalysisConfig;
     private readonly _abstractDomain: AbstractDomain<ScheduleConcreteState, ScheduleAbstractState>;
@@ -109,6 +115,10 @@ export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcret
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
             return ScheduleAbstractStateFactory.createInitialState(task, w);
         });
+    }
+
+    getTransitionLabel(from: ScheduleAbstractState, to: ScheduleAbstractState): ProgramOperation {
+        throw new ImplementMeException();
     }
 
 }

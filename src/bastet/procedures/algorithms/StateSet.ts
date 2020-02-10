@@ -55,6 +55,12 @@ export abstract class StateSet<E extends AbstractElement> {
         }
     }
 
+    abstract isRootState(element: E): boolean;
+
+    abstract addRootSates(elements: Iterable<E>);
+
+    abstract getRootStates(): Set<E>;
+
     addAll(elements: Iterable<E>) {
         for (let e of elements){
             this.add(e);
@@ -72,14 +78,29 @@ export abstract class StateSet<E extends AbstractElement> {
 export class OrderedStateSet<E extends AbstractElement> extends StateSet<E> {
 
     private _states: Set<E>;
+    private _root: Set<E>;
 
     constructor() {
         super();
         this._states = new Set();
+        this._root = new Set();
     }
 
     [Symbol.iterator](): IterableIterator<E> {
         return this._states[Symbol.iterator]();
+    }
+
+    addRootSates(elements: Iterable<E>) {
+        this._root = new Set(elements);
+        this.addAll(elements);
+    }
+
+    isRootState(element: E): boolean {
+        return this._root.has(element);
+    }
+
+    getRootStates(): Set<E> {
+        return this._root;
     }
 
     add(element: E) {

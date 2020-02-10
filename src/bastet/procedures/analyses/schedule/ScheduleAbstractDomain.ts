@@ -201,15 +201,15 @@ export class ScheduleAbstractDomain implements AbstractDomain<ScheduleConcreteSt
     lattice: Lattice<ScheduleAbstractState>;
 
     abstract(elements: Iterable<ScheduleConcreteState>): ScheduleAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     concretize(element: ScheduleAbstractState): Iterable<ScheduleConcreteState> {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     widen(element: ScheduleAbstractState, precision: AbstractionPrecision): ScheduleAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     get concreteDomain(): ConcreteDomain<ScheduleConcreteState> {

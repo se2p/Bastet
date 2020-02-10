@@ -52,6 +52,19 @@ export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends 
 
 }
 
+export interface TransitionLabelProvider {
+
+    getTransitionLabel(from: AbstractElement, to: AbstractElement): ProgramOperation;
+
+}
+
+export interface ProgramAnalysisWithLabelProducer<C extends ConcreteElement, E extends AbstractElement>
+    extends ProgramAnalysis<C, E>, TransitionLabelProvider {
+
+    getTransitionLabel(from: E, to: E): ProgramOperation;
+
+}
+
 export interface WrappingProgramAnalysis<C extends ConcreteElement, E extends AbstractElement>
     extends ProgramAnalysis<C, E> {
 
