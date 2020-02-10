@@ -22,7 +22,7 @@
 import {LabeledTransferRelation, TransferRelation} from "../TransferRelation";
 import {
     ScheduleAbstractState,
-    THREAD_STATE_DONE,
+    THREAD_STATE_DONE, THREAD_STATE_FAILURE,
     THREAD_STATE_RUNNING,
     THREAD_STATE_RUNNING_ATOMIC, THREAD_STATE_YIELD,
     ThreadState
@@ -43,6 +43,7 @@ import {MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
 import {ConcreteString} from "../../domains/ConcreteElements";
 import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressions/StringExpression";
 import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
+import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 
 export type Schedule = ImmList<ThreadState>;
 
@@ -279,7 +280,12 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         //
         // Handle different statements that start other threads and wait for them
         //
-        if (stepOp.ast instanceof BroadcastMessageStatement) {
+        if (stepOp.ast instanceof CallStatement) {
+            const call = stepOp.ast as CallStatement;
+            if (call.calledMethod.text == "_RUNTIME_signalFailure") {
+                resultBase = this.setCompState(resultBase, steppedThreadIdx, THREAD_STATE_FAILURE);
+            }
+        } else if (stepOp.ast instanceof BroadcastMessageStatement) {
             const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
             const msg: string = this.evaluateToConcreteMessage(stmt.msg);
             const waitForIndices: number[] = this.getAllMessageReceiverThreadsFrom(threadStates, msg);

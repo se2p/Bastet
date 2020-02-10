@@ -105,6 +105,7 @@ import {AstNode} from "../../../syntax/ast/AstNode";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AbstractBoolean, AbstractList, AbstractNumber, AbstractString, MemoryTransformer} from "../../domains/MemoryTransformer";
 import {NumberType, ScratchType} from "../../../syntax/ast/core/ScratchType";
+import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 
 export class MemNumExpressionVisitor implements CoreNumberExpressionVisitor<AbstractNumber> {
 
@@ -344,6 +345,10 @@ export class MemTransformerVisitor implements
 
     visit(node: AstNode): AbstractMemory {
         throw new ImplementMeException();
+    }
+
+    visitCallStatement(node: CallStatement): AbstractMemory {
+        return this._mem;
     }
 
     visitAddElementToStatement(node: AddElementToStatement): AbstractMemory {

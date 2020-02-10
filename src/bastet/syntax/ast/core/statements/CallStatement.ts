@@ -37,4 +37,15 @@ export class CallStatement extends Statement {
         this._assignResultTo = assignResultTo;
     }
 
+    get calledMethod(): Identifier {
+        return this._calledMethod;
+    }
+
+    get args(): ExpressionList {
+        return this._args;
+    }
+
+    get assignResultTo(): OptionalAstNode<Identifier> {
+        return this._assignResultTo;
+    }
 }

@@ -36,6 +36,7 @@ export const THREAD_STATE_RUNNING_ATOMIC = 2;
 export const THREAD_STATE_WAIT = 3;
 export const THREAD_STATE_DONE = 4;
 export const THREAD_STATE_YIELD = 5;
+export const THREAD_STATE_FAILURE = 6;
 export const THREAD_STATE_UNKNOWN = 0;
 
 export type ScriptComputationState = number;
