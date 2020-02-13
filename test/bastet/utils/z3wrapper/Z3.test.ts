@@ -29,7 +29,7 @@ describe('Z3Wrapper', function() {
 
     const solver = new Z3Solver();
 
-    it('can instnatiate the WASM module', function() {
+    it('can instantiate the WASM module', function() {
         const lib = solver.lib
 
         var config = lib.Z3_mk_config();

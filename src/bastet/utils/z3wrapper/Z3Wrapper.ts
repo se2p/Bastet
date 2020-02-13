@@ -24,7 +24,11 @@ import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {LibZ3, Z3_context} from "./libz3";
 import {WasmJSInstance} from "./wasmInstance";
 
-const Z3Mod = require("./libz3.so.js");
+require ("./Z3Module");
+
+require("./libz3.so.js");
+
+const Z3Module = global['Module'];
 
 export class Z3Context {
 
@@ -37,7 +41,7 @@ export class Z3Solver {
     private _lib: LibZ3;
 
     constructor() {
-        this._lib = new LibZ3(Z3Mod);
+        this._lib = new LibZ3(Z3Module);
     }
 
     public createContext(): Z3Context {
