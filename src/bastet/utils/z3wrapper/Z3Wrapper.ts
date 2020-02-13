@@ -22,11 +22,9 @@
 
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {LibZ3, Z3_context} from "./libz3";
-import {WasmJSInstance} from "./wasmInstance";
-
-require ("./Z3Module");
-
-require("./libz3.so.js");
+import {Module} from "./Z3Module";
+import {Preconditions} from "../Preconditions";
+Preconditions.checkNotUndefined(Module);
 
 const Z3Module = global['Module'];
 
@@ -36,12 +34,43 @@ export class Z3Context {
 
 }
 
+export class SolverFactory {
+
+    public static async createZ3(): Promise<Z3Solver> {
+        const z3module = Z3Module;
+        require("./libz3.so.js");
+
+        let solverInitPromise = new Promise( (resolve, reject) => {
+            Module['onSolverInitDone'] = () => {
+                console.log("Hello World");
+                resolve();
+            };
+
+        });
+
+        let solverInitTimeout = new Promise( (resolve, reject) => {
+            setTimeout(_ => {
+                resolve(); console.log("Timeout");
+            }, 5000);
+        });
+
+        await Promise.race([solverInitPromise, solverInitTimeout])
+            .then((value) => { })
+            .catch((reason) => { });
+
+        return new Z3Solver(z3module)
+    }
+}
+
 export class Z3Solver {
 
     private _lib: LibZ3;
+    private _module: any;
 
-    constructor() {
-        this._lib = new LibZ3(Z3Module);
+    constructor(z3mod: any) {
+        this._module = Preconditions.checkNotUndefined(z3mod);
+        Preconditions.checkNotUndefined(z3mod["asm"]);
+        this._lib = new LibZ3(z3mod);
     }
 
     public createContext(): Z3Context {

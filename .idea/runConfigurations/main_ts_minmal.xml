@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="main.ts minmal" type="NodeJSConfigurationType" application-parameters="-P test/programs/mini1program.sc -S test/programs/empty.sc -I src/public/intermediate.sc" node-parameters="--require ts-node/register" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
+  <configuration default="false" name="main.ts minmal" type="NodeJSConfigurationType" application-parameters="-P test/programs/mini1program.sc -S test/programs/empty.sc -I src/public/intermediate.sc" node-parameters="--experimental-wasi-unstable-preview1 --experimental-wasm-bigint --require ts-node/register" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
     <method v="2" />
   </configuration>
 </component>

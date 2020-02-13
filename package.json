@@ -57,6 +57,7 @@
     "commander": "^4.1.0",
     "immutable": "^4.0.0-rc.12",
     "toposort": "^2.0.2",
-    "typescript-logging": "^0.6.4"
+    "typescript-logging": "^0.6.4",
+    "wasm-ts": "^0.1.3"
   }
 }

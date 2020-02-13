@@ -20,7 +20,11 @@
  *
  */
 
-var Module = {
+import Imports = WebAssembly.Imports;
+import AsmModule = WebAssembly.Module;
+import AsmInstance = WebAssembly.Instance;
+
+export var Module = {
     print: function(text) {
         console.log(text);
     },
@@ -33,42 +37,35 @@ var Module = {
         return "lib/z3/libz3.so.wasm";
     },
 
-    instantiateWasm: function(info, callback) {
+    postRun: function() {
+    },
+
+    instantiateWasm: function(importObject, callback) {
         const filename = this.locateFile("", "");
 
         const fs = require('fs');
         const buffer = fs.readFileSync(filename);
 
-        const env = {
-            memoryBase: 0,
-            tableBase: 0,
-            memory: new WebAssembly.Memory({
-                initial: 256
-            }),
-            table: new WebAssembly.Table({
-                initial: 0,
-                element: 'anyfunc'
-            })
-        };
-
         (async () => {
-            const modulePromies = WebAssembly.compile(buffer);
-            const module = await modulePromies;
-            console.log(module);
-            const instancePromies = WebAssembly.instantiate(module, env);
-            const instance = await instancePromies;
-            console.log(instancePromies);
-
-            console.log(instance.exports);
-            Module["asm"] = instance.exports;
+            var theAsmModule;
+            await WebAssembly.compile(buffer)
+                .then((asmModule) => {
+                    theAsmModule = asmModule;
+                    return WebAssembly.instantiate(asmModule, importObject);
+                })
+                .catch((reason => console.log(reason)))
+                .then((asmInstance) => callback(asmInstance, theAsmModule))
+                .catch((reason) => console.log(reason));
         })();
 
         return Module["asm"];
-    }
+    },
 
+    onRuntimeInitialized: function() {
+        Module['onSolverInitDone']();
+    }
 };
 
 global['Module'] = Module;
 
-global.Module = Module;
 

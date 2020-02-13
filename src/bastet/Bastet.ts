@@ -36,7 +36,7 @@ import {AstNode} from "./syntax/ast/AstNode";
 import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
 import {AnalysisProcedureConfig, AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
 import {AppToDot} from "./syntax/app/AppToDot";
-import {Z3Solver} from "./utils/z3wrapper/Z3Wrapper";
+import {SolverFactory, Z3Solver} from "./utils/z3wrapper/Z3Wrapper";
 
 const commander = require('commander');
 
@@ -61,9 +61,10 @@ export class Bastet {
      *
      * @returns a JSON object with the analyses result.
      */
-    public run() : {} {
-        const solver = new Z3Solver();
-        solver.lib.Z3_mk_config();
+    public async run() : Promise<{}> {
+        const solver = await SolverFactory.createZ3();
+        const cfg = solver.lib.Z3_mk_config();
+        const context = solver.lib.Z3_mk_context(cfg);
 
         // Parsing of command line options
         const cmdlineArguments = this.parseProgramArguments();
