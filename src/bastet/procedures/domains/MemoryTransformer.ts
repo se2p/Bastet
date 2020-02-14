@@ -23,13 +23,16 @@
 import {Preconditions} from "../../utils/Preconditions";
 import {Identifier} from "../../syntax/ast/core/Identifier";
 import {BooleanType, NumberType, ScratchType, StringType} from "../../syntax/ast/core/ScratchType";
-import {AbstractMemory} from "../analyses/mem/MemAbstractDomain";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString, ConcreteStringList} from "./ConcreteElements";
 import {AbstractElement} from "../../lattices/Lattice";
 import {AbstractDomain} from "./AbstractDomain";
 import {AbstractStringList} from "./StringListAbstractDomain";
 
 export interface AbstractValue extends AbstractElement {
+
+}
+
+export interface AbstractMemory extends AbstractElement {
 
 }
 
@@ -103,31 +106,31 @@ export class ListVariable {
 
 }
 
-export interface ListTheory {
+export interface ListTheory<L extends AbstractList> {
 
 }
 
-export interface StringTheory {
+export interface StringTheory<S extends AbstractString> {
 
-    fromConcreteString(str: ConcreteString): AbstractString;
+    fromConcreteString(str: ConcreteString): S;
 
-    abstractStringValue(id: Identifier): AbstractString;
+    abstractStringValue(id: Identifier): S;
 
-    emptyString(): AbstractString;
+    emptyString(): S;
 
-    topString(): AbstractString;
+    topString(): S;
 
-    bottomString(): AbstractString;
+    bottomString(): S;
 
-    lengthOf(str: AbstractString): AbstractNumber;
+    lengthOf(str: S): AbstractNumber;
 
-    castNumberAsString(num: AbstractNumber): AbstractString;
+    castNumberAsString(num: AbstractNumber): S;
 
-    castBoolAsString(num: AbstractBoolean): AbstractString;
+    castBoolAsString(num: AbstractBoolean): S;
 
-    joinStrings(str1: AbstractString, str2: AbstractString): AbstractString;
+    joinStrings(str1: S, str2: S): S;
 
-    ithLetterOf(index: AbstractNumber, str: AbstractString): AbstractString;
+    ithLetterOf(index: AbstractNumber, str: S): S;
 
 }
 
@@ -155,7 +158,7 @@ export interface StringTheoryQueries {
 
 }
 
-export interface RationalNumberTheory<N extends AbstractNumber> {
+export interface RationalNumberTheory<N extends AbstractNumber, B extends AbstractBoolean> {
 
     fromConcreteNumber(str: ConcreteNumber): N;
 
@@ -171,7 +174,7 @@ export interface RationalNumberTheory<N extends AbstractNumber> {
 
     castStringAsNumber(str: AbstractString): N;
 
-    castBoolAsNumber(val: AbstractBoolean): N;
+    castBoolAsNumber(val: B): N;
 
     multiply(op1: N, op2: N): N;
 
@@ -184,11 +187,11 @@ export interface RationalNumberTheory<N extends AbstractNumber> {
     minus(op1: N, op2: N): N;
 
 
-    isGreaterThan(s1: N, s2: N): AbstractBoolean;
+    isGreaterThan(s1: N, s2: N): B;
 
-    isLessThan(s1: N, s2: N): AbstractBoolean;
+    isLessThan(s1: N, s2: N): B;
 
-    isNumberEqualTo(s1: N, s2: N): AbstractBoolean;
+    isNumberEqualTo(s1: N, s2: N): B;
 
 }
 
@@ -406,5 +409,18 @@ export abstract class MemoryTransformer<M extends AbstractMemory> implements Mem
     abstract queryAbstractNumber(id: NumberVariable): AbstractNumber;
 
     abstract queryAbstractString(id: StringVariable): AbstractString;
+
+}
+
+export interface AbstractMemoryTheory<M extends AbstractMemory, B extends AbstractBoolean,
+    N extends AbstractNumber, S extends AbstractString, L extends AbstractList> {
+
+    boolTheory: BooleanTheory<B>;
+
+    numTheory: RationalNumberTheory<N, B>;
+
+    stringTheory: StringTheory<S>;
+
+    listTheory: ListTheory<L>;
 
 }

@@ -20,13 +20,13 @@
  */
 
 import {ProgramAnalysis, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
-import {AbstractMemory, MemAbstractDomain, MemAbstractState, MemAbstractStates, Theories} from "./MemAbstractDomain";
+import {SyMemAbstractDomain, SymMemAbstractState } from "./SyMemAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {MemTransferRelation} from "./MemTransferRelation";
+import {SyMemTransferRelation} from "./SyMemTransferRelation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {
     ConcreteBooleanDomain,
@@ -39,44 +39,50 @@ import {FlatBooleanValueDomain, FlatBooleanValueTheory} from "../../domains/Flat
 import {OurStringListTheory, StringListAbstractDomain} from "../../domains/StringListAbstractDomain";
 import {OurStringTheory, StringAbstractDomain} from "../../domains/StringAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
+import {Z3Solver} from "../../../utils/z3wrapper/Z3Wrapper";
+import {
+    AbstractBoolean,
+    AbstractList,
+    AbstractNumber,
+    AbstractString,
+    AbstractMemoryTheory
+} from "../../domains/MemoryTransformer";
+import {
+    BooleanFormula,
+    FirstOrderFormula,
+    ListFormula,
+    NumberFormula,
+    StringFormula
+} from "../../../utils/ConjunctiveNormalForm";
+import {PropositionalFormula} from "../../../utils/bdd/BDD";
+import {Lattice} from "../../../lattices/Lattice";
 
-export class MemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, AbstractMemory>, LabeledTransferRelation<MemAbstractState> {
+export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, SymMemAbstractState>, LabeledTransferRelation<SymMemAbstractState> {
 
-    private readonly _theories: Theories;
-    private readonly _abstractDomain: MemAbstractDomain;
-    private readonly _transferRelation: MemTransferRelation;
+    private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
+    private readonly _abstractDomain: SyMemAbstractDomain;
+    private readonly _transferRelation: SyMemTransferRelation;
 
-    constructor() {
-        const numDomain = new NumIntervalValueDomain(new ConcreteNumberDomain());
-        const boolDomain = new FlatBooleanValueDomain(new ConcreteBooleanDomain());
-        const stringDomain = new StringAbstractDomain(new ConcreteBoundedStringDomain(42));
-        const stringListDomain = new StringListAbstractDomain(new ConcreteBoundedStringListDomain(23));
-
-        const boolTheory = new FlatBooleanValueTheory(boolDomain);
-        const numTheory = new NumIntervalTheory(numDomain, boolTheory);
-        const stringTheory = new OurStringTheory(stringDomain, boolTheory, numTheory);
-        const listTheory = new OurStringListTheory(stringListDomain);
-
-        this._theories = new Theories(boolTheory, numTheory, stringTheory, listTheory);
-        this._abstractDomain = new MemAbstractDomain(numDomain, boolDomain, stringDomain, stringListDomain);
-
-        this._transferRelation = new MemTransferRelation(this._abstractDomain, this._theories);
+    constructor(folLattice: Lattice<FirstOrderFormula>, propLattice: Lattice<PropositionalFormula>,
+                theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
+        this._abstractDomain = new SyMemAbstractDomain(folLattice, propLattice);
+        this._transferRelation = new SyMemTransferRelation(this._abstractDomain, this._theories);
     }
 
-    abstractSucc(fromState: MemAbstractState): Iterable<MemAbstractState> {
+    abstractSucc(fromState: SymMemAbstractState): Iterable<SymMemAbstractState> {
         return this._transferRelation.abstractSucc(fromState);
     }
 
-    join(state1: MemAbstractState, state2: MemAbstractState): MemAbstractState {
+    join(state1: SymMemAbstractState, state2: SymMemAbstractState): SymMemAbstractState {
         return this._abstractDomain.lattice.join(state1, state2);
     }
 
-    merge(state1: MemAbstractState, state2: MemAbstractState): boolean {
+    merge(state1: SymMemAbstractState, state2: SymMemAbstractState): boolean {
         // MERGE-SEP
         return false;
     }
 
-    stop(state: MemAbstractState, reached: Iterable<MemAbstractState>): boolean {
+    stop(state: SymMemAbstractState, reached: Iterable<SymMemAbstractState>): boolean {
         for (const r of reached) {
             if (r.equals(state)) {
                 return true;
@@ -85,25 +91,25 @@ export class MemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, Ab
         return false;
     }
 
-    target(state: MemAbstractState): boolean {
+    target(state: SymMemAbstractState): boolean {
         return false;
     }
 
-    widen(state: MemAbstractState): MemAbstractState {
+    widen(state: SymMemAbstractState): SymMemAbstractState {
         return state;
     }
 
-    initialStatesFor(task: App): MemAbstractState[] {
+    initialStatesFor(task: App): SymMemAbstractState[] {
         return [this._abstractDomain.lattice.top()];
     }
 
-    abstractSuccFor(fromState: MemAbstractState, op: ProgramOperation): Iterable<MemAbstractState> {
+    abstractSuccFor(fromState: SymMemAbstractState, op: ProgramOperation): Iterable<SymMemAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
         return this._transferRelation.abstractSuccFor(fromState, op);
     }
 
-    get abstractDomain(): AbstractDomain<ConcreteMemory, AbstractMemory> {
+    get abstractDomain(): AbstractDomain<ConcreteMemory, SymMemAbstractState> {
         return this._abstractDomain;
     }
 }

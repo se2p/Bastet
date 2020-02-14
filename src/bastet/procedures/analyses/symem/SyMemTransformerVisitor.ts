@@ -25,7 +25,7 @@ import {
     CoreStringExpressionVisitor,
     CoreVisitor
 } from "../../../syntax/ast/CoreVisitor";
-import {AbstractMemory, MemAbstractDomain, Theories} from "./MemAbstractDomain";
+import {SyMemAbstractDomain, SymMemAbstractState} from "./SyMemAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {
@@ -103,157 +103,170 @@ import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/Bro
 import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {Preconditions} from "../../../utils/Preconditions";
-import {AbstractBoolean, AbstractList, AbstractNumber, AbstractString, MemoryTransformer} from "../../domains/MemoryTransformer";
-import {NumberType, ScratchType} from "../../../syntax/ast/core/ScratchType";
+import {
+    AbstractBoolean,
+    AbstractList,
+    AbstractNumber,
+    AbstractString,
+    AbstractMemoryTheory,
+    MemoryTransformer, RationalNumberTheory
+} from "../../domains/MemoryTransformer";
+import {NumberType, ScratchType, ScratchTypeID} from "../../../syntax/ast/core/ScratchType";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
+import {
+    BooleanFormula,
+    FirstOrderFormula,
+    ListFormula,
+    NumberFormula,
+    StringFormula
+} from "../../../utils/ConjunctiveNormalForm";
+import {ConcreteNumber, ConcreteNumberDomain} from "../../domains/ConcreteElements";
+import {AbstractElement} from "../../../lattices/Lattice";
+import {Map as ImmMap} from "immutable";
 
-export class MemNumExpressionVisitor implements CoreNumberExpressionVisitor<AbstractNumber> {
+export class MemNumExpressionVisitor<N extends AbstractNumber, B extends AbstractBoolean> implements CoreNumberExpressionVisitor<N> {
 
-    private readonly _mem: AbstractMemory;
-    private readonly _dom: MemAbstractDomain;
+    private readonly _theory: RationalNumberTheory<N, B>;
 
-    constructor(dom: MemAbstractDomain, mem: AbstractMemory) {
-        this._dom = Preconditions.checkNotUndefined(dom);
-        this._mem = Preconditions.checkNotUndefined(mem);
+    constructor(theory: RationalNumberTheory<N, B>) {
+        this._theory = Preconditions.checkNotUndefined(theory);
     }
 
-    visit(node: AstNode): AbstractNumber {
+    visit(node: AstNode): N {
         throw new ImplementMeException();
     }
 
-    visitBoolAsNumberExpression(node: BoolAsNumberExpression): AbstractNumber {
+    visitBoolAsNumberExpression(node: BoolAsNumberExpression): N {
         throw new ImplementMeException();
     }
 
-    visitDivideExpression(node: DivideExpression): AbstractNumber {
+    visitDivideExpression(node: DivideExpression): N {
         throw new ImplementMeException();
     }
 
-    visitIndexOfExpression(node: IndexOfExpression): AbstractNumber {
+    visitIndexOfExpression(node: IndexOfExpression): N {
         throw new ImplementMeException();
     }
 
-    visitLengthOListExpression(node: LengthOListExpression): AbstractNumber {
+    visitLengthOListExpression(node: LengthOListExpression): N {
         throw new ImplementMeException();
     }
 
-    visitLengthOfStringExpression(node: LengthOfStringExpression): AbstractNumber {
+    visitLengthOfStringExpression(node: LengthOfStringExpression): N {
         throw new ImplementMeException();
     }
 
-    visitMinusExpression(node: MinusExpression): AbstractNumber {
+    visitMinusExpression(node: MinusExpression): N {
         throw new ImplementMeException();
     }
 
-    visitModuloExpression(node: ModuloExpression): AbstractNumber {
+    visitModuloExpression(node: ModuloExpression): N {
         throw new ImplementMeException();
     }
 
-    visitMultiplyExpression(node: MultiplyExpression): AbstractNumber {
+    visitMultiplyExpression(node: MultiplyExpression): N {
         throw new ImplementMeException();
     }
 
-    visitNumFunctExpression(node: NumFunctExpression): AbstractNumber {
+    visitNumFunctExpression(node: NumFunctExpression): N {
         throw new ImplementMeException();
     }
 
-    visitNumberLiteral(node: NumberLiteral): AbstractNumber {
-        return this._dom.numDomain.abstract([
-            this._dom.numDomain.concreteDomain.createElement({value: node.num})]);
+    visitNumberLiteral(node: NumberLiteral): N {
+        return this._theory.fromConcreteNumber(new ConcreteNumber(node.num));
     }
 
-    visitNumberVariableExpression(node: NumberVariableExpression): AbstractNumber {
-        const result = this._mem.getNum(node.id.text);
+    visitNumberVariableExpression(node: NumberVariableExpression): N {
+        const result = this._theory.abstractNumberValue(node.id);
         return Preconditions.checkNotUndefined(result);
     }
 
-    visitPickRandomFromExpression(node: PickRandomFromExpression): AbstractNumber {
+    visitPickRandomFromExpression(node: PickRandomFromExpression): N {
         throw new ImplementMeException();
     }
 
-    visitPlusExpression(node: PlusExpression): AbstractNumber {
+    visitPlusExpression(node: PlusExpression): N {
         throw new ImplementMeException();
     }
 
-    visitRoundExpression(node: RoundExpression): AbstractNumber {
+    visitRoundExpression(node: RoundExpression): N {
         throw new ImplementMeException();
     }
 
-    visitStringAsNumberExpression(node: StringAsNumberExpression): AbstractNumber {
+    visitStringAsNumberExpression(node: StringAsNumberExpression): N {
         throw new ImplementMeException();
     }
 
-    visitTimerExpression(node: TimerExpression): AbstractNumber {
+    visitTimerExpression(node: TimerExpression): N {
         throw new ImplementMeException();
     }
 
 }
 
-export class MemBoolExpressionVisitor implements CoreBoolExpressionVisitor<AbstractBoolean> {
+export class SyMemBoolExpressionVisitor implements CoreBoolExpressionVisitor<BooleanFormula> {
 
-    private readonly _mem: AbstractMemory;
-    private readonly _dom: MemAbstractDomain;
-    private readonly _theories: Theories;
+    private readonly _base: SymMemAbstractState;
+    private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
-    constructor(dom: MemAbstractDomain, theories: Theories, mem: AbstractMemory) {
-        this._dom = Preconditions.checkNotUndefined(dom);
-        this._mem = Preconditions.checkNotUndefined(mem);
+    constructor(theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>,
+                base: SymMemAbstractState) {
         this._theories = Preconditions.checkNotUndefined(theories);
+        this._base = Preconditions.checkNotUndefined(base);
     }
 
-    visit(node: AstNode): AbstractBoolean {
+    visit(node: AstNode): BooleanFormula {
         throw new ImplementMeException();
     }
 
-    visitAndExpression(node: AndExpression): AbstractBoolean {
+    visitAndExpression(node: AndExpression): BooleanFormula {
         throw new ImplementMeException();
     }
 
-    visitBooleanLiteral(node: BooleanLiteral): AbstractBoolean {
+    visitBooleanLiteral(node: BooleanLiteral): BooleanFormula {
         throw new ImplementMeException();
     }
 
-    visitBooleanVariableExpression(node: BooleanVariableExpression): AbstractBoolean {
+    visitBooleanVariableExpression(node: BooleanVariableExpression): BooleanFormula {
         throw new ImplementMeException();
     }
 
-    visitNegationExpression(node: NegationExpression): AbstractBoolean {
-        const toNegate: AbstractBoolean = node.negate.accept(this);
+    visitNegationExpression(node: NegationExpression): BooleanFormula {
+        const toNegate: BooleanFormula = node.negate.accept(this);
         return this._theories.boolTheory.not(toNegate);
     }
 
-    visitNumEqualsExpression(node: NumEqualsExpression): AbstractBoolean {
+    visitNumEqualsExpression(node: NumEqualsExpression): BooleanFormula {
         throw new ImplementMeException();
     }
 
-    visitNumGreaterThanExpression(node: NumGreaterThanExpression): AbstractBoolean {
-        const numVisitor = new MemNumExpressionVisitor(this._dom, this._mem);
+    visitNumGreaterThanExpression(node: NumGreaterThanExpression): BooleanFormula {
+        const numVisitor = new MemNumExpressionVisitor(this._theories.numTheory);
         const op1: AbstractNumber = node.operand1.accept(numVisitor);
         const op2: AbstractNumber = node.operand2.accept(numVisitor);
         return this._theories.numTheory.isGreaterThan(op1, op2);
     }
 
-    visitNumLessThanExpression(node: NumLessThanExpression): AbstractBoolean {
+    visitNumLessThanExpression(node: NumLessThanExpression): BooleanFormula {
         throw new ImplementMeException();
     }
 
-    visitOrExpression(node: OrExpression): AbstractBoolean {
+    visitOrExpression(node: OrExpression): BooleanFormula {
         throw new ImplementMeException();
     }
 
-    visitStrContainsExpression(node: StrContainsExpression): AbstractBoolean {
+    visitStrContainsExpression(node: StrContainsExpression): BooleanFormula {
         throw new ImplementMeException();
     }
 
-    visitStrEqualsExpression(node: StrEqualsExpression): AbstractBoolean {
+    visitStrEqualsExpression(node: StrEqualsExpression): BooleanFormula {
         throw new ImplementMeException();
     }
 
-    visitStrGreaterThanExpression(node: StrGreaterThanExpression): AbstractBoolean {
+    visitStrGreaterThanExpression(node: StrGreaterThanExpression): BooleanFormula {
         throw new ImplementMeException();
     }
 
-    visitStrLessThanExpression(node: StrLessThanExpression): AbstractBoolean {
+    visitStrLessThanExpression(node: StrLessThanExpression): BooleanFormula {
         throw new ImplementMeException();
     }
 
@@ -261,10 +274,10 @@ export class MemBoolExpressionVisitor implements CoreBoolExpressionVisitor<Abstr
 
 export class MemStringExpressionVisitor implements CoreStringExpressionVisitor<AbstractString> {
 
-    private readonly _mem: AbstractMemory;
+    private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
-    constructor(mem: AbstractMemory) {
-        this._mem = Preconditions.checkNotUndefined(mem);
+    constructor(theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
+        this._theories = Preconditions.checkNotUndefined(theories);
     }
 
     visit(node: AstNode): AbstractString {
@@ -311,10 +324,10 @@ export class MemStringExpressionVisitor implements CoreStringExpressionVisitor<A
 
 export class MemListExpressionVisitor implements CoreListExpressionVisitor<AbstractList> {
 
-    private readonly _mem: AbstractMemory;
+    private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
-    constructor(mem: AbstractMemory) {
-        this._mem = Preconditions.checkNotUndefined(mem);
+    constructor(theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
+        this._theories = Preconditions.checkNotUndefined(theories);
     }
 
     visit(node: AstNode): AbstractList {
@@ -331,126 +344,140 @@ export class MemListExpressionVisitor implements CoreListExpressionVisitor<Abstr
 
 }
 
-export class MemTransformerVisitor implements
-    CoreVisitor<AbstractMemory>,
-    CoreNonCtrlStatementnVisitor<AbstractMemory> {
+export class SyMemTransformerVisitor<B extends AbstractBoolean,
+    N extends AbstractNumber, S extends AbstractString, L extends AbstractList>
+    implements CoreVisitor<B>, CoreNonCtrlStatementnVisitor<B> {
 
-    private readonly _mem: AbstractMemory;
-    private readonly _dom: MemAbstractDomain;
+    private readonly _mem: B;
+    private readonly _theories: AbstractMemoryTheory<B, B, N, S, L>;
+    private _typesPrime: ImmMap<string, ScratchTypeID>;
 
-    constructor(dom: MemAbstractDomain, transformer: MemoryTransformer<AbstractMemory>, mem: AbstractMemory) {
-        this._dom = Preconditions.checkNotUndefined(dom);
-        this._mem = Preconditions.checkNotUndefined(mem);
+    constructor(base: B, types: ImmMap<string, ScratchTypeID>, theories: AbstractMemoryTheory<B, B, N, S, L>) {
+        this._mem = Preconditions.checkNotUndefined(base);
+        this._theories = Preconditions.checkNotUndefined(theories);
+        this._typesPrime = Preconditions.checkNotUndefined(types);
     }
 
-    visit(node: AstNode): AbstractMemory {
+    get typesPrime(): ImmMap<string, ScratchTypeID> {
+        return this._typesPrime;
+    }
+
+    visit(node: AstNode): B {
         throw new ImplementMeException();
     }
 
-    visitCallStatement(node: CallStatement): AbstractMemory {
+    visitCallStatement(node: CallStatement): B {
         return this._mem;
     }
 
-    visitAddElementToStatement(node: AddElementToStatement): AbstractMemory {
+    visitAddElementToStatement(node: AddElementToStatement): B {
         throw new ImplementMeException();
     }
 
-    visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): AbstractMemory {
+    visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): B {
         return this._mem;
     }
 
-    visitBroadcastMessageStatement(node: BroadcastMessageStatement): AbstractMemory {
+    visitBroadcastMessageStatement(node: BroadcastMessageStatement): B {
         return this._mem;
     }
 
-    visitChangeAttributeByStatement(node: ChangeAttributeByStatement): AbstractMemory {
+    visitChangeAttributeByStatement(node: ChangeAttributeByStatement): B {
         throw new ImplementMeException();
     }
 
-    visitChangeVarByStatement(node: ChangeVarByStatement): AbstractMemory {
+    visitChangeVarByStatement(node: ChangeVarByStatement): B {
         throw new ImplementMeException();
     }
 
-    visitCreateCloneOfStatement(node: CreateCloneOfStatement): AbstractMemory {
+    visitCreateCloneOfStatement(node: CreateCloneOfStatement): B {
         throw new ImplementMeException();
     }
 
-    visitDeclareAttributeOfStatement(node: DeclareAttributeOfStatement): AbstractMemory {
+    visitDeclareAttributeOfStatement(node: DeclareAttributeOfStatement): B {
         throw new ImplementMeException();
     }
 
-    visitDeclareAttributeStatement(node: DeclareAttributeStatement): AbstractMemory {
+    visitDeclareAttributeStatement(node: DeclareAttributeStatement): B {
         throw new ImplementMeException();
     }
 
-    visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): AbstractMemory {
-        return this._mem.withDeclaration(node.ident.text, node.type);
-    }
+    visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): B {
+        this._typesPrime = this._typesPrime.set(node.ident.text, node.type.typeId);
+        // TODO: Continue here.
+        //   What if the variable is already declared and has values assigned to it? (in case of loop unrollings)
+        //   What is the role of SSA?
 
-    visitDeleteFromAllStatement(node: DeleteAllFromStatement): AbstractMemory {
+        // return this._mem.withDeclaration(node.ident.text, node.type);
         throw new ImplementMeException();
     }
 
-    visitDeleteIthFromStatement(node: DeleteIthFromStatement): AbstractMemory {
+    visitDeleteFromAllStatement(node: DeleteAllFromStatement): B {
         throw new ImplementMeException();
     }
 
-    visitDeleteThisCloneStatement(node: DeleteThisCloneStatement): AbstractMemory {
+    visitDeleteIthFromStatement(node: DeleteIthFromStatement): B {
         throw new ImplementMeException();
     }
 
-    visitEpsilonStatement(node: EpsilonStatement): AbstractMemory {
+    visitDeleteThisCloneStatement(node: DeleteThisCloneStatement): B {
+        throw new ImplementMeException();
+    }
+
+    visitEpsilonStatement(node: EpsilonStatement): B {
         return this._mem;
     }
 
-    visitExpressionStatement(node: ExpressionStatement): AbstractMemory {
+    visitExpressionStatement(node: ExpressionStatement): B {
         throw new ImplementMeException();
     }
 
-    visitInsertAtStatement(node: InsertAtStatement): AbstractMemory {
+    visitInsertAtStatement(node: InsertAtStatement): B {
         throw new ImplementMeException();
     }
 
-    visitReplaceElementAtStatement(node: ReplaceElementAtStatement): AbstractMemory {
+    visitReplaceElementAtStatement(node: ReplaceElementAtStatement): B {
         throw new ImplementMeException();
     }
 
-    visitResetTimerStatement(node: ResetTimerStatement): AbstractMemory {
+    visitResetTimerStatement(node: ResetTimerStatement): B {
         throw new ImplementMeException();
     }
 
-    visitSetAttributeOfToStatement(node: SetAttributeOfToStatement): AbstractMemory {
+    visitSetAttributeOfToStatement(node: SetAttributeOfToStatement): B {
         throw new ImplementMeException();
     }
 
-    visitSetAttributeToStatement(node: SetAttributeToStatement): AbstractMemory {
+    visitSetAttributeToStatement(node: SetAttributeToStatement): B {
         throw new ImplementMeException();
     }
 
-    visitStopAllStatement(node: StopAllStatement): AbstractMemory {
+    visitStopAllStatement(node: StopAllStatement): B {
         throw new ImplementMeException();
     }
 
-    visitStopOthersInActorStatement(node: StopOthersInActorStatement): AbstractMemory {
+    visitStopOthersInActorStatement(node: StopOthersInActorStatement): B {
         throw new ImplementMeException();
     }
 
-    visitStopThisStatement(node: StopThisStatement): AbstractMemory {
+    visitStopThisStatement(node: StopThisStatement): B {
         throw new ImplementMeException();
     }
 
-    visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): AbstractMemory {
-        const declaredType: ScratchType = this._mem.getType(node.variable.text);
+    visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): B {
+        // We assume that a wrapping analysis step takes care of SSA.
+        const declaredType: ScratchType = ScratchType.fromId(this._typesPrime.get(node.variable.text));
         if (declaredType instanceof NumberType) {
-            const visitor = new MemNumExpressionVisitor(this._dom, this._mem);
-            const value: AbstractNumber = node.toValue.accept(visitor);
-            return this._mem.withNum(node.variable.text, value);
+            const visitor = new MemNumExpressionVisitor(this._theories.numTheory);
+            const value: N = node.toValue.accept(visitor);
+            const assume: B = this._theories.numTheory.isNumberEqualTo(this._theories.numTheory.abstractNumberValue(node.variable), value);
+            return this._theories.boolTheory.and(this._mem, assume);
         } else {
             throw ImplementMeException;
         }
     }
 
-    visitWaitUntilStatement(node: WaitUntilStatement): AbstractMemory {
+    visitWaitUntilStatement(node: WaitUntilStatement): B {
         throw new ImplementMeException();
     }
 

@@ -20,53 +20,60 @@
  */
 
 import {LabeledTransferRelation} from "../TransferRelation";
-import {AbstractMemory, MemAbstractDomain, MemAbstractState, Theories} from "./MemAbstractDomain";
+import {SyMemAbstractDomain, SymMemAbstractState} from "./SyMemAbstractDomain";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {MemBoolExpressionVisitor, MemTransformerVisitor} from "./MemTransformerVisitor";
-import {AbstractBoolean, MemoryTransformer} from "../../domains/MemoryTransformer";
+import {SyMemBoolExpressionVisitor, SyMemTransformerVisitor} from "./SyMemTransformerVisitor";
+import {AbstractBoolean, AbstractMemoryTheory, MemoryTransformer} from "../../domains/MemoryTransformer";
 import {Preconditions} from "../../../utils/Preconditions";
-import {AbstMemTransformer} from "./MemTransformer";
+import {
+    BooleanFormula,
+    FirstOrderFormula,
+    ListFormula,
+    NumberFormula,
+    StringFormula
+} from "../../../utils/ConjunctiveNormalForm";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
-export class MemTransferRelation implements LabeledTransferRelation<MemAbstractState> {
+export class SyMemTransferRelation implements LabeledTransferRelation<SymMemAbstractState> {
 
-    private readonly _abstDomain: MemAbstractDomain;
+    private readonly _abstDomain: SyMemAbstractDomain;
 
-    private readonly _theories: Theories;
+    private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
-    constructor(abstDomain: MemAbstractDomain, theories: Theories) {
+    constructor(abstDomain: SyMemAbstractDomain, theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
         this._abstDomain = Preconditions.checkNotUndefined(abstDomain);
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
-    public abstractSucc(fromState: MemAbstractState): Iterable<MemAbstractState> {
+    public abstractSucc(fromState: SymMemAbstractState): Iterable<SymMemAbstractState> {
         throw new IllegalStateException("Only the labelled transfer is supported by this transfer relation");
     }
 
-    public abstractSuccFor(fromState: MemAbstractState, op: ProgramOperation): Iterable<MemAbstractState> {
+    public abstractSuccFor(fromState: SymMemAbstractState, op: ProgramOperation): Iterable<SymMemAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
 
         const transformer = this.memoryTransformerFor(fromState);
         if (op instanceof AssumeOperation) {
-            const visitor = new MemBoolExpressionVisitor(this._abstDomain, this._theories, fromState);
+            const visitor = new SyMemBoolExpressionVisitor(this._theories, fromState);
             const assume: AssumeOperation = op as AssumeOperation;
             const assumeValue: AbstractBoolean = assume.expression.accept(visitor);
             Preconditions.checkNotUndefined(assumeValue);
             // TODO: Add a shortcut in case the bool evaluates to FALSE
 
-            return [transformer.assumeTruth(assumeValue)];
+            return [new SymMemAbstractState(fromState.types, transformer.assumeTruth(assumeValue), fromState.summaryFormula)];
         } else {
-            const visitor = new MemTransformerVisitor(this._abstDomain, transformer, fromState);
-            const succ: AbstractMemory = op.ast.accept(visitor);
-            Preconditions.checkNotUndefined(succ);
+            const visitor = new SyMemTransformerVisitor(fromState, fromState.types, this._theories);
+            const blockFormulaPrime: FirstOrderFormula = op.ast.accept(visitor);
+            const typesPrime = visitor.typesPrime;
 
-            return [succ];
+            return [new SymMemAbstractState(typesPrime, blockFormulaPrime, fromState.summaryFormula)];
         }
     }
 
-    private memoryTransformerFor(state: MemAbstractState): MemoryTransformer<MemAbstractState> {
-        return new AbstMemTransformer(this._abstDomain, this._theories, state);
+    private memoryTransformerFor(state: SymMemAbstractState): MemoryTransformer<SymMemAbstractState> {
+        throw new ImplementMeException();
     }
 
 }

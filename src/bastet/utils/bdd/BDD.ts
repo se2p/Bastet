@@ -23,6 +23,56 @@
 import {Record as ImmRec, List as ImmList, Set as ImmSet, Map as ImmMap} from "immutable"
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../Preconditions";
+import {AbstractElement, Lattice} from "../../lattices/Lattice";
+
+export interface PropositionalFormula extends AbstractElement {
+
+}
+
+export class BDDLibraryFactory {
+
+    public static async createBDDLib(): Promise<BDDLibrary> {
+        return new BDDLibrary();
+    }
+}
+
+export class BDDLattice<B extends PropositionalFormula> implements Lattice<B> {
+
+    bottom(): B {
+        throw new ImplementMeException();
+    }
+
+    isIncluded(element1: B, element2: B): boolean {
+        throw new ImplementMeException();
+    }
+
+    join(element1: B, element2: B): B {
+        throw new ImplementMeException();
+    }
+
+    meet(element1: B, element2: B): B {
+        throw new ImplementMeException();
+    }
+
+    top(): B {
+        throw new ImplementMeException();
+    }
+
+}
+
+export class BDDLibrary {
+
+    private readonly _lattice: Lattice<PropositionalFormula>;
+
+    constructor() {
+        this._lattice = new BDDLattice();
+    }
+
+    get lattice(): Lattice<PropositionalFormula> {
+       return this._lattice;
+    }
+
+}
 
 /**
  * The paper "Binary Decision Diagrams with Edge-Specified Reductions" by

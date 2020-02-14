@@ -23,6 +23,9 @@
 import {LibZ3InContext, LibZ3NonContext} from "./libz3";
 import {Preconditions} from "../Preconditions";
 import {WasmJSInstance} from "./wasmInstance";
+import {FirstOrderFormula} from "../ConjunctiveNormalForm";
+import {Lattice} from "../../lattices/Lattice";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
 export var PreModule = {
     print: function(text) {
@@ -94,13 +97,40 @@ export class SolverFactory {
     }
 }
 
+export class FirstOrderLattice<F extends FirstOrderFormula> implements Lattice<FirstOrderFormula> {
+
+    bottom(): F {
+        throw new ImplementMeException();
+    }
+
+    isIncluded(element1: F, element2: F): boolean {
+        throw new ImplementMeException();
+    }
+
+    join(element1: F, element2: F): F {
+        throw new ImplementMeException();
+    }
+
+    meet(element1: F, element2: F): F {
+        throw new ImplementMeException();
+    }
+
+    top(): F {
+        throw new ImplementMeException();
+    }
+
+}
+
 export class Z3Solver extends LibZ3NonContext {
 
     private _module: WasmJSInstance;
 
+    private _lattice: FirstOrderLattice<FirstOrderFormula>;
+
     constructor(z3mod: WasmJSInstance) {
         super(z3mod);
         this._module = Preconditions.checkNotUndefined(z3mod);
+        this._lattice = new FirstOrderLattice<FirstOrderFormula>();
     }
 
     public createContext(): LibZ3InContext {
@@ -109,4 +139,7 @@ export class Z3Solver extends LibZ3NonContext {
         return new LibZ3InContext(this._wasmInstance, ctx);
     }
 
+    get lattice(): FirstOrderLattice<FirstOrderFormula> {
+        return this._lattice;
+    }
 }

@@ -22,10 +22,27 @@
 import {List as ImmList, Map as ImmMap, Record as ImmRec} from "immutable";
 import {AbstractElement} from "../lattices/Lattice";
 import {BooleanLiteral} from "../syntax/ast/core/expressions/BooleanExpression";
+import {AbstractBoolean, AbstractList, AbstractNumber, AbstractString} from "../procedures/domains/MemoryTransformer";
 
 export type ExpressionId = number;
 
 export interface FirstOrderFormula extends AbstractElement {
+
+}
+
+export interface BooleanFormula extends AbstractBoolean, FirstOrderFormula {
+
+}
+
+export interface StringFormula extends AbstractString {
+
+}
+
+export interface NumberFormula extends AbstractNumber {
+
+}
+
+export interface ListFormula extends AbstractList {
 
 }
 

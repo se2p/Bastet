@@ -22,17 +22,17 @@
 
 import {
     AbstractBoolean, AbstractList, AbstractMap,
-    AbstractNumber, AbstractString,
-    BooleanVariable, ListVariable, MapVariable,
+    AbstractNumber, AbstractString, BooleanTheory,
+    BooleanVariable, ListTheory, ListVariable, MapVariable,
     MemoryTransformer,
-    NumberVariable, StringVariable
-} from "../../domains/MemoryTransformer";
-import {MemAbstractDomain, MemAbstractState, Theories} from "./MemAbstractDomain";
-import {Identifier} from "../../../syntax/ast/core/Identifier";
-import {ScratchType} from "../../../syntax/ast/core/ScratchType";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {Preconditions} from "../../../utils/Preconditions";
+    NumberVariable, RationalNumberTheory, StringTheory, StringVariable
+} from "../domains/MemoryTransformer";
+import {Identifier} from "../../syntax/ast/core/Identifier";
+import {ScratchType} from "../../syntax/ast/core/ScratchType";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {Preconditions} from "../../utils/Preconditions";
 
+/*
 export class AbstMemTransformer extends MemoryTransformer<MemAbstractState> {
 
     private readonly _dom: MemAbstractDomain;
@@ -190,3 +190,5 @@ export class AbstMemTransformer extends MemoryTransformer<MemAbstractState> {
 
 
 }
+
+*/

@@ -104,7 +104,7 @@ export class NumIntervalLattice implements Lattice<NumIntervalValue> {
     }
 }
 
-export class NumIntervalTheory implements RationalNumberTheory<NumIntervalValue> {
+export class NumIntervalTheory implements RationalNumberTheory<NumIntervalValue, AbstractBoolean> {
 
     private readonly _dom: NumIntervalValueDomain;
     private readonly _boolTheory: BooleanTheory<AbstractBoolean>;
