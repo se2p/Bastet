@@ -35,6 +35,7 @@ import {GraphConcreteState, GraphAbstractStateAttribs, GraphAbstractState} from 
 import {ReachabilityAlgorithm} from "./algorithms/Reachability";
 import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
 import {ConcreteMemory} from "./domains/ConcreteElements";
+import {SolverFactory} from "../utils/z3wrapper/Z3Wrapper";
 
 export class AnalysisProcedureConfig {
 
@@ -46,9 +47,11 @@ export class AnalysisProcedureConfig {
 
 export class AnalysisProcedureFactory {
 
-    public static createAnalysisProcedure(config: AnalysisProcedureConfig): AnalysisProcedure {
+    public static async createAnalysisProcedure(config: AnalysisProcedureConfig): Promise<AnalysisProcedure> {
         return new class implements AnalysisProcedure {
-            run(task: App): {} {
+            async run(task: App): Promise<{}> {
+                const solver = await SolverFactory.createZ3();
+
                 const memAnalysis = new MemAnalysis();
                 const schedAnalysis = new ScheduleAnalysis({}, task, memAnalysis);
                 const graphAnalysis = new GraphAnalysis(task, schedAnalysis);
