@@ -62,13 +62,12 @@ export class SyMemTransferRelation implements LabeledTransferRelation<SymMemAbst
             Preconditions.checkNotUndefined(assumeValue);
             // TODO: Add a shortcut in case the bool evaluates to FALSE
 
-            return [new SymMemAbstractState(fromState.types, transformer.assumeTruth(assumeValue), fromState.summaryFormula)];
+            return [new SymMemAbstractState(transformer.assumeTruth(assumeValue), fromState.summaryFormula)];
         } else {
-            const visitor = new SyMemTransformerVisitor(fromState, fromState.types, this._theories);
+            const visitor = new SyMemTransformerVisitor(fromState, this._theories);
             const blockFormulaPrime: FirstOrderFormula = op.ast.accept(visitor);
-            const typesPrime = visitor.typesPrime;
 
-            return [new SymMemAbstractState(typesPrime, blockFormulaPrime, fromState.summaryFormula)];
+            return [new SymMemAbstractState(blockFormulaPrime, fromState.summaryFormula)];
         }
     }
 

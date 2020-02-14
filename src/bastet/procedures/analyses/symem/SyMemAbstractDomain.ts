@@ -46,9 +46,6 @@ import {PropositionalFormula} from "../../../utils/bdd/BDD";
 
 export interface SyMemAbstractStateAttributes {
 
-    /** All declared variables and their types */
-    types: ImmMap<string, ScratchTypeID>;
-
     blockFormula: FirstOrderFormula;
 
     summaryFormula: PropositionalFormula;
@@ -57,7 +54,6 @@ export interface SyMemAbstractStateAttributes {
 
 const SyMemAbstractStateRecord = ImmRec({
 
-    types: ImmMap({}),
     blockFormula: null,
     summaryFormula: null
 
@@ -65,12 +61,10 @@ const SyMemAbstractStateRecord = ImmRec({
 
 export class SymMemAbstractState extends SyMemAbstractStateRecord implements SyMemAbstractStateAttributes {
 
-    types: ImmMap<string, ScratchTypeID>;
     blockFormula: FirstOrderFormula;
     summaryFormula: PropositionalFormula;
 
-    constructor(types: ImmMap<string, ScratchTypeID>,
-                blockFormula: FirstOrderFormula, summaryFormula: PropositionalFormula) {
+    constructor(blockFormula: FirstOrderFormula, summaryFormula: PropositionalFormula) {
         super({blockFormula: blockFormula, summaryFormula: summaryFormula});
     }
 
@@ -82,24 +76,6 @@ export class SymMemAbstractState extends SyMemAbstractStateRecord implements SyM
         return this.set('summaryFormula', value);
     }
 
-    public getType(ident: string): ScratchType {
-        const typeId: ScratchTypeID = this.types.get(ident);
-        if (!typeId) {
-            throw new IllegalStateException(`Variable "${ident}" not declared.`);
-        }
-        return ScratchType.fromId(typeId);
-    }
-
-    public withDeclaration(ident: string, type: ScratchType) {
-        return this.set('types', this.types.set(ident, type.typeId));
-    }
-
-    public withUndeclare(ident: string) {
-        let result = this.set('types', this.types.remove(ident));
-        // TODO: Also remove the values
-        return result;
-    }
-
 }
 
 export class SymMemAbstractStateLattice implements Lattice<SymMemAbstractState> {
@@ -109,8 +85,8 @@ export class SymMemAbstractStateLattice implements Lattice<SymMemAbstractState> 
     private readonly _top: SymMemAbstractState;
 
     constructor(folLattice: Lattice<FirstOrderFormula>, propLattice: Lattice<PropositionalFormula>) {
-        this._bottom = new SymMemAbstractState(ImmMap({}), folLattice.bottom(), propLattice.bottom());
-        this._top = new SymMemAbstractState(ImmMap({}), folLattice.top(), propLattice.top());
+        this._bottom = new SymMemAbstractState(folLattice.bottom(), propLattice.bottom());
+        this._top = new SymMemAbstractState(folLattice.top(), propLattice.top());
     }
 
     bottom(): SymMemAbstractState {

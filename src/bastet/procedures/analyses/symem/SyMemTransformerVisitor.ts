@@ -350,16 +350,10 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
 
     private readonly _mem: B;
     private readonly _theories: AbstractMemoryTheory<B, B, N, S, L>;
-    private _typesPrime: ImmMap<string, ScratchTypeID>;
 
-    constructor(base: B, types: ImmMap<string, ScratchTypeID>, theories: AbstractMemoryTheory<B, B, N, S, L>) {
+    constructor(base: B, theories: AbstractMemoryTheory<B, B, N, S, L>) {
         this._mem = Preconditions.checkNotUndefined(base);
         this._theories = Preconditions.checkNotUndefined(theories);
-        this._typesPrime = Preconditions.checkNotUndefined(types);
-    }
-
-    get typesPrime(): ImmMap<string, ScratchTypeID> {
-        return this._typesPrime;
     }
 
     visit(node: AstNode): B {
@@ -403,7 +397,6 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
     }
 
     visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): B {
-        this._typesPrime = this._typesPrime.set(node.ident.text, node.type.typeId);
         // TODO: Continue here.
         //   What if the variable is already declared and has values assigned to it? (in case of loop unrollings)
         //   What is the role of SSA?
@@ -466,7 +459,7 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
 
     visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): B {
         // We assume that a wrapping analysis step takes care of SSA.
-        const declaredType: ScratchType = ScratchType.fromId(this._typesPrime.get(node.variable.text));
+        const declaredType = null;
         if (declaredType instanceof NumberType) {
             const visitor = new MemNumExpressionVisitor(this._theories.numTheory);
             const value: N = node.toValue.accept(visitor);
