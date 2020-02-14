@@ -25,6 +25,7 @@ import {SSAState} from "./SSAAbstractDomain";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
 
@@ -35,11 +36,11 @@ export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
     }
 
     abstractSucc(fromState: SSAState): Iterable<SSAState> {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     abstractSuccFor(fromState: SSAState, op: ProgramOperation): Iterable<SSAState> {
-        return undefined;
+        throw new ImplementMeException();
     }
     
 }
