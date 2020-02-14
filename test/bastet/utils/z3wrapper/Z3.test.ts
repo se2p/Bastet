@@ -20,25 +20,16 @@
  *
  */
 
-import {LibZ3, Z3_config, Z3_context} from "../../../../src/bastet/utils/z3wrapper/libz3";
+import {Z3_config, Z3_context} from "../../../../src/bastet/utils/z3wrapper/libz3";
 import {Ptr, Uint32} from "../../../../src/bastet/utils/z3wrapper/ctypes";
 import {WasmJSInstance} from "../../../../src/bastet/utils/z3wrapper/wasmInstance"
-import {Z3Solver} from "../../../../src/bastet/utils/z3wrapper/Z3Wrapper";
+import {SolverFactory, Z3Solver} from "../../../../src/bastet/utils/z3wrapper/Z3Wrapper";
 
 describe('Z3Wrapper', function() {
 
-    const solver = new Z3Solver();
+    const solver = SolverFactory.createZ3();
 
     it('can instantiate the WASM module', function() {
-        const lib = solver.lib
-
-        var config = lib.Z3_mk_config();
-        console.log("config: ", config);
-        var context = lib.Z3_mk_context(config);
-        console.log("context: ", context);
-        let nullP = Ptr.nullPtr();
-        var ast = lib.Z3_parse_smtlib2_string(context, "(declare-fun x () Int)", new Uint32(0), nullP, nullP, new Uint32(0), nullP, nullP);
-        console.log("ast: ", ast);
     })
 
 

@@ -63,8 +63,8 @@ export class Bastet {
      */
     public async run() : Promise<{}> {
         const solver = await SolverFactory.createZ3();
-        const cfg = solver.lib.Z3_mk_config();
-        const context = solver.lib.Z3_mk_context(cfg);
+        const ctx = solver.createContext();
+        ctx.freeContext();
 
         // Parsing of command line options
         const cmdlineArguments = this.parseProgramArguments();

@@ -20,29 +20,61 @@
  *
  */
 
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {LibZ3, Z3_context} from "./libz3";
-import {Module} from "./Z3Module";
+import {LibZ3InContext, LibZ3NonContext} from "./libz3";
 import {Preconditions} from "../Preconditions";
-Preconditions.checkNotUndefined(Module);
+import {WasmJSInstance} from "./wasmInstance";
 
-const Z3Module = global['Module'];
+export var PreModule = {
+    print: function(text) {
+        console.log(text);
+    },
 
-export class Z3Context {
+    printErr: function(text) {
+        console.error(text);
+    },
 
-    private readonly _context: Z3_context;
+    locateFile: function (path, scriptDir) {
+        return "lib/z3/libz3.so.wasm";
+    },
 
-}
+    postRun: function() {
+    },
+
+    instantiateWasm: function(importObject, callback) {
+        const filename = this.locateFile("", "");
+
+        const fs = require('fs');
+        const buffer = fs.readFileSync(filename);
+
+        (async () => {
+            var theAsmModule;
+            await WebAssembly.compile(buffer)
+                .then((asmModule) => {
+                    theAsmModule = asmModule;
+                    return WebAssembly.instantiate(asmModule, importObject);
+                })
+                .catch((reason => console.log(reason)))
+                .then((asmInstance) => callback(asmInstance, theAsmModule))
+                .catch((reason) => console.log(reason));
+        })();
+
+        return undefined;
+    },
+
+    onRuntimeInitialized: function() {
+        global['Module']['onSolverInitDone']();
+    }
+};
+
+global['Module'] = PreModule;
 
 export class SolverFactory {
 
     public static async createZ3(): Promise<Z3Solver> {
-        const z3module = Z3Module;
         require("./libz3.so.js");
 
         let solverInitPromise = new Promise( (resolve, reject) => {
-            Module['onSolverInitDone'] = () => {
-                console.log("Hello World");
+            global['Module']['onSolverInitDone'] = () => {
                 resolve();
             };
 
@@ -50,34 +82,31 @@ export class SolverFactory {
 
         let solverInitTimeout = new Promise( (resolve, reject) => {
             setTimeout(_ => {
-                resolve(); console.log("Timeout");
-            }, 5000);
+                resolve();
+            }, 15000);
         });
 
         await Promise.race([solverInitPromise, solverInitTimeout])
             .then((value) => { })
             .catch((reason) => { });
 
-        return new Z3Solver(z3module)
+        return new Z3Solver(global['Module']);
     }
 }
 
-export class Z3Solver {
+export class Z3Solver extends LibZ3NonContext {
 
-    private _lib: LibZ3;
-    private _module: any;
+    private _module: WasmJSInstance;
 
-    constructor(z3mod: any) {
+    constructor(z3mod: WasmJSInstance) {
+        super(z3mod);
         this._module = Preconditions.checkNotUndefined(z3mod);
-        Preconditions.checkNotUndefined(z3mod["asm"]);
-        this._lib = new LibZ3(z3mod);
     }
 
-    public createContext(): Z3Context {
-        throw new ImplementMeException();
+    public createContext(): LibZ3InContext {
+        const cfg = this.mk_config();
+        const ctx = this.mk_context(cfg);
+        return new LibZ3InContext(this._wasmInstance, ctx);
     }
 
-    get lib(): LibZ3 {
-        return this._lib;
-    }
 }
