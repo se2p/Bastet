@@ -53,4 +53,10 @@ export class LabeledTransferRelationImpl<E extends AbstractElement> implements L
         return this._abstractSuccFor(fromState, op);
     }
 
+    public static from<E extends AbstractElement>(tr: LabeledTransferRelation<E>) {
+        return new LabeledTransferRelationImpl<E>((e) => tr.abstractSucc(e),
+            (e, op) => tr.abstractSuccFor(e, op));
+
+    }
+
 }
