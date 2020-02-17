@@ -19,13 +19,14 @@
  *
  */
 
-import {Expression} from "./Expression";
+import {Expression, Expressions} from "./Expression";
 import {AbstractNode, AstNode} from "../../AstNode";
 import {ScratchType} from "../ScratchType";
 
 export abstract class AbstractExpression extends AbstractNode implements Expression {
 
     private readonly _type: ScratchType;
+    private _refId: number;
 
     protected constructor(type: ScratchType, childs: AstNode[]) {
         super(childs);
@@ -34,6 +35,13 @@ export abstract class AbstractExpression extends AbstractNode implements Express
 
     get type(): ScratchType {
         return this._type;
+    }
+
+    public getRefId(): number {
+        if (!this._refId) {
+            this._refId = Expressions.idFor(this);
+        }
+        return this._refId;
     }
 
 }

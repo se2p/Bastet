@@ -20,19 +20,67 @@
  *
  */
 
-export class GraphToDotVisitor  {
+import {StateSet} from "../../algorithms/StateSet";
+import {GraphAbstractState} from "./GraphAbstractDomain";
+import {Preconditions} from "../../../utils/Preconditions";
+import {TransitionLabelProvider} from "../ProgramAnalysis";
 
+export class GraphToDot  {
+
+    private _headerdot: any[];
     private _dot: string[];
     private _idseq: number;
+    private _reached: StateSet<GraphAbstractState>;
+    private _frontier: StateSet<GraphAbstractState>;
+    private _transLabProvider: TransitionLabelProvider;
 
-    constructor() {
+    constructor(transLabProvider: TransitionLabelProvider,
+                reached: StateSet<GraphAbstractState>,
+                frontier: StateSet<GraphAbstractState>) {
+        this._transLabProvider = Preconditions.checkNotUndefined(transLabProvider);
+        this._reached = Preconditions.checkNotUndefined(reached);
+        this._frontier = Preconditions.checkNotUndefined(frontier);
+        this._headerdot = [];
         this._dot = [];
         this._idseq = 0;
     }
 
+    private writeState(e: GraphAbstractState) {
+        const stateLabel = "";
+        this._dot.push(`    ${e.getId()} [label="${stateLabel}"];`);
+    }
+
+    private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
+        const transLabel = "";
+        this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabel}"];`);
+    }
+
+    private export() {
+        this._headerdot.push(`    node [shape=box, style=filled];`);
+
+        const idToStateMap = new Map<number, GraphAbstractState>();
+
+        for (const e of this._reached) {
+            idToStateMap.set(e.getId(), e);
+            this.writeState(e);
+        }
+
+        for (const e of this._reached) {
+            for (const ePredId of e.getPredecessors()) {
+                const ePred = idToStateMap.get(ePredId);
+                Preconditions.checkNotUndefined(ePred);
+                this.writeTransition(ePred, e);
+            }
+        }
+    }
+
     public writeToFile(filepath: string): void {
+        this.export();
         let fs = require('fs');
-        fs.writeFileSync(filepath, `digraph ast {\n` + this._dot.join("\n") + `\n}\n`);
+        fs.writeFileSync(filepath, `digraph ReachabilityGraph {\n`
+            + this._headerdot.join("\n")
+            + this._dot.join("\n")
+            + `\n}\n`);
     }
 
     private static escpace(text: string): string {

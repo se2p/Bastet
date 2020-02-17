@@ -19,7 +19,12 @@
  *
  */
 
-import {ProgramAnalysis, ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
+import {
+    ProgramAnalysis,
+    ProgramAnalysisWithLabelProducer,
+    ProgramAnalysisWithLabels,
+    WrappingProgramAnalysis
+} from "../ProgramAnalysis";
 import {
     ScheduleAbstractDomain,
     ScheduleAbstractState,
@@ -27,14 +32,13 @@ import {
     ScheduleConcreteState
 } from "./ScheduleAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
-import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
-import {Script} from "../../../syntax/app/controlflow/Script";
-import {Actor} from "../../../syntax/app/Actor";
 import {ScheduleTransferRelation} from "./ScheduleTransferRelation";
 import {LabeledTransferRelationImpl} from "../TransferRelation";
 import {Preconditions} from "../../../utils/Preconditions";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
+import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export class ScheduleAnalysisConfig extends BastetConfiguration {
 
@@ -48,7 +52,8 @@ export class ScheduleAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState> {
+export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<ScheduleConcreteState, ScheduleAbstractState>,
+    WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState> {
 
     private readonly _config: ScheduleAnalysisConfig;
     private readonly _abstractDomain: AbstractDomain<ScheduleConcreteState, ScheduleAbstractState>;
@@ -62,8 +67,8 @@ export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcret
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new ScheduleAbstractDomain();
         this._transferRelation = new ScheduleTransferRelation(this._config, task,
-            new LabeledTransferRelationImpl(this._wrappedAnalysis.abstractSucc,
-                this._wrappedAnalysis.abstractSuccFor));
+            new LabeledTransferRelationImpl((e) => this._wrappedAnalysis.abstractSucc(e),
+                (e, op) => this._wrappedAnalysis.abstractSuccFor(e, op)));
     }
 
     abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
@@ -71,15 +76,23 @@ export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcret
     }
 
     join(state1: ScheduleAbstractState, state2: ScheduleAbstractState): ScheduleAbstractState {
-        return undefined;
+        return this._abstractDomain.lattice.join(state1, state2);
     }
 
     merge(state1: ScheduleAbstractState, state2: ScheduleAbstractState): boolean {
         return false;
     }
 
-    stop(state: ScheduleAbstractState, reached: StateSet<ScheduleAbstractState>): ScheduleAbstractState {
-        return undefined;
+    stop(state: ScheduleAbstractState, reached: Iterable<ScheduleAbstractState>): boolean {
+        for (const r of reached) {
+            if (state.getThreadStates().equals(r.getThreadStates())) {
+                const w = state.getWrappedState();
+                if (this._wrappedAnalysis.stop(w, [r.getWrappedState()])) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     target(state: ScheduleAbstractState): boolean {
@@ -99,11 +112,13 @@ export class ScheduleAnalysis implements WrappingProgramAnalysis<ScheduleConcret
     }
 
     initialStatesFor(task: App): ScheduleAbstractState[] {
-        const bootstrapper: Actor = task.bootstrapper;
-        const initScript: Script = task.getInitScript();
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            return ScheduleAbstractStateFactory.createInitialState(bootstrapper, initScript, w);
+            return ScheduleAbstractStateFactory.createInitialState(task, w);
         });
+    }
+
+    getTransitionLabel(from: ScheduleAbstractState, to: ScheduleAbstractState): ProgramOperation {
+        throw new ImplementMeException();
     }
 
 }

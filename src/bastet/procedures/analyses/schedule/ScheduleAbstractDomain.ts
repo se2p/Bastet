@@ -28,12 +28,15 @@ import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
 import {Script, ScriptId} from "../../../syntax/app/controlflow/Script";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ConcreteDomain} from "../../domains/ConcreteElements";
+import {App} from "../../../syntax/app/App";
+import {BootstrapEvent} from "../../../syntax/ast/core/CoreEvent";
 
 export const THREAD_STATE_RUNNING = 1;
 export const THREAD_STATE_RUNNING_ATOMIC = 2;
 export const THREAD_STATE_WAIT = 3;
 export const THREAD_STATE_DONE = 4;
 export const THREAD_STATE_YIELD = 5;
+export const THREAD_STATE_FAILURE = 6;
 export const THREAD_STATE_UNKNOWN = 0;
 
 export type ScriptComputationState = number;
@@ -92,12 +95,24 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement {
         return this.get('locationId');
     }
 
+    public withLocationId(value: LocationID): ThreadState {
+        return this.set('locationId', value);
+    }
+
     public getComputationState(): ScriptComputationState {
         return this.get('computationState');
     }
 
+    public withComputationState(value: ScriptComputationState): ThreadState {
+        return this.set('computationState', value);
+    }
+
     public getWaitingForThreads(): ImmSet<ThreadId> {
         return this.get('waitingForThreads');
+    }
+
+    public withWaitingForThreads(value: ImmSet<ThreadId>): ThreadState {
+        return this.set('waitingForThreads', value);
     }
 
 }
@@ -126,7 +141,7 @@ export interface ScheduleAbstractStateAttributes extends AbstractElement, Single
 
     threadStates: ImmList<ThreadState>;
 
-    wrappedState: ImmRec<any>;
+    wrappedState: AbstractElement;
 
 }
 
@@ -143,7 +158,7 @@ const ScheduleAbstractStateRecord = ImmRec({
  */
 export class ScheduleAbstractState extends ScheduleAbstractStateRecord implements AbstractElement {
 
-    constructor(threadStates: ImmList<ThreadState>, wrappedState: ImmRec<any>) {
+    constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement) {
         super({threadStates: threadStates, wrappedState: wrappedState});
     }
 
@@ -151,7 +166,7 @@ export class ScheduleAbstractState extends ScheduleAbstractStateRecord implement
         return this.get("threadStates");
     }
 
-    public getWrappedState(): ImmList<ThreadState> {
+    public getWrappedState(): AbstractElement {
         return this.get("wrappedState");
     }
 }
@@ -162,10 +177,22 @@ export class ScheduleAbstractStateFactory {
         return new ScheduleAbstractState(threadStates, wrappedStated);
     }
 
-    static createInitialState(bootstrapper: Actor, initScript: Script, wrappedState: ImmRec<any>) {
-        const threadState = ThreadStateFactory.createRunningThread(bootstrapper.ident,
-            initScript.id, initScript.getInitialLocation());
-        return new ScheduleAbstractState(ImmList([threadState]), wrappedState);
+    static createInitialState(task: App, wrappedState: ImmRec<any>) {
+        let threads = ImmList<ThreadState>([]);
+        for (const actor of task.actors) {
+            for (const script of actor.scripts) {
+                const threadId = ThreadStateFactory.freshId();
+                let threadState = THREAD_STATE_WAIT;
+                if (script.event === BootstrapEvent.instance()) {
+                    threadState = THREAD_STATE_RUNNING;
+                }
+                for (const locId of script.transitions.entryLocationSet) {
+                    threads = threads.push(new ThreadState(threadId, actor.ident, script.id, locId,
+                        threadState, ImmSet()));
+                }
+            }
+        }
+        return new ScheduleAbstractState(threads, wrappedState);
     }
 }
 
@@ -174,15 +201,15 @@ export class ScheduleAbstractDomain implements AbstractDomain<ScheduleConcreteSt
     lattice: Lattice<ScheduleAbstractState>;
 
     abstract(elements: Iterable<ScheduleConcreteState>): ScheduleAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     concretize(element: ScheduleAbstractState): Iterable<ScheduleConcreteState> {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     widen(element: ScheduleAbstractState, precision: AbstractionPrecision): ScheduleAbstractState {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     get concreteDomain(): ConcreteDomain<ScheduleConcreteState> {

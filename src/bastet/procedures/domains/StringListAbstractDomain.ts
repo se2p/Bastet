@@ -25,6 +25,7 @@ import {ConcreteDomain, ConcreteList, ConcreteString, ConcreteStringList} from "
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
+import {AbstractList, AbstractStringListDomain, ListTheory} from "./MemoryTransformer";
 
 export interface AbstractStringList extends AbstractElement {
 
@@ -54,7 +55,17 @@ export class StringListLattice implements Lattice<AbstractStringList> {
 
 }
 
-export class StringListAbstractDomain implements AbstractDomain<ConcreteStringList, AbstractStringList> {
+export class OurStringListTheory implements ListTheory<AbstractList> {
+
+    private readonly _dom: StringListAbstractDomain;
+
+    constructor(dom: StringListAbstractDomain) {
+        this._dom = dom;
+    }
+
+}
+
+export class StringListAbstractDomain implements AbstractStringListDomain {
 
     private readonly _concreteDomain: ConcreteDomain<ConcreteStringList>;
     private readonly _lattice: Lattice<AbstractStringList>;
@@ -83,4 +94,5 @@ export class StringListAbstractDomain implements AbstractDomain<ConcreteStringLi
     get lattice(): Lattice<AbstractStringList> {
         return this._lattice;
     }
+
 }

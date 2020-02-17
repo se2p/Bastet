@@ -36,6 +36,7 @@ import {AstNode} from "./syntax/ast/AstNode";
 import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
 import {AnalysisProcedureConfig, AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
 import {AppToDot} from "./syntax/app/AppToDot";
+import {SolverFactory, Z3Solver} from "./utils/z3wrapper/Z3Wrapper";
 
 const commander = require('commander');
 
@@ -60,7 +61,7 @@ export class Bastet {
      *
      * @returns a JSON object with the analyses result.
      */
-    public run() : {} {
+    public async run() : Promise<{}> {
         // Parsing of command line options
         const cmdlineArguments = this.parseProgramArguments();
         if (!cmdlineArguments) {
@@ -75,7 +76,7 @@ export class Bastet {
         const staticTaskModel: App = this.buildTaskModel(intermLibFilepath, programFilepath, specFilepath);
 
         // Build the analyses procedure as defined by the configuration
-        const analysisProcedure = this.buildAnalysisProcedure(cmdlineArguments);
+        const analysisProcedure = await this.buildAnalysisProcedure(cmdlineArguments);
 
         // Run the analyses procedure on the task and return the result
         return this.runAnalysis(staticTaskModel, analysisProcedure);
@@ -111,7 +112,7 @@ export class Bastet {
         return staticTaskModel;
     }
 
-    private buildAnalysisProcedure(programArguments) : AnalysisProcedure {
+    private async buildAnalysisProcedure(programArguments) : Promise<AnalysisProcedure> {
         // TODO: Allow for sequences of analyses procedures that can built on the respective previous results.
         const config: AnalysisProcedureConfig = AnalysisProcedureConfig.createFromCmdLineArgs(programArguments);
         return AnalysisProcedureFactory.createAnalysisProcedure(config);

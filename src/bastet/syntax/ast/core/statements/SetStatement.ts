@@ -69,6 +69,13 @@ export class StoreEvalResultToVariableStatement extends SetStatement {
         this._toValue = toValue;
     }
 
+    get variable(): Identifier {
+        return this._variable;
+    }
+
+    get toValue(): Expression {
+        return this._toValue;
+    }
 }
 
 export class StoreCallResultToVariableStatement extends SetStatement {

@@ -22,10 +22,18 @@
 
 import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {ConcreteDomain, ConcreteString} from "./ConcreteElements";
-import {AbstractString} from "./MemoryTransformer";
+import {
+    AbstractBoolean,
+    AbstractNumber,
+    AbstractString,
+    AbstractStringDomain,
+    BooleanTheory, RationalNumberTheory,
+    StringTheory
+} from "./MemoryTransformer";
 import {Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
+import {Identifier} from "../../syntax/ast/core/Identifier";
 
 export class AbstractStringLattice implements Lattice<AbstractString> {
 
@@ -51,7 +59,61 @@ export class AbstractStringLattice implements Lattice<AbstractString> {
 
 }
 
-export class StringAbstractDomain implements AbstractDomain<ConcreteString, AbstractString> {
+export class OurStringTheory implements StringTheory<AbstractString> {
+
+    private readonly _dom: AbstractStringDomain;
+    private readonly _boolTheory: BooleanTheory<AbstractBoolean>;
+    private readonly _numTheory: RationalNumberTheory<AbstractNumber, AbstractBoolean>;
+
+    constructor(dom: AbstractStringDomain, boolTheory: BooleanTheory<AbstractBoolean>, numTheory: RationalNumberTheory<AbstractNumber, AbstractBoolean>) {
+        this._dom = Preconditions.checkNotUndefined(dom);
+        this._boolTheory = Preconditions.checkNotUndefined(boolTheory);
+        this._numTheory = Preconditions.checkNotUndefined(numTheory);
+    }
+
+    abstractStringValue(id: Identifier): AbstractString {
+        return undefined;
+    }
+
+    bottomString(): AbstractString {
+        return undefined;
+    }
+
+    castBoolAsString(num: AbstractBoolean): AbstractString {
+        return undefined;
+    }
+
+    castNumberAsString(num: AbstractNumber): AbstractString {
+        return undefined;
+    }
+
+    emptyString(): AbstractString {
+        return undefined;
+    }
+
+    fromConcreteString(str: ConcreteString): AbstractString {
+        return undefined;
+    }
+
+    ithLetterOf(index: AbstractNumber, str: AbstractString): AbstractString {
+        return undefined;
+    }
+
+    joinStrings(str1: AbstractString, str2: AbstractString): AbstractString {
+        return undefined;
+    }
+
+    lengthOf(str: AbstractString): AbstractNumber {
+        return undefined;
+    }
+
+    topString(): AbstractString {
+        return undefined;
+    }
+
+}
+
+export class StringAbstractDomain implements AbstractStringDomain {
 
     private readonly _concreteDomain: ConcreteDomain<ConcreteString>;
     private readonly _lattice: Lattice<AbstractString>;
@@ -79,6 +141,10 @@ export class StringAbstractDomain implements AbstractDomain<ConcreteString, Abst
 
     get lattice(): Lattice<AbstractString> {
         return this._lattice;
+    }
+
+    getTheory(): StringTheory<AbstractString> {
+        throw new ImplementMeException();
     }
 
 }

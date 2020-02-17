@@ -50,6 +50,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
             // CHOOSE: Choose the next state to compute successors for.
             //      This step determines the state-space traversal strategy.
             const e: E = this._chooseOp.choose();
+            frontier.remove(e);
 
             // SUCC: Compute the set of successor states
             for (const ePrime of this._analysis.abstractSucc(e)) {

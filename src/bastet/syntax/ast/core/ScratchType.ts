@@ -42,10 +42,20 @@ export abstract class ScratchType extends AbstractNode {
     protected constructor(childs, typeid: ScratchTypeID) {
         super([]);
         this._typeId = typeid;
+        ScratchType.registerType(this);
     }
 
-    public static registerType(typeIdent: string, type: ScratchType) {
+    private static TYPE_MAP: Map<ScratchTypeID, ScratchType>;
 
+    public static registerType(type: ScratchType) {
+        if (!ScratchType.TYPE_MAP) {
+            ScratchType.TYPE_MAP = new Map();
+        }
+        ScratchType.TYPE_MAP.set(type.typeId, type);
+    }
+
+    static fromId(id: ScratchTypeID): ScratchType {
+        return ScratchType.TYPE_MAP.get(id);
     }
 
     static isVoid(type: ScratchType) {

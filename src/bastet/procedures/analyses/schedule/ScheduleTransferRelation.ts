@@ -22,19 +22,61 @@
 import {LabeledTransferRelation, TransferRelation} from "../TransferRelation";
 import {
     ScheduleAbstractState,
-    THREAD_STATE_DONE,
+    THREAD_STATE_DONE, THREAD_STATE_FAILURE,
     THREAD_STATE_RUNNING,
-    THREAD_STATE_RUNNING_ATOMIC,
+    THREAD_STATE_RUNNING_ATOMIC, THREAD_STATE_YIELD,
     ThreadState
 } from "./ScheduleAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperations} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {App} from "../../../syntax/app/App";
 import {ScheduleAnalysisConfig} from "./ScheduleAnalysis";
+import {List as ImmList} from "immutable";
+import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
+import {WaitSecsStatement} from "../../../syntax/ast/core/statements/WaitSecsStatement";
+import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
+import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import {MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
+import {ConcreteString} from "../../domains/ConcreteElements";
+import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressions/StringExpression";
+import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
+import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
+
+export type Schedule = ImmList<ThreadState>;
+
+class StepInformation {
+
+    private readonly _threadIndex: number;
+    private readonly _succLoc: LocationID;
+    private readonly _isInnerAtomic: boolean;
+    private readonly _ops: ProgramOperation[];
+
+    constructor(threadIndex: number, succLoc: number, isInnerAtomic: boolean, ops: ProgramOperation[]) {
+        this._threadIndex = threadIndex;
+        this._succLoc = succLoc;
+        this._isInnerAtomic = isInnerAtomic;
+        this._ops = ops;
+    }
+
+    get threadIndex(): number {
+        return this._threadIndex;
+    }
+
+    get succLoc(): number {
+        return this._succLoc;
+    }
+
+    get isInnerAtomic(): boolean {
+        return this._isInnerAtomic;
+    }
+
+    get ops(): ProgramOperation[] {
+        return this._ops;
+    }
+}
 
 /**
  * Mimics the green-threading of the Scratch VM.
@@ -53,6 +95,9 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
     }
 
     abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
+        Preconditions.checkNotUndefined(fromState);
+        Preconditions.checkNotUndefined(fromState.wrappedState);
+
         if (this._config.aggregateAtomicTransitions) {
             throw new ImplementMeException();
         } else {
@@ -78,14 +123,14 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
     }
 
     programStep(fromState: ScheduleAbstractState): ScheduleAbstractState[] {
-        Preconditions.checkState(fromState.threadStates.size <= 1, "More than one thread not yet supported");
+        Preconditions.checkNotUndefined(fromState);
 
         // ATTENTION!!
         //
         // PROBLEM:
         //    The scheduling does not implement all details of the Scratch VM. In general,
         //    the Scratch VM implements a round-robin scheduling which would lead
-        //    to a deterministic execution order. Nevertheless, there is a WORK_TIME timeout;
+        //    to a deterministic execution order. Nevertheless, there is a WORK_TIME timeout:
         //    reaching this timeout makes executions non-deterministic, because
         //    the the scheduling starts from the first thread in the list if this timout is reached.
         //
@@ -94,43 +139,93 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         //    an exception if the WORK_TIME timeout would have been reached before
         //    all threads in the list were stepped.
 
-        if (fromState.threadStates.size == 0) {
+        const threadsToStep: number[] = this.chooseThreadToStep(fromState);
+        if (threadsToStep.length === 0) {
             return [];
-        } else if (fromState.threadStates.size == 1) {
-            const t: ThreadState = fromState.threadStates.get(0);
-            Preconditions.checkNotUndefined(t);
-            if (t.getComputationState() === THREAD_STATE_DONE) {
-                return [fromState];
-            } else if (t.getComputationState() === THREAD_STATE_RUNNING || t.getComputationState() === THREAD_STATE_RUNNING_ATOMIC) {
-                // Determine the (sequences of) control-flow transition(s) to execute in this step
-                // ATTENTION: We assume that each sequence corresponds to an atomic
-                //      statement in the input programming language (Scratch)
-                const opSeq: [ProgramOperation, LocationID, boolean][] = this.resolveStepOp(t);
-
-                // Compute a successor state for each sequence and call the wrapped analysis to do so
-                for (const [op, succLoc, isInnerAtomic] of opSeq) {
-                    const wrappedSuccState = this._wrappedTransferRelation.abstractSuccFor(fromState.wrappedState, op);
-                    // TODO: Produce a state with THREAD_STATE_RUNNING_ATOMIC if isInnerAtomic
-                }
-                throw new ImplementMeException();
-            } else {
-                throw new IllegalStateException("Yet unsupported thread state!");
-            }
-        } else {
-            throw new IllegalStateException("More than one thread not yet supported.");
         }
+        Preconditions.checkState(threadsToStep.length === 1);
+
+        const threadIndexToStep: number = threadsToStep[0];
+        const threadToStep: ThreadState = fromState.getThreadStates().get(threadIndexToStep);
+        Preconditions.checkState(threadToStep.getComputationState() === THREAD_STATE_RUNNING || threadToStep.getComputationState() === THREAD_STATE_RUNNING_ATOMIC);
+
+        // Determine the (sequences of) control-flow transition(s) to execute in this step
+        // ATTENTION: We assume that each sequence corresponds to an atomic
+        //      statement in the input programming language (Scratch)
+        const leavingOps: [ProgramOperation, LocationID, boolean][] = this.resolveLeavingOps(threadToStep);
+        Preconditions.checkState(leavingOps.length > 0, "A thread with no leaving ops must NOT be in state THREAD_STATE_RUNNING");
+
+        const result: ScheduleAbstractState[] = [];
+
+        for (const [stepOp, succLoc, isInnerAtomic] of leavingOps) {
+            const stepToTake: StepInformation = new StepInformation(threadIndexToStep, succLoc, isInnerAtomic, [stepOp]);
+
+            console.log([threadToStep.getActorId(), stepOp.ast.toTreeString()]);
+
+            // Determine the new schedule (the next thread to execute)
+            //   TODO: Take triggered events into account
+            //   TODO: Determine sets of threads to wait for
+            const nextSchedules: Schedule[] = this.computeNextSchedules(fromState.getThreadStates(), stepToTake);
+
+            for (const newThreadStates of nextSchedules) {
+                // Compute a successor state for each sequence and call the wrapped analysis to do so
+                Preconditions.checkNotUndefined(fromState.wrappedState);
+                let wrappedSuccStates: Iterable<AbstractElement> = this._wrappedTransferRelation.abstractSuccFor(fromState.wrappedState, stepOp);
+
+                for (const w of wrappedSuccStates) {
+                    Preconditions.checkNotUndefined(w);
+                    const e = new ScheduleAbstractState(newThreadStates, w);
+                    result.push(e);
+                }
+            }
+        }
+
+        return result;
     }
 
+    /**
+     * Get the list of indices of threads in the list of threads
+     * that should make a step.
+     *
+     * @param fromState
+     */
+    private chooseThreadToStep(fromState: ScheduleAbstractState): number[] {
+        Preconditions.checkNotUndefined(fromState);
+        Preconditions.checkArgument(fromState.getThreadStates().size > 0);
+
+        let index = 0;
+        for (const t of fromState.getThreadStates()) {
+            if (t.getComputationState() === THREAD_STATE_RUNNING
+                || t.getComputationState() === THREAD_STATE_RUNNING_ATOMIC) {
+                return [index];
+            }
+            index++;
+        }
+
+        // No threads left to be stepped
+        return [];
+    }
 
     private startAfterProgramStatementHandlerThreads(onState: ScheduleAbstractState): ScheduleAbstractState {
-        throw new ImplementMeException();
+        return onState;
     }
 
     /**
      * Returns either a singleton-list or the empty list.
      */
-    private resolveStepOp(t: ThreadState): [ProgramOperation, LocationID, boolean][] {
-        throw new ImplementMeException();
+    private resolveLeavingOps(threadState: ThreadState): [ProgramOperation, LocationID, boolean][] {
+        const script = this._task.getActorByName(threadState.getActorId()).getScript(threadState.getScriptId());
+        console.log('TODO: atomic transitions?');
+
+        let result = [];
+        for (const [opId, succLoc] of script.transitions.transitionsFrom(threadState.getLocationId())) {
+            const isAtomic = false;
+            const op: ProgramOperation = ProgramOperations.withID(opId);
+            Preconditions.checkNotUndefined(op);
+            result.push([op, succLoc, isAtomic]);
+        }
+
+        return result;
     }
 
     private restartThread(state: ScheduleAbstractState): ScheduleAbstractState {
@@ -142,10 +237,231 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
     }
 
     private hasObserverThreadToProcess(fromState: ScheduleAbstractState): boolean {
-        throw new ImplementMeException();
+        for (const t of fromState.getThreadStates()) {
+            const a = this._task.getActorByName(t.getActorId());
+            if (a.isObserver) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private specificationStep(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
+        throw new ImplementMeException();
+    }
+
+    private setCompState(inSchedule: Schedule, ofThreadWithIdx: number, compState: number): Schedule {
+        return inSchedule.set(ofThreadWithIdx,
+            inSchedule.get(ofThreadWithIdx).withComputationState(compState));
+    }
+
+    /**
+     * Given the schedule `threadStates` based on that `takenStep` was conducted,
+     * create the set of succesor schedules.
+     *
+     * @param threadStates
+     * @param takenStep
+     */
+    private computeNextSchedules(threadStates: Schedule, takenStep: StepInformation): Schedule[] {
+        Preconditions.checkNotUndefined(threadStates);
+        Preconditions.checkNotUndefined(takenStep);
+        Preconditions.checkArgument(takenStep.ops.length === 1);
+
+        const stepOp = takenStep.ops[0];
+        const steppedThreadIdx = takenStep.threadIndex;
+
+        // Set the new control location
+        const steppedThread = threadStates.get(steppedThreadIdx)
+            .withLocationId(takenStep.succLoc);
+        let resultBase = threadStates.set(steppedThreadIdx, steppedThread);
+
+        // TODO: Where and how to handle the `clone` statement?
+
+        //
+        // Handle different statements that start other threads and wait for them
+        //
+        if (stepOp.ast instanceof CallStatement) {
+            const call = stepOp.ast as CallStatement;
+            if (call.calledMethod.text == "_RUNTIME_signalFailure") {
+                resultBase = this.setCompState(resultBase, steppedThreadIdx, THREAD_STATE_FAILURE);
+            }
+        } else if (stepOp.ast instanceof BroadcastMessageStatement) {
+            const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
+            const msg: string = this.evaluateToConcreteMessage(stmt.msg);
+            const waitForIndices: number[] = this.getAllMessageReceiverThreadsFrom(threadStates, msg);
+
+            // Prepare the waiting threads for running
+            for (const waitForThreadIdx of waitForIndices) {
+                resultBase = this.setCompState(resultBase, waitForThreadIdx, THREAD_STATE_YIELD);
+            }
+
+        } else if (stepOp.ast instanceof BroadcastAndWaitStatement) {
+            const stmt: BroadcastAndWaitStatement = stepOp.ast as BroadcastAndWaitStatement;
+            const msg: string = this.evaluateToConcreteMessage(stmt.msg);
+            const waitForIndices: number[] = this.getAllMessageReceiverThreadsFrom(threadStates, msg);
+            const waitFor: ThreadState[] = waitForIndices.map((idx) => threadStates.get(idx));
+
+            // Prepare the waiting threads for running
+            for (const waitForThreadIdx of waitForIndices) {
+                resultBase = this.setCompState(resultBase, waitForThreadIdx, THREAD_STATE_YIELD);
+            }
+
+            // Wait for all triggered threads to finish
+            resultBase = resultBase.set(steppedThreadIdx, steppedThread.withWaitingForThreads(
+                    steppedThread
+                        .getWaitingForThreads()
+                        .union(waitFor.map((t) => t.getThreadId()))));
+
+        } else if (stepOp.ast instanceof WaitUntilStatement) {
+            const stmt: WaitUntilStatement = stepOp.ast as WaitUntilStatement;
+
+            // ASSUMPTION:
+            //   For each WaitUntilStatement exists a special script that is triggered
+            //   whenever the condition is met. The body of this script is empty.
+
+            // const waitfor: ThreadState = this.getConditionCheckThreadFrom(threadStates, stmt.cond);
+            // Preconditions.checkState(waitfor !== null, "There must be one condition check thread");
+
+            // TODO:
+            //   We might have to introduce an EXIT code of threads that signals
+            //   whether or not a specific control location has been reached while
+            //   processing the body.
+            throw new ImplementMeException();
+
+        } else if (stepOp.ast instanceof WaitSecsStatement) {
+            const stmt: WaitSecsStatement = stepOp.ast as WaitSecsStatement;
+            // const timeCond: BooleanExpression = this.createTimeCond(stmt.secs);
+            // const waitfor: ThreadState = this.createTemporaryCheckThreadFor(timeCond);
+
+            // TODO:
+            //   Since (1) the `WaitSecsStatement` can be parameterized with
+            //   a number expression, and (2) the condition is relative to the
+            //   time the statement was invoked, a more elaborated logic is needed here.
+            throw new ImplementMeException();
+        }
+
+        if (takenStep.isInnerAtomic) {
+            if (steppedThread.getComputationState() !== THREAD_STATE_RUNNING_ATOMIC) {
+                resultBase = this.setCompState(resultBase, steppedThreadIdx, THREAD_STATE_RUNNING_ATOMIC);
+            }
+        } else {
+            // The current state is either in RUNNING or RUNNING_ATOMIC
+            Preconditions.checkState(steppedThread.getComputationState() == THREAD_STATE_RUNNING
+                || steppedThread.getComputationState() == THREAD_STATE_RUNNING_ATOMIC);
+
+
+            // YIELD the current state if it is not yet on a terminating control location
+            // of the script.
+            const nextOps = this.resolveLeavingOps(steppedThread);
+            if (nextOps.length == 0) {
+                // Set to THREAD_STATE_DONE if on a terminating location
+                resultBase = this.setCompState(resultBase, steppedThreadIdx, THREAD_STATE_DONE);
+            }
+
+            // Determine and set the next thread to step
+            const nextNonObserverThreadToStep: number = this.determineNextNonObserverThreadToStep(resultBase, steppedThreadIdx);
+
+            if (nextOps.length > 0) {
+                resultBase = this.setCompState(resultBase, steppedThreadIdx, THREAD_STATE_YIELD);
+            }
+
+            if (nextNonObserverThreadToStep > -1) {
+                resultBase = this.setCompState(resultBase, nextNonObserverThreadToStep, THREAD_STATE_RUNNING);
+            }
+        }
+
+        // TODO: Different schedules that were triggered by different events
+
+        // TODO: WaitUntilStatement (should trigger a corresponding hat with ConditionReachedEvent and waits for it)
+        // TODO: WaitSecsStatement (also triggers a hat with ConditionReachedEvent and waits for it)
+        // TODO: BroadcastAndWaitStatement (triggeres all registered hats and waits for them)
+
+        // TODO: Hats to activate:
+        //  - BootStrap
+        //  - AfterBootstrap
+        //  - Startup
+        //  - StartedAsClone
+        //  - ReceivedMessage (after a Broadcast op)
+        //  - ReachedCondition (after each user-visible state)
+
+        // TODO: Mouse inputs, keyboard inputs, microphone inputs, others?
+
+        // TODO: Produce a state with THREAD_STATE_RUNNING_ATOMIC if isInnerAtomic
+
+        this.checkSchedule(resultBase);
+
+        return [resultBase];
+    }
+
+    private checkSchedule(sched: Schedule) {
+        for (const ts of sched) {
+            const ops = this.resolveLeavingOps(ts);
+            if (ts.getComputationState() == THREAD_STATE_RUNNING || ts.getComputationState() == THREAD_STATE_RUNNING_ATOMIC) {
+                Preconditions.checkState(ops.length > 0);
+            }
+        }
+    }
+
+    private getAllMessageReceiverThreadsFrom(threadStates: Schedule, msg: string): number[] {
+        const result: number[] = [];
+        let index = 0;
+        for (const t of threadStates) {
+            const script = this._task.getActorByName(t.getActorId()).getScript(t.getScriptId());
+            if (script.event instanceof MessageReceivedEvent) {
+                const ev: MessageReceivedEvent = script.event as MessageReceivedEvent;
+                const handled = this.evaluateToConcreteMessage(ev.message);
+                if (msg == handled) {
+                    result.push(index);
+                }
+            }
+            index++;
+        }
+        return result;
+    }
+
+    private determineNextNonObserverThreadToStep(resultBase: Schedule, steppedThreadIdx: number): number {
+        let indexToCheck = (steppedThreadIdx + 1) % resultBase.size;
+        let checked = 0;
+        while (checked <= resultBase.size) {
+            indexToCheck = (indexToCheck + 1) % resultBase.size;
+            const threadAtIndex = resultBase.get(indexToCheck);
+            if (this.isNonObserverThread(threadAtIndex)) {
+                if (threadAtIndex.getComputationState() === THREAD_STATE_RUNNING_ATOMIC) {
+                    throw new IllegalStateException("Not expecting this");
+
+                } else if (threadAtIndex.getComputationState() === THREAD_STATE_YIELD) {
+                    return indexToCheck;
+                }
+            }
+            checked++;
+        }
+
+        // Continue to execute the previously stepped thread of no other
+        // is ready to be stepped.
+        const stepped = resultBase.get(steppedThreadIdx);
+        if (this.isSteppable(stepped)) {
+            return steppedThreadIdx;
+        } else {
+            return -1;
+        }
+    }
+
+    private isSteppable(thread: ThreadState): boolean {
+        return thread.getComputationState() == THREAD_STATE_RUNNING_ATOMIC
+            || thread.getComputationState() == THREAD_STATE_RUNNING
+            || thread.getComputationState() == THREAD_STATE_YIELD;
+    }
+
+    private isNonObserverThread(thread: ThreadState) {
+        const actor = this._task.getActorByName(thread.getActorId());
+        return !actor.isObserver;
+    }
+
+    private evaluateToConcreteMessage(msg: StringExpression) {
+        if (msg instanceof StringLiteral) {
+            const lit = msg as StringLiteral;
+            return lit.text;
+        }
         throw new ImplementMeException();
     }
 }

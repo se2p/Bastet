@@ -26,8 +26,16 @@ import {Map as ImmMap, Record as ImmRec} from "immutable";
 import {ConcreteDomain, ConcreteElementFactory, ConcreteNumber, ConcreteNumberOrderLattice} from "./ConcreteElements";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
+import {
+    AbstractBoolean,
+    AbstractNumber,
+    AbstractNumberDomain,
+    AbstractString, BooleanTheory,
+    RationalNumberTheory
+} from "./MemoryTransformer";
+import {Identifier} from "../../syntax/ast/core/Identifier";
 
-export interface NumIntervalValue extends AbstractElement {
+export interface NumIntervalValueAttribs extends AbstractElement {
 
     minValue: ConcreteNumber;
     maxValue: ConcreteNumber;
@@ -41,7 +49,7 @@ const NumIntervalValueRecord = ImmRec({
 
 });
 
-export class NumIntervalValueImpl extends NumIntervalValueRecord implements NumIntervalValue {
+export class NumIntervalValue extends NumIntervalValueRecord implements NumIntervalValueAttribs {
 
     constructor(min: ConcreteNumber, max: ConcreteNumber) {
         super({minValue: min, maxValue: max});
@@ -96,7 +104,83 @@ export class NumIntervalLattice implements Lattice<NumIntervalValue> {
     }
 }
 
-export class NumIntervalValueDomain implements AbstractDomain<ConcreteNumber, NumIntervalValue> {
+export class NumIntervalTheory implements RationalNumberTheory<NumIntervalValue, AbstractBoolean> {
+
+    private readonly _dom: NumIntervalValueDomain;
+    private readonly _boolTheory: BooleanTheory<AbstractBoolean>;
+
+    constructor(dom: NumIntervalValueDomain, boolTheory: BooleanTheory<AbstractBoolean>) {
+        this._dom = Preconditions.checkNotUndefined(dom);
+        this._boolTheory = Preconditions.checkNotUndefined(boolTheory);
+    }
+
+    abstractNumberValue(id: Identifier): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+    bottomNumber(): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+    castBoolAsNumber(val: AbstractBoolean): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+    castStringAsNumber(str: AbstractString): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+    divide(op1: NumIntervalValue, op2: NumIntervalValue): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+    fromConcreteNumber(str: ConcreteNumber): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+    isGreaterThan(s1: NumIntervalValue, s2: NumIntervalValue): AbstractBoolean {
+        return this._boolTheory.fromBoolean(s1.maxValue > s2.minValue);
+    }
+
+    isLessThan(s1: NumIntervalValue, s2: NumIntervalValue): AbstractBoolean {
+        throw new ImplementMeException();
+    }
+
+    isNumberEqualTo(s1: NumIntervalValue, s2: NumIntervalValue): AbstractBoolean {
+        throw new ImplementMeException();
+    }
+
+    minus(op1: NumIntervalValue, op2: NumIntervalValue): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+    modulo(op1: NumIntervalValue, op2: NumIntervalValue): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+    multiply(op1: NumIntervalValue, op2: NumIntervalValue): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+    one(): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+    plus(op1: NumIntervalValue, op2: NumIntervalValue): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+    topNumber(): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+    zero(): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+}
+
+export class NumIntervalValueDomain implements AbstractNumberDomain {
 
     private readonly _lattice: NumIntervalLattice;
     private readonly _concreteDomain: ConcreteDomain<ConcreteNumber>;
@@ -119,7 +203,7 @@ export class NumIntervalValueDomain implements AbstractDomain<ConcreteNumber, Nu
                 maxElement = e;
             }
         }
-        return new NumIntervalValueImpl(minElement, maxElement);
+        return new NumIntervalValue(minElement, maxElement);
     }
 
     concretize(element: NumIntervalValue): Iterable<ConcreteNumber> {

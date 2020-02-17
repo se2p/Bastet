@@ -34,13 +34,10 @@ export class App {
 
     private readonly _actorMap: ActorMap;
 
-    private readonly _bootstrapper: Actor;
-
-    constructor(origin: string, ident: string, actorMap: ActorMap, bootstrapper: Actor) {
+    constructor(origin: string, ident: string, actorMap: ActorMap) {
         this._origin = Preconditions.checkNotUndefined(origin);
         this._ident = Preconditions.checkNotEmpty(ident);
         this._actorMap = Preconditions.checkIsDic(actorMap);
-        this._bootstrapper = Preconditions.checkNotUndefined(bootstrapper);
     }
 
     get origin(): string {
@@ -49,10 +46,6 @@ export class App {
 
     get ident(): string {
         return this._ident;
-    }
-
-    get bootstrapper(): Actor {
-        return this._bootstrapper;
     }
 
     get actorMap(): ActorMap {
@@ -85,17 +78,11 @@ export class App {
         return new MethodDefinitionList(result);
     }
 
-    public getInitScript(): Script {
-        Preconditions.checkNotUndefined(this._bootstrapper);
-        Preconditions.checkArgument(this.bootstrapper.scripts.length == 1);
-        return this.bootstrapper.scripts.values().next().value;
-    }
-
     private static EMPTY_APP: App = null;
 
     public static empty(): App {
        if (App.EMPTY_APP == null) {
-           App.EMPTY_APP = new App("", "empty", {}, Actors.defaultBoostraper());
+           App.EMPTY_APP = new App("", "empty", {});
        }
        return App.EMPTY_APP;
     }

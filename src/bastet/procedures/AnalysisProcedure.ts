@@ -23,6 +23,6 @@ import {App} from "../syntax/app/App";
 
 export interface AnalysisProcedure {
 
-    run(task: App) : {};
+    run(task: App) : Promise<{}>;
 
 }

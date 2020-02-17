@@ -28,7 +28,7 @@ export interface TransferRelation<E extends AbstractElement> {
 
 }
 
-export interface LabeledTransferRelation<E> extends TransferRelation<E>{
+export interface LabeledTransferRelation<E extends AbstractElement> extends TransferRelation<E>{
 
     abstractSuccFor(fromState: E, op: ProgramOperation): Iterable<E>;
 
@@ -51,6 +51,12 @@ export class LabeledTransferRelationImpl<E extends AbstractElement> implements L
 
     abstractSuccFor(fromState: E, op: ProgramOperation): Iterable<E> {
         return this._abstractSuccFor(fromState, op);
+    }
+
+    public static from<E extends AbstractElement>(tr: LabeledTransferRelation<E>) {
+        return new LabeledTransferRelationImpl<E>((e) => tr.abstractSucc(e),
+            (e, op) => tr.abstractSuccFor(e, op));
+
     }
 
 }

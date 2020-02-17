@@ -23,6 +23,7 @@ import {WithIdent} from "../../../../utils/WithIdent";
 import {AstNode} from "../../../ast/AstNode";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {BooleanExpression, NegationExpression} from "../../../ast/core/expressions/BooleanExpression";
+import {EpsilonStatement} from "../../../ast/core/statements/EpsilonStatement";
 
 export type OperationID = number;
 
@@ -96,6 +97,10 @@ export class RawOperation extends ProgramOperation {
 
 export class NoopProgramOperation extends ProgramOperation {
 
+    constructor() {
+        super(new EpsilonStatement());
+    }
+
     toString(): string {
         return "epsilon";
     }
@@ -106,7 +111,7 @@ export class ProgramOperations {
     private static opCodeToIdMap: Map<string, OperationID> = new Map();
     private static idToAstMap: Map<OperationID, AstNode> = new Map();
     private static opMap: Map<OperationID, ProgramOperation> = new Map();
-    private static readonly EPSILON_OP = new NoopProgramOperation(null);
+    private static readonly EPSILON_OP = new NoopProgramOperation();
     private static idSequencePos: OperationID;
 
     public static fresh(): OperationID {

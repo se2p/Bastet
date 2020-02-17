@@ -20,7 +20,7 @@
  */
 
 import {AbstractNode} from "../AstNode";
-import {StringExpression} from "./expressions/StringExpression";
+import {StringExpression, StringLiteral} from "./expressions/StringExpression";
 import {BooleanExpression} from "./expressions/BooleanExpression";
 import {StatementList} from "./statements/Statement";
 
@@ -28,10 +28,32 @@ export abstract class CoreEvent extends AbstractNode {
 
 }
 
-export class BootstrapEvent extends CoreEvent {
+export class MessageReceivedEvent extends CoreEvent {
+
+    private readonly _namespace: StringExpression;
+    private readonly _message: StringExpression;
+
+    constructor(namespace: StringExpression, message: StringExpression) {
+        super([namespace, message]);
+        this._namespace = namespace;
+        this._message = message;
+    }
+
+    get namespace(): StringExpression {
+        return this._namespace;
+    }
+
+    get message(): StringExpression {
+        return this._message;
+    }
+}
+
+export class BootstrapEvent extends MessageReceivedEvent {
+
+    public static readonly MSG: string = "__INIT";
 
     constructor() {
-        super([]);
+        super(StringLiteral.from("RUNTIME"), StringLiteral.from(BootstrapEvent.MSG));
     }
 
     private static INSTANCE: BootstrapEvent;
@@ -39,6 +61,25 @@ export class BootstrapEvent extends CoreEvent {
     public static instance(): BootstrapEvent {
         if (!this.INSTANCE) {
             this.INSTANCE = new BootstrapEvent();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
+export class StartupEvent extends MessageReceivedEvent {
+
+    public static readonly MSG: string = "__STARTUP";
+
+    constructor() {
+        super(StringLiteral.from("RUNTIME"), StringLiteral.from(StartupEvent.MSG));
+    }
+
+    private static INSTANCE: StartupEvent;
+
+    public static instance(): StartupEvent {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new StartupEvent();
         }
         return this.INSTANCE;
     }
@@ -113,23 +154,6 @@ export class AfterStatementMonitoringEvent extends CoreEvent {
 
 }
 
-export class StartupEvent extends CoreEvent {
-
-    constructor() {
-        super([]);
-    }
-
-    private static INSTANCE: StartupEvent;
-
-    public static instance(): StartupEvent {
-        if (!this.INSTANCE) {
-            this.INSTANCE = new StartupEvent();
-        }
-        return this.INSTANCE;
-    }
-
-}
-
 export class CloneStartEvent extends CoreEvent {
 
     constructor() {
@@ -143,19 +167,6 @@ export class CloneStartEvent extends CoreEvent {
             this.INSTANCE = new CloneStartEvent();
         }
         return this.INSTANCE;
-    }
-
-}
-
-export class MessageReceivedEvent extends CoreEvent {
-
-    private readonly _namespace: StringExpression;
-    private readonly _message: StringExpression;
-
-    constructor(namespace: StringExpression, message: StringExpression) {
-        super([namespace, message]);
-        this._namespace = namespace;
-        this._message = message;
     }
 
 }

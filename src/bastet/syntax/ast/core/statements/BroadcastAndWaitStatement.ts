@@ -30,4 +30,8 @@ export class BroadcastAndWaitStatement extends Statement {
         super([msg]);
         this._msg = msg;
     }
+
+    get msg(): StringExpression {
+        return this._msg;
+    }
 }

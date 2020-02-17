@@ -27,3 +27,31 @@ export interface Expression extends AstNode {
     type: ScratchType;
 
 }
+
+export class Expressions {
+
+    private static EXPRESSION_ID_SEQ: number;
+    private static EXPR_TO_ID_MAP: Map<string, number>;
+
+    public static freshId(): number {
+        if (!Expressions.EXPRESSION_ID_SEQ) {
+            Expressions.EXPRESSION_ID_SEQ = 0;
+        }
+        return Expressions.EXPRESSION_ID_SEQ++;
+    }
+
+    static idFor(param: Expression): number {
+        if (!Expressions.EXPR_TO_ID_MAP) {
+            Expressions.EXPR_TO_ID_MAP = new Map();
+        }
+
+        const key = param.toTreeString();
+        let result = Expressions.EXPR_TO_ID_MAP.get(key);
+        if (result === undefined)  {
+            result = this.freshId();
+            Expressions.EXPR_TO_ID_MAP.set(key, result);
+        }
+
+        return result;
+    }
+}

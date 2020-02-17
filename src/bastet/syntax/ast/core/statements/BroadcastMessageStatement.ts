@@ -31,4 +31,7 @@ export class BroadcastMessageStatement extends Statement {
         this._msg = msg;
     }
 
+    get msg(): StringExpression {
+        return this._msg;
+    }
 }

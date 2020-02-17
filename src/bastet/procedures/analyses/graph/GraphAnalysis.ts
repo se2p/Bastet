@@ -19,18 +19,20 @@
  *
  */
 
-import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
+import {ProgramAnalysis, TransitionLabelProvider, WrappingProgramAnalysis} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
-import {StateSet} from "../../algorithms/StateSet";
 import {
     GraphAbstractDomain,
     GraphAbstractState,
     GraphAbstractStateFactory,
     GraphConcreteState
 } from "./GraphAbstractDomain";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {App} from "../../../syntax/app/App";
 import {GraphTransferRelation} from "./GraphTransferRelation";
+import {AbstractElement} from "../../../lattices/Lattice";
+import {StateSet} from "../../algorithms/StateSet";
+import {Preconditions} from "../../../utils/Preconditions";
+import {GraphToDot} from "./GraphToDot";
 
 export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState> {
 
@@ -40,8 +42,11 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
 
     private readonly _transferRelation: GraphTransferRelation;
 
-    constructor(wrappedAnalysis: ProgramAnalysis<any, any>) {
-        this._wrappedAnalysis = wrappedAnalysis;
+    private readonly _task: App;
+
+    constructor(task: App, wrappedAnalysis: ProgramAnalysis<any, any>) {
+        this._task = Preconditions.checkNotUndefined(task);
+        this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new GraphAbstractDomain();
         this._transferRelation = new GraphTransferRelation((e) => this._wrappedAnalysis.abstractSucc(e));
     }
@@ -51,15 +56,22 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     join(state1: GraphAbstractState, state2: GraphAbstractState): GraphAbstractState {
-        throw new ImplementMeException();
+        return this._abstractDomain.lattice.join(state1, state2);
     }
 
     merge(state1: GraphAbstractState, state2: GraphAbstractState): boolean {
-        throw new ImplementMeException();
+        // MERGE-SEP
+        return false;
     }
 
-    stop(state: GraphAbstractState, reached: StateSet<GraphAbstractState>): GraphAbstractState {
-        throw new ImplementMeException();
+    stop(state: GraphAbstractState, reached: Iterable<GraphAbstractState>): boolean {
+        for (const r of reached) {
+            const w: AbstractElement = state.getWrappedState();
+            if (this._wrappedAnalysis.stop(w, [r.getWrappedState()])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     target(state: GraphAbstractState): boolean {
@@ -67,7 +79,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     widen(state: GraphAbstractState): GraphAbstractState {
-        throw new ImplementMeException();
+        // TODO: Implement the widening (delegate to wrapped analyses)
+        return state;
     }
 
     get abstractDomain(): AbstractDomain<GraphConcreteState, GraphAbstractState> {
@@ -79,9 +92,26 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     initialStatesFor(task: App): GraphAbstractState[] {
+        Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
             return GraphAbstractStateFactory.withFreshID([], w);
         } );
     }
 
+    private determineTransLabProvider(from: ProgramAnalysis<any, any>): TransitionLabelProvider {
+        if ('getTransitionLabel' in from) {
+            return from as TransitionLabelProvider;
+        } else if ('wrappedAnalysis' in from) {
+            const wrapper = from as WrappingProgramAnalysis<any, any>
+            return this.determineTransLabProvider(wrapper.wrappedAnalysis);
+        } else {
+            return null;
+        }
+    }
+
+    exportAnalysisResult(reachedPrime: StateSet<GraphAbstractState>, frontierPrime: StateSet<GraphAbstractState>) {
+        const trp = this.determineTransLabProvider(this.wrappedAnalysis);
+        const exporter = new GraphToDot(trp, reachedPrime, frontierPrime);
+        exporter.writeToFile(`output/reachability-graph.dot`);
+    }
 }
