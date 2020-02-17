@@ -23,8 +23,15 @@ import {Statement} from "./Statement";
 import {Identifier} from "../Identifier";
 import {ScratchType} from "../ScratchType";
 import {StringExpression} from "../expressions/StringExpression";
+import {Variable} from "../Variable";
+import {Preconditions} from "../../../../utils/Preconditions";
+import {AstNode} from "../../AstNode";
 
 export abstract class DeclarationStatement extends Statement {
+
+    constructor(childs: AstNode[]) {
+        super(childs);
+    }
 
 }
 
@@ -37,37 +44,40 @@ export interface VariableDeclaration {
 
 export abstract class DeclareVariableStatement extends DeclarationStatement implements VariableDeclaration {
 
-    private readonly _ident: Identifier;
-    private readonly _type: ScratchType;
+    private readonly _variable: Variable;
 
-    constructor(ident: Identifier, type: ScratchType) {
-        super([ident, type]);
-        this._ident = ident;
-        this._type = type;
+    constructor(variable: Variable) {
+        Preconditions.checkNotUndefined(variable);
+        super([variable.identifier, variable.type]);
     }
 
     get ident(): Identifier {
-        return this._ident;
+        return this._variable.identifier;
     }
 
     get type(): ScratchType {
-        return this._type;
+        return this._variable.type;
     }
 
+    get variable(): Variable {
+        return this._variable;
+    }
 }
 
 export class DeclareStackVariableStatement extends DeclareVariableStatement {
 
-    constructor(ident: Identifier, type: ScratchType) {
-        super(ident, type);
+    constructor(variable: Variable) {
+        super(variable);
     }
+
 }
 
 export class DeclareActorVariableStatement extends DeclareVariableStatement {
 
-    constructor(ident: Identifier, type: ScratchType) {
-        super(ident, type);
+    constructor(variable: Variable) {
+        super(variable);
     }
+
 }
 
 export class DeclareAttributeStatement extends DeclarationStatement {
@@ -81,6 +91,13 @@ export class DeclareAttributeStatement extends DeclarationStatement {
         this._type = type;
     }
 
+    get type(): ScratchType {
+        return this._type;
+    }
+
+    get attribute(): StringExpression {
+        return this._attribute;
+    }
 }
 
 export class DeclareAttributeOfStatement extends DeclarationStatement {
@@ -96,5 +113,16 @@ export class DeclareAttributeOfStatement extends DeclarationStatement {
         this._of = of;
     }
 
+    get attribute(): StringExpression {
+        return this._attribute;
+    }
+
+    get type(): ScratchType {
+        return this._type;
+    }
+
+    get of(): Identifier {
+        return this._of;
+    }
 }
 

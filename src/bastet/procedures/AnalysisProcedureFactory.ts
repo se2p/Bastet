@@ -38,6 +38,7 @@ import {
 } from "../utils/ConjunctiveNormalForm";
 import {BDDLibrary, BDDLibraryFactory} from "../utils/bdd/BDD";
 import {Z3MemoryTheoryInContext} from "../utils/z3wrapper/Z3MemoryTheory";
+import {SSAAnalysis} from "./analyses/ssa/SSAAnalysis";
 
 export class AnalysisProcedureConfig {
 
@@ -62,7 +63,8 @@ export class AnalysisProcedureFactory {
                     = new Z3MemoryTheoryInContext(defaultContect);
 
                 const memAnalysis = new SyMemAnalysis(solver.lattice, bddlib.lattice, theories);
-                const schedAnalysis = new ScheduleAnalysis({}, task, memAnalysis);
+                const ssaAnalysis = new SSAAnalysis(task, memAnalysis);
+                const schedAnalysis = new ScheduleAnalysis({}, task, ssaAnalysis);
                 const graphAnalysis = new GraphAnalysis(task, schedAnalysis);
 
                 const frontier: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();

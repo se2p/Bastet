@@ -26,32 +26,42 @@ import {ParameterDeclarationList} from "./ParameterDeclaration";
 import {StatementList} from "./statements/Statement";
 import {ScratchType, VoidType} from "./ScratchType";
 import {StringLiteral} from "./expressions/StringExpression";
+import {Variable, VariableWithDataLocation} from "./Variable";
+import {DataLocations} from "../../app/controlflow/DataLocation";
 
 
 export class ResultDeclaration extends AbstractNode {
 
-    private readonly _ident: Identifier;
-    private readonly _type: ScratchType;
+    private readonly _variable: Variable;
 
-    constructor(ident: Identifier, type: ScratchType) {
-        super([ident, type]);
-        this._ident = ident;
-        this._type = type;
-    }
-
-    private static readonly VOID = new ResultDeclaration(new Identifier(new StringLiteral("")), VoidType.instance());
-
-    public static void(): ResultDeclaration {
-        return this.VOID;
+    constructor(variable: Variable) {
+        super([variable.identifier, variable.type]);
+        this._variable = variable;
     }
 
     get ident(): Identifier {
-        return this._ident;
+        return this._variable.identifier;
     }
 
     get type(): ScratchType {
-        return this._type;
+        return this._variable.type;
     }
+
+    get variable(): Variable {
+        return this._variable;
+    }
+
+    private static VOID;
+
+    public static void(): ResultDeclaration {
+        if (!ResultDeclaration.VOID) {
+            ResultDeclaration.VOID = new ResultDeclaration(
+                new VariableWithDataLocation(DataLocations.createTypedLocation(
+                    new Identifier(new StringLiteral("")), VoidType.instance())));
+        }
+        return ResultDeclaration.VOID;
+    }
+
 }
 
 export class MethodSignature extends AbstractNode {

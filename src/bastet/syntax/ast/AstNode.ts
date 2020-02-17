@@ -23,6 +23,7 @@ import {CoreVisitor} from "./CoreVisitor";
 import {List as ImmList} from "immutable"
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
+import {Preconditions} from "../../utils/Preconditions";
 
 export interface AstNode {
 
@@ -51,6 +52,9 @@ export abstract class AbstractNode implements AstNode {
     private treeString: string = null;
 
     protected constructor(childs: AstNode[]) {
+        for (const c of childs) {
+            Preconditions.checkNotUndefined(c);
+        }
         this._children = childs;
     }
 

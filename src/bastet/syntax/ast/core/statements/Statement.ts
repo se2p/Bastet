@@ -19,10 +19,14 @@
  *
  */
 
-import {AbstractNode} from "../../AstNode";
+import {AbstractNode, AstNode} from "../../AstNode";
 import {AstNodeList} from "../../AstNodeList";
 
 export abstract class Statement extends AbstractNode {
+
+    constructor(childs: AstNode[]) {
+        super(childs);
+    }
 
 }
 

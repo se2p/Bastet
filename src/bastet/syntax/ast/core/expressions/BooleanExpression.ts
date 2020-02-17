@@ -28,6 +28,7 @@ import {Identifier} from "../Identifier";
 import {UnaryExpression} from "./UnaryExpression";
 import {StringExpression} from "./StringExpression";
 import {NumberExpression} from "./NumberExpression";
+import {Variable, VariableExpression} from "../Variable";
 
 export type BooleanLiteralExpression = BooleanExpression;
 
@@ -117,18 +118,8 @@ export class BooleanLiteral extends AbstractBooleanExpression {
 
 }
 
-export class BooleanVariableExpression extends AbstractBooleanExpression {
+export class BooleanVariableExpression extends VariableExpression {
 
-    private readonly _variable: Identifier;
-
-    constructor(variable: Identifier) {
-        super([variable]);
-        this._variable = variable;
-    }
-
-    get ident(): Identifier {
-        return this._variable;
-    }
 }
 
 export class NegationExpression extends AbstractBooleanExpression {

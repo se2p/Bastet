@@ -24,7 +24,7 @@ import {StringLiteral} from "./expressions/StringExpression";
 
 export class Identifier extends AbstractNode {
 
-    private static readonly FRESH_PREFIX = "__tmp_"
+    private static readonly FRESH_PREFIX = "__tmp_";
 
     private readonly _name: StringLiteral;
 

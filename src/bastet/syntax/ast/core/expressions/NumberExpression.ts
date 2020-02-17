@@ -27,6 +27,8 @@ import {AstNode} from "../../AstNode";
 import {StringExpression, StringLiteral} from "./StringExpression";
 import {BooleanExpression} from "./BooleanExpression";
 import {BinaryExpression} from "./BinaryExpression";
+import {AbstractVariable, Variable, VariableExpression} from "../Variable";
+import {ListExpression} from "./ListExpression";
 
 export interface NumberExpression extends Expression {
 
@@ -79,18 +81,8 @@ export class NumberLiteral extends AbstractNumberExpression {
 
 }
 
-export class NumberVariableExpression extends AbstractNumberExpression {
+export class NumberVariableExpression extends VariableExpression implements NumberExpression {
 
-    private readonly _id: Identifier;
-
-    constructor(id: Identifier) {
-        super([id]);
-        this._id = id;
-    }
-
-    get id(): Identifier {
-        return this._id;
-    }
 }
 
 export class StringAsNumberExpression extends AbstractNumberExpression {
@@ -102,6 +94,9 @@ export class StringAsNumberExpression extends AbstractNumberExpression {
         this._toConvert = str;
     }
 
+    get toConvert(): StringExpression {
+        return this._toConvert;
+    }
 }
 
 export class BoolAsNumberExpression extends AbstractNumberExpression {
@@ -113,6 +108,9 @@ export class BoolAsNumberExpression extends AbstractNumberExpression {
         this._toConvert = toconvert;
     }
 
+    get toConvert(): BooleanExpression {
+        return this._toConvert;
+    }
 }
 
 export class TimerExpression extends AbstractNumberExpression {
@@ -132,6 +130,9 @@ export class LengthOfStringExpression extends AbstractNumberExpression {
         this._str = str;
     }
 
+    get str(): StringExpression {
+        return this._str;
+    }
 }
 
 export class LengthOListExpression extends AbstractNumberExpression {
@@ -143,19 +144,30 @@ export class LengthOListExpression extends AbstractNumberExpression {
         this._listVar = listVar;
     }
 
+    get listVar(): Identifier {
+        return this._listVar;
+    }
+
 }
 
 export class IndexOfExpression extends AbstractNumberExpression {
 
+    private readonly _variable: Variable;
     private readonly _expr: Expression;
-    private readonly _variable: Identifier;
 
-    constructor(expr: Expression, variable: Identifier) {
-        super([expr, variable]);
+    constructor(expr: Expression, variable: Variable) {
+        super([expr, variable.identifier]);
         this._expr = expr;
         this._variable = variable;
     }
 
+    get expr(): Expression {
+        return this._expr;
+    }
+
+    get variable(): Variable {
+        return this._variable;
+    }
 }
 
 export class PickRandomFromExpression extends AbstractNumberExpression {
@@ -169,6 +181,13 @@ export class PickRandomFromExpression extends AbstractNumberExpression {
         this._to = to;
     }
 
+    get from(): NumberExpression {
+        return this._from;
+    }
+
+    get to(): NumberExpression {
+        return this._to;
+    }
 }
 
 export class RoundExpression extends AbstractNumberExpression {
@@ -180,6 +199,9 @@ export class RoundExpression extends AbstractNumberExpression {
         this._num = num;
     }
 
+    get num(): NumberExpression {
+        return this._num;
+    }
 }
 
 export class NumFunctExpression extends AbstractNumberExpression {
@@ -193,6 +215,13 @@ export class NumFunctExpression extends AbstractNumberExpression {
         this._arg = arg;
     }
 
+    get funct(): StringLiteral {
+        return this._funct;
+    }
+
+    get arg(): NumberExpression {
+        return this._arg;
+    }
 }
 
 export class MultiplyExpression extends BinaryNumberExpression {

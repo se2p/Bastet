@@ -25,7 +25,7 @@ import {Maps} from "../../utils/Maps";
 import {Lists} from "../../utils/Lists";
 import {ImmutableList} from "../../utils/ImmutableList";
 import {ImmutableMap} from "../../utils/ImmutableMap";
-import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
+import {DataLocation, DataLocationMap, TypedDataLocation} from "./controlflow/DataLocation";
 import {MethodDefinition, MethodDefinitionMap, MethodSignature, MethodSignatureMap} from "../ast/core/MethodDefinition";
 import {ActorMode} from "../ast/core/ActorDefinition";
 import {Preconditions} from "../../utils/Preconditions";
@@ -66,7 +66,7 @@ export class Actor {
     private readonly _resources: ImmutableMap<string, AppResource>;
 
     /** Set of the actor's data locations (variables) */
-    private readonly _datalocs: ImmutableMap<string, DataLocation>;
+    private readonly _datalocs: ImmutableMap<string, TypedDataLocation>;
 
     /** List of initialization statements. Includes declarations and initializations. */
     private readonly _initScript: Script;
@@ -126,12 +126,12 @@ export class Actor {
         return this._inheritsFrom;
     }
 
-    get datalocs(): IterableIterator<DataLocation> {
+    get datalocs(): IterableIterator<TypedDataLocation> {
         return this._datalocs.values();
     }
 
-    get datalocMap(): ImmutableMap<string, DataLocation> {
-        return this._resources;
+    get datalocMap(): ImmutableMap<string, TypedDataLocation> {
+        return this._datalocs;
     }
 
     get resources(): IterableIterator<AppResource> {

@@ -27,6 +27,7 @@ import {NumberExpression} from "./NumberExpression";
 import {BooleanExpression} from "./BooleanExpression";
 import {Identifier} from "../Identifier";
 import {BinaryExpression} from "./BinaryExpression";
+import {Variable, VariableExpression} from "../Variable";
 
 export interface StringExpression extends Expression {
 
@@ -62,13 +63,10 @@ export class StringLiteral extends AbstractStringExpression {
     }
 }
 
-export class StringVariableExpression extends AbstractStringExpression {
+export class StringVariableExpression extends VariableExpression {
 
-    private readonly _variable: Identifier;
-
-    constructor(variable: Identifier) {
-        super([variable]);
-        this._variable = variable;
+    constructor(variable: Variable) {
+        super(variable);
     }
 }
 

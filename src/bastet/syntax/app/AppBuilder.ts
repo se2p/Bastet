@@ -23,7 +23,7 @@ import {Actor, ActorMap, Actors} from "./Actor";
 import {App} from "./App";
 import {AppResource, AppResourceMap} from "./AppResource";
 import {Script} from "./controlflow/Script";
-import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
+import {DataLocation, DataLocationMap, DataLocations, TypedDataLocation} from "./controlflow/DataLocation";
 import {ScratchType, VoidType} from "../ast/core/ScratchType";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {TransitionRelation, TransitionRelations} from "./controlflow/TransitionRelation";
@@ -50,6 +50,7 @@ import {Lists} from "../../utils/Lists";
 import {Method} from "./controlflow/Method";
 import {DeclareStackVariableStatement} from "../ast/core/statements/DeclarationStatement";
 import {Identifier} from "../ast/core/Identifier";
+import {Variable, VariableWithDataLocation} from "../ast/core/Variable";
 
 export class AppBuilder {
 
@@ -159,7 +160,9 @@ export class AppBuilder {
             if (!ScratchType.isVoid(m.returns.type)) {
                 const resultVarIdent: Identifier = m.returns.ident;
                 const resultVarType: ScratchType = m.returns.type;
-                const declarationStmt = new DeclareStackVariableStatement(resultVarIdent, resultVarType);
+                const resultVar: Variable = new VariableWithDataLocation(
+                    DataLocations.createTypedLocation(resultVarIdent, resultVarType));
+                const declarationStmt = new DeclareStackVariableStatement(resultVar);
                 const dclStmtList = StatementList.from([declarationStmt]);
 
                 methodTr = TransitionRelations.concat(methodTr, dclStmtList.accept(visitor));
@@ -208,26 +211,6 @@ export class AppBuilder {
             result[methodName] = methodDef;
         }
 
-        return result;
-    }
-
-    private buildMethodResultDef(resultDecl: ResultDeclaration): DataLocation {
-        if (resultDecl.type == VoidType.instance()) {
-            return DataLocation.void();
-        } else {
-            const id: string = resultDecl.ident.text;
-            const t: ScratchType = resultDecl.type;
-            return new DataLocation(resultDecl, id, t);
-        }
-    }
-
-    private buildParameterDeclarations(parameterListContext: ParameterDeclarationList): DataLocationMap {
-        let result: DataLocationMap = {};
-        for (let p of parameterListContext.elements) {
-            const id: string = p.ident.text;
-            const t: ScratchType = p.type;
-            result[id] = new DataLocation(p, id, t);
-        }
         return result;
     }
 
