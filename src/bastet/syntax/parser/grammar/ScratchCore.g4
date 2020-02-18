@@ -238,6 +238,7 @@ commonStmt  :
  |  'change'  variable 'by' expression # ChangeVarByStatement
  |  'change' 'attribute' stringExpr 'by' numExpr # ChagenAttributeByStatement
  |  'epsilon' # EpsilonStatement
+ |  'assume' boolExpr # AssumeStatement
  |  setStmt # SetStatement
  ;
 

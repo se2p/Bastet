@@ -30,7 +30,7 @@ import {
     ActorRoleModeContext,
     AddElementToStatementContext, AfterBootstrapMonitoringEventContext,
     AfterStatementMonitoringEventContext,
-    AppMessageContext,
+    AppMessageContext, AssumeStatementContext,
     BoolAndExpressionContext,
     BoolAsNumExpressionContext,
     BoolAsStringExpressionContext,
@@ -319,6 +319,8 @@ import {App} from "../app/App";
 import {AbstractVariable, Variable, VariableWithDataLocation} from "../ast/core/Variable";
 import {DataLocations} from "../app/controlflow/DataLocation";
 import {NumberVariable} from "../../procedures/domains/MemoryTransformer";
+import {AssumeStatement} from "../ast/core/statements/AssumeStatement";
+import {Bool} from "../../utils/z3wrapper/libz3";
 
 const toposort = require('toposort')
 
@@ -1316,6 +1318,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             return TransformerResult.withNode(
                 new DeclareStackVariableStatement(variable));
         }
+    }
+
+    public visitAssumeStatement(ctx: AssumeStatementContext): TransformerResult {
+        const exprTr = ctx.boolExpr().accept(this);
+        return new TransformerResult(exprTr.statementsToPrepend,
+            new AssumeStatement(exprTr.node as BooleanExpression));
     }
 
     public visitDefaultBoolExpression(ctx: DefaultBoolExpressionContext) : TransformerResult {
