@@ -11,7 +11,6 @@ cache:
 install_dependencies:
   stage: build
   script:
-    - apt-get install -y default-jre
     - npm install -D typescript
     - npm install
     - mkdir -p output/static
