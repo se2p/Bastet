@@ -22,7 +22,7 @@ actor Elefant1 is ScratchSprite begin
             wait 1 seconds
             changeCostumeTo("Elefant3")
             wait 1 seconds
-            changeCostumeTo("Elefant4"
+            changeCostumeTo("Elefant4")
             wait 1 seconds
             changeCostumeTo("Elefant5")
             wait 1 seconds

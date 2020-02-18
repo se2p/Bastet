@@ -65,6 +65,7 @@ actor DirectorObserver is Observer begin
             end
         end
 
+        // TODO: Check if changed within the last 1000 msec
        if timestamp - _RUMTIME_millis > 1000
             assert (result)
             define timestamp as _RUMTIME_millis()

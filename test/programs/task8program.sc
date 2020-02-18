@@ -1,6 +1,7 @@
 program Task8Program
 
 actor Stage is ScratchStage begin
+    // TODO: The URIs must be strings (in quotes)
     sound Plopp 83a9787d4cb6f3b7632b4ddfebf74367.wav
     image Bühnenbild1 78d212878a6f0a2b3067aa2c8bca28e1.png
     image Hintergrund-Manege-klein d6aca145c741a1b12309267dcecdbd49.svg
@@ -45,6 +46,7 @@ actor Katze is ScratchSprite begin
     script on green flag do begin
         repeat forever begin
             if touchingObject(“Ball”) then begin
+                // TOOD: Parsing might not work here
                 sayTextFor(“Hab ich dich!”, 2.0 secs)
             end
         end

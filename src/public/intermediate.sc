@@ -67,9 +67,15 @@ role ScratchEntity is RuntimeEntity begin
 
     extern radToDeg(n: number) returns number
 
+    // TODO: sqrt
+
     // @Category "Looks"
     define changeActiveGraphicTo (id: string) begin
-       // JAVASCRIPT CODE here (signaled by the 'external' keyword)
+        // TODO: Set the following attributes:
+        //    define current_costume_name as id
+        //    define current_costume_width as _RUNTIME_getImageWidth(id)
+        //    define current_costume_height as _RUNTIME_getImageHeight(id)
+
     end
 
     // @Category "Looks"
@@ -296,6 +302,7 @@ role ScratchSprite is ScratchEntity begin
 
         declare leg_a as number
         declare leg_b as number
+        // TODO: Query attributes of myself and the other actor
         define leg_a as _RUNTIME_getImageWidth() //TODO use image identifier
         define leg_b as _RUNTIME_getImageHeight() //TODO use image identifier
 
@@ -304,6 +311,7 @@ role ScratchSprite is ScratchEntity begin
 
         declare leg_a_other as number
         declare leg_b_other as number
+        // TODO: Query attributes of myself and the other actor
         define leg_a_other as _RUNTIME_getImageWidth() //TODO use image identifier
         define leg_b_other as _RUNTIME_getImageHeight() //TODO use image identifier
 
@@ -316,6 +324,7 @@ role ScratchSprite is ScratchEntity begin
         define y_other as attribute "y" of obj
 
         declare result as boolean
+        // TODO: Fix this (some kind of negation needed?)
         define result as (((mathSqrt((x + x_other)*(x + x_other) + (y + y_other) * (y + y_other)) - radius - radius_other) > 0)
 
     end returns result : boolean
@@ -338,14 +347,14 @@ role ScratchSprite is ScratchEntity begin
     define sayTextFor (msg: string, scs: number) begin
         // msgBounded = substr(msg, 0, 330)
         define bubbleText as msg
-        define bubbleStart as _RUNTIME_millis
+        define bubbleStart as _RUNTIME_millis()
         define bubbleType as 'say'
         define bubbleDuration as scs
     end
 
     define sayText (msg: string) begin
         define bubbleText as msg
-        define bubbleStart as _RUNTIME_millis
+        define bubbleStart as _RUNTIME_millis()
         define bubbleType as 'say'
     end
 
@@ -376,6 +385,7 @@ role ScratchSprite is ScratchEntity begin
             define max as 180
             define range as (max - min) +1
 
+            // TODO: Might not parse
             define result as dir - (Math.floor((dir - min) / range) * range);
     end returns result : number
 

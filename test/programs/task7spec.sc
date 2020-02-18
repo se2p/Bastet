@@ -47,8 +47,8 @@ actor DirectorObserver is Observer begin
         end
        // The actual invariant check
 
-       if timestamp - _RUMTIME_millis > 2000
-            assert (actor_1_switched_costume )
+       if _RUNTIME_millis() - timestamp > 2000
+            assert (actor_1_switched_costume)
             define timestamp as _RUMTIME_millis()
        end
     end returns actor_1_switched_costume: boolean
