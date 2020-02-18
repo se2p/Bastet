@@ -13,6 +13,7 @@ install_dependencies:
   script:
     - npm install -D typescript
     - npm install
+    - mkdir -p output/static
   artifacts:
     paths:
       - node_modules/
