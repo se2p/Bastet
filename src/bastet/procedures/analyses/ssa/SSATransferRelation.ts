@@ -57,7 +57,7 @@ export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
         }
 
         const result: SSAState[] = [];
-        for (const w of this._wrapped.abstractSuccFor(fromState, opPrime)) {
+        for (const w of this._wrapped.abstractSuccFor(fromState.wrappedState, opPrime)) {
             result.push(ssasigner.ssa.withWrappedState(w));
         }
 

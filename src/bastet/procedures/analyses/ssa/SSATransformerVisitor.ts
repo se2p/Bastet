@@ -133,6 +133,7 @@ import {
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {Variable, VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
+import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 
 export class SSAssigner {
 
@@ -194,6 +195,10 @@ export class SSATransformerVisitor implements CoreVisitor<AstNode>,
 
     visit(node: AstNode): AstNode {
         throw new ImplementMeException();
+    }
+
+    visitAssumeStatement(node: AssumeStatement): AstNode {
+        return new AssumeStatement(node.condition.accept(this) as BooleanExpression);
     }
 
     visitBoolAsNumberExpression(node: BoolAsNumberExpression): AstNode {
@@ -368,7 +373,7 @@ export class SSATransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitStringLiteral(node: StringLiteral): AstNode {
-        throw new ImplementMeException();
+        return node;
     }
 
     visitStringVariableExpression(node: StringVariableExpression): AstNode {
