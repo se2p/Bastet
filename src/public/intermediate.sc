@@ -359,20 +359,26 @@ role ScratchSprite is ScratchEntity begin
         setDirection(direction + degrees)
     end
 
-    define setDirection(direction: number) begin
+    define setDirection(dir: number) begin
         // TODO do we need to check if we are in the stage
-
         // Make sure direction is between -179 and 180
-        declare min as number
-        declare max as number
-        declare range as number
-
-        define min as -179
-        define max as 180
-        define range as (max - min) +1
-
-        define direction as direction - (Math.floor((direction - min) / range) * range);
+        define direction as wrapClamp(dir)
     end
+
+    // Make sure our direction is always between -179 and 180
+    define wrapClamp(dir: number) begin
+            declare min as number
+            declare max as number
+            declare range as number
+            declare result as number
+
+            define min as -179
+            define max as 180
+            define range as (max - min) +1
+
+            define result as dir - (Math.floor((dir - min) / range) * range);
+    end returns result : number
+
 
 
     //    looks_show,            //   "show"
