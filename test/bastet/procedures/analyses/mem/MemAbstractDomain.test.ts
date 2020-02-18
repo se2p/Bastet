@@ -25,7 +25,7 @@ import {
     NumIntervalValueDomain
 } from "../../../../../src/bastet/procedures/domains/NumIntervalValueDomain";
 import {ConcreteNumberDomain} from "../../../../../src/bastet/procedures/domains/ConcreteElements";
-import {NumberType, ScratchType} from "../../../../../src/bastet/syntax/ast/core/ScratchType";
+import {NumberType} from "../../../../../src/bastet/syntax/ast/core/ScratchType";
 
 describe("MemAbstractStateImpl", () => {
 

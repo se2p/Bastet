@@ -1,7 +1,4 @@
-import assert from 'assert'
-import { Map } from 'immutable'
-import { ProductElement } from '../../../../../src/bastet/lattices/elements/ProductElement'
-import { MapElement } from '../../../../../src/bastet/lattices/elements/MapElement'
+import {Map} from 'immutable'
 
 describe('Functionality of immutable maps', function() {
 

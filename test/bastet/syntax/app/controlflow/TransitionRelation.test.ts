@@ -19,13 +19,12 @@
 
 import {Map as ImmMap, Set as ImmSet} from "immutable"
 import {
-    TransitionRelation, TransitionRelationBuilder,
+    TransitionRelation,
+    TransitionRelationBuilder,
     TransitionRelations
 } from "../../../../../src/bastet/syntax/app/controlflow/TransitionRelation";
 import {ControlLocation} from "../../../../../src/bastet/syntax/app/controlflow/ControlLocation";
-import {
-    ProgramOperations, RawOperation
-} from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperations, RawOperation} from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
 import {StopAllStatement} from "../../../../../src/bastet/syntax/ast/core/statements/TerminationStatement";
 
 describe("TransitionRelation", () => {

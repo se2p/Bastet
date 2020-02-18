@@ -27,7 +27,8 @@ import {
     MemAbstractStates
 } from "../../../../../src/bastet/procedures/analyses/mem/MemAbstractDomain";
 import {
-    ProgramOperation, ProgramOperationFactory
+    ProgramOperation,
+    ProgramOperationFactory
 } from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
 import {
     BooleanExpression,
@@ -40,10 +41,10 @@ import {
 import {Identifier} from "../../../../../src/bastet/syntax/ast/core/Identifier";
 import {NumIntervalValueDomain} from "../../../../../src/bastet/procedures/domains/NumIntervalValueDomain";
 import {FlatBooleanValueDomain} from "../../../../../src/bastet/procedures/domains/FlatBooleanValueDomain";
-import {FlatStringValueDomain} from "../../../../../src/bastet/procedures/domains/FlatStringValueDomain";
-import {ListValueDomain} from "../../../../../src/bastet/procedures/domains/ListValueDomain";
 import {
-    ConcreteBooleanDomain, ConcreteBoundedStringDomain, ConcreteBoundedStringListDomain,
+    ConcreteBooleanDomain,
+    ConcreteBoundedStringDomain,
+    ConcreteBoundedStringListDomain,
     ConcreteNumberDomain
 } from "../../../../../src/bastet/procedures/domains/ConcreteElements";
 import {StringAbstractDomain} from "../../../../../src/bastet/procedures/domains/StringAbstractDomain";
