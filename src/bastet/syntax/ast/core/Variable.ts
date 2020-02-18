@@ -75,7 +75,7 @@ export class VariableWithDataLocation extends AbstractExpression implements Vari
     constructor(dataloc: DataLocation) {
         super(ScratchType.fromId(dataloc.type), []);
         this._dataloc = dataloc;
-        this._identifier = new Identifier(StringLiteral.from(dataloc.ident));
+        this._identifier = Identifier.of(dataloc.ident);
     }
 
     get identifier(): Identifier {

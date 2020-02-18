@@ -57,7 +57,7 @@ export class ResultDeclaration extends AbstractNode {
         if (!ResultDeclaration.VOID) {
             ResultDeclaration.VOID = new ResultDeclaration(
                 new VariableWithDataLocation(DataLocations.createTypedLocation(
-                    new Identifier(new StringLiteral("")), VoidType.instance())));
+                    Identifier.of(""), VoidType.instance())));
         }
         return ResultDeclaration.VOID;
     }

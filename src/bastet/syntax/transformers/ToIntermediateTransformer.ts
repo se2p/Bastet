@@ -515,11 +515,11 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitIdentExpression(ctx: IdentExpressionContext): TransformerResult {
-        return TransformerResult.withNode(new Identifier(StringLiteral.from(ctx.Identifier().text)));
+        return TransformerResult.withNode(Identifier.of(ctx.Identifier().text));
     }
 
     public visitStrIdentExpression(ctx: StrIdentExpressionContext): TransformerResult {
-        return TransformerResult.withNode(new Identifier(StringLiteral.from(ctx.text)));
+        return TransformerResult.withNode(Identifier.of(ctx.text));
     }
 
     private buildArrayFrom<E extends AstNode>(elements: RuleNode[]): TransformerResultList<E> {
@@ -998,7 +998,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const callArgs = new ExpressionList([argsTr.node as Expression]);
         prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
         // - The actual call statement
-        const callMethodIdent = new Identifier(ctx.numFunct().accept(this).nodeOnly() as StringLiteral);
+        const callMethodIdent = Identifier.of((ctx.numFunct().accept(this).nodeOnly() as StringLiteral).text);
         const callStmt = new CallStatement(callMethodIdent, callArgs, OptionalAstNode.with(resultVarIdent));
         prepend = StatementLists.concat(prepend, new StatementList([callStmt]));
 
@@ -1636,7 +1636,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitVariable(ctx: VariableContext) : TransformerResult {
-        return TransformerResult.withNode(new Identifier(StringLiteral.from(ctx.text)));
+        return TransformerResult.withNode(Identifier.of(ctx.text));
     }
 
     public visitWaitSecsStatement(ctx: WaitSecsStatementContext) : TransformerResult {
