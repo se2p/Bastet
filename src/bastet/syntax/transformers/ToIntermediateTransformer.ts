@@ -1177,7 +1177,9 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitBoolVariableExpression(ctx: BoolVariableExpressionContext) : TransformerResult {
-        return TransformerResult.withNode(new BooleanVariableExpression(ctx.variable().accept(this).nodeOnly() as AbstractVariable));
+        const ident = ctx.variable().accept(this).nodeOnly() as Identifier;
+        const variable = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, BooleanType.instance()));
+        return TransformerResult.withNode(new BooleanVariableExpression(variable));
     }
 
     private constructBinaryOp(ctx: RuleNode, constr: new (n1:AstNode, n2:AstNode) => AstNode) : TransformerResult {
@@ -1536,12 +1538,15 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitStoreEvalResultStatement(ctx: StoreEvalResultStatementContext) : TransformerResult {
-        const tr = ctx.expression().accept(this);
+
+        const ident = ctx.variable().accept(this).nodeOnly() as Identifier;
+        const exprTr = ctx.expression().accept(this);
+        const exprType = (exprTr.node as Expression).type;
+        const variable = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, exprType));
 
         return new TransformerResult(
-            tr.statementsToPrepend,
-            new StoreEvalResultToVariableStatement(ctx.variable().accept(this).nodeOnly() as AbstractVariable,
-                tr.node as Expression));
+            exprTr.statementsToPrepend,
+            new StoreEvalResultToVariableStatement(variable, exprTr.node as Expression));
     }
 
     public visitStoreCallResultStatement(ctx: StoreCallResultStatementContext) : TransformerResult {

@@ -120,6 +120,9 @@ export class BooleanLiteral extends AbstractBooleanExpression {
 
 export class BooleanVariableExpression extends VariableExpression {
 
+    constructor(variable: Variable) {
+        super(variable);
+    }
 }
 
 export class NegationExpression extends AbstractBooleanExpression {
