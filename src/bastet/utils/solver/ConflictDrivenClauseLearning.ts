@@ -22,7 +22,7 @@
 
 import {CNFFormula} from "../ConjunctiveNormalForm";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable";
+import {Record as ImmRec, Set as ImmSet} from "immutable";
 
 
 export interface BoolVariableAttributes {

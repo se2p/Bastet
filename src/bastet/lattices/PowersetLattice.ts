@@ -20,9 +20,9 @@
  *
  */
 
-import {AbstractElement, Lattice} from "./Lattice";
+import {Lattice} from "./Lattice";
 import {ImplementMeException} from "../core/exceptions/ImplementMeException";
-import {Set as ImmSet, List as ImmList, Map as ImmMap, Record as ImmRec} from "immutable";
+import {Record as ImmRec, Set as ImmSet} from "immutable";
 
 
 export class PowersetAttributes {

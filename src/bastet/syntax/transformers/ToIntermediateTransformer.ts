@@ -28,9 +28,11 @@ import {
     ActorDefinitionListContext,
     ActorModeContext,
     ActorRoleModeContext,
-    AddElementToStatementContext, AfterBootstrapMonitoringEventContext,
+    AddElementToStatementContext,
+    AfterBootstrapMonitoringEventContext,
     AfterStatementMonitoringEventContext,
-    AppMessageContext, AssumeStatementContext,
+    AppMessageContext,
+    AssumeStatementContext,
     BoolAndExpressionContext,
     BoolAsNumExpressionContext,
     BoolAsStringExpressionContext,
@@ -39,7 +41,8 @@ import {
     BoolLiteralExpressionContext,
     BoolOrExpressionContext,
     BoolParanthExpressionContext,
-    BoolVariableExpressionContext, BootstapEventContext,
+    BoolVariableExpressionContext,
+    BootstapEventContext,
     BroadcastAndWaitStatementContext,
     BroadcastMessageStatementContext,
     CallStmtContext,
@@ -243,7 +246,8 @@ import {
 } from "../ast/core/ScratchType";
 import {
     AfterBootstrapMonitoringEvent,
-    AfterStatementMonitoringEvent, BootstrapEvent,
+    AfterStatementMonitoringEvent,
+    BootstrapEvent,
     CloneStartEvent,
     ConditionReachedEvent,
     CoreEvent,
@@ -316,11 +320,9 @@ import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {App} from "../app/App";
-import {AbstractVariable, Variable, VariableWithDataLocation} from "../ast/core/Variable";
+import {AbstractVariable, VariableWithDataLocation} from "../ast/core/Variable";
 import {DataLocations} from "../app/controlflow/DataLocation";
-import {NumberVariable} from "../../procedures/domains/MemoryTransformer";
 import {AssumeStatement} from "../ast/core/statements/AssumeStatement";
-import {Bool} from "../../utils/z3wrapper/libz3";
 
 const toposort = require('toposort')
 

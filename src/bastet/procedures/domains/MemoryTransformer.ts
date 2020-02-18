@@ -24,7 +24,7 @@ import {Preconditions} from "../../utils/Preconditions";
 import {Identifier} from "../../syntax/ast/core/Identifier";
 import {BooleanType, NumberType, ScratchType, StringType} from "../../syntax/ast/core/ScratchType";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString, ConcreteStringList} from "./ConcreteElements";
-import {AbstractElement, Lattice} from "../../lattices/Lattice";
+import {AbstractElement} from "../../lattices/Lattice";
 import {AbstractDomain} from "./AbstractDomain";
 import {AbstractStringList} from "./StringListAbstractDomain";
 

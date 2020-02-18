@@ -23,8 +23,8 @@ import {LabeledTransferRelation} from "../TransferRelation";
 import {SyMemAbstractDomain, SymMemAbstractState} from "./SyMemAbstractDomain";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {SyMemBoolExpressionVisitor, SyMemTransformerVisitor} from "./SyMemTransformerVisitor";
-import {AbstractBoolean, AbstractMemoryTheory, MemoryTransformer} from "../../domains/MemoryTransformer";
+import {SyMemTransformerVisitor} from "./SyMemTransformerVisitor";
+import {AbstractMemoryTheory} from "../../domains/MemoryTransformer";
 import {Preconditions} from "../../../utils/Preconditions";
 import {
     BooleanFormula,
@@ -33,7 +33,6 @@ import {
     NumberFormula,
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 

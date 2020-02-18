@@ -19,7 +19,7 @@
  *
  */
 
-import {List as ImmList, Map as ImmMap, Record as ImmRec} from "immutable";
+import {List as ImmList, Record as ImmRec} from "immutable";
 import {AbstractElement} from "../lattices/Lattice";
 import {BooleanLiteral} from "../syntax/ast/core/expressions/BooleanExpression";
 import {AbstractBoolean, AbstractList, AbstractNumber, AbstractString} from "../procedures/domains/MemoryTransformer";

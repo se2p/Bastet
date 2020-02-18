@@ -19,21 +19,16 @@
  *
  */
 
-import {
-    ProgramAnalysis,
-    ProgramAnalysisWithLabels,
-    TransitionLabelProvider,
-    WrappingProgramAnalysis
-} from "../ProgramAnalysis";
+import {ProgramAnalysis, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
-import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
+import {ConcreteElement} from "../../domains/ConcreteElements";
 import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferRelation";
 import {SSAAbstractDomain, SSAState} from "./SSAAbstractDomain";
 import {SSATransferRelation} from "./SSATransferRelation";
-import {Record as ImmRec, Map as ImmMap, Set as ImmSet} from "immutable"
+import {Map as ImmMap} from "immutable"
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 
 

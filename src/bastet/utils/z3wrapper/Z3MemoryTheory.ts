@@ -20,21 +20,26 @@
  *
  */
 
-import {BooleanFormula, FirstOrderFormula} from "../ConjunctiveNormalForm";
+import {FirstOrderFormula} from "../ConjunctiveNormalForm";
 import {
-    AbstractBoolean, AbstractList,
+    AbstractBoolean,
+    AbstractList,
     AbstractMemoryTheory,
     AbstractNumber,
-    AbstractString, BooleanTheory, ListTheory, RationalNumberTheory, StringTheory
+    AbstractString,
+    BooleanTheory,
+    ListTheory,
+    RationalNumberTheory,
+    StringTheory
 } from "../../procedures/domains/MemoryTransformer";
-import {List as ImmList, Record as ImmRec} from "immutable";
-import {LibZ3InContext, Z3_ast, Z3_context} from "./libz3";
+import {Record as ImmRec} from "immutable";
+import {LibZ3InContext, Z3_ast} from "./libz3";
 import {Identifier} from "../../syntax/ast/core/Identifier";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../procedures/domains/ConcreteElements";
 import {Preconditions} from "../Preconditions";
 import {Sint32} from "./ctypes";
 import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
-import {FirstOrderLattice, SMTFirstOrderLattice} from "../../procedures/domains/FirstOrderDomain";
+import {SMTFirstOrderLattice} from "../../procedures/domains/FirstOrderDomain";
 import {Z3ProverEnvironment} from "./Z3Wrapper";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;

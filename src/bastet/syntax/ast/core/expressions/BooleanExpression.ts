@@ -24,7 +24,6 @@ import {AbstractExpression} from "./AbstractExpression";
 import {AstNode} from "../../AstNode";
 import {BooleanType, NumberType} from "../ScratchType";
 import {BinaryExpression} from "./BinaryExpression";
-import {Identifier} from "../Identifier";
 import {UnaryExpression} from "./UnaryExpression";
 import {StringExpression} from "./StringExpression";
 import {NumberExpression} from "./NumberExpression";

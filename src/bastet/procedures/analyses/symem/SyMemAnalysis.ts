@@ -19,34 +19,16 @@
  *
  */
 
-import {ProgramAnalysis, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
-import {SyMemAbstractDomain, SymMemAbstractState } from "./SyMemAbstractDomain";
+import {ProgramAnalysisWithLabels} from "../ProgramAnalysis";
+import {SyMemAbstractDomain, SymMemAbstractState} from "./SyMemAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
-import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {SyMemTransferRelation} from "./SyMemTransferRelation";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {
-    ConcreteBooleanDomain,
-    ConcreteBoundedStringDomain, ConcreteBoundedStringListDomain,
-    ConcreteMemory,
-    ConcreteNumberDomain
-} from "../../domains/ConcreteElements";
-import {NumIntervalTheory, NumIntervalValueDomain} from "../../domains/NumIntervalValueDomain";
-import {FlatBooleanValueDomain, FlatBooleanValueTheory} from "../../domains/FlatBooleanValueDomain";
-import {OurStringListTheory, StringListAbstractDomain} from "../../domains/StringListAbstractDomain";
-import {OurStringTheory, StringAbstractDomain} from "../../domains/StringAbstractDomain";
+import {ConcreteMemory} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
-import {Z3SMT} from "../../../utils/z3wrapper/Z3Wrapper";
-import {
-    AbstractBoolean,
-    AbstractList,
-    AbstractNumber,
-    AbstractString,
-    AbstractMemoryTheory
-} from "../../domains/MemoryTransformer";
+import {AbstractMemoryTheory} from "../../domains/MemoryTransformer";
 import {
     BooleanFormula,
     FirstOrderFormula,

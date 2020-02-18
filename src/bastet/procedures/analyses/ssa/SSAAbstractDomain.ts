@@ -22,7 +22,7 @@
 import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
 import {AbstractElement, Lattice} from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {Record as ImmRec, Map as ImmMap, Set as ImmSet} from "immutable"
+import {Map as ImmMap, Record as ImmRec} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
 import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 import {ScratchTypeID} from "../../../syntax/ast/core/ScratchType";

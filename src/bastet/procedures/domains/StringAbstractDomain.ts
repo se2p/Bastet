@@ -20,14 +20,15 @@
  *
  */
 
-import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
+import {AbstractionPrecision} from "./AbstractDomain";
 import {ConcreteDomain, ConcreteString} from "./ConcreteElements";
 import {
     AbstractBoolean,
     AbstractNumber,
     AbstractString,
     AbstractStringDomain,
-    BooleanTheory, RationalNumberTheory,
+    BooleanTheory,
+    RationalNumberTheory,
     StringTheory
 } from "./MemoryTransformer";
 import {Lattice} from "../../lattices/Lattice";

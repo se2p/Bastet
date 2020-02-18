@@ -19,12 +19,11 @@
  *
  */
 
-import {Actor, ActorMap, Actors} from './Actor'
+import {Actor, ActorMap} from './Actor'
 import {Maps} from "../../utils/Maps";
 import {MethodDefinition, MethodDefinitionList} from "../ast/core/MethodDefinition";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {Script} from "./controlflow/Script";
 
 export class App {
 

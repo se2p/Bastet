@@ -23,20 +23,12 @@ import {AnalysisProcedure} from "./AnalysisProcedure";
 import {App} from "../syntax/app/App";
 import {GraphAnalysis} from "./analyses/graph/GraphAnalysis";
 import {ScheduleAnalysis} from "./analyses/schedule/ScheduleAnalysis";
-import {GraphConcreteState, GraphAbstractStateAttribs, GraphAbstractState} from "./analyses/graph/GraphAbstractDomain";
+import {GraphAbstractState} from "./analyses/graph/GraphAbstractDomain";
 import {ReachabilityAlgorithm} from "./algorithms/Reachability";
 import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
 import {SMTFactory} from "../utils/z3wrapper/Z3Wrapper";
 import {SyMemAnalysis} from "./analyses/symem/SyMemAnalysis";
-import {AbstractMemoryTheory} from "./domains/MemoryTransformer";
-import {
-    BooleanFormula,
-    FirstOrderFormula,
-    ListFormula,
-    NumberFormula,
-    StringFormula
-} from "../utils/ConjunctiveNormalForm";
-import {BDDLibrary, BDDLibraryFactory} from "../utils/bdd/BDD";
+import {BDDLibraryFactory} from "../utils/bdd/BDD";
 import {Z3MemoryTheoryInContext} from "../utils/z3wrapper/Z3MemoryTheory";
 import {SSAAnalysis} from "./analyses/ssa/SSAAnalysis";
 

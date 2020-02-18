@@ -20,19 +20,10 @@
  *
  */
 
-import {LibZ3InContext, LibZ3NonContext, Z3_context, Z3_solver} from "./libz3";
+import {LibZ3InContext, LibZ3NonContext, Z3_solver} from "./libz3";
 import {Preconditions} from "../Preconditions";
 import {WasmJSInstance} from "./wasmInstance";
-import {FirstOrderFormula} from "../ConjunctiveNormalForm";
-import {Lattice} from "../../lattices/Lattice";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {
-    Z3BooleanFormula,
-    Z3BooleanTheory,
-    Z3FirstOrderFormula,
-    Z3FirstOrderLattice,
-    Z3MemoryTheoryInContext
-} from "./Z3MemoryTheory";
+import {Z3FirstOrderFormula, Z3FirstOrderLattice, Z3MemoryTheoryInContext} from "./Z3MemoryTheory";
 import {FirstOrderSolver} from "../../procedures/domains/FirstOrderDomain";
 import {Sint32, Uint32} from "./ctypes";
 import {BooleanTheory} from "../../procedures/domains/MemoryTransformer";

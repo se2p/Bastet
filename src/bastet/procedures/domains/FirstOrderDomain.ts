@@ -27,9 +27,7 @@ import {FirstOrderFormula} from "../../utils/ConjunctiveNormalForm";
 import {Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
-import {Z3FirstOrderFormula, Z3MemoryTheoryInContext} from "../../utils/z3wrapper/Z3MemoryTheory";
-import {Z3ProverEnvironment} from "../../utils/z3wrapper/Z3Wrapper";
-import {AbstractMemoryTheory, BooleanTheory} from "./MemoryTransformer";
+import {BooleanTheory} from "./MemoryTransformer";
 
 export interface FirstOrderLattice<F extends FirstOrderFormula> extends Lattice<F> {
 

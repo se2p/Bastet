@@ -20,24 +20,28 @@
  */
 
 import {
-    CoreBoolExpressionVisitor, CoreListExpressionVisitor, CoreNonCtrlStatementnVisitor,
+    CoreBoolExpressionVisitor,
+    CoreListExpressionVisitor,
+    CoreNonCtrlStatementnVisitor,
     CoreNumberExpressionVisitor,
     CoreStringExpressionVisitor,
     CoreVisitor
 } from "../../../syntax/ast/CoreVisitor";
-import {SyMemAbstractDomain, SymMemAbstractState} from "./SyMemAbstractDomain";
+import {SymMemAbstractState} from "./SyMemAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {
     BoolAsNumberExpression,
     DivideExpression,
     IndexOfExpression,
-    LengthOfStringExpression, LengthOListExpression,
+    LengthOfStringExpression,
+    LengthOListExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
     NumberLiteral,
-    NumberVariableExpression, NumFunctExpression,
+    NumberVariableExpression,
+    NumFunctExpression,
     PickRandomFromExpression,
     PlusExpression,
     RoundExpression,
@@ -56,7 +60,7 @@ import {
     StringVariableExpression
 } from "../../../syntax/ast/core/expressions/StringExpression";
 import {
-    AndExpression, BooleanExpression,
+    AndExpression,
     BooleanLiteral,
     BooleanVariableExpression,
     NegationExpression,
@@ -106,12 +110,12 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {
     AbstractBoolean,
     AbstractList,
+    AbstractMemoryTheory,
     AbstractNumber,
     AbstractString,
-    AbstractMemoryTheory,
-    MemoryTransformer, RationalNumberTheory
+    RationalNumberTheory
 } from "../../domains/MemoryTransformer";
-import {NumberType, ScratchType, ScratchTypeID} from "../../../syntax/ast/core/ScratchType";
+import {NumberType} from "../../../syntax/ast/core/ScratchType";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {
     BooleanFormula,
@@ -120,9 +124,7 @@ import {
     NumberFormula,
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
-import {ConcreteNumber, ConcreteNumberDomain} from "../../domains/ConcreteElements";
-import {AbstractElement} from "../../../lattices/Lattice";
-import {Map as ImmMap} from "immutable";
+import {ConcreteNumber} from "../../domains/ConcreteElements";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 
 export class MemNumExpressionVisitor<N extends AbstractNumber, B extends AbstractBoolean> implements CoreNumberExpressionVisitor<N> {

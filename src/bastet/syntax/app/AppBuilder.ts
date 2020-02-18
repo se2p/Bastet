@@ -23,8 +23,8 @@ import {Actor, ActorMap, Actors} from "./Actor";
 import {App} from "./App";
 import {AppResource, AppResourceMap} from "./AppResource";
 import {Script} from "./controlflow/Script";
-import {DataLocation, DataLocationMap, DataLocations, TypedDataLocation} from "./controlflow/DataLocation";
-import {ScratchType, VoidType} from "../ast/core/ScratchType";
+import {DataLocationMap, DataLocations} from "./controlflow/DataLocation";
+import {ScratchType} from "../ast/core/ScratchType";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {TransitionRelation, TransitionRelations} from "./controlflow/TransitionRelation";
 import {TransitionRelationToDot} from "./controlflow/TransitionRelationToDot";
@@ -37,12 +37,11 @@ import {ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
     MethodDefinitionList,
     MethodDefinitionMap,
-    MethodSignatureList, MethodSignatureMap,
-    ResultDeclaration
+    MethodSignatureList,
+    MethodSignatureMap
 } from "../ast/core/MethodDefinition";
-import {ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
-import {StatementList, StatementLists} from "../ast/core/statements/Statement";
+import {StatementList} from "../ast/core/statements/Statement";
 import {Scripts} from "./controlflow/Scripts";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {Maps} from "../../utils/Maps";

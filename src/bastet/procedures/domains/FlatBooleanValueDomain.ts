@@ -21,10 +21,10 @@
  */
 
 
-import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
+import {AbstractionPrecision} from "./AbstractDomain";
 import {AbstractBoolean, AbstractBooleanDomain, BooleanTheory} from "./MemoryTransformer";
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
-import {ConcreteBoolean, ConcreteDomain, ConcreteElementFactory, ConcreteNumber} from "./ConcreteElements";
+import {ConcreteBoolean, ConcreteDomain} from "./ConcreteElements";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Identifier} from "../../syntax/ast/core/Identifier";
 import {Record as ImmRec} from "immutable";

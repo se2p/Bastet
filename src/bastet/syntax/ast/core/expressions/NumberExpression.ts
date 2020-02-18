@@ -27,8 +27,7 @@ import {AstNode} from "../../AstNode";
 import {StringExpression, StringLiteral} from "./StringExpression";
 import {BooleanExpression} from "./BooleanExpression";
 import {BinaryExpression} from "./BinaryExpression";
-import {AbstractVariable, Variable, VariableExpression} from "../Variable";
-import {ListExpression} from "./ListExpression";
+import {Variable, VariableExpression} from "../Variable";
 
 export interface NumberExpression extends Expression {
 

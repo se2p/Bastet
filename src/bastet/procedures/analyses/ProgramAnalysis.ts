@@ -21,7 +21,6 @@
 
 import {AbstractDomain} from "../domains/AbstractDomain";
 import {AbstractElement} from "../../lattices/Lattice";
-import {StateSet} from "../algorithms/StateSet";
 import {App} from "../../syntax/app/App";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";

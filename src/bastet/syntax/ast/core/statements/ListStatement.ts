@@ -19,7 +19,6 @@
  *
  */
 
-import {Identifier} from "../Identifier";
 import {Statement} from "./Statement";
 import {NumberExpression} from "../expressions/NumberExpression";
 import {StringExpression} from "../expressions/StringExpression";

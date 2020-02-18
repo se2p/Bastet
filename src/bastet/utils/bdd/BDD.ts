@@ -20,7 +20,7 @@
  *
  */
 
-import {Record as ImmRec, List as ImmList, Set as ImmSet, Map as ImmMap} from "immutable"
+import {List as ImmList, Record as ImmRec} from "immutable"
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../Preconditions";
 import {AbstractElement, Lattice} from "../../lattices/Lattice";

@@ -21,10 +21,9 @@
 
 import {Expression} from "./Expression";
 import {AbstractExpression} from "./AbstractExpression";
-import {Identifier} from "../Identifier";
-import {ListType, ScratchType, StringType} from "../ScratchType";
+import {ListType, ScratchType} from "../ScratchType";
 import {ExpressionList} from "./ExpressionList";
-import {AbstractVariable, Variable, VariableExpression} from "../Variable";
+import {VariableExpression} from "../Variable";
 
 export interface ListExpression extends Expression {
 

@@ -22,9 +22,11 @@
 import {LabeledTransferRelation, TransferRelation} from "../TransferRelation";
 import {
     ScheduleAbstractState,
-    THREAD_STATE_DONE, THREAD_STATE_FAILURE,
+    THREAD_STATE_DONE,
+    THREAD_STATE_FAILURE,
     THREAD_STATE_RUNNING,
-    THREAD_STATE_RUNNING_ATOMIC, THREAD_STATE_YIELD,
+    THREAD_STATE_RUNNING_ATOMIC,
+    THREAD_STATE_YIELD,
     ThreadState
 } from "./ScheduleAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
@@ -40,7 +42,6 @@ import {WaitSecsStatement} from "../../../syntax/ast/core/statements/WaitSecsSta
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
-import {ConcreteString} from "../../domains/ConcreteElements";
 import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressions/StringExpression";
 import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";

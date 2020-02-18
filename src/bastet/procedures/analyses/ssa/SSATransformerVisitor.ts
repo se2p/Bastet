@@ -20,7 +20,9 @@
  */
 
 import {
-    CoreBoolExpressionVisitor, CoreListExpressionVisitor, CoreNonCtrlStatementnVisitor,
+    CoreBoolExpressionVisitor,
+    CoreListExpressionVisitor,
+    CoreNonCtrlStatementnVisitor,
     CoreNumberExpressionVisitor,
     CoreStringExpressionVisitor,
     CoreVisitor
@@ -31,12 +33,15 @@ import {
     BoolAsNumberExpression,
     DivideExpression,
     IndexOfExpression,
-    LengthOfStringExpression, LengthOListExpression,
+    LengthOfStringExpression,
+    LengthOListExpression,
     MinusExpression,
     ModuloExpression,
-    MultiplyExpression, NumberExpression,
+    MultiplyExpression,
+    NumberExpression,
     NumberLiteral,
-    NumberVariableExpression, NumFunctExpression,
+    NumberVariableExpression,
+    NumFunctExpression,
     PickRandomFromExpression,
     PlusExpression,
     RoundExpression,
@@ -50,12 +55,14 @@ import {
     JoinStringsExpression,
     NumAsStringExpression,
     ResourceAttributeOfExpression,
-    StringAttributeOfExpression, StringExpression,
+    StringAttributeOfExpression,
+    StringExpression,
     StringLiteral,
     StringVariableExpression
 } from "../../../syntax/ast/core/expressions/StringExpression";
 import {
-    AndExpression, BooleanExpression,
+    AndExpression,
+    BooleanExpression,
     BooleanLiteral,
     BooleanVariableExpression,
     NegationExpression,
@@ -102,26 +109,6 @@ import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/Bro
 import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {Preconditions} from "../../../utils/Preconditions";
-import {
-    AbstractBoolean,
-    AbstractList,
-    AbstractNumber,
-    AbstractString,
-    AbstractMemoryTheory,
-    MemoryTransformer, RationalNumberTheory
-} from "../../domains/MemoryTransformer";
-import {NumberType, ScratchType, ScratchTypeID} from "../../../syntax/ast/core/ScratchType";
-import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
-import {
-    BooleanFormula,
-    FirstOrderFormula,
-    ListFormula,
-    NumberFormula,
-    StringFormula
-} from "../../../utils/ConjunctiveNormalForm";
-import {ConcreteNumber, ConcreteNumberDomain} from "../../domains/ConcreteElements";
-import {AbstractElement} from "../../../lattices/Lattice";
-import {Map as ImmMap} from "immutable";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {SSAState} from "./SSAAbstractDomain";
 import {
@@ -131,7 +118,6 @@ import {
     VersionedDataLocation
 } from "../../../syntax/app/controlflow/DataLocation";
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
-import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {Variable, VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 

@@ -20,7 +20,6 @@
  */
 
 import {Statement} from "./Statement";
-import {NumberExpression} from "../expressions/NumberExpression";
 import {BooleanExpression} from "../expressions/BooleanExpression";
 
 export class AssumeStatement extends Statement {

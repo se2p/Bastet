@@ -1,4 +1,5 @@
 import {assert} from "./util"
+
 type WasmHeap = DataView;
 
 export abstract class CType {

@@ -25,7 +25,7 @@ import {Maps} from "../../utils/Maps";
 import {Lists} from "../../utils/Lists";
 import {ImmutableList} from "../../utils/ImmutableList";
 import {ImmutableMap} from "../../utils/ImmutableMap";
-import {DataLocation, DataLocationMap, TypedDataLocation} from "./controlflow/DataLocation";
+import {DataLocationMap, TypedDataLocation} from "./controlflow/DataLocation";
 import {MethodDefinition, MethodDefinitionMap, MethodSignature, MethodSignatureMap} from "../ast/core/MethodDefinition";
 import {ActorMode} from "../ast/core/ActorDefinition";
 import {Preconditions} from "../../utils/Preconditions";
@@ -36,7 +36,7 @@ import {
     NeverEvent,
     RenderedMonitoringEvent
 } from "../ast/core/CoreEvent";
-import {TransitionRelation, TransitionRelationBuilder, TransitionRelations} from "./controlflow/TransitionRelation";
+import {TransitionRelation, TransitionRelations} from "./controlflow/TransitionRelation";
 import {Scripts} from "./controlflow/Scripts";
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
 import {GREENFLAG_MESSAGE, INIT_MESSAGE} from "../ast/core/Message";

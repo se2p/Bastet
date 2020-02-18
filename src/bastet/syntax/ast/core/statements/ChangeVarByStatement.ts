@@ -20,7 +20,6 @@
  */
 
 import {Statement} from "./Statement";
-import {Identifier} from "../Identifier";
 import {Expression} from "../expressions/Expression";
 import {Variable} from "../Variable";
 
