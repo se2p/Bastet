@@ -55,8 +55,13 @@ export class App {
         return Maps.values(this._actorMap);
     }
 
+
     get actorNames(): string[] {
         return Object.keys(this._actorMap);
+    }
+
+    get nonBootActors(): Actor[] {
+        return Maps.values(this.actorMap).filter((a) => !a.isBootstrapper);
     }
 
     public getActorByName(name: string): Actor {

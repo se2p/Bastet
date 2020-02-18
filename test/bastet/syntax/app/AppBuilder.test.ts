@@ -54,7 +54,7 @@ describe("AppBuilder", () => {
         const diss: App = AppBuilder.dissolveInheritance(app);
 
         it('Results in two actors: D and C', function() {
-            expect(diss.actors.length).toEqual(2);
+            expect(diss.nonBootActors.length).toEqual(2);
             expect(diss.actorNames).toContain("D");
             expect(diss.actorNames).toContain("C");
         });
