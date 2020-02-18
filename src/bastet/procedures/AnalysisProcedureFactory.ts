@@ -26,7 +26,7 @@ import {ScheduleAnalysis} from "./analyses/schedule/ScheduleAnalysis";
 import {GraphConcreteState, GraphAbstractStateAttribs, GraphAbstractState} from "./analyses/graph/GraphAbstractDomain";
 import {ReachabilityAlgorithm} from "./algorithms/Reachability";
 import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
-import {SolverFactory} from "../utils/z3wrapper/Z3Wrapper";
+import {SMTFactory} from "../utils/z3wrapper/Z3Wrapper";
 import {SyMemAnalysis} from "./analyses/symem/SyMemAnalysis";
 import {AbstractMemoryTheory} from "./domains/MemoryTransformer";
 import {
@@ -53,16 +53,16 @@ export class AnalysisProcedureFactory {
     public static async createAnalysisProcedure(config: AnalysisProcedureConfig): Promise<AnalysisProcedure> {
         return new class implements AnalysisProcedure {
             async run(task: App): Promise<{}> {
-                const solver = await SolverFactory.createZ3();
+                const smt = await SMTFactory.createZ3();
                 const bddlib = await BDDLibraryFactory.createBDDLib();
 
-                const defaultContect = solver.createContext();
                 // TODO: Delete the context after the analysis is no more in use
+                const defaultContect = smt.createContext();
+                const theories = new Z3MemoryTheoryInContext(defaultContect);
+                const prover = smt.createProver(defaultContect);
+                const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
-                const theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>
-                    = new Z3MemoryTheoryInContext(defaultContect);
-
-                const memAnalysis = new SyMemAnalysis(solver.lattice, bddlib.lattice, theories);
+                const memAnalysis = new SyMemAnalysis(firstOrderLattice, bddlib.lattice, theories);
                 const ssaAnalysis = new SSAAnalysis(task, memAnalysis);
                 const schedAnalysis = new ScheduleAnalysis({}, task, ssaAnalysis);
                 const graphAnalysis = new GraphAnalysis(task, schedAnalysis);

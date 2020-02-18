@@ -33,7 +33,9 @@ import {Identifier} from "../../syntax/ast/core/Identifier";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../procedures/domains/ConcreteElements";
 import {Preconditions} from "../Preconditions";
 import {Sint32} from "./ctypes";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
+import {FirstOrderLattice, SMTFirstOrderLattice} from "../../procedures/domains/FirstOrderDomain";
+import {Z3ProverEnvironment} from "./Z3Wrapper";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;
 
@@ -94,7 +96,8 @@ export class Z3BooleanTheory implements BooleanTheory<Z3BooleanFormula> {
     }
 
     and(op1: Z3BooleanFormula, op2: Z3BooleanFormula): Z3BooleanFormula {
-        return new Z3BooleanFormula(this._ctx.mk_and(op1.getAST(), op2.getAST()));
+        throw new ImplementMeForException("mk_and needs an array as argument. How to pass it in context of EMSCRIPTEN?")
+        // return new Z3BooleanFormula(this._ctx.mk_and(2, op1.getAST(), op2.getAST()));
     }
 
     bottomBoolean(): Z3BooleanFormula {
@@ -164,7 +167,9 @@ export class Z3NumberTheory implements RationalNumberTheory<Z3NumberFormula, Z3B
     }
 
     fromConcreteNumber(str: ConcreteNumber): Z3NumberFormula {
-        return new Z3NumberFormula(this._ctx.mk_int_symbol(new Sint32(str.value)));
+        return new Z3NumberFormula(
+            this._ctx.mk_const(
+                this._ctx.mk_int_symbol(new Sint32(str.value)), this._ctx.mk_int_sort()));
     }
 
     isGreaterThan(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
@@ -281,7 +286,10 @@ export class Z3MemoryTheoryInContext implements AbstractMemoryTheory<Z3Formula, 
 
     private readonly _stringTheory: StringTheory<Z3StringFormula>;
 
+    private readonly _ctx: LibZ3InContext;
+
     constructor(ctx: LibZ3InContext) {
+        this._ctx = Preconditions.checkNotUndefined(ctx);
         this._boolTheory = new Z3BooleanTheory(ctx);
         this._numTheory = new Z3NumberTheory(ctx);
         this._stringTheory = new Z3StringTheory(ctx);
@@ -303,5 +311,13 @@ export class Z3MemoryTheoryInContext implements AbstractMemoryTheory<Z3Formula, 
     get stringTheory(): StringTheory<Z3StringFormula> {
         return this._stringTheory;
     }
+
 }
 
+export class Z3FirstOrderLattice extends SMTFirstOrderLattice<Z3FirstOrderFormula> {
+
+    constructor(theory: BooleanTheory<Z3FirstOrderFormula>, prover: Z3ProverEnvironment) {
+        super(theory, prover);
+    }
+
+}

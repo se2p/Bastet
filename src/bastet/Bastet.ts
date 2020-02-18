@@ -36,7 +36,7 @@ import {AstNode} from "./syntax/ast/AstNode";
 import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
 import {AnalysisProcedureConfig, AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
 import {AppToDot} from "./syntax/app/AppToDot";
-import {SolverFactory, Z3Solver} from "./utils/z3wrapper/Z3Wrapper";
+import {SMTFactory, Z3SMT} from "./utils/z3wrapper/Z3Wrapper";
 
 const commander = require('commander');
 

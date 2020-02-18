@@ -39,7 +39,7 @@ import {FlatBooleanValueDomain, FlatBooleanValueTheory} from "../../domains/Flat
 import {OurStringListTheory, StringListAbstractDomain} from "../../domains/StringListAbstractDomain";
 import {OurStringTheory, StringAbstractDomain} from "../../domains/StringAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {Z3Solver} from "../../../utils/z3wrapper/Z3Wrapper";
+import {Z3SMT} from "../../../utils/z3wrapper/Z3Wrapper";
 import {
     AbstractBoolean,
     AbstractList,
@@ -65,6 +65,10 @@ export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
 
     constructor(folLattice: Lattice<FirstOrderFormula>, propLattice: Lattice<PropositionalFormula>,
                 theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
+        Preconditions.checkNotUndefined(folLattice);
+        Preconditions.checkNotUndefined(propLattice);
+
+        this._theories = Preconditions.checkNotUndefined(theories);
         this._abstractDomain = new SyMemAbstractDomain(folLattice, propLattice);
         this._transferRelation = new SyMemTransferRelation(this._abstractDomain, this._theories);
     }

@@ -123,6 +123,7 @@ import {
 import {ConcreteNumber, ConcreteNumberDomain} from "../../domains/ConcreteElements";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {Map as ImmMap} from "immutable";
+import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 
 export class MemNumExpressionVisitor<N extends AbstractNumber, B extends AbstractBoolean> implements CoreNumberExpressionVisitor<N> {
 
@@ -397,12 +398,8 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
     }
 
     visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): B {
-        // TODO: Continue here.
-        //   What if the variable is already declared and has values assigned to it? (in case of loop unrollings)
-        //   What is the role of SSA?
-
-        // return this._mem.withDeclaration(node.ident.text, node.type);
-        throw new ImplementMeException();
+        // We assume the variables to be initialized with NONDET-values
+        return this._mem;
     }
 
     visitDeleteFromAllStatement(node: DeleteAllFromStatement): B {
@@ -457,13 +454,19 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
         throw new ImplementMeException();
     }
 
+    visitAssumeStatement(node: AssumeStatement): B {
+        const assume = node.condition.accept(this);
+        return this._theories.boolTheory.and(this._mem, assume);
+    }
+
     visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): B {
         // We assume that a wrapping analysis step takes care of SSA.
-        const declaredType = null;
+        const declaredType = node.variable.type;
         if (declaredType instanceof NumberType) {
             const visitor = new MemNumExpressionVisitor(this._theories.numTheory);
             const value: N = node.toValue.accept(visitor);
-            const assume: B = this._theories.numTheory.isNumberEqualTo(this._theories.numTheory.abstractNumberValue(node.variable.identifier), value);
+            const assignTo = this._theories.numTheory.abstractNumberValue(node.variable.identifier);
+            const assume: B = this._theories.numTheory.isNumberEqualTo(assignTo, value);
             return this._theories.boolTheory.and(this._mem, assume);
         } else {
             throw ImplementMeException;

@@ -49,6 +49,7 @@ export abstract class DeclareVariableStatement extends DeclarationStatement impl
     constructor(variable: Variable) {
         Preconditions.checkNotUndefined(variable);
         super([variable.identifier, variable.type]);
+        this._variable = variable;
     }
 
     get ident(): Identifier {
@@ -67,6 +68,7 @@ export abstract class DeclareVariableStatement extends DeclarationStatement impl
 export class DeclareStackVariableStatement extends DeclareVariableStatement {
 
     constructor(variable: Variable) {
+        Preconditions.checkNotUndefined(variable);
         super(variable);
     }
 
@@ -75,6 +77,7 @@ export class DeclareStackVariableStatement extends DeclareVariableStatement {
 export class DeclareActorVariableStatement extends DeclareVariableStatement {
 
     constructor(variable: Variable) {
+        Preconditions.checkNotUndefined(variable);
         super(variable);
     }
 

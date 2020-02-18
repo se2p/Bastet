@@ -23,15 +23,38 @@
 import {Z3_config, Z3_context} from "../../../../src/bastet/utils/z3wrapper/libz3";
 import {Ptr, Uint32} from "../../../../src/bastet/utils/z3wrapper/ctypes";
 import {WasmJSInstance} from "../../../../src/bastet/utils/z3wrapper/wasmInstance"
-import {SolverFactory, Z3Solver} from "../../../../src/bastet/utils/z3wrapper/Z3Wrapper";
+import {SMTFactory, Z3SMT} from "../../../../src/bastet/utils/z3wrapper/Z3Wrapper";
 
-describe('Z3Wrapper', function() {
+let smt: Z3SMT;
+let ctx;
+let theory;
+let prover;
 
-    const solver = SolverFactory.createZ3();
-
-    it('can instantiate the WASM module', function() {
-    })
-
-
+beforeAll( async (done) => {
+    smt = await SMTFactory.createZ3();
+    ctx = smt.createContext();
+    theory = smt.createTheory(ctx);
+    prover = smt.createProver(ctx);
+    done();
 });
+
+
+test ("Case: False", () => {
+    prover.push();
+    const falseFormula = theory.boolTheory.falseBool();
+    prover.assert(falseFormula);
+    const isUnsat: boolean = prover.isUnsat();
+    expect(isUnsat).toBe(true);
+    prover.pop();
+});
+
+test ("Case: True", () => {
+    prover.push();
+    const trueFormula = theory.boolTheory.trueBool();
+    prover.assert(trueFormula);
+    const isUnsat: boolean = prover.isUnsat();
+    expect(isUnsat).toBe(false);
+    prover.pop();
+});
+
 

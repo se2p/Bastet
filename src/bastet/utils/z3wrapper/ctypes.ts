@@ -129,6 +129,7 @@ export class Float extends NumberCType {
   }
 }
 
+
 export class Double extends NumberCType {
   sizeof(): number { return 64 };
   min(): number { return -(1<<31); };
