@@ -30,6 +30,10 @@ role RuntimeEntity begin
 
     extern _RUNTIME_integerFromInterval(from_num: number, to_num: number) returns number
 
+    extern _RUNTIME_getImageWidth(ident: string) returns number
+
+    extern _RUNTIME_getImageHeight(ident: string) returns number
+
 end
 
 role Observer is RuntimeEntity begin
@@ -233,6 +237,7 @@ role ScratchSprite is ScratchEntity begin
     define visible as true
 
     define atomic pointTowards (s: string) begin
+        // Todo what about random?
         declare targetX as number
         declare targetY as number
 
@@ -277,12 +282,42 @@ role ScratchSprite is ScratchEntity begin
 
     // @Category "Sensing"
     define touchingMousePointer () begin
-        // ...
+        // FIXME use collision detection and offset
+        // FIXME check if mousepointer is out of bounds
+        declare result as boolean
+        if item (_RUNTIME_getMouseX () * _RUNTIME_getMouseX () ) of actor_1_graphics = 0 begin //todo is 0 the default value
+            define result as false
+        end
     end returns result : boolean
 
     // @Category "Sensing"
     define touchingObject (obj: string) begin
-            // ...
+        // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
+
+        declare leg_a as number
+        declare leg_b as number
+        define leg_a as _RUNTIME_getImageWidth() //TODO use image identifier
+        define leg_b as _RUNTIME_getImageHeight() //TODO use image identifier
+
+        declare radius as number
+        define radius as 0.5 * mathSqrt(leg_a * leg_a + leg_b * leg_b)
+
+        declare leg_a_other as number
+        declare leg_b_other as number
+        define leg_a_other as _RUNTIME_getImageWidth() //TODO use image identifier
+        define leg_b_other as _RUNTIME_getImageHeight() //TODO use image identifier
+
+        declare radius_other as number
+        define radius_other as 0.5 * mathSqrt(leg_a_other * leg_a_other + leg_b_other * leg_b_other)
+
+        declare x_other as number
+        define x_other as attribute "x" of obj
+        declare y_other as number
+        define y_other as attribute "y" of obj
+
+        declare result as boolean
+        define result as (((mathSqrt((x + x_other)*(x + x_other) + (y + y_other) * (y + y_other)) - radius - radius_other) > 0)
+
     end returns result : boolean
 
     // @Category "Sensing"
@@ -316,12 +351,27 @@ role ScratchSprite is ScratchEntity begin
 
     // @Category "looks"
     define turnLeft(deg: number) begin
-
+        setDirection(direction - degrees)
     end
 
     // @Category "looks"
     define turnRight(deg: number) begin
+        setDirection(direction + degrees)
+    end
 
+    define setDirection(direction: number) begin
+        // TODO do we need to check if we are in the stage
+
+        // Make sure direction is between -179 and 180
+        declare min as number
+        declare max as number
+        declare range as number
+
+        define min as -179
+        define max as 180
+        define range as (max - min) +1
+
+        define direction as direction - (Math.floor((direction - min) / range) * range);
     end
 
 
