@@ -23,7 +23,7 @@
 import {List as ImmList, Record as ImmRec} from "immutable"
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../Preconditions";
-import {AbstractElement, Lattice} from "../../lattices/Lattice";
+import {AbstractElement, Lattice, LatticeWithComplements} from "../../lattices/Lattice";
 
 export interface PropositionalFormula extends AbstractElement {
 
@@ -36,7 +36,7 @@ export class BDDLibraryFactory {
     }
 }
 
-export class BDDLattice implements Lattice<BDD> {
+export class BDDLattice implements LatticeWithComplements<BDD> {
 
     private readonly _bottom: BDD;
     private readonly _top: BDD;
@@ -51,6 +51,15 @@ export class BDDLattice implements Lattice<BDD> {
     }
 
     isIncluded(element1: BDD, element2: BDD): boolean {
+        if (element1 === this._bottom || element2 === this._top) {
+            return true;
+        }
+        if (element1 === element2) {
+            return true;
+        }
+        if (element2 === this._bottom) {
+            return element1 === this._bottom;
+        }
         throw new ImplementMeException();
     }
 
@@ -66,17 +75,29 @@ export class BDDLattice implements Lattice<BDD> {
         return this._top;
     }
 
+    complement(element: BDD): BDD {
+        if (element === this._bottom) {
+            return this._top;
+        }
+
+        if (element === this._top) {
+            return this._bottom;
+        }
+
+        throw new ImplementMeException();
+    }
+
 }
 
 export class BDDLibrary {
 
-    private readonly _lattice: Lattice<PropositionalFormula>;
+    private readonly _lattice: LatticeWithComplements<PropositionalFormula>;
 
     constructor() {
         this._lattice = new BDDLattice();
     }
 
-    get lattice(): Lattice<PropositionalFormula> {
+    get lattice(): LatticeWithComplements<PropositionalFormula> {
        return this._lattice;
     }
 

@@ -24,12 +24,12 @@
 import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {ConcreteDomain, ConcreteElement} from "./ConcreteElements";
 import {FirstOrderFormula} from "../../utils/ConjunctiveNormalForm";
-import {Lattice} from "../../lattices/Lattice";
+import {Lattice, LatticeWithComplements} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
 import {BooleanTheory} from "./MemoryTransformer";
 
-export interface FirstOrderLattice<F extends FirstOrderFormula> extends Lattice<F> {
+export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
 
 }
 
@@ -117,6 +117,8 @@ export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
     isIncluded(element1: F, element2: F): boolean {
         this._prover.push();
         try {
+            // UNSAT a  <=>  a lessOrEqual ⊥
+            // NOT true OR false  <=>  false OR false
             const implication = this._boolTheory.or(
                 this._boolTheory.not(element1), element2);
             this._prover.assert(implication);
@@ -136,6 +138,10 @@ export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
 
     top(): F {
         return this._boolTheory.trueBool();
+    }
+
+    complement(element: F): F {
+        return this._boolTheory.not(element);
     }
 
 }

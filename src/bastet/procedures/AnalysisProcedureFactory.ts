@@ -66,7 +66,7 @@ export class AnalysisProcedureFactory {
                 const chooseOpConfig = new ChooseOpConfig();
                 const chooseOp = frontier.createChooseOp(chooseOpConfig);
                 const reachabilityAlgorithm = new ReachabilityAlgorithm(graphAnalysis, chooseOp);
-                const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, graphAnalysis.refiner);
+                const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, graphAnalysis.refiner, graphAnalysis);
 
                 const initialStates: GraphAbstractState[] = graphAnalysis.initialStatesFor(task);
                 frontier.addAll(initialStates);

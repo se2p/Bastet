@@ -240,7 +240,10 @@ export class SyMemBoolExpressionVisitor<B extends AbstractBoolean, N extends Abs
     }
 
     visitNumEqualsExpression(node: NumEqualsExpression): B {
-        throw new ImplementMeException();
+        const numVisitor = new MemNumExpressionVisitor(this._theories.numTheory);
+        const op1: N = node.operand1.accept(numVisitor);
+        const op2: N = node.operand2.accept(numVisitor);
+        return this._theories.numTheory.isNumberEqualTo(op1, op2);
     }
 
     visitNumGreaterThanExpression(node: NumGreaterThanExpression): B {
@@ -251,7 +254,10 @@ export class SyMemBoolExpressionVisitor<B extends AbstractBoolean, N extends Abs
     }
 
     visitNumLessThanExpression(node: NumLessThanExpression): B {
-        throw new ImplementMeException();
+        const numVisitor = new MemNumExpressionVisitor(this._theories.numTheory);
+        const op1: N = node.operand1.accept(numVisitor);
+        const op2: N = node.operand2.accept(numVisitor);
+        return this._theories.numTheory.isLessThan(op1, op2);
     }
 
     visitOrExpression(node: OrExpression): B {

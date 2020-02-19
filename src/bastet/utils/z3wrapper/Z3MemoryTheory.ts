@@ -98,7 +98,7 @@ export class Z3BooleanTheory implements BooleanTheory<Z3BooleanFormula> {
     }
 
     abstractBooleanValue(id: Variable): Z3BooleanFormula {
-        return new Z3BooleanFormula(this._ctx.mk_fresh_const(id.qualifiedName, this._ctx.mk_bool_sort()));
+        return new Z3BooleanFormula(this._ctx.mk_const(this._ctx.mk_string_symbol(id.qualifiedName), this._ctx.mk_bool_sort()));
     }
 
     private arrayToHeap(typedArray){
@@ -118,7 +118,6 @@ export class Z3BooleanTheory implements BooleanTheory<Z3BooleanFormula> {
         const typedArray = new Int32Array([op1.getAST().val(), op2.getAST().val()]);
         const arrayOnHeap = this.arrayToHeap(typedArray);
         try {
-            // throw new ImplementMeForException("mk_and needs an array as argument. How to pass it in context of EMSCRIPTEN?")
             return new Z3BooleanFormula(this._ctx.mk_and(new Uint32(2), new Ptr(arrayOnHeap.byteOffset)));
         } finally {
             this.freeArray(arrayOnHeap);
@@ -150,7 +149,13 @@ export class Z3BooleanTheory implements BooleanTheory<Z3BooleanFormula> {
     }
 
     or(op1: Z3BooleanFormula, op2: Z3BooleanFormula): Z3BooleanFormula {
-        return new Z3BooleanFormula(this._ctx.mk_or(op1.getAST(), op2.getAST()));
+        const typedArray = new Int32Array([op1.getAST().val(), op2.getAST().val()]);
+        const arrayOnHeap = this.arrayToHeap(typedArray);
+        try {
+            return new Z3BooleanFormula(this._ctx.mk_or(new Uint32(2), new Ptr(arrayOnHeap.byteOffset)));
+        } finally {
+            this.freeArray(arrayOnHeap);
+        }
     }
 
     topBoolean(): Z3BooleanFormula {
@@ -172,7 +177,7 @@ export class Z3NumberTheory implements RationalNumberTheory<Z3NumberFormula, Z3B
     }
 
     abstractNumberValue(id: Variable): Z3NumberFormula {
-        return new Z3NumberFormula(this._ctx.mk_fresh_const(id.qualifiedName, this._ctx.mk_int_sort()));
+        return new Z3NumberFormula(this._ctx.mk_const(this._ctx.mk_string_symbol(id.qualifiedName), this._ctx.mk_int_sort()));
     }
 
     bottomNumber(): Z3NumberFormula {
@@ -193,8 +198,7 @@ export class Z3NumberTheory implements RationalNumberTheory<Z3NumberFormula, Z3B
 
     fromConcreteNumber(str: ConcreteNumber): Z3NumberFormula {
         return new Z3NumberFormula(
-            this._ctx.mk_const(
-                this._ctx.mk_int_symbol(new Sint32(str.value)), this._ctx.mk_int_sort()));
+            this._ctx.mk_int(new Sint32(str.value), this._ctx.mk_int_sort()));
     }
 
     isGreaterThan(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {

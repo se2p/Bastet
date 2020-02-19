@@ -27,22 +27,37 @@ import {StateSet} from "./StateSet";
 import {AnalysisAlgorithm} from "./Algorithm";
 import {Refiner} from "../analyses/Refiner";
 import {Preconditions} from "../../utils/Preconditions";
+import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 
 export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
     implements AnalysisAlgorithm<C, E> {
 
-    private readonly wrappedAlgorithm: AnalysisAlgorithm<C, E>;
+    private readonly _analysis: ProgramAnalysis<C, E>;
 
-    private readonly refiner: Refiner<E>;
+    private readonly _wrappedAlgorithm: AnalysisAlgorithm<C, E>;
 
-    constructor(wrappedAlgorithm: AnalysisAlgorithm<C, E>, refiner: Refiner<E>) {
-        this.wrappedAlgorithm = Preconditions.checkNotUndefined(wrappedAlgorithm);
-        this.refiner = Preconditions.checkNotUndefined(refiner);
+    private readonly _refiner: Refiner<E>;
+
+    constructor(wrappedAlgorithm: AnalysisAlgorithm<C, E>, refiner: Refiner<E>, analysis: ProgramAnalysis<C, E>) {
+        this._wrappedAlgorithm = Preconditions.checkNotUndefined(wrappedAlgorithm);
+        this._refiner = Preconditions.checkNotUndefined(refiner);
+        this._analysis = Preconditions.checkNotUndefined(analysis);
     }
 
     public run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
         do {
-            [frontier, reached] = this.wrappedAlgorithm.run(frontier, reached);
+            [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);
+            if (!frontier.isEmpty()) {
+                // Target state was found
+                Preconditions.checkState(reached.getAddedLast().length > 0);
+                const targetState = reached.getAddedLast()[0];
+                Preconditions.checkState(this._analysis.target(targetState));
+
+                // Check the feasibility with the refiner
+                if (this._refiner.checkIsFeasible(targetState)) {
+                    console.log("Program is UNSAFE");
+                }
+            }
         } while (!frontier.isEmpty());
 
         return [frontier, reached];
