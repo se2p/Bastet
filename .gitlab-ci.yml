@@ -23,3 +23,4 @@ testing_testing:
   script:
     - npm install -D typescript
     - npm test
+    - mkdir -p output/static
