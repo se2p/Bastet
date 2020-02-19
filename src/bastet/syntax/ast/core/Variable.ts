@@ -24,7 +24,6 @@ import {ScratchType} from "./ScratchType";
 import {Identifier} from "./Identifier";
 import {AbstractExpression} from "./expressions/AbstractExpression";
 import {DataLocation} from "../../app/controlflow/DataLocation";
-import {StringLiteral} from "./expressions/StringExpression";
 import {Preconditions} from "../../../utils/Preconditions";
 
 export interface Variable {
@@ -33,20 +32,7 @@ export interface Variable {
 
     type: ScratchType;
 
-}
-
-export abstract class AbstractVariable extends AbstractExpression implements Variable {
-
-    private readonly _identifier: Identifier;
-
-    constructor(type: ScratchType, identifier: Identifier) {
-        super(type, [type, identifier]);
-        this._identifier = identifier;
-    }
-
-    get identifier(): Identifier {
-        return this._identifier;
-    }
+    qualifiedName: string;
 
 }
 
@@ -80,5 +66,9 @@ export class VariableWithDataLocation extends AbstractExpression implements Vari
 
     get identifier(): Identifier {
         return this._identifier;
+    }
+
+    get qualifiedName(): string {
+        return this._dataloc.qualifiedName;
     }
 }

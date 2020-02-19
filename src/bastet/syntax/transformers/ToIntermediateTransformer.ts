@@ -320,7 +320,7 @@ import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {App} from "../app/App";
-import {AbstractVariable, VariableWithDataLocation} from "../ast/core/Variable";
+import {VariableWithDataLocation} from "../ast/core/Variable";
 import {DataLocations} from "../app/controlflow/DataLocation";
 import {AssumeStatement} from "../ast/core/statements/AssumeStatement";
 
@@ -1219,7 +1219,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     public visitAddElementToStatement(ctx: AddElementToStatementContext) : TransformerResult {
         const exprTr = ctx.stringExpr().accept(this);
         return new TransformerResult(exprTr.statementsToPrepend, new AddElementToStatement(
-            ctx.variable().accept(this).nodeOnly() as AbstractVariable,
+            ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation,
             exprTr.node as StringExpression));
     }
 
@@ -1261,7 +1261,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TransformerResult(
             exprTr.statementsToPrepend,
             new ChangeVarByStatement(
-                ctx.variable().accept(this).node as AbstractVariable,
+                ctx.variable().accept(this).node as VariableWithDataLocation,
                 exprTr.node as Expression));
     }
 
@@ -1342,14 +1342,14 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitDeleteAllFromStatement(ctx: DeleteAllFromStatementContext) : TransformerResult {
         return TransformerResult.withNode(
-            new DeleteAllFromStatement(ctx.variable().accept(this).nodeOnly() as AbstractVariable));
+            new DeleteAllFromStatement(ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation));
     }
 
     public visitDeleteIthFromStatement(ctx: DeleteIthFromStatementContext) : TransformerResult {
         const numTr = ctx.numExpr().accept(this);
         return new TransformerResult(
             numTr.statementsToPrepend,
-            new DeleteIthFromStatement(ctx.variable().accept(this).nodeOnly() as AbstractVariable,
+            new DeleteIthFromStatement(ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation,
                 numTr.node as NumberExpression));
     }
 
@@ -1371,7 +1371,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const tr = ctx.expression().accept(this);
         return new TransformerResult(tr.statementsToPrepend,
             new IndexOfExpression(tr.node as Expression,
-                ctx.variable().accept(this).nodeOnly() as AbstractVariable));
+                ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation));
     }
 
     public visitNumberIndexType(ctx: IndexTypeContext) : TransformerResult {
@@ -1392,7 +1392,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const strTr = ctx.stringExpr().accept(this);
         return new TransformerResult(
             StatementLists.concat(numTr.statementsToPrepend, strTr.statementsToPrepend),
-            new InsertAtStatement(ctx.variable().accept(this).nodeOnly() as AbstractVariable,
+            new InsertAtStatement(ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation,
                 numTr.node as NumberExpression,
                 strTr.node as StringExpression));
     }
@@ -1521,7 +1521,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TransformerResult(
             StatementLists.concat(strTr.statementsToPrepend, numTr.statementsToPrepend),
             new ReplaceElementAtStatement(
-                ctx.variable().accept(this).nodeOnly() as AbstractVariable,
+                ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation,
                 numTr.node as NumberExpression,
                 strTr.node as StringExpression));
     }
@@ -1562,7 +1562,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     public visitStoreCallResultStatement(ctx: StoreCallResultStatementContext) : TransformerResult {
         const exprListTr = ctx.callStmt().expressionList().expressionListPlain().accept(this);
         const methodIdent = ctx.callStmt().ident().accept(this).nodeOnly() as Identifier;
-        const toVar = ctx.variable().accept(this).nodeOnly() as AbstractVariable;
+        const toVar = ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation;
         return new TransformerResult(exprListTr.statementsToPrepend,
             new StoreCallResultToVariableStatement(methodIdent, exprListTr.node as ExpressionList, toVar));
     }

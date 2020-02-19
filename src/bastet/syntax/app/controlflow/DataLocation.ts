@@ -33,6 +33,8 @@ export interface DataLocation {
 
     ident: string;
 
+    qualifiedName: string;
+
 }
 
 export interface TypedDataLocationAttributes {
@@ -40,6 +42,8 @@ export interface TypedDataLocationAttributes {
     type: ScratchTypeID;
 
     ident: string;
+
+    qualifiedName: string;
 
 }
 
@@ -53,15 +57,19 @@ const TypedDataLocationRecord = ImmRec({
 
     type: 0,
 
-    ident: ""
+    ident: "",
+
+    qualifiedName: ""
 
 });
 
-const StaticDataLocationRecord = ImmRec({
+const VersionedDataLocationRecord = ImmRec({
 
     type: 0,
 
     ident: "",
+
+    qualifiedName: "",
 
     version: 0
 
@@ -70,11 +78,15 @@ const StaticDataLocationRecord = ImmRec({
 export class TypedDataLocation extends TypedDataLocationRecord implements TypedDataLocationAttributes {
 
     constructor(ident: string, type: ScratchTypeID) {
-        super({ident: ident, type: type});
+        super({ident: ident, qualifiedName: ident, type: type});
     }
 
     public getIdent(): string {
         return this.get("ident");
+    }
+
+    public getQualifiedName(): string {
+        return this.get("qualifiedName");
     }
 
     public getType(): ScratchTypeID {
@@ -92,10 +104,11 @@ export class TypedDataLocation extends TypedDataLocationRecord implements TypedD
 
 }
 
-export class VersionedDataLocation extends StaticDataLocationRecord implements StaticDataLocationAttributes {
+export class VersionedDataLocation extends VersionedDataLocationRecord implements StaticDataLocationAttributes {
 
     constructor(ident: string, type: ScratchTypeID, version: number) {
-        super({ident: ident, type: type, version: version});
+        const qualifiedName = `${ident}@${version}`
+        super({ident: ident, qualifiedName: qualifiedName, type: type, version: version});
     }
 
     public getIdent(): string {
@@ -108,6 +121,10 @@ export class VersionedDataLocation extends StaticDataLocationRecord implements S
 
     public getVersion(): number {
         return this.get("version");
+    }
+
+    public getQualifiedName(): string {
+        return this.get("qualifiedName");
     }
 
 }
