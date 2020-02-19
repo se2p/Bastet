@@ -108,9 +108,9 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
     }
 
     target(state: ScheduleAbstractState): Property[] {
-        let result = [];
+        let result: Property[] = [];
         if (state.getIsTargetFor().size > 0) {
-            for (const p in state.getIsTargetFor()) {
+            for (const p of state.getIsTargetFor()) {
                 result.push(p);
             }
         }

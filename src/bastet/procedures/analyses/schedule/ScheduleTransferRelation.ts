@@ -46,7 +46,7 @@ import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressi
 import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {RuntimeMethods} from "../../../syntax/app/controlflow/RuntimeMethods";
-import {Property} from "../../../syntax/Property";
+import {Properties, Property} from "../../../syntax/Property";
 import {ExpressionList} from "../../../syntax/ast/core/expressions/ExpressionList";
 import instantiate = WebAssembly.instantiate;
 
@@ -308,7 +308,7 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         if (stepOp.ast instanceof CallStatement) {
             const call = stepOp.ast as CallStatement;
             if (call.calledMethod.text == RuntimeMethods._RUNTIME_signalFailure) {
-                const properties = this.propertiesFromArguments(call.args);
+                const properties: ImmSet<Property> = Properties.fromArguments(call.args);
                 resultBase = this.setFailure(resultBase, steppedThreadIdx, properties);
             }
         } else if (stepOp.ast instanceof BroadcastMessageStatement) {
@@ -491,18 +491,4 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         throw new ImplementMeException();
     }
 
-    private propertiesFromArguments(args: ExpressionList): ImmSet<Property> {
-        let result = ImmSet();
-        for (const a of args) {
-            Preconditions.checkArgument(a instanceof StringLiteral);
-            const s: StringLiteral = a as StringLiteral;
-            result = result.add(s.text);
-        }
-
-        if (result.isEmpty()) {
-            result = result.add("Violating program location reachable!");
-        }
-
-        return result;
-    }
 }

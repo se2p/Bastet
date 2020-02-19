@@ -21,6 +21,9 @@
  */
 
 import {Record as ImmRec, Set as ImmSet} from "immutable";
+import {ExpressionList} from "./ast/core/expressions/ExpressionList";
+import {Preconditions} from "../utils/Preconditions";
+import {StringLiteral} from "./ast/core/expressions/StringExpression";
 
 export interface PropertyAttributes {
 
@@ -37,6 +40,8 @@ const PropertyRecord = ImmRec({
 export class Property extends PropertyRecord implements PropertyAttributes {
 
     constructor(text: string) {
+        Preconditions.checkNotUndefined(text);
+        Preconditions.checkArgument(text.length > 0);
         super({text: text});
     }
 
@@ -86,6 +91,22 @@ export class Properties {
     public static from(str: string): Property {
         return new Property(str);
     }
+
+    public static fromArguments(args: ExpressionList): ImmSet<Property> {
+        let result: ImmSet<Property> = ImmSet();
+        for (const a of args) {
+            Preconditions.checkArgument(a instanceof StringLiteral);
+            const s: StringLiteral = a as StringLiteral;
+            result = result.add(new Property(s.text));
+        }
+
+        if (result.isEmpty()) {
+            result = result.add(new Property("Violating program location reachable!"));
+        }
+
+        return result;
+    }
+
 
 }
 

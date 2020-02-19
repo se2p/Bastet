@@ -55,7 +55,7 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
 
                 // Check the feasibility with the refiner
                 if (this._refiner.checkIsFeasible(targetState)) {
-                    console.log("Program is UNSAFE");
+                    return [frontier, reached];
                 }
             }
         } while (!frontier.isEmpty());

@@ -20,15 +20,6 @@
  *
  */
 
-import {StateSet} from "./StateSet";
-import {ConcreteElement} from "../domains/ConcreteElements";
-import {AbstractElement} from "../../lattices/Lattice";
-import {Property} from "../../syntax/Property";
-import {Counterexample} from "./Counterexample";
-
-export interface AnalysisAlgorithm<C extends ConcreteElement, E extends AbstractElement> {
-
-    run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>];
+export class Counterexample {
 
 }
-
