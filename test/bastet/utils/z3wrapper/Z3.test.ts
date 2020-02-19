@@ -20,6 +20,8 @@
  *
  */
 
+import {Z3_config, Z3_context} from "../../../../src/bastet/utils/z3wrapper/libz3";
+import {Ptr, Uint32} from "../../../../src/bastet/utils/z3wrapper/ctypes";
 import {SMTFactory, Z3SMT} from "../../../../src/bastet/utils/z3wrapper/Z3Wrapper";
 
 let smt: Z3SMT;

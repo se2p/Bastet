@@ -20,28 +20,24 @@
  */
 
 import {
-    CoreBoolExpressionVisitor,
-    CoreListExpressionVisitor,
-    CoreNonCtrlStatementnVisitor,
+    CoreBoolExpressionVisitor, CoreListExpressionVisitor, CoreNonCtrlStatementnVisitor,
     CoreNumberExpressionVisitor,
     CoreStringExpressionVisitor,
     CoreVisitor
 } from "../../../syntax/ast/CoreVisitor";
-import {SymMemAbstractState} from "./SyMemAbstractDomain";
+import {SyMemAbstractDomain, SymMemAbstractState} from "./SyMemAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {
     BoolAsNumberExpression,
     DivideExpression,
     IndexOfExpression,
-    LengthOfStringExpression,
-    LengthOListExpression,
+    LengthOfStringExpression, LengthOListExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
     NumberLiteral,
-    NumberVariableExpression,
-    NumFunctExpression,
+    NumberVariableExpression, NumFunctExpression,
     PickRandomFromExpression,
     PlusExpression,
     RoundExpression,
@@ -60,7 +56,7 @@ import {
     StringVariableExpression
 } from "../../../syntax/ast/core/expressions/StringExpression";
 import {
-    AndExpression,
+    AndExpression, BooleanExpression,
     BooleanLiteral,
     BooleanVariableExpression,
     NegationExpression,
@@ -110,12 +106,12 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {
     AbstractBoolean,
     AbstractList,
-    AbstractMemoryTheory,
     AbstractNumber,
     AbstractString,
-    RationalNumberTheory
+    AbstractMemoryTheory,
+    MemoryTransformer, RationalNumberTheory
 } from "../../domains/MemoryTransformer";
-import {NumberType} from "../../../syntax/ast/core/ScratchType";
+import {BooleanType, NumberType, ScratchType, ScratchTypeID} from "../../../syntax/ast/core/ScratchType";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {
     BooleanFormula,
@@ -124,10 +120,14 @@ import {
     NumberFormula,
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
-import {ConcreteNumber} from "../../domains/ConcreteElements";
+import {ConcreteNumber, ConcreteNumberDomain} from "../../domains/ConcreteElements";
+import {AbstractElement} from "../../../lattices/Lattice";
+import {Map as ImmMap} from "immutable";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
+import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 
-export class MemNumExpressionVisitor<N extends AbstractNumber, B extends AbstractBoolean> implements CoreNumberExpressionVisitor<N> {
+export class MemNumExpressionVisitor<N extends AbstractNumber, B extends AbstractBoolean>
+    implements CoreNumberExpressionVisitor<N> {
 
     private readonly _theory: RationalNumberTheory<N, B>;
 
@@ -175,14 +175,6 @@ export class MemNumExpressionVisitor<N extends AbstractNumber, B extends Abstrac
         throw new ImplementMeException();
     }
 
-    visitNumberLiteral(node: NumberLiteral): N {
-        return this._theory.fromConcreteNumber(new ConcreteNumber(node.num));
-    }
-
-    visitNumberVariableExpression(node: NumberVariableExpression): N {
-        const result = this._theory.abstractNumberValue(node.variable.identifier);
-        return Preconditions.checkNotUndefined(result);
-    }
 
     visitPickRandomFromExpression(node: PickRandomFromExpression): N {
         throw new ImplementMeException();
@@ -208,13 +200,11 @@ export class MemNumExpressionVisitor<N extends AbstractNumber, B extends Abstrac
 
 export class SyMemBoolExpressionVisitor implements CoreBoolExpressionVisitor<BooleanFormula> {
 
-    private readonly _base: SymMemAbstractState;
+    private readonly _base: FirstOrderFormula;
     private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
-    constructor(theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>,
-                base: SymMemAbstractState) {
+    constructor(theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
         this._theories = Preconditions.checkNotUndefined(theories);
-        this._base = Preconditions.checkNotUndefined(base);
     }
 
     visit(node: AstNode): BooleanFormula {
@@ -359,10 +349,6 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
-    visit(node: AstNode): B {
-        throw new ImplementMeException();
-    }
-
     visitCallStatement(node: CallStatement): B {
         return this._mem;
     }
@@ -476,6 +462,18 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
     }
 
     visitWaitUntilStatement(node: WaitUntilStatement): B {
+        throw new ImplementMeException();
+    }
+
+    visit(node: AstNode): B {
+        if (node['type']) {
+            const type = node['type'];
+            if (type === BooleanType.instance()) {
+                const visitor = new SyMemBoolExpressionVisitor(this._theories);
+
+            }
+        }
+
         throw new ImplementMeException();
     }
 
