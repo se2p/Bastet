@@ -42,6 +42,7 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {GraphAbstractState} from "../graph/GraphAbstractDomain";
+import {Property} from "../../../syntax/Property";
 
 export class ScheduleAnalysisConfig extends BastetConfiguration {
 
@@ -106,11 +107,17 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
         return false;
     }
 
-    target(state: ScheduleAbstractState): boolean {
-        if (state.getIsTarget()) {
-            return true;
+    target(state: ScheduleAbstractState): Property[] {
+        let result = [];
+        if (state.getIsTargetFor().size > 0) {
+            for (const p in state.getIsTargetFor()) {
+                result.push(p);
+            }
         }
-        return this._wrappedAnalysis.target(state.wrappedState);
+        for (const p of this._wrappedAnalysis.target(state.wrappedState)) {
+            result.push(p);
+        }
+        return result;
     }
 
     widen(state: ScheduleAbstractState): ScheduleAbstractState {

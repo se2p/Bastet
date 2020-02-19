@@ -25,6 +25,7 @@ import {App} from "../../syntax/app/App";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner} from "./Refiner";
+import {Property} from "../../syntax/Property";
 
 export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement> {
 
@@ -43,7 +44,7 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
 
     widen(state: E): E;
 
-    target(state: E): boolean;
+    target(state: E): Property[];
 
     initialStatesFor(task: App): E[];
 

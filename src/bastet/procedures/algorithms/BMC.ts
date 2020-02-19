@@ -51,7 +51,7 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
                 // Target state was found
                 Preconditions.checkState(reached.getAddedLast().length > 0);
                 const targetState = reached.getAddedLast()[0];
-                Preconditions.checkState(this._analysis.target(targetState));
+                Preconditions.checkState(this._analysis.target(targetState).length > 0);
 
                 // Check the feasibility with the refiner
                 if (this._refiner.checkIsFeasible(targetState)) {

@@ -34,6 +34,7 @@ import {StateSet} from "../../algorithms/StateSet";
 import {Preconditions} from "../../../utils/Preconditions";
 import {GraphToDot} from "./GraphToDot";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
+import {Property} from "../../../syntax/Property";
 
 export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState>,
     Unwrapper<GraphAbstractState, AbstractElement> {
@@ -79,7 +80,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         return false;
     }
 
-    target(state: GraphAbstractState): boolean {
+    target(state: GraphAbstractState): Property[] {
         return this._wrappedAnalysis.target(state.wrappedState);
     }
 

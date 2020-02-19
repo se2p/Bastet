@@ -30,6 +30,7 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {ConcreteDomain} from "../../domains/ConcreteElements";
 import {App} from "../../../syntax/app/App";
 import {BootstrapEvent} from "../../../syntax/ast/core/CoreEvent";
+import {Property} from "../../../syntax/Property";
 
 export const THREAD_STATE_RUNNING = 1;
 export const THREAD_STATE_RUNNING_ATOMIC = 2;
@@ -60,6 +61,9 @@ export interface ThreadStateAttributes {
     computationState: ScriptComputationState;
 
     waitingForThreads: ImmSet<ThreadId>;
+
+    failedFor: ImmSet<Property>;
+
 }
 
 const ThreadStateRecord = ImmRec({
@@ -68,15 +72,18 @@ const ThreadStateRecord = ImmRec({
     scriptId: -1,
     locationId: -1,
     computationState: THREAD_STATE_UNKNOWN,
-    waitingForThreads: ImmSet<ThreadId>()
+    waitingForThreads: ImmSet<ThreadId>(),
+    failedFor: ImmSet<Property>()
 });
 
 export class ThreadState extends ThreadStateRecord implements AbstractElement {
 
-    constructor(threadId, actorId, scriptId, locationId, compState, waitingForThreads) {
+    constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId,
+                locationId: LocationID, compState: ScriptComputationState,
+                waitingForThreads: ImmSet<ThreadId>, failedFor: ImmSet<Property>) {
         super({threadId: threadId, actorId: actorId, scriptId: scriptId,
             locationId: locationId, computationState: compState,
-            waitingForThreads: waitingForThreads});
+            waitingForThreads: waitingForThreads, failedFor: failedFor});
     }
 
     public getThreadId(): ThreadId {
@@ -111,8 +118,16 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement {
         return this.get('waitingForThreads');
     }
 
+    public getFailedFor(): ImmSet<Property> {
+        return this.get('failedFor');
+    }
+
     public withWaitingForThreads(value: ImmSet<ThreadId>): ThreadState {
         return this.set('waitingForThreads', value);
+    }
+
+    public withFailedFor(value: ImmSet<Property>): ThreadState {
+        return this.set('failedFor', value);
     }
 
 }
@@ -132,14 +147,14 @@ export class ThreadStateFactory {
                                       scriptId: ScriptId, locationId: LocationID): ThreadState {
         const threadId = this.freshId();
         return new ThreadState(threadId, actorId, scriptId, locationId,
-            THREAD_STATE_RUNNING, ImmSet());
+            THREAD_STATE_RUNNING, ImmSet(), ImmSet());
     }
 
 }
 
 export interface ScheduleAbstractStateAttributes extends AbstractElement, SingletonStateWrapper {
 
-    isTarget: boolean;
+    isTargetFor: ImmSet<Property>;
 
     threadStates: ImmList<ThreadState>;
 
@@ -153,7 +168,7 @@ const ScheduleAbstractStateRecord = ImmRec({
 
     wrappedState: null,
 
-    isTarget: false
+    isTargetFor: ImmSet()
 
 });
 
@@ -163,8 +178,8 @@ const ScheduleAbstractStateRecord = ImmRec({
  */
 export class ScheduleAbstractState extends ScheduleAbstractStateRecord implements AbstractElement {
 
-    constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement, isTarget: boolean) {
-        super({threadStates: threadStates, wrappedState: wrappedState, isTarget: isTarget});
+    constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement, isTargetFor: ImmSet<Property>) {
+        super({threadStates: threadStates, wrappedState: wrappedState, isTargetFor: isTargetFor});
     }
 
     public getThreadStates(): ImmList<ThreadState> {
@@ -175,15 +190,15 @@ export class ScheduleAbstractState extends ScheduleAbstractStateRecord implement
         return this.get("wrappedState");
     }
 
-    public getIsTarget(): boolean {
-        return this.get("isTarget");
+    public getIsTargetFor(): ImmSet<Property> {
+        return this.get("isTargetFor");
     }
 }
 
 export class ScheduleAbstractStateFactory {
 
-    public static createState(threadStates: ImmList<ThreadState>, wrappedStated: ImmRec<any>, isTarget: boolean): ScheduleAbstractState {
-        return new ScheduleAbstractState(threadStates, wrappedStated, isTarget);
+    public static createState(threadStates: ImmList<ThreadState>, wrappedStated: ImmRec<any>, isTargetFor: ImmSet<Property>): ScheduleAbstractState {
+        return new ScheduleAbstractState(threadStates, wrappedStated, isTargetFor);
     }
 
     static createInitialState(task: App, wrappedState: ImmRec<any>, isTarget) {
@@ -197,10 +212,11 @@ export class ScheduleAbstractStateFactory {
                 }
                 for (const locId of script.transitions.entryLocationSet) {
                     threads = threads.push(new ThreadState(threadId, actor.ident, script.id, locId,
-                        threadState, ImmSet()));
+                        threadState, ImmSet(), ImmSet()));
                 }
             }
         }
+
         return new ScheduleAbstractState(threads, wrappedState, isTarget);
     }
 }

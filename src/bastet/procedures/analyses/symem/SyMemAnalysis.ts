@@ -40,6 +40,7 @@ import {PropositionalFormula} from "../../../utils/bdd/BDD";
 import {Lattice, LatticeWithComplements} from "../../../lattices/Lattice";
 import {SyMemRefiner} from "./SyMemRefiner";
 import {Refiner} from "../Refiner";
+import {Property} from "../../../syntax/Property";
 
 export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, SymMemAbstractState>,
     LabeledTransferRelation<SymMemAbstractState> {
@@ -85,8 +86,8 @@ export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         return false;
     }
 
-    target(state: SymMemAbstractState): boolean {
-        return false;
+    target(state: SymMemAbstractState): Property[] {
+        return [];
     }
 
     widen(state: SymMemAbstractState): SymMemAbstractState {

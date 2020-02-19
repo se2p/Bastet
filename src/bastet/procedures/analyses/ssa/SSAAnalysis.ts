@@ -32,6 +32,7 @@ import {Map as ImmMap} from "immutable"
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {ScheduleAbstractState} from "../schedule/ScheduleAbstractDomain";
+import {Property} from "../../../syntax/Property";
 
 
 export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, SSAState>,
@@ -85,7 +86,7 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return false;
     }
 
-    target(state: SSAState): boolean {
+    target(state: SSAState): Property[] {
         return this._wrappedAnalysis.target(state.wrappedState);
     }
 

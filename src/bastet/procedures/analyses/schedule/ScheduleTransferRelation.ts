@@ -36,7 +36,7 @@ import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {App} from "../../../syntax/app/App";
 import {ScheduleAnalysisConfig} from "./ScheduleAnalysis";
-import {List as ImmList} from "immutable";
+import {List as ImmList, Set as ImmSet} from "immutable";
 import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
 import {WaitSecsStatement} from "../../../syntax/ast/core/statements/WaitSecsStatement";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
@@ -46,6 +46,9 @@ import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressi
 import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {RuntimeMethods} from "../../../syntax/app/controlflow/RuntimeMethods";
+import {Property} from "../../../syntax/Property";
+import {ExpressionList} from "../../../syntax/ast/core/expressions/ExpressionList";
+import instantiate = WebAssembly.instantiate;
 
 export type Schedule = ImmList<ThreadState>;
 
@@ -176,14 +179,26 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
 
                 for (const w of wrappedSuccStates) {
                     Preconditions.checkNotUndefined(w);
-                    const isTargetState = nextSchedules.filter(s => s.filter(t => t.getComputationState() === THREAD_STATE_FAILURE)).length > 0;
-                    const e = new ScheduleAbstractState(newThreadStates, w, isTargetState);
+                    const properties = this.extractProperties(nextSchedules);
+                    const e = new ScheduleAbstractState(newThreadStates, w, properties);
                     result.push(e);
                 }
             }
         }
 
         return result;
+    }
+
+    private extractProperties(sched: Schedule[]) {
+        const properties = [];
+        for (const s of sched) {
+            for (const t of s) {
+                for (const p of t.getFailedFor()) {
+                    properties.push(p);
+                }
+            }
+        }
+        return ImmSet(properties);
     }
 
     /**
@@ -258,6 +273,13 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
             inSchedule.get(ofThreadWithIdx).withComputationState(compState));
     }
 
+    private setFailure(inSchedule: Schedule, ofThreadWithIdx: number, properties: ImmSet<Property>): Schedule {
+        return inSchedule.set(ofThreadWithIdx,
+            inSchedule.get(ofThreadWithIdx)
+                .withComputationState(THREAD_STATE_FAILURE)
+                .withFailedFor(properties));
+    }
+
     /**
      * Given the schedule `threadStates` based on that `takenStep` was conducted,
      * create the set of succesor schedules.
@@ -286,7 +308,8 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         if (stepOp.ast instanceof CallStatement) {
             const call = stepOp.ast as CallStatement;
             if (call.calledMethod.text == RuntimeMethods._RUNTIME_signalFailure) {
-                resultBase = this.setCompState(resultBase, steppedThreadIdx, THREAD_STATE_FAILURE);
+                const properties = this.propertiesFromArguments(call.args);
+                resultBase = this.setFailure(resultBase, steppedThreadIdx, properties);
             }
         } else if (stepOp.ast instanceof BroadcastMessageStatement) {
             const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
@@ -466,5 +489,20 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
             return lit.text;
         }
         throw new ImplementMeException();
+    }
+
+    private propertiesFromArguments(args: ExpressionList): ImmSet<Property> {
+        let result = ImmSet();
+        for (const a of args) {
+            Preconditions.checkArgument(a instanceof StringLiteral);
+            const s: StringLiteral = a as StringLiteral;
+            result = result.add(s.text);
+        }
+
+        if (result.isEmpty()) {
+            result = result.add("Violating program location reachable!");
+        }
+
+        return result;
     }
 }
