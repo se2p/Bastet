@@ -107,7 +107,7 @@ import {ChangeVarByStatement} from "../../../syntax/ast/core/statements/ChangeVa
 import {ChangeAttributeByStatement} from "../../../syntax/ast/core/statements/ChangeAttributeByStatement";
 import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
 import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
-import {AstNode} from "../../../syntax/ast/AstNode";
+import {AstNode, OptionalAstNode} from "../../../syntax/ast/AstNode";
 import {Preconditions} from "../../../utils/Preconditions";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {SSAState} from "./SSAAbstractDomain";
@@ -120,6 +120,8 @@ import {
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 import {Variable, VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
+import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
+import {ExpressionList} from "../../../syntax/ast/core/expressions/ExpressionList";
 
 export class SSAssigner {
 
@@ -181,6 +183,23 @@ export class SSATransformerVisitor implements CoreVisitor<AstNode>,
 
     visit(node: AstNode): AstNode {
         throw new ImplementMeException();
+    }
+
+    visitCallStatement(node: CallStatement): AstNode {
+        const argExprs = [];
+        for (const a of node.args){
+            argExprs.push(a.accept(this) as Expression);
+        }
+        const args = new ExpressionList(argExprs);
+
+        let assignResultTo: OptionalAstNode<VariableWithDataLocation>;
+        if (node.assignResultTo.isPresent()) {
+            const readDataLocVersion: VersionedDataLocation = this._ssa.currentVersionOf(node.assignResultTo.value().dataloc);
+            assignResultTo = OptionalAstNode.with(new VariableWithDataLocation(readDataLocVersion));
+        } else {
+            assignResultTo = node.assignResultTo;
+        }
+        return new CallStatement(node.calledMethod, args, assignResultTo);
     }
 
     visitAssumeStatement(node: AssumeStatement): AstNode {

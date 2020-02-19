@@ -23,14 +23,15 @@ import {Statement} from "./Statement";
 import {Identifier} from "../Identifier";
 import {ExpressionList} from "../expressions/ExpressionList";
 import {OptionalAstNode} from "../../AstNode";
+import {Variable, VariableWithDataLocation} from "../Variable";
 
 export class CallStatement extends Statement {
 
     private readonly _calledMethod: Identifier;
     private readonly _args: ExpressionList;
-    private readonly _assignResultTo: OptionalAstNode<Identifier>;
+    private readonly _assignResultTo: OptionalAstNode<VariableWithDataLocation>;
 
-    constructor(calledMethod: Identifier, args: ExpressionList, assignResultTo: OptionalAstNode<Identifier>) {
+    constructor(calledMethod: Identifier, args: ExpressionList, assignResultTo: OptionalAstNode<VariableWithDataLocation>) {
         super([calledMethod, args, assignResultTo]);
         this._calledMethod = calledMethod;
         this._args = args;
@@ -45,7 +46,7 @@ export class CallStatement extends Statement {
         return this._args;
     }
 
-    get assignResultTo(): OptionalAstNode<Identifier> {
+    get assignResultTo(): OptionalAstNode<VariableWithDataLocation> {
         return this._assignResultTo;
     }
 }

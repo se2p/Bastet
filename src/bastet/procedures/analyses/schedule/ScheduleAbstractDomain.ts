@@ -139,6 +139,8 @@ export class ThreadStateFactory {
 
 export interface ScheduleAbstractStateAttributes extends AbstractElement, SingletonStateWrapper {
 
+    isTarget: boolean;
+
     threadStates: ImmList<ThreadState>;
 
     wrappedState: AbstractElement;
@@ -148,7 +150,10 @@ export interface ScheduleAbstractStateAttributes extends AbstractElement, Single
 const ScheduleAbstractStateRecord = ImmRec({
 
     threadStates: ImmList<ThreadState>([]),
+
     wrappedState: null,
+
+    isTarget: false
 
 });
 
@@ -158,8 +163,8 @@ const ScheduleAbstractStateRecord = ImmRec({
  */
 export class ScheduleAbstractState extends ScheduleAbstractStateRecord implements AbstractElement {
 
-    constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement) {
-        super({threadStates: threadStates, wrappedState: wrappedState});
+    constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement, isTarget: boolean) {
+        super({threadStates: threadStates, wrappedState: wrappedState, isTarget: isTarget});
     }
 
     public getThreadStates(): ImmList<ThreadState> {
@@ -169,15 +174,19 @@ export class ScheduleAbstractState extends ScheduleAbstractStateRecord implement
     public getWrappedState(): AbstractElement {
         return this.get("wrappedState");
     }
+
+    public getIsTarget(): boolean {
+        return this.get("isTarget");
+    }
 }
 
 export class ScheduleAbstractStateFactory {
 
-    public static createState(threadStates: ImmList<ThreadState>, wrappedStated: ImmRec<any>): ScheduleAbstractState {
-        return new ScheduleAbstractState(threadStates, wrappedStated);
+    public static createState(threadStates: ImmList<ThreadState>, wrappedStated: ImmRec<any>, isTarget: boolean): ScheduleAbstractState {
+        return new ScheduleAbstractState(threadStates, wrappedStated, isTarget);
     }
 
-    static createInitialState(task: App, wrappedState: ImmRec<any>) {
+    static createInitialState(task: App, wrappedState: ImmRec<any>, isTarget) {
         let threads = ImmList<ThreadState>([]);
         for (const actor of task.actors) {
             for (const script of actor.scripts) {
@@ -192,7 +201,7 @@ export class ScheduleAbstractStateFactory {
                 }
             }
         }
-        return new ScheduleAbstractState(threads, wrappedState);
+        return new ScheduleAbstractState(threads, wrappedState, isTarget);
     }
 }
 

@@ -71,4 +71,8 @@ export class VariableWithDataLocation extends AbstractExpression implements Vari
     get qualifiedName(): string {
         return this._dataloc.qualifiedName;
     }
+
+    get dataloc(): DataLocation {
+        return this._dataloc;
+    }
 }

@@ -999,7 +999,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
         // - The actual call statement
         const callMethodIdent = Identifier.of((ctx.numFunct().accept(this).nodeOnly() as StringLiteral).text);
-        const callStmt = new CallStatement(callMethodIdent, callArgs, OptionalAstNode.with(resultVarIdent));
+        const resultDataLocVar = new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, NumberType.instance()));
+        const callStmt = new CallStatement(callMethodIdent, callArgs, OptionalAstNode.with(resultDataLocVar));
         prepend = StatementLists.concat(prepend, new StatementList([callStmt]));
 
         return new TransformerResult(prepend, resultVarExpr);
@@ -1243,7 +1244,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             new CallStatement(
                 ctx.ident().accept(this).nodeOnly() as Identifier,
                 exprTr.node as ExpressionList,
-                OptionalAstNode.absent<Identifier>()));
+                OptionalAstNode.absent<VariableWithDataLocation>()));
     }
 
     public visitChagenAttributeByStatement(ctx: ChagenAttributeByStatementContext) : TransformerResult {
@@ -1846,7 +1847,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                     new CallStatement(
                         Identifier.of(functionCandidateName),
                         argsTr.node,
-                        OptionalAstNode.with(resultVarIdent))
+                        OptionalAstNode.with(new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, resultVarType))))
                 ]));
 
                 return new TransformerResult(prepend, resultVarExpr);

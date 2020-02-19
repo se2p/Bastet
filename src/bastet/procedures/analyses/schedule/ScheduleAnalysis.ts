@@ -113,7 +113,7 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
 
     initialStatesFor(task: App): ScheduleAbstractState[] {
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            return ScheduleAbstractStateFactory.createInitialState(task, w);
+            return ScheduleAbstractStateFactory.createInitialState(task, w, false);
         });
     }
 

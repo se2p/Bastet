@@ -45,6 +45,7 @@ import {MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
 import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressions/StringExpression";
 import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
+import {RuntimeMethods} from "../../../syntax/app/controlflow/RuntimeMethods";
 
 export type Schedule = ImmList<ThreadState>;
 
@@ -175,7 +176,8 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
 
                 for (const w of wrappedSuccStates) {
                     Preconditions.checkNotUndefined(w);
-                    const e = new ScheduleAbstractState(newThreadStates, w);
+                    const isTargetState = nextSchedules.filter(s => s.filter(t => t.getComputationState() === THREAD_STATE_FAILURE)).length > 0;
+                    const e = new ScheduleAbstractState(newThreadStates, w, isTargetState);
                     result.push(e);
                 }
             }
@@ -283,7 +285,7 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         //
         if (stepOp.ast instanceof CallStatement) {
             const call = stepOp.ast as CallStatement;
-            if (call.calledMethod.text == "_RUNTIME_signalFailure") {
+            if (call.calledMethod.text == RuntimeMethods._RUNTIME_signalFailure) {
                 resultBase = this.setCompState(resultBase, steppedThreadIdx, THREAD_STATE_FAILURE);
             }
         } else if (stepOp.ast instanceof BroadcastMessageStatement) {

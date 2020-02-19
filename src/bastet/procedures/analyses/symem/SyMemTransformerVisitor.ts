@@ -125,6 +125,7 @@ import {AbstractElement} from "../../../lattices/Lattice";
 import {Map as ImmMap} from "immutable";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
+import {RuntimeMethods} from "../../../syntax/app/controlflow/RuntimeMethods";
 
 export class MemNumExpressionVisitor<N extends AbstractNumber, B extends AbstractBoolean>
     implements CoreNumberExpressionVisitor<N> {
@@ -206,68 +207,70 @@ export class MemNumExpressionVisitor<N extends AbstractNumber, B extends Abstrac
 
 }
 
-export class SyMemBoolExpressionVisitor implements CoreBoolExpressionVisitor<BooleanFormula> {
+export class SyMemBoolExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
+    S extends AbstractString, L extends AbstractList>
+    implements CoreBoolExpressionVisitor<B> {
 
-    private readonly _base: FirstOrderFormula;
-    private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
+    private readonly _base: B;
+    private readonly _theories: AbstractMemoryTheory<B, B, N, S, L>;
 
-    constructor(theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
+    constructor(theories: AbstractMemoryTheory<B, B, N, S, L>) {
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
-    visit(node: AstNode): BooleanFormula {
+    visit(node: AstNode): B {
         throw new ImplementMeException();
     }
 
-    visitAndExpression(node: AndExpression): BooleanFormula {
+    visitAndExpression(node: AndExpression): B {
         throw new ImplementMeException();
     }
 
-    visitBooleanLiteral(node: BooleanLiteral): BooleanFormula {
+    visitBooleanLiteral(node: BooleanLiteral): B {
         throw new ImplementMeException();
     }
 
-    visitBooleanVariableExpression(node: BooleanVariableExpression): BooleanFormula {
+    visitBooleanVariableExpression(node: BooleanVariableExpression): B {
         throw new ImplementMeException();
     }
 
-    visitNegationExpression(node: NegationExpression): BooleanFormula {
-        const toNegate: BooleanFormula = node.negate.accept(this);
+    visitNegationExpression(node: NegationExpression): B {
+        const toNegate: B = node.negate.accept(this);
         return this._theories.boolTheory.not(toNegate);
     }
 
-    visitNumEqualsExpression(node: NumEqualsExpression): BooleanFormula {
+    visitNumEqualsExpression(node: NumEqualsExpression): B {
         throw new ImplementMeException();
     }
 
-    visitNumGreaterThanExpression(node: NumGreaterThanExpression): BooleanFormula {
+    visitNumGreaterThanExpression(node: NumGreaterThanExpression): B {
         const numVisitor = new MemNumExpressionVisitor(this._theories.numTheory);
-        const op1: AbstractNumber = node.operand1.accept(numVisitor);
-        const op2: AbstractNumber = node.operand2.accept(numVisitor);
+        const op1: N = node.operand1.accept(numVisitor);
+        const op2: N = node.operand2.accept(numVisitor);
         return this._theories.numTheory.isGreaterThan(op1, op2);
     }
 
-    visitNumLessThanExpression(node: NumLessThanExpression): BooleanFormula {
+    visitNumLessThanExpression(node: NumLessThanExpression): B {
         throw new ImplementMeException();
     }
 
-    visitOrExpression(node: OrExpression): BooleanFormula {
+    visitOrExpression(node: OrExpression): B {
         throw new ImplementMeException();
     }
 
-    visitStrContainsExpression(node: StrContainsExpression): BooleanFormula {
+    visitStrContainsExpression(node: StrContainsExpression): B {
         throw new ImplementMeException();
     }
 
-    visitStrEqualsExpression(node: StrEqualsExpression): BooleanFormula {
+    visitStrEqualsExpression(node: StrEqualsExpression): B {
         throw new ImplementMeException();
     }
 
-    visitStrGreaterThanExpression(node: StrGreaterThanExpression): BooleanFormula {
+    visitStrGreaterThanExpression(node: StrGreaterThanExpression): B {
         throw new ImplementMeException();
     }
 
-    visitStrLessThanExpression(node: StrLessThanExpression): BooleanFormula {
+    visitStrLessThanExpression(node: StrLessThanExpression): B {
         throw new ImplementMeException();
     }
 
@@ -358,7 +361,11 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
     }
 
     visitCallStatement(node: CallStatement): B {
-        return this._mem;
+        const method = node.calledMethod.text;
+        if (method == RuntimeMethods._RUNTIME_signalFailure) {
+            return this._mem;
+        }
+        throw new ImplementMeException();
     }
 
     visitAddElementToStatement(node: AddElementToStatement): B {
@@ -451,7 +458,7 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
     }
 
     visitAssumeStatement(node: AssumeStatement): B {
-        const assume = node.condition.accept(this);
+        const assume = this.visitBoolExpression(node.condition);
         return this._theories.boolTheory.and(this._mem, assume);
     }
 
@@ -473,15 +480,13 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
         throw new ImplementMeException();
     }
 
+    visitBoolExpression(node: BooleanExpression): B {
+        Preconditions.checkNotUndefined(node);
+        const visitor = new SyMemBoolExpressionVisitor(this._theories);
+        return node.accept(visitor);
+    }
+
     visit(node: AstNode): B {
-        if (node['type']) {
-            const type = node['type'];
-            if (type === BooleanType.instance()) {
-                const visitor = new SyMemBoolExpressionVisitor(this._theories);
-
-            }
-        }
-
         throw new ImplementMeException();
     }
 
