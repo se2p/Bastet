@@ -196,6 +196,14 @@ export class MemNumExpressionVisitor<N extends AbstractNumber, B extends Abstrac
         throw new ImplementMeException();
     }
 
+    visitNumberLiteral(node: NumberLiteral): N {
+        throw new ImplementMeException();
+    }
+
+    visitNumberVariableExpression(node: NumberVariableExpression): N {
+        throw new ImplementMeException();
+    }
+
 }
 
 export class SyMemBoolExpressionVisitor implements CoreBoolExpressionVisitor<BooleanFormula> {
