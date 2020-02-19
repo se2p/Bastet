@@ -27,7 +27,6 @@ import {DataLocationMap, DataLocations} from "./controlflow/DataLocation";
 import {ScratchType} from "../ast/core/ScratchType";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {TransitionRelation, TransitionRelations} from "./controlflow/TransitionRelation";
-import {TransitionRelationToDot} from "./controlflow/TransitionRelationToDot";
 import {AstNode} from "../ast/AstNode";
 import {Preconditions} from "../../utils/Preconditions";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
@@ -97,27 +96,12 @@ export class AppBuilder {
 
             // Add as result
             result[flatActor.ident] = flatActor;
-
-            // Dot file export
-            this.exportScriptsToDoT(flatActor);
         }
 
         const boostrapper = Actors.defaultBoostraper();
         result[boostrapper.ident] = boostrapper;
 
         return result;
-    }
-
-    private exportScriptsToDoT(actor: Actor): void {
-        const toDotWriter = new TransitionRelationToDot();
-        let i: number = 1;
-        for (let s of actor.scripts) {
-            const target: string = `output/actor_${actor.ident}_script_${i}.dot`;
-            toDotWriter.export(s.transitions, target);
-            i++;
-        }
-        const target: string = `output/actor_${actor.ident}_script_init.dot`;
-        toDotWriter.export(actor.initScript.transitions, target);
     }
 
     private buildActorFlat(actorDefinition: ActorDefinition, actorNamePrefix: string) {
