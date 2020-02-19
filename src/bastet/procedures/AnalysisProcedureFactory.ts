@@ -31,6 +31,7 @@ import {SyMemAnalysis} from "./analyses/symem/SyMemAnalysis";
 import {BDDLibraryFactory} from "../utils/bdd/BDD";
 import {Z3MemoryTheoryInContext} from "../utils/z3wrapper/Z3MemoryTheory";
 import {SSAAnalysis} from "./analyses/ssa/SSAAnalysis";
+import {BMCAlgorithm} from "./algorithms/BMC";
 
 export class AnalysisProcedureConfig {
 
@@ -65,12 +66,13 @@ export class AnalysisProcedureFactory {
                 const chooseOpConfig = new ChooseOpConfig();
                 const chooseOp = frontier.createChooseOp(chooseOpConfig);
                 const reachabilityAlgorithm = new ReachabilityAlgorithm(graphAnalysis, chooseOp);
+                const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, graphAnalysis.refiner);
 
                 const initialStates: GraphAbstractState[] = graphAnalysis.initialStatesFor(task);
                 frontier.addAll(initialStates);
                 reached.addRootSates(initialStates);
 
-                const [reachedPrime, frontierPrime] = reachabilityAlgorithm.run(frontier, reached);
+                const [reachedPrime, frontierPrime] = bmcAlgorithm.run(frontier, reached);
 
                 graphAnalysis.exportAnalysisResult(reachedPrime, frontierPrime);
 

@@ -33,14 +33,18 @@ import {AbstractElement} from "../../../lattices/Lattice";
 import {StateSet} from "../../algorithms/StateSet";
 import {Preconditions} from "../../../utils/Preconditions";
 import {GraphToDot} from "./GraphToDot";
+import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 
-export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState> {
+export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState>,
+    Unwrapper<GraphAbstractState, AbstractElement> {
 
     private readonly _abstractDomain: AbstractDomain<GraphConcreteState, GraphAbstractState>;
 
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
 
     private readonly _transferRelation: GraphTransferRelation;
+
+    private readonly _refiner: Refiner<GraphAbstractState>;
 
     private readonly _task: App;
 
@@ -49,6 +53,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new GraphAbstractDomain();
         this._transferRelation = new GraphTransferRelation((e) => this._wrappedAnalysis.abstractSucc(e));
+        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
     }
 
     abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
@@ -83,14 +88,6 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         return state;
     }
 
-    get abstractDomain(): AbstractDomain<GraphConcreteState, GraphAbstractState> {
-        return this._abstractDomain;
-    }
-
-    get wrappedAnalysis(): ProgramAnalysis<any, any> {
-        return this._wrappedAnalysis;
-    }
-
     initialStatesFor(task: App): GraphAbstractState[] {
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
@@ -113,5 +110,21 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         const trp = this.determineTransLabProvider(this.wrappedAnalysis);
         const exporter = new GraphToDot(trp, reachedPrime, frontierPrime);
         exporter.writeToFile(`output/reachability-graph.dot`);
+    }
+
+    unwrap(e: GraphAbstractState): AbstractElement {
+        return e.getWrappedState();
+    }
+
+    get refiner(): Refiner<GraphAbstractState> {
+        return this._refiner;
+    }
+
+    get abstractDomain(): AbstractDomain<GraphConcreteState, GraphAbstractState> {
+        return this._abstractDomain;
+    }
+
+    get wrappedAnalysis(): ProgramAnalysis<any, any> {
+        return this._wrappedAnalysis;
     }
 }

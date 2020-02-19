@@ -38,12 +38,19 @@ import {
 } from "../../../utils/ConjunctiveNormalForm";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
 import {Lattice} from "../../../lattices/Lattice";
+import {SyMemRefiner} from "./SyMemRefiner";
+import {Refiner} from "../Refiner";
 
-export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, SymMemAbstractState>, LabeledTransferRelation<SymMemAbstractState> {
+export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, SymMemAbstractState>,
+    LabeledTransferRelation<SymMemAbstractState> {
 
     private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
+
     private readonly _abstractDomain: SyMemAbstractDomain;
+
     private readonly _transferRelation: SyMemTransferRelation;
+
+    private readonly _refiner: SyMemRefiner;
 
     constructor(folLattice: Lattice<FirstOrderFormula>, propLattice: Lattice<PropositionalFormula>,
                 theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
@@ -53,6 +60,7 @@ export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         this._theories = Preconditions.checkNotUndefined(theories);
         this._abstractDomain = new SyMemAbstractDomain(folLattice, propLattice);
         this._transferRelation = new SyMemTransferRelation(this._abstractDomain, this._theories);
+        this._refiner = new SyMemRefiner();
     }
 
     abstractSucc(fromState: SymMemAbstractState): Iterable<SymMemAbstractState> {
@@ -97,5 +105,9 @@ export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
 
     get abstractDomain(): AbstractDomain<ConcreteMemory, SymMemAbstractState> {
         return this._abstractDomain;
+    }
+
+    get refiner(): Refiner<SymMemAbstractState> {
+        return this._refiner;
     }
 }

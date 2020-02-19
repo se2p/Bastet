@@ -39,6 +39,9 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
+import {AbstractElement} from "../../../lattices/Lattice";
+import {GraphAbstractState} from "../graph/GraphAbstractDomain";
 
 export class ScheduleAnalysisConfig extends BastetConfiguration {
 
@@ -53,12 +56,19 @@ export class ScheduleAnalysisConfig extends BastetConfiguration {
 }
 
 export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<ScheduleConcreteState, ScheduleAbstractState>,
-    WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState> {
+    WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState>,
+    Unwrapper<ScheduleAbstractState, AbstractElement> {
 
     private readonly _config: ScheduleAnalysisConfig;
+
     private readonly _abstractDomain: AbstractDomain<ScheduleConcreteState, ScheduleAbstractState>;
+
     private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any>;
+
     private readonly _transferRelation: ScheduleTransferRelation;
+
+    private readonly _refiner: Refiner<ScheduleAbstractState>;
+
     private readonly _task: App;
 
     constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any>) {
@@ -69,6 +79,7 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
         this._transferRelation = new ScheduleTransferRelation(this._config, task,
             new LabeledTransferRelationImpl((e) => this._wrappedAnalysis.abstractSucc(e),
                 (e, op) => this._wrappedAnalysis.abstractSuccFor(e, op)));
+        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
     }
 
     abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
@@ -96,11 +107,22 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
     }
 
     target(state: ScheduleAbstractState): boolean {
+        if (state.getIsTarget()) {
+            return true;
+        }
         return this._wrappedAnalysis.target(state.wrappedState);
     }
 
     widen(state: ScheduleAbstractState): ScheduleAbstractState {
         return undefined;
+    }
+
+    unwrap(e: ScheduleAbstractState): AbstractElement {
+        return e.getWrappedState();
+    }
+
+    get refiner(): Refiner<ScheduleAbstractState> {
+        return this._refiner;
     }
 
     get wrappedAnalysis(): ProgramAnalysis<any, any> {

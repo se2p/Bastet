@@ -30,16 +30,21 @@ import {SSAAbstractDomain, SSAState} from "./SSAAbstractDomain";
 import {SSATransferRelation} from "./SSATransferRelation";
 import {Map as ImmMap} from "immutable"
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
+import {ScheduleAbstractState} from "../schedule/ScheduleAbstractDomain";
 
 
 export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, SSAState>,
-    LabeledTransferRelation<SSAState> {
+    LabeledTransferRelation<SSAState>,
+    Unwrapper<SSAState, AbstractElement> {
 
     private readonly _abstractDomain: AbstractDomain<ConcreteElement, SSAState>;
 
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
 
     private readonly _transferRelation: SSATransferRelation;
+
+    private readonly _refiner: Refiner<SSAState>;
 
     private readonly _task: App;
 
@@ -50,6 +55,7 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
 
         const wrappedTr = LabeledTransferRelationImpl.from(wrappedAnalysis);
         this._transferRelation = new SSATransferRelation(wrappedTr);
+        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
     }
 
     abstractSucc(fromState: SSAState): Iterable<SSAState> {
@@ -86,6 +92,14 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
     widen(state: SSAState): SSAState {
         // TODO: Implement the widening (delegate to wrapped analyses)
         return state;
+    }
+
+    unwrap(e: SSAState): AbstractElement {
+        return e.getWrappedState();
+    }
+
+    get refiner(): Refiner<SSAState> {
+        return this._refiner;
     }
 
     get abstractDomain(): AbstractDomain<ConcreteElement, SSAState> {

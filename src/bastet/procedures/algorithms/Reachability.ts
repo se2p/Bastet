@@ -83,14 +83,14 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
 
                     // TARGET: Has a target state been signaled?
                     if (this._analysis.target(checkStopFor)) {
-                        return [reached, frontier];
+                        return [frontier, reached];
                     }
                 }
             }
         }
 
         Preconditions.checkState(frontier.isEmpty());
-        return [reached, frontier];
+        return [frontier, reached];
     }
 
 }

@@ -21,30 +21,34 @@
  */
 
 
-import {ConcreteElement} from "../domains/ConcreteElements";
 import {AbstractElement} from "../../lattices/Lattice";
-import {StateSet} from "./StateSet";
-import {AnalysisAlgorithm} from "./Algorithm";
-import {Refiner} from "../analyses/Refiner";
 import {Preconditions} from "../../utils/Preconditions";
 
-export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
-    implements AnalysisAlgorithm<C, E> {
+export interface Refiner<E extends AbstractElement> {
 
-    private readonly wrappedAlgorithm: AnalysisAlgorithm<C, E>;
+    checkIsFeasible(e: E): boolean;
 
-    private readonly refiner: Refiner<E>;
+}
 
-    constructor(wrappedAlgorithm: AnalysisAlgorithm<C, E>, refiner: Refiner<E>) {
-        this.wrappedAlgorithm = Preconditions.checkNotUndefined(wrappedAlgorithm);
-        this.refiner = Preconditions.checkNotUndefined(refiner);
+export interface Unwrapper<E extends AbstractElement, W extends AbstractElement> {
+
+    unwrap(e: E): W;
+
+}
+
+export class WrappingRefiner<E extends AbstractElement, W extends AbstractElement> implements Refiner<E>{
+
+    private readonly _wrapped: Refiner<W>;
+    private readonly _unwrapper: Unwrapper<E, W>;
+
+    constructor(wrapped: Refiner<W>, unwrapper: Unwrapper<E, W>) {
+        this._wrapped = Preconditions.checkNotUndefined(wrapped);
+        this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
     }
 
-    public run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
-        do {
-            [frontier, reached] = this.wrappedAlgorithm.run(frontier, reached);
-        } while (!frontier.isEmpty());
-
-        return [frontier, reached];
+    checkIsFeasible(e: E): boolean {
+        const w = this._unwrapper.unwrap(e);
+        return this._wrapped.checkIsFeasible(w);
     }
+
 }

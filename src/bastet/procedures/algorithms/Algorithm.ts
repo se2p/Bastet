@@ -20,31 +20,14 @@
  *
  */
 
-
+import {StateSet} from "./StateSet";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {AbstractElement} from "../../lattices/Lattice";
-import {StateSet} from "./StateSet";
-import {AnalysisAlgorithm} from "./Algorithm";
-import {Refiner} from "../analyses/Refiner";
-import {Preconditions} from "../../utils/Preconditions";
 
-export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
-    implements AnalysisAlgorithm<C, E> {
+export interface AnalysisAlgorithm<C extends ConcreteElement, E extends AbstractElement> {
 
-    private readonly wrappedAlgorithm: AnalysisAlgorithm<C, E>;
+    run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>];
 
-    private readonly refiner: Refiner<E>;
-
-    constructor(wrappedAlgorithm: AnalysisAlgorithm<C, E>, refiner: Refiner<E>) {
-        this.wrappedAlgorithm = Preconditions.checkNotUndefined(wrappedAlgorithm);
-        this.refiner = Preconditions.checkNotUndefined(refiner);
-    }
-
-    public run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
-        do {
-            [frontier, reached] = this.wrappedAlgorithm.run(frontier, reached);
-        } while (!frontier.isEmpty());
-
-        return [frontier, reached];
-    }
 }
+
+
