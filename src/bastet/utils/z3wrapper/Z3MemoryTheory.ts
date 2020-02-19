@@ -41,6 +41,7 @@ import {Ptr, Sint32, Uint32} from "./ctypes";
 import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {SMTFirstOrderLattice} from "../../procedures/domains/FirstOrderDomain";
 import {Z3ProverEnvironment} from "./Z3Wrapper";
+import {Variable} from "../../syntax/ast/core/Variable";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;
 
@@ -96,8 +97,8 @@ export class Z3BooleanTheory implements BooleanTheory<Z3BooleanFormula> {
         this._ctx = Preconditions.checkNotUndefined(ctx);
     }
 
-    abstractBooleanValue(id: Identifier): Z3BooleanFormula {
-        return new Z3BooleanFormula(this._ctx.mk_fresh_const(id.text, this._ctx.mk_bool_sort()));
+    abstractBooleanValue(id: Variable): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_fresh_const(id.qualifiedName, this._ctx.mk_bool_sort()));
     }
 
     private arrayToHeap(typedArray){
@@ -170,8 +171,8 @@ export class Z3NumberTheory implements RationalNumberTheory<Z3NumberFormula, Z3B
         this._ctx = Preconditions.checkNotUndefined(ctx);
     }
 
-    abstractNumberValue(id: Identifier): Z3NumberFormula {
-        return new Z3NumberFormula(this._ctx.mk_fresh_const(id.text, this._ctx.mk_int_sort()));
+    abstractNumberValue(id: Variable): Z3NumberFormula {
+        return new Z3NumberFormula(this._ctx.mk_fresh_const(id.qualifiedName, this._ctx.mk_int_sort()));
     }
 
     bottomNumber(): Z3NumberFormula {

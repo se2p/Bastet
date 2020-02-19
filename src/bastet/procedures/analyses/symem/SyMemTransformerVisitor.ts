@@ -197,11 +197,11 @@ export class MemNumExpressionVisitor<N extends AbstractNumber, B extends Abstrac
     }
 
     visitNumberLiteral(node: NumberLiteral): N {
-        throw new ImplementMeException();
+        return this._theory.fromConcreteNumber(new ConcreteNumber(node.num));
     }
 
     visitNumberVariableExpression(node: NumberVariableExpression): N {
-        throw new ImplementMeException();
+        return this._theory.abstractNumberValue(node.variable);
     }
 
 }
@@ -461,7 +461,7 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
         if (declaredType instanceof NumberType) {
             const visitor = new MemNumExpressionVisitor(this._theories.numTheory);
             const value: N = node.toValue.accept(visitor);
-            const assignTo = this._theories.numTheory.abstractNumberValue(node.variable.identifier);
+            const assignTo = this._theories.numTheory.abstractNumberValue(node.variable);
             const assume: B = this._theories.numTheory.isNumberEqualTo(assignTo, value);
             return this._theories.boolTheory.and(this._mem, assume);
         } else {

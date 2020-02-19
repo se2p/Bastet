@@ -34,6 +34,7 @@ import {
     RationalNumberTheory
 } from "./MemoryTransformer";
 import {Identifier} from "../../syntax/ast/core/Identifier";
+import {Variable} from "../../syntax/ast/core/Variable";
 
 export interface NumIntervalValueAttribs extends AbstractElement {
 
@@ -114,7 +115,7 @@ export class NumIntervalTheory implements RationalNumberTheory<NumIntervalValue,
         this._boolTheory = Preconditions.checkNotUndefined(boolTheory);
     }
 
-    abstractNumberValue(id: Identifier): NumIntervalValue {
+    abstractNumberValue(id: Variable): NumIntervalValue {
         throw new ImplementMeException();
     }
 
