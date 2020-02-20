@@ -82,7 +82,7 @@ export class AnalysisProcedureFactory {
                 frontier.addAll(initialStates);
                 reached.addRootSates(initialStates);
 
-                const [reachedPrime, frontierPrime] = multiPropertyAlgorithm.run(frontier, reached);
+                const [frontierPrime, reachedPrime] = multiPropertyAlgorithm.run(frontier, reached);
                 graphAnalysis.exportAnalysisResult(reachedPrime, frontierPrime);
 
                 return {};
