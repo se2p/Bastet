@@ -64,6 +64,8 @@ export interface StateSet<E extends AbstractElement> {
     addRootSates(elements: Iterable<E>);
 
     getRootStates(): Set<E>;
+
+    getSize(): number;
 }
 
 export abstract class AbstractStateSet<E extends AbstractElement> {
@@ -99,6 +101,9 @@ export abstract class AbstractStateSet<E extends AbstractElement> {
     abstract createChooseOp(config: ChooseOpConfig);
 
     abstract getAddedLast(): E[];
+
+    abstract getSize(): number;
+
 }
 
 /**
@@ -164,6 +169,10 @@ export class OrderedStateSet<E extends AbstractElement> extends AbstractStateSet
                 return outer._states.values().next().value as E;
             }
         }
+    }
+
+    getSize(): number {
+        return this._states.size;
     }
 }
 

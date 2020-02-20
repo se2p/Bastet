@@ -20,13 +20,25 @@
  *
  */
 
+import {Preconditions} from "../../utils/Preconditions";
+import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
+
 const { performance } = require('perf_hooks');
 
 export class PerfTimer {
 
+    private _duartion: number;
+
     private _startTime: number;
 
     private _stopTime: number;
+
+    private readonly _onStopCallback: (timer: PerfTimer) => void;
+
+    constructor(onStopCallback: (timer: PerfTimer) => void) {
+        this._onStopCallback = onStopCallback;
+        this._duartion = 0;
+    }
 
     public start() {
         this._startTime = performance.now();
@@ -34,20 +46,70 @@ export class PerfTimer {
 
     public stop(): number {
         this._stopTime = performance.now();
+        return this.stopWith(this._stopTime);
+    }
+
+    public stopWith(commonTimeMsec: number): number {
+        this._stopTime = commonTimeMsec;
+        this._duartion = this._duartion + this.lastIntervalDuration;
+        this._onStopCallback(this);
         return this.duration;
     }
 
-    get duration() : number {
+    get lastIntervalDuration() : number {
         return this._stopTime - this._startTime;
+    }
+
+    get duration() : number {
+        return this._duartion;
     }
 }
 
+
 export class AnalysisStatistics {
 
-    public readonly analysisTime: PerfTimer;
+    private readonly _name: string;
 
-    constructor() {
-        this.analysisTime = new PerfTimer();
+    private readonly _statisticsTree : {};
+
+    private readonly _contextTimer: PerfTimer;
+
+    constructor(name: string, context: {}) {
+        this._statisticsTree = Preconditions.checkNotUndefined(context);
+        this._name = Preconditions.checkNotEmpty(name);
+        this._contextTimer = new PerfTimer((t) => {
+            this._statisticsTree['duration'] = t.duration;
+        });
+    }
+
+    get contextTimer(): PerfTimer {
+        return this._contextTimer;
+    }
+
+    public newContext(name: string): AnalysisStatistics {
+        if (this._statisticsTree[name]) {
+            throw new IllegalStateException("Context already in use");
+        }
+        const newContextRoot = this._statisticsTree[name] = {};
+        return new AnalysisStatistics(name, newContextRoot);
+    }
+
+    public increment(key: string) {
+        this.incrementBy(key, 1);
+    }
+
+    public incrementBy(key: string, by: number) {
+        const currentValue = this._statisticsTree[key] || 0;
+        this._statisticsTree[key] = currentValue + by;
+    }
+
+    public put(key: string, value: any) {
+        Preconditions.checkNotEmpty(key);
+        this._statisticsTree[key] = value;
+    }
+
+    public stringifyToJSON(): string {
+        return JSON.stringify(this._statisticsTree, null, "    ");
     }
 
 }

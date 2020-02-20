@@ -82,6 +82,10 @@ export abstract class DelegatingStateSetWrapper<E extends AbstractElement> imple
         return this._wrappedReached.removeAll(elements);
     }
 
+    getSize(): number {
+        return this._wrappedReached.getSize();
+    }
+
 }
 
 export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DelegatingStateSetWrapper<E> {

@@ -36,6 +36,7 @@ import {GraphToDot} from "./GraphToDot";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
+import {AnalysisStatistics} from "../AnalysisStatistics";
 
 export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState>,
     Unwrapper<GraphAbstractState, AbstractElement> {
@@ -50,12 +51,15 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
 
     private readonly _task: App;
 
-    constructor(task: App, wrappedAnalysis: ProgramAnalysis<any, any>) {
+    private readonly _statistics: AnalysisStatistics;
+
+    constructor(task: App, wrappedAnalysis: ProgramAnalysis<any, any>, statistics: AnalysisStatistics) {
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new GraphAbstractDomain();
         this._transferRelation = new GraphTransferRelation((e) => this._wrappedAnalysis.abstractSucc(e));
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
+        this._statistics = Preconditions.checkNotUndefined(statistics).newContext(this.constructor.name);
     }
 
     abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {

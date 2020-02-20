@@ -34,7 +34,7 @@ import {SSAAnalysis} from "./analyses/ssa/SSAAnalysis";
 import {BMCAlgorithm} from "./algorithms/BMCAlgorithm";
 import {MultiPropertyAlgorithm} from "./algorithms/MultiPropertyAlgorithm";
 import {Property} from "../syntax/Property";
-import {Record as ImmRec, Set as ImmSet} from "immutable";
+import {Set as ImmSet} from "immutable";
 import {AnalysisStatistics} from "./analyses/AnalysisStatistics";
 
 export class AnalysisProcedureConfig {
@@ -50,13 +50,13 @@ export class AnalysisProcedureFactory {
     public static async createAnalysisProcedure(config: AnalysisProcedureConfig): Promise<AnalysisProcedure> {
         return new class implements AnalysisProcedure {
 
-            private _analysisStartTime: number;
+            private _statistics: AnalysisStatistics;
 
             async run(task: App): Promise<{}> {
                 const smt = await SMTFactory.createZ3();
                 const bddlib = await BDDLibraryFactory.createBDDLib();
 
-                const statistics = new AnalysisStatistics();
+                this._statistics = new AnalysisStatistics("BASTET", {});
 
                 // TODO: Delete the context after the analysis is no more in use
                 const defaultContect = smt.createContext();
@@ -64,19 +64,20 @@ export class AnalysisProcedureFactory {
                 const prover = smt.createProver(defaultContect);
                 const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
-                const memAnalysis = new SyMemAnalysis(firstOrderLattice, bddlib.lattice, theories);
-                const ssaAnalysis = new SSAAnalysis(task, memAnalysis);
-                const schedAnalysis = new ScheduleAnalysis({}, task, ssaAnalysis);
-                const graphAnalysis = new GraphAnalysis(task, schedAnalysis);
+                const memAnalysis = new SyMemAnalysis(firstOrderLattice, bddlib.lattice, theories, this._statistics);
+                const ssaAnalysis = new SSAAnalysis(task, memAnalysis, this._statistics);
+                const schedAnalysis = new ScheduleAnalysis({}, task, ssaAnalysis, this._statistics);
+                const graphAnalysis = new GraphAnalysis(task, schedAnalysis, this._statistics);
 
                 const frontier: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
                 const reached: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
 
                 const chooseOpConfig = new ChooseOpConfig();
                 const chooseOp = frontier.createChooseOp(chooseOpConfig);
-                const reachabilityAlgorithm = new ReachabilityAlgorithm(graphAnalysis, chooseOp);
-                const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, graphAnalysis.refiner, graphAnalysis);
-                const multiPropertyAlgorithm = new MultiPropertyAlgorithm(task, bmcAlgorithm, graphAnalysis, statistics, this.onAnalysisResult);
+                const reachabilityAlgorithm = new ReachabilityAlgorithm(graphAnalysis, chooseOp, this._statistics);
+                const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, graphAnalysis.refiner, graphAnalysis, this._statistics);
+                const multiPropertyAlgorithm = new MultiPropertyAlgorithm(task, bmcAlgorithm, graphAnalysis, this._statistics,
+                    (v, s, u, stats) => this.onAnalysisResult(v, s, u, stats));
 
                 const initialStates: GraphAbstractState[] = graphAnalysis.initialStatesFor(task);
                 frontier.addAll(initialStates);
@@ -88,8 +89,11 @@ export class AnalysisProcedureFactory {
                 return {};
             }
 
-            private onAnalysisResult(violated: ImmSet<Property>, satisifed: ImmSet<Property>, unknowns: ImmSet<Property>, statistics: AnalysisStatistics) {
-                const analysisDurtionMSec = statistics.analysisTime.duration.toFixed(3);
+            private onAnalysisResult(violated: ImmSet<Property>, satisifed: ImmSet<Property>, unknowns: ImmSet<Property>, mpaStatistics: AnalysisStatistics) {
+                const analysisDurtionMSec = mpaStatistics.contextTimer.duration.toFixed(3);
+
+                console.log("\n## Statistics #################################################\n");
+                console.log(this._statistics.stringifyToJSON());
 
                 const printPropertySetAs = function(role: string, set: ImmSet<Property>) {
                     if (!set.isEmpty()) {
@@ -102,14 +106,12 @@ export class AnalysisProcedureFactory {
                     }
                 };
 
-                console.log("\n==============================================================");
+                console.log("\n## Summary ####################################################");
                 console.log(`\nAnalysis finished after ${analysisDurtionMSec} msec.\n`);
 
                 printPropertySetAs("VIOLATED", violated);
                 printPropertySetAs("SATISFIED", satisifed);
                 printPropertySetAs("UNKNOWN", unknowns);
-
-                console.log("\n");
             }
         }
     }
