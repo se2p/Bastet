@@ -22,7 +22,7 @@
 
 
 import {ChooseOpConfig, StateSet} from "../../algorithms/StateSet";
-import {GraphAbstractState} from "./GraphAbstractDomain";
+import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 
@@ -88,16 +88,56 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Delega
 
     private readonly _frontierSet: StateSet<E>;
 
+    private readonly _children: Map<GraphStateId, GraphStateId[]>;
+
+    private readonly _idToStateMap: Map<GraphStateId, E>;
+
     constructor(wrappedReached: StateSet<E>, frontierSet: StateSet<E>) {
         super(wrappedReached);
         this._frontierSet = Preconditions.checkNotUndefined(frontierSet);
+        this._children = new Map<GraphStateId, GraphStateId[]>();
+        this._idToStateMap = new Map<GraphStateId, E>();
     }
 
-    add(element: E): any {
+    public add(element: E): any {
+        // A `GraphAbstractState` has only references to the parents.
+        // This wrapper has to keep track of the children, too.
+        for (const parentId of element.getPredecessors()) {
+            const parentChilds = this._children.get(parentId) || [];
+            parentChilds.push(element.getId());
+            this._children.set(parentId, parentChilds);
+        }
+
+        // Track the mapping between state ids and the corresponding state objects
+        this._idToStateMap.set(element.getId(), element);
+
         return super.add(element);
     }
 
-    remove(element: E): any {
+    private removeChildren(element: E) {
+        Preconditions.checkNotUndefined(element);
+
+        // Set the list of children to the empty list before recurring. Avoids an infinite loop.
+        const toRemove: GraphStateId[] = this._children.get(element.getId());
+        this._children.set(element.getId(), []);
+
+        // Remove the children recursively
+        for (const childId of toRemove) {
+            const childState = this._idToStateMap.get(childId);
+            Preconditions.checkNotUndefined(childState);
+            this.remove(childState);
+
+            // Also remove the child from the set of frontier states
+            this._frontierSet.remove(childState);
+        }
+    }
+
+    public remove(element: E): any {
+        // Remove all children
+        this.removeChildren(element);
+
+        // Remove the state itself
+        this._idToStateMap.delete(element.getId());
         return super.remove(element);
     }
 
