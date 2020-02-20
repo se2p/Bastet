@@ -20,12 +20,22 @@
  *
  */
 
-import {LibZ3InContext, LibZ3NonContext} from "./libz3";
+import {LibZ3InContext, LibZ3NonContext, Z3_context, Z3_solver} from "./libz3";
 import {Preconditions} from "../Preconditions";
-import {WasmJSInstance} from "./wasmInstance";
+import {WasmJSInstance} from "./WasmInstance";
 import {FirstOrderFormula} from "../ConjunctiveNormalForm";
 import {Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {
+    Z3BooleanFormula,
+    Z3BooleanTheory,
+    Z3FirstOrderFormula,
+    Z3FirstOrderLattice,
+    Z3MemoryTheoryInContext
+} from "./Z3MemoryTheory";
+import {FirstOrderSolver} from "../../procedures/domains/FirstOrderDomain";
+import {Sint32, Uint32} from "./ctypes";
+import {BooleanTheory} from "../../procedures/domains/MemoryTransformer";
 
 export var PreModule = {
     print: function(text) {
@@ -71,9 +81,9 @@ export var PreModule = {
 
 global['Module'] = PreModule;
 
-export class SolverFactory {
+export class SMTFactory {
 
-    public static async createZ3(): Promise<Z3Solver> {
+    public static async createZ3(): Promise<Z3SMT> {
         require("./libz3.so.js");
 
         let solverInitPromise = new Promise( (resolve, reject) => {
@@ -93,44 +103,79 @@ export class SolverFactory {
             .then((value) => { })
             .catch((reason) => { });
 
-        return new Z3Solver(global['Module']);
+        return new Z3SMT(global['Module']);
     }
 }
 
-export class FirstOrderLattice<F extends FirstOrderFormula> implements Lattice<FirstOrderFormula> {
+const Z3_L_TRUE = 1;
+const Z3_L_UNDEF = 0;
+const Z3_L_FALSE = -1;
 
-    bottom(): F {
-        throw new ImplementMeException();
+export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
+
+    private _ctx: LibZ3InContext;
+    private _solver: Z3_solver;
+
+    constructor(ctx: LibZ3InContext) {
+        super();
+        this._ctx = Preconditions.checkNotUndefined(ctx);
+        this._solver = this._ctx.mk_solver();
+        this._ctx.solver_inc_ref(this._solver);
     }
 
-    isIncluded(element1: F, element2: F): boolean {
-        throw new ImplementMeException();
+    /**
+     * Check whether the assertions in a given solver are consistent or not.
+     */
+    public isUnsat(): boolean {
+        const checkResult: Sint32 = this._ctx.solver_check(this._solver);
+        return checkResult.val() == Z3_L_FALSE;
     }
 
-    join(element1: F, element2: F): F {
-        throw new ImplementMeException();
+    /**
+     * Assert a constraint `f` into the solver.
+     *
+     * @param f
+     */
+    public assert(f: Z3FirstOrderFormula): void  {
+        console.log("ASSERT", this._ctx.ast_to_string(f.getAST()));
+        this._ctx.solver_assert(this._solver, f.getAST());
     }
 
-    meet(element1: F, element2: F): F {
-        throw new ImplementMeException();
+    /**
+     * Remove all assertions from the solver.
+     */
+    public reset(): void {
+        this._ctx.solver_reset(this._solver);
     }
 
-    top(): F {
-        throw new ImplementMeException();
+    /**
+     * Backtrack one backtracking point.
+     */
+    public pop(): void {
+        this._ctx.solver_pop(this._solver, new Uint32(1));
+    }
+
+    /**
+     * Create a backtracking point.
+     */
+    public push(): void {
+        this._ctx.solver_push(this._solver);
+    }
+
+    public release(): void {
+        this.reset();
+        this._ctx.solver_dec_ref(this._solver);
     }
 
 }
 
-export class Z3Solver extends LibZ3NonContext {
+export class Z3SMT extends LibZ3NonContext {
 
     private _module: WasmJSInstance;
-
-    private _lattice: FirstOrderLattice<FirstOrderFormula>;
 
     constructor(z3mod: WasmJSInstance) {
         super(z3mod);
         this._module = Preconditions.checkNotUndefined(z3mod);
-        this._lattice = new FirstOrderLattice<FirstOrderFormula>();
     }
 
     public createContext(): LibZ3InContext {
@@ -139,7 +184,16 @@ export class Z3Solver extends LibZ3NonContext {
         return new LibZ3InContext(this._wasmInstance, ctx);
     }
 
-    get lattice(): FirstOrderLattice<FirstOrderFormula> {
-        return this._lattice;
+    public createProver(ctx: LibZ3InContext): Z3ProverEnvironment {
+        return new Z3ProverEnvironment(ctx);
     }
+
+    public createTheory(ctx: LibZ3InContext): Z3MemoryTheoryInContext {
+        return new Z3MemoryTheoryInContext(ctx);
+    }
+
+    public createLattice(prover: Z3ProverEnvironment, boolTheory: BooleanTheory<Z3FirstOrderFormula>): Z3FirstOrderLattice {
+        return new Z3FirstOrderLattice(boolTheory, prover);
+    }
+
 }

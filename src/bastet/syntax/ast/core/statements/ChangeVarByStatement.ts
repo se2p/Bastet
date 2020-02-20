@@ -20,18 +20,25 @@
  */
 
 import {Statement} from "./Statement";
-import {Identifier} from "../Identifier";
 import {Expression} from "../expressions/Expression";
+import {Variable} from "../Variable";
 
 export class ChangeVarByStatement extends Statement {
 
-    private readonly _variable: Identifier;
+    private readonly _variable: Variable;
     private readonly _value: Expression;
 
-    constructor(variable: Identifier, value: Expression) {
-        super([variable, value]);
+    constructor(variable: Variable, value: Expression) {
+        super([variable.identifier, value]);
         this._variable = variable;
         this._value = value;
     }
 
+    get variable(): Variable {
+        return this._variable;
+    }
+
+    get value(): Expression {
+        return this._value;
+    }
 }

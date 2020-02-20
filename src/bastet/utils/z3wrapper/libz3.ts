@@ -1,7 +1,8 @@
 
 import {Uint8, Ptr, Void, Uint32, Sint32, Float, Double, Uint64, Sint64} from './ctypes'
-import {WasmJSInstance} from "./wasmInstance";
+import {WasmJSInstance} from "./WasmInstance";
 import {Preconditions} from "../Preconditions";
+import {FirstOrderFormula} from "../ConjunctiveNormalForm";
 
 export class Z3_lbool extends Uint8 {};
 export class Z3_tactic extends Ptr { };
@@ -53,10 +54,8 @@ export class LibZ3InContext {
     private readonly _context: Z3_context;
 
     constructor(wasmInstance: WasmJSInstance, context: Z3_context) {
-        Preconditions.checkNotUndefined(wasmInstance);
-        Preconditions.checkNotUndefined(context);
-        this._wasmInstance = wasmInstance;
-        this._context = context;
+        this._wasmInstance = Preconditions.checkNotUndefined(wasmInstance);
+        this._context = Preconditions.checkNotUndefined(context);
     }
 
     public freeContext() {

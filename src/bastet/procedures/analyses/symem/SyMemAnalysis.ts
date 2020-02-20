@@ -19,34 +19,16 @@
  *
  */
 
-import {ProgramAnalysis, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
-import {SyMemAbstractDomain, SymMemAbstractState } from "./SyMemAbstractDomain";
+import {ProgramAnalysisWithLabels} from "../ProgramAnalysis";
+import {SyMemAbstractDomain, SymMemAbstractState} from "./SyMemAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
-import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {SyMemTransferRelation} from "./SyMemTransferRelation";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {
-    ConcreteBooleanDomain,
-    ConcreteBoundedStringDomain, ConcreteBoundedStringListDomain,
-    ConcreteMemory,
-    ConcreteNumberDomain
-} from "../../domains/ConcreteElements";
-import {NumIntervalTheory, NumIntervalValueDomain} from "../../domains/NumIntervalValueDomain";
-import {FlatBooleanValueDomain, FlatBooleanValueTheory} from "../../domains/FlatBooleanValueDomain";
-import {OurStringListTheory, StringListAbstractDomain} from "../../domains/StringListAbstractDomain";
-import {OurStringTheory, StringAbstractDomain} from "../../domains/StringAbstractDomain";
+import {ConcreteMemory} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
-import {Z3Solver} from "../../../utils/z3wrapper/Z3Wrapper";
-import {
-    AbstractBoolean,
-    AbstractList,
-    AbstractNumber,
-    AbstractString,
-    AbstractMemoryTheory
-} from "../../domains/MemoryTransformer";
+import {AbstractMemoryTheory} from "../../domains/MemoryTransformer";
 import {
     BooleanFormula,
     FirstOrderFormula,
@@ -55,18 +37,32 @@ import {
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
-import {Lattice} from "../../../lattices/Lattice";
+import {Lattice, LatticeWithComplements} from "../../../lattices/Lattice";
+import {SyMemRefiner} from "./SyMemRefiner";
+import {Refiner} from "../Refiner";
+import {Property} from "../../../syntax/Property";
+import {StateSet} from "../../algorithms/StateSet";
 
-export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, SymMemAbstractState>, LabeledTransferRelation<SymMemAbstractState> {
+export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, SymMemAbstractState>,
+    LabeledTransferRelation<SymMemAbstractState> {
 
     private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
+
     private readonly _abstractDomain: SyMemAbstractDomain;
+
     private readonly _transferRelation: SyMemTransferRelation;
 
-    constructor(folLattice: Lattice<FirstOrderFormula>, propLattice: Lattice<PropositionalFormula>,
+    private readonly _refiner: SyMemRefiner;
+
+    constructor(folLattice: LatticeWithComplements<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
                 theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
+        Preconditions.checkNotUndefined(folLattice);
+        Preconditions.checkNotUndefined(propLattice);
+
+        this._theories = Preconditions.checkNotUndefined(theories);
         this._abstractDomain = new SyMemAbstractDomain(folLattice, propLattice);
         this._transferRelation = new SyMemTransferRelation(this._abstractDomain, this._theories);
+        this._refiner = new SyMemRefiner(this._abstractDomain.lattice);
     }
 
     abstractSucc(fromState: SymMemAbstractState): Iterable<SymMemAbstractState> {
@@ -91,8 +87,8 @@ export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         return false;
     }
 
-    target(state: SymMemAbstractState): boolean {
-        return false;
+    target(state: SymMemAbstractState): Property[] {
+        return [];
     }
 
     widen(state: SymMemAbstractState): SymMemAbstractState {
@@ -111,5 +107,13 @@ export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
 
     get abstractDomain(): AbstractDomain<ConcreteMemory, SymMemAbstractState> {
         return this._abstractDomain;
+    }
+
+    get refiner(): Refiner<SymMemAbstractState> {
+        return this._refiner;
+    }
+
+    wrapStateSets(frontier: StateSet<SymMemAbstractState>, reached: StateSet<SymMemAbstractState>): [StateSet<SymMemAbstractState>, StateSet<SymMemAbstractState>] {
+        return [frontier, reached];
     }
 }

@@ -20,20 +20,21 @@
  *
  */
 
-import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
+import {AbstractionPrecision} from "./AbstractDomain";
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
-import {Map as ImmMap, Record as ImmRec} from "immutable";
+import {Record as ImmRec} from "immutable";
 import {ConcreteDomain, ConcreteElementFactory, ConcreteNumber, ConcreteNumberOrderLattice} from "./ConcreteElements";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
 import {
     AbstractBoolean,
-    AbstractNumber,
     AbstractNumberDomain,
-    AbstractString, BooleanTheory,
+    AbstractString,
+    BooleanTheory,
     RationalNumberTheory
 } from "./MemoryTransformer";
 import {Identifier} from "../../syntax/ast/core/Identifier";
+import {Variable} from "../../syntax/ast/core/Variable";
 
 export interface NumIntervalValueAttribs extends AbstractElement {
 
@@ -114,7 +115,7 @@ export class NumIntervalTheory implements RationalNumberTheory<NumIntervalValue,
         this._boolTheory = Preconditions.checkNotUndefined(boolTheory);
     }
 
-    abstractNumberValue(id: Identifier): NumIntervalValue {
+    abstractNumberValue(id: Variable): NumIntervalValue {
         throw new ImplementMeException();
     }
 

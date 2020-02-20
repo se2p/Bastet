@@ -19,32 +19,33 @@
  *
  */
 
-import {Identifier} from "../Identifier";
 import {Statement} from "./Statement";
 import {NumberExpression} from "../expressions/NumberExpression";
 import {StringExpression} from "../expressions/StringExpression";
+import {Variable} from "../Variable";
 
 export interface ListStatement {
 
 }
 
 export class DeleteAllFromStatement extends Statement implements ListStatement {
-    constructor(listVariable: Identifier) {
-        super([listVariable]);
+
+    private readonly _listVariable: Variable;
+
+    constructor(listVariable: Variable) {
+        super([listVariable.identifier]);
         this._listVariable = listVariable;
     }
-
-    private readonly _listVariable: Identifier;
 
 }
 
 export class DeleteIthFromStatement extends Statement implements ListStatement {
 
-    private readonly _listVariable: Identifier;
+    private readonly _listVariable: Variable;
     private readonly _index: NumberExpression;
 
-    constructor(listVariable: Identifier, index: NumberExpression) {
-        super([listVariable, index]);
+    constructor(listVariable: Variable, index: NumberExpression) {
+        super([listVariable.identifier, index]);
         this._listVariable = listVariable;
         this._index = index;
     }
@@ -53,11 +54,11 @@ export class DeleteIthFromStatement extends Statement implements ListStatement {
 
 export class AddElementToStatement extends Statement implements ListStatement {
 
-    private readonly _listVariable: Identifier;
+    private readonly _listVariable: Variable;
     private readonly _element: StringExpression;
 
-    constructor(listVariable: Identifier, element: StringExpression) {
-        super([listVariable, element]);
+    constructor(listVariable: Variable, element: StringExpression) {
+        super([listVariable.identifier, element]);
         this._listVariable = listVariable;
         this._element = element;
     }
@@ -66,12 +67,12 @@ export class AddElementToStatement extends Statement implements ListStatement {
 
 export class InsertAtStatement extends Statement implements ListStatement {
 
-    private readonly _listVariable: Identifier;
+    private readonly _listVariable: Variable;
     private readonly _index: NumberExpression;
     private readonly _element: StringExpression;
 
-    constructor(listVariable: Identifier, index: NumberExpression, element: StringExpression) {
-        super([listVariable, index, element]);
+    constructor(listVariable: Variable, index: NumberExpression, element: StringExpression) {
+        super([listVariable.identifier, index, element]);
         this._listVariable = listVariable;
         this._index = index;
         this._element = element;
@@ -81,12 +82,12 @@ export class InsertAtStatement extends Statement implements ListStatement {
 
 export class ReplaceElementAtStatement extends Statement implements ListStatement {
 
-    private readonly _listVariable: Identifier;
+    private readonly _listVariable: Variable;
     private readonly _index: NumberExpression;
     private readonly _element: StringExpression;
 
-    constructor(listVariable: Identifier, index: NumberExpression, element: StringExpression) {
-        super([listVariable, index, element]);
+    constructor(listVariable: Variable, index: NumberExpression, element: StringExpression) {
+        super([listVariable.identifier, index, element]);
         this._listVariable = listVariable;
         this._index = index;
         this._element = element;

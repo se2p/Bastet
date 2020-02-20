@@ -22,9 +22,11 @@
 import {LabeledTransferRelation, TransferRelation} from "../TransferRelation";
 import {
     ScheduleAbstractState,
-    THREAD_STATE_DONE, THREAD_STATE_FAILURE,
+    THREAD_STATE_DONE,
+    THREAD_STATE_FAILURE,
     THREAD_STATE_RUNNING,
-    THREAD_STATE_RUNNING_ATOMIC, THREAD_STATE_YIELD,
+    THREAD_STATE_RUNNING_ATOMIC,
+    THREAD_STATE_YIELD,
     ThreadState
 } from "./ScheduleAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
@@ -34,16 +36,19 @@ import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {App} from "../../../syntax/app/App";
 import {ScheduleAnalysisConfig} from "./ScheduleAnalysis";
-import {List as ImmList} from "immutable";
+import {List as ImmList, Set as ImmSet} from "immutable";
 import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
 import {WaitSecsStatement} from "../../../syntax/ast/core/statements/WaitSecsStatement";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
-import {ConcreteString} from "../../domains/ConcreteElements";
 import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressions/StringExpression";
 import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
+import {RuntimeMethods} from "../../../syntax/app/controlflow/RuntimeMethods";
+import {Properties, Property} from "../../../syntax/Property";
+import {ExpressionList} from "../../../syntax/ast/core/expressions/ExpressionList";
+import instantiate = WebAssembly.instantiate;
 
 export type Schedule = ImmList<ThreadState>;
 
@@ -174,13 +179,26 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
 
                 for (const w of wrappedSuccStates) {
                     Preconditions.checkNotUndefined(w);
-                    const e = new ScheduleAbstractState(newThreadStates, w);
+                    const properties = this.extractProperties(nextSchedules);
+                    const e = new ScheduleAbstractState(newThreadStates, w, properties);
                     result.push(e);
                 }
             }
         }
 
         return result;
+    }
+
+    private extractProperties(sched: Schedule[]) {
+        const properties = [];
+        for (const s of sched) {
+            for (const t of s) {
+                for (const p of t.getFailedFor()) {
+                    properties.push(p);
+                }
+            }
+        }
+        return ImmSet(properties);
     }
 
     /**
@@ -255,6 +273,13 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
             inSchedule.get(ofThreadWithIdx).withComputationState(compState));
     }
 
+    private setFailure(inSchedule: Schedule, ofThreadWithIdx: number, properties: ImmSet<Property>): Schedule {
+        return inSchedule.set(ofThreadWithIdx,
+            inSchedule.get(ofThreadWithIdx)
+                .withComputationState(THREAD_STATE_FAILURE)
+                .withFailedFor(properties));
+    }
+
     /**
      * Given the schedule `threadStates` based on that `takenStep` was conducted,
      * create the set of succesor schedules.
@@ -282,8 +307,9 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         //
         if (stepOp.ast instanceof CallStatement) {
             const call = stepOp.ast as CallStatement;
-            if (call.calledMethod.text == "_RUNTIME_signalFailure") {
-                resultBase = this.setCompState(resultBase, steppedThreadIdx, THREAD_STATE_FAILURE);
+            if (call.calledMethod.text == RuntimeMethods._RUNTIME_signalFailure) {
+                const properties: ImmSet<Property> = Properties.fromArguments(call.args);
+                resultBase = this.setFailure(resultBase, steppedThreadIdx, properties);
             }
         } else if (stepOp.ast instanceof BroadcastMessageStatement) {
             const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
@@ -464,4 +490,5 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         }
         throw new ImplementMeException();
     }
+
 }

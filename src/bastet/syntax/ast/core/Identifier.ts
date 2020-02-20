@@ -20,25 +20,24 @@
  */
 
 import {AbsentAstNode, AbstractNode, OptionalAstNode, PresentAstNode} from "../AstNode";
-import {StringLiteral} from "./expressions/StringExpression";
 
 export class Identifier extends AbstractNode {
 
-    private static readonly FRESH_PREFIX = "__tmp_"
+    private static readonly FRESH_PREFIX = "__tmp_";
 
-    private readonly _name: StringLiteral;
+    private readonly _name: string;
 
-    constructor(name: StringLiteral) {
-        super([name]);
+    constructor(name: string) {
+        super([]);
         this._name = name;
     }
 
     toTreeString(): string {
-        return this._name.text;
+        return this._name;
     }
 
     public static of(txt: string) {
-        return new Identifier(new StringLiteral(txt));
+        return new Identifier(txt);
     }
 
     public static optional(val: Identifier|null): OptionalAstNode<Identifier> {
@@ -56,20 +55,20 @@ export class Identifier extends AbstractNode {
             this.FRESH_SEQ = 0;
         }
         const num: number = this.FRESH_SEQ++;
-        return new Identifier(StringLiteral.from(`${this.FRESH_PREFIX}${num}`));
+        return new Identifier(`${this.FRESH_PREFIX}${num}`);
     }
 
-    private static RESULT_IDENT: Identifier = new Identifier(StringLiteral.from("result"));
+    private static RESULT_IDENT: Identifier = new Identifier("result");
 
     public static resultIdentifier(): Identifier {
         if (this.RESULT_IDENT === null) {
-            this.RESULT_IDENT = new Identifier(StringLiteral.from("result"));
+            this.RESULT_IDENT = new Identifier("result");
         }
         return this.RESULT_IDENT;
     }
 
     get text(): string {
-        return this._name.text;
+        return this._name;
     }
 
 }

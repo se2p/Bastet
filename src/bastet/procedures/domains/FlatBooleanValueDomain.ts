@@ -21,13 +21,14 @@
  */
 
 
-import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
+import {AbstractionPrecision} from "./AbstractDomain";
 import {AbstractBoolean, AbstractBooleanDomain, BooleanTheory} from "./MemoryTransformer";
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
-import {ConcreteBoolean, ConcreteDomain, ConcreteElementFactory, ConcreteNumber} from "./ConcreteElements";
+import {ConcreteBoolean, ConcreteDomain} from "./ConcreteElements";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Identifier} from "../../syntax/ast/core/Identifier";
 import {Record as ImmRec} from "immutable";
+import {Variable} from "../../syntax/ast/core/Variable";
 
 export class FlatBoolLattice implements Lattice<FlatBooleanValue> {
 
@@ -120,7 +121,7 @@ export class FlatBooleanValueTheory implements BooleanTheory<FlatBooleanValue> {
         this._top = dom.lattice.top();
     }
 
-    abstractBooleanValue(id: Identifier): FlatBooleanValue {
+    abstractBooleanValue(id: Variable): FlatBooleanValue {
         throw new ImplementMeException();
     }
 

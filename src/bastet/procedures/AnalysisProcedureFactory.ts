@@ -23,21 +23,19 @@ import {AnalysisProcedure} from "./AnalysisProcedure";
 import {App} from "../syntax/app/App";
 import {GraphAnalysis} from "./analyses/graph/GraphAnalysis";
 import {ScheduleAnalysis} from "./analyses/schedule/ScheduleAnalysis";
-import {GraphConcreteState, GraphAbstractStateAttribs, GraphAbstractState} from "./analyses/graph/GraphAbstractDomain";
-import {ReachabilityAlgorithm} from "./algorithms/Reachability";
+import {GraphAbstractState} from "./analyses/graph/GraphAbstractDomain";
+import {ReachabilityAlgorithm} from "./algorithms/ReachabilityAlgorithm";
 import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
-import {SolverFactory} from "../utils/z3wrapper/Z3Wrapper";
+import {SMTFactory} from "../utils/z3wrapper/Z3Wrapper";
 import {SyMemAnalysis} from "./analyses/symem/SyMemAnalysis";
-import {AbstractMemoryTheory} from "./domains/MemoryTransformer";
-import {
-    BooleanFormula,
-    FirstOrderFormula,
-    ListFormula,
-    NumberFormula,
-    StringFormula
-} from "../utils/ConjunctiveNormalForm";
-import {BDDLibrary, BDDLibraryFactory} from "../utils/bdd/BDD";
+import {BDDLibraryFactory} from "../utils/bdd/BDD";
 import {Z3MemoryTheoryInContext} from "../utils/z3wrapper/Z3MemoryTheory";
+import {SSAAnalysis} from "./analyses/ssa/SSAAnalysis";
+import {BMCAlgorithm} from "./algorithms/BMCAlgorithm";
+import {MultiPropertyAlgorithm} from "./algorithms/MultiPropertyAlgorithm";
+import {Property} from "../syntax/Property";
+import {Record as ImmRec, Set as ImmSet} from "immutable";
+import {AnalysisStatistics} from "./analyses/AnalysisStatistics";
 
 export class AnalysisProcedureConfig {
 
@@ -51,18 +49,24 @@ export class AnalysisProcedureFactory {
 
     public static async createAnalysisProcedure(config: AnalysisProcedureConfig): Promise<AnalysisProcedure> {
         return new class implements AnalysisProcedure {
+
+            private _analysisStartTime: number;
+
             async run(task: App): Promise<{}> {
-                const solver = await SolverFactory.createZ3();
+                const smt = await SMTFactory.createZ3();
                 const bddlib = await BDDLibraryFactory.createBDDLib();
 
-                const defaultContect = solver.createContext();
+                const statistics = new AnalysisStatistics();
+
                 // TODO: Delete the context after the analysis is no more in use
+                const defaultContect = smt.createContext();
+                const theories = new Z3MemoryTheoryInContext(defaultContect);
+                const prover = smt.createProver(defaultContect);
+                const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
-                const theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>
-                    = new Z3MemoryTheoryInContext(defaultContect);
-
-                const memAnalysis = new SyMemAnalysis(solver.lattice, bddlib.lattice, theories);
-                const schedAnalysis = new ScheduleAnalysis({}, task, memAnalysis);
+                const memAnalysis = new SyMemAnalysis(firstOrderLattice, bddlib.lattice, theories);
+                const ssaAnalysis = new SSAAnalysis(task, memAnalysis);
+                const schedAnalysis = new ScheduleAnalysis({}, task, ssaAnalysis);
                 const graphAnalysis = new GraphAnalysis(task, schedAnalysis);
 
                 const frontier: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
@@ -71,16 +75,41 @@ export class AnalysisProcedureFactory {
                 const chooseOpConfig = new ChooseOpConfig();
                 const chooseOp = frontier.createChooseOp(chooseOpConfig);
                 const reachabilityAlgorithm = new ReachabilityAlgorithm(graphAnalysis, chooseOp);
+                const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, graphAnalysis.refiner, graphAnalysis);
+                const multiPropertyAlgorithm = new MultiPropertyAlgorithm(task, bmcAlgorithm, graphAnalysis, statistics, this.onAnalysisResult);
 
                 const initialStates: GraphAbstractState[] = graphAnalysis.initialStatesFor(task);
                 frontier.addAll(initialStates);
                 reached.addRootSates(initialStates);
 
-                const [reachedPrime, frontierPrime] = reachabilityAlgorithm.run(frontier, reached);
-
+                const [frontierPrime, reachedPrime] = multiPropertyAlgorithm.run(frontier, reached);
                 graphAnalysis.exportAnalysisResult(reachedPrime, frontierPrime);
 
                 return {};
+            }
+
+            private onAnalysisResult(violated: ImmSet<Property>, satisifed: ImmSet<Property>, unknowns: ImmSet<Property>, statistics: AnalysisStatistics) {
+                const analysisDurtionMSec = statistics.analysisTime.duration.toFixed(3);
+
+                const printPropertySetAs = function(role: string, set: ImmSet<Property>) {
+                    if (!set.isEmpty()) {
+                        console.log(`Following properties are ${role}:`);
+                        let index = 1;
+                        for (const p of set) {
+                            console.log(`\t(${index}) ${p.text}`);
+                            index++;
+                        }
+                    }
+                };
+
+                console.log("\n==============================================================");
+                console.log(`\nAnalysis finished after ${analysisDurtionMSec} msec.\n`);
+
+                printPropertySetAs("VIOLATED", violated);
+                printPropertySetAs("SATISFIED", satisifed);
+                printPropertySetAs("UNKNOWN", unknowns);
+
+                console.log("\n");
             }
         }
     }

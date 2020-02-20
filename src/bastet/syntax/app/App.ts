@@ -19,12 +19,18 @@
  *
  */
 
-import {Actor, ActorMap, Actors} from './Actor'
+import {Actor, ActorMap} from './Actor'
 import {Maps} from "../../utils/Maps";
 import {MethodDefinition, MethodDefinitionList} from "../ast/core/MethodDefinition";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {Script} from "./controlflow/Script";
+import {Record as ImmRec, Set as ImmSet} from "immutable";
+import {OperationID, ProgramOperation} from "./controlflow/ops/ProgramOperation";
+import {LocationID} from "./controlflow/ControlLocation";
+import {CallStatement} from "../ast/core/statements/CallStatement";
+import {RuntimeMethods} from "./controlflow/RuntimeMethods";
+import {Properties, Property} from "../Property";
+
 
 export class App {
 
@@ -56,8 +62,38 @@ export class App {
         return Maps.values(this._actorMap);
     }
 
+
     get actorNames(): string[] {
         return Object.keys(this._actorMap);
+    }
+
+    get nonBootActors(): Actor[] {
+        return Maps.values(this.actorMap).filter((a) => !a.isBootstrapper);
+    }
+
+    public getProperties(): ImmSet<Property> {
+        let result = ImmSet<Property>();
+        for (const a of this.actors.values()) {
+            for (const s of a.scripts) {
+                for (const l of s.transitions.locationSet) {
+                    for (const ts of s.transitions.transitionsFrom(l)) {
+                        for (const t of ts.entries()) {
+                            const [opId, locId] = t;
+                            const op = ProgramOperation.for(opId);
+                            if (op.ast instanceof CallStatement) {
+                                const call = op.ast as CallStatement;
+                                if (call.calledMethod.text == RuntimeMethods._RUNTIME_signalFailure) {
+                                    const properties = Properties.fromArguments(call.args);
+                                    result = result.union(properties);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     public getActorByName(name: string): Actor {

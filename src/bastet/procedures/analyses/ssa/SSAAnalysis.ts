@@ -19,32 +19,34 @@
  *
  */
 
-import {
-    ProgramAnalysis,
-    ProgramAnalysisWithLabels,
-    TransitionLabelProvider,
-    WrappingProgramAnalysis
-} from "../ProgramAnalysis";
+import {ProgramAnalysis, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
-import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
+import {ConcreteElement} from "../../domains/ConcreteElements";
 import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferRelation";
 import {SSAAbstractDomain, SSAState} from "./SSAAbstractDomain";
 import {SSATransferRelation} from "./SSATransferRelation";
-import {Record as ImmRec, Map as ImmMap, Set as ImmSet} from "immutable"
+import {Map as ImmMap} from "immutable"
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
+import {ScheduleAbstractState} from "../schedule/ScheduleAbstractDomain";
+import {Property} from "../../../syntax/Property";
+import {StateSet} from "../../algorithms/StateSet";
 
 
 export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, SSAState>,
-    LabeledTransferRelation<SSAState> {
+    LabeledTransferRelation<SSAState>,
+    Unwrapper<SSAState, AbstractElement> {
 
     private readonly _abstractDomain: AbstractDomain<ConcreteElement, SSAState>;
 
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
 
     private readonly _transferRelation: SSATransferRelation;
+
+    private readonly _refiner: Refiner<SSAState>;
 
     private readonly _task: App;
 
@@ -55,6 +57,7 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
 
         const wrappedTr = LabeledTransferRelationImpl.from(wrappedAnalysis);
         this._transferRelation = new SSATransferRelation(wrappedTr);
+        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
     }
 
     abstractSucc(fromState: SSAState): Iterable<SSAState> {
@@ -84,13 +87,21 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return false;
     }
 
-    target(state: SSAState): boolean {
+    target(state: SSAState): Property[] {
         return this._wrappedAnalysis.target(state.wrappedState);
     }
 
     widen(state: SSAState): SSAState {
         // TODO: Implement the widening (delegate to wrapped analyses)
         return state;
+    }
+
+    unwrap(e: SSAState): AbstractElement {
+        return e.getWrappedState();
+    }
+
+    get refiner(): Refiner<SSAState> {
+        return this._refiner;
     }
 
     get abstractDomain(): AbstractDomain<ConcreteElement, SSAState> {
@@ -106,6 +117,10 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
             return new SSAState(ImmMap({}), ImmMap({}), w);
         } );
+    }
+
+    wrapStateSets(frontier: StateSet<SSAState>, reached: StateSet<SSAState>): [StateSet<SSAState>, StateSet<SSAState>] {
+        return [frontier, reached];
     }
 
 }

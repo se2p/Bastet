@@ -31,4 +31,7 @@ export class ExpressionStatement extends Statement {
         this._expression = expression;
     }
 
+    get expression(): Expression {
+        return this._expression;
+    }
 }

@@ -95,6 +95,7 @@ import {
 } from "./core/statements/SetStatement";
 import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
+import {AssumeStatement} from "./core/statements/AssumeStatement";
 
 export interface CoreVisitor<R> {
 
@@ -211,6 +212,8 @@ export interface CoreCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 }
 
 export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
+
+    visitAssumeStatement(node: AssumeStatement): R;
 
     visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): R;
 

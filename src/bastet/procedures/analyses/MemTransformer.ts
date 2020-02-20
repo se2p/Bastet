@@ -20,18 +20,6 @@
  *
  */
 
-import {
-    AbstractBoolean, AbstractList, AbstractMap,
-    AbstractNumber, AbstractString, BooleanTheory,
-    BooleanVariable, ListTheory, ListVariable, MapVariable,
-    MemoryTransformer,
-    NumberVariable, RationalNumberTheory, StringTheory, StringVariable
-} from "../domains/MemoryTransformer";
-import {Identifier} from "../../syntax/ast/core/Identifier";
-import {ScratchType} from "../../syntax/ast/core/ScratchType";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {Preconditions} from "../../utils/Preconditions";
-
 /*
 export class AbstMemTransformer extends MemoryTransformer<MemAbstractState> {
 

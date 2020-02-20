@@ -27,6 +27,7 @@ import {ConcreteBoolean, ConcreteNumber, ConcreteString, ConcreteStringList} fro
 import {AbstractElement} from "../../lattices/Lattice";
 import {AbstractDomain} from "./AbstractDomain";
 import {AbstractStringList} from "./StringListAbstractDomain";
+import {Variable} from "../../syntax/ast/core/Variable";
 
 export interface AbstractValue extends AbstractElement {
 
@@ -162,7 +163,7 @@ export interface RationalNumberTheory<N extends AbstractNumber, B extends Abstra
 
     fromConcreteNumber(str: ConcreteNumber): N;
 
-    abstractNumberValue(id: Identifier): N;
+    abstractNumberValue(id: Variable): N;
 
     zero(): N;
 
@@ -217,7 +218,7 @@ export interface BooleanTheory<B extends AbstractBoolean> {
 
     fromConcreteBoolean(str: ConcreteBoolean): B;
 
-    abstractBooleanValue(id: Identifier): B;
+    abstractBooleanValue(id: Variable): B;
 
     falseBool(): B;
 
@@ -239,19 +240,19 @@ export interface MemoryTheory {
 
     /** Variable Declarations */
 
-    declareVariable(id: Identifier, type: ScratchType): AbstractMemory;
+    declareVariable(id: Variable, type: ScratchType): AbstractMemory;
 
-    freeVariable(id: Identifier): AbstractMemory;
+    freeVariable(id: Variable): AbstractMemory;
 
-    getStringVariable(id: Identifier): StringVariable;
+    getStringVariable(id: Variable): StringVariable;
 
-    getNumberVariable(id: Identifier): NumberVariable;
+    getNumberVariable(id: Variable): NumberVariable;
 
-    getBooleanVariable(id: Identifier): BooleanVariable;
+    getBooleanVariable(id: Variable): BooleanVariable;
 
-    getListVariable(id: Identifier): ListVariable;
+    getListVariable(id: Variable): ListVariable;
 
-    getMapVariable(id: Identifier): MapVariable;
+    getMapVariable(id: Variable): MapVariable;
 
 
     /** Querying Variable Values */
@@ -386,19 +387,19 @@ export abstract class MemoryTransformer<M extends AbstractMemory> implements Mem
 
     abstract assumeTruth(boolVal: AbstractBoolean): AbstractMemory;
 
-    abstract declareVariable(id: Identifier, type: ScratchType): AbstractMemory;
+    abstract declareVariable(id: Variable, type: ScratchType): AbstractMemory;
 
-    abstract freeVariable(id: Identifier): AbstractMemory;
+    abstract freeVariable(id: Variable): AbstractMemory;
 
-    abstract getBooleanVariable(id: Identifier): BooleanVariable;
+    abstract getBooleanVariable(id: Variable): BooleanVariable;
 
-    abstract getListVariable(id: Identifier): ListVariable;
+    abstract getListVariable(id: Variable): ListVariable;
 
-    abstract getMapVariable(id: Identifier): MapVariable;
+    abstract getMapVariable(id: Variable): MapVariable;
 
-    abstract getNumberVariable(id: Identifier): NumberVariable;
+    abstract getNumberVariable(id: Variable): NumberVariable;
 
-    abstract getStringVariable(id: Identifier): StringVariable;
+    abstract getStringVariable(id: Variable): StringVariable;
 
     abstract queryAbstractBoolean(id: BooleanVariable): AbstractBoolean;
 

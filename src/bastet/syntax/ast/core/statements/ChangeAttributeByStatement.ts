@@ -33,4 +33,12 @@ export class ChangeAttributeByStatement extends Statement {
         this._attrib = variable;
         this._expr = expr;
     }
+
+    get attrib(): StringExpression {
+        return this._attrib;
+    }
+
+    get expr(): Expression {
+        return this._expr;
+    }
 }

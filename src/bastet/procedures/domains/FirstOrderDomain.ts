@@ -24,32 +24,35 @@
 import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {ConcreteDomain, ConcreteElement} from "./ConcreteElements";
 import {FirstOrderFormula} from "../../utils/ConjunctiveNormalForm";
-import {Lattice} from "../../lattices/Lattice";
+import {Lattice, LatticeWithComplements} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {Preconditions} from "../../utils/Preconditions";
+import {BooleanTheory} from "./MemoryTransformer";
 
-export interface FirstOrderLattice extends Lattice<FirstOrderFormula> {
+export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
 
 }
 
-export class FirstOrderDomain implements AbstractDomain<ConcreteElement, FirstOrderFormula> {
+export class FirstOrderDomain<F extends FirstOrderFormula>
+    implements AbstractDomain<ConcreteElement, F> {
 
     private readonly _concreteDomain: ConcreteDomain<ConcreteElement>;
-    private readonly _lattice: FirstOrderLattice;
+    private readonly _lattice: FirstOrderLattice<F>;
 
-    constructor(concreteDomain: ConcreteDomain<ConcreteElement>, lattice: FirstOrderLattice) {
-        this._concreteDomain = concreteDomain;
-        this._lattice = lattice;
+    constructor(concreteDomain: ConcreteDomain<ConcreteElement>, lattice: FirstOrderLattice<F>) {
+        this._concreteDomain = Preconditions.checkNotUndefined(concreteDomain);
+        this._lattice = Preconditions.checkNotUndefined(lattice);
     }
 
-    abstract(elements: Iterable<ConcreteElement>): FirstOrderFormula {
+    abstract(elements: Iterable<ConcreteElement>): F {
         throw new ImplementMeException();
     }
 
-    concretize(element: FirstOrderFormula): Iterable<ConcreteElement> {
+    concretize(element: F): Iterable<ConcreteElement> {
         throw new ImplementMeException();
     }
 
-    widen(element: FirstOrderFormula, precision: AbstractionPrecision): FirstOrderFormula {
+    widen(element: F, precision: AbstractionPrecision): F {
         throw new ImplementMeException();
     }
 
@@ -57,7 +60,88 @@ export class FirstOrderDomain implements AbstractDomain<ConcreteElement, FirstOr
         return this._concreteDomain;
     }
 
-    get lattice(): FirstOrderLattice {
+    get lattice(): FirstOrderLattice<F> {
         return this._lattice;
     }
+
+}
+
+export abstract class FirstOrderSolver<F extends FirstOrderFormula> {
+
+    /**
+     * Create a backtracking point.
+     */
+    public abstract push();
+
+    /**
+     * Backtrack one backtracking point.
+     */
+    public abstract pop();
+
+    /**
+     * Check whether the assertions in a given solver are consistent or not.
+     */
+    public abstract isUnsat(): boolean;
+
+    /**
+     * Assert a constraint `f` into the solver.
+     *
+     * @param f
+     */
+    public abstract assert(f: F);
+
+    /**
+     * Remove all assertions from the solver.
+     */
+    public abstract reset();
+
+    public abstract release();
+
+}
+
+export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
+    implements FirstOrderLattice<F> {
+
+    private readonly _boolTheory: BooleanTheory<F>;
+    private readonly _prover: FirstOrderSolver<F>;
+
+    constructor(theory: BooleanTheory<F>, prover: FirstOrderSolver<F>) {
+        this._boolTheory = Preconditions.checkNotUndefined(theory);
+        this._prover = Preconditions.checkNotUndefined(prover);
+    }
+
+    bottom(): F {
+        return this._boolTheory.falseBool();
+    }
+
+    isIncluded(element1: F, element2: F): boolean {
+        this._prover.push();
+        try {
+            // UNSAT a  <=>  a lessOrEqual ⊥
+            // NOT true OR false  <=>  false OR false
+            const implication = this._boolTheory.or(
+                this._boolTheory.not(element1), element2);
+            this._prover.assert(implication);
+            return !this._prover.isUnsat();
+        } finally {
+            this._prover.pop();
+        }
+    }
+
+    join(element1: F, element2: F): F {
+        return this._boolTheory.or(element1, element2);
+    }
+
+    meet(element1: F, element2: F): F {
+        return this._boolTheory.and(element1, element2);
+    }
+
+    top(): F {
+        return this._boolTheory.trueBool();
+    }
+
+    complement(element: F): F {
+        return this._boolTheory.not(element);
+    }
+
 }

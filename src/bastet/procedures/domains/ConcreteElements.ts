@@ -20,7 +20,7 @@
  *
  */
 
-import {AbstractElement, Lattice} from "../../lattices/Lattice";
+import {Lattice} from "../../lattices/Lattice";
 import {ImmutableMap} from "../../utils/ImmutableMap";
 import {ImmutableList} from "../../utils/ImmutableList";
 import {Preconditions} from "../../utils/Preconditions";

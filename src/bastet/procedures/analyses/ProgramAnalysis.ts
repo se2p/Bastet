@@ -21,14 +21,18 @@
 
 import {AbstractDomain} from "../domains/AbstractDomain";
 import {AbstractElement} from "../../lattices/Lattice";
-import {StateSet} from "../algorithms/StateSet";
 import {App} from "../../syntax/app/App";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
+import {Refiner} from "./Refiner";
+import {Property} from "../../syntax/Property";
+import {StateSet} from "../algorithms/StateSet";
 
 export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement> {
 
     abstractDomain: AbstractDomain<C, E>;
+
+    refiner: Refiner<E>;
 
     abstractSucc(fromState: E): Iterable<E>;
 
@@ -41,9 +45,12 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
 
     widen(state: E): E;
 
-    target(state: E): boolean;
+    target(state: E): Property[];
 
     initialStatesFor(task: App): E[];
+
+    wrapStateSets(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>];
+
 }
 
 export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends AbstractElement> extends ProgramAnalysis<C, E> {

@@ -23,8 +23,8 @@ import {LabeledTransferRelation} from "../TransferRelation";
 import {SyMemAbstractDomain, SymMemAbstractState} from "./SyMemAbstractDomain";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {SyMemBoolExpressionVisitor, SyMemTransformerVisitor} from "./SyMemTransformerVisitor";
-import {AbstractBoolean, AbstractMemoryTheory, MemoryTransformer} from "../../domains/MemoryTransformer";
+import {SyMemTransformerVisitor} from "./SyMemTransformerVisitor";
+import {AbstractMemoryTheory} from "../../domains/MemoryTransformer";
 import {Preconditions} from "../../../utils/Preconditions";
 import {
     BooleanFormula,
@@ -33,7 +33,8 @@ import {
     NumberFormula,
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {AstNode} from "../../../syntax/ast/AstNode";
+import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 
 export class SyMemTransferRelation implements LabeledTransferRelation<SymMemAbstractState> {
 
@@ -54,25 +55,23 @@ export class SyMemTransferRelation implements LabeledTransferRelation<SymMemAbst
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
 
-        const transformer = this.memoryTransformerFor(fromState);
+        let ast: AstNode;
         if (op instanceof AssumeOperation) {
-            const visitor = new SyMemBoolExpressionVisitor(this._theories, fromState);
-            const assume: AssumeOperation = op as AssumeOperation;
-            const assumeValue: AbstractBoolean = assume.expression.accept(visitor);
-            Preconditions.checkNotUndefined(assumeValue);
-            // TODO: Add a shortcut in case the bool evaluates to FALSE
-
-            return [new SymMemAbstractState(transformer.assumeTruth(assumeValue), fromState.summaryFormula)];
+            const assume = op as AssumeOperation;
+            ast = new AssumeStatement(op.expression);
         } else {
-            const visitor = new SyMemTransformerVisitor(fromState, this._theories);
-            const blockFormulaPrime: FirstOrderFormula = op.ast.accept(visitor);
-
-            return [new SymMemAbstractState(blockFormulaPrime, fromState.summaryFormula)];
+            ast = op.ast;
         }
+
+        return this.abstractSuccForAst(fromState, ast);
     }
 
-    private memoryTransformerFor(state: SymMemAbstractState): MemoryTransformer<SymMemAbstractState> {
-        throw new ImplementMeException();
+    private abstractSuccForAst(fromState: SymMemAbstractState, ast: AstNode): Iterable<SymMemAbstractState> {
+        const visitor = new SyMemTransformerVisitor(fromState.blockFormula, this._theories);
+
+        const blockFormulaPrime: FirstOrderFormula = ast.accept(visitor);
+
+        return [new SymMemAbstractState(blockFormulaPrime, fromState.summaryFormula)];
     }
 
 }

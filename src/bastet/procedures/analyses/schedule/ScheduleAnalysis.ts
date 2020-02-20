@@ -39,6 +39,11 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
+import {AbstractElement} from "../../../lattices/Lattice";
+import {GraphAbstractState} from "../graph/GraphAbstractDomain";
+import {Property} from "../../../syntax/Property";
+import {StateSet} from "../../algorithms/StateSet";
 
 export class ScheduleAnalysisConfig extends BastetConfiguration {
 
@@ -53,12 +58,19 @@ export class ScheduleAnalysisConfig extends BastetConfiguration {
 }
 
 export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<ScheduleConcreteState, ScheduleAbstractState>,
-    WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState> {
+    WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState>,
+    Unwrapper<ScheduleAbstractState, AbstractElement> {
 
     private readonly _config: ScheduleAnalysisConfig;
+
     private readonly _abstractDomain: AbstractDomain<ScheduleConcreteState, ScheduleAbstractState>;
+
     private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any>;
+
     private readonly _transferRelation: ScheduleTransferRelation;
+
+    private readonly _refiner: Refiner<ScheduleAbstractState>;
+
     private readonly _task: App;
 
     constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any>) {
@@ -69,6 +81,7 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
         this._transferRelation = new ScheduleTransferRelation(this._config, task,
             new LabeledTransferRelationImpl((e) => this._wrappedAnalysis.abstractSucc(e),
                 (e, op) => this._wrappedAnalysis.abstractSuccFor(e, op)));
+        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
     }
 
     abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
@@ -95,12 +108,29 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
         return false;
     }
 
-    target(state: ScheduleAbstractState): boolean {
-        return this._wrappedAnalysis.target(state.wrappedState);
+    target(state: ScheduleAbstractState): Property[] {
+        let result: Property[] = [];
+        if (state.getIsTargetFor().size > 0) {
+            for (const p of state.getIsTargetFor()) {
+                result.push(p);
+            }
+        }
+        for (const p of this._wrappedAnalysis.target(state.wrappedState)) {
+            result.push(p);
+        }
+        return result;
     }
 
     widen(state: ScheduleAbstractState): ScheduleAbstractState {
         return undefined;
+    }
+
+    unwrap(e: ScheduleAbstractState): AbstractElement {
+        return e.getWrappedState();
+    }
+
+    get refiner(): Refiner<ScheduleAbstractState> {
+        return this._refiner;
     }
 
     get wrappedAnalysis(): ProgramAnalysis<any, any> {
@@ -113,12 +143,16 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
 
     initialStatesFor(task: App): ScheduleAbstractState[] {
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            return ScheduleAbstractStateFactory.createInitialState(task, w);
+            return ScheduleAbstractStateFactory.createInitialState(task, w, false);
         });
     }
 
     getTransitionLabel(from: ScheduleAbstractState, to: ScheduleAbstractState): ProgramOperation {
         throw new ImplementMeException();
+    }
+
+    wrapStateSets(frontier: StateSet<ScheduleAbstractState>, reached: StateSet<ScheduleAbstractState>): [StateSet<ScheduleAbstractState>, StateSet<ScheduleAbstractState>] {
+        return [frontier, reached];
     }
 
 }

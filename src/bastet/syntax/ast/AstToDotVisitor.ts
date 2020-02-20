@@ -21,6 +21,7 @@
 
 import {CoreVisitor} from "./CoreVisitor";
 import {AstNode} from "./AstNode";
+import {Preconditions} from "../../utils/Preconditions";
 
 export class AstToDotVisitor implements CoreVisitor<number> {
 
@@ -37,6 +38,7 @@ export class AstToDotVisitor implements CoreVisitor<number> {
         this._dot.push(`    ${nodeNo} [label="${node.constructor.name}"];`);
 
         for (let child of node) {
+            Preconditions.checkNotUndefined(child);
             const childNo = child.accept(this);
             this._dot.push(`    ${nodeNo} -> ${childNo};`);
         }

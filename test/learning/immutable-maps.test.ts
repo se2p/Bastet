@@ -1,5 +1,5 @@
 import assert from 'assert'
-import { Map } from 'immutable'
+import {Map} from 'immutable'
 
 describe('Functionality of immutable maps', function() {
     it('Operations on immutable maps', function() {

@@ -21,22 +21,16 @@
 
 import {Expression} from "./Expression";
 import {AbstractExpression} from "./AbstractExpression";
-import {Identifier} from "../Identifier";
-import {ListType, ScratchType, StringType} from "../ScratchType";
+import {ListType, ScratchType} from "../ScratchType";
 import {ExpressionList} from "./ExpressionList";
+import {VariableExpression} from "../Variable";
 
 export interface ListExpression extends Expression {
 
 }
 
-export class ListVariableExpression extends AbstractExpression implements ListExpression {
+export class ListVariableExpression extends VariableExpression implements ListExpression {
 
-    private readonly _list: Identifier;
-
-    constructor(list: Identifier) {
-        super(ListType.withElementType(StringType.instance()), [list]);
-        this._list = list;
-    }
 }
 
 export class ExpressionListExpression extends AbstractExpression implements ListExpression {

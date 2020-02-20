@@ -1,4 +1,5 @@
 import {assert} from "./util"
+
 type WasmHeap = DataView;
 
 export abstract class CType {
@@ -128,6 +129,7 @@ export class Float extends NumberCType {
     return new Float(heap.getFloat32(off));
   }
 }
+
 
 export class Double extends NumberCType {
   sizeof(): number { return 64 };

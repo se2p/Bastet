@@ -22,79 +22,12 @@
 import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
 import {AbstractElement, Lattice} from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {Record as ImmRec, Map as ImmMap, Set as ImmSet} from "immutable"
+import {Map as ImmMap, Record as ImmRec} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
 import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 import {ScratchTypeID} from "../../../syntax/ast/core/ScratchType";
 import {Preconditions} from "../../../utils/Preconditions";
 
-export interface DataLocationAttributes {
-
-    type: ScratchTypeID;
-
-    name: string;
-
-}
-
-export interface VersionedDataLocationAttributes extends DataLocationAttributes {
-
-    version: number;
-
-}
-
-const DataLocationRecord = ImmRec({
-
-    type: 0,
-
-    name: ""
-
-});
-
-const VersionedDataLocationRecord = ImmRec({
-
-    type: 0,
-
-    name: "",
-
-    version: 0
-
-});
-
-export class DataLocation extends DataLocationRecord implements DataLocationAttributes {
-
-    constructor(name: string, type: ScratchTypeID) {
-        super({name: name, type: type});
-    }
-
-    public getName(): string {
-        return this.get("name");
-    }
-
-    public getType(): ScratchTypeID {
-        return this.get("type");
-    }
-
-}
-
-export class VersionedDataLocation extends VersionedDataLocationRecord implements VersionedDataLocationAttributes {
-
-    constructor(name: string, type: ScratchTypeID, version: number) {
-        super({name: name, type: type, version: version});
-    }
-
-    public getName(): string {
-        return this.get("name");
-    }
-
-    public getType(): ScratchTypeID {
-        return this.get("type");
-    }
-
-    public getVersion(): number {
-        return this.get("version");
-    }
-
-}
 
 export interface SSAStateAttribs extends AbstractElement, SingletonStateWrapper {
 

@@ -20,10 +20,10 @@
  *
  */
 
-import {Record as ImmRec, List as ImmList, Set as ImmSet, Map as ImmMap} from "immutable"
+import {List as ImmList, Record as ImmRec} from "immutable"
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../Preconditions";
-import {AbstractElement, Lattice} from "../../lattices/Lattice";
+import {AbstractElement, Lattice, LatticeWithComplements} from "../../lattices/Lattice";
 
 export interface PropositionalFormula extends AbstractElement {
 
@@ -36,25 +36,54 @@ export class BDDLibraryFactory {
     }
 }
 
-export class BDDLattice<B extends PropositionalFormula> implements Lattice<B> {
+export class BDDLattice implements LatticeWithComplements<BDD> {
 
-    bottom(): B {
+    private readonly _bottom: BDD;
+    private readonly _top: BDD;
+
+    constructor() {
+        this._bottom = new BDD(ImmList([new BDDEdge(ReductionRule.X, BDDNodes.falseNode())]));
+        this._top = new BDD(ImmList([new BDDEdge(ReductionRule.X, BDDNodes.trueNode())]));
+    }
+
+    bottom(): BDD {
+        return this._bottom;
+    }
+
+    isIncluded(element1: BDD, element2: BDD): boolean {
+        if (element1 === this._bottom || element2 === this._top) {
+            return true;
+        }
+        if (element1 === element2) {
+            return true;
+        }
+        if (element2 === this._bottom) {
+            return element1 === this._bottom;
+        }
         throw new ImplementMeException();
     }
 
-    isIncluded(element1: B, element2: B): boolean {
+    join(element1: BDD, element2: BDD): BDD {
         throw new ImplementMeException();
     }
 
-    join(element1: B, element2: B): B {
+    meet(element1: BDD, element2: BDD): BDD {
         throw new ImplementMeException();
     }
 
-    meet(element1: B, element2: B): B {
-        throw new ImplementMeException();
+    top(): BDD {
+        return this._top;
     }
 
-    top(): B {
+    complement(element: BDD): BDD {
+        if (element === this._bottom) {
+            return this._top;
+        }
+
+        if (element === this._top) {
+            return this._bottom;
+        }
+
         throw new ImplementMeException();
     }
 
@@ -62,17 +91,33 @@ export class BDDLattice<B extends PropositionalFormula> implements Lattice<B> {
 
 export class BDDLibrary {
 
-    private readonly _lattice: Lattice<PropositionalFormula>;
+    private readonly _lattice: LatticeWithComplements<PropositionalFormula>;
 
     constructor() {
         this._lattice = new BDDLattice();
     }
 
-    get lattice(): Lattice<PropositionalFormula> {
+    get lattice(): LatticeWithComplements<PropositionalFormula> {
        return this._lattice;
     }
 
 }
+
+export interface BDDAttributes {
+
+    /**
+     * The BDD can have multiple rood notes (each
+     * without incoming edges). One root node is formalized as p*.
+     * To each root points a dangling edge with a reduction rule k*.
+     */
+    roots: ImmList<BDDEdge>;
+}
+
+const BDDRecord = ImmRec({
+
+    roots: ImmList([])
+
+});
 
 /**
  * The paper "Binary Decision Diagrams with Edge-Specified Reductions" by
@@ -80,14 +125,11 @@ export class BDDLibrary {
  *
  * This is our implementation of their approach.
  */
-export class BDD {
+export class BDD extends BDDRecord implements BDDAttributes {
 
-    /**
-     * The BDD can have multiple rood notes (each
-     * without incoming edges). One root node is formalized as p*.
-     * To each root points a dangling edge with a reduction rule k*.
-     */
-    private readonly _roots: ImmList<BDDEdge>;
+    constructor(roots: ImmList<BDDEdge>) {
+        super({roots: roots});
+    }
 
     /**
      * Returns the set of all BDD nodes that are reachable on forwards
@@ -99,12 +141,12 @@ export class BDD {
         throw new ImplementMeException();
     }
 
-    get roots(): Iterable<BDDEdge> {
-        return this._roots;
+    get roots(): ImmList<BDDEdge> {
+        return this.get('roots');
     }
 
     get rootNodes(): BDDNode[] {
-        return [ ...this._roots.map((e) => { return e.targetNode; }) ];
+        return [ ...this.roots.map((e) => { return e.targetNode; }) ];
     }
 
     get zeroNode(): BDDNode {
@@ -184,6 +226,8 @@ export interface BDDNodeAttributes {
 
     level: number;
 
+    nodeRole: NodeRole;
+
     falseEdge: BDDEdge;
 
     trueEdge: BDDEdge;
@@ -200,9 +244,17 @@ export interface BDDNodeAttributes {
 
 }
 
+export enum NodeRole {
+    INTERMEDIATE = 0,
+    TRUE = 1,
+    FALSE = 2
+}
+
+
 const BDDNodeRecord = ImmRec({
 
-    level: ReductionRule.UNDEFINED,
+    level: -1,
+    nodeRole: 0,
     falseEdge: null,
     trueEdge: null
 
@@ -210,8 +262,8 @@ const BDDNodeRecord = ImmRec({
 
 export class BDDNode extends BDDNodeRecord implements BDDNodeAttributes {
 
-    constructor(level: ReductionRule, trueEdge: BDDEdge, falseEdge: BDDEdge) {
-        super({level: level, trueEdge: trueEdge, falseEdge: falseEdge});
+    constructor(level: ReductionRule, trueEdge: BDDEdge, falseEdge: BDDEdge, nodeRole: NodeRole) {
+        super({level: level, trueEdge: trueEdge, falseEdge: falseEdge, nodeRole: nodeRole});
     }
 
     get level(): number {
@@ -236,6 +288,27 @@ export class BDDNode extends BDDNodeRecord implements BDDNodeAttributes {
 
     leavingEdges(): Iterable<BDDEdge> {
         return [this.getFalseEdge(), this.getTrueEdge()];
+    }
+
+}
+
+export class BDDNodes {
+
+    private static TRUE_NODE: BDDNode;
+    private static FALSE_NODE: BDDNode;
+
+    public static trueNode(): BDDNode {
+        if (!BDDNodes.TRUE_NODE) {
+            BDDNodes.TRUE_NODE = new BDDNode(0, null, null, NodeRole.TRUE);
+        }
+        return this.TRUE_NODE;
+    }
+
+    public static falseNode(): BDDNode {
+        if (!BDDNodes.FALSE_NODE) {
+            BDDNodes.FALSE_NODE = new BDDNode(0, null, null, NodeRole.FALSE);
+        }
+        return this.FALSE_NODE;
     }
 
 }

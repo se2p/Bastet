@@ -19,23 +19,137 @@
  *
  */
 
-import {ScratchType, VoidType} from "../../ast/core/ScratchType";
-import {AstNode} from "../../ast/AstNode";
+import {ScratchType, ScratchTypeID, VoidType} from "../../ast/core/ScratchType";
+import {Record as ImmRec} from "immutable";
+import {Identifier} from "../../ast/core/Identifier";
 
 export type DataLocationID = string;
 
-export type DataLocationMap = { [id:string]: DataLocation } ;
+export type DataLocationMap = { [id:string]: TypedDataLocation } ;
 
-export default class DataLocation {
+export interface DataLocation {
 
-    constructor(stmt: AstNode|null, id: string, type: ScratchType) {
+    type: ScratchTypeID;
 
+    ident: string;
+
+    qualifiedName: string;
+
+}
+
+export interface TypedDataLocationAttributes {
+
+    type: ScratchTypeID;
+
+    ident: string;
+
+    qualifiedName: string;
+
+}
+
+export interface StaticDataLocationAttributes extends TypedDataLocationAttributes {
+
+    version: number;
+
+}
+
+const TypedDataLocationRecord = ImmRec({
+
+    type: 0,
+
+    ident: "",
+
+    qualifiedName: ""
+
+});
+
+const VersionedDataLocationRecord = ImmRec({
+
+    type: 0,
+
+    ident: "",
+
+    qualifiedName: "",
+
+    version: 0
+
+});
+
+export class TypedDataLocation extends TypedDataLocationRecord implements TypedDataLocationAttributes {
+
+    constructor(ident: string, type: ScratchTypeID) {
+        super({ident: ident, qualifiedName: ident, type: type});
     }
 
-    private static readonly VOID_LOCATION = new DataLocation(null, "void", VoidType.instance());
+    public getIdent(): string {
+        return this.get("ident");
+    }
+
+    public getQualifiedName(): string {
+        return this.get("qualifiedName");
+    }
+
+    public getType(): ScratchTypeID {
+        return this.get("type");
+    }
+
+    private static VOID_LOCATION;
 
     static void(): DataLocation {
+        if (!TypedDataLocation.VOID_LOCATION) {
+            TypedDataLocation.VOID_LOCATION = new TypedDataLocation("void", VoidType.instance().typeId);
+        }
         return this.VOID_LOCATION;
+    }
+
+}
+
+export class VersionedDataLocation extends VersionedDataLocationRecord implements StaticDataLocationAttributes {
+
+    constructor(ident: string, type: ScratchTypeID, version: number) {
+        const qualifiedName = `${ident}@${version}`
+        super({ident: ident, qualifiedName: qualifiedName, type: type, version: version});
+    }
+
+    public getIdent(): string {
+        return this.get("ident");
+    }
+
+    public getType(): ScratchTypeID {
+        return this.get("type");
+    }
+
+    public getVersion(): number {
+        return this.get("version");
+    }
+
+    public getQualifiedName(): string {
+        return this.get("qualifiedName");
+    }
+
+}
+
+/**
+ * Might add actor-specific prefixes.
+ */
+export interface DataLocationMapper {
+
+    mapDataLocation(loc: DataLocation): DataLocation;
+
+}
+
+export class DummyDataLocationMapper implements DataLocationMapper {
+
+    mapDataLocation(loc: DataLocation): DataLocation {
+        return loc;
+    }
+
+}
+
+export class DataLocations {
+
+    public static createTypedLocation(id: Identifier, type: ScratchType) {
+        return new TypedDataLocation(id.text, type.typeId);
     }
 
 }

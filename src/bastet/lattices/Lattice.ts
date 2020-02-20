@@ -59,3 +59,9 @@ export interface Lattice<E extends AbstractElement> {
     top(): E;
 
 }
+
+export interface LatticeWithComplements<E extends AbstractElement> extends Lattice<E> {
+
+    complement(element: E): E;
+
+}

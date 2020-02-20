@@ -23,11 +23,10 @@ import {Actor, ActorMap, Actors} from "./Actor";
 import {App} from "./App";
 import {AppResource, AppResourceMap} from "./AppResource";
 import {Script} from "./controlflow/Script";
-import DataLocation, {DataLocationMap} from "./controlflow/DataLocation";
-import {ScratchType, VoidType} from "../ast/core/ScratchType";
+import {DataLocationMap, DataLocations} from "./controlflow/DataLocation";
+import {ScratchType} from "../ast/core/ScratchType";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {TransitionRelation, TransitionRelations} from "./controlflow/TransitionRelation";
-import {TransitionRelationToDot} from "./controlflow/TransitionRelationToDot";
 import {AstNode} from "../ast/AstNode";
 import {Preconditions} from "../../utils/Preconditions";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
@@ -37,12 +36,11 @@ import {ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
     MethodDefinitionList,
     MethodDefinitionMap,
-    MethodSignatureList, MethodSignatureMap,
-    ResultDeclaration
+    MethodSignatureList,
+    MethodSignatureMap
 } from "../ast/core/MethodDefinition";
-import {ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
-import {StatementList, StatementLists} from "../ast/core/statements/Statement";
+import {StatementList} from "../ast/core/statements/Statement";
 import {Scripts} from "./controlflow/Scripts";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {Maps} from "../../utils/Maps";
@@ -50,6 +48,7 @@ import {Lists} from "../../utils/Lists";
 import {Method} from "./controlflow/Method";
 import {DeclareStackVariableStatement} from "../ast/core/statements/DeclarationStatement";
 import {Identifier} from "../ast/core/Identifier";
+import {Variable, VariableWithDataLocation} from "../ast/core/Variable";
 
 export class AppBuilder {
 
@@ -97,27 +96,12 @@ export class AppBuilder {
 
             // Add as result
             result[flatActor.ident] = flatActor;
-
-            // Dot file export
-            this.exportScriptsToDoT(flatActor);
         }
 
         const boostrapper = Actors.defaultBoostraper();
         result[boostrapper.ident] = boostrapper;
 
         return result;
-    }
-
-    private exportScriptsToDoT(actor: Actor): void {
-        const toDotWriter = new TransitionRelationToDot();
-        let i: number = 1;
-        for (let s of actor.scripts) {
-            const target: string = `output/actor_${actor.ident}_script_${i}.dot`;
-            toDotWriter.export(s.transitions, target);
-            i++;
-        }
-        const target: string = `output/actor_${actor.ident}_script_init.dot`;
-        toDotWriter.export(actor.initScript.transitions, target);
     }
 
     private buildActorFlat(actorDefinition: ActorDefinition, actorNamePrefix: string) {
@@ -159,7 +143,9 @@ export class AppBuilder {
             if (!ScratchType.isVoid(m.returns.type)) {
                 const resultVarIdent: Identifier = m.returns.ident;
                 const resultVarType: ScratchType = m.returns.type;
-                const declarationStmt = new DeclareStackVariableStatement(resultVarIdent, resultVarType);
+                const resultVar: Variable = new VariableWithDataLocation(
+                    DataLocations.createTypedLocation(resultVarIdent, resultVarType));
+                const declarationStmt = new DeclareStackVariableStatement(resultVar);
                 const dclStmtList = StatementList.from([declarationStmt]);
 
                 methodTr = TransitionRelations.concat(methodTr, dclStmtList.accept(visitor));
@@ -208,26 +194,6 @@ export class AppBuilder {
             result[methodName] = methodDef;
         }
 
-        return result;
-    }
-
-    private buildMethodResultDef(resultDecl: ResultDeclaration): DataLocation {
-        if (resultDecl.type == VoidType.instance()) {
-            return DataLocation.void();
-        } else {
-            const id: string = resultDecl.ident.text;
-            const t: ScratchType = resultDecl.type;
-            return new DataLocation(resultDecl, id, t);
-        }
-    }
-
-    private buildParameterDeclarations(parameterListContext: ParameterDeclarationList): DataLocationMap {
-        let result: DataLocationMap = {};
-        for (let p of parameterListContext.elements) {
-            const id: string = p.ident.text;
-            const t: ScratchType = p.type;
-            result[id] = new DataLocation(p, id, t);
-        }
         return result;
     }
 

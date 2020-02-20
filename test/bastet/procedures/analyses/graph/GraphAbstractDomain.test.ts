@@ -19,11 +19,7 @@
  *
  */
 
-import {Set as ImmSet} from "immutable";
-import {
-    GraphAbstractDomain,
-    GraphAbstractStateBuilder
-} from "../../../../../src/bastet/procedures/analyses/graph/GraphAbstractDomain";
+import {GraphAbstractStateBuilder} from "../../../../../src/bastet/procedures/analyses/graph/GraphAbstractDomain";
 
 describe('Functionality of the graph abstract domain', function() {
 

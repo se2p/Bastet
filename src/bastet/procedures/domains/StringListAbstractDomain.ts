@@ -20,8 +20,8 @@
  *
  */
 
-import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
-import {ConcreteDomain, ConcreteList, ConcreteString, ConcreteStringList} from "./ConcreteElements";
+import {AbstractionPrecision} from "./AbstractDomain";
+import {ConcreteDomain, ConcreteStringList} from "./ConcreteElements";
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";

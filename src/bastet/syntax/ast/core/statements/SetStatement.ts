@@ -25,9 +25,14 @@ import {Expression} from "../expressions/Expression";
 import {StringExpression} from "../expressions/StringExpression";
 import {Identifier} from "../Identifier";
 import {ExpressionList} from "../expressions/ExpressionList";
+import {Variable} from "../Variable";
+import {AstNode} from "../../AstNode";
 
 export abstract class SetStatement extends Statement {
 
+    constructor(childs: AstNode[]) {
+        super(childs);
+    }
 }
 
 export class SetAttributeToStatement extends SetStatement {
@@ -41,6 +46,13 @@ export class SetAttributeToStatement extends SetStatement {
         this._toValue = toValue;
     }
 
+    get attrib(): StringExpression {
+        return this._attrib;
+    }
+
+    get toValue(): Expression {
+        return this._toValue;
+    }
 }
 
 export class SetAttributeOfToStatement extends SetStatement {
@@ -56,20 +68,31 @@ export class SetAttributeOfToStatement extends SetStatement {
         this._toValue = toValue;
     }
 
+    get attrib(): StringExpression {
+        return this._attrib;
+    }
+
+    get ofEntity(): Identifier {
+        return this._ofEntity;
+    }
+
+    get toValue(): Expression {
+        return this._toValue;
+    }
 }
 
 export class StoreEvalResultToVariableStatement extends SetStatement {
 
-    private readonly _variable: Identifier;
+    private readonly _variable: Variable;
     private readonly _toValue: Expression;
 
-    constructor(variable: Identifier, toValue: Expression) {
-        super([variable, toValue]);
+    constructor(variable: Variable, toValue: Expression) {
+        super([variable.identifier, toValue]);
         this._variable = variable;
         this._toValue = toValue;
     }
 
-    get variable(): Identifier {
+    get variable(): Variable {
         return this._variable;
     }
 
@@ -82,10 +105,10 @@ export class StoreCallResultToVariableStatement extends SetStatement {
 
     private readonly _method: Identifier;
     private readonly _arguments: ExpressionList;
-    private readonly _toVariable: Identifier;
+    private readonly _toVariable: Variable;
 
-    constructor(method: Identifier, args: ExpressionList, toVariable: Identifier) {
-        super([method, args, toVariable]);
+    constructor(method: Identifier, args: ExpressionList, toVariable: Variable) {
+        super([method, args, toVariable.identifier]);
         this._method = method;
         this._arguments = args;
         this._toVariable = toVariable;

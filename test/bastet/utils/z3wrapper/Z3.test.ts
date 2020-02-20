@@ -22,16 +22,86 @@
 
 import {Z3_config, Z3_context} from "../../../../src/bastet/utils/z3wrapper/libz3";
 import {Ptr, Uint32} from "../../../../src/bastet/utils/z3wrapper/ctypes";
-import {WasmJSInstance} from "../../../../src/bastet/utils/z3wrapper/wasmInstance"
-import {SolverFactory, Z3Solver} from "../../../../src/bastet/utils/z3wrapper/Z3Wrapper";
+import {SMTFactory, Z3SMT} from "../../../../src/bastet/utils/z3wrapper/Z3Wrapper";
+import {VariableWithDataLocation} from "../../../../src/bastet/syntax/ast/core/Variable";
+import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataLocation";
+import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
+import {NumberType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
+import {ConcreteNumber} from "../../../../src/bastet/procedures/domains/ConcreteElements";
+import {Z3FirstOrderLattice} from "../../../../src/bastet/utils/z3wrapper/Z3MemoryTheory";
 
-describe('Z3Wrapper', function() {
+let smt: Z3SMT;
+let ctx;
+let theories;
+let prover;
 
-    const solver = SolverFactory.createZ3();
-
-    it('can instantiate the WASM module', function() {
-    })
-
-
+beforeAll( async (done) => {
+    smt = await SMTFactory.createZ3();
+    ctx = smt.createContext();
+    theories = smt.createTheory(ctx);
+    prover = smt.createProver(ctx);
+    done();
 });
 
+
+test ("Case: False", () => {
+    prover.push();
+    const falseFormula = theories.boolTheory.falseBool();
+    prover.assert(falseFormula);
+    const isUnsat: boolean = prover.isUnsat();
+    expect(isUnsat).toBe(true);
+    prover.pop();
+});
+
+test ("Case: True", () => {
+    prover.push();
+    const trueFormula = theories.boolTheory.trueBool();
+    prover.assert(trueFormula);
+    const isUnsat: boolean = prover.isUnsat();
+    expect(isUnsat).toBe(false);
+    prover.pop();
+});
+
+test ("Implication. Unsat", () => {
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), NumberType.instance()));
+    prover.push();
+    const f = theories.boolTheory.and(
+        theories.numTheory.isNumberEqualTo(
+            theories.numTheory.abstractNumberValue(x),
+            theories.numTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.numTheory.isNumberEqualTo(
+            theories.numTheory.abstractNumberValue(x),
+            theories.numTheory.fromConcreteNumber(new ConcreteNumber(42))));
+    prover.assert(f);
+    const isUnsat: boolean = prover.isUnsat();
+    expect(isUnsat).toBe(true);
+    prover.pop();
+});
+
+test ("Implication. Sat", () => {
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), NumberType.instance()));
+    prover.push();
+    const f = theories.boolTheory.and(
+                theories.numTheory.isNumberEqualTo(
+                    theories.numTheory.abstractNumberValue(x),
+                    theories.numTheory.fromConcreteNumber(new ConcreteNumber(42))),
+                theories.numTheory.isNumberEqualTo(
+                    theories.numTheory.abstractNumberValue(x),
+                    theories.numTheory.fromConcreteNumber(new ConcreteNumber(42))));
+    prover.assert(f);
+    const isUnsat: boolean = prover.isUnsat();
+    expect(isUnsat).toBe(false);
+    prover.pop();
+});
+
+test("Lattice Include 1", () => {
+    const lattice = new Z3FirstOrderLattice(theories.boolTheory, prover);
+    const result = lattice.isIncluded(lattice.top(), lattice.bottom());
+    expect(result).toBe(false);
+});
+
+test("Lattice Include 2", () => {
+    const lattice = new Z3FirstOrderLattice(theories.boolTheory, prover);
+    const result = lattice.isIncluded(lattice.bottom(), lattice.bottom());
+    expect(result).toBe(true);
+});

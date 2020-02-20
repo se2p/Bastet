@@ -39,7 +39,34 @@ export class ChooseLastOperator<E extends AbstractElement> implements ChooseOper
 
 }
 
-export abstract class StateSet<E extends AbstractElement> {
+export interface StateSet<E extends AbstractElement> {
+
+    isEmpty(): boolean;
+
+    getStateSet(inPartitionOf: E): StateSet<E>;
+
+    [Symbol.iterator](): IterableIterator<E>;
+
+    remove(element: E);
+
+    add(element: E);
+
+    createChooseOp(config: ChooseOpConfig);
+
+    getAddedLast(): E[];
+
+    removeAll(elements: Iterable<E>);
+
+    addAll(elements: Iterable<E>);
+
+    isRootState(element: E): boolean;
+
+    addRootSates(elements: Iterable<E>);
+
+    getRootStates(): Set<E>;
+}
+
+export abstract class AbstractStateSet<E extends AbstractElement> {
 
     abstract isEmpty(): boolean;
 
@@ -70,20 +97,26 @@ export abstract class StateSet<E extends AbstractElement> {
     abstract add(element: E);
 
     abstract createChooseOp(config: ChooseOpConfig);
+
+    abstract getAddedLast(): E[];
 }
 
 /**
  * Ordered by insertion time.
  */
-export class OrderedStateSet<E extends AbstractElement> extends StateSet<E> {
+export class OrderedStateSet<E extends AbstractElement> extends AbstractStateSet<E> {
 
     private _states: Set<E>;
+
     private _root: Set<E>;
+
+    private _addedLast: E[];
 
     constructor() {
         super();
         this._states = new Set();
         this._root = new Set();
+        this._addedLast = [];
     }
 
     [Symbol.iterator](): IterableIterator<E> {
@@ -105,10 +138,15 @@ export class OrderedStateSet<E extends AbstractElement> extends StateSet<E> {
 
     add(element: E) {
         this._states.add(element);
+        this._addedLast = [element];
     }
 
     getStateSet(inPartitionOf: E): StateSet<E> {
         return this;
+    }
+
+    getAddedLast(): E[] {
+        return this._addedLast;
     }
 
     isEmpty(): boolean {
