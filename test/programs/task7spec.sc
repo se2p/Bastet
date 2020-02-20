@@ -29,27 +29,27 @@ actor DirectorObserver is Observer begin
     declare observer_state as enum ["INIT", "STARTUP_FINISHED"]
 
     declare actor_1_id as string
-    declare actor_1_switched_costume as boolean
 
     declare actor_1_costume as string
     declare actor_1_prev_costume as string
 
-    declare timestamp as number
-    define timestamp as _RUMTIME_millis()
+    declare last_change as number
+    define last_change as _RUMTIME_millis()
 
     define atomic checkBehaviorSatisfied () begin
         // (a) Attributes of the first actor
-        define actor_1_costume as attribute "currentCostume" of actor_1_id
-        define actor_1_switched_costume as false
+        define actor_1_costume as attribute "current_costume_name" of actor_1_id
+
+        declare result as boolean
+        define result as true
 
         if not actor_1_costume = actor_1_prev_costume then begin
-           define actor_1_switched_costume as true
+           define last_change as _RUMTIME_millis()
         end
-       // The actual invariant check
 
-       if _RUNTIME_millis() - timestamp > 2000
-            assert (actor_1_switched_costume)
-            define timestamp as _RUMTIME_millis()
+       // The actual invariant check
+       if _RUNTIME_millis() - last_change > 2000
+           define result as false
        end
     end returns actor_1_switched_costume: boolean
 

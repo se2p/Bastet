@@ -44,6 +44,59 @@ role Observer is RuntimeEntity begin
         end
     end
 
+    // @Category "Sensing"
+    define touchingObjects (fst: string, snd: string) begin
+        // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
+
+        declare leg_a_fst as number
+        declare leg_b_fst as number
+        define leg_a_fst as attribute "current_costume_width" of fst
+        define leg_b_fst as attribute "current_costume_height" of fst
+
+        declare radius_fst as number
+        define radius_fst as 0.5 * mathSqrt(leg_a_fst * leg_a_fst + leg_b_fst * leg_b_fst)
+
+        declare leg_a_snd as number
+        declare leg_b_snd as number
+        define leg_a_snd as attribute "current_costume_width" of snd
+        define leg_b_snd as attribute "current_costume_height" of snd
+
+        declare radius_snd as number
+        define radius_snd as 0.5 * mathSqrt(leg_a_snd * leg_a_snd + leg_b_snd * leg_b_snd)
+
+        declare x_fst as number
+        define x_fst as attribute "x" of fst
+        declare y_fst as number
+        define y_fst as attribute "y" of fst
+
+        declare x_snd as number
+        define x_snd as attribute "x" of snd
+        declare y_snd as number
+        define y_snd as attribute "y" of snd
+
+
+        declare result as boolean
+        define result as not (((mathSqrt((x_fst + x_snd)*(x_fst + x_snd) + (y_fst + y_snd) * (y_fst + y_snd)) - radius_fst - radius_snd) > 0))
+
+    end returns result : boolean
+
+    define touchingMousePointer (obj_id: string) begin
+        declare result as boolean
+
+        declare x as number
+        declare y as number
+        define x as attribute "x" of obj_id
+        define y as attribute "y" of obj_id
+
+        if _RUNTIME_getMouseX() >= x
+                and _RUNTIME_getMouseX() <= x + current_costume_width
+                and _RUNTIME_getMouseY >= y
+                and _RUNTIME_getMouseY <= y+current_costume_height begin
+
+            define result as false
+        end
+    end returns result : boolean
+
 end
 
 role ScratchEntity is RuntimeEntity begin
@@ -67,15 +120,18 @@ role ScratchEntity is RuntimeEntity begin
 
     extern radToDeg(n: number) returns number
 
-    // TODO: sqrt
+    // TODO: Maybe add an approximation for sqrt
+    extern mathSqrt(n: number) returns number
+
+    // TODO: Maybe add an approximation for floor
+    extern mathFloor(n: number) returns number
+
 
     // @Category "Looks"
     define changeActiveGraphicTo (id: string) begin
-        // TODO: Set the following attributes:
-        //    define current_costume_name as id
-        //    define current_costume_width as _RUNTIME_getImageWidth(id)
-        //    define current_costume_height as _RUNTIME_getImageHeight(id)
-
+        define current_costume_name as id
+        define current_costume_width as _RUNTIME_getImageWidth(id)
+        define current_costume_height as _RUNTIME_getImageHeight(id)
     end
 
     // @Category "Looks"
@@ -288,10 +344,13 @@ role ScratchSprite is ScratchEntity begin
 
     // @Category "Sensing"
     define touchingMousePointer () begin
-        // FIXME use collision detection and offset
-        // FIXME check if mousepointer is out of bounds
         declare result as boolean
-        if item (_RUNTIME_getMouseX () * _RUNTIME_getMouseX () ) of actor_1_graphics = 0 begin //todo is 0 the default value
+
+        if _RUNTIME_getMouseX() >= x
+                and _RUNTIME_getMouseX() <= x + current_costume_width
+                and _RUNTIME_getMouseY >= y
+                and _RUNTIME_getMouseY <= y+current_costume_height begin
+
             define result as false
         end
     end returns result : boolean
@@ -303,17 +362,16 @@ role ScratchSprite is ScratchEntity begin
         declare leg_a as number
         declare leg_b as number
         // TODO: Query attributes of myself and the other actor
-        define leg_a as _RUNTIME_getImageWidth() //TODO use image identifier
-        define leg_b as _RUNTIME_getImageHeight() //TODO use image identifier
+        define leg_a as current_costume_width
+        define leg_b as current_costume_height
 
         declare radius as number
         define radius as 0.5 * mathSqrt(leg_a * leg_a + leg_b * leg_b)
 
         declare leg_a_other as number
         declare leg_b_other as number
-        // TODO: Query attributes of myself and the other actor
-        define leg_a_other as _RUNTIME_getImageWidth() //TODO use image identifier
-        define leg_b_other as _RUNTIME_getImageHeight() //TODO use image identifier
+        define leg_a_other as attribute "current_costume_width" of obj
+        define leg_b_other as attribute "current_costume_height" of obj
 
         declare radius_other as number
         define radius_other as 0.5 * mathSqrt(leg_a_other * leg_a_other + leg_b_other * leg_b_other)
@@ -324,8 +382,7 @@ role ScratchSprite is ScratchEntity begin
         define y_other as attribute "y" of obj
 
         declare result as boolean
-        // TODO: Fix this (some kind of negation needed?)
-        define result as (((mathSqrt((x + x_other)*(x + x_other) + (y + y_other) * (y + y_other)) - radius - radius_other) > 0)
+        define result as not (((mathSqrt((x + x_other)*(x + x_other) + (y + y_other) * (y + y_other)) - radius - radius_other) > 0))
 
     end returns result : boolean
 
@@ -385,8 +442,7 @@ role ScratchSprite is ScratchEntity begin
             define max as 180
             define range as (max - min) +1
 
-            // TODO: Might not parse
-            define result as dir - (Math.floor((dir - min) / range) * range);
+            define result as dir - (mathFloor((dir - min) / range) * range);
     end returns result : number
 
 

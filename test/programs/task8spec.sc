@@ -40,7 +40,7 @@ actor DirectorObserver is Observer begin
     define atomic checkBehaviorSatisfied () begin
         define result as false
 
-            if spritesTouching() then begin
+            if touchingObjects(actor_1_id, actor_2_id) then begin
                 if attribute "bubbleText" of actor_1_id = "Hab ich dich!" then begin
                     define result as true
                 end else begin attribute "bubbleText" of actor_2_id = "Hab ich dich!"
@@ -55,27 +55,6 @@ actor DirectorObserver is Observer begin
     define atomic storeRelevantStateInfosForNext () begin
 
     end
-
-    define atomic spritesTouching() begin
-         define actor_1_graphics as attribute "active_graphic_pixels" of actor_1_id
-         define actor_2_graphics as attribute "active_graphic_pixels" of actor_2_id
-
-         declare result as boolean
-         define result as true
-
-         declare i as number
-         define i as 0
-
-         until (i = length of actor_1_graphics or result = true) begin
-            if item i of actor_1_graphics > 0 and item i of actor_2_graphics then begin
-                if result = false then begin
-                    result = true
-                end
-            end
-         end
-
-      end returns result: boolean
-
 
     script on bootstrap do begin
         define observer_state as "INIT"

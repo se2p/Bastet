@@ -31,7 +31,7 @@ actor DirectorObserver is Observer begin
     declare observer_state as enum ["INIT", "STARTUP_FINISHED"]
 
     declare actor_1_id as string
-    declare result as boolean
+    declare mouseTouched as boolean
 
     declare actor_1_color as string
     declare actor_1_prev_color as string
@@ -39,47 +39,35 @@ actor DirectorObserver is Observer begin
     declare actor_1_direction as number
     declare actor_1_prev_direction as number
 
-
-    declare timestamp as number
-    define timestamp as _RUMTIME_millis()
+    declare last_change as number
+    define last_change as _RUMTIME_millis()
 
     define atomic checkBehaviorSatisfied () begin
         // (a) Attributes of the first actor
-        define actor_1_color as attribute "currentColor" of actor_1_id
+        define actor_1_color as attribute "color" of actor_1_id
         define actor_1_direction as attribute "direction" of actor_1_id
-        define result as false
 
         // The actual invariant check
         if not actor_1_color = actor_1_prev_color then begin
-           define result as true
+           define mouseTouched as true
         end
 
-        if touchingMouse() then begin
+        if touchingMouse(actor_1_id) then begin
             if not actor_1_direction = actor_1_prev_direction then begin
-                define result as true
+                define mouseTouched as true
+                define last_change as _RUMTIME_millis()
             end
         end else begin
             // Only turn if we are touching the mouse, if we turn and do not touch the mouse, this is wrong
             if not actor_1_direction = actor_1_prev_direction then begin
-                define result as false
+                define mouseTouched as false
             end
         end
 
         // TODO: Check if changed within the last 1000 msec
-       if timestamp - _RUMTIME_millis > 1000
-            assert (result)
-            define timestamp as _RUMTIME_millis()
+       if last_change - _RUMTIME_millis > 1000 and mouseTouched begin
+           define result as false
        end
-    end returns result: boolean
-
-    define atomic touchingMouse() begin
-        define actor_1_graphics as attribute "active_graphic_pixels" of actor_1_id
-        declare result as boolean
-        define result as true
-        if item (_RUNTIME_getMouseX () * _RUNTIME_getMouseX () ) of actor_1_graphics = 0 begin //todo is 0 the default value
-            define result as false
-        end
-
     end returns result: boolean
 
     define atomic storeRelevantStateInfosForNext () begin
