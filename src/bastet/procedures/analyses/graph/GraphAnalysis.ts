@@ -35,6 +35,7 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {GraphToDot} from "./GraphToDot";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
+import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
 
 export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState>,
     Unwrapper<GraphAbstractState, AbstractElement> {
@@ -130,6 +131,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     wrapStateSets(frontier: StateSet<GraphAbstractState>, reached: StateSet<GraphAbstractState>): [StateSet<GraphAbstractState>, StateSet<GraphAbstractState>] {
-        return [frontier, reached];
+        const wrappedReached = new GraphReachedSetWrapper(reached, frontier);
+        return [frontier, wrappedReached];
     }
 }
