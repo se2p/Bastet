@@ -67,7 +67,7 @@ export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         this._abstractDomain = new SyMemAbstractDomain(folLattice, propLattice);
         this._transferRelation = new SyMemTransferRelation(this._abstractDomain, this._theories);
         this._refiner = new SyMemRefiner(this._abstractDomain.lattice);
-        this._statistics = Preconditions.checkNotUndefined(statistics).newContext(this.constructor.name);
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
     abstractSucc(fromState: SymMemAbstractState): Iterable<SymMemAbstractState> {

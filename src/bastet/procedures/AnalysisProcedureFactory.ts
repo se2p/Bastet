@@ -23,7 +23,7 @@ import {AnalysisProcedure} from "./AnalysisProcedure";
 import {App} from "../syntax/app/App";
 import {GraphAnalysis} from "./analyses/graph/GraphAnalysis";
 import {ScheduleAnalysis} from "./analyses/schedule/ScheduleAnalysis";
-import {GraphAbstractState} from "./analyses/graph/GraphAbstractDomain";
+import {GraphAbstractState, GraphConcreteState} from "./analyses/graph/GraphAbstractDomain";
 import {ReachabilityAlgorithm} from "./algorithms/ReachabilityAlgorithm";
 import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
 import {SMTFactory} from "../utils/z3wrapper/Z3Wrapper";
@@ -36,6 +36,7 @@ import {MultiPropertyAlgorithm} from "./algorithms/MultiPropertyAlgorithm";
 import {Property} from "../syntax/Property";
 import {Set as ImmSet} from "immutable";
 import {AnalysisStatistics} from "./analyses/AnalysisStatistics";
+import {StatsAnalysis} from "./analyses/stats/StatsAnalysis";
 
 export class AnalysisProcedureConfig {
 
@@ -68,18 +69,19 @@ export class AnalysisProcedureFactory {
                 const ssaAnalysis = new SSAAnalysis(task, memAnalysis, this._statistics);
                 const schedAnalysis = new ScheduleAnalysis({}, task, ssaAnalysis, this._statistics);
                 const graphAnalysis = new GraphAnalysis(task, schedAnalysis, this._statistics);
+                const outerAnalysis = new StatsAnalysis<GraphConcreteState, GraphAbstractState>(graphAnalysis, this._statistics);
 
                 const frontier: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
                 const reached: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
 
                 const chooseOpConfig = new ChooseOpConfig();
                 const chooseOp = frontier.createChooseOp(chooseOpConfig);
-                const reachabilityAlgorithm = new ReachabilityAlgorithm(graphAnalysis, chooseOp, this._statistics);
-                const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, graphAnalysis.refiner, graphAnalysis, this._statistics);
-                const multiPropertyAlgorithm = new MultiPropertyAlgorithm(task, bmcAlgorithm, graphAnalysis, this._statistics,
+                const reachabilityAlgorithm = new ReachabilityAlgorithm(outerAnalysis, chooseOp, this._statistics);
+                const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, outerAnalysis.refiner, outerAnalysis, this._statistics);
+                const multiPropertyAlgorithm = new MultiPropertyAlgorithm(task, bmcAlgorithm, outerAnalysis, this._statistics,
                     (v, s, u, stats) => this.onAnalysisResult(v, s, u, stats));
 
-                const initialStates: GraphAbstractState[] = graphAnalysis.initialStatesFor(task);
+                const initialStates: GraphAbstractState[] = outerAnalysis.initialStatesFor(task);
                 frontier.addAll(initialStates);
                 reached.addRootSates(initialStates);
 

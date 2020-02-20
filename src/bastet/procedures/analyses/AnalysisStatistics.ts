@@ -65,7 +65,6 @@ export class PerfTimer {
     }
 }
 
-
 export class AnalysisStatistics {
 
     private readonly _name: string;
@@ -86,11 +85,28 @@ export class AnalysisStatistics {
         return this._contextTimer;
     }
 
-    public newContext(name: string): AnalysisStatistics {
-        if (this._statisticsTree[name]) {
-            throw new IllegalStateException("Context already in use");
+    public startTimer() {
+        this.contextTimer.start();
+    }
+
+    public stopTimer() {
+        this.contextTimer.stop();
+    }
+
+    public runWithTimer<R>(command: () => R): R {
+        this.startTimer();
+        try {
+            return command();
+        } finally {
+            this.stopTimer();
         }
-        const newContextRoot = this._statisticsTree[name] = {};
+    }
+
+    public withContext(name: string): AnalysisStatistics {
+        let newContextRoot = this._statisticsTree[name];
+        if (!newContextRoot) {
+            newContextRoot = this._statisticsTree[name] = {};
+        }
         return new AnalysisStatistics(name, newContextRoot);
     }
 

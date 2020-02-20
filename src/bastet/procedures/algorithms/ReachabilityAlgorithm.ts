@@ -44,7 +44,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
     constructor(analysis: ProgramAnalysis<C, E>, chooseOp: ChooseOperator<E>, statistics: AnalysisStatistics) {
         this._analysis = Preconditions.checkNotUndefined(analysis);
         this._chooseOp = Preconditions.checkNotUndefined(chooseOp);
-        this._statistics = Preconditions.checkNotUndefined(statistics).newContext(this.constructor.name);
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
     get analysis(): ProgramAnalysis<C, E> {

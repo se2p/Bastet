@@ -85,7 +85,7 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
             new LabeledTransferRelationImpl((e) => this._wrappedAnalysis.abstractSucc(e),
                 (e, op) => this._wrappedAnalysis.abstractSuccFor(e, op)));
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
-        this._statistics = Preconditions.checkNotUndefined(statistics).newContext(this.constructor.name);
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
     abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {

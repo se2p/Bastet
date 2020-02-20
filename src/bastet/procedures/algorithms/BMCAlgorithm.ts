@@ -47,7 +47,7 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
         this._wrappedAlgorithm = Preconditions.checkNotUndefined(wrappedAlgorithm);
         this._refiner = Preconditions.checkNotUndefined(refiner);
         this._analysis = Preconditions.checkNotUndefined(analysis);
-        this._statistics = Preconditions.checkNotUndefined(statistics).newContext(this.constructor.name);
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
     public run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {

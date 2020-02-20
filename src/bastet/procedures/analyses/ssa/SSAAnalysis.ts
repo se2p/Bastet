@@ -61,7 +61,7 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         const wrappedTr = LabeledTransferRelationImpl.from(wrappedAnalysis);
         this._transferRelation = new SSATransferRelation(wrappedTr);
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
-        this._statistics = Preconditions.checkNotUndefined(statistics).newContext(this.constructor.name);
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
     abstractSucc(fromState: SSAState): Iterable<SSAState> {

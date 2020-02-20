@@ -55,7 +55,7 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
         this._wrappedAlgorithm = Preconditions.checkNotUndefined(algorithm);
         this._analysis = Preconditions.checkNotUndefined(analysis);
         this._resultCallback = Preconditions.checkNotUndefined(resultCallback);
-        this._statistics = Preconditions.checkNotUndefined(stats).newContext(this.constructor.name);
+        this._statistics = Preconditions.checkNotUndefined(stats).withContext(this.constructor.name);
         this._properties = this._task.getProperties();
     }
 
