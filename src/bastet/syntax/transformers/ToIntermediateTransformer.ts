@@ -913,7 +913,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TransformerResult(
             cond.statementsToPrepend,
             new IfStatement(
-                cond.nodeOnly() as BooleanExpression,
+                cond.node as BooleanExpression,
                 ctx.stmtList().accept(this).nodeOnly() as StatementList,
                 this.statementListFrom(ctx.elseCase().stmtList())));
     }
