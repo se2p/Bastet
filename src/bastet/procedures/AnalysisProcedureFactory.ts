@@ -35,6 +35,7 @@ import {BMCAlgorithm} from "./algorithms/BMC";
 import {MultiPropertyAlgorithm} from "./algorithms/MultiPropertyAlgorithm";
 import {Property} from "../syntax/Property";
 import {Record as ImmRec, Set as ImmSet} from "immutable";
+import {AnalysisStatistics} from "./analyses/AnalysisStatistics";
 
 export class AnalysisProcedureConfig {
 
@@ -48,9 +49,14 @@ export class AnalysisProcedureFactory {
 
     public static async createAnalysisProcedure(config: AnalysisProcedureConfig): Promise<AnalysisProcedure> {
         return new class implements AnalysisProcedure {
+
+            private _analysisStartTime: number;
+
             async run(task: App): Promise<{}> {
                 const smt = await SMTFactory.createZ3();
                 const bddlib = await BDDLibraryFactory.createBDDLib();
+
+                const statistics = new AnalysisStatistics();
 
                 // TODO: Delete the context after the analysis is no more in use
                 const defaultContect = smt.createContext();
@@ -70,21 +76,21 @@ export class AnalysisProcedureFactory {
                 const chooseOp = frontier.createChooseOp(chooseOpConfig);
                 const reachabilityAlgorithm = new ReachabilityAlgorithm(graphAnalysis, chooseOp);
                 const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, graphAnalysis.refiner, graphAnalysis);
-                const multiPropertyAlgorithm = new MultiPropertyAlgorithm(task, bmcAlgorithm, graphAnalysis, this.onAnalysisResult);
+                const multiPropertyAlgorithm = new MultiPropertyAlgorithm(task, bmcAlgorithm, graphAnalysis, statistics, this.onAnalysisResult);
 
                 const initialStates: GraphAbstractState[] = graphAnalysis.initialStatesFor(task);
                 frontier.addAll(initialStates);
                 reached.addRootSates(initialStates);
 
                 const [reachedPrime, frontierPrime] = multiPropertyAlgorithm.run(frontier, reached);
-
                 graphAnalysis.exportAnalysisResult(reachedPrime, frontierPrime);
 
                 return {};
             }
 
+            private onAnalysisResult(violated: ImmSet<Property>, satisifed: ImmSet<Property>, unknowns: ImmSet<Property>, statistics: AnalysisStatistics) {
+                const analysisDurtionMSec = statistics.analysisTime.duration.toFixed(3);
 
-            private onAnalysisResult(violated: ImmSet<Property>, satisifed: ImmSet<Property>, unknowns: ImmSet<Property>) {
                 const printPropertySetAs = function(role: string, set: ImmSet<Property>) {
                     if (!set.isEmpty()) {
                         console.log(`Following properties are ${role}:`);
@@ -97,7 +103,7 @@ export class AnalysisProcedureFactory {
                 };
 
                 console.log("\n==============================================================");
-                console.log("\nAnalysis finished.\n");
+                console.log(`\nAnalysis finished after ${analysisDurtionMSec} msec.\n`);
 
                 printPropertySetAs("VIOLATED", violated);
                 printPropertySetAs("SATISFIED", satisifed);

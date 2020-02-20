@@ -23,7 +23,6 @@
 
 import {AbstractElement} from "../../lattices/Lattice";
 import {ConcreteElement} from "../domains/ConcreteElements";
-import {Counterexample} from "./Counterexample";
 import {Property} from "../../syntax/Property";
 import {App} from "../../syntax/app/App";
 import {Record as ImmRec, Set as ImmSet} from "immutable";
@@ -31,8 +30,9 @@ import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 import {AnalysisAlgorithm} from "./Algorithm";
 import {Preconditions} from "../../utils/Preconditions";
 import {StateSet} from "./StateSet";
+import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
 
-export type ResultCallback = (violated: ImmSet<Property>, satisfied: ImmSet<Property>, unknown: ImmSet<Property>) => void;
+export type ResultCallback = (violated: ImmSet<Property>, satisfied: ImmSet<Property>, unknown: ImmSet<Property>, stats: AnalysisStatistics) => void;
 
 export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends AbstractElement> implements AnalysisAlgorithm<C, E>{
 
@@ -46,11 +46,14 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
 
     private readonly _resultCallback: ResultCallback;
 
-    constructor(task: App, algorithm: AnalysisAlgorithm<C, E>, analysis: ProgramAnalysis<C, E>, resultCallback: ResultCallback) {
+    private readonly _statistics: AnalysisStatistics;
+
+    constructor(task: App, algorithm: AnalysisAlgorithm<C, E>, analysis: ProgramAnalysis<C, E>, stats: AnalysisStatistics, resultCallback: ResultCallback) {
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAlgorithm = Preconditions.checkNotUndefined(algorithm);
         this._analysis = Preconditions.checkNotUndefined(analysis);
         this._resultCallback = Preconditions.checkNotUndefined(resultCallback);
+        this._statistics = Preconditions.checkNotUndefined(stats);
         this._properties = this._task.getProperties();
     }
 
@@ -59,18 +62,23 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
         let satisfied: ImmSet<Property> = ImmSet();
         let unknown: ImmSet<Property> = ImmSet();
 
-        do {
-            [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);
+        this._statistics.analysisTime.start();
+        try {
+            do {
+                [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);
 
-            if (reached.getAddedLast().length > 0) {
-                Preconditions.checkState(reached.getAddedLast().length > 0);
-                const lastState = reached.getAddedLast()[0];
-                const targetProperties = ImmSet<Property>(this._analysis.target(lastState));
-                violated = violated.union(targetProperties);
-            }
-        } while (!frontier.isEmpty());
+                if (reached.getAddedLast().length > 0) {
+                    Preconditions.checkState(reached.getAddedLast().length > 0);
+                    const lastState = reached.getAddedLast()[0];
+                    const targetProperties = ImmSet<Property>(this._analysis.target(lastState));
+                    violated = violated.union(targetProperties);
+                }
+            } while (!frontier.isEmpty());
+        } finally {
+            this._statistics.analysisTime.stop();
+        }
 
-        this._resultCallback(violated, satisfied, unknown);
+        this._resultCallback(violated, satisfied, unknown, this._statistics);
 
         return [frontier, reached];
     }
