@@ -34,7 +34,7 @@ actor DirectorObserver is Observer begin
     declare actor_1_prev_costume as string
 
     declare last_change as number
-    define last_change as _RUMTIME_millis()
+    define last_change as _RUNTIME_millis()
 
     define atomic checkBehaviorSatisfied () begin
         // (a) Attributes of the first actor
@@ -44,7 +44,7 @@ actor DirectorObserver is Observer begin
         define result as true
 
         if not (actor_1_costume = actor_1_prev_costume) then begin
-           define last_change as _RUMTIME_millis()
+           define last_change as _RUNTIME_millis()
         end
 
        // The actual invariant check
@@ -61,7 +61,7 @@ actor DirectorObserver is Observer begin
 
     end
 
-    script on startup finished do begin
+    script on bootstrap finished do begin
         if observer_state = "INIT" then begin
         end else begin
             // First specification check (base condition)
