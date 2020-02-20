@@ -40,7 +40,7 @@ actor DirectorObserver is Observer begin
     declare actor_1_prev_direction as number
 
     declare last_change as number
-    define last_change as _RUMTIME_millis()
+    define last_change as _RUNTIME_millis()
 
     define atomic checkBehaviorSatisfied () begin
         // (a) Attributes of the first actor
@@ -52,10 +52,10 @@ actor DirectorObserver is Observer begin
            define mouseTouched as true
         end
 
-        if touchingMouse(actor_1_id) then begin
+        if touchingMousePointer(actor_1_id) then begin
             if not actor_1_direction = actor_1_prev_direction then begin
                 define mouseTouched as true
-                define last_change as _RUMTIME_millis()
+                define last_change as _RUNTIME_millis()
             end
         end else begin
             // Only turn if we are touching the mouse, if we turn and do not touch the mouse, this is wrong
@@ -65,7 +65,7 @@ actor DirectorObserver is Observer begin
         end
 
         // TODO: Check if changed within the last 1000 msec
-       if last_change - _RUMTIME_millis > 1000 and mouseTouched begin
+       if last_change - _RUNTIME_millis > 1000 and mouseTouched then begin
            define result as false
        end
     end returns result: boolean
@@ -79,7 +79,7 @@ actor DirectorObserver is Observer begin
 
     end
 
-    script on startup finished do begin
+    script on bootstrap finished do begin
         if observer_state = "INIT" then begin
         end else begin
             // First specification check (base condition)

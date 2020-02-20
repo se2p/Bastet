@@ -43,8 +43,10 @@ actor DirectorObserver is Observer begin
             if touchingObjects(actor_1_id, actor_2_id) then begin
                 if attribute "bubbleText" of actor_1_id = "Hab ich dich!" then begin
                     define result as true
-                end else begin attribute "bubbleText" of actor_2_id = "Hab ich dich!"
-                    define result as true
+                end else begin
+                    if attribute "bubbleText" of actor_2_id = "Hab ich dich!" then begin
+                        define result as true
+                    end
                 end
             end
 
