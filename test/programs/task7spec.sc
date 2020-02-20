@@ -43,12 +43,12 @@ actor DirectorObserver is Observer begin
         declare result as boolean
         define result as true
 
-        if not actor_1_costume = actor_1_prev_costume then begin
+        if not (actor_1_costume = actor_1_prev_costume) then begin
            define last_change as _RUMTIME_millis()
         end
 
        // The actual invariant check
-       if _RUNTIME_millis() - last_change > 2000
+       if _RUNTIME_millis() - last_change > 2000 then begin
            define result as false
        end
     end returns actor_1_switched_costume: boolean

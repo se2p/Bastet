@@ -34,6 +34,12 @@ role RuntimeEntity begin
 
     extern _RUNTIME_getImageHeight(ident: string) returns number
 
+    // TODO: Maybe add an approximation for sqrt
+    extern mathSqrt(n: number) returns number
+
+    // TODO: Maybe add an approximation for floor
+    extern mathFloor(n: number) returns number
+
 end
 
 role Observer is RuntimeEntity begin
@@ -88,10 +94,10 @@ role Observer is RuntimeEntity begin
         define x as attribute "x" of obj_id
         define y as attribute "y" of obj_id
 
-        if _RUNTIME_getMouseX() >= x
-                and _RUNTIME_getMouseX() <= x + current_costume_width
-                and _RUNTIME_getMouseY >= y
-                and _RUNTIME_getMouseY <= y+current_costume_height begin
+        if not (_RUNTIME_getMouseX() < x
+                or _RUNTIME_getMouseX() > x + current_costume_width
+                or _RUNTIME_getMouseY() < y
+                or _RUNTIME_getMouseY() > y + current_costume_height) then begin
 
             define result as false
         end
@@ -119,13 +125,6 @@ role ScratchEntity is RuntimeEntity begin
     extern degToRad(n: number) returns number
 
     extern radToDeg(n: number) returns number
-
-    // TODO: Maybe add an approximation for sqrt
-    extern mathSqrt(n: number) returns number
-
-    // TODO: Maybe add an approximation for floor
-    extern mathFloor(n: number) returns number
-
 
     // @Category "Looks"
     define changeActiveGraphicTo (id: string) begin
@@ -346,10 +345,10 @@ role ScratchSprite is ScratchEntity begin
     define touchingMousePointer () begin
         declare result as boolean
 
-        if _RUNTIME_getMouseX() >= x
-                and _RUNTIME_getMouseX() <= x + current_costume_width
-                and _RUNTIME_getMouseY >= y
-                and _RUNTIME_getMouseY <= y+current_costume_height begin
+        if not (_RUNTIME_getMouseX() < x
+                or _RUNTIME_getMouseX() > x + current_costume_width
+                or _RUNTIME_getMouseY() < y
+                or _RUNTIME_getMouseY() > y + current_costume_height) then begin
 
             define result as false
         end
@@ -405,14 +404,14 @@ role ScratchSprite is ScratchEntity begin
         // msgBounded = substr(msg, 0, 330)
         define bubbleText as msg
         define bubbleStart as _RUNTIME_millis()
-        define bubbleType as 'say'
+        define bubbleType as "say"
         define bubbleDuration as scs
     end
 
     define sayText (msg: string) begin
         define bubbleText as msg
         define bubbleStart as _RUNTIME_millis()
-        define bubbleType as 'say'
+        define bubbleType as "say"
     end
 
     // @Category "looks"
@@ -438,11 +437,11 @@ role ScratchSprite is ScratchEntity begin
             declare range as number
             declare result as number
 
-            define min as -179
+            define min as (0-179) // TODO how can we use neg. numbers?
             define max as 180
-            define range as (max - min) +1
+            define range as ((max - min) +1)
 
-            define result as dir - (mathFloor((dir - min) / range) * range);
+            define result as (dir - (mathFloor((dir - min) / range) * range))
     end returns result : number
 
 
