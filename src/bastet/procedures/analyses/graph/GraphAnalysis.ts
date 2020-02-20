@@ -128,4 +128,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     get wrappedAnalysis(): ProgramAnalysis<any, any> {
         return this._wrappedAnalysis;
     }
+
+    wrapStateSets(frontier: StateSet<GraphAbstractState>, reached: StateSet<GraphAbstractState>): [StateSet<GraphAbstractState>, StateSet<GraphAbstractState>] {
+        return [frontier, reached];
+    }
 }

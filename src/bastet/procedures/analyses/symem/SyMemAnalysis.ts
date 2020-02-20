@@ -41,6 +41,7 @@ import {Lattice, LatticeWithComplements} from "../../../lattices/Lattice";
 import {SyMemRefiner} from "./SyMemRefiner";
 import {Refiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
+import {StateSet} from "../../algorithms/StateSet";
 
 export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, SymMemAbstractState>,
     LabeledTransferRelation<SymMemAbstractState> {
@@ -110,5 +111,9 @@ export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
 
     get refiner(): Refiner<SymMemAbstractState> {
         return this._refiner;
+    }
+
+    wrapStateSets(frontier: StateSet<SymMemAbstractState>, reached: StateSet<SymMemAbstractState>): [StateSet<SymMemAbstractState>, StateSet<SymMemAbstractState>] {
+        return [frontier, reached];
     }
 }

@@ -43,6 +43,7 @@ import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {GraphAbstractState} from "../graph/GraphAbstractDomain";
 import {Property} from "../../../syntax/Property";
+import {StateSet} from "../../algorithms/StateSet";
 
 export class ScheduleAnalysisConfig extends BastetConfiguration {
 
@@ -148,6 +149,10 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
 
     getTransitionLabel(from: ScheduleAbstractState, to: ScheduleAbstractState): ProgramOperation {
         throw new ImplementMeException();
+    }
+
+    wrapStateSets(frontier: StateSet<ScheduleAbstractState>, reached: StateSet<ScheduleAbstractState>): [StateSet<ScheduleAbstractState>, StateSet<ScheduleAbstractState>] {
+        return [frontier, reached];
     }
 
 }

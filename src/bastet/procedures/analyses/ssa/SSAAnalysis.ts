@@ -33,6 +33,7 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {ScheduleAbstractState} from "../schedule/ScheduleAbstractDomain";
 import {Property} from "../../../syntax/Property";
+import {StateSet} from "../../algorithms/StateSet";
 
 
 export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, SSAState>,
@@ -116,6 +117,10 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
             return new SSAState(ImmMap({}), ImmMap({}), w);
         } );
+    }
+
+    wrapStateSets(frontier: StateSet<SSAState>, reached: StateSet<SSAState>): [StateSet<SSAState>, StateSet<SSAState>] {
+        return [frontier, reached];
     }
 
 }
