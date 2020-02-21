@@ -24,6 +24,10 @@ role RuntimeEntity begin
     // elapsed since the VM started.
     extern _RUNTIME_millis () returns number
 
+    extern _RUNTIME_timerValue () returns number
+
+    extern _RUNTIME_resetTimer ()
+
     extern _RUNTIME_signalFailure ()
 
     extern _RUNTIME_numberFromInterval(from_num: number, to_num: number) returns number
@@ -44,13 +48,14 @@ end
 
 role Observer is RuntimeEntity begin
 
+    // @Category "Specification"
     define atomic assert (condition: boolean) begin
         if not condition then begin
             _RUNTIME_signalFailure()
         end
     end
 
-    // @Category "Sensing"
+    // @Category "Specification"
     define touchingObjects (fst: string, snd: string) begin
         // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
 
@@ -86,6 +91,7 @@ role Observer is RuntimeEntity begin
 
     end returns result : boolean
 
+    // @Category "Specification"
     define touchingMousePointer (obj_id: string) begin
         declare result as boolean
 

@@ -322,6 +322,7 @@ coreNumExpr  :
  |  'cast' boolExpr 'to' 'number' # BoolAsNumExpression
 
  |  'timer' # TimerExpression
+
  |  'length' 'of' stringExpr # LengthOfStringExpression
  |  'length' 'of' 'list' variable # LengthOfListExpression
  |  'index' 'of' expression 'in' variable # IndexOfExpression
