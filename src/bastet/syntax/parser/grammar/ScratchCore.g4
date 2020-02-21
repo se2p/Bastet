@@ -133,7 +133,6 @@ methodResultDeclaration :
     | # VoidReturnDefinition
     ;
 
-
 // A list of procedure definitions.
 methodDefinitionList : methodDefinition* ;
 
