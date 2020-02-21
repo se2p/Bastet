@@ -306,7 +306,6 @@ coreBoolExpr  :
  |  numExpr  '='  numExpr # NumEqualsExpression
 
  |  stringExpr  'contains'  stringExpr # StrContainsExpression
- |  variable  'contains'  stringExpr # VarContainsExpression
 
  |  'default' Boolean 'for' coreBoolExpr # DefaultBoolExpression
  |  '?bool' # UnspecifiedBoolExpression
