@@ -12,7 +12,7 @@
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
     "test": "npm run build && jest --forceExit --coverage --verbose",
     "watch-test": "npm run test -- --watchAll",
-    "build-ts": "tsc",
+    "build-ts": "tsc --incremental",
     "watch-ts": "tsc -w",
     "lint": "tsc --noEmit && eslint \"**/*.{js,ts}\" --quiet --fix",
     "copy-static-assets": "ts-node copyStaticAssets.ts",
