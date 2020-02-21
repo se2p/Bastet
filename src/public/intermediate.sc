@@ -2,6 +2,10 @@ module IntermediateModule
 
 role RuntimeEntity begin
 
+    extern _RUNTIME_getMouseX () returns number
+
+    extern _RUNTIME_getMouseY () returns number
+
     extern _RUNTIME_getInitialActors () returns list of string
 
     extern _RUNTIME_getClonesOf (ac: string) returns list of string
@@ -26,6 +30,16 @@ role RuntimeEntity begin
 
     extern _RUNTIME_integerFromInterval(from_num: number, to_num: number) returns number
 
+    extern _RUNTIME_getImageWidth(ident: string) returns number
+
+    extern _RUNTIME_getImageHeight(ident: string) returns number
+
+    // TODO: Maybe add an approximation for sqrt
+    extern mathSqrt(n: number) returns number
+
+    // TODO: Maybe add an approximation for floor
+    extern mathFloor(n: number) returns number
+
 end
 
 role Observer is RuntimeEntity begin
@@ -35,6 +49,59 @@ role Observer is RuntimeEntity begin
             _RUNTIME_signalFailure()
         end
     end
+
+    // @Category "Sensing"
+    define touchingObjects (fst: string, snd: string) begin
+        // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
+
+        declare leg_a_fst as number
+        declare leg_b_fst as number
+        define leg_a_fst as attribute "current_costume_width" of fst
+        define leg_b_fst as attribute "current_costume_height" of fst
+
+        declare radius_fst as number
+        define radius_fst as 0.5 * mathSqrt(leg_a_fst * leg_a_fst + leg_b_fst * leg_b_fst)
+
+        declare leg_a_snd as number
+        declare leg_b_snd as number
+        define leg_a_snd as attribute "current_costume_width" of snd
+        define leg_b_snd as attribute "current_costume_height" of snd
+
+        declare radius_snd as number
+        define radius_snd as 0.5 * mathSqrt(leg_a_snd * leg_a_snd + leg_b_snd * leg_b_snd)
+
+        declare x_fst as number
+        define x_fst as attribute "x" of fst
+        declare y_fst as number
+        define y_fst as attribute "y" of fst
+
+        declare x_snd as number
+        define x_snd as attribute "x" of snd
+        declare y_snd as number
+        define y_snd as attribute "y" of snd
+
+
+        declare result as boolean
+        define result as not (((mathSqrt((x_fst + x_snd)*(x_fst + x_snd) + (y_fst + y_snd) * (y_fst + y_snd)) - radius_fst - radius_snd) > 0))
+
+    end returns result : boolean
+
+    define touchingMousePointer (obj_id: string) begin
+        declare result as boolean
+
+        declare x as number
+        declare y as number
+        define x as attribute "x" of obj_id
+        define y as attribute "y" of obj_id
+
+        if not (_RUNTIME_getMouseX() < x
+                or _RUNTIME_getMouseX() > x + current_costume_width
+                or _RUNTIME_getMouseY() < y
+                or _RUNTIME_getMouseY() > y + current_costume_height) then begin
+
+            define result as false
+        end
+    end returns result : boolean
 
 end
 
@@ -61,7 +128,9 @@ role ScratchEntity is RuntimeEntity begin
 
     // @Category "Looks"
     define changeActiveGraphicTo (id: string) begin
-       // JAVASCRIPT CODE here (signaled by the 'external' keyword)
+        define current_costume_name as id
+        define current_costume_width as _RUNTIME_getImageWidth(id)
+        define current_costume_height as _RUNTIME_getImageHeight(id)
     end
 
     // @Category "Looks"
@@ -213,6 +282,13 @@ role ScratchSprite is ScratchEntity begin
     // See https://en.scratch-wiki.info/wiki/Hide_(block)
     declare visible as boolean
 
+    // Bubble above a ScratchSprite for saying or thinking text for a given duration
+    // In Scratch if the bubbleText is empty, the bubble is not visible
+    declare bubbleText as string
+    declare bubbleType as string
+    declare bubbleStart as number
+    declare bubbleDuration as number
+
     // Initialize the variables with their default values
     define x as 0
     define y as 0
@@ -222,6 +298,7 @@ role ScratchSprite is ScratchEntity begin
     define visible as true
 
     define atomic pointTowards (s: string) begin
+        // Todo what about random?
         declare targetX as number
         declare targetY as number
 
@@ -266,7 +343,46 @@ role ScratchSprite is ScratchEntity begin
 
     // @Category "Sensing"
     define touchingMousePointer () begin
-        // ...
+        declare result as boolean
+
+        if not (_RUNTIME_getMouseX() < x
+                or _RUNTIME_getMouseX() > x + current_costume_width
+                or _RUNTIME_getMouseY() < y
+                or _RUNTIME_getMouseY() > y + current_costume_height) then begin
+
+            define result as false
+        end
+    end returns result : boolean
+
+    // @Category "Sensing"
+    define touchingObject (obj: string) begin
+        // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
+
+        declare leg_a as number
+        declare leg_b as number
+        // TODO: Query attributes of myself and the other actor
+        define leg_a as current_costume_width
+        define leg_b as current_costume_height
+
+        declare radius as number
+        define radius as 0.5 * mathSqrt(leg_a * leg_a + leg_b * leg_b)
+
+        declare leg_a_other as number
+        declare leg_b_other as number
+        define leg_a_other as attribute "current_costume_width" of obj
+        define leg_b_other as attribute "current_costume_height" of obj
+
+        declare radius_other as number
+        define radius_other as 0.5 * mathSqrt(leg_a_other * leg_a_other + leg_b_other * leg_b_other)
+
+        declare x_other as number
+        define x_other as attribute "x" of obj
+        declare y_other as number
+        define y_other as attribute "y" of obj
+
+        declare result as boolean
+        define result as not (((mathSqrt((x + x_other)*(x + x_other) + (y + y_other) * (y + y_other)) - radius - radius_other) > 0))
+
     end returns result : boolean
 
     // @Category "Sensing"
@@ -286,11 +402,49 @@ role ScratchSprite is ScratchEntity begin
 
     define sayTextFor (msg: string, scs: number) begin
         // msgBounded = substr(msg, 0, 330)
+        define bubbleText as msg
+        define bubbleStart as _RUNTIME_millis()
+        define bubbleType as "say"
+        define bubbleDuration as scs
     end
 
     define sayText (msg: string) begin
-
+        define bubbleText as msg
+        define bubbleStart as _RUNTIME_millis()
+        define bubbleType as "say"
     end
+
+    // @Category "looks"
+    define turnLeft(deg: number) begin
+        setDirection(direction - degrees)
+    end
+
+    // @Category "looks"
+    define turnRight(deg: number) begin
+        setDirection(direction + degrees)
+    end
+
+    define setDirection(dir: number) begin
+        // TODO do we need to check if we are in the stage
+        // Make sure direction is between -179 and 180
+        define direction as wrapClamp(dir)
+    end
+
+    // Make sure our direction is always between -179 and 180
+    define wrapClamp(dir: number) begin
+            declare min as number
+            declare max as number
+            declare range as number
+            declare result as number
+
+            define min as (0-179) // TODO how can we use neg. numbers?
+            define max as 180
+            define range as ((max - min) +1)
+
+            define result as (dir - (mathFloor((dir - min) / range) * range))
+    end returns result : number
+
+
 
     //    looks_show,            //   "show"
     //    looks_hide,            //   |  "hide"

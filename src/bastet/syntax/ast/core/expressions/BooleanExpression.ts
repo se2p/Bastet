@@ -117,7 +117,7 @@ export class BooleanLiteral extends AbstractBooleanExpression {
 
 }
 
-export class BooleanVariableExpression extends VariableExpression {
+export class BooleanVariableExpression extends VariableExpression implements BooleanExpression {
 
     constructor(variable: Variable) {
         super(variable);
