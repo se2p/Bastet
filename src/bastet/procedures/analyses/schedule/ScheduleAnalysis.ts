@@ -44,6 +44,7 @@ import {AbstractElement} from "../../../lattices/Lattice";
 import {GraphAbstractState} from "../graph/GraphAbstractDomain";
 import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
+import {AnalysisStatistics} from "../AnalysisStatistics";
 
 export class ScheduleAnalysisConfig extends BastetConfiguration {
 
@@ -73,7 +74,9 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
 
     private readonly _task: App;
 
-    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any>) {
+    private readonly _statistics: AnalysisStatistics;
+
+    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any>, statistics: AnalysisStatistics) {
         this._config = new ScheduleAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
@@ -82,6 +85,7 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
             new LabeledTransferRelationImpl((e) => this._wrappedAnalysis.abstractSucc(e),
                 (e, op) => this._wrappedAnalysis.abstractSuccFor(e, op)));
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
     abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {

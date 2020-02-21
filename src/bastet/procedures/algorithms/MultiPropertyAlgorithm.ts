@@ -34,6 +34,8 @@ import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
 
 export type ResultCallback = (violated: ImmSet<Property>, satisfied: ImmSet<Property>, unknown: ImmSet<Property>, stats: AnalysisStatistics) => void;
 
+export const STAT_KEY_MPA_ITERATIONS = "iterations";
+
 export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends AbstractElement> implements AnalysisAlgorithm<C, E>{
 
     private readonly _task: App;
@@ -53,7 +55,7 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
         this._wrappedAlgorithm = Preconditions.checkNotUndefined(algorithm);
         this._analysis = Preconditions.checkNotUndefined(analysis);
         this._resultCallback = Preconditions.checkNotUndefined(resultCallback);
-        this._statistics = Preconditions.checkNotUndefined(stats);
+        this._statistics = Preconditions.checkNotUndefined(stats).withContext(this.constructor.name);
         this._properties = this._task.getProperties();
     }
 
@@ -62,9 +64,10 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
         let satisfied: ImmSet<Property> = ImmSet();
         let unknown: ImmSet<Property> = ImmSet();
 
-        this._statistics.analysisTime.start();
+        this._statistics.contextTimer.start();
         try {
             do {
+                this._statistics.increment(STAT_KEY_MPA_ITERATIONS);
                 [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);
 
                 if (reached.getAddedLast().length > 0) {
@@ -75,7 +78,7 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
                 }
             } while (!frontier.isEmpty());
         } finally {
-            this._statistics.analysisTime.stop();
+            this._statistics.contextTimer.stop();
         }
 
         this._resultCallback(violated, satisfied, unknown, this._statistics);

@@ -24,7 +24,11 @@ import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 import {ChooseOperator, StateSet} from "./StateSet";
 import {Preconditions} from "../../utils/Preconditions";
 import {ConcreteElement} from "../domains/ConcreteElements";
+import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
 
+export const STAT_KEY_REACH_ITERATIONS = "iterations";
+export const STAT_KEY_REACH_REACHED = "reached states";
+export const STAT_KEY_REACH_FRONTIER = "frontier states";
 
 /**
  * The implementation of this algorithm is inspired by the
@@ -35,10 +39,12 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
 
     private readonly _analysis: ProgramAnalysis<C, E>;
     private readonly _chooseOp: ChooseOperator<E>;
+    private readonly _statistics: AnalysisStatistics;
 
-    constructor(analysis: ProgramAnalysis<C, E>, chooseOp: ChooseOperator<E>) {
-        this._analysis = analysis;
-        this._chooseOp = chooseOp;
+    constructor(analysis: ProgramAnalysis<C, E>, chooseOp: ChooseOperator<E>, statistics: AnalysisStatistics) {
+        this._analysis = Preconditions.checkNotUndefined(analysis);
+        this._chooseOp = Preconditions.checkNotUndefined(chooseOp);
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
     get analysis(): ProgramAnalysis<C, E> {
@@ -47,6 +53,8 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
 
     public run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
         while (!frontier.isEmpty()) {
+            this._statistics.increment(STAT_KEY_REACH_ITERATIONS);
+
             // CHOOSE: Choose the next state to compute successors for.
             //      This step determines the state-space traversal strategy.
             const e: E = this._chooseOp.choose();
@@ -83,13 +91,19 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
 
                     // TARGET: Has a target state been signaled?
                     if (this._analysis.target(checkStopFor).length > 0) {
-                        return [frontier, reached];
+                        return this.takeNoteOfResult(frontier, reached);
                     }
                 }
             }
         }
 
         Preconditions.checkState(frontier.isEmpty());
+        return this.takeNoteOfResult(frontier, reached);
+    }
+
+    private takeNoteOfResult(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
+        this._statistics.put(STAT_KEY_REACH_REACHED, reached.getSize());
+        this._statistics.put(STAT_KEY_REACH_FRONTIER, frontier.getSize());
         return [frontier, reached];
     }
 

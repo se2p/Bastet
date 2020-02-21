@@ -42,6 +42,7 @@ import {SyMemRefiner} from "./SyMemRefiner";
 import {Refiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
+import {AnalysisStatistics} from "../AnalysisStatistics";
 
 export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, SymMemAbstractState>,
     LabeledTransferRelation<SymMemAbstractState> {
@@ -54,8 +55,11 @@ export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
 
     private readonly _refiner: SyMemRefiner;
 
+    private readonly _statistics: AnalysisStatistics;
+
     constructor(folLattice: LatticeWithComplements<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
-                theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
+                theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>,
+                statistics: AnalysisStatistics) {
         Preconditions.checkNotUndefined(folLattice);
         Preconditions.checkNotUndefined(propLattice);
 
@@ -63,6 +67,7 @@ export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         this._abstractDomain = new SyMemAbstractDomain(folLattice, propLattice);
         this._transferRelation = new SyMemTransferRelation(this._abstractDomain, this._theories);
         this._refiner = new SyMemRefiner(this._abstractDomain.lattice);
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
     abstractSucc(fromState: SymMemAbstractState): Iterable<SymMemAbstractState> {

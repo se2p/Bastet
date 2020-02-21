@@ -34,6 +34,7 @@ import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {ScheduleAbstractState} from "../schedule/ScheduleAbstractDomain";
 import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
+import {AnalysisStatistics} from "../AnalysisStatistics";
 
 
 export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, SSAState>,
@@ -50,7 +51,9 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
 
     private readonly _task: App;
 
-    constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any>) {
+    private readonly _statistics: AnalysisStatistics;
+
+    constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any>, statistics: AnalysisStatistics) {
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new SSAAbstractDomain(wrappedAnalysis.abstractDomain);
@@ -58,6 +61,7 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         const wrappedTr = LabeledTransferRelationImpl.from(wrappedAnalysis);
         this._transferRelation = new SSATransferRelation(wrappedTr);
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
     abstractSucc(fromState: SSAState): Iterable<SSAState> {

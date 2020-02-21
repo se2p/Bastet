@@ -28,6 +28,9 @@ import {AnalysisAlgorithm} from "./Algorithm";
 import {Refiner} from "../analyses/Refiner";
 import {Preconditions} from "../../utils/Preconditions";
 import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
+import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
+
+export const STAT_KEY_BMC_ITERATIONS = "iterations";
 
 export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
     implements AnalysisAlgorithm<C, E> {
@@ -38,14 +41,18 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
 
     private readonly _refiner: Refiner<E>;
 
-    constructor(wrappedAlgorithm: AnalysisAlgorithm<C, E>, refiner: Refiner<E>, analysis: ProgramAnalysis<C, E>) {
+    private readonly _statistics: AnalysisStatistics;
+
+    constructor(wrappedAlgorithm: AnalysisAlgorithm<C, E>, refiner: Refiner<E>, analysis: ProgramAnalysis<C, E>, statistics: AnalysisStatistics) {
         this._wrappedAlgorithm = Preconditions.checkNotUndefined(wrappedAlgorithm);
         this._refiner = Preconditions.checkNotUndefined(refiner);
         this._analysis = Preconditions.checkNotUndefined(analysis);
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
     public run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
         do {
+            this._statistics.increment(STAT_KEY_BMC_ITERATIONS);
             [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);
             if (!frontier.isEmpty()) {
                 // Target state was found
