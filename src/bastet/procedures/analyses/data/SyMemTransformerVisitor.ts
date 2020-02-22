@@ -478,7 +478,7 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
             const assume: B = this._theories.numTheory.isNumberEqualTo(assignTo, value);
             return this._theories.boolTheory.and(this._mem, assume);
         } else {
-            throw ImplementMeException;
+            throw new ImplementMeException;
         }
     }
 
