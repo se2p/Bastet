@@ -31,9 +31,12 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner} from "../Refiner";
 import {ProgramTimeProfile} from "../../../utils/TimeProfile";
 import {TimeTransferRelation} from "./TimeTransferRelation";
-import {LabeledTransferRelationImpl} from "../TransferRelation";
+import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferRelation";
+import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {Concern} from "../../../syntax/Concern";
 
-export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement> implements WrappingProgramAnalysis<C, E> {
+export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement> implements WrappingProgramAnalysis<C, E>,
+    LabeledTransferRelation<E>{
 
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
 
@@ -54,7 +57,11 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement> 
     }
 
     abstractSucc(fromState: E): Iterable<E> {
-        return this._wrappedAnalysis.abstractSucc(fromState);
+        return this._transfer.abstractSucc(fromState);
+    }
+
+    abstractSuccFor(fromState: E, op: ProgramOperation, co: Concern): Iterable<E> {
+        return this._transfer.abstractSuccFor(fromState, op, co);
     }
 
     initialStatesFor(task: App): E[] {
