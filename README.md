@@ -22,6 +22,15 @@ This framework implements:
 - Counterexample-guided abstraction refinement (CEGAR)
 - Craig interpolation (in a first step for an interval analysis)
 
+
+### Development Environment
+
+- IDE: JetBrains WebStorm 2019.x
+- NodeJs 13.9 (Current)
+- TypeScript 3.7 (npm install -g typescript)
+- UMLet UML Editor 14.3
+
+
 ### Building BASTET
 
 ```
@@ -57,10 +66,3 @@ Scratch Programs Automatically":
   year      = {2019}
 }
 ```
-
-### Development Environment
-
-- IDE: JetBrains WebStorm 2019.x
-- NodeJs 13.9 (Current)
-- TypeScript 3.7 (npm install -g typescript)
-- UMLet UML Editor 14.3
