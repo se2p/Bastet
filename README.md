@@ -15,12 +15,15 @@ That is, to specify *SCRATCH* programs a specification language with some notion
 of time should be preferred. We operationalize all given specifications as 
 *SCRATCH* programs. 
 
-This framework implements:
+Currently, this framework implements:
 - Abstract interpretation (including its lattice-theoretical foundations)
 - Configurable program analysis (a variant of it)
 - Model checking (of software)
+- Bounded Model Checking
+
+Upcoming versions will support:
 - Counterexample-guided abstraction refinement (CEGAR)
-- Craig interpolation (in a first step for an interval analysis)
+- Craig interpolation
 
 
 ### Development Environment
