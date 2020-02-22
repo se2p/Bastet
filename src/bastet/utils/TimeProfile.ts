@@ -72,3 +72,9 @@ export class StaticTimeProfile {
     }
 
 }
+
+export interface ProgramTimeProfile {
+
+    getOpProfile(op: ProgramOperation): OperationTimeProfile;
+
+}

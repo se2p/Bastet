@@ -22,6 +22,8 @@
 import {AbstractElement} from "../../lattices/Lattice";
 import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../syntax/Concern";
+import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
+import {Preconditions} from "../../utils/Preconditions";
 
 export interface TransferRelation<E extends AbstractElement> {
 
@@ -42,11 +44,14 @@ export class LabeledTransferRelationImpl<E extends AbstractElement> implements L
     private readonly _abstractSuccFor: (fromState: E, op: ProgramOperation, co: Concern) => Iterable<E>;
 
     constructor(abstractSucc: (fromState: E) => Iterable<E>, abstractSuccFor: (fromState: E, op: ProgramOperation, co: Concern) => Iterable<E>) {
+        this._abstractSuccFor = Preconditions.checkNotUndefined(abstractSuccFor);
         this._abstractSucc = abstractSucc;
-        this._abstractSuccFor = abstractSuccFor;
     }
 
     abstractSucc(fromState: E): Iterable<E> {
+        if (!this._abstractSucc) {
+            throw new IllegalStateException("This transfer is intended to be used with labels only!");
+        }
         return this._abstractSucc(fromState);
     }
 

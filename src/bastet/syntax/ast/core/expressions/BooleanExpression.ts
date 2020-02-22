@@ -181,7 +181,22 @@ export class NumGreaterThanExpression extends BinaryExpression<NumberExpression,
 
 }
 
+export class NumGreaterEqualExpression extends BinaryExpression<NumberExpression, NumberExpression> implements BooleanExpression {
+
+    constructor(op1: NumberExpression, op2: NumberExpression) {
+        super(BooleanType.instance(), op1, op2);
+    }
+
+}
+
 export class NumLessThanExpression extends BinaryExpression<NumberExpression, NumberExpression> implements BooleanExpression {
+
+    constructor(op1: NumberExpression, op2: NumberExpression) {
+        super(BooleanType.instance(), op1, op2);
+    }
+}
+
+export class NumLessEqualExpression extends BinaryExpression<NumberExpression, NumberExpression> implements BooleanExpression {
 
     constructor(op1: NumberExpression, op2: NumberExpression) {
         super(BooleanType.instance(), op1, op2);

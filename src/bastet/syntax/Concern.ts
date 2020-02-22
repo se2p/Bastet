@@ -53,6 +53,9 @@ export class Concern extends ConcernRecord implements ConcernAttributes {
 
 }
 
+/**
+ * See the authors PhD thesis.
+ */
 export class Concerns {
 
     private static LOW_CONCERN: Concern;
@@ -123,6 +126,9 @@ const ConcernDependencyGraphRecord = ImmRec({
 
 });
 
+/**
+ * See the authors PhD thesis.
+ */
 export class ConcernDependencyGraph extends ConcernDependencyGraphRecord implements ConcernDependencyGraphAttributes {
 
     constructor(concerns: ImmSet<Concern>, dependencies: ImmMap<Concern, ImmSet<Concern>>) {

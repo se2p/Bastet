@@ -19,7 +19,7 @@
  *
  */
 
-import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
+import {ProgramAnalysis, ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AnalysisStatistics} from "../AnalysisStatistics";
@@ -29,16 +29,28 @@ import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner} from "../Refiner";
+import {ProgramTimeProfile} from "../../../utils/TimeProfile";
+import {TimeTransferRelation} from "./TimeTransferRelation";
+import {LabeledTransferRelationImpl} from "../TransferRelation";
 
-export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement> implements WrappingProgramAnalysis<C, E> {
+export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement> implements WrappingProgramAnalysis<C, E> {
 
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
+
     private readonly _statistics: AnalysisStatistics;
 
-    constructor(wrappedAnalysis: ProgramAnalysis<any, any>, statistics: AnalysisStatistics) {
-        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);
+    private readonly _timeProfile: ProgramTimeProfile;
 
+    private readonly _transfer: TimeTransferRelation<any>;
+
+    constructor(wrappedAnalysis: ProgramAnalysisWithLabels<any, any>, statistics: AnalysisStatistics,
+                timeProfile: ProgramTimeProfile) {
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
+        this._timeProfile = Preconditions.checkNotUndefined(timeProfile);
+        this._transfer = new TimeTransferRelation(timeProfile,
+            new LabeledTransferRelationImpl(null,
+            (from, op, co) => wrappedAnalysis.abstractSuccFor(from, op, co)));
     }
 
     abstractSucc(fromState: E): Iterable<E> {
