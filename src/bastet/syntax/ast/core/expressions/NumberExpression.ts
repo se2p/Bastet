@@ -59,6 +59,9 @@ export class NumberLiteral extends AbstractNumberExpression {
     }
 
     public static of(num: number) {
+        if (num == 0) {
+            return this.zero();
+        }
         return new NumberLiteral(num);
     }
 
@@ -76,6 +79,15 @@ export class NumberLiteral extends AbstractNumberExpression {
 
     toTreeString(): string {
         return this.num.toString();
+    }
+
+    private static ZERO: NumberLiteral;
+
+    public static zero(): NumberLiteral {
+        if (NumberLiteral.ZERO) {
+            NumberLiteral.ZERO = new NumberLiteral(0);
+        }
+        return NumberLiteral.ZERO;
     }
 
 }

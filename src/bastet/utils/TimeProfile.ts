@@ -23,6 +23,8 @@
 import {NumIntervalValue} from "../procedures/domains/NumIntervalValueDomain";
 import {OperationID, ProgramOperation} from "../syntax/app/controlflow/ops/ProgramOperation";
 import {ImplementMeException} from "../core/exceptions/ImplementMeException";
+import {WaitSecsStatement} from "../syntax/ast/core/statements/WaitSecsStatement";
+import {ConcreteNumber} from "../procedures/domains/ConcreteElements";
 
 /**
  * A STATIC time profile for a given program operation.
@@ -55,7 +57,7 @@ export class OperationTimeProfile {
     }
 }
 
-export class StaticTimeProfile {
+export class StaticTimeProfile implements ProgramTimeProfile {
 
     private readonly _opTimes: Map<OperationID, OperationTimeProfile>;
 
@@ -70,5 +72,11 @@ export class StaticTimeProfile {
     public getOpProfile(op: ProgramOperation): OperationTimeProfile {
         throw new ImplementMeException();
     }
+
+}
+
+export interface ProgramTimeProfile {
+
+    getOpProfile(op: ProgramOperation): OperationTimeProfile;
 
 }

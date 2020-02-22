@@ -30,10 +30,11 @@ export type OperationID = number;
 export abstract class ProgramOperation implements WithIdent {
 
     private readonly _ast: AstNode|null;
+
     private readonly _id: OperationID;
 
-    constructor(ast: AstNode|null) {
-        this._ast = ast;
+    constructor(ast: AstNode) {
+        this._ast = Preconditions.checkNotUndefined(ast);
         this._id = ProgramOperations.constructOp(ast);
         ProgramOperations.register(this);
     }

@@ -36,6 +36,7 @@ import {
 import {FirstOrderSolver} from "../../procedures/domains/FirstOrderDomain";
 import {Sint32, Uint32} from "./ctypes";
 import {BooleanTheory} from "../../procedures/domains/MemoryTransformer";
+import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 
 export var PreModule = {
     print: function(text) {
@@ -47,7 +48,7 @@ export var PreModule = {
     },
 
     locateFile: function (path, scriptDir) {
-        return "lib/z3/libz3.so.wasm";
+        return "dist/lib/z3/libz3.so.wasm";
     },
 
     postRun: function() {
@@ -84,7 +85,11 @@ global['Module'] = PreModule;
 export class SMTFactory {
 
     public static async createZ3(): Promise<Z3SMT> {
-        require("./libz3.so.js");
+        try {
+            require("../../../lib/z3/libz3.so.js");
+        } catch (e) {
+            throw new IllegalStateException("Initialization of Z3 failed: " + e);
+        }
 
         let solverInitPromise = new Promise( (resolve, reject) => {
             global['Module']['onSolverInitDone'] = () => {

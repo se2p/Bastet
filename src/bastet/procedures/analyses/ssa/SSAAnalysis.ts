@@ -35,6 +35,7 @@ import {ScheduleAbstractState} from "../control/ScheduleAbstractDomain";
 import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
+import {Concern} from "../../../syntax/Concern";
 
 
 export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, SSAState>,
@@ -68,8 +69,8 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return this._transferRelation.abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: SSAState, op: ProgramOperation): Iterable<SSAState> {
-        return this._transferRelation.abstractSuccFor(fromState, op);
+    abstractSuccFor(fromState: SSAState, op: ProgramOperation, co: Concern): Iterable<SSAState> {
+        return this._transferRelation.abstractSuccFor(fromState, op, co);
     }
 
     join(state1: SSAState, state2: SSAState): SSAState {

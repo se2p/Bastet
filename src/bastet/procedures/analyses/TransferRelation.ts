@@ -21,6 +21,9 @@
 
 import {AbstractElement} from "../../lattices/Lattice";
 import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
+import {Concern} from "../../syntax/Concern";
+import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
+import {Preconditions} from "../../utils/Preconditions";
 
 export interface TransferRelation<E extends AbstractElement> {
 
@@ -30,7 +33,7 @@ export interface TransferRelation<E extends AbstractElement> {
 
 export interface LabeledTransferRelation<E extends AbstractElement> extends TransferRelation<E>{
 
-    abstractSuccFor(fromState: E, op: ProgramOperation): Iterable<E>;
+    abstractSuccFor(fromState: E, op: ProgramOperation, co: Concern): Iterable<E>;
 
 }
 
@@ -38,24 +41,27 @@ export class LabeledTransferRelationImpl<E extends AbstractElement> implements L
 
     private readonly _abstractSucc: (fromState: E) => Iterable<E>;
 
-    private readonly _abstractSuccFor: (fromState: E, op: ProgramOperation) => Iterable<E>;
+    private readonly _abstractSuccFor: (fromState: E, op: ProgramOperation, co: Concern) => Iterable<E>;
 
-    constructor(abstractSucc: (fromState: E) => Iterable<E>, abstractSuccFor: (fromState: E, op: ProgramOperation) => Iterable<E>) {
+    constructor(abstractSucc: (fromState: E) => Iterable<E>, abstractSuccFor: (fromState: E, op: ProgramOperation, co: Concern) => Iterable<E>) {
+        this._abstractSuccFor = Preconditions.checkNotUndefined(abstractSuccFor);
         this._abstractSucc = abstractSucc;
-        this._abstractSuccFor = abstractSuccFor;
     }
 
     abstractSucc(fromState: E): Iterable<E> {
+        if (!this._abstractSucc) {
+            throw new IllegalStateException("This transfer is intended to be used with labels only!");
+        }
         return this._abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: E, op: ProgramOperation): Iterable<E> {
-        return this._abstractSuccFor(fromState, op);
+    abstractSuccFor(fromState: E, op: ProgramOperation, co: Concern): Iterable<E> {
+        return this._abstractSuccFor(fromState, op, co);
     }
 
     public static from<E extends AbstractElement>(tr: LabeledTransferRelation<E>) {
         return new LabeledTransferRelationImpl<E>((e) => tr.abstractSucc(e),
-            (e, op) => tr.abstractSuccFor(e, op));
+            (e, op, co) => tr.abstractSuccFor(e, op, co));
 
     }
 

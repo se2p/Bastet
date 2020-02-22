@@ -43,6 +43,7 @@ import {Refiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
+import {Concern} from "../../../syntax/Concern";
 
 export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, SymMemAbstractState>,
     LabeledTransferRelation<SymMemAbstractState> {
@@ -104,10 +105,10 @@ export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         return [this._abstractDomain.lattice.top()];
     }
 
-    abstractSuccFor(fromState: SymMemAbstractState, op: ProgramOperation): Iterable<SymMemAbstractState> {
+    abstractSuccFor(fromState: SymMemAbstractState, op: ProgramOperation, co: Concern): Iterable<SymMemAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
-        return this._transferRelation.abstractSuccFor(fromState, op);
+        return this._transferRelation.abstractSuccFor(fromState, op, co);
     }
 
     get abstractDomain(): AbstractDomain<ConcreteMemory, SymMemAbstractState> {

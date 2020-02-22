@@ -51,11 +51,15 @@ export class Identifier extends AbstractNode {
     private static FRESH_SEQ: number;
 
     public static fresh(): Identifier {
+        return Identifier.freshWithPrefix(this.FRESH_PREFIX);
+    }
+
+    public static freshWithPrefix(prefix: string): Identifier {
         if (!this.FRESH_SEQ) {
             this.FRESH_SEQ = 0;
         }
         const num: number = this.FRESH_SEQ++;
-        return new Identifier(`${this.FRESH_PREFIX}${num}`);
+        return new Identifier(`${prefix}${num}`);
     }
 
     private static RESULT_IDENT: Identifier = new Identifier("result");
