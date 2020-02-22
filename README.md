@@ -1,19 +1,19 @@
-# Bastet Framework
+# BASTET Framework
 
-*Bastet* is a framework for the analysis and verification of Scratch programs.
+*BASTET* is a framework for the analysis and verification of *SCRATCH* programs.
 
-Scratch programs run highly **concurrent** (Green threads) and can be distributed 
+*SCRATCH* programs run highly **concurrent** (Green threads) and can be distributed 
 among different machines. **Communication among processes** is implemented both based 
 on message passing but also based on shared memory. Since message passing can
 be implemented based on shared memory and vice versa we could stick
-to one paradigm only. Nevertheless, *Bastet* should (in the long run) support
+to one paradigm only. Nevertheless, *BASTET* should (in the long run) support
 to transform a program (for analysis) to do either a purely shared-memory
 based approach, a purely message-passing based approach, or an hybrid approach.
 
-Typically, Scratch programs make heavily usage of **timers** to control program execution.
-That is, to specify Scratch programs a specification language with some notion
+Typically, *SCRATCH* programs make heavily usage of **timers** to control program execution.
+That is, to specify *SCRATCH* programs a specification language with some notion
 of time should be preferred. We operationalize all given specifications as 
-Scratch programs. 
+*SCRATCH* programs. 
 
 This framework implements:
 - Abstract interpretation (including its lattice-theoretical foundations)
@@ -21,6 +21,24 @@ This framework implements:
 - Model checking (of software)
 - Counterexample-guided abstraction refinement (CEGAR)
 - Craig interpolation (in a first step for an interval analysis)
+
+### Building BASTET
+
+```
+npm install
+npm build
+```
+
+### Running BASTET
+
+We recommend to use the `bastet.sh` wrapper script (can be started from an Unix shell):
+
+```
+./scripts/bastet.sh \
+    --program test/programs/mini1program.sc \
+    --specification test/programs/empty.sc \
+    --intermediateLibrary src/public/intermediate.sc
+```
 
 ## Publications and Citing
 
@@ -40,9 +58,9 @@ Scratch Programs Automatically":
 }
 ```
 
-## Development Environment
+### Development Environment
 
 - IDE: JetBrains WebStorm 2019.x
-- NodeJs 10.16 (LTS)
-- TypeScript 3.6 (npm install -g typescript)
+- NodeJs 13.9 (Current)
+- TypeScript 3.7 (npm install -g typescript)
 - UMLet UML Editor 14.3
