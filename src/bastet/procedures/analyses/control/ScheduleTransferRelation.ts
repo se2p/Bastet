@@ -50,6 +50,7 @@ import {Properties, Property} from "../../../syntax/Property";
 import {ExpressionList} from "../../../syntax/ast/core/expressions/ExpressionList";
 import instantiate = WebAssembly.instantiate;
 import {Concern, Concerns} from "../../../syntax/Concern";
+import {Logger} from "../../../utils/Logger";
 
 export type Schedule = ImmList<ThreadState>;
 
@@ -237,7 +238,7 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
      */
     private resolveLeavingOps(threadState: ThreadState): [ProgramOperation, LocationID, boolean][] {
         const script = this._task.getActorByName(threadState.getActorId()).getScript(threadState.getScriptId());
-        console.log('TODO: atomic transitions?');
+        Logger.potentialUnsound('Add support for atomic transitions');
 
         let result = [];
         for (const [opId, succLoc] of script.transitions.transitionsFrom(threadState.getLocationId())) {
@@ -368,7 +369,7 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
             //   Since (1) the `WaitSecsStatement` can be parameterized with
             //   a number expression, and (2) the condition is relative to the
             //   time the statement was invoked, a more elaborated logic is needed here.
-            throw new ImplementMeException();
+            Logger.potentialUnsound("wait N seconds might have to be considered in the scheduling.")
         }
 
         if (takenStep.isInnerAtomic) {

@@ -49,6 +49,7 @@ import {Method} from "./controlflow/Method";
 import {DeclareStackVariableStatement} from "../ast/core/statements/DeclarationStatement";
 import {Identifier} from "../ast/core/Identifier";
 import {Variable, VariableWithDataLocation} from "../ast/core/Variable";
+import {Logger} from "../../utils/Logger";
 
 export class AppBuilder {
 
@@ -234,7 +235,7 @@ export class AppBuilder {
         // }
 
         // Data locations based on the resources
-        console.warn("Declarations ignored");
+        Logger.potentialIncomplete("Add data locations for resources?");
         return result;
     }
 
