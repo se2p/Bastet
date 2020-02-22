@@ -21,5 +21,7 @@
  */
 
 export enum RuntimeMethods {
-    _RUNTIME_signalFailure = "_RUNTIME_signalFailure"
+    _RUNTIME_signalFailure = "_RUNTIME_signalFailure",
+    _RUNTIME_waitSeconds = "_RUNTIME_waitSeconds",
+    _RUNTIME_waitMillis  = "_RUNTIME_waitMillis",
 }

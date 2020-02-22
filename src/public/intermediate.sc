@@ -24,6 +24,10 @@ role RuntimeEntity begin
     // elapsed since the VM started.
     extern _RUNTIME_millis () returns number
 
+    extern _RUNTIME_waitMillis (ms: number)
+
+    extern _RUNTIME_waitSeconds (s: number)
+
     extern _RUNTIME_timerValue () returns number
 
     extern _RUNTIME_resetTimer ()
@@ -217,6 +221,18 @@ role ScratchEntity is RuntimeEntity begin
 
     end returns result : number
 
+    // @Category "Control"
+    // @Block "wait <Num> seconds"
+    define waitSeconds (secs: number) begin
+        _RUNTIME_waitSeconds (secs)
+    end
+
+    // @Category "Control"
+    // @Block "wait <Num> millis"
+    define waitMillis (millis: number) begin
+        _RUNTIME_waitMillis (millis)
+    end
+
     // data_setvariableto, sensing_setdragmode, motion_setrotationstyle, looks_seteffectto,
     // sound_seteffectto, sound_setvolumeto;
 
@@ -232,7 +248,7 @@ role ScratchEntity is RuntimeEntity begin
     // sensing_current, sensing_distanceto, sensing_mousex, sensing_mousey,
     // sensing_loudness, operator_mathop;
 
-    // control_wait,            //"wait" NumExpr "seconds"
+    // control_wait,            //
     //    control_wait_until,      //"wait" "until" BoolExpr
      //   control_stop,            //"stop" "other" "scripts" "in" "sprite"
       //  control_create_clone_of, // "create" "clone" "of" Ident

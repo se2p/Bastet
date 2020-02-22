@@ -323,6 +323,7 @@ import {App} from "../app/App";
 import {VariableWithDataLocation} from "../ast/core/Variable";
 import {DataLocations} from "../app/controlflow/DataLocation";
 import {AssumeStatement} from "../ast/core/statements/AssumeStatement";
+import {RuntimeMethods} from "../app/controlflow/RuntimeMethods";
 
 const toposort = require('toposort')
 
@@ -1641,10 +1642,11 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitWaitSecsStatement(ctx: WaitSecsStatementContext) : TransformerResult {
-        const tr = ctx.numExpr().accept(this);
+        const secondsTr = ctx.numExpr().accept(this);
         return new TransformerResult(
-            tr.statementsToPrepend,
-            new WaitSecsStatement(tr.node as NumberExpression));
+            secondsTr.statementsToPrepend,
+            new CallStatement(Identifier.of(RuntimeMethods._RUNTIME_waitSeconds),
+                new ExpressionList([secondsTr.node as Expression]), OptionalAstNode.absent()));
     }
 
     public visitWaitUntilStatement(ctx: WaitUntilStatementContext) : TransformerResult {
