@@ -3,5 +3,6 @@
 
 import {Bastet} from "./bastet/Bastet";
 
-var bastet = new Bastet();
-let analysisResult = bastet.run();
+new Bastet().run().catch((e) => {
+    console.error("Running BASTET failed with " + e);
+});

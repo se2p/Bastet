@@ -1,6 +1,6 @@
 #!/bin/bash
 
-readonly LIB_DIR="./lib"
+readonly LIB_DIR="./dist/lib"
 readonly MY_TEMP_DIR=$(mktemp -d)
 
 # Delete all temp files that 

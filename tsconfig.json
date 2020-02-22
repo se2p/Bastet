@@ -49,7 +49,9 @@
         ]
     },
     // "paths": {},                           /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
-    "rootDirs": ["src", "lib"],               /* List of root folders whose combined content represents the structure of the project at runtime. */
+    "rootDirs": ["src",
+      "src/lib"
+    ],               /* List of root folders whose combined content represents the structure of the project at runtime. */
     // "typeRoots": [],                       /* List of folders to include type definitions from. */
     // "types": [],                           /* Type declaration files to be included in compilation. */
     // "allowSyntheticDefaultImports": true,  /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
@@ -68,7 +70,8 @@
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
   },
   "include": [
-    "src/**/*", "lib/**/*"
+    "src/**/*",
+    "src/lib/**/*"
   ],
   "exclude": [
     "node_modules",

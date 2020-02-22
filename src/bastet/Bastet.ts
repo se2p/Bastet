@@ -36,6 +36,7 @@ import {AstNode} from "./syntax/ast/AstNode";
 import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
 import {AnalysisProcedureConfig, AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
 import {AppToDot} from "./syntax/app/AppToDot";
+import {IllegalArgumentException} from "./core/exceptions/IllegalArgumentException";
 
 const commander = require('commander');
 
@@ -75,7 +76,8 @@ export class Bastet {
         const staticTaskModel: App = this.buildTaskModel(intermLibFilepath, programFilepath, specFilepath);
 
         // Build the analyses procedure as defined by the configuration
-        const analysisProcedure = await this.buildAnalysisProcedure(cmdlineArguments);
+        const analysisProcedure = await this.buildAnalysisProcedure(cmdlineArguments)
+            .catch((e) => { throw new IllegalArgumentException(e); });
 
         // Run the analyses procedure on the task and return the result
         return this.runAnalysis(staticTaskModel, analysisProcedure);
