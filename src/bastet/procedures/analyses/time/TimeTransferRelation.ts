@@ -112,7 +112,6 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
             }
 
             return this.withIntermediateTransfersBefore(fromState, intermediateStatements, op, co);
-
         }
     }
 
@@ -128,6 +127,7 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
         if (minTimeExpr === NumberLiteral.zero() && maxTimeExpr === NumberLiteral.zero()) {
             return true;
         }
+
         return false;
     }
 
