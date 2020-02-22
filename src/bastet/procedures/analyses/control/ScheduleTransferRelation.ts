@@ -167,7 +167,7 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
 
             console.log([threadToStep.getActorId(), stepOp.ast.toTreeString()]);
 
-            // Determine the new schedule (the next thread to execute)
+            // Determine the new control (the next thread to execute)
             //   TODO: Take triggered events into account
             //   TODO: Determine sets of threads to wait for
             const nextSchedules: Schedule[] = this.computeNextSchedules(fromState.getThreadStates(), stepToTake);
@@ -281,7 +281,7 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
     }
 
     /**
-     * Given the schedule `threadStates` based on that `takenStep` was conducted,
+     * Given the control `threadStates` based on that `takenStep` was conducted,
      * create the set of succesor schedules.
      *
      * @param threadStates

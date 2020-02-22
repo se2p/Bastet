@@ -31,7 +31,7 @@ import {SSATransferRelation} from "./SSATransferRelation";
 import {Map as ImmMap} from "immutable"
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
-import {ScheduleAbstractState} from "../schedule/ScheduleAbstractDomain";
+import {ScheduleAbstractState} from "../control/ScheduleAbstractDomain";
 import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
