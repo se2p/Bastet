@@ -83,7 +83,7 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
         this._abstractDomain = new ScheduleAbstractDomain();
         this._transferRelation = new ScheduleTransferRelation(this._config, task,
             new LabeledTransferRelationImpl((e) => this._wrappedAnalysis.abstractSucc(e),
-                (e, op) => this._wrappedAnalysis.abstractSuccFor(e, op)));
+                (e, op, co) => this._wrappedAnalysis.abstractSuccFor(e, op, co)));
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }

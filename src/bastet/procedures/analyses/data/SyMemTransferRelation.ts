@@ -35,6 +35,7 @@ import {
 } from "../../../utils/ConjunctiveNormalForm";
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
+import {Concern} from "../../../syntax/Concern";
 
 export class SyMemTransferRelation implements LabeledTransferRelation<SymMemAbstractState> {
 
@@ -51,7 +52,7 @@ export class SyMemTransferRelation implements LabeledTransferRelation<SymMemAbst
         throw new IllegalStateException("Only the labelled transfer is supported by this transfer relation");
     }
 
-    public abstractSuccFor(fromState: SymMemAbstractState, op: ProgramOperation): Iterable<SymMemAbstractState> {
+    public abstractSuccFor(fromState: SymMemAbstractState, op: ProgramOperation, co: Concern): Iterable<SymMemAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
 

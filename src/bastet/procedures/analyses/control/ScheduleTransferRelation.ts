@@ -49,6 +49,7 @@ import {RuntimeMethods} from "../../../syntax/app/controlflow/RuntimeMethods";
 import {Properties, Property} from "../../../syntax/Property";
 import {ExpressionList} from "../../../syntax/ast/core/expressions/ExpressionList";
 import instantiate = WebAssembly.instantiate;
+import {Concern, Concerns} from "../../../syntax/Concern";
 
 export type Schedule = ImmList<ThreadState>;
 
@@ -144,6 +145,8 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         //    an exception if the WORK_TIME timeout would have been reached before
         //    all threads in the list were stepped.
 
+        const stepConcern: Concern = Concerns.defaultSpecificationConcern();
+
         const threadsToStep: number[] = this.chooseThreadToStep(fromState);
         if (threadsToStep.length === 0) {
             return [];
@@ -175,7 +178,8 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
             for (const newThreadStates of nextSchedules) {
                 // Compute a successor state for each sequence and call the wrapped analysis to do so
                 Preconditions.checkNotUndefined(fromState.wrappedState);
-                let wrappedSuccStates: Iterable<AbstractElement> = this._wrappedTransferRelation.abstractSuccFor(fromState.wrappedState, stepOp);
+                let wrappedSuccStates: Iterable<AbstractElement> = this._wrappedTransferRelation.abstractSuccFor(
+                    fromState.wrappedState, stepOp, stepConcern);
 
                 for (const w of wrappedSuccStates) {
                     Preconditions.checkNotUndefined(w);
@@ -265,6 +269,7 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
     }
 
     private specificationStep(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
+        const stepConcern = Concerns.defaultSpecificationConcern();
         throw new ImplementMeException();
     }
 

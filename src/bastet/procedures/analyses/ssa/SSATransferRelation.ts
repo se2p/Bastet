@@ -29,6 +29,7 @@ import {IllegalStateException} from "../../../core/exceptions/IllegalStateExcept
 import {SSAssigner, SSATransformerVisitor} from "./SSATransformerVisitor";
 import {BooleanExpression} from "../../../syntax/ast/core/expressions/BooleanExpression";
 import {DummyDataLocationMapper} from "../../../syntax/app/controlflow/DataLocation";
+import {Concern} from "../../../syntax/Concern";
 
 export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
 
@@ -44,7 +45,7 @@ export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
         throw new IllegalStateException("This TR is only applicable to labeled transitions");
     }
 
-    abstractSuccFor(fromState: SSAState, op: ProgramOperation): Iterable<SSAState> {
+    abstractSuccFor(fromState: SSAState, op: ProgramOperation, co: Concern): Iterable<SSAState> {
         const ssasigner = new SSAssigner(fromState);
         const visitor = new SSATransformerVisitor(ssasigner, this._mapper);
 
@@ -56,7 +57,7 @@ export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
         }
 
         const result: SSAState[] = [];
-        for (const w of this._wrapped.abstractSuccFor(fromState.wrappedState, opPrime)) {
+        for (const w of this._wrapped.abstractSuccFor(fromState.wrappedState, opPrime, co)) {
             result.push(ssasigner.ssa.withWrappedState(w));
         }
 

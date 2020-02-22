@@ -27,6 +27,7 @@ import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperatio
 import {Refiner} from "./Refiner";
 import {Property} from "../../syntax/Property";
 import {StateSet} from "../algorithms/StateSet";
+import {Concern} from "../../syntax/Concern";
 
 export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement> {
 
@@ -55,7 +56,7 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
 
 export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends AbstractElement> extends ProgramAnalysis<C, E> {
 
-    abstractSuccFor(fromState: E, op: ProgramOperation): Iterable<E>;
+    abstractSuccFor(fromState: E, op: ProgramOperation, co: Concern): Iterable<E>;
 
 }
 
