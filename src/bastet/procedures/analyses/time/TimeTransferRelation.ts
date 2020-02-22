@@ -28,8 +28,11 @@ import {ProgramOperation, ProgramOperationFactory} from "../../../syntax/app/con
 import {Concern, Concerns} from "../../../syntax/Concern";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ProgramTimeProfile} from "../../../utils/TimeProfile";
-import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements/DeclarationStatement";
-import {Variable, VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
+import {
+    DeclareStackVariableStatement,
+    DeclareSystemVariableStatement
+} from "../../../syntax/ast/core/statements/DeclarationStatement";
+import {Variable, VariableExpression, VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {Statement} from "../../../syntax/ast/core/statements/Statement";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
@@ -46,6 +49,10 @@ import {
 import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
 import {NumberType} from "../../../syntax/ast/core/ScratchType";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
+import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
+import {INIT_MESSAGE} from "../../../syntax/ast/core/Message";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {WaitSecsStatement} from "../../../syntax/ast/core/statements/WaitSecsStatement";
 
 export class TimeTransferRelation<W extends AbstractElement> implements LabeledTransferRelation<W> {
 
@@ -59,6 +66,10 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
     constructor(timeProfile: ProgramTimeProfile, wrappedTransfer: LabeledTransferRelation<W>) {
         this._timeProfile = Preconditions.checkNotUndefined(timeProfile);
         this._wrappedTransfer = Preconditions.checkNotUndefined(wrappedTransfer);
+
+        this._globalTimeVariable = new VariableWithDataLocation(
+            DataLocations.createTypedLocation(new Identifier("__global_time"), NumberType.instance()));
+        this._globalTimeVariableExpr = new VariableExpression(this._globalTimeVariable);
     }
 
     abstractSucc(fromState: W): Iterable<W> {
@@ -66,42 +77,83 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
     }
 
     abstractSuccFor(fromState: W, op: ProgramOperation, co: Concern): Iterable<W> {
+        if (op.ast instanceof BroadcastAndWaitStatement) {
+            const bcw = op.ast as BroadcastAndWaitStatement;
+            if (bcw.msg === INIT_MESSAGE.messageid) {
+                const initStmts: Statement[] = [
+                    new DeclareSystemVariableStatement(this._globalTimeVariable),
+                    new StoreEvalResultToVariableStatement(this._globalTimeVariable, NumberLiteral.of(0)) ];
+
+                return this.withIntermediateTransfersBefore(fromState, initStmts, op, co);
+            }
+        }
+
         if (this.isTimeMonitoringConcern(co)) {
             // Do not add time transitions here!
             return this._wrappedTransfer.abstractSuccFor(fromState, op, co);
         } else {
             const opTimeVariable: Variable = new VariableWithDataLocation(
-                DataLocations.createTypedLocation(Identifier.fresh(), NumberType.instance()));
+                DataLocations.createTypedLocation(Identifier.freshWithPrefix("__op_time_"), NumberType.instance()));
             const opTimeVariableExpr: NumberVariableExpression = new NumberVariableExpression(opTimeVariable);
 
-            const opProfile = this._timeProfile.getOpProfile(op);
-            const minTimeExpr: NumberExpression = new NumberLiteral(opProfile.nsecs.minValue.value);
-            const maxTimeExpr: NumberExpression = new NumberLiteral(opProfile.nsecs.maxValue.value);
+            const [minTimeExpr, maxTimeExpr] = this.determineTimeIntervalExpressions(op);
 
-            const assumeTimeMin = new NumGreaterEqualExpression(opTimeVariableExpr, minTimeExpr);
-            const assumeTimeMax = new NumLessEqualExpression(opTimeVariableExpr, maxTimeExpr);
+            let intermediateStatements: Statement[] = [];
+            if (!this.isEmptyInterval(minTimeExpr, maxTimeExpr)) {
+                const assumeTimeMin = new NumGreaterEqualExpression(opTimeVariableExpr, minTimeExpr);
+                const assumeTimeMax = new NumLessEqualExpression(opTimeVariableExpr, maxTimeExpr);
 
-            const opTimeStatements: Statement[] = [
-                new DeclareStackVariableStatement(opTimeVariable),
-                new AssumeStatement(assumeTimeMin),
-                new AssumeStatement(assumeTimeMax),
-                new StoreEvalResultToVariableStatement(this._globalTimeVariable,
-                    new PlusExpression(this._globalTimeVariableExpr, opTimeVariableExpr)) ];
-
-            let result: W[] = [fromState];
-            for (const stmt of opTimeStatements) {
-                const timeOp: ProgramOperation = ProgramOperationFactory.createFor(stmt);
-                let statelistPrime: W[] = [];
-                for (const w of result) {
-                    for (const succ of this._wrappedTransfer.abstractSuccFor(w, timeOp, co)) {
-                        statelistPrime.push(succ);
-                    }
-                }
-                result = statelistPrime;
+                const intermediateStatements: Statement[] = [
+                    new DeclareStackVariableStatement(opTimeVariable),
+                    new AssumeStatement(assumeTimeMin),
+                    new AssumeStatement(assumeTimeMax),
+                    new StoreEvalResultToVariableStatement(this._globalTimeVariable,
+                        new PlusExpression(this._globalTimeVariableExpr, opTimeVariableExpr))];
             }
 
-            return result;
+            return this.withIntermediateTransfersBefore(fromState, intermediateStatements, op, co);
+
         }
+    }
+
+    private determineTimeIntervalExpressions(op: ProgramOperation): [NumberExpression, NumberExpression] {
+        if (op.ast instanceof WaitSecsStatement) {
+            // TODO: How is this handled in the scheduling? Is this relevant?
+            throw new ImplementMeException();
+        }
+        throw new ImplementMeException();
+    }
+
+    private isEmptyInterval(minTimeExpr: NumberExpression, maxTimeExpr: NumberExpression) {
+        if (minTimeExpr === NumberLiteral.zero() && maxTimeExpr === NumberLiteral.zero()) {
+            return true;
+        }
+        return false;
+    }
+
+    private withIntermediateTransfersBefore(fromState: W, intermediateStmts: Statement[],
+                                            op: ProgramOperation, co: Concern) {
+        // TODO: This could can be written in a more beautiful fashion
+
+        const ops: ProgramOperation[] = [];
+        for (const stmt of intermediateStmts) {
+            const timeOp: ProgramOperation = ProgramOperationFactory.createFor(stmt);
+            ops.push(timeOp);
+        }
+        ops.push(op);
+
+        let result: W[] = [fromState];
+        for (const toExecute of ops) {
+            let statelistPrime: W[] = [];
+            for (const w of result) {
+                for (const succ of this._wrappedTransfer.abstractSuccFor(w, toExecute, co)) {
+                    statelistPrime.push(succ);
+                }
+            }
+            result = statelistPrime;
+        }
+
+        return result;
     }
 
     private isTimeMonitoringConcern(co: Concern): boolean {

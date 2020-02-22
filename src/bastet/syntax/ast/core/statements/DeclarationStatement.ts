@@ -83,6 +83,15 @@ export class DeclareActorVariableStatement extends DeclareVariableStatement {
 
 }
 
+export class DeclareSystemVariableStatement extends DeclareVariableStatement {
+
+    constructor(variable: Variable) {
+        Preconditions.checkNotUndefined(variable);
+        super(variable);
+    }
+
+}
+
 export class DeclareAttributeStatement extends DeclarationStatement {
 
     private readonly _attribute: StringExpression;

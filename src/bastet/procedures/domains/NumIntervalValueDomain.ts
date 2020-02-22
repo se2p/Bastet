@@ -63,6 +63,10 @@ export class NumIntervalValue extends NumIntervalValueRecord implements NumInter
     get maxValue(): ConcreteNumber {
         return this.get('maxValue');
     }
+
+    get isEmpty(): boolean {
+        return this.minValue.value == 0 && this.maxValue.value == 0;
+    }
 }
 
 export class NumIntervalLattice implements Lattice<NumIntervalValue> {
