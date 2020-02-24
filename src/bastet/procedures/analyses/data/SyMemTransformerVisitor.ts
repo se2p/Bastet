@@ -145,7 +145,7 @@ export class MemNumExpressionVisitor<N extends AbstractNumber, B extends Abstrac
     }
 
     visitDivideExpression(node: DivideExpression): N {
-        throw new ImplementMeException();
+        return this._theory.divide(node.operand1.accept(this), node.operand2.accept(this));
     }
 
     visitIndexOfExpression(node: IndexOfExpression): N {
@@ -165,24 +165,23 @@ export class MemNumExpressionVisitor<N extends AbstractNumber, B extends Abstrac
     }
 
     visitModuloExpression(node: ModuloExpression): N {
-        throw new ImplementMeException();
+        return this._theory.modulo(node.operand1.accept(this), node.operand2.accept(this));
     }
 
     visitMultiplyExpression(node: MultiplyExpression): N {
-        throw new ImplementMeException();
+        return this._theory.multiply(node.operand1.accept(this), node.operand2.accept(this));
     }
 
     visitNumFunctExpression(node: NumFunctExpression): N {
         throw new ImplementMeException();
     }
 
-
     visitPickRandomFromExpression(node: PickRandomFromExpression): N {
         throw new ImplementMeException();
     }
 
     visitPlusExpression(node: PlusExpression): N {
-        throw new ImplementMeException();
+        return this._theory.plus(node.operand1.accept(this), node.operand2.accept(this));
     }
 
     visitRoundExpression(node: RoundExpression): N {
