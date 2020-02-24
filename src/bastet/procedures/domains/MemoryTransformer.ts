@@ -234,6 +234,8 @@ export interface BooleanTheory<B extends AbstractBoolean> {
 
     or(op1: B, op2: B): B;
 
+    equal(op1: B, op2: B): B;
+
 }
 
 export interface MemoryTheory {

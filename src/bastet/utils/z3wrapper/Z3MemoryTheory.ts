@@ -158,6 +158,10 @@ export class Z3BooleanTheory implements BooleanTheory<Z3BooleanFormula> {
         }
     }
 
+    equal(op1: Z3BooleanFormula, op2: Z3BooleanFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_eq(op1.getAST(), op2.getAST()));
+    }
+
     topBoolean(): Z3BooleanFormula {
         return new Z3BooleanFormula(this._ctx.mk_true());
     }

@@ -476,6 +476,14 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
             const assignTo = this._theories.numTheory.abstractNumberValue(node.variable);
             const assume: B = this._theories.numTheory.isNumberEqualTo(assignTo, value);
             return this._theories.boolTheory.and(this._mem, assume);
+
+        } else if (declaredType instanceof BooleanType) {
+            const visitor = new SyMemBoolExpressionVisitor(this._theories);
+            const value: B = node.toValue.accept(visitor);
+            const assignTo = this._theories.boolTheory.abstractBooleanValue(node.variable);
+            const assume: B = this._theories.boolTheory.equal(assignTo, value);
+            return this._theories.boolTheory.and(this._mem, assume);
+
         } else {
             throw new ImplementMeException;
         }
