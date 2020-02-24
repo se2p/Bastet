@@ -161,7 +161,7 @@ export class MemNumExpressionVisitor<N extends AbstractNumber, B extends Abstrac
     }
 
     visitMinusExpression(node: MinusExpression): N {
-        throw new ImplementMeException();
+        return this._theory.minus(node.operand1.accept(this), node.operand2.accept(this));
     }
 
     visitModuloExpression(node: ModuloExpression): N {

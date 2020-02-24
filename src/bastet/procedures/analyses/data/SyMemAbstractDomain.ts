@@ -39,6 +39,7 @@ export interface SyMemAbstractStateAttributes {
 const SyMemAbstractStateRecord = ImmRec({
 
     blockFormula: null,
+
     summaryFormula: null
 
 });

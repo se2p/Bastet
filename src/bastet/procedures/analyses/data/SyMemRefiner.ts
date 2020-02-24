@@ -34,7 +34,7 @@ export class SyMemRefiner implements Refiner<SymMemAbstractState> {
     }
 
     checkIsFeasible(e: SymMemAbstractState): boolean {
-        return this._lattice.isIncluded(this._lattice.complement(e), this._lattice.bottom());
+        return !this._lattice.isIncluded(e, this._lattice.bottom());
     }
 
 }

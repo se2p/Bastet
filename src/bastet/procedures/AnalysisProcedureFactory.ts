@@ -111,9 +111,19 @@ export class AnalysisProcedureFactory {
                 console.log("\n## Summary ####################################################");
                 console.log(`\nAnalysis finished after ${analysisDurtionMSec} msec.\n`);
 
-                printPropertySetAs("VIOLATED", violated);
-                printPropertySetAs("SATISFIED", satisifed);
-                printPropertySetAs("UNKNOWN", unknowns);
+                mpaStatistics.put("num_violated", violated.size);
+                mpaStatistics.put("num_unknown", unknowns.size);
+                mpaStatistics.put("num_satisfied", satisifed.size);
+
+                if (violated.isEmpty() && satisifed.isEmpty() && unknowns.isEmpty()) {
+                    console.log('No violations found. Full specification SATISFIED.')
+                } else {
+                    printPropertySetAs("VIOLATED", violated);
+                    printPropertySetAs("SATISFIED", satisifed);
+                    printPropertySetAs("UNKNOWN", unknowns);
+                }
+
+                console.log("\nBye.");
             }
         }
     }

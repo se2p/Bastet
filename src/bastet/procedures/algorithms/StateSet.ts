@@ -159,6 +159,7 @@ export class OrderedStateSet<E extends AbstractElement> extends AbstractStateSet
     }
 
     remove(element: E) {
+        this._addedLast = this._addedLast.filter((e) => e != element);
         this._states.delete(element);
     }
 

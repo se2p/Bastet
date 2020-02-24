@@ -62,7 +62,7 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
     run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
         let violated: ImmSet<Property> = ImmSet();
         let satisfied: ImmSet<Property> = ImmSet();
-        let unknown: ImmSet<Property> = ImmSet();
+        let unknown: ImmSet<Property> = this._properties;
 
         this._statistics.contextTimer.start();
         try {
@@ -75,8 +75,12 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
                     const lastState = reached.getAddedLast()[0];
                     const targetProperties = ImmSet<Property>(this._analysis.target(lastState));
                     violated = violated.union(targetProperties);
+                    unknown = unknown.subtract(violated);
                 }
             } while (!frontier.isEmpty());
+
+            satisfied = unknown.subtract(violated);
+            unknown = unknown.subtract(satisfied);
         } finally {
             this._statistics.contextTimer.stop();
         }

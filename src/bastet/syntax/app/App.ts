@@ -77,15 +77,12 @@ export class App {
             for (const s of a.scripts) {
                 for (const l of s.transitions.locationSet) {
                     for (const ts of s.transitions.transitionsFrom(l)) {
-                        for (const t of ts.entries()) {
-                            const [opId, locId] = t;
-                            const op = ProgramOperation.for(opId);
-                            if (op.ast instanceof CallStatement) {
-                                const call = op.ast as CallStatement;
-                                if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
-                                    const properties = Properties.fromArguments(call.args);
-                                    result = result.union(properties);
-                                }
+                        const op = ProgramOperation.for(ts.opId);
+                        if (op.ast instanceof CallStatement) {
+                            const call = op.ast as CallStatement;
+                            if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
+                                const properties = Properties.fromArguments(call.args);
+                                result = result.union(properties);
                             }
                         }
                     }

@@ -107,8 +107,8 @@ export class TransitionRelationBuilder {
 
         // Add all transitions
         for (let from of input.locationSet) {
-            for (let [op, to] of input.transitionsFrom(from)) {
-                this.addTransition(ControlLocation.for(from), ControlLocation.for(to), ProgramOperation.for(op));
+            for (const t of input.transitionsFrom(from)) {
+                this.addTransition(ControlLocation.for(from), ControlLocation.for(t.target), ProgramOperation.for(t.opId));
             }
         }
 
@@ -137,6 +137,26 @@ export class TransitionRelationBuilder {
 
 export type TransitionTable = ImmMap<LocationID, ImmMap<LocationID, ImmSet<OperationID>>>;
 
+export class TransitionTo {
+
+    private readonly _opId: OperationID;
+
+    private readonly _target: LocationID;
+
+    constructor(opId: number, toLocId: number) {
+        this._opId = opId;
+        this._target = toLocId;
+    }
+
+    get opId(): number {
+        return this._opId;
+    }
+
+    get target(): number {
+        return this._target;
+    }
+}
+
 export class TransitionRelation {
 
     private readonly _transitions: TransitionTable;
@@ -157,14 +177,15 @@ export class TransitionRelation {
         this._locations = locations;
         this._entryLocations = entryLocs;
         this._exitLocations = exitLocs;
+        entryLocs.forEach((l) => Preconditions.checkArgument(this._locations.contains(l)));
         this._closureTerminators = new Map();
     }
 
     public toString() {
         let lines: string[] = [];
         for (let fromId of this._locations) {
-            for (let [op, toId] of this.transitionsFrom(fromId)) {
-                lines.push(`(${fromId}) ${op} (${toId})`);
+            for (let t of this.transitionsFrom(fromId)) {
+                lines.push(`(${fromId}) ${t.opId} (${t.target})`);
             }
         }
         return lines.join("\n");
@@ -236,9 +257,9 @@ export class TransitionRelation {
             if (!visited.has(work)) {
                 visited.add(work);
                 let isTerminationState = this.transitionsFrom(work).length == 0;
-                for (let [op, target] of this.transitionsFrom(work)) {
-                    if (op == ProgramOperations.epsilon().ident) {
-                        worklist.push(target);
+                for (let t of this.transitionsFrom(work)) {
+                    if (t.opId == ProgramOperations.epsilon().ident) {
+                        worklist.push(t.target);
                     } else {
                         isTerminationState = true;
                     }
@@ -263,20 +284,20 @@ export class TransitionRelation {
         return result;
     }
 
-    public transitionsFrom(from: LocationID): [OperationID, LocationID][] {
+    public transitionsFrom(from: LocationID): Array<TransitionTo> {
         let transitionsTo: ImmMap<LocationID, ImmSet<OperationID>> = this.transitionTable.get(from) || ImmMap();
 
-        let result: [OperationID, LocationID][] = [];
+        let result: Array<TransitionTo> = new Array<TransitionTo>();
         for (let [to, ops] of transitionsTo.entries()) {
             for (let o of ops) {
-                result.push([o, to]);
+                result.push(new TransitionTo(o, to));
             }
         }
 
         return result;
     }
 
-    public transitionsTo(to: LocationID): [OperationID, LocationID][] {
+    public transitionsTo(to: LocationID): Array<TransitionTo> {
         return this.backwards.transitionsFrom(to);
     }
 
@@ -509,7 +530,7 @@ export class TransitionRelations {
     }
 
     private static getDirClosure(l: LocationID,
-                                 nextOp: (l) => [OperationID, LocationID][]): Set<LocationID> {
+                                 nextOp: (l) => Array<TransitionTo>): Set<LocationID> {
         const result: Set<LocationID> = new Set();
 
         // Forwards reachable
@@ -520,10 +541,10 @@ export class TransitionRelations {
             const work: LocationID = worklist.pop();
             result.add(work);
             forwardsDone.add(work);
-            nextOp(work).forEach(([op, target]) => {
-                if (ProgramOperations.epsilon().ident == op) {
-                    if (!forwardsDone.has(target)) {
-                        worklist.push(target);
+            nextOp(work).forEach((t) => {
+                if (ProgramOperations.epsilon().ident == t.opId) {
+                    if (!forwardsDone.has(t.target)) {
+                        worklist.push(t.target);
                     }
                 }
             });

@@ -63,6 +63,8 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
                 // Check the feasibility with the refiner
                 if (this._refiner.checkIsFeasible(targetState)) {
                     return [frontier, reached];
+                } else {
+                    reached.remove(targetState);
                 }
             }
         } while (!frontier.isEmpty());

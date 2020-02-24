@@ -230,8 +230,8 @@ role ScratchEntity is RuntimeEntity begin
         // A busy-waiting implementation.
         // The external method `_RUNTIME_waitSeconds` is intended to
         // not conduct a busy wait.
-        define waitUntil as number
-        declare waitUntil as _RUNTIME_seconds() + secs
+        declare waitUntil as number
+        define waitUntil as _RUNTIME_seconds() + secs
         until (_RUNTIME_seconds() < waitUntil) repeat begin
         end
     end
@@ -242,8 +242,8 @@ role ScratchEntity is RuntimeEntity begin
         // A busy-waiting implementation.
         // The external method `_RUNTIME_waitMillis` is intended to
         // not conduct a busy wait.
-        define waitUntil as number
-        declare waitUntil as _RUNTIME_millis() + millis
+        declare waitUntil as number
+        define waitUntil as _RUNTIME_millis() + millis
         until (_RUNTIME_millis() < waitUntil) repeat begin
         end
     end

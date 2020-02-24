@@ -31,7 +31,7 @@ import {
 } from "./ScheduleAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {ProgramOperation, ProgramOperations} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {OperationID, ProgramOperation, ProgramOperations} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {App} from "../../../syntax/app/App";
@@ -240,12 +240,12 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         const script = this._task.getActorByName(threadState.getActorId()).getScript(threadState.getScriptId());
         Logger.potentialUnsound('Add support for atomic transitions');
 
-        let result = [];
-        for (const [opId, succLoc] of script.transitions.transitionsFrom(threadState.getLocationId())) {
+        let result: [ProgramOperation, LocationID, boolean][] = [];
+        for (const t of script.transitions.transitionsFrom(threadState.getLocationId())) {
             const isAtomic = false;
-            const op: ProgramOperation = ProgramOperations.withID(opId);
+            const op: ProgramOperation = ProgramOperations.withID(t.opId);
             Preconditions.checkNotUndefined(op);
-            result.push([op, succLoc, isAtomic]);
+            result.push([op, t.target, isAtomic]);
         }
 
         return result;

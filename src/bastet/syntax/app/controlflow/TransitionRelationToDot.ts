@@ -19,7 +19,7 @@
  *
  */
 
-import {TransitionRelation} from "./TransitionRelation";
+import {TransitionRelation, TransitionTo} from "./TransitionRelation";
 import {LocationID} from "./ControlLocation";
 import {OperationID, ProgramOperations} from "./ops/ProgramOperation";
 
@@ -40,11 +40,11 @@ export class TransitionRelationToDot {
             let fromlocid: LocationID = worklist.pop();
             if (!visited.has(fromlocid)) {
                 visited.add(fromlocid);
-                let fromWork: [OperationID, LocationID][] = tr.transitionsFrom(fromlocid);
-                for (let [opid, tolocid] of fromWork) {
-                    let op = ProgramOperations.withID(opid);
-                    output.push(`    ${fromlocid} -> ${tolocid} [label="${this.escapeLabel(op.toString())}"];`);
-                    worklist.push(tolocid);
+                let fromWork: Array<TransitionTo> = tr.transitionsFrom(fromlocid);
+                for (const t of fromWork) {
+                    let op = ProgramOperations.withID(t.opId);
+                    output.push(`    ${fromlocid} -> ${t.target} [label="${this.escapeLabel(op.toString())}"];`);
+                    worklist.push(t.target);
                 }
             }
         }
