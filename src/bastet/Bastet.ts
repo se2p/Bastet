@@ -51,10 +51,10 @@ export class Bastet {
         return program
             .version('0.0.1')
             .option('-d, --debug', 'Debugging mode')
+            .option('-c, --configuration <required>', 'Configuration file')
             .requiredOption('-I, --intermediateLibrary <required>', 'Program file that defines the intermediate functions')
             .requiredOption('-P, --program <required>', 'Program file')
             .requiredOption('-S, --specification <required>', 'Specification file')
-            .option('-c, --configuration <required>', 'Configuration file')
             .parse(process.argv);
     }
 
