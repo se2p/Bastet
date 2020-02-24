@@ -105,3 +105,38 @@ test("Lattice Include 2", () => {
     const result = lattice.isIncluded(lattice.bottom(), lattice.bottom());
     expect(result).toBe(true);
 });
+
+test("Lattice Include 3", () => {
+    const lattice = new Z3FirstOrderLattice(theories.boolTheory, prover);
+    const result = lattice.isIncluded(lattice.top(), lattice.top());
+    expect(result).toBe(true);
+});
+
+test("Lattice Include 4", () => {
+    const lattice = new Z3FirstOrderLattice(theories.boolTheory, prover);
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), NumberType.instance()));
+    const f = theories.boolTheory.and(
+        theories.numTheory.isNumberEqualTo(
+            theories.numTheory.abstractNumberValue(x),
+            theories.numTheory.fromConcreteNumber(new ConcreteNumber(42))),
+        theories.numTheory.isNumberEqualTo(
+            theories.numTheory.abstractNumberValue(x),
+            theories.numTheory.fromConcreteNumber(new ConcreteNumber(42))));
+    const result = lattice.isIncluded(f, lattice.bottom());
+    expect(result).toBe(false);
+});
+
+test("Lattice Include 5", () => {
+    const lattice = new Z3FirstOrderLattice(theories.boolTheory, prover);
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), NumberType.instance()));
+    const f = theories.boolTheory.and(
+        theories.numTheory.isNumberEqualTo(
+            theories.numTheory.abstractNumberValue(x),
+            theories.numTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.numTheory.isNumberEqualTo(
+            theories.numTheory.abstractNumberValue(x),
+            theories.numTheory.fromConcreteNumber(new ConcreteNumber(42))));
+    const result = lattice.isIncluded(f, lattice.bottom());
+    expect(result).toBe(true);
+});
+

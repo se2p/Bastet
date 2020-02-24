@@ -133,7 +133,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
      */
     public isUnsat(): boolean {
         const checkResult: Sint32 = this._ctx.solver_check(this._solver);
-        return checkResult.val() == Z3_L_FALSE;
+        return (checkResult.val() == Z3_L_FALSE);
     }
 
     /**

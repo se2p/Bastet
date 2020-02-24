@@ -119,10 +119,10 @@ export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
         try {
             // UNSAT a  <=>  a lessOrEqual ⊥
             // NOT true OR false  <=>  false OR false
-            const implication = this._boolTheory.or(
-                this._boolTheory.not(element1), element2);
+            const implication = this.complement(this.join(
+                this.complement(element1), element2));
             this._prover.assert(implication);
-            return !this._prover.isUnsat();
+            return this._prover.isUnsat();
         } finally {
             this._prover.pop();
         }
