@@ -21,11 +21,11 @@
  */
 
 import {LibZ3InContext, LibZ3NonContext, Z3_context, Z3_solver} from "./libz3";
-import {Preconditions} from "../Preconditions";
+import {Preconditions} from "../../Preconditions";
 import {WasmJSInstance} from "./WasmInstance";
-import {FirstOrderFormula} from "../ConjunctiveNormalForm";
-import {Lattice} from "../../lattices/Lattice";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {FirstOrderFormula} from "../../ConjunctiveNormalForm";
+import {Lattice} from "../../../lattices/Lattice";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {
     Z3BooleanFormula,
     Z3BooleanTheory,
@@ -33,10 +33,10 @@ import {
     Z3FirstOrderLattice,
     Z3MemoryTheoryInContext
 } from "./Z3MemoryTheory";
-import {FirstOrderSolver} from "../../procedures/domains/FirstOrderDomain";
+import {FirstOrderSolver} from "../../../procedures/domains/FirstOrderDomain";
 import {Sint32, Uint32} from "./ctypes";
-import {BooleanTheory} from "../../procedures/domains/MemoryTransformer";
-import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
+import {BooleanTheory} from "../../../procedures/domains/MemoryTransformer";
+import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 
 export var PreModule = {
     print: function(text) {
@@ -86,7 +86,7 @@ export class SMTFactory {
 
     public static async createZ3(): Promise<Z3SMT> {
         try {
-            require("../../../lib/z3/libz3.so.js");
+            require("../../../../lib/z3/libz3.so.js");
         } catch (e) {
             throw new IllegalStateException("Initialization of Z3 failed: " + e);
         }

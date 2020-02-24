@@ -20,7 +20,7 @@
  *
  */
 
-import {FirstOrderFormula} from "../ConjunctiveNormalForm";
+import {FirstOrderFormula} from "../../ConjunctiveNormalForm";
 import {
     AbstractBoolean,
     AbstractList,
@@ -31,17 +31,17 @@ import {
     ListTheory,
     RationalNumberTheory,
     StringTheory
-} from "../../procedures/domains/MemoryTransformer";
+} from "../../../procedures/domains/MemoryTransformer";
 import {Record as ImmRec} from "immutable";
 import {LibZ3InContext, Z3_ast} from "./libz3";
-import {Identifier} from "../../syntax/ast/core/Identifier";
-import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../procedures/domains/ConcreteElements";
-import {Preconditions} from "../Preconditions";
+import {Identifier} from "../../../syntax/ast/core/Identifier";
+import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../../procedures/domains/ConcreteElements";
+import {Preconditions} from "../../Preconditions";
 import {Ptr, Sint32, Uint32} from "./ctypes";
-import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
-import {SMTFirstOrderLattice} from "../../procedures/domains/FirstOrderDomain";
+import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
+import {SMTFirstOrderLattice} from "../../../procedures/domains/FirstOrderDomain";
 import {Z3ProverEnvironment} from "./Z3Wrapper";
-import {Variable} from "../../syntax/ast/core/Variable";
+import {Variable} from "../../../syntax/ast/core/Variable";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;
 

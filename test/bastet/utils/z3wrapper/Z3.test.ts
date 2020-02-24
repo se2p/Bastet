@@ -20,15 +20,15 @@
  *
  */
 
-import {Z3_config, Z3_context} from "../../../../src/bastet/utils/z3wrapper/libz3";
-import {Ptr, Uint32} from "../../../../src/bastet/utils/z3wrapper/ctypes";
-import {SMTFactory, Z3SMT} from "../../../../src/bastet/utils/z3wrapper/Z3Wrapper";
+import {Z3_config, Z3_context} from "../../../../src/bastet/utils/smt/z3/libz3";
+import {Ptr, Uint32} from "../../../../src/bastet/utils/smt/z3/ctypes";
+import {SMTFactory, Z3SMT} from "../../../../src/bastet/utils/smt/z3/Z3Wrapper";
 import {VariableWithDataLocation} from "../../../../src/bastet/syntax/ast/core/Variable";
 import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataLocation";
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
 import {NumberType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
 import {ConcreteNumber} from "../../../../src/bastet/procedures/domains/ConcreteElements";
-import {Z3FirstOrderLattice} from "../../../../src/bastet/utils/z3wrapper/Z3MemoryTheory";
+import {Z3FirstOrderLattice} from "../../../../src/bastet/utils/smt/z3/Z3MemoryTheory";
 
 let smt: Z3SMT;
 let ctx;

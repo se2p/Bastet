@@ -28,7 +28,9 @@ import {Variable, VariableWithDataLocation} from "../Variable";
 export class CallStatement extends Statement {
 
     private readonly _calledMethod: Identifier;
+
     private readonly _args: ExpressionList;
+
     private readonly _assignResultTo: OptionalAstNode<VariableWithDataLocation>;
 
     constructor(calledMethod: Identifier, args: ExpressionList, assignResultTo: OptionalAstNode<VariableWithDataLocation>) {

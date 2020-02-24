@@ -137,6 +137,10 @@ export class FlatBooleanValueTheory implements BooleanTheory<FlatBooleanValue> {
         return this._false;
     }
 
+    equal(op1: FlatBooleanValue, op2: FlatBooleanValue): FlatBooleanValue {
+        throw new ImplementMeException();
+    }
+
     fromConcreteBoolean(str: ConcreteBoolean): FlatBooleanValue {
         if (str.value) {
             return this.trueBool();
