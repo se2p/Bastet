@@ -23,7 +23,7 @@ import {Statement} from "./Statement";
 import {Identifier} from "../Identifier";
 import {ExpressionList} from "../expressions/ExpressionList";
 import {OptionalAstNode} from "../../AstNode";
-import {Variable, VariableWithDataLocation} from "../Variable";
+import {VariableWithDataLocation} from "../Variable";
 
 export class CallStatement extends Statement {
 

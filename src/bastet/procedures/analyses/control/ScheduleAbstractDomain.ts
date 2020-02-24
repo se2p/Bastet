@@ -64,6 +64,8 @@ export interface ThreadStateAttributes {
 
     failedFor: ImmSet<Property>;
 
+    returnCallTo: ImmList<LocationID>;
+
 }
 
 const ThreadStateRecord = ImmRec({
@@ -73,17 +75,18 @@ const ThreadStateRecord = ImmRec({
     locationId: -1,
     computationState: THREAD_STATE_UNKNOWN,
     waitingForThreads: ImmSet<ThreadId>(),
-    failedFor: ImmSet<Property>()
+    failedFor: ImmSet<Property>(),
+    returnCallTo: ImmList<LocationID>()
 });
 
 export class ThreadState extends ThreadStateRecord implements AbstractElement {
 
-    constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId,
-                locationId: LocationID, compState: ScriptComputationState,
-                waitingForThreads: ImmSet<ThreadId>, failedFor: ImmSet<Property>) {
+    constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, locationId: LocationID,
+                compState: ScriptComputationState, waitingForThreads: ImmSet<ThreadId>,
+                failedFor: ImmSet<Property>, returnCallTo: ImmList<LocationID>) {
         super({threadId: threadId, actorId: actorId, scriptId: scriptId,
             locationId: locationId, computationState: compState,
-            waitingForThreads: waitingForThreads, failedFor: failedFor});
+            waitingForThreads: waitingForThreads, failedFor: failedFor, returnCallTo: returnCallTo});
     }
 
     public getThreadId(): ThreadId {
@@ -100,6 +103,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement {
 
     public getLocationId(): LocationID {
         return this.get('locationId');
+    }
+
+    public getReturnCallTo(): ImmList<LocationID> {
+        return this.get('returnCallTo');
     }
 
     public withLocationId(value: LocationID): ThreadState {
@@ -126,6 +133,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement {
         return this.set('waitingForThreads', value);
     }
 
+    public withReturnCallTo(value: ImmList<LocationID>): ThreadState {
+        return this.set('returnCallTo', value);
+    }
+
     public withFailedFor(value: ImmSet<Property>): ThreadState {
         return this.set('failedFor', value);
     }
@@ -147,7 +158,7 @@ export class ThreadStateFactory {
                                       scriptId: ScriptId, locationId: LocationID): ThreadState {
         const threadId = this.freshId();
         return new ThreadState(threadId, actorId, scriptId, locationId,
-            THREAD_STATE_RUNNING, ImmSet(), ImmSet());
+            THREAD_STATE_RUNNING, ImmSet(), ImmSet(), ImmList());
     }
 
 }
@@ -212,7 +223,7 @@ export class ScheduleAbstractStateFactory {
                 }
                 for (const locId of script.transitions.entryLocationSet) {
                     threads = threads.push(new ThreadState(threadId, actor.ident, script.id, locId,
-                        threadState, ImmSet(), ImmSet()));
+                        threadState, ImmSet(), ImmSet(), ImmList()));
                 }
             }
         }

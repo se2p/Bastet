@@ -19,10 +19,11 @@
  *
  */
 
-import {AbstractNode} from "../../AstNode";
+import {AbstractNode, OptionalAstNode} from "../../AstNode";
 import {Statement, StatementList} from "./Statement";
 import {BooleanExpression} from "../expressions/BooleanExpression";
 import {NumberExpression} from "../expressions/NumberExpression";
+import {Variable, VariableWithDataLocation} from "../Variable";
 
 export interface ControlStatement extends AbstractNode {
 
@@ -134,4 +135,18 @@ export class RepeatForeverStatement extends Statement implements ControlStatemen
     get body(): StatementList {
         return this._body;
     }
+}
+
+export class ReturnStatement extends Statement implements ControlStatement {
+
+    private readonly _resultVariable: OptionalAstNode<VariableWithDataLocation>;
+
+    constructor(resultVariable: OptionalAstNode<VariableWithDataLocation>) {
+        super([resultVariable]);
+    }
+
+    get resultVariable(): OptionalAstNode<VariableWithDataLocation> {
+        return this._resultVariable;
+    }
+
 }

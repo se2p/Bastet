@@ -62,7 +62,6 @@ export class App {
         return Maps.values(this._actorMap);
     }
 
-
     get actorNames(): string[] {
         return Object.keys(this._actorMap);
     }

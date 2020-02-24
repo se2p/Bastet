@@ -27,7 +27,7 @@ import {DataLocationMap, DataLocations} from "./controlflow/DataLocation";
 import {ScratchType} from "../ast/core/ScratchType";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {TransitionRelation, TransitionRelations} from "./controlflow/TransitionRelation";
-import {AstNode} from "../ast/AstNode";
+import {AstNode, OptionalAstNode} from "../ast/AstNode";
 import {Preconditions} from "../../utils/Preconditions";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {ActorDefinition, ConcreteActorMode} from "../ast/core/ActorDefinition";
@@ -50,6 +50,7 @@ import {DeclareStackVariableStatement} from "../ast/core/statements/DeclarationS
 import {Identifier} from "../ast/core/Identifier";
 import {Variable, VariableWithDataLocation} from "../ast/core/Variable";
 import {Logger} from "../../utils/Logger";
+import {ReturnStatement} from "../ast/core/statements/ControlStatement";
 
 export class AppBuilder {
 
@@ -141,13 +142,15 @@ export class AppBuilder {
             // when calling the method with actual arguments.
 
             // 1. Declare the result variable
+            let resultVariable: OptionalAstNode<VariableWithDataLocation> = OptionalAstNode.absent();
             if (!ScratchType.isVoid(m.returns.type)) {
                 const resultVarIdent: Identifier = m.returns.ident;
                 const resultVarType: ScratchType = m.returns.type;
-                const resultVar: Variable = new VariableWithDataLocation(
+                const resultVar: VariableWithDataLocation = new VariableWithDataLocation(
                     DataLocations.createTypedLocation(resultVarIdent, resultVarType));
                 const declarationStmt = new DeclareStackVariableStatement(resultVar);
                 const dclStmtList = StatementList.from([declarationStmt]);
+                resultVariable = OptionalAstNode.with(resultVar);
 
                 methodTr = TransitionRelations.concat(methodTr, dclStmtList.accept(visitor));
             }
@@ -155,7 +158,14 @@ export class AppBuilder {
             // 2. Concat the body
             methodTr = TransitionRelations.concat(methodTr, m.statements.accept(visitor));
 
-            // 3. Eliminate epsilon transitions
+            // 3. Add a transition with a return statement.
+            //    This statement does only signal that the method
+            //    returns to the caller.
+            const returnStmt = new ReturnStatement(resultVariable);
+            const returnStmtInList = StatementList.from([returnStmt]);
+            methodTr = TransitionRelations.concat(methodTr, returnStmtInList.accept(visitor));
+
+            // 4. Eliminate epsilon transitions
             methodTr = TransitionRelations.eliminateEpsilons(methodTr);
 
             result.push(new Method(m, methodTr));
