@@ -28,12 +28,12 @@ import {TextualProgramParser} from "../parser/TextualProgramParser";
 
 export class CodeToApp {
 
-    public static codeToApp(code: string, library: App, actorNamePrefix: string = ""): App {
+    public static codeToApp(code: string, library: App, config: {}, actorNamePrefix: string = ""): App {
         const scratchParser = new TextualProgramParser();
         const rawAST: RuleNode = scratchParser.parseSource("string", code);
         const transformer = new ToIntermediateTransformer();
         const typeStorage = new TypeInformationStorage();
-        const intermAST: AstNode = transformer.transform(library, rawAST, typeStorage);
+        const intermAST: AstNode = transformer.transform(library, rawAST, typeStorage, config);
         const ab: AppBuilder = new AppBuilder(library);
         return ab.buildFromSyntaxTree("string", intermAST, actorNamePrefix);
     }

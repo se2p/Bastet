@@ -50,7 +50,8 @@ describe("AppBuilder", () => {
             end
             `;
 
-        const app: App = CodeToApp.codeToApp(code, App.empty());
+        const config: {} = {};
+        const app: App = CodeToApp.codeToApp(code, App.empty(), {}, "");
         const diss: App = AppBuilder.dissolveInheritance(app);
 
         it('Results in two actors: D and C', function() {
