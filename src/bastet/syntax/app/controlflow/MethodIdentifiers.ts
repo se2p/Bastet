@@ -20,8 +20,16 @@
  *
  */
 
-export enum RuntimeMethods {
+export enum MethodIdentifiers {
+
     _RUNTIME_signalFailure = "_RUNTIME_signalFailure",
+
     _RUNTIME_waitSeconds = "_RUNTIME_waitSeconds",
+
     _RUNTIME_waitMillis  = "_RUNTIME_waitMillis",
+
+    _BUSY_WAIT_waitMillis  = "waitMillis",
+
+    _BUSY_WAIT_waitSeconds  = "waitSeconds",
+
 }

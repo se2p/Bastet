@@ -45,7 +45,7 @@ import {MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
 import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressions/StringExpression";
 import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
-import {RuntimeMethods} from "../../../syntax/app/controlflow/RuntimeMethods";
+import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
 import {Properties, Property} from "../../../syntax/Property";
 import {ExpressionList} from "../../../syntax/ast/core/expressions/ExpressionList";
 import instantiate = WebAssembly.instantiate;
@@ -313,7 +313,7 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         //
         if (stepOp.ast instanceof CallStatement) {
             const call = stepOp.ast as CallStatement;
-            if (call.calledMethod.text == RuntimeMethods._RUNTIME_signalFailure) {
+            if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
                 const properties: ImmSet<Property> = Properties.fromArguments(call.args);
                 resultBase = this.setFailure(resultBase, steppedThreadIdx, properties);
             }

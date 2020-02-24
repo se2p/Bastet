@@ -71,9 +71,10 @@ export class Bastet {
         const intermLibFilepath: string = cmdlineArguments.intermediateLibrary;
         const programFilepath: string = cmdlineArguments.program;
         const specFilepath: string = cmdlineArguments.specification;
+        const configDictionary: {} = {};
 
         // Build the static task model
-        const staticTaskModel: App = this.buildTaskModel(intermLibFilepath, programFilepath, specFilepath);
+        const staticTaskModel: App = this.buildTaskModel(intermLibFilepath, programFilepath, specFilepath, configDictionary);
 
         // Build the analyses procedure as defined by the configuration
         const analysisProcedure = await this.buildAnalysisProcedure(cmdlineArguments)
@@ -87,17 +88,17 @@ export class Bastet {
         return analysisProcedure.run(staticTaskModel);
     }
 
-    private buildTaskModel(libraryFilepath: string, programFilepath: string, specFilepath: string): App {
+    private buildTaskModel(libraryFilepath: string, programFilepath: string, specFilepath: string, config: {}): App {
         const typeStorage = new TypeInformationStorage();
 
         // Build the set of methods for translating into the intermediate AST
-        const staticLibraryModel: App = this.parseFromIntermediateCode("library", libraryFilepath, typeStorage);
+        const staticLibraryModel: App = this.parseFromIntermediateCode("library", libraryFilepath, typeStorage, config);
 
         // Parse the program (a Scratch program) into an intermediate AST
-        const staticProgramModel: App = this.parseFromRawCode("program", "", programFilepath, staticLibraryModel, typeStorage);
+        const staticProgramModel: App = this.parseFromRawCode("program", "", programFilepath, staticLibraryModel, typeStorage, config);
 
         // Parse the specification (also a Scratch program) into an intermediate AST
-        const staticSpecModel: App = this.parseFromRawCode("spec", "__spec", specFilepath, staticLibraryModel, typeStorage);
+        const staticSpecModel: App = this.parseFromRawCode("spec", "__spec", specFilepath, staticLibraryModel, typeStorage, config);
 
         // Create the control-flow structure of the verification task
         const staticTaskModelWithInheritance: App = ControlFlows.unionOf(staticLibraryModel,
@@ -119,7 +120,7 @@ export class Bastet {
         return AnalysisProcedureFactory.createAnalysisProcedure(config);
     }
 
-    private parseFromIntermediateCode(ident: string, filepath: string, typeStorage: TypeInformationStorage): App {
+    private parseFromIntermediateCode(ident: string, filepath: string, typeStorage: TypeInformationStorage, config: {}): App {
         Preconditions.checkNotEmpty(filepath);
 
         const scratchParser : ProgramParser = ProgramParserFactory.createParserFor(filepath);
@@ -134,7 +135,7 @@ export class Bastet {
         Preconditions.checkState(rawAST instanceof ProgramContext );
 
         const transformer = new ToIntermediateTransformer();
-        const intermediateAST: AstNode = transformer.transform(App.empty(), rawAST, typeStorage);
+        const intermediateAST: AstNode = transformer.transform(App.empty(), rawAST, typeStorage, config);
 
         {
             const astToDotVisitor = new AstToDotVisitor();
@@ -152,7 +153,8 @@ export class Bastet {
      * @param filepath
      */
     private parseFromRawCode(ident: string, actorNamePrefix: string, filepath: string,
-                             staticLibraryModel: App, typeStorage: TypeInformationStorage): App {
+                             staticLibraryModel: App, typeStorage: TypeInformationStorage,
+                             config: {}): App {
         Preconditions.checkNotEmpty(filepath);
 
         // Create the parser for the file format
@@ -170,7 +172,7 @@ export class Bastet {
         // Transform the AST: Replaces specific statements or expressions
         // by generic constructs.
         const transformer = new ToIntermediateTransformer();
-        const intermediateAST: AstNode = transformer.transform(staticLibraryModel, rawAST, typeStorage);
+        const intermediateAST: AstNode = transformer.transform(staticLibraryModel, rawAST, typeStorage, config);
 
         {
             const astToDotVisitor = new AstToDotVisitor();

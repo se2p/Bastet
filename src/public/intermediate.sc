@@ -24,6 +24,10 @@ role RuntimeEntity begin
     // elapsed since the VM started.
     extern _RUNTIME_millis () returns number
 
+    // Returns the number of seconds that
+    // elapsed since the VM started.
+    extern _RUNTIME_seconds () returns number
+
     extern _RUNTIME_waitMillis (ms: number)
 
     extern _RUNTIME_waitSeconds (s: number)
@@ -88,7 +92,6 @@ role Observer is RuntimeEntity begin
         define x_snd as attribute "x" of snd
         declare y_snd as number
         define y_snd as attribute "y" of snd
-
 
         declare result as boolean
         define result as not (((mathSqrt((x_fst + x_snd)*(x_fst + x_snd) + (y_fst + y_snd) * (y_fst + y_snd)) - radius_fst - radius_snd) > 0))
@@ -224,13 +227,25 @@ role ScratchEntity is RuntimeEntity begin
     // @Category "Control"
     // @Block "wait <Num> seconds"
     define waitSeconds (secs: number) begin
-        _RUNTIME_waitSeconds (secs)
+        // A busy-waiting implementation.
+        // The external method `_RUNTIME_waitSeconds` is intended to
+        // not conduct a busy wait.
+        declare start as number
+        define start as _RUNTIME_seconds()
+        until (_RUNTIME_seconds() - start < secs) repeat begin
+        end
     end
 
     // @Category "Control"
     // @Block "wait <Num> millis"
     define waitMillis (millis: number) begin
-        _RUNTIME_waitMillis (millis)
+        // A busy-waiting implementation.
+        // The external method `_RUNTIME_waitMillis` is intended to
+        // not conduct a busy wait.
+        declare start as number
+        define start as _RUNTIME_millis()
+        until (_RUNTIME_millis() - start < millis) repeat begin
+        end
     end
 
     // data_setvariableto, sensing_setdragmode, motion_setrotationstyle, looks_seteffectto,

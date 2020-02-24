@@ -28,7 +28,7 @@ import {Record as ImmRec, Set as ImmSet} from "immutable";
 import {OperationID, ProgramOperation} from "./controlflow/ops/ProgramOperation";
 import {LocationID} from "./controlflow/ControlLocation";
 import {CallStatement} from "../ast/core/statements/CallStatement";
-import {RuntimeMethods} from "./controlflow/RuntimeMethods";
+import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
 import {Properties, Property} from "../Property";
 
 
@@ -82,7 +82,7 @@ export class App {
                             const op = ProgramOperation.for(opId);
                             if (op.ast instanceof CallStatement) {
                                 const call = op.ast as CallStatement;
-                                if (call.calledMethod.text == RuntimeMethods._RUNTIME_signalFailure) {
+                                if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
                                     const properties = Properties.fromArguments(call.args);
                                     result = result.union(properties);
                                 }

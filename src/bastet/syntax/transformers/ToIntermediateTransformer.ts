@@ -323,9 +323,22 @@ import {App} from "../app/App";
 import {VariableWithDataLocation} from "../ast/core/Variable";
 import {DataLocations} from "../app/controlflow/DataLocation";
 import {AssumeStatement} from "../ast/core/statements/AssumeStatement";
-import {RuntimeMethods} from "../app/controlflow/RuntimeMethods";
+import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
+import {BastetConfiguration} from "../../utils/BastetConfiguration";
 
-const toposort = require('toposort')
+const toposort = require('toposort');
+
+export class TransformerConfig extends BastetConfiguration {
+
+    constructor(dict: {}) {
+        super(dict);
+    }
+
+    get useBusyWaiting(): boolean {
+        return this.getBoolProperty('use-busy-waiting', true);
+    }
+
+}
 
 class TTransformerResult<T extends AstNode> {
 
@@ -471,10 +484,11 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     private readonly _methodLibrary: App;
     private readonly _typeStack: Array<ScratchType>;
     private _actorScope : boolean;
+    private readonly _config: TransformerConfig;
 
-    constructor(methodLibrary: App, typeInformationStorage: TypeInformationStorage) {
-        Preconditions.checkNotUndefined(methodLibrary);
-        this._methodLibrary = methodLibrary;
+    constructor(config: TransformerConfig, methodLibrary: App, typeInformationStorage: TypeInformationStorage) {
+        this._config = Preconditions.checkNotUndefined(config);
+        this._methodLibrary = Preconditions.checkNotUndefined(methodLibrary);
         this._typeStack = new Array<ScratchType>();
         this._activeActorTypes = null;
         this._actorTypeInfos = typeInformationStorage;
@@ -1643,9 +1657,14 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitWaitSecsStatement(ctx: WaitSecsStatementContext) : TransformerResult {
         const secondsTr = ctx.numExpr().accept(this);
+
+        const methodToCall: string = this._config.useBusyWaiting
+            ? MethodIdentifiers._BUSY_WAIT_waitSeconds
+            : MethodIdentifiers._RUNTIME_waitSeconds;
+
         return new TransformerResult(
             secondsTr.statementsToPrepend,
-            new CallStatement(Identifier.of(RuntimeMethods._RUNTIME_waitSeconds),
+            new CallStatement(Identifier.of(methodToCall),
                 new ExpressionList([secondsTr.node as Expression]), OptionalAstNode.absent()));
     }
 
@@ -1887,8 +1906,9 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
 export class ToIntermediateTransformer {
 
-    transform(methodLib: App, origin: RuleNode, typeInformationStorage: TypeInformationStorage): AstNode {
-        const visitor = new ToIntermediateVisitor(methodLib, typeInformationStorage);
+    transform(methodLib: App, origin: RuleNode, typeInformationStorage: TypeInformationStorage, config: {}): AstNode {
+        const transformerConfig = new TransformerConfig(config);
+        const visitor = new ToIntermediateVisitor(transformerConfig, methodLib, typeInformationStorage);
         return origin.accept(visitor).nodeOnly();
     }
 

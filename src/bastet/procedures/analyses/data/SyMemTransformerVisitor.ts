@@ -125,7 +125,7 @@ import {AbstractElement} from "../../../lattices/Lattice";
 import {Map as ImmMap} from "immutable";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
-import {RuntimeMethods} from "../../../syntax/app/controlflow/RuntimeMethods";
+import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
 
 export class MemNumExpressionVisitor<N extends AbstractNumber, B extends AbstractBoolean>
     implements CoreNumberExpressionVisitor<N> {
@@ -368,7 +368,7 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
 
     visitCallStatement(node: CallStatement): B {
         const method = node.calledMethod.text;
-        if (method == RuntimeMethods._RUNTIME_signalFailure) {
+        if (method == MethodIdentifiers._RUNTIME_signalFailure) {
             return this._mem;
         }
         throw new ImplementMeException();
