@@ -25,7 +25,7 @@ import {ProgramParserFactory} from "./syntax/parser/ProgramParserFactory";
 import {ToIntermediateTransformer, TypeInformationStorage} from "./syntax/transformers/ToIntermediateTransformer";
 import {ControlFlows} from "./syntax/app/ControlFlows";
 import {App} from "./syntax/app/App";
-import {AnalysisProcedure} from "./procedures/AnalysisProcedure";
+import {AnalysisProcedure, AnalysisResult, NullAnalysisResult} from "./procedures/AnalysisProcedure";
 import {ProgramParser} from "./syntax/parser/ProgramParser";
 import {Preconditions} from "./utils/Preconditions";
 import {AppBuilder} from "./syntax/app/AppBuilder";
@@ -37,6 +37,7 @@ import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
 import {AnalysisProcedureConfig, AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
 import {AppToDot} from "./syntax/app/AppToDot";
 import {IllegalArgumentException} from "./core/exceptions/IllegalArgumentException";
+import {AnalysisStatistics} from "./procedures/analyses/AnalysisStatistics";
 
 const commander = require('commander');
 
@@ -53,6 +54,7 @@ export class Bastet {
             .requiredOption('-I, --intermediateLibrary <required>', 'Program file that defines the intermediate functions')
             .requiredOption('-P, --program <required>', 'Program file')
             .requiredOption('-S, --specification <required>', 'Specification file')
+            .option('-c, --configuration <required>', 'Configuration file')
             .parse(process.argv);
     }
 
@@ -61,30 +63,36 @@ export class Bastet {
      *
      * @returns a JSON object with the analyses result.
      */
-    public async run() : Promise<{}> {
+    public async run() : Promise<AnalysisResult> {
         // Parsing of command line options
         const cmdlineArguments = this.parseProgramArguments();
         if (!cmdlineArguments) {
-            return {};
+            return new NullAnalysisResult(new AnalysisStatistics("NULL", {}));
         }
 
         const intermLibFilepath: string = cmdlineArguments.intermediateLibrary;
         const programFilepath: string = cmdlineArguments.program;
         const specFilepath: string = cmdlineArguments.specification;
-        const configDictionary: {} = {};
+        const configFilepath: string = cmdlineArguments['configuration'] || "./config/default.json";
+
+        return this.runFor(configFilepath, intermLibFilepath, programFilepath, specFilepath);
+    }
+
+    public async runFor(configFilepath: string, libraryFilepath: string, programFilepath: string, specFilepath: string) : Promise<AnalysisResult> {
+        const config: AnalysisProcedureConfig = AnalysisProcedureConfig.readFromConfigurationFile(configFilepath);
 
         // Build the static task model
-        const staticTaskModel: App = this.buildTaskModel(intermLibFilepath, programFilepath, specFilepath, configDictionary);
+        const staticTaskModel: App = this.buildTaskModel(libraryFilepath, programFilepath, specFilepath, config);
 
         // Build the analyses procedure as defined by the configuration
-        const analysisProcedure = await this.buildAnalysisProcedure(cmdlineArguments)
+        const analysisProcedure = await this.buildAnalysisProcedure(config)
             .catch((e) => { throw new IllegalArgumentException(e); });
 
         // Run the analyses procedure on the task and return the result
         return this.runAnalysis(staticTaskModel, analysisProcedure);
     }
 
-    private runAnalysis(staticTaskModel: App, analysisProcedure: AnalysisProcedure) : {} {
+    private runAnalysis(staticTaskModel: App, analysisProcedure: AnalysisProcedure) : Promise<AnalysisResult> {
         return analysisProcedure.run(staticTaskModel);
     }
 
@@ -114,9 +122,8 @@ export class Bastet {
         return staticTaskModel;
     }
 
-    private async buildAnalysisProcedure(programArguments) : Promise<AnalysisProcedure> {
+    private async buildAnalysisProcedure(config: AnalysisProcedureConfig) : Promise<AnalysisProcedure> {
         // TODO: Allow for sequences of analyses procedures that can built on the respective previous results.
-        const config: AnalysisProcedureConfig = AnalysisProcedureConfig.createFromCmdLineArgs(programArguments);
         return AnalysisProcedureFactory.createAnalysisProcedure(config);
     }
 

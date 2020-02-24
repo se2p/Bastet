@@ -19,7 +19,7 @@
  *
  */
 
-import {AnalysisProcedure} from "./AnalysisProcedure";
+import {AnalysisProcedure, AnalysisResult, MultiPropertyAnalysisResult} from "./AnalysisProcedure";
 import {App} from "../syntax/app/App";
 import {GraphAnalysis} from "./analyses/graph/GraphAnalysis";
 import {ScheduleAnalysis} from "./analyses/control/ScheduleAnalysis";
@@ -40,7 +40,7 @@ import {StatsAnalysis} from "./analyses/stats/StatsAnalysis";
 
 export class AnalysisProcedureConfig {
 
-    static createFromCmdLineArgs(programArguments: any) {
+    static readFromConfigurationFile(configFilepath: string) {
         return new AnalysisProcedureConfig();
     }
 
@@ -53,11 +53,14 @@ export class AnalysisProcedureFactory {
 
             private _statistics: AnalysisStatistics;
 
-            async run(task: App): Promise<{}> {
+            private _result: MultiPropertyAnalysisResult;
+
+            async run(task: App): Promise<MultiPropertyAnalysisResult> {
                 const smt = await SMTFactory.createZ3();
                 const bddlib = await BDDLibraryFactory.createBDDLib();
 
                 this._statistics = new AnalysisStatistics("BASTET", {});
+                this._result = new MultiPropertyAnalysisResult(ImmSet<Property>(), ImmSet<Property>(), task.getProperties(), this._statistics);
 
                 // TODO: Delete the context after the analysis is no more in use
                 const defaultContect = smt.createContext();
@@ -88,18 +91,22 @@ export class AnalysisProcedureFactory {
                 const [frontierPrime, reachedPrime] = multiPropertyAlgorithm.run(frontier, reached);
                 graphAnalysis.exportAnalysisResult(reachedPrime, frontierPrime);
 
-                return {};
+                return this._result;
             }
 
             private onAnalysisResult(violated: ImmSet<Property>, satisifed: ImmSet<Property>, unknowns: ImmSet<Property>, mpaStatistics: AnalysisStatistics) {
                 const analysisDurtionMSec = mpaStatistics.contextTimer.duration.toFixed(3);
+
+                mpaStatistics.put("num_violated", violated.size);
+                mpaStatistics.put("num_unknown", unknowns.size);
+                mpaStatistics.put("num_satisfied", satisifed.size);
 
                 console.log("\n## Statistics #################################################\n");
                 console.log(this._statistics.stringifyToJSON());
 
                 const printPropertySetAs = function(role: string, set: ImmSet<Property>) {
                     if (!set.isEmpty()) {
-                        console.log(`Following properties are ${role}:`);
+                        console.log(`Following properties are ${role}:\n`);
                         let index = 1;
                         for (const p of set) {
                             console.log(`\t(${index}) ${p.text}`);
@@ -111,10 +118,6 @@ export class AnalysisProcedureFactory {
                 console.log("\n## Summary ####################################################");
                 console.log(`\nAnalysis finished after ${analysisDurtionMSec} msec.\n`);
 
-                mpaStatistics.put("num_violated", violated.size);
-                mpaStatistics.put("num_unknown", unknowns.size);
-                mpaStatistics.put("num_satisfied", satisifed.size);
-
                 if (violated.isEmpty() && satisifed.isEmpty() && unknowns.isEmpty()) {
                     console.log('No violations found. Full specification SATISFIED.')
                 } else {
@@ -124,6 +127,9 @@ export class AnalysisProcedureFactory {
                 }
 
                 console.log("\nBye.");
+
+                // Store the new result
+                this._result = new MultiPropertyAnalysisResult(satisifed, violated, unknowns, this._statistics);
             }
         }
     }
