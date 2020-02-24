@@ -61,11 +61,15 @@ export class BinaryBoolExpression extends BinaryExpression<BooleanExpression, Bo
 
 export class BooleanLiteral extends AbstractBooleanExpression {
 
-    private readonly _literal: boolean;
+    private readonly _value: boolean;
 
     constructor(literal: boolean) {
         super([]);
-        this._literal = literal;
+        this._value = literal;
+    }
+
+    get value(): boolean {
+        return this._value;
     }
 
     private static TRUE: BooleanLiteral;
@@ -108,7 +112,7 @@ export class BooleanLiteral extends AbstractBooleanExpression {
     }
 
     toTreeString(): string {
-        if (this._literal) {
+        if (this._value) {
             return "true";
         } else {
             return "false";

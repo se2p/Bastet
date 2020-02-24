@@ -120,7 +120,7 @@ import {
     NumberFormula,
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
-import {ConcreteNumber, ConcreteNumberDomain} from "../../domains/ConcreteElements";
+import {ConcreteBoolean, ConcreteNumber, ConcreteNumberDomain} from "../../domains/ConcreteElements";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {Map as ImmMap} from "immutable";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
@@ -222,15 +222,15 @@ export class SyMemBoolExpressionVisitor<B extends AbstractBoolean, N extends Abs
     }
 
     visitAndExpression(node: AndExpression): B {
-        throw new ImplementMeException();
+        return this._theories.boolTheory.and(node.operand1.accept(this), node.operand2.accept(this));
     }
 
     visitBooleanLiteral(node: BooleanLiteral): B {
-        throw new ImplementMeException();
+        return this._theories.boolTheory.fromConcreteBoolean(new ConcreteBoolean(node.value));
     }
 
     visitBooleanVariableExpression(node: BooleanVariableExpression): B {
-        throw new ImplementMeException();
+        return this._theories.boolTheory.abstractBooleanValue(node.variable);
     }
 
     visitNegationExpression(node: NegationExpression): B {
@@ -260,7 +260,7 @@ export class SyMemBoolExpressionVisitor<B extends AbstractBoolean, N extends Abs
     }
 
     visitOrExpression(node: OrExpression): B {
-        throw new ImplementMeException();
+        return this._theories.boolTheory.or(node.operand1.accept(this), node.operand2.accept(this));
     }
 
     visitStrContainsExpression(node: StrContainsExpression): B {
