@@ -19,7 +19,7 @@
  *
  */
 
-import {LabeledTransferRelation, TransferRelation} from "../TransferRelation";
+import {LabeledTransferRelation, TransferRelation, Transfers} from "../TransferRelation";
 import {
     ScheduleAbstractState,
     THREAD_STATE_DONE,
@@ -60,12 +60,14 @@ class StepInformation {
     private readonly _succLoc: LocationID;
     private readonly _isInnerAtomic: boolean;
     private readonly _ops: ProgramOperation[];
+    private readonly _returnCallTo: LocationID[];
 
-    constructor(threadIndex: number, succLoc: number, isInnerAtomic: boolean, ops: ProgramOperation[]) {
+    constructor(threadIndex: number, succLoc: number, isInnerAtomic: boolean, ops: ProgramOperation[], returnCallTo: LocationID[]) {
         this._threadIndex = threadIndex;
         this._succLoc = succLoc;
         this._isInnerAtomic = isInnerAtomic;
-        this._ops = ops;
+        this._ops = Preconditions.checkNotUndefined(ops);
+        this._returnCallTo = Preconditions.checkNotUndefined(returnCallTo);
     }
 
     get threadIndex(): number {
@@ -82,6 +84,10 @@ class StepInformation {
 
     get ops(): ProgramOperation[] {
         return this._ops;
+    }
+
+    get returnCallTo(): LocationID[] {
+        return this._returnCallTo;
     }
 }
 
@@ -161,16 +167,12 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
         // Determine the (sequences of) control-flow transition(s) to execute in this step
         // ATTENTION: We assume that each sequence corresponds to an atomic
         //      statement in the input programming language (Scratch)
-        const leavingOps: [ProgramOperation, LocationID, boolean][] = this.resolveLeavingOps(threadToStep);
+        const leavingOps: StepInformation[] = this.resolveLeavingOps(threadToStep, threadIndexToStep);
         Preconditions.checkState(leavingOps.length > 0, "A thread with no leaving ops must NOT be in state THREAD_STATE_RUNNING");
 
         const result: ScheduleAbstractState[] = [];
 
-        for (const [stepOp, succLoc, isInnerAtomic] of leavingOps) {
-            const stepToTake: StepInformation = new StepInformation(threadIndexToStep, succLoc, isInnerAtomic, [stepOp]);
-
-            console.log([threadToStep.getActorId(), stepOp.ast.toTreeString()]);
-
+        for (const stepToTake of leavingOps) {
             // Determine the new control (the next thread to execute)
             //   TODO: Take triggered events into account
             //   TODO: Determine sets of threads to wait for
@@ -179,8 +181,8 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
             for (const newThreadStates of nextSchedules) {
                 // Compute a successor state for each sequence and call the wrapped analysis to do so
                 Preconditions.checkNotUndefined(fromState.wrappedState);
-                let wrappedSuccStates: Iterable<AbstractElement> = this._wrappedTransferRelation.abstractSuccFor(
-                    fromState.wrappedState, stepOp, stepConcern);
+                const wrappedSuccStates: Iterable<AbstractElement> = Transfers.withIntermediateOps(
+                    this._wrappedTransferRelation, fromState.wrappedState, stepToTake.ops, stepConcern);
 
                 for (const w of wrappedSuccStates) {
                     Preconditions.checkNotUndefined(w);
@@ -236,16 +238,20 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
     /**
      * Returns either a singleton-list or the empty list.
      */
-    private resolveLeavingOps(threadState: ThreadState): [ProgramOperation, LocationID, boolean][] {
+    private resolveLeavingOps(threadState: ThreadState, threadIndex: number): StepInformation[] {
         const script = this._task.getActorByName(threadState.getActorId()).getScript(threadState.getScriptId());
         Logger.potentialUnsound('Add support for atomic transitions');
 
-        let result: [ProgramOperation, LocationID, boolean][] = [];
+        let result: StepInformation[] = [];
         for (const t of script.transitions.transitionsFrom(threadState.getLocationId())) {
             const isAtomic = false;
+            const returnCallTo: LocationID[] = [];
+
+            // Add the code to realize an inter-procedural analysis here
+
             const op: ProgramOperation = ProgramOperations.withID(t.opId);
             Preconditions.checkNotUndefined(op);
-            result.push([op, t.target, isAtomic]);
+            result.push(new StepInformation(threadIndex, t.target, isAtomic, [op], returnCallTo));
         }
 
         return result;
@@ -384,7 +390,7 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
 
             // YIELD the current state if it is not yet on a terminating control location
             // of the script.
-            const nextOps = this.resolveLeavingOps(steppedThread);
+            const nextOps = this.resolveLeavingOps(steppedThread, steppedThreadIdx);
             if (nextOps.length == 0) {
                 // Set to THREAD_STATE_DONE if on a terminating location
                 resultBase = this.setCompState(resultBase, steppedThreadIdx, THREAD_STATE_DONE);
@@ -426,11 +432,13 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
     }
 
     private checkSchedule(sched: Schedule) {
+        let threadIndex = 0;
         for (const ts of sched) {
-            const ops = this.resolveLeavingOps(ts);
+            const ops = this.resolveLeavingOps(ts, threadIndex);
             if (ts.getComputationState() == THREAD_STATE_RUNNING || ts.getComputationState() == THREAD_STATE_RUNNING_ATOMIC) {
                 Preconditions.checkState(ops.length > 0);
             }
+            threadIndex++;
         }
     }
 

@@ -21,7 +21,7 @@
  */
 
 
-import {LabeledTransferRelation} from "../TransferRelation";
+import {LabeledTransferRelation, Transfers} from "../TransferRelation";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {ProgramOperation, ProgramOperationFactory} from "../../../syntax/app/controlflow/ops/ProgramOperation";
@@ -84,7 +84,7 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
                     new DeclareSystemVariableStatement(this._globalTimeVariable),
                     new StoreEvalResultToVariableStatement(this._globalTimeVariable, NumberLiteral.of(0)) ];
 
-                return this.withIntermediateTransfersBefore(fromState, initStmts, op, co);
+                return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState, initStmts, op, co);
             }
         }
 
@@ -111,7 +111,7 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
                         new PlusExpression(this._globalTimeVariableExpr, opTimeVariableExpr))];
             }
 
-            return this.withIntermediateTransfersBefore(fromState, intermediateStatements, op, co);
+            return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState, intermediateStatements, op, co);
         }
     }
 
@@ -129,31 +129,6 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
         }
 
         return false;
-    }
-
-    private withIntermediateTransfersBefore(fromState: W, intermediateStmts: Statement[],
-                                            op: ProgramOperation, co: Concern) {
-        // TODO: This could can be written in a more beautiful fashion
-
-        const ops: ProgramOperation[] = [];
-        for (const stmt of intermediateStmts) {
-            const timeOp: ProgramOperation = ProgramOperationFactory.createFor(stmt);
-            ops.push(timeOp);
-        }
-        ops.push(op);
-
-        let result: W[] = [fromState];
-        for (const toExecute of ops) {
-            let statelistPrime: W[] = [];
-            for (const w of result) {
-                for (const succ of this._wrappedTransfer.abstractSuccFor(w, toExecute, co)) {
-                    statelistPrime.push(succ);
-                }
-            }
-            result = statelistPrime;
-        }
-
-        return result;
     }
 
     private isTimeMonitoringConcern(co: Concern): boolean {

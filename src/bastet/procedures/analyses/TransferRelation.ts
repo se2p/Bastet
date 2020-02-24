@@ -20,10 +20,11 @@
  */
 
 import {AbstractElement} from "../../lattices/Lattice";
-import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperationFactory} from "../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../syntax/Concern";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {Preconditions} from "../../utils/Preconditions";
+import {Statement} from "../../syntax/ast/core/statements/Statement";
 
 export interface TransferRelation<E extends AbstractElement> {
 
@@ -34,6 +35,41 @@ export interface TransferRelation<E extends AbstractElement> {
 export interface LabeledTransferRelation<E extends AbstractElement> extends TransferRelation<E>{
 
     abstractSuccFor(fromState: E, op: ProgramOperation, co: Concern): Iterable<E>;
+
+}
+
+export class Transfers {
+
+    public static withIntermediateTransfersBefore<W extends AbstractElement>(
+        transferRealtion: LabeledTransferRelation<W>, fromState: W,
+        intermediateStmts: Statement[], op: ProgramOperation, co: Concern): W[] {
+
+        const ops: ProgramOperation[] = [];
+        for (const stmt of intermediateStmts) {
+            const timeOp: ProgramOperation = ProgramOperationFactory.createFor(stmt);
+            ops.push(timeOp);
+        }
+        ops.push(op);
+
+        return Transfers.withIntermediateOps(transferRealtion, fromState, ops, co);
+    }
+
+    public static withIntermediateOps<W extends AbstractElement>(
+        transferRealtion: LabeledTransferRelation<W>, fromState: W, ops: ProgramOperation[], co: Concern): W[] {
+
+        let result: W[] = [fromState];
+        for (const toExecute of ops) {
+            let statelistPrime: W[] = [];
+            for (const w of result) {
+                for (const succ of transferRealtion.abstractSuccFor(w, toExecute, co)) {
+                    statelistPrime.push(succ);
+                }
+            }
+            result = statelistPrime;
+        }
+
+        return result;
+    }
 
 }
 
