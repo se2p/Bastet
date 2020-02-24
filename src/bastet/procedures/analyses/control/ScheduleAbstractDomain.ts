@@ -48,6 +48,34 @@ export interface ScheduleConcreteState {
 
 }
 
+export interface MethodCallAttributes {
+
+    callFrom: LocationID;
+
+    returnTo: LocationID;
+
+}
+
+const MethodCallRecord = ImmRec({
+    callFrom: 0,
+    returnTo: 0
+});
+
+export class MethodCall extends MethodCallRecord implements MethodCallAttributes {
+
+    constructor(callFrom: LocationID, returnTo: LocationID) {
+        super({callFrom: callFrom, returnTo: returnTo});
+    }
+
+    public getCallFrom(): LocationID {
+        return this.get('callFrom');
+    }
+
+    public getReturnTo(): LocationID {
+        return this.get('returnTo');
+    }
+}
+
 export interface ThreadStateAttributes {
 
     threadId: ThreadId;
@@ -64,7 +92,7 @@ export interface ThreadStateAttributes {
 
     failedFor: ImmSet<Property>;
 
-    returnCallTo: ImmList<LocationID>;
+    returnCallTo: ImmList<MethodCall>;
 
 }
 
@@ -76,14 +104,14 @@ const ThreadStateRecord = ImmRec({
     computationState: THREAD_STATE_UNKNOWN,
     waitingForThreads: ImmSet<ThreadId>(),
     failedFor: ImmSet<Property>(),
-    returnCallTo: ImmList<LocationID>()
+    returnCallTo: ImmList<MethodCall>()
 });
 
 export class ThreadState extends ThreadStateRecord implements AbstractElement {
 
     constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, locationId: LocationID,
                 compState: ScriptComputationState, waitingForThreads: ImmSet<ThreadId>,
-                failedFor: ImmSet<Property>, returnCallTo: ImmList<LocationID>) {
+                failedFor: ImmSet<Property>, returnCallTo: ImmList<MethodCall>) {
         super({threadId: threadId, actorId: actorId, scriptId: scriptId,
             locationId: locationId, computationState: compState,
             waitingForThreads: waitingForThreads, failedFor: failedFor, returnCallTo: returnCallTo});
@@ -105,7 +133,7 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement {
         return this.get('locationId');
     }
 
-    public getReturnCallTo(): ImmList<LocationID> {
+    public getReturnCallTo(): ImmList<MethodCall> {
         return this.get('returnCallTo');
     }
 
@@ -133,7 +161,7 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement {
         return this.set('waitingForThreads', value);
     }
 
-    public withReturnCallTo(value: ImmList<LocationID>): ThreadState {
+    public withReturnCallTo(value: ImmList<MethodCall>): ThreadState {
         return this.set('returnCallTo', value);
     }
 

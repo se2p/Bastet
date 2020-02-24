@@ -86,6 +86,9 @@ export class Actor {
     /** List of methods that are defined in the actor. */
     private readonly _methods: ImmutableList<Method>;
 
+    /** Map of method names to their defs */
+    private readonly _methodMap: ImmutableMap<string, Method>;
+
     /** Is the actor an observer, used to check if the spec is satisfied? */
     private readonly _isObserver: boolean;
 
@@ -113,6 +116,12 @@ export class Actor {
             scriptMap.set(s.id, s);
         }
         this._scriptMap = new ImmutableMap<ScriptId, Script>(scriptMap.entries());
+
+        const methodMap: Map<string, Method> = new Map<string, Method>();
+        for (const m of this._methods) {
+            methodMap.set(m.ident.text, m);
+        }
+        this._methodMap = new ImmutableMap<string, Method>(methodMap.entries());
 
         Preconditions.checkArgument(initScript.event === NeverEvent.instance()
             || initScript.event === BootstrapEvent.instance());
@@ -170,10 +179,12 @@ export class Actor {
         return this._actorMode;
     }
 
+    public getMethod(name: string): Method {
+        return Preconditions.checkNotUndefined(this._methodMap.get(name));
+    }
+
     public getScript(id: ScriptId): Script {
-        const result = this._scriptMap.get(id);
-        Preconditions.checkState(result !== null);
-        return result;
+        return Preconditions.checkNotUndefined(this._scriptMap.get(id));
     }
 
     private deterineIsObserver() {

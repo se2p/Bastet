@@ -51,6 +51,10 @@ import {ExpressionList} from "../../../syntax/ast/core/expressions/ExpressionLis
 import instantiate = WebAssembly.instantiate;
 import {Concern, Concerns} from "../../../syntax/Concern";
 import {Logger} from "../../../utils/Logger";
+import {Actor} from "../../../syntax/app/Actor";
+import {MethodDefinition} from "../../../syntax/ast/core/MethodDefinition";
+import {Method} from "../../../syntax/app/controlflow/Method";
+import {ReturnStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 
 export type Schedule = ImmList<ThreadState>;
 
@@ -240,21 +244,38 @@ export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstra
      */
     private resolveLeavingOps(threadState: ThreadState, threadIndex: number): StepInformation[] {
         const script = this._task.getActorByName(threadState.getActorId()).getScript(threadState.getScriptId());
+        const threadActor: Actor = this._task.getActorByName(threadState.getActorId());
+
         Logger.potentialUnsound('Add support for atomic transitions');
 
         let result: StepInformation[] = [];
         for (const t of script.transitions.transitionsFrom(threadState.getLocationId())) {
             const isAtomic = false;
-            const returnCallTo: LocationID[] = [];
-
-            // Add the code to realize an inter-procedural analysis here
-
             const op: ProgramOperation = ProgramOperations.withID(t.opId);
             Preconditions.checkNotUndefined(op);
-            result.push(new StepInformation(threadIndex, t.target, isAtomic, [op], returnCallTo));
+
+            if (op.ast instanceof CallStatement) {
+                // The following lines realize the inter-procedural analysis.
+                const returnCallTo: LocationID[] = [t.target];
+                const calledMethod: Method = threadActor.getMethod(op.ast.calledMethod.text);
+                const interProcOps: ProgramOperation[] = this.createPassArgumentsOps(calledMethod, op.ast.args);
+
+                for (const entryLocId of calledMethod.controlflow.entryLocationSet) {
+                    result.push(new StepInformation(threadIndex, entryLocId, isAtomic, interProcOps, returnCallTo));
+                }
+            } else if (op.ast instanceof ReturnStatement) {
+                // Assign the result to the variable that was referenced in the `CallStatement`
+                throw new ImplementMeException();
+            } else {
+                result.push(new StepInformation(threadIndex, t.target, isAtomic, [op], []));
+            }
         }
 
         return result;
+    }
+
+    private createPassArgumentsOps(calledMethod: Method, args: ExpressionList): ProgramOperation[] {
+        throw new ImplementMeException();
     }
 
     private restartThread(state: ScheduleAbstractState): ScheduleAbstractState {
