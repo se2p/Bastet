@@ -65,7 +65,8 @@ describe("TransitionRelationBuilder", () => {
             expect(result.transitionTable.size).toEqual(1);
 
             const fromL0 = result.transitionsFrom(l0.ident);
-            expect(fromL0[0]).toEqual([ProgramOperations.epsilon().ident, l0.ident]);
+            expect(fromL0[0].opId).toEqual(ProgramOperations.epsilon().ident);
+            expect(fromL0[0].target).toEqual(l0.ident);
         });
 
 
