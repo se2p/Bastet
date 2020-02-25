@@ -50,8 +50,16 @@ export interface ControlConcreteState {
 
 export interface MethodCallAttributes {
 
+    /**
+     * Control location from that the method has been called
+     */
     callFrom: LocationID;
 
+
+    /**
+     * Control location to that the method call is supposed to
+     * return to after the method is finished
+     */
     returnTo: LocationID;
 
 }
@@ -78,20 +86,28 @@ export class MethodCall extends MethodCallRecord implements MethodCallAttributes
 
 export interface ThreadStateAttributes {
 
-    threadId: ThreadId;
-
+    /** Unique identifier of the actor */
     actorId: ActorId;
 
-    scriptId: ScriptId;
+    /** Unique identifier of the thread */
+    threadId: ThreadId;
 
-    locationId: LocationID;
-
+    /** Computation state of the thread */
     computationState: ScriptComputationState;
 
+    /** Set of threads this thread is waiting for before it can continue */
     waitingForThreads: ImmSet<ThreadId>;
 
+    /** Unique identifier of the script */
+    scriptId: ScriptId;
+
+    /** Identifier of the control location (position in the transition system of the script) */
+    locationId: LocationID;
+
+    /** Set of properties for that the thread ran into a failing control location (ERROR location) */
     failedFor: ImmSet<Property>;
 
+    /** Stack of method call and return locations to enable the inter-procedural analysis */
     returnCallTo: ImmList<MethodCall>;
 
     /** Scope to uniquely identify currently declared and references variables (data locations) */
@@ -111,7 +127,7 @@ const ThreadStateRecord = ImmRec({
     scopeStack: ImmList<string>()
 });
 
-export class ThreadState extends ThreadStateRecord implements AbstractElement {
+export class ThreadState extends ThreadStateRecord implements AbstractElement, ThreadStateAttributes {
 
     constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, locationId: LocationID,
                 compState: ScriptComputationState, waitingForThreads: ImmSet<ThreadId>,
