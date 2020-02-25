@@ -21,7 +21,7 @@
 
 import {LabeledTransferRelation, TransferRelation, Transfers} from "../TransferRelation";
 import {
-    ControlAbstractState,
+    ControlAbstractState, MethodCall,
     THREAD_STATE_DONE,
     THREAD_STATE_FAILURE,
     THREAD_STATE_RUNNING,
@@ -48,30 +48,43 @@ import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
 import {Properties, Property} from "../../../syntax/Property";
 import {ExpressionList} from "../../../syntax/ast/core/expressions/ExpressionList";
-import instantiate = WebAssembly.instantiate;
 import {Concern, Concerns} from "../../../syntax/Concern";
 import {Logger} from "../../../utils/Logger";
 import {Actor} from "../../../syntax/app/Actor";
-import {MethodDefinition} from "../../../syntax/ast/core/MethodDefinition";
 import {Method} from "../../../syntax/app/controlflow/Method";
 import {ReturnStatement} from "../../../syntax/ast/core/statements/ControlStatement";
+import {
+    DataLocationMode,
+    DataLocationRenamer,
+    RenamingTransformerVisitor
+} from "../../../syntax/transformers/RenamingTransformerVisitor";
+import {DataLocation} from "../../../syntax/app/controlflow/DataLocation";
+import {Statement} from "../../../syntax/ast/core/statements/Statement";
 
 export type Schedule = ImmList<ThreadState>;
 
 class StepInformation {
 
     private readonly _threadIndex: number;
-    private readonly _succLoc: LocationID;
-    private readonly _isInnerAtomic: boolean;
-    private readonly _ops: ProgramOperation[];
-    private readonly _returnCallTo: LocationID[];
 
-    constructor(threadIndex: number, succLoc: number, isInnerAtomic: boolean, ops: ProgramOperation[], returnCallTo: LocationID[]) {
+    private readonly _isInnerAtomic: boolean;
+
+    private readonly _ops: ProgramOperation[];
+
+    private readonly _succLoc: LocationID;
+
+    private readonly _succReturnCallTo: ImmList<MethodCall>;
+
+    private readonly _succScopeStack: ImmList<string>;
+
+    constructor(threadIndex: number, succLoc: number, isInnerAtomic: boolean, ops: ProgramOperation[],
+                succReturnCallTo: ImmList<MethodCall>, succScopeStack: ImmList<string>) {
         this._threadIndex = threadIndex;
         this._succLoc = succLoc;
         this._isInnerAtomic = isInnerAtomic;
         this._ops = Preconditions.checkNotUndefined(ops);
-        this._returnCallTo = Preconditions.checkNotUndefined(returnCallTo);
+        this._succReturnCallTo = Preconditions.checkNotUndefined(succReturnCallTo);
+        this._succScopeStack = Preconditions.checkNotUndefined(succScopeStack);
     }
 
     get threadIndex(): number {
@@ -90,9 +103,38 @@ class StepInformation {
         return this._ops;
     }
 
-    get returnCallTo(): LocationID[] {
-        return this._returnCallTo;
+    get succReturnCallTo(): ImmList<MethodCall> {
+        return this._succReturnCallTo;
     }
+
+    get succScopeStack(): ImmList<string> {
+        return this._succScopeStack;
+    }
+}
+
+export class DataLocationScoper implements DataLocationRenamer {
+
+    private readonly _readFromScope: ImmList<string>;
+
+    private readonly _writeToScope: ImmList<string>;
+
+    constructor(readFromScope: ImmList<string>, writeToScope: ImmList<string>) {
+        this._readFromScope = readFromScope;
+        this._writeToScope = writeToScope;
+    }
+
+    renameUsage(dataLoc: DataLocation, usageMode: DataLocationMode, inContextOf: Statement): DataLocation {
+        throw new ImplementMeException();
+    }
+
+}
+
+export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
+
+    constructor(readFromScope: ImmList<string>, writeToScope: ImmList<string>) {
+        super(new DataLocationScoper(readFromScope, writeToScope));
+    }
+
 }
 
 /**
@@ -256,31 +298,45 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
             if (op.ast instanceof CallStatement) {
                 // The following lines realize the inter-procedural analysis.
-                const returnCallTo: LocationID[] = [t.target];
                 const calledMethodName = op.ast.calledMethod.text;
 
                 if (threadActor.isExternalMethod(calledMethodName)) {
-                    result.push(new StepInformation(threadIndex, t.target, isAtomic, [op], []));
+                    result.push(new StepInformation(threadIndex, t.target, isAtomic, [op], threadState.getReturnCallTo(), threadState.getScopeStack()));
                 } else {
                     const calledMethod: Method = threadActor.getMethod(calledMethodName);
                     const interProcOps: ProgramOperation[] = this.createPassArgumentsOps(calledMethod, op.ast.args);
+                    const succReturnCallsTo = threadState.getReturnCallTo().push(new MethodCall(threadState.getLocationId(), t.target));
+                    const succScopeStack = threadState.getScopeStack().push(calledMethodName);
 
                     for (const entryLocId of calledMethod.controlflow.entryLocationSet) {
-                        result.push(new StepInformation(threadIndex, entryLocId, isAtomic, interProcOps, returnCallTo));
+                        result.push(new StepInformation(threadIndex, entryLocId, isAtomic, interProcOps, succReturnCallsTo, succScopeStack));
                     }
                 }
             } else if (op.ast instanceof ReturnStatement) {
+                const callInformation: MethodCall = threadState.getReturnCallTo().get(threadState.getReturnCallTo().size-1);
+                const succReturnCallsTo = threadState.getReturnCallTo().pop();
+                const succScopeStack = threadState.getScopeStack().pop();
+
                 // Assign the result to the variable that was referenced in the `CallStatement`
-                throw new ImplementMeException();
+                const interProcOps: ProgramOperation[] = this.createStoreCallResultOps(callInformation, op.ast as ReturnStatement);
+
+                result.push(new StepInformation(threadIndex, callInformation.getReturnTo(), isAtomic, interProcOps, succReturnCallsTo, succScopeStack));
             } else {
-                result.push(new StepInformation(threadIndex, t.target, isAtomic, [op], []));
+                result.push(new StepInformation(threadIndex, t.target, isAtomic, [op], threadState.getReturnCallTo(), threadState.getScopeStack()));
             }
         }
 
         return result;
     }
 
+    private createStoreCallResultOps(callInformation: MethodCall, ast: ReturnStatement): ProgramOperation[] {
+        throw new ImplementMeException();
+    }
+
     private createPassArgumentsOps(calledMethod: Method, args: ExpressionList): ProgramOperation[] {
+        // 1. Add declarations of the parameter variables (callee scope)
+
+        // 2. Assign the arguments (caller scope) to the parameters (callee scope)
         throw new ImplementMeException();
     }
 
@@ -336,7 +392,9 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         // Set the new control location
         const steppedThread = threadStates.get(steppedThreadIdx)
-            .withLocationId(takenStep.succLoc);
+            .withLocationId(takenStep.succLoc)
+            .withReturnCallTo(takenStep.succReturnCallTo)
+            .withScopeStack(takenStep.succScopeStack);
         let resultBase = threadStates.set(steppedThreadIdx, steppedThread);
 
         // TODO: Where and how to handle the `clone` statement?

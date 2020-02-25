@@ -85,6 +85,7 @@ export class SSARenamer implements DataLocationRenamer {
         } else if (usageMode == DataLocationMode.ASSINGED_TO) {
             return this._ssa.newVersionOf(dataLoc);
         }
+
         throw new ImplementMeException();
     }
 
