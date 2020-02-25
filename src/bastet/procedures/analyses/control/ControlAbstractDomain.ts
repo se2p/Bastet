@@ -221,10 +221,13 @@ export class ThreadStateFactory {
 
 export interface ControlAbstractStateAttributes extends AbstractElement, SingletonStateWrapper {
 
+    /** Set of properties for that the abstract state is a target state (computed, for faster lookup) */
     isTargetFor: ImmSet<Property>;
 
+    /** List of threads and their states */
     threadStates: ImmList<ThreadState>;
 
+    /** Wrapped abstract state that stores the actual data of heap and stack */
     wrappedState: AbstractElement;
 
 }
