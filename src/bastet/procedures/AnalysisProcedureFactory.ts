@@ -22,7 +22,7 @@
 import {AnalysisProcedure, AnalysisResult, MultiPropertyAnalysisResult} from "./AnalysisProcedure";
 import {App} from "../syntax/app/App";
 import {GraphAnalysis} from "./analyses/graph/GraphAnalysis";
-import {ScheduleAnalysis} from "./analyses/control/ScheduleAnalysis";
+import {ControlAnalysis} from "./analyses/control/ControlAnalysis";
 import {GraphAbstractState, GraphConcreteState} from "./analyses/graph/GraphAbstractDomain";
 import {ReachabilityAlgorithm} from "./algorithms/ReachabilityAlgorithm";
 import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
@@ -70,7 +70,7 @@ export class AnalysisProcedureFactory {
 
                 const memAnalysis = new SyMemAnalysis(firstOrderLattice, bddlib.lattice, theories, this._statistics);
                 const ssaAnalysis = new SSAAnalysis(task, memAnalysis, this._statistics);
-                const schedAnalysis = new ScheduleAnalysis({}, task, ssaAnalysis, this._statistics);
+                const schedAnalysis = new ControlAnalysis({}, task, ssaAnalysis, this._statistics);
                 const graphAnalysis = new GraphAnalysis(task, schedAnalysis, this._statistics);
                 const outerAnalysis = new StatsAnalysis<GraphConcreteState, GraphAbstractState>(graphAnalysis, this._statistics);
 

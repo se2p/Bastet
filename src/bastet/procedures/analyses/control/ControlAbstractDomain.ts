@@ -260,7 +260,7 @@ export class ScheduleAbstractStateFactory {
     }
 }
 
-export class ScheduleAbstractDomain implements AbstractDomain<ScheduleConcreteState, ScheduleAbstractState> {
+export class ControlAbstractDomain implements AbstractDomain<ScheduleConcreteState, ScheduleAbstractState> {
 
     lattice: Lattice<ScheduleAbstractState>;
 

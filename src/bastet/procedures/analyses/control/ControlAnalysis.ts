@@ -26,14 +26,14 @@ import {
     WrappingProgramAnalysis
 } from "../ProgramAnalysis";
 import {
-    ScheduleAbstractDomain,
+    ControlAbstractDomain,
     ScheduleAbstractState,
     ScheduleAbstractStateFactory,
     ScheduleConcreteState
-} from "./ScheduleAbstractDomain";
+} from "./ControlAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
-import {ScheduleTransferRelation} from "./ScheduleTransferRelation";
+import {ControlTransferRelation} from "./ControlTransferRelation";
 import {LabeledTransferRelationImpl} from "../TransferRelation";
 import {Preconditions} from "../../../utils/Preconditions";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
@@ -58,7 +58,7 @@ export class ScheduleAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<ScheduleConcreteState, ScheduleAbstractState>,
+export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<ScheduleConcreteState, ScheduleAbstractState>,
     WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState>,
     Unwrapper<ScheduleAbstractState, AbstractElement> {
 
@@ -68,7 +68,7 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
 
     private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any>;
 
-    private readonly _transferRelation: ScheduleTransferRelation;
+    private readonly _transferRelation: ControlTransferRelation;
 
     private readonly _refiner: Refiner<ScheduleAbstractState>;
 
@@ -80,8 +80,8 @@ export class ScheduleAnalysis implements ProgramAnalysisWithLabelProducer<Schedu
         this._config = new ScheduleAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
-        this._abstractDomain = new ScheduleAbstractDomain();
-        this._transferRelation = new ScheduleTransferRelation(this._config, task,
+        this._abstractDomain = new ControlAbstractDomain();
+        this._transferRelation = new ControlTransferRelation(this._config, task,
             new LabeledTransferRelationImpl((e) => this._wrappedAnalysis.abstractSucc(e),
                 (e, op, co) => this._wrappedAnalysis.abstractSuccFor(e, op, co)));
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);

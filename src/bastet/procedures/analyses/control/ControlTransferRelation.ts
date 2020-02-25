@@ -28,14 +28,14 @@ import {
     THREAD_STATE_RUNNING_ATOMIC,
     THREAD_STATE_YIELD,
     ThreadState
-} from "./ScheduleAbstractDomain";
+} from "./ControlAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {OperationID, ProgramOperation, ProgramOperations} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {App} from "../../../syntax/app/App";
-import {ScheduleAnalysisConfig} from "./ScheduleAnalysis";
+import {ScheduleAnalysisConfig} from "./ControlAnalysis";
 import {List as ImmList, Set as ImmSet} from "immutable";
 import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
 import {WaitSecsStatement} from "../../../syntax/ast/core/statements/WaitSecsStatement";
@@ -99,7 +99,7 @@ class StepInformation {
  * Mimics the green-threading of the Scratch VM.
  * Adds special scheduling of some (types of) threads.
  */
-export class ScheduleTransferRelation implements TransferRelation<ScheduleAbstractState> {
+export class ControlTransferRelation implements TransferRelation<ScheduleAbstractState> {
 
     private readonly _wrappedTransferRelation: LabeledTransferRelation<AbstractElement>;
     private readonly _config: ScheduleAnalysisConfig;
