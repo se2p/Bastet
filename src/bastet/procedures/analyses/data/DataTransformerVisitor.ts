@@ -25,7 +25,7 @@ import {
     CoreStringExpressionVisitor,
     CoreVisitor
 } from "../../../syntax/ast/CoreVisitor";
-import {SyMemAbstractDomain, SymMemAbstractState} from "./SyMemAbstractDomain";
+import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {
@@ -127,7 +127,7 @@ import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStateme
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
 
-export class MemNumExpressionVisitor<N extends AbstractNumber, B extends AbstractBoolean>
+export class DataNumExpressionVisitor<N extends AbstractNumber, B extends AbstractBoolean>
     implements CoreNumberExpressionVisitor<N> {
 
     private readonly _theory: RationalNumberTheory<N, B>;
@@ -206,7 +206,7 @@ export class MemNumExpressionVisitor<N extends AbstractNumber, B extends Abstrac
 
 }
 
-export class SyMemBoolExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
+export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
     S extends AbstractString, L extends AbstractList>
     implements CoreBoolExpressionVisitor<B> {
 
@@ -239,21 +239,21 @@ export class SyMemBoolExpressionVisitor<B extends AbstractBoolean, N extends Abs
     }
 
     visitNumEqualsExpression(node: NumEqualsExpression): B {
-        const numVisitor = new MemNumExpressionVisitor(this._theories.numTheory);
+        const numVisitor = new DataNumExpressionVisitor(this._theories.numTheory);
         const op1: N = node.operand1.accept(numVisitor);
         const op2: N = node.operand2.accept(numVisitor);
         return this._theories.numTheory.isNumberEqualTo(op1, op2);
     }
 
     visitNumGreaterThanExpression(node: NumGreaterThanExpression): B {
-        const numVisitor = new MemNumExpressionVisitor(this._theories.numTheory);
+        const numVisitor = new DataNumExpressionVisitor(this._theories.numTheory);
         const op1: N = node.operand1.accept(numVisitor);
         const op2: N = node.operand2.accept(numVisitor);
         return this._theories.numTheory.isGreaterThan(op1, op2);
     }
 
     visitNumLessThanExpression(node: NumLessThanExpression): B {
-        const numVisitor = new MemNumExpressionVisitor(this._theories.numTheory);
+        const numVisitor = new DataNumExpressionVisitor(this._theories.numTheory);
         const op1: N = node.operand1.accept(numVisitor);
         const op2: N = node.operand2.accept(numVisitor);
         return this._theories.numTheory.isLessThan(op1, op2);
@@ -281,7 +281,7 @@ export class SyMemBoolExpressionVisitor<B extends AbstractBoolean, N extends Abs
 
 }
 
-export class MemStringExpressionVisitor implements CoreStringExpressionVisitor<AbstractString> {
+export class DataStringExpressionVisitor implements CoreStringExpressionVisitor<AbstractString> {
 
     private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
@@ -331,7 +331,7 @@ export class MemStringExpressionVisitor implements CoreStringExpressionVisitor<A
 
 }
 
-export class MemListExpressionVisitor implements CoreListExpressionVisitor<AbstractList> {
+export class DataListExpressionVisitor implements CoreListExpressionVisitor<AbstractList> {
 
     private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
@@ -353,7 +353,7 @@ export class MemListExpressionVisitor implements CoreListExpressionVisitor<Abstr
 
 }
 
-export class SyMemTransformerVisitor<B extends AbstractBoolean,
+export class DataTransformerVisitor<B extends AbstractBoolean,
     N extends AbstractNumber, S extends AbstractString, L extends AbstractList>
     implements CoreVisitor<B>, CoreNonCtrlStatementnVisitor<B> {
 
@@ -471,14 +471,14 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
         // We assume that a wrapping analysis step takes care of SSA.
         const declaredType = node.variable.type;
         if (declaredType instanceof NumberType) {
-            const visitor = new MemNumExpressionVisitor(this._theories.numTheory);
+            const visitor = new DataNumExpressionVisitor(this._theories.numTheory);
             const value: N = node.toValue.accept(visitor);
             const assignTo = this._theories.numTheory.abstractNumberValue(node.variable);
             const assume: B = this._theories.numTheory.isNumberEqualTo(assignTo, value);
             return this._theories.boolTheory.and(this._mem, assume);
 
         } else if (declaredType instanceof BooleanType) {
-            const visitor = new SyMemBoolExpressionVisitor(this._theories);
+            const visitor = new DataBoolExpressionVisitor(this._theories);
             const value: B = node.toValue.accept(visitor);
             const assignTo = this._theories.boolTheory.abstractBooleanValue(node.variable);
             const assume: B = this._theories.boolTheory.equal(assignTo, value);
@@ -495,7 +495,7 @@ export class SyMemTransformerVisitor<B extends AbstractBoolean,
 
     visitBoolExpression(node: BooleanExpression): B {
         Preconditions.checkNotUndefined(node);
-        const visitor = new SyMemBoolExpressionVisitor(this._theories);
+        const visitor = new DataBoolExpressionVisitor(this._theories);
         return node.accept(visitor);
     }
 

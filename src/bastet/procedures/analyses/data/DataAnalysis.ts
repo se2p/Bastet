@@ -20,12 +20,12 @@
  */
 
 import {ProgramAnalysisWithLabels} from "../ProgramAnalysis";
-import {SyMemAbstractDomain, SymMemAbstractState} from "./SyMemAbstractDomain";
+import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {SyMemTransferRelation} from "./SyMemTransferRelation";
+import {DataTransferRelation} from "./DataTransferRelation";
 import {ConcreteMemory} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AbstractMemoryTheory} from "../../domains/MemoryTransformer";
@@ -38,23 +38,23 @@ import {
 } from "../../../utils/ConjunctiveNormalForm";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
 import {Lattice, LatticeWithComplements} from "../../../lattices/Lattice";
-import {SyMemRefiner} from "./SyMemRefiner";
+import {DataRefiner} from "./DataRefiner";
 import {Refiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
 
-export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, SymMemAbstractState>,
-    LabeledTransferRelation<SymMemAbstractState> {
+export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState>,
+    LabeledTransferRelation<DataAbstractState> {
 
     private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
-    private readonly _abstractDomain: SyMemAbstractDomain;
+    private readonly _abstractDomain: DataAbstractDomain;
 
-    private readonly _transferRelation: SyMemTransferRelation;
+    private readonly _transferRelation: DataTransferRelation;
 
-    private readonly _refiner: SyMemRefiner;
+    private readonly _refiner: DataRefiner;
 
     private readonly _statistics: AnalysisStatistics;
 
@@ -65,26 +65,26 @@ export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         Preconditions.checkNotUndefined(propLattice);
 
         this._theories = Preconditions.checkNotUndefined(theories);
-        this._abstractDomain = new SyMemAbstractDomain(folLattice, propLattice);
-        this._transferRelation = new SyMemTransferRelation(this._abstractDomain, this._theories);
-        this._refiner = new SyMemRefiner(this._abstractDomain.lattice);
+        this._abstractDomain = new DataAbstractDomain(folLattice, propLattice);
+        this._transferRelation = new DataTransferRelation(this._abstractDomain, this._theories);
+        this._refiner = new DataRefiner(this._abstractDomain.lattice);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
-    abstractSucc(fromState: SymMemAbstractState): Iterable<SymMemAbstractState> {
+    abstractSucc(fromState: DataAbstractState): Iterable<DataAbstractState> {
         return this._transferRelation.abstractSucc(fromState);
     }
 
-    join(state1: SymMemAbstractState, state2: SymMemAbstractState): SymMemAbstractState {
+    join(state1: DataAbstractState, state2: DataAbstractState): DataAbstractState {
         return this._abstractDomain.lattice.join(state1, state2);
     }
 
-    merge(state1: SymMemAbstractState, state2: SymMemAbstractState): boolean {
+    merge(state1: DataAbstractState, state2: DataAbstractState): boolean {
         // MERGE-SEP
         return false;
     }
 
-    stop(state: SymMemAbstractState, reached: Iterable<SymMemAbstractState>): boolean {
+    stop(state: DataAbstractState, reached: Iterable<DataAbstractState>): boolean {
         for (const r of reached) {
             if (r.equals(state)) {
                 return true;
@@ -93,33 +93,33 @@ export class SyMemAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         return false;
     }
 
-    target(state: SymMemAbstractState): Property[] {
+    target(state: DataAbstractState): Property[] {
         return [];
     }
 
-    widen(state: SymMemAbstractState): SymMemAbstractState {
+    widen(state: DataAbstractState): DataAbstractState {
         return state;
     }
 
-    initialStatesFor(task: App): SymMemAbstractState[] {
+    initialStatesFor(task: App): DataAbstractState[] {
         return [this._abstractDomain.lattice.top()];
     }
 
-    abstractSuccFor(fromState: SymMemAbstractState, op: ProgramOperation, co: Concern): Iterable<SymMemAbstractState> {
+    abstractSuccFor(fromState: DataAbstractState, op: ProgramOperation, co: Concern): Iterable<DataAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
         return this._transferRelation.abstractSuccFor(fromState, op, co);
     }
 
-    get abstractDomain(): AbstractDomain<ConcreteMemory, SymMemAbstractState> {
+    get abstractDomain(): AbstractDomain<ConcreteMemory, DataAbstractState> {
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<SymMemAbstractState> {
+    get refiner(): Refiner<DataAbstractState> {
         return this._refiner;
     }
 
-    wrapStateSets(frontier: StateSet<SymMemAbstractState>, reached: StateSet<SymMemAbstractState>): [StateSet<SymMemAbstractState>, StateSet<SymMemAbstractState>] {
+    wrapStateSets(frontier: StateSet<DataAbstractState>, reached: StateSet<DataAbstractState>): [StateSet<DataAbstractState>, StateSet<DataAbstractState>] {
         return [frontier, reached];
     }
 }

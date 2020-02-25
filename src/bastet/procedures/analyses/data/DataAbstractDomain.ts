@@ -28,7 +28,7 @@ import {ConcreteDomain, ConcreteMemory} from "../../domains/ConcreteElements";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
 import {Preconditions} from "../../../utils/Preconditions";
 
-export interface SyMemAbstractStateAttributes {
+export interface DataAbstractStateAttributes {
 
     blockFormula: FirstOrderFormula;
 
@@ -36,7 +36,7 @@ export interface SyMemAbstractStateAttributes {
 
 }
 
-const SyMemAbstractStateRecord = ImmRec({
+const DataAbstractStateRecord = ImmRec({
 
     blockFormula: null,
 
@@ -44,7 +44,7 @@ const SyMemAbstractStateRecord = ImmRec({
 
 });
 
-export class SymMemAbstractState extends SyMemAbstractStateRecord implements SyMemAbstractStateAttributes {
+export class DataAbstractState extends DataAbstractStateRecord implements DataAbstractStateAttributes {
 
     blockFormula: FirstOrderFormula;
     summaryFormula: PropositionalFormula;
@@ -53,21 +53,21 @@ export class SymMemAbstractState extends SyMemAbstractStateRecord implements SyM
         super({blockFormula: blockFormula, summaryFormula: summaryFormula});
     }
 
-    public withBlockFormula(value: FirstOrderFormula): SymMemAbstractState {
+    public withBlockFormula(value: FirstOrderFormula): DataAbstractState {
         return this.set('blockFormula', value);
     }
 
-    public withSummaryFormula(value: PropositionalFormula): SymMemAbstractState {
+    public withSummaryFormula(value: PropositionalFormula): DataAbstractState {
         return this.set('summaryFormula', value);
     }
 
 }
 
-export class SymMemAbstractStateLattice implements LatticeWithComplements<SymMemAbstractState> {
+export class DataAbstractStateLattice implements LatticeWithComplements<DataAbstractState> {
 
-    private readonly _bottom: SymMemAbstractState;
+    private readonly _bottom: DataAbstractState;
 
-    private readonly _top: SymMemAbstractState;
+    private readonly _top: DataAbstractState;
 
     private readonly _folLattice: LatticeWithComplements<FirstOrderFormula>;
 
@@ -76,15 +76,15 @@ export class SymMemAbstractStateLattice implements LatticeWithComplements<SymMem
     constructor(folLattice: LatticeWithComplements<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>) {
         this._folLattice = Preconditions.checkNotUndefined(folLattice);
         this._propLattice = Preconditions.checkNotUndefined(propLattice);
-        this._bottom = new SymMemAbstractState(folLattice.bottom(), propLattice.bottom());
-        this._top = new SymMemAbstractState(folLattice.top(), propLattice.top());
+        this._bottom = new DataAbstractState(folLattice.bottom(), propLattice.bottom());
+        this._top = new DataAbstractState(folLattice.top(), propLattice.top());
     }
 
-    bottom(): SymMemAbstractState {
+    bottom(): DataAbstractState {
         return this._bottom;
     }
 
-    isIncluded(element1: SymMemAbstractState, element2: SymMemAbstractState): boolean {
+    isIncluded(element1: DataAbstractState, element2: DataAbstractState): boolean {
         //if (!this._propLattice.isIncluded(element1.summaryFormula, element2.summaryFormula)) {
         //    return false;
         //}
@@ -92,46 +92,46 @@ export class SymMemAbstractStateLattice implements LatticeWithComplements<SymMem
         return this._folLattice.isIncluded(element1.blockFormula, element2.blockFormula);
     }
 
-    join(element1: SymMemAbstractState, element2: SymMemAbstractState): SymMemAbstractState {
+    join(element1: DataAbstractState, element2: DataAbstractState): DataAbstractState {
         throw new ImplementMeException();
     }
 
-    meet(element1: SymMemAbstractState, element2: SymMemAbstractState): SymMemAbstractState {
+    meet(element1: DataAbstractState, element2: DataAbstractState): DataAbstractState {
         throw new ImplementMeException();
     }
 
-    top(): SymMemAbstractState {
+    top(): DataAbstractState {
         return this._top;
     }
 
-    complement(element: SymMemAbstractState): SymMemAbstractState {
-        return new SymMemAbstractState(this._folLattice.complement(element.blockFormula),
+    complement(element: DataAbstractState): DataAbstractState {
+        return new DataAbstractState(this._folLattice.complement(element.blockFormula),
             this._propLattice.complement(element.summaryFormula));
     }
 
 }
 
-export class SyMemAbstractDomain implements AbstractDomain<ConcreteMemory, SymMemAbstractState> {
+export class DataAbstractDomain implements AbstractDomain<ConcreteMemory, DataAbstractState> {
 
-    private readonly _lattice: LatticeWithComplements<SymMemAbstractState>;
+    private readonly _lattice: LatticeWithComplements<DataAbstractState>;
 
     constructor(folLattice: LatticeWithComplements<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>) {
-        this._lattice = new SymMemAbstractStateLattice(folLattice, propLattice);
+        this._lattice = new DataAbstractStateLattice(folLattice, propLattice);
     }
 
-    abstract(elements: Iterable<ConcreteMemory>): SymMemAbstractState {
+    abstract(elements: Iterable<ConcreteMemory>): DataAbstractState {
         throw new ImplementMeException();
     }
 
-    concretize(element: SymMemAbstractState): Iterable<ConcreteMemory> {
+    concretize(element: DataAbstractState): Iterable<ConcreteMemory> {
         throw new ImplementMeException();
     }
 
-    widen(element: SymMemAbstractState, precision: AbstractionPrecision): SymMemAbstractState {
+    widen(element: DataAbstractState, precision: AbstractionPrecision): DataAbstractState {
         throw new ImplementMeException();
     }
 
-    get lattice(): LatticeWithComplements<SymMemAbstractState> {
+    get lattice(): LatticeWithComplements<DataAbstractState> {
         return this._lattice;
     }
 

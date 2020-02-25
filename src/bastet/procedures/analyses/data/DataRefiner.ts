@@ -22,18 +22,18 @@
 
 
 import {Refiner} from "../Refiner";
-import {SymMemAbstractState} from "./SyMemAbstractDomain";
+import {DataAbstractState} from "./DataAbstractDomain";
 import {Lattice, LatticeWithComplements} from "../../../lattices/Lattice";
 
-export class SyMemRefiner implements Refiner<SymMemAbstractState> {
+export class DataRefiner implements Refiner<DataAbstractState> {
 
-    private readonly _lattice: LatticeWithComplements<SymMemAbstractState>;
+    private readonly _lattice: LatticeWithComplements<DataAbstractState>;
 
-    constructor(lattice: LatticeWithComplements<SymMemAbstractState>) {
+    constructor(lattice: LatticeWithComplements<DataAbstractState>) {
         this._lattice = lattice;
     }
 
-    checkIsFeasible(e: SymMemAbstractState): boolean {
+    checkIsFeasible(e: DataAbstractState): boolean {
         return !this._lattice.isIncluded(e, this._lattice.bottom());
     }
 

@@ -27,7 +27,7 @@ import {GraphAbstractState, GraphConcreteState} from "./analyses/graph/GraphAbst
 import {ReachabilityAlgorithm} from "./algorithms/ReachabilityAlgorithm";
 import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
 import {SMTFactory} from "../utils/smt/z3/Z3Wrapper";
-import {SyMemAnalysis} from "./analyses/data/SyMemAnalysis";
+import {DataAnalysis} from "./analyses/data/DataAnalysis";
 import {BDDLibraryFactory} from "../utils/bdd/BDD";
 import {Z3MemoryTheoryInContext} from "../utils/smt/z3/Z3MemoryTheory";
 import {SSAAnalysis} from "./analyses/ssa/SSAAnalysis";
@@ -68,7 +68,7 @@ export class AnalysisProcedureFactory {
                 const prover = smt.createProver(defaultContect);
                 const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
-                const memAnalysis = new SyMemAnalysis(firstOrderLattice, bddlib.lattice, theories, this._statistics);
+                const memAnalysis = new DataAnalysis(firstOrderLattice, bddlib.lattice, theories, this._statistics);
                 const ssaAnalysis = new SSAAnalysis(task, memAnalysis, this._statistics);
                 const schedAnalysis = new ControlAnalysis({}, task, ssaAnalysis, this._statistics);
                 const graphAnalysis = new GraphAnalysis(task, schedAnalysis, this._statistics);

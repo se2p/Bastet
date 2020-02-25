@@ -20,10 +20,10 @@
  */
 
 import {LabeledTransferRelation} from "../TransferRelation";
-import {SyMemAbstractDomain, SymMemAbstractState} from "./SyMemAbstractDomain";
+import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {SyMemTransformerVisitor} from "./SyMemTransformerVisitor";
+import {DataTransformerVisitor} from "./DataTransformerVisitor";
 import {AbstractMemoryTheory} from "../../domains/MemoryTransformer";
 import {Preconditions} from "../../../utils/Preconditions";
 import {
@@ -37,22 +37,22 @@ import {AstNode} from "../../../syntax/ast/AstNode";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {Concern} from "../../../syntax/Concern";
 
-export class SyMemTransferRelation implements LabeledTransferRelation<SymMemAbstractState> {
+export class DataTransferRelation implements LabeledTransferRelation<DataAbstractState> {
 
-    private readonly _abstDomain: SyMemAbstractDomain;
+    private readonly _abstDomain: DataAbstractDomain;
 
     private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
-    constructor(abstDomain: SyMemAbstractDomain, theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
+    constructor(abstDomain: DataAbstractDomain, theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
         this._abstDomain = Preconditions.checkNotUndefined(abstDomain);
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
-    public abstractSucc(fromState: SymMemAbstractState): Iterable<SymMemAbstractState> {
+    public abstractSucc(fromState: DataAbstractState): Iterable<DataAbstractState> {
         throw new IllegalStateException("Only the labelled transfer is supported by this transfer relation");
     }
 
-    public abstractSuccFor(fromState: SymMemAbstractState, op: ProgramOperation, co: Concern): Iterable<SymMemAbstractState> {
+    public abstractSuccFor(fromState: DataAbstractState, op: ProgramOperation, co: Concern): Iterable<DataAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
 
@@ -67,12 +67,12 @@ export class SyMemTransferRelation implements LabeledTransferRelation<SymMemAbst
         return this.abstractSuccForAst(fromState, ast);
     }
 
-    private abstractSuccForAst(fromState: SymMemAbstractState, ast: AstNode): Iterable<SymMemAbstractState> {
-        const visitor = new SyMemTransformerVisitor(fromState.blockFormula, this._theories);
+    private abstractSuccForAst(fromState: DataAbstractState, ast: AstNode): Iterable<DataAbstractState> {
+        const visitor = new DataTransformerVisitor(fromState.blockFormula, this._theories);
 
         const blockFormulaPrime: FirstOrderFormula = ast.accept(visitor);
 
-        return [new SymMemAbstractState(blockFormulaPrime, fromState.summaryFormula)];
+        return [new DataAbstractState(blockFormulaPrime, fromState.summaryFormula)];
     }
 
 }
