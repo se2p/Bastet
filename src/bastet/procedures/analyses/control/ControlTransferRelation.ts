@@ -21,7 +21,7 @@
 
 import {LabeledTransferRelation, TransferRelation, Transfers} from "../TransferRelation";
 import {
-    ScheduleAbstractState,
+    ControlAbstractState,
     THREAD_STATE_DONE,
     THREAD_STATE_FAILURE,
     THREAD_STATE_RUNNING,
@@ -99,7 +99,7 @@ class StepInformation {
  * Mimics the green-threading of the Scratch VM.
  * Adds special scheduling of some (types of) threads.
  */
-export class ControlTransferRelation implements TransferRelation<ScheduleAbstractState> {
+export class ControlTransferRelation implements TransferRelation<ControlAbstractState> {
 
     private readonly _wrappedTransferRelation: LabeledTransferRelation<AbstractElement>;
     private readonly _config: ScheduleAnalysisConfig;
@@ -111,7 +111,7 @@ export class ControlTransferRelation implements TransferRelation<ScheduleAbstrac
         this._wrappedTransferRelation = Preconditions.checkNotUndefined(wrappedTransferRelation);
     }
 
-    abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
+    abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(fromState.wrappedState);
 
@@ -127,7 +127,7 @@ export class ControlTransferRelation implements TransferRelation<ScheduleAbstrac
      *
      * @param fromState
      */
-    abstractSuccSingleStep(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
+    abstractSuccSingleStep(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
         if (this.hasObserverThreadToProcess(fromState)) {
             // If there is a thread state of the specification in the
             // state RUNNING, or WAITING, step it until no more of those are left.
@@ -139,7 +139,7 @@ export class ControlTransferRelation implements TransferRelation<ScheduleAbstrac
         }
     }
 
-    programStep(fromState: ScheduleAbstractState): ScheduleAbstractState[] {
+    programStep(fromState: ControlAbstractState): ControlAbstractState[] {
         Preconditions.checkNotUndefined(fromState);
 
         // ATTENTION!!
@@ -174,7 +174,7 @@ export class ControlTransferRelation implements TransferRelation<ScheduleAbstrac
         const leavingOps: StepInformation[] = this.resolveLeavingOps(threadToStep, threadIndexToStep);
         Preconditions.checkState(leavingOps.length > 0, "A thread with no leaving ops must NOT be in state THREAD_STATE_RUNNING");
 
-        const result: ScheduleAbstractState[] = [];
+        const result: ControlAbstractState[] = [];
 
         for (const stepToTake of leavingOps) {
             // Determine the new control (the next thread to execute)
@@ -191,7 +191,7 @@ export class ControlTransferRelation implements TransferRelation<ScheduleAbstrac
                 for (const w of wrappedSuccStates) {
                     Preconditions.checkNotUndefined(w);
                     const properties = this.extractProperties(nextSchedules);
-                    const e = new ScheduleAbstractState(newThreadStates, w, properties);
+                    const e = new ControlAbstractState(newThreadStates, w, properties);
                     result.push(e);
                 }
             }
@@ -218,7 +218,7 @@ export class ControlTransferRelation implements TransferRelation<ScheduleAbstrac
      *
      * @param fromState
      */
-    private chooseThreadToStep(fromState: ScheduleAbstractState): number[] {
+    private chooseThreadToStep(fromState: ControlAbstractState): number[] {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkArgument(fromState.getThreadStates().size > 0);
 
@@ -235,7 +235,7 @@ export class ControlTransferRelation implements TransferRelation<ScheduleAbstrac
         return [];
     }
 
-    private startAfterProgramStatementHandlerThreads(onState: ScheduleAbstractState): ScheduleAbstractState {
+    private startAfterProgramStatementHandlerThreads(onState: ControlAbstractState): ControlAbstractState {
         return onState;
     }
 
@@ -278,15 +278,15 @@ export class ControlTransferRelation implements TransferRelation<ScheduleAbstrac
         throw new ImplementMeException();
     }
 
-    private restartThread(state: ScheduleAbstractState): ScheduleAbstractState {
+    private restartThread(state: ControlAbstractState): ControlAbstractState {
         throw new ImplementMeException();
     }
 
-    private stopThisScript(state: ScheduleAbstractState): ScheduleAbstractState {
+    private stopThisScript(state: ControlAbstractState): ControlAbstractState {
         throw new ImplementMeException();
     }
 
-    private hasObserverThreadToProcess(fromState: ScheduleAbstractState): boolean {
+    private hasObserverThreadToProcess(fromState: ControlAbstractState): boolean {
         for (const t of fromState.getThreadStates()) {
             const a = this._task.getActorByName(t.getActorId());
             if (a.isObserver) {
@@ -296,7 +296,7 @@ export class ControlTransferRelation implements TransferRelation<ScheduleAbstrac
         return false;
     }
 
-    private specificationStep(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
+    private specificationStep(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
         const stepConcern = Concerns.defaultSpecificationConcern();
         throw new ImplementMeException();
     }

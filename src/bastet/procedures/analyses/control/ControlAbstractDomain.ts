@@ -44,7 +44,7 @@ export type ScriptComputationState = number;
 
 export type ThreadId = number;
 
-export interface ScheduleConcreteState {
+export interface ControlConcreteState {
 
 }
 
@@ -191,7 +191,7 @@ export class ThreadStateFactory {
 
 }
 
-export interface ScheduleAbstractStateAttributes extends AbstractElement, SingletonStateWrapper {
+export interface ControlAbstractStateAttributes extends AbstractElement, SingletonStateWrapper {
 
     isTargetFor: ImmSet<Property>;
 
@@ -201,7 +201,7 @@ export interface ScheduleAbstractStateAttributes extends AbstractElement, Single
 
 }
 
-const ScheduleAbstractStateRecord = ImmRec({
+const ControlAbstractStateRecord = ImmRec({
 
     threadStates: ImmList<ThreadState>([]),
 
@@ -215,7 +215,7 @@ const ScheduleAbstractStateRecord = ImmRec({
 /**
  * A state with SHARED MEMORY
  */
-export class ScheduleAbstractState extends ScheduleAbstractStateRecord implements AbstractElement {
+export class ControlAbstractState extends ControlAbstractStateRecord implements AbstractElement {
 
     constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement, isTargetFor: ImmSet<Property>) {
         super({threadStates: threadStates, wrappedState: wrappedState, isTargetFor: isTargetFor});
@@ -236,8 +236,8 @@ export class ScheduleAbstractState extends ScheduleAbstractStateRecord implement
 
 export class ScheduleAbstractStateFactory {
 
-    public static createState(threadStates: ImmList<ThreadState>, wrappedStated: ImmRec<any>, isTargetFor: ImmSet<Property>): ScheduleAbstractState {
-        return new ScheduleAbstractState(threadStates, wrappedStated, isTargetFor);
+    public static createState(threadStates: ImmList<ThreadState>, wrappedStated: ImmRec<any>, isTargetFor: ImmSet<Property>): ControlAbstractState {
+        return new ControlAbstractState(threadStates, wrappedStated, isTargetFor);
     }
 
     static createInitialState(task: App, wrappedState: ImmRec<any>, isTarget) {
@@ -256,27 +256,27 @@ export class ScheduleAbstractStateFactory {
             }
         }
 
-        return new ScheduleAbstractState(threads, wrappedState, isTarget);
+        return new ControlAbstractState(threads, wrappedState, isTarget);
     }
 }
 
-export class ControlAbstractDomain implements AbstractDomain<ScheduleConcreteState, ScheduleAbstractState> {
+export class ControlAbstractDomain implements AbstractDomain<ControlConcreteState, ControlAbstractState> {
 
-    lattice: Lattice<ScheduleAbstractState>;
+    lattice: Lattice<ControlAbstractState>;
 
-    abstract(elements: Iterable<ScheduleConcreteState>): ScheduleAbstractState {
+    abstract(elements: Iterable<ControlConcreteState>): ControlAbstractState {
         throw new ImplementMeException();
     }
 
-    concretize(element: ScheduleAbstractState): Iterable<ScheduleConcreteState> {
+    concretize(element: ControlAbstractState): Iterable<ControlConcreteState> {
         throw new ImplementMeException();
     }
 
-    widen(element: ScheduleAbstractState, precision: AbstractionPrecision): ScheduleAbstractState {
+    widen(element: ControlAbstractState, precision: AbstractionPrecision): ControlAbstractState {
         throw new ImplementMeException();
     }
 
-    get concreteDomain(): ConcreteDomain<ScheduleConcreteState> {
+    get concreteDomain(): ConcreteDomain<ControlConcreteState> {
         throw new ImplementMeException();
     }
 

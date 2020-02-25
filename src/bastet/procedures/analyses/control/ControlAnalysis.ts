@@ -27,9 +27,9 @@ import {
 } from "../ProgramAnalysis";
 import {
     ControlAbstractDomain,
-    ScheduleAbstractState,
+    ControlAbstractState,
     ScheduleAbstractStateFactory,
-    ScheduleConcreteState
+    ControlConcreteState
 } from "./ControlAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
@@ -58,19 +58,19 @@ export class ScheduleAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<ScheduleConcreteState, ScheduleAbstractState>,
-    WrappingProgramAnalysis<ScheduleConcreteState, ScheduleAbstractState>,
-    Unwrapper<ScheduleAbstractState, AbstractElement> {
+export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<ControlConcreteState, ControlAbstractState>,
+    WrappingProgramAnalysis<ControlConcreteState, ControlAbstractState>,
+    Unwrapper<ControlAbstractState, AbstractElement> {
 
     private readonly _config: ScheduleAnalysisConfig;
 
-    private readonly _abstractDomain: AbstractDomain<ScheduleConcreteState, ScheduleAbstractState>;
+    private readonly _abstractDomain: AbstractDomain<ControlConcreteState, ControlAbstractState>;
 
     private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any>;
 
     private readonly _transferRelation: ControlTransferRelation;
 
-    private readonly _refiner: Refiner<ScheduleAbstractState>;
+    private readonly _refiner: Refiner<ControlAbstractState>;
 
     private readonly _task: App;
 
@@ -88,19 +88,19 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Schedul
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
-    abstractSucc(fromState: ScheduleAbstractState): Iterable<ScheduleAbstractState> {
+    abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
         return this._transferRelation.abstractSucc(fromState);
     }
 
-    join(state1: ScheduleAbstractState, state2: ScheduleAbstractState): ScheduleAbstractState {
+    join(state1: ControlAbstractState, state2: ControlAbstractState): ControlAbstractState {
         return this._abstractDomain.lattice.join(state1, state2);
     }
 
-    merge(state1: ScheduleAbstractState, state2: ScheduleAbstractState): boolean {
+    merge(state1: ControlAbstractState, state2: ControlAbstractState): boolean {
         return false;
     }
 
-    stop(state: ScheduleAbstractState, reached: Iterable<ScheduleAbstractState>): boolean {
+    stop(state: ControlAbstractState, reached: Iterable<ControlAbstractState>): boolean {
         for (const r of reached) {
             if (state.getThreadStates().equals(r.getThreadStates())) {
                 const w = state.getWrappedState();
@@ -112,7 +112,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Schedul
         return false;
     }
 
-    target(state: ScheduleAbstractState): Property[] {
+    target(state: ControlAbstractState): Property[] {
         let result: Property[] = [];
         if (state.getIsTargetFor().size > 0) {
             for (const p of state.getIsTargetFor()) {
@@ -125,15 +125,15 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Schedul
         return result;
     }
 
-    widen(state: ScheduleAbstractState): ScheduleAbstractState {
+    widen(state: ControlAbstractState): ControlAbstractState {
         return undefined;
     }
 
-    unwrap(e: ScheduleAbstractState): AbstractElement {
+    unwrap(e: ControlAbstractState): AbstractElement {
         return e.getWrappedState();
     }
 
-    get refiner(): Refiner<ScheduleAbstractState> {
+    get refiner(): Refiner<ControlAbstractState> {
         return this._refiner;
     }
 
@@ -145,17 +145,17 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Schedul
         return this._abstractDomain;
     }
 
-    initialStatesFor(task: App): ScheduleAbstractState[] {
+    initialStatesFor(task: App): ControlAbstractState[] {
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
             return ScheduleAbstractStateFactory.createInitialState(task, w, false);
         });
     }
 
-    getTransitionLabel(from: ScheduleAbstractState, to: ScheduleAbstractState): ProgramOperation {
+    getTransitionLabel(from: ControlAbstractState, to: ControlAbstractState): ProgramOperation {
         throw new ImplementMeException();
     }
 
-    wrapStateSets(frontier: StateSet<ScheduleAbstractState>, reached: StateSet<ScheduleAbstractState>): [StateSet<ScheduleAbstractState>, StateSet<ScheduleAbstractState>] {
+    wrapStateSets(frontier: StateSet<ControlAbstractState>, reached: StateSet<ControlAbstractState>): [StateSet<ControlAbstractState>, StateSet<ControlAbstractState>] {
         return [frontier, reached];
     }
 
