@@ -94,6 +94,9 @@ export interface ThreadStateAttributes {
 
     returnCallTo: ImmList<MethodCall>;
 
+    /** Scope to uniquely identify currently declared and references variables (data locations) */
+    scopeStack: ImmList<string>;
+
 }
 
 const ThreadStateRecord = ImmRec({
@@ -104,7 +107,8 @@ const ThreadStateRecord = ImmRec({
     computationState: THREAD_STATE_UNKNOWN,
     waitingForThreads: ImmSet<ThreadId>(),
     failedFor: ImmSet<Property>(),
-    returnCallTo: ImmList<MethodCall>()
+    returnCallTo: ImmList<MethodCall>(),
+    scopeStack: ImmList<string>()
 });
 
 export class ThreadState extends ThreadStateRecord implements AbstractElement {
@@ -137,6 +141,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement {
         return this.get('returnCallTo');
     }
 
+    public getScopeStack(): ImmList<string> {
+        return this.get('scopeStack');
+    }
+
     public withLocationId(value: LocationID): ThreadState {
         return this.set('locationId', value);
     }
@@ -167,6 +175,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement {
 
     public withFailedFor(value: ImmSet<Property>): ThreadState {
         return this.set('failedFor', value);
+    }
+
+    public withScopeStack(value: ImmList<string>): ThreadState {
+        return this.set('scopeStack', value);
     }
 
 }
