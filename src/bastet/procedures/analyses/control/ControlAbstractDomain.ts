@@ -131,10 +131,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, locationId: LocationID,
                 compState: ScriptComputationState, waitingForThreads: ImmSet<ThreadId>,
-                failedFor: ImmSet<Property>, returnCallTo: ImmList<MethodCall>) {
+                failedFor: ImmSet<Property>, returnCallTo: ImmList<MethodCall>, scopeStack: ImmList<string>) {
         super({threadId: threadId, actorId: actorId, scriptId: scriptId,
-            locationId: locationId, computationState: compState,
-            waitingForThreads: waitingForThreads, failedFor: failedFor, returnCallTo: returnCallTo});
+            locationId: locationId, computationState: compState, waitingForThreads: waitingForThreads,
+            failedFor: failedFor, returnCallTo: returnCallTo, scopeStack: scopeStack});
     }
 
     public getThreadId(): ThreadId {
@@ -210,13 +210,6 @@ export class ThreadStateFactory {
         return ThreadStateFactory.THREAD_ID_SEQ++;
     }
 
-    public static createRunningThread(actorId: ActorId,
-                                      scriptId: ScriptId, locationId: LocationID): ThreadState {
-        const threadId = this.freshId();
-        return new ThreadState(threadId, actorId, scriptId, locationId,
-            THREAD_STATE_RUNNING, ImmSet(), ImmSet(), ImmList());
-    }
-
 }
 
 export interface ControlAbstractStateAttributes extends AbstractElement, SingletonStateWrapper {
@@ -282,7 +275,7 @@ export class ScheduleAbstractStateFactory {
                 }
                 for (const locId of script.transitions.entryLocationSet) {
                     threads = threads.push(new ThreadState(threadId, actor.ident, script.id, locId,
-                        threadState, ImmSet(), ImmSet(), ImmList()));
+                        threadState, ImmSet(), ImmSet(), ImmList(), ImmList([actor.ident])));
                 }
             }
         }
