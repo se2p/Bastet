@@ -25,7 +25,7 @@ import {
     DivideExpression,
     IndexOfExpression,
     LengthOfStringExpression,
-    LengthOListExpression,
+    LengthOfListExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
@@ -117,7 +117,7 @@ export interface CoreNumberExpressionVisitor<R> extends CoreVisitor<R>{
 
     visitLengthOfStringExpression(node: LengthOfStringExpression): R;
 
-    visitLengthOListExpression(node: LengthOListExpression): R;
+    visitLengthOListExpression(node: LengthOfListExpression): R;
 
     visitIndexOfExpression(node: IndexOfExpression): R;
 

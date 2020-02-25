@@ -27,7 +27,7 @@ import {AstNode} from "../../AstNode";
 import {StringExpression, StringLiteral} from "./StringExpression";
 import {BooleanExpression} from "./BooleanExpression";
 import {BinaryExpression} from "./BinaryExpression";
-import {Variable, VariableExpression} from "../Variable";
+import {Variable, VariableExpression, VariableWithDataLocation} from "../Variable";
 
 export interface NumberExpression extends Expression {
 
@@ -94,6 +94,9 @@ export class NumberLiteral extends AbstractNumberExpression {
 
 export class NumberVariableExpression extends VariableExpression implements NumberExpression {
 
+    constructor(variable: VariableWithDataLocation) {
+        super(variable);
+    }
 }
 
 export class StringAsNumberExpression extends AbstractNumberExpression {
@@ -146,16 +149,16 @@ export class LengthOfStringExpression extends AbstractNumberExpression {
     }
 }
 
-export class LengthOListExpression extends AbstractNumberExpression {
+export class LengthOfListExpression extends AbstractNumberExpression {
 
-    private readonly _listVar: Identifier;
+    private readonly _listVar: VariableWithDataLocation;
 
-    constructor(listVar: Identifier) {
+    constructor(listVar: VariableWithDataLocation) {
         super([listVar]);
         this._listVar = listVar;
     }
 
-    get listVar(): Identifier {
+    get listVar(): VariableWithDataLocation {
         return this._listVar;
     }
 
@@ -163,10 +166,10 @@ export class LengthOListExpression extends AbstractNumberExpression {
 
 export class IndexOfExpression extends AbstractNumberExpression {
 
-    private readonly _variable: Variable;
+    private readonly _variable: VariableWithDataLocation;
     private readonly _expr: Expression;
 
-    constructor(expr: Expression, variable: Variable) {
+    constructor(expr: Expression, variable: VariableWithDataLocation) {
         super([expr, variable.identifier]);
         this._expr = expr;
         this._variable = variable;
@@ -176,7 +179,7 @@ export class IndexOfExpression extends AbstractNumberExpression {
         return this._expr;
     }
 
-    get variable(): Variable {
+    get variable(): VariableWithDataLocation {
         return this._variable;
     }
 }

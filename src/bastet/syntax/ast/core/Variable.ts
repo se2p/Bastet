@@ -38,15 +38,15 @@ export interface Variable {
 
 export class VariableExpression extends AbstractExpression {
 
-    private readonly _variable: Variable;
+    private readonly _variable: VariableWithDataLocation;
 
-    constructor(variable: Variable) {
+    constructor(variable: VariableWithDataLocation) {
         super(Preconditions.checkNotUndefined(variable.type),
             [Preconditions.checkNotUndefined(variable.identifier)]);
         this._variable = variable;
     }
 
-    get variable(): Variable {
+    get variable(): VariableWithDataLocation {
         return this._variable;
     }
 

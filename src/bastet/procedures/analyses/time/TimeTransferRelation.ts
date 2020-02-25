@@ -60,7 +60,7 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
 
     private readonly _timeProfile: ProgramTimeProfile;
 
-    private readonly _globalTimeVariable: Variable;
+    private readonly _globalTimeVariable: VariableWithDataLocation;
     private readonly _globalTimeVariableExpr: NumberVariableExpression;
 
     constructor(timeProfile: ProgramTimeProfile, wrappedTransfer: LabeledTransferRelation<W>) {
@@ -92,7 +92,7 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
             // Do not add time transitions here!
             return this._wrappedTransfer.abstractSuccFor(fromState, op, co);
         } else {
-            const opTimeVariable: Variable = new VariableWithDataLocation(
+            const opTimeVariable: VariableWithDataLocation = new VariableWithDataLocation(
                 DataLocations.createTypedLocation(Identifier.freshWithPrefix("__op_time_"), NumberType.instance()));
             const opTimeVariableExpr: NumberVariableExpression = new NumberVariableExpression(opTimeVariable);
 

@@ -281,7 +281,7 @@ import {
     DivideExpression,
     IndexOfExpression,
     LengthOfStringExpression,
-    LengthOListExpression,
+    LengthOfListExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
@@ -1463,7 +1463,11 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitLengthOfListExpression(ctx: LengthOfListExpressionContext) : TransformerResult {
-        return TransformerResult.withNode(new LengthOListExpression(ctx.variable().accept(this).node as Identifier));
+        const variableWithDataLocation = new VariableWithDataLocation(
+            DataLocations.createTypedLocation(
+                ctx.variable().accept(this).node as Identifier,
+                ListType.withElementType(StringType.instance())));
+        return TransformerResult.withNode(new LengthOfListExpression(variableWithDataLocation));
     }
 
     public visitLengthOfStringExpression(ctx: LengthOfStringExpressionContext) : TransformerResult {
@@ -1652,6 +1656,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitVariable(ctx: VariableContext) : TransformerResult {
+        // ATTENTION: Contrary to the name of this method, the result is a `Identifier`.
+        //   Type-specific variable visitors return `VariableWithDataLocation`!
         return TransformerResult.withNode(Identifier.of(ctx.text));
     }
 

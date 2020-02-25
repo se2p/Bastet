@@ -23,7 +23,7 @@ import {Statement} from "./Statement";
 import {Identifier} from "../Identifier";
 import {ScratchType} from "../ScratchType";
 import {StringExpression} from "../expressions/StringExpression";
-import {Variable} from "../Variable";
+import {Variable, VariableWithDataLocation} from "../Variable";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {AstNode} from "../../AstNode";
 
@@ -44,9 +44,9 @@ export interface VariableDeclaration {
 
 export abstract class DeclareVariableStatement extends DeclarationStatement implements VariableDeclaration {
 
-    private readonly _variable: Variable;
+    private readonly _variable: VariableWithDataLocation;
 
-    constructor(variable: Variable) {
+    constructor(variable: VariableWithDataLocation) {
         Preconditions.checkNotUndefined(variable);
         super([variable.identifier, variable.type]);
         this._variable = variable;
@@ -60,14 +60,14 @@ export abstract class DeclareVariableStatement extends DeclarationStatement impl
         return this._variable.type;
     }
 
-    get variable(): Variable {
+    get variable(): VariableWithDataLocation {
         return this._variable;
     }
 }
 
 export class DeclareStackVariableStatement extends DeclareVariableStatement {
 
-    constructor(variable: Variable) {
+    constructor(variable: VariableWithDataLocation) {
         Preconditions.checkNotUndefined(variable);
         super(variable);
     }
@@ -76,7 +76,7 @@ export class DeclareStackVariableStatement extends DeclareVariableStatement {
 
 export class DeclareActorVariableStatement extends DeclareVariableStatement {
 
-    constructor(variable: Variable) {
+    constructor(variable: VariableWithDataLocation) {
         Preconditions.checkNotUndefined(variable);
         super(variable);
     }
@@ -85,7 +85,7 @@ export class DeclareActorVariableStatement extends DeclareVariableStatement {
 
 export class DeclareSystemVariableStatement extends DeclareVariableStatement {
 
-    constructor(variable: Variable) {
+    constructor(variable: VariableWithDataLocation) {
         Preconditions.checkNotUndefined(variable);
         super(variable);
     }

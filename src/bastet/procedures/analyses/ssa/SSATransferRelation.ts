@@ -34,11 +34,9 @@ import {Concern} from "../../../syntax/Concern";
 export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
 
     private readonly _wrapped: LabeledTransferRelation<AbstractElement>;
-    private readonly _mapper: DummyDataLocationMapper;
 
     constructor(wrappedTr: LabeledTransferRelation<AbstractElement>) {
         this._wrapped = Preconditions.checkNotUndefined(wrappedTr);
-        this._mapper = new DummyDataLocationMapper();
     }
 
     abstractSucc(fromState: SSAState): Iterable<SSAState> {
@@ -47,7 +45,7 @@ export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
 
     abstractSuccFor(fromState: SSAState, op: ProgramOperation, co: Concern): Iterable<SSAState> {
         const ssasigner = new SSAssigner(fromState);
-        const visitor = new SSATransformerVisitor(ssasigner, this._mapper);
+        const visitor = new SSATransformerVisitor(ssasigner);
 
         let opPrime: ProgramOperation;
         if (op instanceof AssumeOperation) {

@@ -32,7 +32,7 @@ import {
     BoolAsNumberExpression,
     DivideExpression,
     IndexOfExpression,
-    LengthOfStringExpression, LengthOListExpression,
+    LengthOfStringExpression, LengthOfListExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
@@ -152,7 +152,7 @@ export class MemNumExpressionVisitor<N extends AbstractNumber, B extends Abstrac
         throw new ImplementMeException();
     }
 
-    visitLengthOListExpression(node: LengthOListExpression): N {
+    visitLengthOListExpression(node: LengthOfListExpression): N {
         throw new ImplementMeException();
     }
 

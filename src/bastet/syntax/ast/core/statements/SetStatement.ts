@@ -25,7 +25,7 @@ import {Expression} from "../expressions/Expression";
 import {StringExpression} from "../expressions/StringExpression";
 import {Identifier} from "../Identifier";
 import {ExpressionList} from "../expressions/ExpressionList";
-import {Variable} from "../Variable";
+import {Variable, VariableWithDataLocation} from "../Variable";
 import {AstNode} from "../../AstNode";
 
 export abstract class SetStatement extends Statement {
@@ -83,16 +83,16 @@ export class SetAttributeOfToStatement extends SetStatement {
 
 export class StoreEvalResultToVariableStatement extends SetStatement {
 
-    private readonly _variable: Variable;
+    private readonly _variable: VariableWithDataLocation;
     private readonly _toValue: Expression;
 
-    constructor(variable: Variable, toValue: Expression) {
+    constructor(variable: VariableWithDataLocation, toValue: Expression) {
         super([variable.identifier, toValue]);
         this._variable = variable;
         this._toValue = toValue;
     }
 
-    get variable(): Variable {
+    get variable(): VariableWithDataLocation {
         return this._variable;
     }
 

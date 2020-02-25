@@ -27,7 +27,7 @@ import {BinaryExpression} from "./BinaryExpression";
 import {UnaryExpression} from "./UnaryExpression";
 import {StringExpression} from "./StringExpression";
 import {NumberExpression} from "./NumberExpression";
-import {Variable, VariableExpression} from "../Variable";
+import {Variable, VariableExpression, VariableWithDataLocation} from "../Variable";
 
 export type BooleanLiteralExpression = BooleanExpression;
 
@@ -123,7 +123,7 @@ export class BooleanLiteral extends AbstractBooleanExpression {
 
 export class BooleanVariableExpression extends VariableExpression implements BooleanExpression {
 
-    constructor(variable: Variable) {
+    constructor(variable: VariableWithDataLocation) {
         super(variable);
     }
 }
