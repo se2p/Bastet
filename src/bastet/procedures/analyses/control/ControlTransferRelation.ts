@@ -257,11 +257,17 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             if (op.ast instanceof CallStatement) {
                 // The following lines realize the inter-procedural analysis.
                 const returnCallTo: LocationID[] = [t.target];
-                const calledMethod: Method = threadActor.getMethod(op.ast.calledMethod.text);
-                const interProcOps: ProgramOperation[] = this.createPassArgumentsOps(calledMethod, op.ast.args);
+                const calledMethodName = op.ast.calledMethod.text;
 
-                for (const entryLocId of calledMethod.controlflow.entryLocationSet) {
-                    result.push(new StepInformation(threadIndex, entryLocId, isAtomic, interProcOps, returnCallTo));
+                if (threadActor.isExternalMethod(calledMethodName)) {
+                    result.push(new StepInformation(threadIndex, t.target, isAtomic, [op], []));
+                } else {
+                    const calledMethod: Method = threadActor.getMethod(calledMethodName);
+                    const interProcOps: ProgramOperation[] = this.createPassArgumentsOps(calledMethod, op.ast.args);
+
+                    for (const entryLocId of calledMethod.controlflow.entryLocationSet) {
+                        result.push(new StepInformation(threadIndex, entryLocId, isAtomic, interProcOps, returnCallTo));
+                    }
                 }
             } else if (op.ast instanceof ReturnStatement) {
                 // Assign the result to the variable that was referenced in the `CallStatement`

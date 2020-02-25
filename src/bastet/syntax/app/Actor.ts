@@ -179,6 +179,10 @@ export class Actor {
         return this._actorMode;
     }
 
+    public isExternalMethod(name: string) {
+        return this._externalMethodSignatures.get(name) !== null;
+    }
+
     public getMethod(name: string): Method {
         return Preconditions.checkNotUndefined(this._methodMap.get(name));
     }
