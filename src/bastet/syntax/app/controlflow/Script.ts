@@ -19,10 +19,10 @@
  *
  */
 
-import {TransitionRelation} from "./TransitionRelation";
+import {TransitionRelation, WithTransitionRelation} from "./TransitionRelation";
 import {CoreEvent} from "../../ast/core/CoreEvent";
 import {Preconditions} from "../../../utils/Preconditions";
-import {LocationID} from "./ControlLocation";
+import {LocationId} from "./ControlLocation";
 
 
 export type ScriptId = number;
@@ -31,7 +31,7 @@ export type ScriptId = number;
  * A single script, which represents the control flow
  * of a program or a fraction of a program.
  */
-export class Script {
+export class Script implements WithTransitionRelation {
 
     /** A unique identifier of this script */
     private readonly _id: ScriptId;
@@ -62,8 +62,9 @@ export class Script {
         return this._id;
     }
 
-    public getInitialLocation(): LocationID {
+    public getInitialLocation(): LocationId {
         Preconditions.checkState(this.transitions.entryLocationSet.size === 1);
         return this.transitions.entryLocationSet.values().next().value;
     }
+
 }

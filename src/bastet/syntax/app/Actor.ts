@@ -36,7 +36,7 @@ import {
     NeverEvent,
     RenderedMonitoringEvent
 } from "../ast/core/CoreEvent";
-import {TransitionRelation, TransitionRelations} from "./controlflow/TransitionRelation";
+import {TransitionRelation, TransitionRelations, TransRelId} from "./controlflow/TransitionRelation";
 import {Scripts} from "./controlflow/Scripts";
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
 import {GREENFLAG_MESSAGE, INIT_MESSAGE} from "../ast/core/Message";
@@ -92,6 +92,9 @@ export class Actor {
     /** Is the actor an observer, used to check if the spec is satisfied? */
     private readonly _isObserver: boolean;
 
+    /** Map from transition relation identifiers to the corresponding transition relation */
+    private readonly _transRelMap: ImmutableMap<TransRelId, TransitionRelation>;
+
     constructor(mode: ActorMode, ident: string, inheritFrom: Actor[],
                 resources: AppResourceMap, datalocs: DataLocationMap,
                 initScript: Script, methodDefs: MethodDefinitionMap,
@@ -111,17 +114,23 @@ export class Actor {
         this._methods = Lists.immutableCopyOf(methods);
         this._isObserver = this.deterineIsObserver();
 
+        const transRelMap: Map<TransRelId, TransitionRelation> = new Map<TransRelId, TransitionRelation>();
+
         const scriptMap: Map<ScriptId, Script> = new Map<ScriptId, Script>();
         for (const s of this._scripts) {
             scriptMap.set(s.id, s);
+            transRelMap.set(s.transitions.ident, s.transitions);
         }
         this._scriptMap = new ImmutableMap<ScriptId, Script>(scriptMap.entries());
 
         const methodMap: Map<string, Method> = new Map<string, Method>();
         for (const m of this._methods) {
             methodMap.set(m.ident.text, m);
+            transRelMap.set(m.transitions.ident, m.transitions);
         }
         this._methodMap = new ImmutableMap<string, Method>(methodMap.entries());
+
+        this._transRelMap = new ImmutableMap<TransRelId, TransitionRelation>(transRelMap.entries());
 
         Preconditions.checkArgument(initScript.event === NeverEvent.instance()
             || initScript.event === BootstrapEvent.instance());
@@ -161,6 +170,10 @@ export class Actor {
 
     get methodMap(): ImmutableMap<string, MethodDefinition> {
         return this._methodDefinitions;
+    }
+
+    get transRelMap(): ImmutableMap<TransRelId, TransitionRelation> {
+        return this._transRelMap;
     }
 
     get externalMethodMap(): ImmutableMap<string, MethodSignature> {

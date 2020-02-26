@@ -22,22 +22,28 @@
 import {OperationID, ProgramOperation, ProgramOperations} from "./ops/ProgramOperation";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {ControlLocation, LocationID} from "./ControlLocation";
+import {ControlLocation, LocationId} from "./ControlLocation";
 import {Map as ImmMap, Set as ImmSet} from "immutable"
 import {Preconditions} from "../../../utils/Preconditions";
 
-export type TargetId = LocationID;
-export type SourceId = LocationID;
+export type TargetId = LocationId;
+export type SourceId = LocationId;
+
+export interface WithTransitionRelation {
+
+    transitions: TransitionRelation;
+
+}
 
 export class TransitionRelationBuilder {
 
-    private readonly _transitions: Map<LocationID, Map<LocationID, Set<OperationID>>>;
+    private readonly _transitions: Map<LocationId, Map<LocationId, Set<OperationID>>>;
 
-    private readonly _locations: Map<LocationID, ControlLocation>;
+    private readonly _locations: Map<LocationId, ControlLocation>;
 
-    private readonly _entryLocations: Set<LocationID>;
+    private readonly _entryLocations: Set<LocationId>;
 
-    private readonly _exitLocations: Set<LocationID>;
+    private readonly _exitLocations: Set<LocationId>;
 
     public constructor() {
         this._entryLocations = new Set();
@@ -46,7 +52,7 @@ export class TransitionRelationBuilder {
         this._locations = new Map();
     }
 
-    public addEntryLocationWithID(id: LocationID): this {
+    public addEntryLocationWithID(id: LocationId): this {
         return this.addEntryLocation(ControlLocation.for(id));
     }
 
@@ -57,7 +63,7 @@ export class TransitionRelationBuilder {
         return this;
     }
 
-    public addExitLocationWithID(id: LocationID): this {
+    public addExitLocationWithID(id: LocationId): this {
         return this.addExitLocation(ControlLocation.for(id));
     }
 
@@ -73,13 +79,13 @@ export class TransitionRelationBuilder {
         return this;
     }
 
-    public addTransitionByIDs(from: LocationID, to: LocationID, op: ProgramOperation): this {
+    public addTransitionByIDs(from: LocationId, to: LocationId, op: ProgramOperation): this {
         return this.addTransition(ControlLocation.for(from), ControlLocation.for(to), op);
     }
 
     public addTransition(from: ControlLocation, to: ControlLocation, op: ProgramOperation): this {
         // Add the transition
-        let fromMap: Map<LocationID, Set<OperationID>> = this._transitions.get(from.ident);
+        let fromMap: Map<LocationId, Set<OperationID>> = this._transitions.get(from.ident);
         if (!fromMap) {
             fromMap = new Map();
             this._transitions.set(from.ident, fromMap);
@@ -116,13 +122,13 @@ export class TransitionRelationBuilder {
     }
 
     public build(): TransitionRelation {
-        let locations: ImmSet<LocationID> = ImmSet(this._locations.keys());
-        let entryLocs: ImmSet<LocationID> = ImmSet(this._entryLocations);
-        let exitLocs: ImmSet<LocationID> = ImmSet(this._exitLocations);
+        let locations: ImmSet<LocationId> = ImmSet(this._locations.keys());
+        let entryLocs: ImmSet<LocationId> = ImmSet(this._entryLocations);
+        let exitLocs: ImmSet<LocationId> = ImmSet(this._exitLocations);
 
         let transitions: TransitionTable = ImmMap();
         for(let [fromID, fwdTargetMap] of this._transitions.entries()) {
-            let fromMap: ImmMap<LocationID, ImmSet<OperationID>> = ImmMap();
+            let fromMap: ImmMap<LocationId, ImmSet<OperationID>> = ImmMap();
             for (let [targetID, fwdTransOps] of fwdTargetMap.entries()) {
                 const ops = ImmSet(fwdTransOps.values());
                 fromMap = fromMap.set(targetID, ops);
@@ -135,13 +141,13 @@ export class TransitionRelationBuilder {
 
 }
 
-export type TransitionTable = ImmMap<LocationID, ImmMap<LocationID, ImmSet<OperationID>>>;
+export type TransitionTable = ImmMap<LocationId, ImmMap<LocationId, ImmSet<OperationID>>>;
 
 export class TransitionTo {
 
     private readonly _opId: OperationID;
 
-    private readonly _target: LocationID;
+    private readonly _target: LocationId;
 
     constructor(opId: number, toLocId: number) {
         this._opId = opId;
@@ -157,22 +163,28 @@ export class TransitionTo {
     }
 }
 
+export type TransRelId = number;
+
 export class TransitionRelation {
+
+    private readonly _ident: TransRelId;
 
     private readonly _transitions: TransitionTable;
 
-    private readonly _locations: ImmSet<LocationID>;
+    private readonly _locations: ImmSet<LocationId>;
 
-    private readonly _entryLocations: ImmSet<LocationID>;
+    private readonly _entryLocations: ImmSet<LocationId>;
 
-    private readonly _exitLocations: ImmSet<LocationID>;
+    private readonly _exitLocations: ImmSet<LocationId>;
 
     private _backwards: TransitionRelation = null;
 
-    private readonly _closureTerminators: Map<LocationID, ImmSet<LocationID>>;
+    private readonly _closureTerminators: Map<LocationId, ImmSet<LocationId>>;
 
-    constructor(transitions: TransitionTable, locations: ImmSet<LocationID>,
-                entryLocs: ImmSet<LocationID>, exitLocs: ImmSet<LocationID>) {
+    constructor(transitions: TransitionTable, locations: ImmSet<LocationId>,
+                entryLocs: ImmSet<LocationId>, exitLocs: ImmSet<LocationId>) {
+        TransitionRelation.TRANS_REL_ID_SEQ = (TransitionRelation.TRANS_REL_ID_SEQ || 0) + 1;
+        this._ident = TransitionRelation.TRANS_REL_ID_SEQ;
         this._transitions = transitions;
         this._locations = locations;
         this._entryLocations = entryLocs;
@@ -180,6 +192,8 @@ export class TransitionRelation {
         entryLocs.forEach((l) => Preconditions.checkArgument(this._locations.contains(l)));
         this._closureTerminators = new Map();
     }
+
+    private static TRANS_REL_ID_SEQ: TransRelId;
 
     public toString() {
         let lines: string[] = [];
@@ -225,7 +239,7 @@ export class TransitionRelation {
         throw new ImplementMeException();
     }
 
-    get locationSet(): ImmSet<LocationID> {
+    get locationSet(): ImmSet<LocationId> {
         return this._locations;
     }
 
@@ -233,7 +247,7 @@ export class TransitionRelation {
         throw new ImplementMeException();
     }
 
-    get entryLocationSet(): ImmSet<LocationID> {
+    get entryLocationSet(): ImmSet<LocationId> {
         return this._entryLocations;
     }
 
@@ -241,19 +255,19 @@ export class TransitionRelation {
         throw new ImplementMeException();
     }
 
-    get exitLocationSet(): ImmSet<LocationID> {
+    get exitLocationSet(): ImmSet<LocationId> {
         return this._exitLocations;
     }
 
-    private computeClosureTerminationStates(of: LocationID): Set<LocationID> {
-        const result: Set<LocationID> = new Set();
+    private computeClosureTerminationStates(of: LocationId): Set<LocationId> {
+        const result: Set<LocationId> = new Set();
 
-        const visited: Set<LocationID> = new Set();
-        const worklist: Array<LocationID>  = new Array<LocationID>();
+        const visited: Set<LocationId> = new Set();
+        const worklist: Array<LocationId>  = new Array<LocationId>();
 
         worklist.push(of);
         while (worklist.length > 0) {
-            const work: LocationID = worklist.pop();
+            const work: LocationId = worklist.pop();
             if (!visited.has(work)) {
                 visited.add(work);
                 let isTerminationState = this.transitionsFrom(work).length == 0;
@@ -273,10 +287,10 @@ export class TransitionRelation {
         return result;
     }
 
-    public closureTerminationStates(of: LocationID): ImmSet<LocationID> {
-        let result: ImmSet<LocationID> = this._closureTerminators.get(of);
+    public closureTerminationStates(of: LocationId): ImmSet<LocationId> {
+        let result: ImmSet<LocationId> = this._closureTerminators.get(of);
         if (!result) {
-            let termstates: Set<LocationID> = this.computeClosureTerminationStates(of);
+            let termstates: Set<LocationId> = this.computeClosureTerminationStates(of);
             result = ImmSet(termstates);
             this._closureTerminators.set(of, result);
         }
@@ -284,8 +298,8 @@ export class TransitionRelation {
         return result;
     }
 
-    public transitionsFrom(from: LocationID): Array<TransitionTo> {
-        let transitionsTo: ImmMap<LocationID, ImmSet<OperationID>> = this.transitionTable.get(from) || ImmMap();
+    public transitionsFrom(from: LocationId): Array<TransitionTo> {
+        let transitionsTo: ImmMap<LocationId, ImmSet<OperationID>> = this.transitionTable.get(from) || ImmMap();
 
         let result: Array<TransitionTo> = new Array<TransitionTo>();
         for (let [to, ops] of transitionsTo.entries()) {
@@ -297,7 +311,7 @@ export class TransitionRelation {
         return result;
     }
 
-    public transitionsTo(to: LocationID): Array<TransitionTo> {
+    public transitionsTo(to: LocationId): Array<TransitionTo> {
         return this.backwards.transitionsFrom(to);
     }
 
@@ -305,14 +319,17 @@ export class TransitionRelation {
         return new TransitionRelationBuilder();
     }
 
+    get ident(): TransRelId {
+        return this._ident;
+    }
 }
 
 export class LocationEquivalence {
 
-    private _classid: LocationID;
-    private readonly _equivalent: Set<LocationID>;
+    private _classid: LocationId;
+    private readonly _equivalent: Set<LocationId>;
 
-    constructor(equivalent: Set<LocationID>) {
+    constructor(equivalent: Set<LocationId>) {
         this._equivalent = Preconditions.checkNotUndefined(equivalent);
 
         if (equivalent.size > 1) {
@@ -350,9 +367,9 @@ export class TransitionRelations {
     static concat(tr1: TransitionRelation, tr2: TransitionRelation): TransitionRelation {
         // Exit locations of TR1 with the entry locations of TR2
 
-        let locs: ImmSet<LocationID> = tr1.locationSet.merge(tr2.locationSet);
-        let entryLocs: ImmSet<LocationID> = tr1.entryLocationSet;
-        let exitLocs: ImmSet<LocationID> = tr2.exitLocationSet;
+        let locs: ImmSet<LocationId> = tr1.locationSet.merge(tr2.locationSet);
+        let entryLocs: ImmSet<LocationId> = tr1.entryLocationSet;
+        let exitLocs: ImmSet<LocationId> = tr2.exitLocationSet;
         let tx: TransitionTable = tr1.transitionTable.merge(tr2.transitionTable);
 
         for (let exloc of tr1.exitLocationSet) {
@@ -364,16 +381,16 @@ export class TransitionRelations {
         return new TransitionRelation(tx, locs, entryLocs, exitLocs);
     }
 
-    private static addTransition(tx: TransitionTable, from: LocationID, to: LocationID, op: ProgramOperation): TransitionTable {
+    private static addTransition(tx: TransitionTable, from: LocationId, to: LocationId, op: ProgramOperation): TransitionTable {
         Preconditions.checkNotUndefined(tx);
         Preconditions.checkNotUndefined(from);
         Preconditions.checkNotUndefined(to);
         Preconditions.checkNotUndefined(op);
 
-        const oldTargets: ImmMap<LocationID, ImmSet<OperationID>> = tx.get(from) || ImmMap();
+        const oldTargets: ImmMap<LocationId, ImmSet<OperationID>> = tx.get(from) || ImmMap();
         const oldReachingOps: ImmSet<OperationID> = oldTargets.get(to) || ImmSet();
         const newReachingOps: ImmSet<OperationID> = oldReachingOps.add(op.ident);
-        const newTargets: ImmMap<LocationID, ImmSet<OperationID>> = oldTargets.set(to, newReachingOps);
+        const newTargets: ImmMap<LocationId, ImmSet<OperationID>> = oldTargets.set(to, newReachingOps);
         return tx.set(from, newTargets);
     }
 
@@ -433,10 +450,10 @@ export class TransitionRelations {
         let locs = tr.locationSet.add(goto.ident);
 
         let tx: TransitionTable = tr.transitionTable;
-        let entryLocs: ImmSet<LocationID> = tr.entryLocationSet;
-        let exitLocs: ImmSet<LocationID> = tr.exitLocationSet;
+        let entryLocs: ImmSet<LocationId> = tr.entryLocationSet;
+        let exitLocs: ImmSet<LocationId> = tr.exitLocationSet;
 
-        let fromLocs: ImmSet<LocationID> = tr.exitLocationSet;
+        let fromLocs: ImmSet<LocationId> = tr.exitLocationSet;
         for (let from of fromLocs) {
             tx = this.addTransition(tx, from, goto.ident, op);
             exitLocs = exitLocs
@@ -458,10 +475,10 @@ export class TransitionRelations {
         let locs = tr.locationSet.add(loc.ident);
 
         let tx: TransitionTable = tr.transitionTable;
-        let entryLocs: ImmSet<LocationID> = tr.entryLocationSet;
-        let exitLocs: ImmSet<LocationID> = tr.exitLocationSet;
+        let entryLocs: ImmSet<LocationId> = tr.entryLocationSet;
+        let exitLocs: ImmSet<LocationId> = tr.exitLocationSet;
 
-        let toLocs: ImmSet<LocationID> = tr.entryLocationSet;
+        let toLocs: ImmSet<LocationId> = tr.entryLocationSet;
         for (let to of toLocs) {
             tx = this.addTransition(tx, loc.ident, to, op);
             entryLocs = entryLocs.remove(to);
@@ -497,20 +514,20 @@ export class TransitionRelations {
         throw new ImplementMeException();
     }
 
-    private static buildEquivalenceClasses(tr: TransitionRelation): Map<LocationID, LocationEquivalence> {
-        const result: Map<LocationID, LocationEquivalence> = new Map();
+    private static buildEquivalenceClasses(tr: TransitionRelation): Map<LocationId, LocationEquivalence> {
+        const result: Map<LocationId, LocationEquivalence> = new Map();
 
         // 1. Each location is in its own equivalence class
         tr.locationSet.forEach((l) => result.set(l, new LocationEquivalence(new Set([l]))));
 
-        const todo: Set<LocationID> = new Set();
+        const todo: Set<LocationId> = new Set();
         tr.locationSet.forEach((l) => todo.add(l));
 
         while (todo.size > 0) {
-            const l: LocationID = todo.values().next().value;
+            const l: LocationId = todo.values().next().value;
             todo.delete(l);
 
-            const closure: Set<LocationID> = TransitionRelations.getBiDirClosure(tr, l);
+            const closure: Set<LocationId> = TransitionRelations.getBiDirClosure(tr, l);
             closure.forEach((l) => todo.delete(l));
 
             const newClass = new LocationEquivalence(closure);
@@ -529,16 +546,16 @@ export class TransitionRelations {
         return result;
     }
 
-    private static getDirClosure(l: LocationID,
-                                 nextOp: (l) => Array<TransitionTo>): Set<LocationID> {
-        const result: Set<LocationID> = new Set();
+    private static getDirClosure(l: LocationId,
+                                 nextOp: (l) => Array<TransitionTo>): Set<LocationId> {
+        const result: Set<LocationId> = new Set();
 
         // Forwards reachable
-        const forwardsDone: Set<LocationID> = new Set<LocationID>();
-        const worklist: LocationID[] = [l];
+        const forwardsDone: Set<LocationId> = new Set<LocationId>();
+        const worklist: LocationId[] = [l];
 
         while (worklist.length > 0) {
-            const work: LocationID = worklist.pop();
+            const work: LocationId = worklist.pop();
             result.add(work);
             forwardsDone.add(work);
             nextOp(work).forEach((t) => {
@@ -553,15 +570,15 @@ export class TransitionRelations {
         return result;
     }
 
-    private static getBiDirClosure(tr: TransitionRelation, l: LocationID): Set<LocationID> {
-        const result: Set<LocationID> = new Set();
+    private static getBiDirClosure(tr: TransitionRelation, l: LocationId): Set<LocationId> {
+        const result: Set<LocationId> = new Set();
 
         // Forwards reachable
-        const forwardsClosure: Set<LocationID> = this.getDirClosure(l, (l) => tr.transitionsFrom(l));
+        const forwardsClosure: Set<LocationId> = this.getDirClosure(l, (l) => tr.transitionsFrom(l));
         Preconditions.checkState(forwardsClosure.size > 0);
 
         // Backwards reachable
-        const backwardsClosure: Set<LocationID> = this.getDirClosure(l, (l) => tr.transitionsTo(l));
+        const backwardsClosure: Set<LocationId> = this.getDirClosure(l, (l) => tr.transitionsTo(l));
         Preconditions.checkState(backwardsClosure.size > 0);
 
         return new Set([...forwardsClosure, ...backwardsClosure]);
@@ -569,9 +586,9 @@ export class TransitionRelations {
 
     static eliminateEpsilons(tr: TransitionRelation): TransitionRelation {
         // 1. Build equivalence classes
-        const equivMap: Map<LocationID, LocationEquivalence> = this.buildEquivalenceClasses(tr);
+        const equivMap: Map<LocationId, LocationEquivalence> = this.buildEquivalenceClasses(tr);
 
-        const inverseEquiv: Map<LocationID, LocationID> = new Map<LocationID, LocationID>();
+        const inverseEquiv: Map<LocationId, LocationId> = new Map<LocationId, LocationId>();
         for (const key of equivMap.keys()) {
             const value: LocationEquivalence = equivMap.get(key);
             inverseEquiv.set(key, value.classid);
@@ -582,7 +599,7 @@ export class TransitionRelations {
         // 3. Rebuild the transition relation
         const builder = TransitionRelation.builder();
         // - Transitions
-        tr.transitionTable.forEach((targets: ImmMap<LocationID, ImmSet<OperationID>>, from: LocationID) => {
+        tr.transitionTable.forEach((targets: ImmMap<LocationId, ImmSet<OperationID>>, from: LocationId) => {
             for (const to of targets.keys()) {
                 for (const op of targets.get(to)) {
                     if (op === ProgramOperations.epsilon().ident) {
@@ -594,11 +611,11 @@ export class TransitionRelations {
             }
         });
         // - Entry locations
-        tr.entryLocationSet.forEach((l: LocationID) => {
+        tr.entryLocationSet.forEach((l: LocationId) => {
             builder.addEntryLocationWithID(inverseEquiv.get(l));
         });
         // - Exit locations
-        tr.exitLocationSet.forEach((l: LocationID) => {
+        tr.exitLocationSet.forEach((l: LocationId) => {
             builder.addExitLocationWithID(inverseEquiv.get(l));
         });
 

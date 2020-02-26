@@ -21,7 +21,7 @@
 
 import {LabeledTransferRelation, TransferRelation, Transfers} from "../TransferRelation";
 import {
-    ControlAbstractState, MethodCall,
+    ControlAbstractState, MethodCall, RelationLocation,
     THREAD_STATE_DONE,
     THREAD_STATE_FAILURE,
     THREAD_STATE_RUNNING,
@@ -31,8 +31,13 @@ import {
 } from "./ControlAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {OperationID, ProgramOperation, ProgramOperations} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
+import {
+    OperationID,
+    ProgramOperation,
+    ProgramOperations,
+    RawOperation
+} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {App} from "../../../syntax/app/App";
 import {ScheduleAnalysisConfig} from "./ControlAnalysis";
@@ -58,8 +63,14 @@ import {
     DataLocationRenamer,
     RenamingTransformerVisitor
 } from "../../../syntax/transformers/RenamingTransformerVisitor";
-import {DataLocation} from "../../../syntax/app/controlflow/DataLocation";
+import {DataLocation, DataLocations} from "../../../syntax/app/controlflow/DataLocation";
 import {Statement} from "../../../syntax/ast/core/statements/Statement";
+import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements/DeclarationStatement";
+import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
+import {ParameterDeclaration} from "../../../syntax/ast/core/ParameterDeclaration";
+import {Expression} from "../../../syntax/ast/core/expressions/Expression";
+import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
+import {TransitionRelation, TransitionTo} from "../../../syntax/app/controlflow/TransitionRelation";
 
 export type Schedule = ImmList<ThreadState>;
 
@@ -71,19 +82,19 @@ class StepInformation {
 
     private readonly _ops: ProgramOperation[];
 
-    private readonly _succLoc: LocationID;
+    private readonly _succLoc: RelationLocation;
 
-    private readonly _succReturnCallTo: ImmList<MethodCall>;
+    private readonly _succCallStack: ImmList<MethodCall>;
 
     private readonly _succScopeStack: ImmList<string>;
 
-    constructor(threadIndex: number, succLoc: number, isInnerAtomic: boolean, ops: ProgramOperation[],
+    constructor(threadIndex: number, succLoc: RelationLocation, isInnerAtomic: boolean, ops: ProgramOperation[],
                 succReturnCallTo: ImmList<MethodCall>, succScopeStack: ImmList<string>) {
         this._threadIndex = threadIndex;
         this._succLoc = succLoc;
         this._isInnerAtomic = isInnerAtomic;
         this._ops = Preconditions.checkNotUndefined(ops);
-        this._succReturnCallTo = Preconditions.checkNotUndefined(succReturnCallTo);
+        this._succCallStack = Preconditions.checkNotUndefined(succReturnCallTo);
         this._succScopeStack = Preconditions.checkNotUndefined(succScopeStack);
     }
 
@@ -91,7 +102,7 @@ class StepInformation {
         return this._threadIndex;
     }
 
-    get succLoc(): number {
+    get succLoc(): RelationLocation {
         return this._succLoc;
     }
 
@@ -103,8 +114,8 @@ class StepInformation {
         return this._ops;
     }
 
-    get succReturnCallTo(): ImmList<MethodCall> {
-        return this._succReturnCallTo;
+    get succCallStack(): ImmList<MethodCall> {
+        return this._succCallStack;
     }
 
     get succScopeStack(): ImmList<string> {
@@ -285,15 +296,17 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
      * Returns either a singleton-list or the empty list.
      */
     private resolveLeavingOps(threadState: ThreadState, threadIndex: number): StepInformation[] {
-        const script = this._task.getActorByName(threadState.getActorId()).getScript(threadState.getScriptId());
+        const fromLocation: RelationLocation = threadState.getRelationLocation();
+        const fromRelation: TransitionRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
         const threadActor: Actor = this._task.getActorByName(threadState.getActorId());
 
         Logger.potentialUnsound('Add support for atomic transitions');
 
         let result: StepInformation[] = [];
-        for (const t of script.transitions.transitionsFrom(threadState.getLocationId())) {
+        for (const t of fromRelation.transitionsFrom(fromLocation.getLocationId())) {
             const isAtomic = false;
             const op: ProgramOperation = ProgramOperations.withID(t.opId);
+            const statementTarget = new RelationLocation(threadActor.ident, fromRelation.ident, t.target);
             Preconditions.checkNotUndefined(op);
 
             if (op.ast instanceof CallStatement) {
@@ -301,43 +314,83 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 const calledMethodName = op.ast.calledMethod.text;
 
                 if (threadActor.isExternalMethod(calledMethodName)) {
-                    result.push(new StepInformation(threadIndex, t.target, isAtomic, [op], threadState.getReturnCallTo(), threadState.getScopeStack()));
+                    result.push(new StepInformation(threadIndex, statementTarget, isAtomic, [op], threadState.getCallStack(), threadState.getScopeStack()));
                 } else {
                     const calledMethod: Method = threadActor.getMethod(calledMethodName);
                     const interProcOps: ProgramOperation[] = this.createPassArgumentsOps(calledMethod, op.ast.args);
-                    const succReturnCallsTo = threadState.getReturnCallTo().push(new MethodCall(threadState.getLocationId(), t.target));
+                    const succReturnCallsTo = threadState.getCallStack().push(new MethodCall(fromLocation, statementTarget));
                     const succScopeStack = threadState.getScopeStack().push(calledMethodName);
 
-                    for (const entryLocId of calledMethod.controlflow.entryLocationSet) {
-                        result.push(new StepInformation(threadIndex, entryLocId, isAtomic, interProcOps, succReturnCallsTo, succScopeStack));
+                    for (const entryLocId of calledMethod.transitions.entryLocationSet) {
+                        const callToRelationLoc: RelationLocation = new RelationLocation(threadActor.ident, calledMethod.transitions.ident, entryLocId);
+                        result.push(new StepInformation(threadIndex, callToRelationLoc, isAtomic, interProcOps, succReturnCallsTo, succScopeStack));
                     }
                 }
             } else if (op.ast instanceof ReturnStatement) {
-                const callInformation: MethodCall = threadState.getReturnCallTo().get(threadState.getReturnCallTo().size-1);
-                const succReturnCallsTo = threadState.getReturnCallTo().pop();
-                const succScopeStack = threadState.getScopeStack().pop();
+                const callInformation: MethodCall = threadState.getCallStack().get(threadState.getCallStack().size-1);
+                const succReturnCallsTo: ImmList<MethodCall> = threadState.getCallStack().pop();
+                const succScopeStack: ImmList<string> = threadState.getScopeStack().pop();
 
                 // Assign the result to the variable that was referenced in the `CallStatement`
-                const interProcOps: ProgramOperation[] = this.createStoreCallResultOps(callInformation, op.ast as ReturnStatement);
+                const interProcOps: ProgramOperation[] = this.createStoreCallResultOps(threadState, callInformation, op.ast as ReturnStatement);
 
                 result.push(new StepInformation(threadIndex, callInformation.getReturnTo(), isAtomic, interProcOps, succReturnCallsTo, succScopeStack));
             } else {
-                result.push(new StepInformation(threadIndex, t.target, isAtomic, [op], threadState.getReturnCallTo(), threadState.getScopeStack()));
+                result.push(new StepInformation(threadIndex, statementTarget, isAtomic, [op], threadState.getCallStack(), threadState.getScopeStack()));
             }
         }
 
         return result;
     }
 
-    private createStoreCallResultOps(callInformation: MethodCall, ast: ReturnStatement): ProgramOperation[] {
-        throw new ImplementMeException();
+    private createStoreCallResultOps(thread: ThreadState, callInformation: MethodCall, ast: ReturnStatement): ProgramOperation[] {
+        const result: Statement[] = [];
+
+        // Store the result in the caller scope's target variable
+        if (ast.resultVariable.isPresent()) {
+            const callStmt: CallStatement = this.getCallingStatement(callInformation);
+            if (callStmt.assignResultTo.isPresent()) {
+                const variableWithReturnValue: VariableWithDataLocation = ast.resultVariable.value();
+                const storeResultTo: VariableWithDataLocation = callStmt.assignResultTo.value();
+
+                result.push(new StoreEvalResultToVariableStatement(storeResultTo, variableWithReturnValue));
+            }
+       } else {
+            throw new ImplementMeException();
+        }
+
+        return result.map((s) => new RawOperation(s));
+    }
+
+    private getCallingStatement(callInformation: MethodCall): CallStatement {
+        const callFromRelation = this._task.getTransitionRelationById(callInformation.getCallFrom().getRelationId());
+        const returnToRelation = this._task.getTransitionRelationById(callInformation.getReturnTo().getRelationId());
+        Preconditions.checkArgument(callFromRelation === returnToRelation);
+
+        const fromTransitions: Array<TransitionTo> = callFromRelation.transitionsFrom(callInformation.getCallFrom().getLocationId());
+        Preconditions.checkArgument(fromTransitions.length == 1);
+
+        return ProgramOperations.withID(fromTransitions[0].opId).ast as CallStatement;
     }
 
     private createPassArgumentsOps(calledMethod: Method, args: ExpressionList): ProgramOperation[] {
-        // 1. Add declarations of the parameter variables (callee scope)
+        Preconditions.checkArgument(calledMethod.parameters.elements.length == args.elements.length);
+        const result: Statement[] = [];
 
-        // 2. Assign the arguments (caller scope) to the parameters (callee scope)
-        throw new ImplementMeException();
+        let index = 0;
+        while (index < calledMethod.parameters.elements.length) {
+            const p: ParameterDeclaration = calledMethod.parameters.getIth(index);
+            const a: Expression = args.getIth(index);
+
+            // 1. Add declarations of the parameter variables (callee scope)
+            const variable = new VariableWithDataLocation(DataLocations.createTypedLocation(p.ident, p.type));
+            result.push(new DeclareStackVariableStatement(variable));
+
+            // 2. Assign the arguments (caller scope) to the parameters (callee scope)
+            result.push(new StoreEvalResultToVariableStatement(variable, a));
+        }
+
+        return result.map((s) => new RawOperation(s));
     }
 
     private restartThread(state: ControlAbstractState): ControlAbstractState {
@@ -392,8 +445,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         // Set the new control location
         const steppedThread = threadStates.get(steppedThreadIdx)
-            .withLocationId(takenStep.succLoc)
-            .withReturnCallTo(takenStep.succReturnCallTo)
+            .withLocation(takenStep.succLoc)
+            .withCallStack(takenStep.succCallStack)
             .withScopeStack(takenStep.succScopeStack);
         let resultBase = threadStates.set(steppedThreadIdx, steppedThread);
 
@@ -532,6 +585,10 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         let index = 0;
         for (const t of threadStates) {
             const script = this._task.getActorByName(t.getActorId()).getScript(t.getScriptId());
+            if (!script) {
+                continue;
+            }
+
             if (script.event instanceof MessageReceivedEvent) {
                 const ev: MessageReceivedEvent = script.event as MessageReceivedEvent;
                 const handled = this.evaluateToConcreteMessage(ev.message);

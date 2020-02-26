@@ -26,10 +26,11 @@ import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {Record as ImmRec, Set as ImmSet} from "immutable";
 import {OperationID, ProgramOperation} from "./controlflow/ops/ProgramOperation";
-import {LocationID} from "./controlflow/ControlLocation";
+import {LocationId} from "./controlflow/ControlLocation";
 import {CallStatement} from "../ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
 import {Properties, Property} from "../Property";
+import {TransitionRelation, TransRelId} from "./controlflow/TransitionRelation";
 
 
 export class App {
@@ -40,10 +41,19 @@ export class App {
 
     private readonly _actorMap: ActorMap;
 
+    private readonly _transRelById: Map<TransRelId, TransitionRelation>;
+
     constructor(origin: string, ident: string, actorMap: ActorMap) {
         this._origin = Preconditions.checkNotUndefined(origin);
         this._ident = Preconditions.checkNotEmpty(ident);
         this._actorMap = Preconditions.checkIsDic(actorMap);
+
+        this._transRelById = new Map();
+        for (const a of Maps.values(this._actorMap)) {
+            for (const [id, r] of a.transRelMap.entries()) {
+                this._transRelById.set(id, r);
+            }
+        }
     }
 
     get origin(): string {
@@ -97,6 +107,10 @@ export class App {
             throw new IllegalArgumentException(`Actor with name "${name}" is unknown!`);
         }
         return this._actorMap[name];
+    }
+
+    public getTransitionRelationById(id: TransRelId): TransitionRelation {
+        return this._transRelById.get(id);
     }
 
     public getMethodDefinition(methodName: string): MethodDefinitionList {

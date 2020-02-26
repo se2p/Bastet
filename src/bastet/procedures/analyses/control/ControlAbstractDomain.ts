@@ -24,13 +24,14 @@ import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain
 import {AbstractElement, Lattice} from "../../../lattices/Lattice";
 import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable";
 import {ActorId} from "../../../syntax/app/Actor";
-import {LocationID} from "../../../syntax/app/controlflow/ControlLocation";
-import {ScriptId} from "../../../syntax/app/controlflow/Script";
+import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ConcreteDomain} from "../../domains/ConcreteElements";
 import {App} from "../../../syntax/app/App";
 import {BootstrapEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Property} from "../../../syntax/Property";
+import {TransRelId} from "../../../syntax/app/controlflow/TransitionRelation";
+import {ScriptId} from "../../../syntax/app/controlflow/Script";
 
 export const THREAD_STATE_RUNNING = 1;
 export const THREAD_STATE_RUNNING_ATOMIC = 2;
@@ -40,11 +41,50 @@ export const THREAD_STATE_YIELD = 5;
 export const THREAD_STATE_FAILURE = 6;
 export const THREAD_STATE_UNKNOWN = 0;
 
-export type ScriptComputationState = number;
+export type ThreadComputationState = number;
 
 export type ThreadId = number;
 
 export interface ControlConcreteState {
+
+}
+
+export interface ScriptLocationAttributes {
+
+    /** Unique identifier of the actor */
+    actor: ActorId;
+
+    /** Unique identifier of the transition relation */
+    relation: TransRelId;
+
+    /** Unique position within the transition relation */
+    location: LocationId;
+
+}
+
+const RelationLocationRecord = ImmRec({
+    actor: "",
+    relation: 0,
+    location: 0
+});
+
+export class RelationLocation extends RelationLocationRecord implements ScriptLocationAttributes {
+
+    constructor(actor: ActorId, relation: TransRelId, location: LocationId) {
+        super({actor: actor, relation: relation, location: location});
+    }
+
+    public getActorId(): ActorId {
+        return this.get('actor');
+    }
+
+    public getLocationId(): LocationId {
+        return this.get('location');
+    }
+
+    public getRelationId(): TransRelId {
+        return this.get('relation');
+    }
 
 }
 
@@ -53,62 +93,67 @@ export interface MethodCallAttributes {
     /**
      * Control location from that the method has been called
      */
-    callFrom: LocationID;
+    callFrom: RelationLocation;
 
 
     /**
      * Control location to that the method call is supposed to
      * return to after the method is finished
      */
-    returnTo: LocationID;
+    returnTo: RelationLocation;
 
 }
 
 const MethodCallRecord = ImmRec({
-    callFrom: 0,
-    returnTo: 0
+    callFrom: new RelationLocation("", 0, 0),
+    returnTo: new RelationLocation("", 0, 0),
 });
 
 export class MethodCall extends MethodCallRecord implements MethodCallAttributes {
 
-    constructor(callFrom: LocationID, returnTo: LocationID) {
+    constructor(callFrom: RelationLocation, returnTo: RelationLocation) {
         super({callFrom: callFrom, returnTo: returnTo});
     }
 
-    public getCallFrom(): LocationID {
+    public getCallFrom(): RelationLocation {
         return this.get('callFrom');
     }
 
-    public getReturnTo(): LocationID {
+    public getReturnTo(): RelationLocation {
         return this.get('returnTo');
     }
+
 }
 
 export interface ThreadStateAttributes {
 
-    /** Unique identifier of the actor */
-    actorId: ActorId;
-
     /** Unique identifier of the thread */
     threadId: ThreadId;
 
-    /** Computation state of the thread */
-    computationState: ScriptComputationState;
+    /** Unique identifier of the actor */
+    actorId: ActorId;
 
-    /** Set of threads this thread is waiting for before it can continue */
-    waitingForThreads: ImmSet<ThreadId>;
-
-    /** Unique identifier of the script */
+    /**
+     * Script that is executed by the thread. Attention: The script might also call methods
+     * with other transition relations. Furthermore, some transitions that become executed
+     * might have been woven dynamically.
+     */
     scriptId: ScriptId;
 
     /** Identifier of the control location (position in the transition system of the script) */
-    locationId: LocationID;
+    location: RelationLocation;
+
+    /** Computation state of the thread */
+    computationState: ThreadComputationState;
+
+    /** Set of threads this thread is waiting for before it can continue */
+    waitingForThreads: ImmSet<ThreadId>;
 
     /** Set of properties for that the thread ran into a failing control location (ERROR location) */
     failedFor: ImmSet<Property>;
 
     /** Stack of method call and return locations to enable the inter-procedural analysis */
-    returnCallTo: ImmList<MethodCall>;
+    callStack: ImmList<MethodCall>;
 
     /** Scope to uniquely identify currently declared and references variables (data locations) */
     scopeStack: ImmList<string>;
@@ -117,24 +162,24 @@ export interface ThreadStateAttributes {
 
 const ThreadStateRecord = ImmRec({
     threadId: -1,
-    actorId: "",
     scriptId: -1,
-    locationId: -1,
+    actorId: "",
+    location: new RelationLocation("", 0, 0),
     computationState: THREAD_STATE_UNKNOWN,
     waitingForThreads: ImmSet<ThreadId>(),
     failedFor: ImmSet<Property>(),
-    returnCallTo: ImmList<MethodCall>(),
+    callStack: ImmList<MethodCall>(),
     scopeStack: ImmList<string>()
 });
 
 export class ThreadState extends ThreadStateRecord implements AbstractElement, ThreadStateAttributes {
 
-    constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, locationId: LocationID,
-                compState: ScriptComputationState, waitingForThreads: ImmSet<ThreadId>,
-                failedFor: ImmSet<Property>, returnCallTo: ImmList<MethodCall>, scopeStack: ImmList<string>) {
-        super({threadId: threadId, actorId: actorId, scriptId: scriptId,
-            locationId: locationId, computationState: compState, waitingForThreads: waitingForThreads,
-            failedFor: failedFor, returnCallTo: returnCallTo, scopeStack: scopeStack});
+    constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, location: RelationLocation,
+                compState: ThreadComputationState, waitingForThreads: ImmSet<ThreadId>,
+                failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, scopeStack: ImmList<string>) {
+        super({threadId: threadId, actorId: actorId, scriptId: scriptId, location: location,
+            computationState: compState, waitingForThreads: waitingForThreads,
+            failedFor: failedFor, callStack: callStack, scopeStack: scopeStack});
     }
 
     public getThreadId(): ThreadId {
@@ -149,27 +194,27 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
         return this.get('scriptId');
     }
 
-    public getLocationId(): LocationID {
-        return this.get('locationId');
+    public getRelationLocation(): RelationLocation {
+        return this.get('location');
     }
 
-    public getReturnCallTo(): ImmList<MethodCall> {
-        return this.get('returnCallTo');
+    public getCallStack(): ImmList<MethodCall> {
+        return this.get('callStack');
     }
 
     public getScopeStack(): ImmList<string> {
         return this.get('scopeStack');
     }
 
-    public withLocationId(value: LocationID): ThreadState {
-        return this.set('locationId', value);
+    public withLocation(value: RelationLocation): ThreadState {
+        return this.set('location', value);
     }
 
-    public getComputationState(): ScriptComputationState {
+    public getComputationState(): ThreadComputationState {
         return this.get('computationState');
     }
 
-    public withComputationState(value: ScriptComputationState): ThreadState {
+    public withComputationState(value: ThreadComputationState): ThreadState {
         return this.set('computationState', value);
     }
 
@@ -185,8 +230,8 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
         return this.set('waitingForThreads', value);
     }
 
-    public withReturnCallTo(value: ImmList<MethodCall>): ThreadState {
-        return this.set('returnCallTo', value);
+    public withCallStack(value: ImmList<MethodCall>): ThreadState {
+        return this.set('callStack', value);
     }
 
     public withFailedFor(value: ImmSet<Property>): ThreadState {
@@ -235,7 +280,6 @@ const ControlAbstractStateRecord = ImmRec({
 
 });
 
-
 /**
  * A state with SHARED MEMORY
  */
@@ -274,7 +318,8 @@ export class ScheduleAbstractStateFactory {
                     threadState = THREAD_STATE_RUNNING;
                 }
                 for (const locId of script.transitions.entryLocationSet) {
-                    threads = threads.push(new ThreadState(threadId, actor.ident, script.id, locId,
+                    const loc: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, locId);
+                    threads = threads.push(new ThreadState(threadId, actor.ident, script.id, loc,
                         threadState, ImmSet(), ImmSet(), ImmList(), ImmList([actor.ident])));
                 }
             }

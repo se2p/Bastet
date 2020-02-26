@@ -23,18 +23,18 @@ import {MethodDefinition, MethodSignature, ResultDeclaration} from "../../ast/co
 import {ParameterDeclarationList} from "../../ast/core/ParameterDeclaration";
 import {Identifier} from "../../ast/core/Identifier";
 import {StatementList} from "../../ast/core/statements/Statement";
-import {TransitionRelation} from "./TransitionRelation";
+import {TransitionRelation, WithTransitionRelation} from "./TransitionRelation";
 import {Preconditions} from "../../../utils/Preconditions";
 
-export class Method {
+export class Method implements WithTransitionRelation {
 
     private readonly _definition: MethodDefinition;
 
-    private readonly _controlflow: TransitionRelation;
+    private readonly _transitions: TransitionRelation;
 
     constructor(definition: MethodDefinition, controlflow: TransitionRelation) {
         this._definition = Preconditions.checkNotUndefined(definition);
-        this._controlflow = Preconditions.checkNotUndefined(controlflow);
+        this._transitions = Preconditions.checkNotUndefined(controlflow);
     }
 
     get signature() : MethodSignature {
@@ -57,8 +57,8 @@ export class Method {
         return this._definition.statements;
     }
 
-    get controlflow(): TransitionRelation {
-        return this._controlflow;
+    get transitions(): TransitionRelation {
+        return this._transitions;
     }
 
 }

@@ -20,7 +20,7 @@
  */
 
 import {TransitionRelation, TransitionTo} from "./TransitionRelation";
-import {LocationID} from "./ControlLocation";
+import {LocationId} from "./ControlLocation";
 import {OperationID, ProgramOperations} from "./ops/ProgramOperation";
 
 export class TransitionRelationToDot {
@@ -29,15 +29,15 @@ export class TransitionRelationToDot {
         let output: string[] = [];
         let fs = require('fs');
 
-        let visited: Set<LocationID> = new Set<LocationID>();
-        let worklist: Array<LocationID> = new Array();
+        let visited: Set<LocationId> = new Set<LocationId>();
+        let worklist: Array<LocationId> = new Array();
         tr.entryLocationSet.forEach((e) => worklist.push(e));
 
         output.push(`digraph relation {`);
         output.push(`    node [shape=circle, style=filled];`);
 
         while (worklist.length > 0) {
-            let fromlocid: LocationID = worklist.pop();
+            let fromlocid: LocationId = worklist.pop();
             if (!visited.has(fromlocid)) {
                 visited.add(fromlocid);
                 let fromWork: Array<TransitionTo> = tr.transitionsFrom(fromlocid);

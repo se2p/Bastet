@@ -46,4 +46,7 @@ export class ParameterDeclaration extends AbstractNode {
 
 export class ParameterDeclarationList extends AstNodeList<ParameterDeclaration> {
 
+    constructor(elements: ParameterDeclaration[]) {
+        super(elements);
+    }
 }

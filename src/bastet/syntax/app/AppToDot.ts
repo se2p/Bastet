@@ -43,7 +43,7 @@ export class AppToDot {
         let i: number = 1;
         for (let m of actor.methods) {
             const target: string = `output/${subfolder}/actor_${actor.ident}_method_${m.ident.text}.dot`;
-            toDotWriter.export(m.controlflow, target);
+            toDotWriter.export(m.transitions, target);
             i++;
         }
     }
