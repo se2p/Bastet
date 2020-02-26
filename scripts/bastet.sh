@@ -23,19 +23,17 @@ function tempfile {
 # Function to convert a given sb2-file to a file
 # with a semantically equivalent program in our
 # own textual programming language.
-function convert_sb3_to_sc() {
+function convert_sb3_to_sc {
     sb3_file="$1"
-    sc_file="$2"
+    target_sc_file="$2"
 
     echo $sb3_file
 
     if [ -f $sb3_file ]
     then
         echo "Call litterbox to do convert a file"
-        echo "java -jar $LIB_DIR/litterbox/Litterbox.jar -p $sb3_file -u $sc_file"
-        java -jar $LIB_DIR/litterbox/Litterbox.jar -p $sb3_file -u $sc_file
+        java -jar $LIB_DIR/litterbox/Litterbox.jar -p $sb3_file -u $target_sc_file
     else
-        echo $sb3_file
         echo "No existing sb3 file given!"
         exit 1
     fi
