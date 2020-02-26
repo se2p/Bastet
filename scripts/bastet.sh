@@ -3,13 +3,13 @@
 readonly LIB_DIR="./dist/lib"
 readonly MY_TEMP_DIR=$(mktemp -d)
 
-# Delete all temp files that 
+# Delete all temp files that
 # were created by this script
 function cleanup {
     rm -R $MY_TEMP_DIR
 }
 
-trap finish INT TERM HUP EXIT
+trap cleanup INT TERM HUP EXIT
 
 # We store all temporary files in the same temporary
 # folder that gets deleted after the script terminates.
@@ -21,20 +21,24 @@ function tempfile {
 }
 
 # Function to convert a given sb2-file to a file
-# with a semantically equivalent program in our 
+# with a semantically equivalent program in our
 # own textual programming language.
-function convert_sb2_to_sc {
-    sb2_file="$1"
-    target_sc_file="$2"
+function convert_sb3_to_sc() {
+    sb3_file="$1"
+    sc_file="$2"
 
-    if [ ! -f $sb2_file ]
+    echo $sb3_file
+
+    if [ -f $sb3_file ]
     then
-        echo "No existing sb2 file given!"
+        echo "Call litterbox to do convert a file"
+        echo "java -jar $LIB_DIR/litterbox/Litterbox.jar -p $sb3_file -u $sc_file"
+        java -jar $LIB_DIR/litterbox/Litterbox.jar -p $sb3_file -u $sc_file
+    else
+        echo $sb3_file
+        echo "No existing sb3 file given!"
         exit 1
     fi
-
-    echo "TODO: Call litterbox to do the convert"
-    # $LIB_DIR/scripts/litterbox.sh $TODO
 }
 
 # Rebuild the argument list by replacing
@@ -44,16 +48,16 @@ arguments=()
 for arg in "$@"
 do
     argPrime=$arg
-    if [[ $arg == *.sb2  ]]
+    if [[ $arg == *.sb3  ]]
     then
         if [ -f $arg ]
         then
-            sc_file=$(tempfile ".sc") 
+            sc_file=$(tempfile ".sc")
             argPrime=$sc_file
 
-            convert_sb2_to_sc "$arg" "$sc_file"
+            convert_sb3_to_sc "$arg" "$sc_file"
         else
-            echo "WARNING: The given sb2-file does not exist!"
+            echo "WARNING: The given sb3-file does not exist!"
             exit 1
         fi
     fi
