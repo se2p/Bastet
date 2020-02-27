@@ -224,9 +224,14 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
     }
 
     minus(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
-        return new Z3NumberFormula(
-            this._ctx.mk_add(op1.getAST(),
-            this._ctx.mk_unary_minus(op2.getAST())));
+        const typedArray = new Int32Array([op1.getAST().val(), this._ctx.mk_unary_minus(op2.getAST()).val()]);
+        const arrayOnHeap = this.arrayToHeap(typedArray);
+        try {
+            // 'Minus' adds a negative number
+            return new Z3NumberFormula(this._ctx.mk_add(new Uint32(2), new Ptr(arrayOnHeap.byteOffset)));
+        } finally {
+            this.freeArray(arrayOnHeap);
+        }
     }
 
     modulo(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {

@@ -59,6 +59,7 @@ export class Transfers {
 
         let result: W[] = [fromState];
         for (const toExecute of ops) {
+            console.log(toExecute);
             let statelistPrime: W[] = [];
             for (const w of result) {
                 for (const succ of transferRealtion.abstractSuccFor(w, toExecute, co)) {
