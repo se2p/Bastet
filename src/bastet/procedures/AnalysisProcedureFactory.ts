@@ -37,6 +37,8 @@ import {Property} from "../syntax/Property";
 import {Set as ImmSet} from "immutable";
 import {AnalysisStatistics} from "./analyses/AnalysisStatistics";
 import {StatsAnalysis} from "./analyses/stats/StatsAnalysis";
+import {TimeAnalysis} from "./analyses/time/TimeAnalysis";
+import {StaticTimeProfile} from "../utils/TimeProfile";
 
 export class AnalysisProcedureConfig {
 
@@ -68,10 +70,11 @@ export class AnalysisProcedureFactory {
                 const prover = smt.createProver(defaultContect);
                 const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
-                const memAnalysis = new DataAnalysis(firstOrderLattice, bddlib.lattice, theories, this._statistics);
-                const ssaAnalysis = new SSAAnalysis(task, memAnalysis, this._statistics);
-                const schedAnalysis = new ControlAnalysis({}, task, ssaAnalysis, this._statistics);
-                const graphAnalysis = new GraphAnalysis(task, schedAnalysis, this._statistics);
+                const dataAnalysis = new DataAnalysis(firstOrderLattice, bddlib.lattice, theories, this._statistics);
+                const ssaAnalysis = new SSAAnalysis(task, dataAnalysis, this._statistics);
+                const timeAnalysis = new TimeAnalysis(ssaAnalysis, this._statistics, new StaticTimeProfile());
+                const controlAnalysis = new ControlAnalysis({}, task, timeAnalysis, this._statistics);
+                const graphAnalysis = new GraphAnalysis(task, controlAnalysis, this._statistics);
                 const outerAnalysis = new StatsAnalysis<GraphConcreteState, GraphAbstractState>(graphAnalysis, this._statistics);
 
                 const frontier: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();

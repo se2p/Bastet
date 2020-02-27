@@ -60,9 +60,9 @@ import { BoolCallStatementExpressionContext } from "./ScratchParser";
 import { NegatedBoolExpressionContext } from "./ScratchParser";
 import { BoolAndExpressionContext } from "./ScratchParser";
 import { BoolOrExpressionContext } from "./ScratchParser";
-import { NumGreaterThanExpressionContext } from "./ScratchParser";
-import { NumLessThanExpressionContext } from "./ScratchParser";
-import { NumEqualsExpressionContext } from "./ScratchParser";
+import { GreaterThanExpressionContext } from "./ScratchParser";
+import { LessThanExpressionContext } from "./ScratchParser";
+import { EqualsExpressionContext } from "./ScratchParser";
 import { StrContainsExpressionContext } from "./ScratchParser";
 import { DefaultBoolExpressionContext } from "./ScratchParser";
 import { UnspecifiedBoolExpressionContext } from "./ScratchParser";
@@ -178,6 +178,7 @@ import { CoreStringExprContext } from "./ScratchParser";
 import { BoolExprContext } from "./ScratchParser";
 import { CoreBoolExprContext } from "./ScratchParser";
 import { NumExprContext } from "./ScratchParser";
+import { NumOrStringExprContext } from "./ScratchParser";
 import { CoreNumExprContext } from "./ScratchParser";
 import { NumFunctContext } from "./ScratchParser";
 import { ListExprContext } from "./ScratchParser";
@@ -940,43 +941,43 @@ export interface ScratchListener extends ParseTreeListener {
 	exitBoolOrExpression?: (ctx: BoolOrExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumGreaterThanExpression`
+	 * Enter a parse tree produced by the `GreaterThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumGreaterThanExpression?: (ctx: NumGreaterThanExpressionContext) => void;
+	enterGreaterThanExpression?: (ctx: GreaterThanExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumGreaterThanExpression`
+	 * Exit a parse tree produced by the `GreaterThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumGreaterThanExpression?: (ctx: NumGreaterThanExpressionContext) => void;
+	exitGreaterThanExpression?: (ctx: GreaterThanExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumLessThanExpression`
+	 * Enter a parse tree produced by the `LessThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumLessThanExpression?: (ctx: NumLessThanExpressionContext) => void;
+	enterLessThanExpression?: (ctx: LessThanExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumLessThanExpression`
+	 * Exit a parse tree produced by the `LessThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumLessThanExpression?: (ctx: NumLessThanExpressionContext) => void;
+	exitLessThanExpression?: (ctx: LessThanExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumEqualsExpression`
+	 * Enter a parse tree produced by the `EqualsExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumEqualsExpression?: (ctx: NumEqualsExpressionContext) => void;
+	enterEqualsExpression?: (ctx: EqualsExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumEqualsExpression`
+	 * Exit a parse tree produced by the `EqualsExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumEqualsExpression?: (ctx: NumEqualsExpressionContext) => void;
+	exitEqualsExpression?: (ctx: EqualsExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `StrContainsExpression`
@@ -2352,6 +2353,17 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitNumExpr?: (ctx: NumExprContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `ScratchParser.numOrStringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumOrStringExpr?: (ctx: NumOrStringExprContext) => void;
+	/**
+	 * Exit a parse tree produced by `ScratchParser.numOrStringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumOrStringExpr?: (ctx: NumOrStringExprContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.coreNumExpr`.

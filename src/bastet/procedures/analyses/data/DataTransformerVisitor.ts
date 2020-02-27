@@ -94,7 +94,7 @@ import {EpsilonStatement} from "../../../syntax/ast/core/statements/EpsilonState
 import {
     DeclareAttributeOfStatement,
     DeclareAttributeStatement,
-    DeclareStackVariableStatement
+    DeclareStackVariableStatement, DeclareSystemVariableStatement
 } from "../../../syntax/ast/core/statements/DeclarationStatement";
 import {CreateCloneOfStatement} from "../../../syntax/ast/core/statements/CreateCloneOfStatement";
 import {ChangeVarByStatement} from "../../../syntax/ast/core/statements/ChangeVarByStatement";
@@ -413,6 +413,11 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
     }
 
     visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): B {
+        // We assume the variables to be initialized with NONDET-values
+        return this._mem;
+    }
+
+    visitDeclareSystemVariableStatement(node: DeclareSystemVariableStatement): B {
         // We assume the variables to be initialized with NONDET-values
         return this._mem;
     }

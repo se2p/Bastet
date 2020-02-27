@@ -66,7 +66,7 @@ import {
     DeleteIthFromStatementContext,
     DeleteThisCloneContext,
     EnumTypeContext,
-    EpsilonStatementContext,
+    EpsilonStatementContext, EqualsExpressionContext,
     ExpressionListContext,
     ExpressionListPlainContext,
     ExpressionStmtContext,
@@ -75,7 +75,7 @@ import {
     ExternMethodDefinitionListContext,
     ExternMethodResultDeclarationContext,
     ExternVoidReturnDefinitionContext,
-    FunctionReturnDefinitionContext,
+    FunctionReturnDefinitionContext, GreaterThanExpressionContext,
     IdentContext,
     IdentExpressionContext,
     IfStmtContext,
@@ -92,7 +92,7 @@ import {
     JoinStringsExpressionContext,
     KeyContext,
     LengthOfListExpressionContext,
-    LengthOfStringExpressionContext,
+    LengthOfStringExpressionContext, LessThanExpressionContext,
     ListTypeContext,
     ListVariableExpressionContext,
     ListWithElementsExpressionContext,
@@ -108,11 +108,8 @@ import {
     NumBracketsContext,
     NumCallStatementExpressionContext,
     NumDivExpressionContext,
-    NumEqualsExpressionContext,
     NumFunctContext,
     NumFunctExpressionContext,
-    NumGreaterThanExpressionContext,
-    NumLessThanExpressionContext,
     NumLiteralExpressionContext,
     NumMinusExpressionContext,
     NumModExpressionContext,
@@ -412,7 +409,7 @@ export class ActorTypeInformation {
     }
 
     public putVariable(v: VariableDeclaration) {
-        this._actorVariables[v.ident.text] = v;
+        this._actorVariables[v.identifier.text] = v;
     }
 
     public getMethodResultType(ident: Identifier): ScratchType {
@@ -449,6 +446,10 @@ export class ActorTypeInformation {
 
     get actor(): Identifier {
         return this._actor;
+    }
+
+    public getTypeOf(ident: Identifier): ScratchType {
+        return this._actorVariables[ident.text].type;
     }
 }
 
@@ -492,6 +493,10 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     get actorTypeInfos(): TypeInformationStorage {
         return this._actorTypeInfos;
+    }
+
+    private getTypeOf(ident: Identifier): ScratchType {
+        return this._activeActorTypes.getTypeOf(ident);
     }
 
     private getArgumentNodes(ctx: RuleNode): RuleNode[] {
@@ -970,6 +975,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     public visitNumDivExpression(ctx: NumDivExpressionContext) : TransformerResult {
         const tr1 = this.getOperand1(ctx).accept(this);
         const tr2 = this.getOperand2(ctx).accept(this);
+
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
             new DivideExpression(
@@ -977,14 +983,40 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 tr2.node as NumberExpression));
     }
 
-    public visitNumEqualsExpression(ctx: NumEqualsExpressionContext) : TransformerResult {
+    private assertEqualOperandTypes(context: RuleNode, op1: TransformerResult, op2: TransformerResult): ScratchType {
+        const type1 = (op1.node as Expression).type;
+        const type2 = (op2.node as Expression).type;
+
+        if (!(type1 == type2)) {
+            console.log(context);
+            throw new IllegalArgumentException(`Types are not equal: ${type1.toTreeString()} vs ${type2.toTreeString()}`);
+        }
+
+        return type1;
+    }
+
+    public visitEqualsExpression(ctx: EqualsExpressionContext) : TransformerResult {
         const tr1 = this.getOperand1(ctx).accept(this);
         const tr2 = this.getOperand2(ctx).accept(this);
-        return new TransformerResult(
-            StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new NumEqualsExpression(
-                tr1.node as NumberExpression,
-                tr2.node as NumberExpression));
+        this.assertEqualOperandTypes(ctx, tr1, tr2);
+
+        if ((tr1.node as Expression).type == NumberType.instance()) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new NumEqualsExpression(
+                    tr1.node as NumberExpression,
+                    tr2.node as NumberExpression));
+
+        } if ((tr1.node as Expression).type == StringType.instance()) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new StrEqualsExpression(
+                    tr1.node as StringExpression,
+                    tr2.node as StringExpression));
+
+        } else {
+            throw new ImplementMeException();
+        }
     }
 
     public visitNumFunct(ctx: NumFunctContext) : TransformerResult {
@@ -1016,24 +1048,51 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TransformerResult(prepend, resultVarExpr);
     }
 
-    public visitNumGreaterThanExpression(ctx: NumGreaterThanExpressionContext) : TransformerResult {
+    public visitGreaterThanExpression(ctx: GreaterThanExpressionContext) : TransformerResult {
         const tr1 = this.getOperand1(ctx).accept(this);
         const tr2 = this.getOperand2(ctx).accept(this);
-        return new TransformerResult(
-            StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new NumGreaterThanExpression(
-                tr1.node as NumberExpression,
-                tr2.node as NumberExpression));
+        this.assertEqualOperandTypes(ctx, tr1, tr2);
+
+        if ((tr1.node as Expression).type == NumberType.instance()) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new NumGreaterThanExpression(
+                    tr1.node as NumberExpression,
+                    tr2.node as NumberExpression));
+
+        } else if ((tr1.node as Expression).type == StringType.instance()) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new StrGreaterThanExpression(
+                    tr1.node as StringExpression,
+                    tr2.node as StringExpression));
+
+        } else {
+            throw new ImplementMeException();
+        }
     }
 
-    public visitNumLessThanExpression(ctx: NumLessThanExpressionContext) : TransformerResult {
+    public visitLessThanExpression(ctx: LessThanExpressionContext) : TransformerResult {
         const tr1 = this.getOperand1(ctx).accept(this);
         const tr2 = this.getOperand2(ctx).accept(this);
-        return new TransformerResult(
-            StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new NumLessThanExpression(
-                tr1.node as NumberExpression,
-                tr2.node as NumberExpression));
+        this.assertEqualOperandTypes(ctx, tr1, tr2);
+
+        if ((tr1.node as Expression).type == NumberType.instance()) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new NumLessThanExpression(
+                    tr1.node as NumberExpression,
+                    tr2.node as NumberExpression));
+
+        } else if ((tr1.node as Expression).type == StringType.instance()) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new StrLessThanExpression(
+                    tr1.node as StringExpression,
+                    tr2.node as StringExpression));
+        } else {
+            throw new ImplementMeException();
+        }
     }
 
     public visitNumLiteralExpression(ctx: NumLiteralExpressionContext) : TransformerResult {
@@ -1093,9 +1152,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitNumVariableExpression(ctx: NumVariableExpressionContext) : TransformerResult {
-        const ident = ctx.variable().accept(this).nodeOnly() as Identifier;
-        const variable = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, NumberType.instance()));
-        return TransformerResult.withNode(new NumberVariableExpression(variable));
+        return ctx.variable().accept(this);
     }
 
     public visitNumber(ctx: NumberContext) : TransformerResult {
@@ -1192,9 +1249,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitBoolVariableExpression(ctx: BoolVariableExpressionContext) : TransformerResult {
-        const ident = ctx.variable().accept(this).nodeOnly() as Identifier;
-        const variable = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, BooleanType.instance()));
-        return TransformerResult.withNode(new BooleanVariableExpression(variable));
+        return ctx.variable().accept(this);
     }
 
     private constructBinaryOp(ctx: RuleNode, constr: new (n1:AstNode, n2:AstNode) => AstNode) : TransformerResult {
@@ -1311,6 +1366,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
         const dataLoc = DataLocations.createTypedLocation(ident, type);
         const variable = new VariableWithDataLocation(dataLoc);
+
+        this._activeActorTypes.putVariable(variable);
 
         if (this._actorScope) {
             return TransformerResult.withNode(
@@ -1551,10 +1608,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitStoreEvalResultStatement(ctx: StoreEvalResultStatementContext) : TransformerResult {
-
         const ident = ctx.variable().accept(this).nodeOnly() as Identifier;
-        const exprTr = ctx.expression().accept(this);
+        const varType = this.getTypeOf(ident);
+        const exprTr = this.ensureType(varType, ctx.expression().accept(this));
         const exprType = (exprTr.node as Expression).type;
+        Preconditions.checkNotUndefined(exprType);
+
         const variable = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, exprType));
 
         return new TransformerResult(
@@ -1609,9 +1668,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitStringVariableExpression(ctx: StringVariableExpressionContext) : TransformerResult {
-        const ident = ctx.variable().accept(this).nodeOnly() as Identifier;
-        const variable = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, StringType.instance()));
-        return TransformerResult.withNode(new StringVariableExpression(variable));
+        return ctx.variable().accept(this);
     }
 
     public visitTimerExpression(ctx: TimerExpressionContext) : TransformerResult {
@@ -1635,9 +1692,11 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitVariable(ctx: VariableContext) : TransformerResult {
-        // ATTENTION: Contrary to the name of this method, the result is a `Identifier`.
-        //   Type-specific variable visitors return `VariableWithDataLocation`!
-        return TransformerResult.withNode(Identifier.of(ctx.text));
+        const varIdent = new Identifier(ctx.text);
+        const varType = this.getTypeOf(varIdent);
+        Preconditions.checkNotUndefined(varType);
+
+        return TransformerResult.withNode(new VariableWithDataLocation(DataLocations.createTypedLocation(varIdent, varType)));
     }
 
     public visitWaitSecsStatement(ctx: WaitSecsStatementContext) : TransformerResult {
@@ -1887,6 +1946,18 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         throw new ImplementMeException();
     }
 
+    private ensureType(varType: ScratchType, transformerResult: TransformerResult): TransformerResult {
+        if (transformerResult.node['type'] == varType) {
+            return transformerResult;
+
+        } else if (transformerResult.node instanceof Identifier) {
+            const varExpr = new VariableWithDataLocation(DataLocations.createTypedLocation(transformerResult.node, varType));
+            return new TransformerResult(transformerResult.statementsToPrepend, varExpr);
+
+        } else {
+            throw new ImplementMeException();
+        }
+    }
 }
 
 export class ToIntermediateTransformer {

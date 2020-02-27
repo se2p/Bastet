@@ -60,9 +60,9 @@ import { BoolCallStatementExpressionContext } from "./ScratchParser";
 import { NegatedBoolExpressionContext } from "./ScratchParser";
 import { BoolAndExpressionContext } from "./ScratchParser";
 import { BoolOrExpressionContext } from "./ScratchParser";
-import { NumGreaterThanExpressionContext } from "./ScratchParser";
-import { NumLessThanExpressionContext } from "./ScratchParser";
-import { NumEqualsExpressionContext } from "./ScratchParser";
+import { GreaterThanExpressionContext } from "./ScratchParser";
+import { LessThanExpressionContext } from "./ScratchParser";
+import { EqualsExpressionContext } from "./ScratchParser";
 import { StrContainsExpressionContext } from "./ScratchParser";
 import { DefaultBoolExpressionContext } from "./ScratchParser";
 import { UnspecifiedBoolExpressionContext } from "./ScratchParser";
@@ -178,6 +178,7 @@ import { CoreStringExprContext } from "./ScratchParser";
 import { BoolExprContext } from "./ScratchParser";
 import { CoreBoolExprContext } from "./ScratchParser";
 import { NumExprContext } from "./ScratchParser";
+import { NumOrStringExprContext } from "./ScratchParser";
 import { CoreNumExprContext } from "./ScratchParser";
 import { NumFunctContext } from "./ScratchParser";
 import { ListExprContext } from "./ScratchParser";
@@ -658,28 +659,28 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitBoolOrExpression?: (ctx: BoolOrExpressionContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `NumGreaterThanExpression`
+	 * Visit a parse tree produced by the `GreaterThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitNumGreaterThanExpression?: (ctx: NumGreaterThanExpressionContext) => Result;
+	visitGreaterThanExpression?: (ctx: GreaterThanExpressionContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `NumLessThanExpression`
+	 * Visit a parse tree produced by the `LessThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitNumLessThanExpression?: (ctx: NumLessThanExpressionContext) => Result;
+	visitLessThanExpression?: (ctx: LessThanExpressionContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `NumEqualsExpression`
+	 * Visit a parse tree produced by the `EqualsExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitNumEqualsExpression?: (ctx: NumEqualsExpressionContext) => Result;
+	visitEqualsExpression?: (ctx: EqualsExpressionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `StrContainsExpression`
@@ -1540,6 +1541,13 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitNumExpr?: (ctx: NumExprContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `ScratchParser.numOrStringExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitNumOrStringExpr?: (ctx: NumOrStringExprContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `ScratchParser.coreNumExpr`.

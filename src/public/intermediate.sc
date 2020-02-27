@@ -125,6 +125,8 @@ role ScratchEntity is RuntimeEntity begin
 
     declare volume as number
 
+    declare current_costume_name as string
+
     declare sound_effect as enum [ "pitch", "pan_left_right" ]
 
     declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
@@ -138,18 +140,6 @@ role ScratchEntity is RuntimeEntity begin
     extern degToRad(n: number) returns number
 
     extern radToDeg(n: number) returns number
-
-    define isStringEqualTo (str1: string, str2: string) begin
-        // TODO
-    end returns result : boolean
-
-    define isStringGreaterThan (str1: string, str2: string) begin
-        // TODO
-    end returns result : boolean
-
-    define isStringLessThan (str1: string, str2: string) begin
-        // TODO
-    end returns result : boolean
 
     // @Category "Looks"
     define changeActiveGraphicTo (id: string) begin

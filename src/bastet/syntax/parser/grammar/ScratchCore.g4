@@ -297,9 +297,9 @@ coreBoolExpr  :
  |  coreBoolExpr  'and'  numExpr # BoolAndExpression
  |  coreBoolExpr  'or'  coreBoolExpr # BoolOrExpression
 
- |  numExpr  '>'  numExpr # NumGreaterThanExpression
- |  numExpr  '<'  numExpr # NumLessThanExpression
- |  numExpr  '='  numExpr # NumEqualsExpression
+ |  numOrStringExpr  '>'  numOrStringExpr # GreaterThanExpression
+ |  numOrStringExpr  '<'  numOrStringExpr # LessThanExpression
+ |  numOrStringExpr  '='  numOrStringExpr # EqualsExpression
 
  |  stringExpr  'contains'  stringExpr # StrContainsExpression
 
@@ -308,6 +308,8 @@ coreBoolExpr  :
  ;
 
 numExpr : coreNumExpr ;
+
+numOrStringExpr : numExpr | stringExpr;
 
 coreNumExpr  :
     number # NumLiteralExpression
