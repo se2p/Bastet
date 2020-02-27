@@ -60,14 +60,10 @@ import { BoolCallStatementExpressionContext } from "./ScratchParser";
 import { NegatedBoolExpressionContext } from "./ScratchParser";
 import { BoolAndExpressionContext } from "./ScratchParser";
 import { BoolOrExpressionContext } from "./ScratchParser";
-import { StrGreaterThanExpressionContext } from "./ScratchParser";
-import { StrLessThanExpressionContext } from "./ScratchParser";
-import { StrEqualsExpressionContext } from "./ScratchParser";
 import { NumGreaterThanExpressionContext } from "./ScratchParser";
 import { NumLessThanExpressionContext } from "./ScratchParser";
 import { NumEqualsExpressionContext } from "./ScratchParser";
 import { StrContainsExpressionContext } from "./ScratchParser";
-import { VarContainsExpressionContext } from "./ScratchParser";
 import { DefaultBoolExpressionContext } from "./ScratchParser";
 import { UnspecifiedBoolExpressionContext } from "./ScratchParser";
 import { DeclareVariableContext } from "./ScratchParser";
@@ -944,45 +940,6 @@ export interface ScratchListener extends ParseTreeListener {
 	exitBoolOrExpression?: (ctx: BoolOrExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `StrGreaterThanExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterStrGreaterThanExpression?: (ctx: StrGreaterThanExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `StrGreaterThanExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitStrGreaterThanExpression?: (ctx: StrGreaterThanExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `StrLessThanExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterStrLessThanExpression?: (ctx: StrLessThanExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `StrLessThanExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitStrLessThanExpression?: (ctx: StrLessThanExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `StrEqualsExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterStrEqualsExpression?: (ctx: StrEqualsExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `StrEqualsExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitStrEqualsExpression?: (ctx: StrEqualsExpressionContext) => void;
-
-	/**
 	 * Enter a parse tree produced by the `NumGreaterThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
@@ -1033,19 +990,6 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitStrContainsExpression?: (ctx: StrContainsExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `VarContainsExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterVarContainsExpression?: (ctx: VarContainsExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `VarContainsExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitVarContainsExpression?: (ctx: VarContainsExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `DefaultBoolExpression`

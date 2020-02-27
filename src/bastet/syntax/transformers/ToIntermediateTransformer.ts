@@ -148,8 +148,6 @@ import {
     StoreCallResultStatementContext,
     StoreEvalResultStatementContext,
     StrContainsExpressionContext,
-    StrEqualsExpressionContext,
-    StrGreaterThanExpressionContext,
     StrIdentExpressionContext,
     StringAsNumExpressionContext,
     StringAttributeOfExpressionContext,
@@ -158,7 +156,6 @@ import {
     StringParanthExpressionContext,
     StringTypeContext,
     StringVariableExpressionContext,
-    StrLessThanExpressionContext,
     SystemMessageContext,
     TimerExpressionContext,
     UnspecifiedBoolExpressionContext,
@@ -166,7 +163,6 @@ import {
     UnspecifiedNumExprContext,
     UnspecifiedStringExpressionContext,
     UntilStmtContext,
-    VarContainsExpressionContext,
     VariableContext,
     VoidReturnDefinitionContext,
     WaitSecsStatementContext,
@@ -1219,18 +1215,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 tr2.node as StringExpression));
     }
 
-    public visitStrEqualsExpression(ctx: StrEqualsExpressionContext) : TransformerResult {
-        return this.constructBinaryOp(ctx, StrEqualsExpression);
-    }
-
-    public visitStrGreaterThanExpression(ctx: StrGreaterThanExpressionContext) : TransformerResult {
-        return this.constructBinaryOp(ctx, StrGreaterThanExpression);
-    }
-
-    public visitStrLessThanExpression(ctx: StrLessThanExpressionContext) : TransformerResult {
-        return this.constructBinaryOp(ctx, StrLessThanExpression);
-    }
-
     public visitAddElementToStatement(ctx: AddElementToStatementContext) : TransformerResult {
         const exprTr = ctx.stringExpr().accept(this);
         return new TransformerResult(exprTr.statementsToPrepend, new AddElementToStatement(
@@ -1647,10 +1631,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitUnspecifiedStringExpression(ctx: UnspecifiedStringExpressionContext) : TransformerResult {
-        throw new ImplementMeException();
-    }
-
-    public visitVarContainsExpression(ctx: VarContainsExpressionContext) : TransformerResult {
         throw new ImplementMeException();
     }
 
