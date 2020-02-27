@@ -6,7 +6,7 @@ actor MiniActor is RuntimeEntity begin
         declare x as boolean
         define x as false
         if not x then begin
-        end else
+        end else begin
             _RUNTIME_signalFailure()
         end
     end
