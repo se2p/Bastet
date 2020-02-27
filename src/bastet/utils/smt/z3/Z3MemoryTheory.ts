@@ -89,19 +89,19 @@ export class Z3ListFormula extends Z3Formula implements AbstractList {
 
 }
 
-export class Z3BooleanTheory implements BooleanTheory<Z3BooleanFormula> {
+export class Z3Theory {
 
-    private readonly _ctx: LibZ3InContext;
+    protected readonly _ctx: LibZ3InContext;
 
     constructor(ctx: LibZ3InContext) {
         this._ctx = Preconditions.checkNotUndefined(ctx);
     }
 
-    abstractBooleanValue(id: Variable): Z3BooleanFormula {
-        return new Z3BooleanFormula(this._ctx.mk_const(this._ctx.mk_string_symbol(id.qualifiedName), this._ctx.mk_bool_sort()));
+    protected freeArray(heapBytes){
+        this._ctx.wasmInstance._free(heapBytes.byteOffset);
     }
 
-    private arrayToHeap(typedArray){
+    protected arrayToHeap(typedArray){
         const wasmInstance = this._ctx.wasmInstance;
         var numBytes = typedArray.length * typedArray.BYTES_PER_ELEMENT;
         var ptr = wasmInstance._malloc(numBytes);
@@ -110,8 +110,16 @@ export class Z3BooleanTheory implements BooleanTheory<Z3BooleanFormula> {
         return heapBytes;
     }
 
-    private freeArray(heapBytes){
-        this._ctx.wasmInstance._free(heapBytes.byteOffset);
+}
+
+export class Z3BooleanTheory extends Z3Theory implements BooleanTheory<Z3BooleanFormula> {
+
+    constructor(ctx: LibZ3InContext) {
+        super(ctx);
+    }
+
+    abstractBooleanValue(id: Variable): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_const(this._ctx.mk_string_symbol(id.qualifiedName), this._ctx.mk_bool_sort()));
     }
 
     and(op1: Z3BooleanFormula, op2: Z3BooleanFormula): Z3BooleanFormula {
@@ -172,12 +180,10 @@ export class Z3BooleanTheory implements BooleanTheory<Z3BooleanFormula> {
 
 }
 
-export class Z3NumberTheory implements RationalNumberTheory<Z3NumberFormula, Z3BooleanFormula> {
-
-    private readonly _ctx: LibZ3InContext;
+export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3NumberFormula, Z3BooleanFormula> {
 
     constructor(ctx: LibZ3InContext) {
-        this._ctx = Preconditions.checkNotUndefined(ctx);
+        super(ctx);
     }
 
     abstractNumberValue(id: Variable): Z3NumberFormula {
@@ -236,7 +242,13 @@ export class Z3NumberTheory implements RationalNumberTheory<Z3NumberFormula, Z3B
     }
 
     plus(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
-        throw new ImplementMeException();
+        const typedArray = new Int32Array([op1.getAST().val(), op2.getAST().val()]);
+        const arrayOnHeap = this.arrayToHeap(typedArray);
+        try {
+            return new Z3NumberFormula(this._ctx.mk_add(new Uint32(2), new Ptr(arrayOnHeap.byteOffset)));
+        } finally {
+            this.freeArray(arrayOnHeap);
+        }
     }
 
     topNumber(): Z3NumberFormula {
