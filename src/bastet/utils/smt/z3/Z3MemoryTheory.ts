@@ -239,7 +239,13 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
     }
 
     multiply(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
-        return new Z3NumberFormula(this._ctx.mk_mul(op1.getAST(), op2.getAST()));
+        const typedArray = new Int32Array([op1.getAST().val(), op2.getAST().val()]);
+        const arrayOnHeap = this.arrayToHeap(typedArray);
+        try {
+            return new Z3NumberFormula(this._ctx.mk_mul(new Uint32(2), new Ptr(arrayOnHeap.byteOffset)));
+        } finally {
+            this.freeArray(arrayOnHeap);
+        }
     }
 
     one(): Z3NumberFormula {
