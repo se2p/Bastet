@@ -449,7 +449,11 @@ export class ActorTypeInformation {
     }
 
     public getTypeOf(ident: Identifier): ScratchType {
-        return this._actorVariables[ident.text].type;
+        const varDecl = this._actorVariables[ident.text];
+        if (!varDecl) {
+            throw new IllegalArgumentException(`Variable ${ident.text} and its type unknown.`)
+        }
+        return varDecl.type;
     }
 }
 
