@@ -51,7 +51,7 @@ export class GraphToDot  {
     }
 
     private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
-        const transLabels = this._transLabProvider.getTransitionLabel(from, to);
+        const transLabels = GraphToDot.escapeForDot(this._transLabProvider.getTransitionLabel(from, to).toString());
         this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabels}"];`);
     }
 
@@ -83,7 +83,7 @@ export class GraphToDot  {
             + `\n}\n`);
     }
 
-    private static escpace(text: string): string {
+    private static escapeForDot(text: string): string {
         const search = "\"";
         const replacement = "\\\"";
         return text.replace(new RegExp(search, 'g'), replacement);
