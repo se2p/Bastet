@@ -55,7 +55,7 @@ export class Transfers {
     }
 
     public static withIntermediateOps<W extends AbstractElement>(
-        transferRealtion: LabeledTransferRelation<W>, fromState: W, ops: ProgramOperation[], co: Concern): W[] {
+        transferRealtion: LabeledTransferRelation<W>, fromState: W, ops: Iterable<ProgramOperation>, co: Concern): W[] {
 
         let result: W[] = [fromState];
         for (const toExecute of ops) {

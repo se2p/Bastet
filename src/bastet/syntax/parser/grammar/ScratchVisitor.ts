@@ -60,14 +60,10 @@ import { BoolCallStatementExpressionContext } from "./ScratchParser";
 import { NegatedBoolExpressionContext } from "./ScratchParser";
 import { BoolAndExpressionContext } from "./ScratchParser";
 import { BoolOrExpressionContext } from "./ScratchParser";
-import { StrGreaterThanExpressionContext } from "./ScratchParser";
-import { StrLessThanExpressionContext } from "./ScratchParser";
-import { StrEqualsExpressionContext } from "./ScratchParser";
 import { NumGreaterThanExpressionContext } from "./ScratchParser";
 import { NumLessThanExpressionContext } from "./ScratchParser";
 import { NumEqualsExpressionContext } from "./ScratchParser";
 import { StrContainsExpressionContext } from "./ScratchParser";
-import { VarContainsExpressionContext } from "./ScratchParser";
 import { DefaultBoolExpressionContext } from "./ScratchParser";
 import { UnspecifiedBoolExpressionContext } from "./ScratchParser";
 import { DeclareVariableContext } from "./ScratchParser";
@@ -662,30 +658,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitBoolOrExpression?: (ctx: BoolOrExpressionContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `StrGreaterThanExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitStrGreaterThanExpression?: (ctx: StrGreaterThanExpressionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `StrLessThanExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitStrLessThanExpression?: (ctx: StrLessThanExpressionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `StrEqualsExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitStrEqualsExpression?: (ctx: StrEqualsExpressionContext) => Result;
-
-	/**
 	 * Visit a parse tree produced by the `NumGreaterThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
@@ -716,14 +688,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitStrContainsExpression?: (ctx: StrContainsExpressionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `VarContainsExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitVarContainsExpression?: (ctx: VarContainsExpressionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `DefaultBoolExpression`

@@ -21,23 +21,24 @@
 
 import {LabeledTransferRelation, TransferRelation, Transfers} from "../TransferRelation";
 import {
-    ControlAbstractState, MethodCall, RelationLocation,
+    ControlAbstractState,
+    MethodCall,
+    RelationLocation,
     THREAD_STATE_DONE,
     THREAD_STATE_FAILURE,
     THREAD_STATE_RUNNING,
     THREAD_STATE_RUNNING_ATOMIC,
-    THREAD_STATE_YIELD,
+    THREAD_STATE_YIELD, ThreadComputationState,
     ThreadState
 } from "./ControlAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {
-    OperationID,
     ProgramOperation,
+    ProgramOperationFactory,
     ProgramOperations,
     RawOperation
 } from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {App} from "../../../syntax/app/App";
 import {ScheduleAnalysisConfig} from "./ControlAnalysis";
@@ -63,7 +64,7 @@ import {
     DataLocationRenamer,
     RenamingTransformerVisitor
 } from "../../../syntax/transformers/RenamingTransformerVisitor";
-import {DataLocation, DataLocations} from "../../../syntax/app/controlflow/DataLocation";
+import {DataLocation, DataLocations, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {Statement} from "../../../syntax/ast/core/statements/Statement";
 import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements/DeclarationStatement";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
@@ -123,18 +124,37 @@ class StepInformation {
     }
 }
 
+export const SCOPE_SEPARATOR = "@";
+
 export class DataLocationScoper implements DataLocationRenamer {
 
-    private readonly _readFromScope: ImmList<string>;
+    private readonly _readFromScope: string;
 
-    private readonly _writeToScope: ImmList<string>;
+    private readonly _writeToScope: string;
 
     constructor(readFromScope: ImmList<string>, writeToScope: ImmList<string>) {
-        this._readFromScope = readFromScope;
-        this._writeToScope = writeToScope;
+        this._readFromScope = readFromScope.join(SCOPE_SEPARATOR);
+        this._writeToScope = writeToScope.join(SCOPE_SEPARATOR);
+    }
+
+    private isScoped(dataLoc: DataLocation): boolean {
+        return dataLoc.ident.indexOf("@") > -1;
     }
 
     renameUsage(dataLoc: DataLocation, usageMode: DataLocationMode, inContextOf: Statement): DataLocation {
+        if (this.isScoped(dataLoc)) {
+            return dataLoc;
+        }
+
+        if (usageMode == DataLocationMode.ASSINGED_TO) {
+            const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + this._writeToScope;
+            return new TypedDataLocation(newIdent, dataLoc.type);
+
+        } else if (usageMode == DataLocationMode.READ_FROM) {
+            const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + this._readFromScope;
+            return new TypedDataLocation(newIdent, dataLoc.type);
+        }
+
         throw new ImplementMeException();
     }
 
@@ -155,7 +175,9 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
 export class ControlTransferRelation implements TransferRelation<ControlAbstractState> {
 
     private readonly _wrappedTransferRelation: LabeledTransferRelation<AbstractElement>;
+
     private readonly _config: ScheduleAnalysisConfig;
+
     private readonly _task: App;
 
     constructor(config: ScheduleAnalysisConfig, task: App, wrappedTransferRelation: LabeledTransferRelation<AbstractElement>) {
@@ -238,13 +260,15 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             for (const newThreadStates of nextSchedules) {
                 // Compute a successor state for each sequence and call the wrapped analysis to do so
                 Preconditions.checkNotUndefined(fromState.wrappedState);
+                const ops = newThreadStates.get(threadIndexToStep).getOperations().map(oid => ProgramOperations.withID(oid));
+
                 const wrappedSuccStates: Iterable<AbstractElement> = Transfers.withIntermediateOps(
-                    this._wrappedTransferRelation, fromState.wrappedState, stepToTake.ops, stepConcern);
+                    this._wrappedTransferRelation, fromState.wrappedState, ops, stepConcern);
 
                 for (const w of wrappedSuccStates) {
                     Preconditions.checkNotUndefined(w);
-                    const properties = this.extractProperties(nextSchedules);
-                    const e = new ControlAbstractState(newThreadStates, w, properties);
+                    const properties = this.extractFailedForProperties(nextSchedules);
+                    const e = new ControlAbstractState(newThreadStates, w, properties, ImmSet([stepToTake.threadIndex]));
                     result.push(e);
                 }
             }
@@ -253,7 +277,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result;
     }
 
-    private extractProperties(sched: Schedule[]) {
+    private extractFailedForProperties(sched: Schedule[]): ImmSet<Property> {
         const properties = [];
         for (const s of sched) {
             for (const t of s) {
@@ -309,38 +333,17 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             const statementTarget = new RelationLocation(threadActor.ident, fromRelation.ident, t.target);
             Preconditions.checkNotUndefined(op);
 
-            if (op.ast instanceof CallStatement) {
-                // The following lines realize the inter-procedural analysis.
-                const calledMethodName = op.ast.calledMethod.text;
-
-                if (threadActor.isExternalMethod(calledMethodName)) {
-                    result.push(new StepInformation(threadIndex, statementTarget, isAtomic, [op], threadState.getCallStack(), threadState.getScopeStack()));
-                } else {
-                    const calledMethod: Method = threadActor.getMethod(calledMethodName);
-                    const interProcOps: ProgramOperation[] = this.createPassArgumentsOps(calledMethod, op.ast.args);
-                    const succReturnCallsTo = threadState.getCallStack().push(new MethodCall(fromLocation, statementTarget));
-                    const succScopeStack = threadState.getScopeStack().push(calledMethodName);
-
-                    for (const entryLocId of calledMethod.transitions.entryLocationSet) {
-                        const callToRelationLoc: RelationLocation = new RelationLocation(threadActor.ident, calledMethod.transitions.ident, entryLocId);
-                        result.push(new StepInformation(threadIndex, callToRelationLoc, isAtomic, interProcOps, succReturnCallsTo, succScopeStack));
-                    }
-                }
-            } else if (op.ast instanceof ReturnStatement) {
-                const callInformation: MethodCall = threadState.getCallStack().get(threadState.getCallStack().size-1);
-                const succReturnCallsTo: ImmList<MethodCall> = threadState.getCallStack().pop();
-                const succScopeStack: ImmList<string> = threadState.getScopeStack().pop();
-
-                // Assign the result to the variable that was referenced in the `CallStatement`
-                const interProcOps: ProgramOperation[] = this.createStoreCallResultOps(threadState, callInformation, op.ast as ReturnStatement);
-
-                result.push(new StepInformation(threadIndex, callInformation.getReturnTo(), isAtomic, interProcOps, succReturnCallsTo, succScopeStack));
-            } else {
-                result.push(new StepInformation(threadIndex, statementTarget, isAtomic, [op], threadState.getCallStack(), threadState.getScopeStack()));
-            }
+            result.push(new StepInformation(threadIndex, statementTarget, isAtomic,
+                this.scopeOperations([op], threadState.getScopeStack(), threadState.getScopeStack()),
+                threadState.getCallStack(), threadState.getScopeStack()));
         }
 
         return result;
+    }
+
+    private scopeOperations(ops: ProgramOperation[], readFromScope: ImmList<string>, writeToScope: ImmList<string>): ProgramOperation[] {
+        const scoper = new ScopeTransformerVisitor(readFromScope, writeToScope);
+        return ops.map((o) => ProgramOperationFactory.createFor(o.ast.accept(scoper)));
     }
 
     private createStoreCallResultOps(thread: ThreadState, callInformation: MethodCall, ast: ReturnStatement): ProgramOperation[] {
@@ -388,6 +391,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
             // 2. Assign the arguments (caller scope) to the parameters (callee scope)
             result.push(new StoreEvalResultToVariableStatement(variable, a));
+
+            index++;
         }
 
         return result.map((s) => new RawOperation(s));
@@ -416,7 +421,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         throw new ImplementMeException();
     }
 
-    private setCompState(inSchedule: Schedule, ofThreadWithIdx: number, compState: number): Schedule {
+    private setCompState(inSchedule: Schedule, ofThreadWithIdx: number, compState: ThreadComputationState): Schedule {
         return inSchedule.set(ofThreadWithIdx,
             inSchedule.get(ofThreadWithIdx).withComputationState(compState));
     }
@@ -426,6 +431,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             inSchedule.get(ofThreadWithIdx)
                 .withComputationState(THREAD_STATE_FAILURE)
                 .withFailedFor(properties));
+    }
+
+    private updatedThread(threadStates: Schedule, indexToUpdate: number, update: (t: ThreadState) => ThreadState): Schedule {
+        const thread = threadStates.get(indexToUpdate);
+        return threadStates.set(indexToUpdate, update(thread));
     }
 
     /**
@@ -438,17 +448,20 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
     private computeNextSchedules(threadStates: Schedule, takenStep: StepInformation): Schedule[] {
         Preconditions.checkNotUndefined(threadStates);
         Preconditions.checkNotUndefined(takenStep);
-        Preconditions.checkArgument(takenStep.ops.length === 1);
 
+        Preconditions.checkArgument(takenStep.ops.length === 1);
         const stepOp = takenStep.ops[0];
         const steppedThreadIdx = takenStep.threadIndex;
+        const steppedActor = this._task.getActorByName(threadStates.get(steppedThreadIdx).getActorId());
+        const fromLocation = threadStates.get(steppedThreadIdx).getRelationLocation();
 
         // Set the new control location
-        const steppedThread = threadStates.get(steppedThreadIdx)
-            .withLocation(takenStep.succLoc)
-            .withCallStack(takenStep.succCallStack)
-            .withScopeStack(takenStep.succScopeStack);
-        let resultBase = threadStates.set(steppedThreadIdx, steppedThread);
+        let resultBase = this.updatedThread(threadStates, steppedThreadIdx,
+            (thread) => thread
+                .withLocation(takenStep.succLoc)
+                .withOperations(ImmList(takenStep.ops.map(o => o.ident)))
+                .withCallStack(takenStep.succCallStack)
+                .withScopeStack(takenStep.succScopeStack));
 
         // TODO: Where and how to handle the `clone` statement?
 
@@ -456,11 +469,55 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         // Handle different statements that start other threads and wait for them
         //
         if (stepOp.ast instanceof CallStatement) {
-            const call = stepOp.ast as CallStatement;
-            if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
-                const properties: ImmSet<Property> = Properties.fromArguments(call.args);
-                resultBase = this.setFailure(resultBase, steppedThreadIdx, properties);
+            // The following lines realize the inter-procedural analysis.
+            const calledMethodName = stepOp.ast.calledMethod.text;
+
+            if (steppedActor.isExternalMethod(calledMethodName)) {
+                const call = stepOp.ast as CallStatement;
+                if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
+                    const properties: ImmSet<Property> = Properties.fromArguments(call.args);
+                    resultBase = this.updatedThread(resultBase, steppedThreadIdx,
+                        (thread) => thread
+                            .withComputationState(THREAD_STATE_FAILURE)
+                            .withFailedFor(properties));
+                }
+
+            } else {
+                const steppedThread = resultBase.get(steppedThreadIdx);
+                const calledMethod: Method = steppedActor.getMethod(calledMethodName);
+                const interProcOps: ProgramOperation[] = this.createPassArgumentsOps(calledMethod, stepOp.ast.args);
+                const succCallStack = steppedThread.getCallStack()
+                        .push(new MethodCall(fromLocation, takenStep.succLoc));
+                const succScopeStack = steppedThread.getScopeStack().push(calledMethodName);
+
+                for (const entryLocId of calledMethod.transitions.entryLocationSet) {
+                    const callToRelationLoc: RelationLocation = new RelationLocation(steppedActor.ident, calledMethod.transitions.ident, entryLocId);
+                    const currentScopeStack = steppedThread.getScopeStack();
+
+                    resultBase = this.updatedThread(resultBase, steppedThreadIdx,
+                        thread => thread
+                            .withOperations(ImmList(this.scopeOperations(interProcOps, currentScopeStack, succScopeStack).map(op => op.ident)))
+                            .withLocation(callToRelationLoc)
+                            .withCallStack(succCallStack)
+                            .withScopeStack(succScopeStack));
+                }
             }
+        } else if (stepOp.ast instanceof ReturnStatement) {
+            const steppedThread = resultBase.get(steppedThreadIdx);
+            const callInformation: MethodCall = steppedThread.getCallStack().get(steppedThread.getCallStack().size-1);
+            const succReturnCallsTo: ImmList<MethodCall> = steppedThread.getCallStack().pop();
+            const succScopeStack: ImmList<string> = steppedThread.getScopeStack().pop();
+
+            // Assign the result to the variable that was referenced in the `CallStatement`
+            const interProcOps: ProgramOperation[] = this.createStoreCallResultOps(steppedThread, callInformation, stepOp.ast as ReturnStatement);
+
+            resultBase = this.updatedThread(resultBase, steppedThreadIdx,
+                    thread => thread
+                        .withOperations(ImmList(this.scopeOperations(interProcOps, steppedThread.getScopeStack(), succScopeStack).map(o => o.ident)))
+                        .withLocation(callInformation.getReturnTo())
+                        .withCallStack(succReturnCallsTo)
+                        .withScopeStack(succScopeStack));
+
         } else if (stepOp.ast instanceof BroadcastMessageStatement) {
             const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
             const msg: string = this.evaluateToConcreteMessage(stmt.msg);
@@ -472,6 +529,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             }
 
         } else if (stepOp.ast instanceof BroadcastAndWaitStatement) {
+            const steppedThread = resultBase.get(steppedThreadIdx);
             const stmt: BroadcastAndWaitStatement = stepOp.ast as BroadcastAndWaitStatement;
             const msg: string = this.evaluateToConcreteMessage(stmt.msg);
             const waitForIndices: number[] = this.getAllMessageReceiverThreadsFrom(threadStates, msg);
@@ -517,14 +575,13 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         }
 
         if (takenStep.isInnerAtomic) {
+            const steppedThread = resultBase.get(steppedThreadIdx);
             if (steppedThread.getComputationState() !== THREAD_STATE_RUNNING_ATOMIC) {
                 resultBase = this.setCompState(resultBase, steppedThreadIdx, THREAD_STATE_RUNNING_ATOMIC);
             }
         } else {
-            // The current state is either in RUNNING or RUNNING_ATOMIC
-            Preconditions.checkState(steppedThread.getComputationState() == THREAD_STATE_RUNNING
-                || steppedThread.getComputationState() == THREAD_STATE_RUNNING_ATOMIC);
-
+            // The current state is either in RUNNING or RUNNING_ATOMIC (otherwise, we should not have stepped it!)
+            const steppedThread = resultBase.get(steppedThreadIdx);
 
             // YIELD the current state if it is not yet on a terminating control location
             // of the script.

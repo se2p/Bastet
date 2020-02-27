@@ -32,9 +32,9 @@ export class GraphToDot  {
     private _idseq: number;
     private _reached: StateSet<GraphAbstractState>;
     private _frontier: StateSet<GraphAbstractState>;
-    private _transLabProvider: TransitionLabelProvider;
+    private _transLabProvider: TransitionLabelProvider<GraphAbstractState>;
 
-    constructor(transLabProvider: TransitionLabelProvider,
+    constructor(transLabProvider: TransitionLabelProvider<GraphAbstractState>,
                 reached: StateSet<GraphAbstractState>,
                 frontier: StateSet<GraphAbstractState>) {
         this._transLabProvider = Preconditions.checkNotUndefined(transLabProvider);
@@ -51,8 +51,8 @@ export class GraphToDot  {
     }
 
     private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
-        const transLabel = "";
-        this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabel}"];`);
+        const transLabels = this._transLabProvider.getTransitionLabel(from, to);
+        this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabels}"];`);
     }
 
     private export() {

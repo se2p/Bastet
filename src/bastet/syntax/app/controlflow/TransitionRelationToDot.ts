@@ -21,7 +21,7 @@
 
 import {TransitionRelation, TransitionTo} from "./TransitionRelation";
 import {LocationId} from "./ControlLocation";
-import {OperationID, ProgramOperations} from "./ops/ProgramOperation";
+import {OperationId, ProgramOperations} from "./ops/ProgramOperation";
 
 export class TransitionRelationToDot {
 

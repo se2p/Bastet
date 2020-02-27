@@ -151,8 +151,24 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         });
     }
 
-    getTransitionLabel(from: ControlAbstractState, to: ControlAbstractState): ProgramOperation {
-        throw new ImplementMeException();
+    getTransitionLabel(from: ControlAbstractState, to: ControlAbstractState): ProgramOperation[] {
+        const result: ProgramOperation[] = [];
+        for (const threadIdx of from.getSteppedFor().values()) {
+            const steppedThread = from.getThreadStates().get(threadIdx);
+            const succThread = to.getThreadStates().get(threadIdx);
+            Preconditions.checkArgument(steppedThread.getScriptId() == succThread.getScriptId());
+
+            const fromLocation = steppedThread.getRelationLocation();
+            const toLocation = succThread.getRelationLocation();
+
+            if (fromLocation.getRelationId() == toLocation.getRelationId()) {
+               const withinRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
+               result.push(withinRelation.transitionBetween(fromLocation.getLocationId(), toLocation.getLocationId()));
+            } else {
+
+            }
+        }
+        return result;
     }
 
     wrapStateSets(frontier: StateSet<ControlAbstractState>, reached: StateSet<ControlAbstractState>): [StateSet<ControlAbstractState>, StateSet<ControlAbstractState>] {

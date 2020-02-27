@@ -148,8 +148,6 @@ import {
     StoreCallResultStatementContext,
     StoreEvalResultStatementContext,
     StrContainsExpressionContext,
-    StrEqualsExpressionContext,
-    StrGreaterThanExpressionContext,
     StrIdentExpressionContext,
     StringAsNumExpressionContext,
     StringAttributeOfExpressionContext,
@@ -158,7 +156,6 @@ import {
     StringParanthExpressionContext,
     StringTypeContext,
     StringVariableExpressionContext,
-    StrLessThanExpressionContext,
     SystemMessageContext,
     TimerExpressionContext,
     UnspecifiedBoolExpressionContext,
@@ -166,7 +163,6 @@ import {
     UnspecifiedNumExprContext,
     UnspecifiedStringExpressionContext,
     UntilStmtContext,
-    VarContainsExpressionContext,
     VariableContext,
     VoidReturnDefinitionContext,
     WaitSecsStatementContext,
@@ -228,7 +224,6 @@ import {
 } from "../ast/core/statements/DeclarationStatement";
 import {
     SetAttributeToStatement,
-    StoreCallResultToVariableStatement,
     StoreEvalResultToVariableStatement
 } from "../ast/core/statements/SetStatement";
 import {Expression} from "../ast/core/expressions/Expression";
@@ -1220,18 +1215,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 tr2.node as StringExpression));
     }
 
-    public visitStrEqualsExpression(ctx: StrEqualsExpressionContext) : TransformerResult {
-        return this.constructBinaryOp(ctx, StrEqualsExpression);
-    }
-
-    public visitStrGreaterThanExpression(ctx: StrGreaterThanExpressionContext) : TransformerResult {
-        return this.constructBinaryOp(ctx, StrGreaterThanExpression);
-    }
-
-    public visitStrLessThanExpression(ctx: StrLessThanExpressionContext) : TransformerResult {
-        return this.constructBinaryOp(ctx, StrLessThanExpression);
-    }
-
     public visitAddElementToStatement(ctx: AddElementToStatementContext) : TransformerResult {
         const exprTr = ctx.stringExpr().accept(this);
         return new TransformerResult(exprTr.statementsToPrepend, new AddElementToStatement(
@@ -1584,7 +1567,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const methodIdent = ctx.callStmt().ident().accept(this).nodeOnly() as Identifier;
         const toVar = ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation;
         return new TransformerResult(exprListTr.statementsToPrepend,
-            new StoreCallResultToVariableStatement(methodIdent, exprListTr.node as ExpressionList, toVar));
+            new CallStatement(methodIdent, exprListTr.node as ExpressionList, OptionalAstNode.with(toVar)));
     }
 
     public visitStartupEvent(ctx: StartupEventContext) : TransformerResult {
@@ -1648,10 +1631,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitUnspecifiedStringExpression(ctx: UnspecifiedStringExpressionContext) : TransformerResult {
-        throw new ImplementMeException();
-    }
-
-    public visitVarContainsExpression(ctx: VarContainsExpressionContext) : TransformerResult {
         throw new ImplementMeException();
     }
 
@@ -1818,8 +1797,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
 
         const argsTr = ctx.expressionList().accept(this);
-        const storeCallResultStmt = new StoreCallResultToVariableStatement(methodIdent,
-            argsTr.node as ExpressionList, resultVar);
+        const storeCallResultStmt = new CallStatement(methodIdent,
+            argsTr.node as ExpressionList, OptionalAstNode.with(resultVar));
         prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
         prepend = StatementLists.concat(prepend, StatementList.from([storeCallResultStmt]));
 

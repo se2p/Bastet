@@ -24,14 +24,15 @@ import {AstNode} from "../../../ast/AstNode";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {BooleanExpression, NegationExpression} from "../../../ast/core/expressions/BooleanExpression";
 import {EpsilonStatement} from "../../../ast/core/statements/EpsilonStatement";
+import {BooleanType} from "../../../ast/core/ScratchType";
 
-export type OperationID = number;
+export type OperationId = number;
 
 export abstract class ProgramOperation implements WithIdent {
 
     private readonly _ast: AstNode|null;
 
-    private readonly _id: OperationID;
+    private readonly _id: OperationId;
 
     constructor(ast: AstNode) {
         this._ast = Preconditions.checkNotUndefined(ast);
@@ -55,7 +56,7 @@ export abstract class ProgramOperation implements WithIdent {
         }
     }
 
-    public static for(id: OperationID): ProgramOperation {
+    public static for(id: OperationId): ProgramOperation {
         return ProgramOperations.withID(id);
     }
 
@@ -109,25 +110,25 @@ export class NoopProgramOperation extends ProgramOperation {
 
 export class ProgramOperations {
 
-    private static opCodeToIdMap: Map<string, OperationID> = new Map();
-    private static idToAstMap: Map<OperationID, AstNode> = new Map();
-    private static opMap: Map<OperationID, ProgramOperation> = new Map();
+    private static opCodeToIdMap: Map<string, OperationId> = new Map();
+    private static idToAstMap: Map<OperationId, AstNode> = new Map();
+    private static opMap: Map<OperationId, ProgramOperation> = new Map();
     private static readonly EPSILON_OP = new NoopProgramOperation();
-    private static idSequencePos: OperationID;
+    private static idSequencePos: OperationId;
 
-    public static fresh(): OperationID {
+    public static fresh(): OperationId {
         if (isNaN(ProgramOperations.idSequencePos)) {
             ProgramOperations.idSequencePos = 0;
         }
         return ProgramOperations.idSequencePos++;
     }
 
-    public static constructOp(ast: AstNode): OperationID {
+    public static constructOp(ast: AstNode): OperationId {
         if (ast == null) {
             return this.fresh();
         } else {
             let opStr: string = ast.toTreeString();
-            let result: OperationID = ProgramOperations.opCodeToIdMap.get(opStr);
+            let result: OperationId = ProgramOperations.opCodeToIdMap.get(opStr);
             if (!result) {
                 result = this.fresh();
                 ProgramOperations.idToAstMap.set(result, ast);
@@ -137,7 +138,7 @@ export class ProgramOperations {
         }
     }
 
-    public static withID(id: OperationID): ProgramOperation|null {
+    public static withID(id: OperationId): ProgramOperation|null {
         let result: ProgramOperation = ProgramOperations.opMap.get(id) || null;
         if (result == null) {
             const ast: AstNode = ProgramOperations.idToAstMap.get(id);
@@ -165,6 +166,9 @@ export class ProgramOperations {
 export class ProgramOperationFactory {
 
     public static createFor(ast: AstNode): ProgramOperation {
+        if (ast['type'] === BooleanType.instance()) {
+            return this.createAssumeOpFrom(ast as BooleanExpression);
+        }
         return new RawOperation(ast);
     }
 

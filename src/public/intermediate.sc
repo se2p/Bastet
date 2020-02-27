@@ -139,6 +139,18 @@ role ScratchEntity is RuntimeEntity begin
 
     extern radToDeg(n: number) returns number
 
+    define isStringEqualTo (str1: string, str2: string) begin
+        // TODO
+    end returns result : boolean
+
+    define isStringGreaterThan (str1: string, str2: string) begin
+        // TODO
+    end returns result : boolean
+
+    define isStringLessThan (str1: string, str2: string) begin
+        // TODO
+    end returns result : boolean
+
     // @Category "Looks"
     define changeActiveGraphicTo (id: string) begin
         define current_costume_name as id

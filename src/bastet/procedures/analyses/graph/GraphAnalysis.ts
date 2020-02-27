@@ -37,9 +37,10 @@ import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
 import {AnalysisStatistics} from "../AnalysisStatistics";
+import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 
 export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState>,
-    Unwrapper<GraphAbstractState, AbstractElement> {
+    Unwrapper<GraphAbstractState, AbstractElement>, TransitionLabelProvider<GraphAbstractState> {
 
     private readonly _abstractDomain: AbstractDomain<GraphConcreteState, GraphAbstractState>;
 
@@ -102,20 +103,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         } );
     }
 
-    private determineTransLabProvider(from: ProgramAnalysis<any, any>): TransitionLabelProvider {
-        if ('getTransitionLabel' in from) {
-            return from as TransitionLabelProvider;
-        } else if ('wrappedAnalysis' in from) {
-            const wrapper = from as WrappingProgramAnalysis<any, any>
-            return this.determineTransLabProvider(wrapper.wrappedAnalysis);
-        } else {
-            return null;
-        }
-    }
-
     exportAnalysisResult(reachedPrime: StateSet<GraphAbstractState>, frontierPrime: StateSet<GraphAbstractState>) {
-        const trp = this.determineTransLabProvider(this.wrappedAnalysis);
-        const exporter = new GraphToDot(trp, reachedPrime, frontierPrime);
+        const exporter = new GraphToDot(this, reachedPrime, frontierPrime);
         exporter.writeToFile(`output/reachability-graph.dot`);
     }
 
@@ -138,5 +127,9 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     wrapStateSets(frontier: StateSet<GraphAbstractState>, reached: StateSet<GraphAbstractState>): [StateSet<GraphAbstractState>, StateSet<GraphAbstractState>] {
         const wrappedReached = new GraphReachedSetWrapper(reached, frontier);
         return [frontier, wrappedReached];
+    }
+
+    getTransitionLabel(from: GraphAbstractState, to: GraphAbstractState): ProgramOperation[] {
+        return this.wrappedAnalysis['getTransitionLabel'](from.getWrappedState(), to.getWrappedState());
     }
 }

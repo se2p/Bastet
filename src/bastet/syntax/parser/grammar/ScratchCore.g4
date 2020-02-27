@@ -297,10 +297,6 @@ coreBoolExpr  :
  |  coreBoolExpr  'and'  numExpr # BoolAndExpression
  |  coreBoolExpr  'or'  coreBoolExpr # BoolOrExpression
 
- |  stringExpr  '>'  stringExpr # StrGreaterThanExpression
- |  stringExpr  '<'  stringExpr # StrLessThanExpression
- |  stringExpr  '='  stringExpr # StrEqualsExpression
-
  |  numExpr  '>'  numExpr # NumGreaterThanExpression
  |  numExpr  '<'  numExpr # NumLessThanExpression
  |  numExpr  '='  numExpr # NumEqualsExpression
