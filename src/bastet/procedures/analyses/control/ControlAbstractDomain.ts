@@ -281,15 +281,20 @@ export interface ControlAbstractStateAttributes extends AbstractElement, Singlet
     /** Wrapped abstract state that stores the actual data of heap and stack */
     wrappedState: AbstractElement;
 
+    /** The threads that have been stepped to get to this state */
+    steppedThreadIndices: ImmSet<number>;
+
 }
 
 const ControlAbstractStateRecord = ImmRec({
 
     threadStates: ImmList<ThreadState>([]),
 
+    steppedThreadIndices: ImmSet<number>(),
+
     wrappedState: null,
 
-    isTargetFor: ImmSet()
+    isTargetFor: ImmSet<Property>()
 
 });
 
@@ -298,8 +303,10 @@ const ControlAbstractStateRecord = ImmRec({
  */
 export class ControlAbstractState extends ControlAbstractStateRecord implements AbstractElement {
 
-    constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement, isTargetFor: ImmSet<Property>) {
-        super({threadStates: threadStates, wrappedState: wrappedState, isTargetFor: isTargetFor});
+    constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement, isTargetFor: ImmSet<Property>,
+                steppedThreadIndices: ImmSet<number>) {
+        super({threadStates: threadStates, wrappedState: wrappedState, isTargetFor: isTargetFor,
+            steppedThreadIndices: steppedThreadIndices});
     }
 
     public getThreadStates(): ImmList<ThreadState> {
@@ -313,13 +320,13 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
     public getIsTargetFor(): ImmSet<Property> {
         return this.get("isTargetFor");
     }
+
+    public getSteppedFor(): ImmSet<number> {
+        return this.get("steppedThreadIndices");
+    }
 }
 
 export class ScheduleAbstractStateFactory {
-
-    public static createState(threadStates: ImmList<ThreadState>, wrappedStated: ImmRec<any>, isTargetFor: ImmSet<Property>): ControlAbstractState {
-        return new ControlAbstractState(threadStates, wrappedStated, isTargetFor);
-    }
 
     static createInitialState(task: App, wrappedState: ImmRec<any>, isTarget) {
         let threads = ImmList<ThreadState>([]);
@@ -338,7 +345,7 @@ export class ScheduleAbstractStateFactory {
             }
         }
 
-        return new ControlAbstractState(threads, wrappedState, isTarget);
+        return new ControlAbstractState(threads, wrappedState, isTarget, ImmSet());
     }
 }
 

@@ -311,6 +311,15 @@ export class TransitionRelation {
         return result;
     }
 
+    public transitionBetween(from: LocationId, to: LocationId): ProgramOperation {
+        for (const t of this.transitionsFrom(from)) {
+            if (t.target == to) {
+                return ProgramOperation.for(t.opId);
+            }
+        }
+        return null;
+    }
+
     public transitionsTo(to: LocationId): Array<TransitionTo> {
         return this.backwards.transitionsFrom(to);
     }

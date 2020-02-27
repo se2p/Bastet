@@ -60,16 +60,16 @@ export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends 
 
 }
 
-export interface TransitionLabelProvider {
+export interface TransitionLabelProvider<E extends AbstractElement> {
 
-    getTransitionLabel(from: AbstractElement, to: AbstractElement): ProgramOperation;
+    getTransitionLabel(from: E, to: E): ProgramOperation[];
 
 }
 
 export interface ProgramAnalysisWithLabelProducer<C extends ConcreteElement, E extends AbstractElement>
-    extends ProgramAnalysis<C, E>, TransitionLabelProvider {
+    extends ProgramAnalysis<C, E>, TransitionLabelProvider<E> {
 
-    getTransitionLabel(from: E, to: E): ProgramOperation;
+    getTransitionLabel(from: E, to: E): ProgramOperation[];
 
 }
 

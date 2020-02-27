@@ -268,7 +268,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 for (const w of wrappedSuccStates) {
                     Preconditions.checkNotUndefined(w);
                     const properties = this.extractFailedForProperties(nextSchedules);
-                    const e = new ControlAbstractState(newThreadStates, w, properties);
+                    const e = new ControlAbstractState(newThreadStates, w, properties, ImmSet([stepToTake.threadIndex]));
                     result.push(e);
                 }
             }
@@ -277,7 +277,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result;
     }
 
-    private extractFailedForProperties(sched: Schedule[]) {
+    private extractFailedForProperties(sched: Schedule[]): ImmSet<Property> {
         const properties = [];
         for (const s of sched) {
             for (const t of s) {
