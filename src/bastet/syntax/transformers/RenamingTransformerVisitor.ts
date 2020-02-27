@@ -119,6 +119,7 @@ import {CallStatement} from "../ast/core/statements/CallStatement";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {Statement} from "../ast/core/statements/Statement";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {ReturnStatement} from "../ast/core/statements/ControlStatement";
 
 export enum DataLocationMode {
 
@@ -177,6 +178,15 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
         }
     }
 
+    private withMode(mode: DataLocationMode, cb: () => AstNode): AstNode {
+        this._activeUsageMode = mode;
+        try {
+            return cb();
+        } finally {
+            this._activeUsageMode = null;
+        }
+    }
+
     private rename(dataLoc: DataLocation): DataLocation {
         return this._renamer.renameUsage(dataLoc, this._activeUsageMode, this._activeStatement);
     }
@@ -191,6 +201,19 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     private renameDeclaration(dataLoc: DataLocation): DataLocation {
         return this._renamer.renameUsage(dataLoc, DataLocationMode.ASSINGED_TO, this._activeStatement);
+    }
+
+    visitReturnStatement(node: ReturnStatement): AstNode {
+        return this.doForStatement(node, () => {
+            let resultVar;
+            if (node.resultVariable.isPresent()) {
+                const writeDataLoc = this.renameAssigned(node.resultVariable.value().dataloc);
+                resultVar = OptionalAstNode.with(new VariableWithDataLocation(writeDataLoc));
+            } else {
+                resultVar = OptionalAstNode.absent();
+            }
+            return new ReturnStatement(resultVar);
+        });
     }
 
     visitCallStatement(node: CallStatement): AstNode {
@@ -511,12 +534,16 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
         throw new IllegalStateException("We assume that 'attributes' are no more used");
     }
 
+    visitVariableWithDataLocation(node: VariableWithDataLocation): AstNode {
+        return new VariableWithDataLocation(this.rename(node.dataloc));
+    }
+
     visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): AstNode {
         return this.doForStatement(node, (() => {
             const assignedDataLoc: DataLocation = this.renameAssigned(node.variable.dataloc);
             return new StoreEvalResultToVariableStatement(
                 new VariableWithDataLocation(assignedDataLoc),
-                node.toValue.accept(this) as Expression);
+                this.withMode(DataLocationMode.READ_FROM, () => node.toValue.accept(this)) as Expression);
         }));
     }
 

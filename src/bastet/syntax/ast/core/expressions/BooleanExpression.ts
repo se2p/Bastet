@@ -38,7 +38,7 @@ export interface BooleanExpression extends Expression {
 export class AbstractBooleanExpression extends AbstractExpression implements BooleanExpression {
 
     constructor(childs: AstNode[]) {
-        super(NumberType.instance(), childs);
+        super(BooleanType.instance(), childs);
     }
 
 }

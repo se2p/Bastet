@@ -59,9 +59,10 @@ export class VariableWithDataLocation extends AbstractExpression implements Vari
     private readonly _identifier: Identifier;
 
     constructor(dataloc: DataLocation) {
-        super(ScratchType.fromId(dataloc.type), []);
+        const ident = Identifier.of(dataloc.ident);
+        super(ScratchType.fromId(dataloc.type), [ident]);
         this._dataloc = dataloc;
-        this._identifier = Identifier.of(dataloc.ident);
+        this._identifier = ident;
     }
 
     get identifier(): Identifier {

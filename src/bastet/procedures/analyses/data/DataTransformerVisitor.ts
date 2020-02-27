@@ -126,6 +126,7 @@ import {Map as ImmMap} from "immutable";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
+import {Variable, VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 
 export class DataNumExpressionVisitor<N extends AbstractNumber, B extends AbstractBoolean>
     implements CoreNumberExpressionVisitor<N> {
@@ -138,6 +139,10 @@ export class DataNumExpressionVisitor<N extends AbstractNumber, B extends Abstra
 
     visit(node: AstNode): N {
         throw new ImplementMeException();
+    }
+
+    visitVariableWithDataLocation(node: VariableWithDataLocation): N {
+        return this._theory.abstractNumberValue(node);
     }
 
     visitBoolAsNumberExpression(node: BoolAsNumberExpression): N {
@@ -369,8 +374,10 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
         const method = node.calledMethod.text;
         if (method == MethodIdentifiers._RUNTIME_signalFailure) {
             return this._mem;
+        } else if (method.startsWith("_RUNTIME_")) {
+            throw new ImplementMeException();
         }
-        throw new ImplementMeException();
+        return this._mem;
     }
 
     visitAddElementToStatement(node: AddElementToStatement): B {

@@ -20,7 +20,7 @@
  */
 
 import {TransitionRelation, TransitionRelations} from "./TransitionRelation";
-import {OperationID, ProgramOperation, ProgramOperationFactory, ProgramOperations} from "./ops/ProgramOperation";
+import {OperationId, ProgramOperation, ProgramOperationFactory, ProgramOperations} from "./ops/ProgramOperation";
 import {ControlLocation} from "./ControlLocation";
 import {CoreCtrlStatementnVisitor, CoreVisitor} from "../../ast/CoreVisitor";
 import {CallStatement} from "../../ast/core/statements/CallStatement";
@@ -111,7 +111,7 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
     visit(node: AstNode): TransitionRelation {
         this._stack.push("visit");
         try {
-            const opid: OperationID = ProgramOperations.constructOp(node);
+            const opid: OperationId = ProgramOperations.constructOp(node);
             return TransitionRelations.forOpSeq(ProgramOperation.for(opid));
         } finally {
             this._stack.pop();

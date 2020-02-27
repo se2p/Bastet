@@ -193,7 +193,7 @@ export class Actor {
     }
 
     public isExternalMethod(name: string) {
-        return this._externalMethodSignatures.get(name) !== null;
+        return this._externalMethodSignatures.get(name) != null;
     }
 
     public getMethod(name: string): Method {

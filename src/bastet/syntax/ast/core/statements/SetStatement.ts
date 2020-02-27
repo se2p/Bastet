@@ -101,18 +101,4 @@ export class StoreEvalResultToVariableStatement extends SetStatement {
     }
 }
 
-export class StoreCallResultToVariableStatement extends SetStatement {
-
-    private readonly _method: Identifier;
-    private readonly _arguments: ExpressionList;
-    private readonly _toVariable: Variable;
-
-    constructor(method: Identifier, args: ExpressionList, toVariable: Variable) {
-        super([method, args, toVariable.identifier]);
-        this._method = method;
-        this._arguments = args;
-        this._toVariable = toVariable;
-    }
-
-}
 

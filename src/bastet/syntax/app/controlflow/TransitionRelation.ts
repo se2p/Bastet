@@ -19,7 +19,7 @@
  *
  */
 
-import {OperationID, ProgramOperation, ProgramOperations} from "./ops/ProgramOperation";
+import {OperationId, ProgramOperation, ProgramOperations} from "./ops/ProgramOperation";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ControlLocation, LocationId} from "./ControlLocation";
@@ -37,7 +37,7 @@ export interface WithTransitionRelation {
 
 export class TransitionRelationBuilder {
 
-    private readonly _transitions: Map<LocationId, Map<LocationId, Set<OperationID>>>;
+    private readonly _transitions: Map<LocationId, Map<LocationId, Set<OperationId>>>;
 
     private readonly _locations: Map<LocationId, ControlLocation>;
 
@@ -85,13 +85,13 @@ export class TransitionRelationBuilder {
 
     public addTransition(from: ControlLocation, to: ControlLocation, op: ProgramOperation): this {
         // Add the transition
-        let fromMap: Map<LocationId, Set<OperationID>> = this._transitions.get(from.ident);
+        let fromMap: Map<LocationId, Set<OperationId>> = this._transitions.get(from.ident);
         if (!fromMap) {
             fromMap = new Map();
             this._transitions.set(from.ident, fromMap);
         }
 
-        let opsToLocSet: Set<OperationID> = fromMap.get(to.ident);
+        let opsToLocSet: Set<OperationId> = fromMap.get(to.ident);
         if (!opsToLocSet) {
             opsToLocSet = new Set();
             fromMap.set(to.ident, opsToLocSet);
@@ -128,7 +128,7 @@ export class TransitionRelationBuilder {
 
         let transitions: TransitionTable = ImmMap();
         for(let [fromID, fwdTargetMap] of this._transitions.entries()) {
-            let fromMap: ImmMap<LocationId, ImmSet<OperationID>> = ImmMap();
+            let fromMap: ImmMap<LocationId, ImmSet<OperationId>> = ImmMap();
             for (let [targetID, fwdTransOps] of fwdTargetMap.entries()) {
                 const ops = ImmSet(fwdTransOps.values());
                 fromMap = fromMap.set(targetID, ops);
@@ -141,11 +141,11 @@ export class TransitionRelationBuilder {
 
 }
 
-export type TransitionTable = ImmMap<LocationId, ImmMap<LocationId, ImmSet<OperationID>>>;
+export type TransitionTable = ImmMap<LocationId, ImmMap<LocationId, ImmSet<OperationId>>>;
 
 export class TransitionTo {
 
-    private readonly _opId: OperationID;
+    private readonly _opId: OperationId;
 
     private readonly _target: LocationId;
 
@@ -299,7 +299,7 @@ export class TransitionRelation {
     }
 
     public transitionsFrom(from: LocationId): Array<TransitionTo> {
-        let transitionsTo: ImmMap<LocationId, ImmSet<OperationID>> = this.transitionTable.get(from) || ImmMap();
+        let transitionsTo: ImmMap<LocationId, ImmSet<OperationId>> = this.transitionTable.get(from) || ImmMap();
 
         let result: Array<TransitionTo> = new Array<TransitionTo>();
         for (let [to, ops] of transitionsTo.entries()) {
@@ -387,10 +387,10 @@ export class TransitionRelations {
         Preconditions.checkNotUndefined(to);
         Preconditions.checkNotUndefined(op);
 
-        const oldTargets: ImmMap<LocationId, ImmSet<OperationID>> = tx.get(from) || ImmMap();
-        const oldReachingOps: ImmSet<OperationID> = oldTargets.get(to) || ImmSet();
-        const newReachingOps: ImmSet<OperationID> = oldReachingOps.add(op.ident);
-        const newTargets: ImmMap<LocationId, ImmSet<OperationID>> = oldTargets.set(to, newReachingOps);
+        const oldTargets: ImmMap<LocationId, ImmSet<OperationId>> = tx.get(from) || ImmMap();
+        const oldReachingOps: ImmSet<OperationId> = oldTargets.get(to) || ImmSet();
+        const newReachingOps: ImmSet<OperationId> = oldReachingOps.add(op.ident);
+        const newTargets: ImmMap<LocationId, ImmSet<OperationId>> = oldTargets.set(to, newReachingOps);
         return tx.set(from, newTargets);
     }
 
@@ -599,7 +599,7 @@ export class TransitionRelations {
         // 3. Rebuild the transition relation
         const builder = TransitionRelation.builder();
         // - Transitions
-        tr.transitionTable.forEach((targets: ImmMap<LocationId, ImmSet<OperationID>>, from: LocationId) => {
+        tr.transitionTable.forEach((targets: ImmMap<LocationId, ImmSet<OperationId>>, from: LocationId) => {
             for (const to of targets.keys()) {
                 for (const op of targets.get(to)) {
                     if (op === ProgramOperations.epsilon().ident) {

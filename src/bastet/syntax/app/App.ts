@@ -25,7 +25,7 @@ import {MethodDefinition, MethodDefinitionList} from "../ast/core/MethodDefiniti
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {Record as ImmRec, Set as ImmSet} from "immutable";
-import {OperationID, ProgramOperation} from "./controlflow/ops/ProgramOperation";
+import {OperationId, ProgramOperation} from "./controlflow/ops/ProgramOperation";
 import {LocationId} from "./controlflow/ControlLocation";
 import {CallStatement} from "../ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";

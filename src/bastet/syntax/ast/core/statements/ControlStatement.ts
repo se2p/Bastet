@@ -24,6 +24,7 @@ import {Statement, StatementList} from "./Statement";
 import {BooleanExpression} from "../expressions/BooleanExpression";
 import {NumberExpression} from "../expressions/NumberExpression";
 import {Variable, VariableWithDataLocation} from "../Variable";
+import {Preconditions} from "../../../../utils/Preconditions";
 
 export interface ControlStatement extends AbstractNode {
 
@@ -142,7 +143,8 @@ export class ReturnStatement extends Statement implements ControlStatement {
     private readonly _resultVariable: OptionalAstNode<VariableWithDataLocation>;
 
     constructor(resultVariable: OptionalAstNode<VariableWithDataLocation>) {
-        super([resultVariable]);
+        super([Preconditions.checkNotUndefined(resultVariable)]);
+        this._resultVariable = resultVariable;
     }
 
     get resultVariable(): OptionalAstNode<VariableWithDataLocation> {
