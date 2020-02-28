@@ -10,7 +10,7 @@ actor MiniActor is RuntimeEntity begin
         declare x as number
         define x as 42
         if gz (x) then begin
-        end else
+        end else begin
             _RUNTIME_signalFailure()
         end
     end

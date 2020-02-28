@@ -53,10 +53,10 @@ function execute_explicit(bastet: Bastet, fixturePath: string, expectSuccess: bo
 
     asyncAwaitFunction().then(result => {
             let analysisResult: MultiPropertyAnalysisResult = result as MultiPropertyAnalysisResult;
-            if (expectSuccess && analysisResult.satisfied.size < 1) {
-                expect(analysisResult.satisfied.size).resolves.toBeGreaterThan(1)
-            } else if (!expectSuccess) {
-                expect(analysisResult.violated.size).resolves.toBeGreaterThan(1)
+            if (expectSuccess) {
+                expect(analysisResult.satisfied.size).toBeGreaterThan(0)
+            } else {
+                expect(analysisResult.violated.size).toBeGreaterThan(0)
             }
             done()
         }
