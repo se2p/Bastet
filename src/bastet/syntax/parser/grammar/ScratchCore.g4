@@ -61,11 +61,7 @@ resourceList : resource* ;
 // Decalration of a variable. Depending on the possition of the
 // declaration statement, the variable is either local to the actor
 // or local to the current stack of a script execution.
-declarationStmt :
-        'declare' ident 'as' type # DeclareVariable
-     |  'declare' stringExpr 'as' type 'attribute' # DeclareAttribute
-     |  'declare' stringExpr 'as' type 'attribute' 'of' ident # DeclareAttributeOf
-     ;
+declarationStmt : 'declare' ident 'as' type # DeclareVariable ;
 
 // A list of variable declarations.
 declarationStmtList : declarationStmt* ;
@@ -73,9 +69,8 @@ declarationStmtList : declarationStmt* ;
 // The list of datatypes that are allowed for the declaration
 // of variables and attributes.
 type :
- primitiveType # Primitive
+    primitiveType # Primitive
  | 'list' 'of' type # ListType
- | 'map' 'from' indexType # MapType
  ;
 
 primitiveType:
@@ -234,8 +229,6 @@ commonStmt  :
  |  'broadcast' message # BroadcastMessageStatement
  |  'broadcast' message 'and' 'wait' # BroadcastAndWaitStatement
  |  'reset' 'timer' # ResetTimerStatement
- |  'change'  variable 'by' expression # ChangeVarByStatement
- |  'change' 'attribute' stringExpr 'by' numExpr # ChagenAttributeByStatement
  |  'epsilon' # EpsilonStatement
  |  'assume' boolExpr # AssumeStatement
  |  setStmt # SetStatement
@@ -250,9 +243,7 @@ listStmt :
  ;
 
 setStmt :
-    'set' 'attribute' String 'to' expression # SetAttributeToStatement
- |  'set' 'attribute' String 'of' ident 'to' expression # SetAttributeOfToStatement
- |  'define' variable 'as' expression # StoreEvalResultStatement
+    'define' variable 'as' expression # StoreEvalResultStatement
  |  'define' variable 'as' callStmt # StoreCallResultStatement
  ;
 
@@ -326,10 +317,7 @@ coreNumExpr  :
  |  'length' 'of' stringExpr # LengthOfStringExpression
  |  'length' 'of' 'list' variable # LengthOfListExpression
  |  'index' 'of' expression 'in' variable # IndexOfExpression
- |  'pick' 'random'  coreNumExpr  'to'  coreNumExpr # NumRandomExpression
- |  'round'  coreNumExpr # NumRoundExpression
 
- |  numFunct  'of'  coreNumExpr # NumFunctExpression
  |  coreNumExpr  '*'  coreNumExpr # NumMulExpression
  |  coreNumExpr  '/'  coreNumExpr # NumDivExpression
  |  coreNumExpr  'mod'  coreNumExpr # NumModExpression
@@ -338,22 +326,6 @@ coreNumExpr  :
 
  | 'default' number 'for' coreNumExpr # DefaultNumExpr
  | '?number' # UnspecifiedNumExpr ;
-
-numFunct :
-   'abs'
-|  'floor'
-|  'ceiling'
-|  'sqrt'
-|  'sin'
-|  'cos'
-|  'tan'
-|  'asin'
-|  'acos'
-|  'atan'
-|  'ln'
-|  'log'
-|  'powe'
-|  'powten' ;
 
 listExpr :
     variable # ListVariableExpression

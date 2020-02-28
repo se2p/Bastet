@@ -38,19 +38,60 @@ role RuntimeEntity begin
 
     extern _RUNTIME_signalFailure ()
 
-    extern _RUNTIME_numberFromInterval(from_num: number, to_num: number) returns number
+    extern _RUNTIME_numberFromInterval (from_num: number, to_num: number) returns number
 
-    extern _RUNTIME_integerFromInterval(from_num: number, to_num: number) returns number
+    extern _RUNTIME_integerFromInterval (from_num: number, to_num: number) returns number
 
-    extern _RUNTIME_getImageWidth(ident: string) returns number
+    extern _RUNTIME_getImageWidth (ident: string) returns number
 
-    extern _RUNTIME_getImageHeight(ident: string) returns number
+    extern _RUNTIME_getImageHeight (ident: string) returns number
+
+    // A random integer in the interval [from, to],
+    // that is, both end points are included.
+    extern randomIntegerBetween (from: number, to: number) returns number;
+
+    // See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
+    extern randomBetween (from: number, to: number) returns number;
 
     // TODO: Maybe add an approximation for sqrt
-    extern mathSqrt(n: number) returns number
+    extern mathSqrt (n: number) returns number
 
     // TODO: Maybe add an approximation for floor
-    extern mathFloor(n: number) returns number
+    extern mathFloor (n: number) returns number
+
+    extern mathAbs (n: number) returns number
+
+    extern mathFloor (n: number) returns number
+
+    extern mathCeiling (n: number) returns number
+
+    extern mathSqrt (n: number) returns number
+
+    extern mathSin (n: number) returns number
+
+    extern mathCos (n: number) returns number
+
+    extern mathTan (n: number) returns number
+
+    extern mathAsin (n: number) returns number
+
+    extern mathAcos (n: number) returns number
+
+    extern mathAtan (n: number) returns number
+
+    extern mathLn(n: number) returns number
+
+    extern mathLog(n: number) returns number
+
+    extern mathPowe(n: number) returns number
+
+    extern mathPowten(n: number) returns number
+
+    extern mathAtan2(n1: number, n2: number) returns number
+
+    extern degToRad(n: number) returns number
+
+    extern radToDeg(n: number) returns number
 
 end
 
@@ -134,16 +175,6 @@ role ScratchEntity is RuntimeEntity begin
     declare sound_effect as enum [ "pitch", "pan_left_right" ]
 
     declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
-
-    extern mathSin(n: number) returns number
-
-    extern mathCos(n: number) returns number
-
-    extern mathAtan2(n1: number, n2: number) returns number
-
-    extern degToRad(n: number) returns number
-
-    extern radToDeg(n: number) returns number
 
     // @Category "Looks"
     define changeActiveGraphicTo (id: string) begin

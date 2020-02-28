@@ -7,13 +7,10 @@ import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
 import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
-import { MapTypeContext } from "./ScratchParser";
 import { ConcreteActorModeContext } from "./ScratchParser";
 import { ActorRoleModeContext } from "./ScratchParser";
 import { ExternFunctionReturnDefinitionContext } from "./ScratchParser";
 import { ExternVoidReturnDefinitionContext } from "./ScratchParser";
-import { SetAttributeToStatementContext } from "./ScratchParser";
-import { SetAttributeOfToStatementContext } from "./ScratchParser";
 import { StoreEvalResultStatementContext } from "./ScratchParser";
 import { StoreCallResultStatementContext } from "./ScratchParser";
 import { ListVariableExpressionContext } from "./ScratchParser";
@@ -23,6 +20,8 @@ import { ImportAllActorsContext } from "./ScratchParser";
 import { StopAllContext } from "./ScratchParser";
 import { StopThisContext } from "./ScratchParser";
 import { DeleteThisCloneContext } from "./ScratchParser";
+import { NumberExpressionContext } from "./ScratchParser";
+import { StringExpressionContext } from "./ScratchParser";
 import { DeleteAllFromStatementContext } from "./ScratchParser";
 import { DeleteIthFromStatementContext } from "./ScratchParser";
 import { AddElementToStatementContext } from "./ScratchParser";
@@ -48,8 +47,6 @@ import { CreateCloneOfStatementContext } from "./ScratchParser";
 import { BroadcastMessageStatementContext } from "./ScratchParser";
 import { BroadcastAndWaitStatementContext } from "./ScratchParser";
 import { ResetTimerStatementContext } from "./ScratchParser";
-import { ChangeVarByStatementContext } from "./ScratchParser";
-import { ChagenAttributeByStatementContext } from "./ScratchParser";
 import { EpsilonStatementContext } from "./ScratchParser";
 import { AssumeStatementContext } from "./ScratchParser";
 import { SetStatementContext } from "./ScratchParser";
@@ -67,8 +64,6 @@ import { StrContainsExpressionContext } from "./ScratchParser";
 import { DefaultBoolExpressionContext } from "./ScratchParser";
 import { UnspecifiedBoolExpressionContext } from "./ScratchParser";
 import { DeclareVariableContext } from "./ScratchParser";
-import { DeclareAttributeContext } from "./ScratchParser";
-import { DeclareAttributeOfContext } from "./ScratchParser";
 import { StringLiteralExpressionContext } from "./ScratchParser";
 import { StringVariableExpressionContext } from "./ScratchParser";
 import { StringParanthExpressionContext } from "./ScratchParser";
@@ -102,9 +97,6 @@ import { TimerExpressionContext } from "./ScratchParser";
 import { LengthOfStringExpressionContext } from "./ScratchParser";
 import { LengthOfListExpressionContext } from "./ScratchParser";
 import { IndexOfExpressionContext } from "./ScratchParser";
-import { NumRandomExpressionContext } from "./ScratchParser";
-import { NumRoundExpressionContext } from "./ScratchParser";
-import { NumFunctExpressionContext } from "./ScratchParser";
 import { NumMulExpressionContext } from "./ScratchParser";
 import { NumDivExpressionContext } from "./ScratchParser";
 import { NumModExpressionContext } from "./ScratchParser";
@@ -180,7 +172,6 @@ import { CoreBoolExprContext } from "./ScratchParser";
 import { NumExprContext } from "./ScratchParser";
 import { NumOrStringExprContext } from "./ScratchParser";
 import { CoreNumExprContext } from "./ScratchParser";
-import { NumFunctContext } from "./ScratchParser";
 import { ListExprContext } from "./ScratchParser";
 import { ExpressionContext } from "./ScratchParser";
 import { CoreExpressionContext } from "./ScratchParser";
@@ -235,14 +226,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitListType?: (ctx: ListTypeContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `MapType`
-	 * labeled alternative in `ScratchParser.type`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitMapType?: (ctx: MapTypeContext) => Result;
-
-	/**
 	 * Visit a parse tree produced by the `ConcreteActorMode`
 	 * labeled alternative in `ScratchParser.actorMode`.
 	 * @param ctx the parse tree
@@ -273,22 +256,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitExternVoidReturnDefinition?: (ctx: ExternVoidReturnDefinitionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `SetAttributeToStatement`
-	 * labeled alternative in `ScratchParser.setStmt`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitSetAttributeToStatement?: (ctx: SetAttributeToStatementContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `SetAttributeOfToStatement`
-	 * labeled alternative in `ScratchParser.setStmt`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitSetAttributeOfToStatement?: (ctx: SetAttributeOfToStatementContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `StoreEvalResultStatement`
@@ -361,6 +328,22 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitDeleteThisClone?: (ctx: DeleteThisCloneContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `NumberExpression`
+	 * labeled alternative in `ScratchParser.numOrStringExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitNumberExpression?: (ctx: NumberExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `StringExpression`
+	 * labeled alternative in `ScratchParser.numOrStringExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitStringExpression?: (ctx: StringExpressionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `DeleteAllFromStatement`
@@ -563,22 +546,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitResetTimerStatement?: (ctx: ResetTimerStatementContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `ChangeVarByStatement`
-	 * labeled alternative in `ScratchParser.commonStmt`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitChangeVarByStatement?: (ctx: ChangeVarByStatementContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `ChagenAttributeByStatement`
-	 * labeled alternative in `ScratchParser.commonStmt`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitChagenAttributeByStatement?: (ctx: ChagenAttributeByStatementContext) => Result;
-
-	/**
 	 * Visit a parse tree produced by the `EpsilonStatement`
 	 * labeled alternative in `ScratchParser.commonStmt`.
 	 * @param ctx the parse tree
@@ -713,22 +680,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitDeclareVariable?: (ctx: DeclareVariableContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `DeclareAttribute`
-	 * labeled alternative in `ScratchParser.declarationStmt`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitDeclareAttribute?: (ctx: DeclareAttributeContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `DeclareAttributeOf`
-	 * labeled alternative in `ScratchParser.declarationStmt`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitDeclareAttributeOf?: (ctx: DeclareAttributeOfContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `StringLiteralExpression`
@@ -993,30 +944,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitIndexOfExpression?: (ctx: IndexOfExpressionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `NumRandomExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitNumRandomExpression?: (ctx: NumRandomExpressionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `NumRoundExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitNumRoundExpression?: (ctx: NumRoundExpressionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `NumFunctExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitNumFunctExpression?: (ctx: NumFunctExpressionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `NumMulExpression`
@@ -1555,13 +1482,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitCoreNumExpr?: (ctx: CoreNumExprContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `ScratchParser.numFunct`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitNumFunct?: (ctx: NumFunctContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `ScratchParser.listExpr`.

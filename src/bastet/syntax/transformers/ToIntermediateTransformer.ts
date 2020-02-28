@@ -46,8 +46,6 @@ import {
     BroadcastAndWaitStatementContext,
     BroadcastMessageStatementContext,
     CallStmtContext,
-    ChagenAttributeByStatementContext,
-    ChangeVarByStatementContext,
     CloneStartEventContext,
     ColorFromNumExpressionContext,
     ConcreteActorModeContext,
@@ -56,8 +54,6 @@ import {
     CoreStringExprContext,
     CreateCloneOfStatementContext,
     DeclarationStmtListContext,
-    DeclareAttributeContext,
-    DeclareAttributeOfContext,
     DeclareVariableContext,
     DefaultBoolExpressionContext,
     DefaultNumExprContext,
@@ -96,7 +92,6 @@ import {
     ListTypeContext,
     ListVariableExpressionContext,
     ListWithElementsExpressionContext,
-    MapTypeContext,
     MessageReceivedEventContext,
     MethodDefinitionContext,
     MethodDefinitionListContext,
@@ -108,14 +103,11 @@ import {
     NumBracketsContext,
     NumCallStatementExpressionContext,
     NumDivExpressionContext,
-    NumFunctContext,
-    NumFunctExpressionContext,
     NumLiteralExpressionContext,
     NumMinusExpressionContext,
     NumModExpressionContext,
     NumMulExpressionContext,
     NumPlusExpressionContext,
-    NumRandomExpressionContext,
     NumVariableExpressionContext,
     ParameterContext,
     ParameterListContext,
@@ -131,8 +123,6 @@ import {
     ResourceLocatorContext,
     ScriptContext,
     ScriptListContext,
-    SetAttributeOfToStatementContext,
-    SetAttributeToStatementContext,
     SetStatementContext,
     SetStmtListContext,
     SoundResourceContext,
@@ -1050,10 +1040,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(NumberType.instance());
     }
 
-    public visitMapType (ctx: MapTypeContext): TransformerResult {
-        return TransformerResult.withNode(MapType.withIndexType(ctx.indexType().accept(this).nodeOnly() as ScratchType));
-    }
-
     public visitActorComponentsDefinition (ctx: ActorComponentsDefinitionContext): TransformerResult {
         throw new IllegalStateException("Not expected to be needed.");
     }
@@ -1174,35 +1160,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         }
     }
 
-    public visitNumFunct(ctx: NumFunctContext) : TransformerResult {
-        return TransformerResult.withNode(new StringLiteral(ctx.text));
-    }
-
-    public visitNumFunctExpression(ctx: NumFunctExpressionContext) : TransformerResult {
-        let prepend: StatementList = StatementList.empty();
-
-        // Declare and initialize a fresh variable for the result
-        const resultVarIdent: Identifier = Identifier.fresh();
-        const resultVar = new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, NumberType.instance()));
-        const resultVarExpr = new NumberVariableExpression(resultVar);
-        const declarationStmt = new DeclareStackVariableStatement(resultVar);
-        const initStmt: Statement = new StoreEvalResultToVariableStatement(resultVar, NumberLiteral.of(0));
-        prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt, initStmt]));
-
-        // Function call
-        // - Arguments
-        const argsTr = ctx.coreNumExpr().accept(this);
-        const callArgs = new ExpressionList([argsTr.node as Expression]);
-        prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
-        // - The actual call statement
-        const callMethodIdent = Identifier.of((ctx.numFunct().accept(this).nodeOnly() as StringLiteral).text);
-        const resultDataLocVar = new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, NumberType.instance()));
-        const callStmt = new CallStatement(callMethodIdent, callArgs, OptionalAstNode.with(resultDataLocVar));
-        prepend = StatementLists.concat(prepend, new StatementList([callStmt]));
-
-        return new TransformerResult(prepend, resultVarExpr);
-    }
-
     public visitGreaterThanExpression(ctx: GreaterThanExpressionContext) : TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
@@ -1290,18 +1247,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
             new PlusExpression(
-                tr1.node as NumberExpression,
-                tr2.node as NumberExpression));
-    }
-
-    public visitNumRandomExpression(ctx: NumRandomExpressionContext) : TransformerResult {
-        // We support this as a native operation.
-        // This is useful if dealing with non-det data that can be in a specific range
-        const tr1 = this.parseOperand1(ctx);
-        const tr2 = this.parseOperand2(ctx);
-        return new TransformerResult(
-            StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new PickRandomFromExpression(
                 tr1.node as NumberExpression,
                 tr2.node as NumberExpression));
     }
@@ -1455,25 +1400,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 OptionalAstNode.absent<VariableWithDataLocation>()));
     }
 
-    public visitChagenAttributeByStatement(ctx: ChagenAttributeByStatementContext) : TransformerResult {
-        const attributeTr = ctx.stringExpr().accept(this);
-        const valueTr = ctx.numExpr().accept(this);
-        return new TransformerResult(
-            StatementLists.concat(attributeTr.statementsToPrepend, valueTr.statementsToPrepend),
-            new ChangeAttributeByStatement(
-                attributeTr.node as StringExpression,
-                valueTr.node as NumberExpression));
-    }
-
-    public visitChangeVarByStatement(ctx: ChangeVarByStatementContext) : TransformerResult {
-        const exprTr = ctx.expression().accept(this);
-        return new TransformerResult(
-            exprTr.statementsToPrepend,
-            new ChangeVarByStatement(
-                ctx.variable().accept(this).node as VariableWithDataLocation,
-                exprTr.node as Expression));
-    }
-
     public visitCloneStartEvent(ctx: CloneStartEventContext) : TransformerResult {
         return TransformerResult.withNode(new CloneStartEvent());
     }
@@ -1495,24 +1421,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TransformerResult(
             strTr.statementsToPrepend,
             new CreateCloneOfStatement(strTr.node as StringExpression));
-    }
-
-    public visitDeclareAttribute(ctx: DeclareAttributeContext) : TransformerResult {
-        const strTr = ctx.stringExpr().accept(this);
-        return new TransformerResult(
-            strTr.statementsToPrepend,
-            new DeclareAttributeStatement(strTr.node as StringExpression,
-                ctx.type().accept(this).node as ScratchType));
-    }
-
-    public visitDeclareAttributeOf(ctx: DeclareAttributeOfContext) : TransformerResult {
-        const strTr = ctx.stringExpr().accept(this);
-        return new TransformerResult(
-            strTr.statementsToPrepend,
-            new DeclareAttributeOfStatement(
-                strTr.node as StringExpression,
-                ctx.type().accept(this).nodeOnly() as ScratchType,
-                ctx.ident().accept(this).nodeOnly() as Identifier));
     }
 
     public visitDeclareVariable(ctx: DeclareVariableContext) : TransformerResult {
@@ -1750,19 +1658,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitImageResource(ctx: SoundResourceContext): TransformerResult {
         return TransformerResult.withNode(ImageResourceType.instance());
-    }
-
-    public visitSetAttributeOfToStatement(ctx: SetAttributeOfToStatementContext) : TransformerResult {
-        throw new ImplementMeException();
-    }
-
-    public visitSetAttributeToStatement(ctx: SetAttributeToStatementContext) : TransformerResult {
-        const tr = ctx.expression().accept(this);
-        return new TransformerResult(
-            tr.statementsToPrepend,
-            new SetAttributeToStatement(
-                StringLiteral.from(ctx.String().text) as StringExpression,
-                tr.node as Expression));
     }
 
     public visitStoreEvalResultStatement(ctx: StoreEvalResultStatementContext) : TransformerResult {
