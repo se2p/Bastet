@@ -6,11 +6,11 @@ program Task6Spec
  * Task: The `circus director` should `run` to the `monkey` `automatically`.
  *
  * Rewrite as bounded safety property:
- *      The circus director must always run to the monkey.
+ *      The circus director must move towards the monkey at least once every second.
  *
  * Precondition:
  *      There exists two actors, one with the role of
- *      the monkey and one in the role of the circus director.
+ *      the monkey (id is "Affe") and one in the role of the circus director (id is "Zirkusdirektor").
  *
  * Interpretations and considerations:
  *  - Also the monkey could move on its own, in arbitrary
@@ -41,17 +41,22 @@ actor DirectorObserver is Observer begin
     declare actor_2_last_y as number
     declare actor_2_last_x as number
 
+    define actor_1_id as "Zirkusdirektor-rennend"
+    define actor_2_id as "Affe"
+
     declare actor_1_moving_towards_2 as boolean
     declare actor_2_moving_towards_1 as boolean
 
     define actor_1_moving_towards_2 as true
-    define actor_2_moving_towards_1 as true
+
+    declare last_change as number
+    define last_change as _RUNTIME_millis()
 
     // TODO: Store attributes as 'normal' variables of the actor?
     // TODO: Is the map datatype really needed?
 
     define atomic isBehaviorSatisfied () begin
-        define result as false
+        define result as true
 
         // (a) Attributes of the first actor
         declare actor_1_x as number
@@ -68,61 +73,38 @@ actor DirectorObserver is Observer begin
         // TODO: Parameterize the code / move to a method.
         //      Map data type needed for this.
 
-        // Is actor 1 moving monotonously to actor 2?
+        // If actor 2 is left of actor 1:
+        //   actor1.x' <= actor1.x (left move)
+        // If actor 2 is right of actor 1:
+        //   actor1.x' >= actor1.x (right move)
+        declare actor_1_x_move_towards_2 as boolean
+        define actor_1_x_move_towards_2 as (actor_1_last_x = actor_2_last_x)
+        if actor_2_last_x < actor_1_last_x then begin
+           define actor_1_x_move_towards_2 as (actor1_x < actor_1_last_x) or (actor1_x = actor_1_last_x)
+        end
+        if actor_2_last_x > actor_1_last_x then begin
+           define actor_1_x_move_towards_2 as (actor1_x > actor_1_last_x) or (actor1_x = actor_1_last_x)
+        end
+
+        declare actor_1_y_move_towards_2 as boolean
+        define actor_1_y_move_towards_2 as (actor_1_last_y = actor_2_last_y)
+        if actor_2_last_y < actor_1_last_y then begin
+           define actor_1_y_move_towards_2  as (actor_1_y < actor_1_last_y) or (actor_1_y = actor_1_last_y)
+        end
+        if actor_2_last_y > actor_1_last_y then begin
+           define actor_1_y_move_towards_2  as (actor_1_y > actor_1_last_y) or (actor_1_y = actor_1_last_y)
+        end
+
+        define actor_1_moving_towards_2 as actor_1_x_move_towards_2 or actor_1_y_move_towards_2
+
         if actor_1_moving_towards_2 then begin
-            // If actor 2 is left of actor 1:
-            //   actor1.x' <= actor1.x (left move)
-            // If actor 2 is right of actor 1:
-            //   actor1.x' >= actor1.x (right move)
-            declare actor_1_x_move_towards_2 as boolean
-            define actor_1_x_move_towards_2 as (actor_1_last_x = actor_2_last_x)
-            if actor_2_last_x < actor_1_last_x then begin
-               define actor_1_x_move_towards_2 as (actor_1_x < actor_1_last_x) or (actor_1_x = actor_1_last_x)
-            end
-            if actor_2_last_x > actor_1_last_x then begin
-               define actor_1_x_move_towards_2 as (actor_1_x > actor_1_last_x) or (actor_1_x = actor_1_last_x)
-            end
-
-            declare actor_1_y_move_towards_2 as boolean
-            define actor_1_y_move_towards_2 as (actor_1_last_y = actor_2_last_y)
-            if actor_2_last_y < actor_1_last_y then begin
-               define actor_1_y_move_towards_2  as (actor_1_y < actor_1_last_y) or (actor_1_y = actor_1_last_y)
-            end
-            if actor_2_last_y > actor_1_last_y then begin
-               define actor_1_y_move_towards_2  as (actor_1_y > actor_1_last_y) or (actor_1_y = actor_1_last_y)
-            end
-
-            define actor_1_moving_towards_2 as actor_1_x_move_towards_2 or actor_1_y_move_towards_2
+           define last_change as _RUNTIME_millis()
         end
 
-        // Is actor 2 moving monotonously to actor 1?
-        if actor_2_moving_towards_1 then begin
-            // If actor 1 is left of actor 2:
-            //   actor2.x' <= actor2.x (left move)
-            // If actor 1 is right of actor 2:
-            //   actor2.x' >= actor2.x (right move)
-            declare actor_2_x_move_towards_1 as boolean
-            define actor_2_x_move_towards_1 as (actor_2_last_x = actor_1_last_x)
-            if actor_1_last_x < actor_2_last_x then begin
-               define actor_2_x_move_towards_1  as (actor_2_x < actor_2_last_x) or (actor_2_x = actor_2_last_x)
-            end
-            if actor_1_last_x > actor_2_last_x then begin
-               define actor_2_x_move_towards_1 as (actor_2_x > actor_2_last_x) or (actor_2_x = actor_2_last_x)
-            end
-
-            declare actor_2_y_move_towards_1 as boolean
-            define actor_2_y_move_towards_1 as (actor_2_last_y = actor_1_last_y)
-            if actor_1_last_y < actor_2_last_y then begin
-               define actor_2_y_move_towards_1 as (actor_2_y < actor_2_last_y) or (actor_2_y = actor_2_last_y)
-            end
-            if actor_1_last_y > actor_2_last_y then begin
-               define actor_2_y_move_towards_1 as (actor_2_y > actor_2_last_y) or (actor_2_y = actor_2_last_y)
-            end
-
-            define actor_2_moving_towards_1 as actor_2_x_move_towards_1 or actor_2_y_move_towards_1
+        // The actual invariant check
+        if _RUNTIME_millis() - last_change > 1000 then begin
+            define result as false
         end
-
-        define result as actor_1_moving_towards_2 or actor_2_moving_towards_1
     end returns result: boolean
 
     define atomic storeRelevantStateInfosForNext () begin

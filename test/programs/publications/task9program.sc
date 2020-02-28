@@ -43,7 +43,9 @@ actor Pferd is ScratchSprite begin
       script on startup do begin
           repeat forever begin
               if touchingMousePointer() then begin
-                      repeat 10 times begin
+                      declare i as number
+                      define i as 0
+                      until i == 10 begin
                           turnRight(36.0)
                       end
                   end

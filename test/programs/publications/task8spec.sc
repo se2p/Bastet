@@ -9,8 +9,8 @@ program Task6Spec
  *      The cat must always say "Hab ich dich!" whenever it touches the ball.
  *
  * Precondition:
- *      There exists two actors, one with the role of
- *      the cat and one in the role of the ball.
+ *      There exists two actors, one with the id "Katze"
+ *      and one with the id "Ball"
  *
  * Interpretations and considerations:
  *   - Neither ball nor cat have to be able to move
@@ -29,13 +29,12 @@ program Task6Spec
 
 actor DirectorObserver is Observer begin
 
-    declare observer_state as enum ["INIT", "BOOTSTRAP_FINISHED"]
-
     declare actor_1_id as string
+    define actor_1_id as "Katze"
     declare actor_2_id as string
+    define actor_2_id as "Ball"
 
     declare actors_touching as boolean
-
 
     define atomic checkBehaviorSatisfied () begin
         define result as false
@@ -43,10 +42,6 @@ actor DirectorObserver is Observer begin
             if touchingObjects(actor_1_id, actor_2_id) then begin
                 if attribute "bubbleText" of actor_1_id = "Hab ich dich!" then begin
                     define result as true
-                end else begin
-                    if attribute "bubbleText" of actor_2_id = "Hab ich dich!" then begin
-                        define result as true
-                    end
                 end
             end
 
@@ -59,12 +54,9 @@ actor DirectorObserver is Observer begin
     end
 
     script on bootstrap do begin
-        define observer_state as "INIT"
     end
 
     script on bootstrap finished do begin
-        define observer_state as "BOOTSTRAP_FINISHED"
-
         // First specification check (base condition)
         assert(checkBehaviorSatisfied())
 
@@ -73,10 +65,8 @@ actor DirectorObserver is Observer begin
     end
 
     script on statement finished do begin
-        if observer_state = "BOOTSTRAP_FINISHED" then begin
-            // The actual specification check
-            assert(checkBehaviorSatisfied())
-        end
+        // The actual specification check
+        assert(checkBehaviorSatisfied())
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
