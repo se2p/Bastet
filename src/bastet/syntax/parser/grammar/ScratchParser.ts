@@ -3358,31 +3358,31 @@ export class ScratchParser extends Parser {
 					switch ( this.interpreter.adaptivePredict(this._input, 37, this._ctx) ) {
 					case 1:
 						{
-						_localctx = new BoolOrExpressionContext(new CoreBoolExprContext(_parentctx, _parentState));
+						_localctx = new BoolAndExpressionContext(new CoreBoolExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, ScratchParser.RULE_coreBoolExpr);
 						this.state = 656;
-						if (!(this.precpred(this._ctx, 7))) {
-							throw new FailedPredicateException(this, "this.precpred(this._ctx, 7)");
+						if (!(this.precpred(this._ctx, 8))) {
+							throw new FailedPredicateException(this, "this.precpred(this._ctx, 8)");
 						}
 						this.state = 657;
-						this.match(ScratchParser.T__88);
+						this.match(ScratchParser.T__63);
 						this.state = 658;
-						this.coreBoolExpr(8);
+						this.coreBoolExpr(9);
 						}
 						break;
 
 					case 2:
 						{
-						_localctx = new BoolAndExpressionContext(new CoreBoolExprContext(_parentctx, _parentState));
+						_localctx = new BoolOrExpressionContext(new CoreBoolExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, ScratchParser.RULE_coreBoolExpr);
 						this.state = 659;
-						if (!(this.precpred(this._ctx, 8))) {
-							throw new FailedPredicateException(this, "this.precpred(this._ctx, 8)");
+						if (!(this.precpred(this._ctx, 7))) {
+							throw new FailedPredicateException(this, "this.precpred(this._ctx, 7)");
 						}
 						this.state = 660;
-						this.match(ScratchParser.T__63);
+						this.match(ScratchParser.T__88);
 						this.state = 661;
-						this.numExpr();
+						this.coreBoolExpr(8);
 						}
 						break;
 					}
@@ -4246,10 +4246,10 @@ export class ScratchParser extends Parser {
 	private coreBoolExpr_sempred(_localctx: CoreBoolExprContext, predIndex: number): boolean {
 		switch (predIndex) {
 		case 0:
-			return this.precpred(this._ctx, 7);
+			return this.precpred(this._ctx, 8);
 
 		case 1:
-			return this.precpred(this._ctx, 8);
+			return this.precpred(this._ctx, 7);
 		}
 		return true;
 	}
@@ -4589,9 +4589,9 @@ export class ScratchParser extends Parser {
 		"\u0279\x03\x02\x02\x02\u0290\u027B\x03\x02\x02\x02\u0290\u027F\x03\x02" +
 		"\x02\x02\u0290\u0283\x03\x02\x02\x02\u0290\u0287\x03\x02\x02\x02\u0290" +
 		"\u028B\x03\x02\x02\x02\u0290\u028F\x03\x02\x02\x02\u0291\u029A\x03\x02" +
-		"\x02\x02\u0292\u0293\f\t\x02\x02\u0293\u0294\x07[\x02\x02\u0294\u0299" +
-		"\x05v<\n\u0295\u0296\f\n\x02\x02\u0296\u0297\x07B\x02\x02\u0297\u0299" +
-		"\x05x=\x02\u0298\u0292\x03\x02\x02\x02\u0298\u0295\x03\x02\x02\x02\u0299" +
+		"\x02\x02\u0292\u0293\f\n\x02\x02\u0293\u0294\x07B\x02\x02\u0294\u0299" +
+		"\x05v<\v\u0295\u0296\f\t\x02\x02\u0296\u0297\x07[\x02\x02\u0297\u0299" +
+		"\x05v<\n\u0298\u0292\x03\x02\x02\x02\u0298\u0295\x03\x02\x02\x02\u0299" +
 		"\u029C\x03\x02\x02\x02\u029A\u0298\x03\x02\x02\x02\u029A\u029B\x03\x02" +
 		"\x02\x02\u029Bw\x03\x02\x02\x02\u029C\u029A\x03\x02\x02\x02\u029D\u029E" +
 		"\x05z>\x02\u029Ey\x03\x02\x02\x02\u029F\u02A0\b>\x01\x02\u02A0\u02D2\x05" +
@@ -8622,11 +8622,14 @@ export class NegatedBoolExpressionContext extends CoreBoolExprContext {
 	}
 }
 export class BoolAndExpressionContext extends CoreBoolExprContext {
-	public coreBoolExpr(): CoreBoolExprContext {
-		return this.getRuleContext(0, CoreBoolExprContext);
-	}
-	public numExpr(): NumExprContext {
-		return this.getRuleContext(0, NumExprContext);
+	public coreBoolExpr(): CoreBoolExprContext[];
+	public coreBoolExpr(i: number): CoreBoolExprContext;
+	public coreBoolExpr(i?: number): CoreBoolExprContext | CoreBoolExprContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(CoreBoolExprContext);
+		} else {
+			return this.getRuleContext(i, CoreBoolExprContext);
+		}
 	}
 	constructor(ctx: CoreBoolExprContext) {
 		super(ctx.parent, ctx.invokingState);
