@@ -148,7 +148,7 @@ actor DirectorObserver is Observer begin
 
     script on statement finished do begin
         // The actual specification check
-        assert(checkBehaviorSatisfied())
+        assert(isBehaviorSatisfied())
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
