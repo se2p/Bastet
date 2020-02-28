@@ -142,6 +142,8 @@ export class DataLocationScoper implements DataLocationRenamer {
     }
 
     renameUsage(dataLoc: DataLocation, usageMode: DataLocationMode, inContextOf: Statement): DataLocation {
+        Preconditions.checkNotUndefined(usageMode);
+
         if (this.isScoped(dataLoc)) {
             return dataLoc;
         }

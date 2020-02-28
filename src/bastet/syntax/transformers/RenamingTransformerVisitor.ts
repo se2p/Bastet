@@ -150,6 +150,7 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     constructor(renamer: DataLocationRenamer) {
         this._renamer = Preconditions.checkNotUndefined(renamer);
+        this._activeUsageMode = DataLocationMode.READ_FROM;
     }
 
     private transformBeforeException() {
