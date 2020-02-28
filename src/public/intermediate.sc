@@ -67,17 +67,17 @@ role RuntimeEntity begin
 
     extern mathSqrt (n: number) returns number
 
+    extern mathSin (n: number) returns number
+
+    extern mathCos (n: number) returns number
+
     extern mathTan (n: number) returns number
 
     extern mathAsin (n: number) returns number
 
     extern mathAcos (n: number) returns number
 
-    extern mathATan (n: number) returns number
-
-    extern mathSin (n: number) returns number
-
-    extern mathCos (n: number) returns number
+    extern mathAtan (n: number) returns number
 
     extern mathLn(n: number) returns number
 
@@ -100,6 +100,31 @@ role RuntimeEntity begin
             define range as ((max - min) +1)
             define result as (dir - (mathFloor((dir - min) / range) * range))
     end returns result : number
+
+    // @Category "Control"
+    // @Block "wait <Num> seconds"
+    define waitSeconds (secs: number) begin
+        // A busy-waiting implementation.
+        // The external methode`_RUNTIME_waitSeconds` is intended to
+        // not conduct a busy wait.
+        declare waitUntil as number
+        define waitUntil as _RUNTIME_seconds() + secs
+        until (_RUNTIME_seconds() < waitUntil) repeat begin
+        end
+    end
+
+    // @Category "Control"
+    // @Block "wait <Num> millis"
+    define waitMillis (millis: number) begin
+        // A busy-waiting implementation.
+        // The external method `_RUNTIME_waitMillis` is intended to
+        // not conduct a busy wait.
+        declare waitUntil as number
+        define waitUntil as _RUNTIME_millis() + millis
+        until (_RUNTIME_millis() < waitUntil) repeat begin
+        end
+    end
+
 end
 
 role Observer is RuntimeEntity begin
@@ -272,30 +297,6 @@ role ScratchEntity is RuntimeEntity begin
     define volume () begin
 
     end returns result : number
-
-    // @Category "Control"
-    // @Block "wait <Num> seconds"
-    define waitSeconds (secs: number) begin
-        // A busy-waiting implementation.
-        // The external methode`_RUNTIME_waitSeconds` is intended to
-        // not conduct a busy wait.
-        declare waitUntil as number
-        define waitUntil as _RUNTIME_seconds() + secs
-        until (_RUNTIME_seconds() < waitUntil) repeat begin
-        end
-    end
-
-    // @Category "Control"
-    // @Block "wait <Num> millis"
-    define waitMillis (millis: number) begin
-        // A busy-waiting implementation.
-        // The external method `_RUNTIME_waitMillis` is intended to
-        // not conduct a busy wait.
-        declare waitUntil as number
-        define waitUntil as _RUNTIME_millis() + millis
-        until (_RUNTIME_millis() < waitUntil) repeat begin
-        end
-    end
 
     // data_setvariableto, sensing_setdragmode, motion_setrotationstyle, looks_seteffectto,
     // sound_seteffectto, sound_setvolumeto;

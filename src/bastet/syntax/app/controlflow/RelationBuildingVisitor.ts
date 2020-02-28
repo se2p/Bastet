@@ -24,9 +24,15 @@ import {OperationId, ProgramOperation, ProgramOperationFactory, ProgramOperation
 import {ControlLocation} from "./ControlLocation";
 import {CoreCtrlStatementnVisitor, CoreVisitor} from "../../ast/CoreVisitor";
 import {CallStatement} from "../../ast/core/statements/CallStatement";
-import {IfStatement, RepeatForeverStatement, UntilStatement} from "../../ast/core/statements/ControlStatement";
+import {
+    IfStatement,
+    RepeatForeverStatement,
+    UntilQueriedConditionStatement,
+    UntilStatement
+} from "../../ast/core/statements/ControlStatement";
 import {StatementList} from "../../ast/core/statements/Statement";
 import {AstNode} from "../../ast/AstNode";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 
 export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>, CoreCtrlStatementnVisitor<TransitionRelation> {
@@ -103,6 +109,37 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
                 TransitionRelations.singleton(loopHead),
                 TransitionRelations.concat(TransitionRelations.forOpSeq(condAssumeOp), loopBody),
                 loopHead);
+        } finally {
+            this._stack.pop();
+        }
+    }
+
+    visitUntilQueriedConditionStatement(node: UntilQueriedConditionStatement): TransitionRelation {
+        this._stack.push("visitUntilQueriedConditionStatement");
+        try {
+            const loopHead: ControlLocation = ControlLocation.fresh();
+            const loopTerminationLocation: ControlLocation = ControlLocation.fresh();
+
+            const queryBody: TransitionRelation = node.conditionQueryStatements.accept(this);
+            const loopBody: TransitionRelation = node.body.accept(this);
+
+            const enterLoopBodyGuarded = TransitionRelations.concat(
+                TransitionRelations.forOpSeq(ProgramOperationFactory.createAssumeOpFrom(node.condition)), loopBody);
+
+            const leaveLoopGuarded = TransitionRelations.forOpSeq(
+                ProgramOperationFactory.negatedAssumeOpFrom(node.condition));
+
+            const result = TransitionRelations.concat(
+                TransitionRelations.concatOpTr(loopHead, ProgramOperations.epsilon(), queryBody),
+                TransitionRelations.forkTransitions(
+                    TransitionRelations.concatTrOpGoto(enterLoopBodyGuarded, ProgramOperations.epsilon(), loopHead),
+                    TransitionRelations.concatTrOpGoto(leaveLoopGuarded, ProgramOperations.epsilon(), loopTerminationLocation)));
+
+            const el = TransitionRelations.eliminateEpsilons(result);
+            console.log(el.toString());
+            console.log(el.entryLocationSet.toArray());
+            console.log(el.exitLocationSet.toArray());
+            return result;
         } finally {
             this._stack.pop();
         }
