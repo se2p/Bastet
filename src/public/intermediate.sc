@@ -67,17 +67,11 @@ role RuntimeEntity begin
 
     extern mathSqrt (n: number) returns number
 
-    extern mathSin (n: number) returns number
-
-    extern mathCos (n: number) returns number
-
     extern mathTan (n: number) returns number
 
     extern mathAsin (n: number) returns number
 
     extern mathAcos (n: number) returns number
-
-    extern mathAtan (n: number) returns number
 
     extern mathLn(n: number) returns number
 
@@ -93,6 +87,13 @@ role RuntimeEntity begin
 
     extern radToDeg(n: number) returns number
 
+    // Make sure our direction is always between -179 and 180
+    define wrapClamp(dir: number, min: number, max: number) begin
+            declare range as number
+            declare result as number
+            define range as ((max - min) +1)
+            define result as (dir - (mathFloor((dir - min) / range) * range))
+    end returns result : number
 end
 
 role Observer is RuntimeEntity begin
@@ -506,22 +507,8 @@ role ScratchSprite is ScratchEntity begin
     define setDirection(dir: number) begin
         // TODO do we need to check if we are in the stage
         // Make sure direction is between -179 and 180
-        define direction as wrapClamp(dir)
+        define direction as wrapClamp(dir, 0-179, 180)
     end
-
-    // Make sure our direction is always between -179 and 180
-    define wrapClamp(dir: number) begin
-            declare min as number
-            declare max as number
-            declare range as number
-            declare result as number
-
-            define min as (0-179) // TODO how can we use neg. numbers?
-            define max as 180
-            define range as ((max - min) +1)
-
-            define result as (dir - (mathFloor((dir - min) / range) * range))
-    end returns result : number
 
 
 
