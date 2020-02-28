@@ -28,8 +28,6 @@ program Task0Spec
 
 actor DirectorObserver is Observer begin
 
-    declare observer_state as enum ["INIT", "STARTUP_FINISHED"]
-
     declare actor_1_id as string
     define actor_1_id as "Pferd"
     declare mouseTouched as boolean
@@ -80,22 +78,16 @@ actor DirectorObserver is Observer begin
     end
 
     script on bootstrap finished do begin
-        if observer_state = "INIT" then begin
-        end else begin
-            // First specification check (base condition)
-            assert(checkBehaviorSatisfied())
-        end
+        // First specification check (base condition)
+        assert(checkBehaviorSatisfied())
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
     end
 
     script on statement finished do begin
-        if observer_state = "INIT" then begin
-        end else begin
-            // The actual specification check
-            assert(checkBehaviorSatisfied())
-        end
+        // The actual specification check
+        assert(checkBehaviorSatisfied())
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()

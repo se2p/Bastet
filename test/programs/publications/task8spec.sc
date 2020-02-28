@@ -29,8 +29,6 @@ program Task6Spec
 
 actor DirectorObserver is Observer begin
 
-    declare observer_state as enum ["INIT", "BOOTSTRAP_FINISHED"]
-
     declare actor_1_id as string
     define actor_1_id as "Katze"
     declare actor_2_id as string
@@ -56,12 +54,9 @@ actor DirectorObserver is Observer begin
     end
 
     script on bootstrap do begin
-        define observer_state as "INIT"
     end
 
     script on bootstrap finished do begin
-        define observer_state as "BOOTSTRAP_FINISHED"
-
         // First specification check (base condition)
         assert(checkBehaviorSatisfied())
 
@@ -70,10 +65,8 @@ actor DirectorObserver is Observer begin
     end
 
     script on statement finished do begin
-        if observer_state = "BOOTSTRAP_FINISHED" then begin
-            // The actual specification check
-            assert(checkBehaviorSatisfied())
-        end
+        // The actual specification check
+        assert(checkBehaviorSatisfied())
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
