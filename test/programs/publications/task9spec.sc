@@ -1,4 +1,4 @@
-program Task7Spec
+program Task0Spec
 
 /**
  * ## Task 9 "
@@ -9,12 +9,12 @@ program Task7Spec
  *      The horse must switch color at least every 1 seconds or turn around if the mouse touches the horse.
  *
  * Precondition:
- *      There exists one actor with the role of the horse.
+ *      There exists one actor with the id "Pferd".
  *
  * Interpretations and considerations:
  *
  * Rewrite without explicit actor names:
- *    Given at max one actor it always changes its color after 1 second or is turning if the mouse touches the sprite
+ *    Given at one actor with the id "Pferd" it always changes its color after 1 second or is turning if the mouse touches the sprite
  *
  *   EXISTS a in _RUNTIME_getAllActors():
  *     FORALL trace in PROGRAM_TRACES:
@@ -31,6 +31,7 @@ actor DirectorObserver is Observer begin
     declare observer_state as enum ["INIT", "STARTUP_FINISHED"]
 
     declare actor_1_id as string
+    define actor_1_id as "Pferd"
     declare mouseTouched as boolean
 
     declare actor_1_color as string
@@ -64,7 +65,6 @@ actor DirectorObserver is Observer begin
             end
         end
 
-        // TODO: Check if changed within the last 1000 msec
        if last_change - _RUNTIME_millis > 1000 and mouseTouched then begin
            define result as false
        end

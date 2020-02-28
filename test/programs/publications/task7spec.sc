@@ -10,7 +10,7 @@ program Task7Spec
  *
  * Precondition:
  *      There exists one actors with the role of
- *      the elephant.
+ *      the elephant with a the name "Elefant1".
  *
  * Interpretations and considerations:
  *
@@ -29,6 +29,7 @@ actor DirectorObserver is Observer begin
     declare observer_state as enum ["INIT", "STARTUP_FINISHED"]
 
     declare actor_1_id as string
+    define actor_1_id as "Elefant1"
 
     declare actor_1_costume as string
     declare actor_1_prev_costume as string
