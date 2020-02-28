@@ -317,6 +317,8 @@ import {DataLocations} from "../app/controlflow/DataLocation";
 import {AssumeStatement} from "../ast/core/statements/AssumeStatement";
 import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
 import {BastetConfiguration} from "../../utils/BastetConfiguration";
+import {ParsingException} from "../../core/exceptions/ParsingException";
+import {ParserRuleContext} from "antlr4ts";
 
 const toposort = require('toposort');
 
@@ -1757,7 +1759,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     public visitStoreEvalResultStatement(ctx: StoreEvalResultStatementContext) : TransformerResult {
         const ident = ctx.variable().accept(this).nodeOnly() as Identifier;
         const varType = this.getTypeOf(ident);
-        const exprTr = this.ensureType(varType, ctx.expression().accept(this));
+        const exprTr = this.ensureType(ctx, varType, ctx.expression().accept(this));
         const exprType = (exprTr.node as Expression).type;
         Preconditions.checkNotUndefined(exprType);
 
@@ -2098,7 +2100,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         throw new ImplementMeException();
     }
 
-    private ensureType(varType: ScratchType, transformerResult: TransformerResult): TransformerResult {
+    private ensureType(context: ParserRuleContext, varType: ScratchType, transformerResult: TransformerResult): TransformerResult {
         if (transformerResult.node['type'] == varType) {
             return transformerResult;
 
@@ -2107,7 +2109,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             return new TransformerResult(transformerResult.statementsToPrepend, varExpr);
 
         } else {
-            throw new ImplementMeException();
+            throw new ParsingException(`Type ${varType.toTreeString()} expected.`, context);
         }
     }
 }
