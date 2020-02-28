@@ -48,10 +48,10 @@ role RuntimeEntity begin
 
     // A random integer in the interval [from, to],
     // that is, both end points are included.
-    extern randomIntegerBetween (from: number, to: number) returns number
+    extern randomIntegerBetween (intervalStart: number, intervalEnd: number) returns number
 
     // See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
-    extern randomBetween (from: number, to: number) returns number
+    extern randomBetween (intervalStart: number, intervalEnd: number) returns number
 
     // TODO: Maybe add an approximation for sqrt
     extern mathSqrt (n: number) returns number
