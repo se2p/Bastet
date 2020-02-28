@@ -294,7 +294,7 @@ coreBoolExpr  :
  |  callStmt # BoolCallStatementExpression
 
  |  'not'  coreBoolExpr # NegatedBoolExpression
- |  coreBoolExpr  'and'  numExpr # BoolAndExpression
+ |  coreBoolExpr  'and'  coreBoolExpr # BoolAndExpression
  |  coreBoolExpr  'or'  coreBoolExpr # BoolOrExpression
 
  |  numExpr  '>'  numExpr # NumGreaterThanExpression
