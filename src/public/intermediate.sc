@@ -127,6 +127,10 @@ role ScratchEntity is RuntimeEntity begin
 
     declare current_costume_name as string
 
+    declare current_costume_width as number
+
+    declare current_costume_height as number
+
     declare sound_effect as enum [ "pitch", "pan_left_right" ]
 
     declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
