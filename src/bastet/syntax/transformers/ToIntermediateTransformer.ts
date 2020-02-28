@@ -996,23 +996,32 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitStmtList(ctx: StmtListContext): TransformerResult {
-        let result: StatementList = StatementList.empty();
+        try {
+            let result: StatementList = StatementList.empty();
 
-        for (let idc of ctx.stmtListPlain().stmt()) {
-            const tr: TransformerResult = idc.accept(this);
-            result = StatementLists.concat(result, tr.statementsToPrepend);
-            const trs: StatementList = new StatementList([ tr.node as Statement ]);
-            result = StatementLists.concat(result, trs);
+            for (let idc of ctx.stmtListPlain().stmt()) {
+                const tr: TransformerResult = idc.accept(this);
+                result = StatementLists.concat(result, tr.statementsToPrepend);
+                const trs: StatementList = new StatementList([tr.node as Statement]);
+                result = StatementLists.concat(result, trs);
+            }
+
+            if (ctx.terminationStmt()) {
+                const tr: TransformerResult = ctx.terminationStmt().accept(this);
+                result = StatementLists.concat(result, tr.statementsToPrepend);
+                const trs: StatementList = new StatementList([tr.node as Statement]);
+                result = StatementLists.concat(result, trs);
+            }
+
+            return TransformerResult.withNode(result);
+
+        } catch (e) {
+           if (e.constructor.name == "ParsingException") {
+               throw e;
+           } else {
+               throw new ParsingException(e.message, ctx);
+           }
         }
-
-        if (ctx.terminationStmt()) {
-            const tr: TransformerResult = ctx.terminationStmt().accept(this);
-            result = StatementLists.concat(result, tr.statementsToPrepend);
-            const trs: StatementList = new StatementList([ tr.node as Statement ]);
-            result = StatementLists.concat(result, trs);
-        }
-
-        return TransformerResult.withNode(result);
     }
 
     public visitStmtListPlain(ctx: StmtListPlainContext): TransformerResult {
