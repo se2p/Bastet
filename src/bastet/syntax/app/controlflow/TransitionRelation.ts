@@ -450,6 +450,21 @@ export class TransitionRelations {
             .build();
     }
 
+    static forkTransitions(caseOneGuarded: TransitionRelation, caseTwoGuarded: TransitionRelation): TransitionRelation {
+        let builder = TransitionRelation.builder()
+            .addAllTransitionsOf(caseOneGuarded)
+            .addAllTransitionsOf(caseTwoGuarded);
+
+        const casesEntryLocs = caseOneGuarded.entryLocationSet.union(caseTwoGuarded.entryLocationSet);
+
+        const resultEntryLoc: ControlLocation = ControlLocation.fresh();
+        for (let centry of casesEntryLocs) {
+            builder.addTransition(resultEntryLoc, ControlLocation.for(centry), ProgramOperations.epsilon());
+        }
+
+        return builder.addEntryLocation(resultEntryLoc).build();
+    }
+
     static concatTrOpGoto(tr: TransitionRelation, op: ProgramOperation, goto: ControlLocation): TransitionRelation {
         Preconditions.checkNotUndefined(tr);
         Preconditions.checkNotUndefined(op);
@@ -492,6 +507,8 @@ export class TransitionRelations {
             tx = this.addTransition(tx, loc.ident, to, op);
             entryLocs = entryLocs.remove(to);
         }
+
+        entryLocs = entryLocs.add(loc.ident);
 
         return new TransitionRelation(tx, locs, entryLocs, exitLocs);
     }
