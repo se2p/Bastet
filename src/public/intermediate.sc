@@ -148,10 +148,13 @@ role Observer is RuntimeEntity begin
         define x as cast attribute "x" of obj_id to number
         define y as cast attribute "y" of obj_id to number
 
+        define width as cast attribute "current_costume_width" of obj_id to number
+        define height as cast attribute "current_costume_height" of obj_id to number
+
         if not (_RUNTIME_getMouseX() < x
-                or _RUNTIME_getMouseX() > x + current_costume_width
+                or _RUNTIME_getMouseX() > x + width
                 or _RUNTIME_getMouseY() < y
-                or _RUNTIME_getMouseY() > y + current_costume_height) then begin
+                or _RUNTIME_getMouseY() > y + height) then begin
 
             define result as false
         end
