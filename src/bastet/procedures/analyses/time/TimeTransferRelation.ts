@@ -108,7 +108,7 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
                 const assumeTimeMin = new NumGreaterEqualExpression(opTimeVariableExpr, minTimeExpr);
                 const assumeTimeMax = new NumLessEqualExpression(opTimeVariableExpr, maxTimeExpr);
 
-                const intermediateStatements: Statement[] = [
+                intermediateStatements = [
                     new DeclareStackVariableStatement(opTimeVariable),
                     new AssumeStatement(assumeTimeMin),
                     new AssumeStatement(assumeTimeMax),

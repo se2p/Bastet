@@ -183,6 +183,14 @@ export class NumIntervalTheory implements RationalNumberTheory<NumIntervalValue,
         throw new ImplementMeException();
     }
 
+    isGreaterEqual(s1: NumIntervalValue, s2: NumIntervalValue): AbstractBoolean {
+        throw new ImplementMeException();
+    }
+
+    isLessEqual(s1: NumIntervalValue, s2: NumIntervalValue): AbstractBoolean {
+        throw new ImplementMeException();
+    }
+
 }
 
 export class NumIntervalValueDomain implements AbstractNumberDomain {
