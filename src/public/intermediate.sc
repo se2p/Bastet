@@ -69,29 +69,29 @@ role Observer is RuntimeEntity begin
 
         declare leg_a_fst as number
         declare leg_b_fst as number
-        define leg_a_fst as attribute "current_costume_width" of fst
-        define leg_b_fst as attribute "current_costume_height" of fst
+        define leg_a_fst as cast attribute "current_costume_width" of fst to number
+        define leg_b_fst as cast attribute "current_costume_height" of fst to number
 
         declare radius_fst as number
         define radius_fst as 0.5 * mathSqrt(leg_a_fst * leg_a_fst + leg_b_fst * leg_b_fst)
 
         declare leg_a_snd as number
         declare leg_b_snd as number
-        define leg_a_snd as attribute "current_costume_width" of snd
-        define leg_b_snd as attribute "current_costume_height" of snd
+        define leg_a_snd as cast attribute "current_costume_width" of snd to number
+        define leg_b_snd as cast attribute "current_costume_height" of snd to number
 
         declare radius_snd as number
         define radius_snd as 0.5 * mathSqrt(leg_a_snd * leg_a_snd + leg_b_snd * leg_b_snd)
 
         declare x_fst as number
-        define x_fst as attribute "x" of fst
+        define x_fst as cast attribute "x" of fst to number
         declare y_fst as number
-        define y_fst as attribute "y" of fst
+        define y_fst as cast attribute "y" of fst to number
 
         declare x_snd as number
-        define x_snd as attribute "x" of snd
+        define x_snd as cast attribute "x" of snd to number
         declare y_snd as number
-        define y_snd as attribute "y" of snd
+        define y_snd as cast attribute "y" of snd to number
 
         declare result as boolean
         define result as not (((mathSqrt((x_fst + x_snd)*(x_fst + x_snd) + (y_fst + y_snd) * (y_fst + y_snd)) - radius_fst - radius_snd) > 0))
@@ -104,8 +104,8 @@ role Observer is RuntimeEntity begin
 
         declare x as number
         declare y as number
-        define x as attribute "x" of obj_id
-        define y as attribute "y" of obj_id
+        define x as cast attribute "x" of obj_id to number
+        define y as cast attribute "y" of obj_id to number
 
         if not (_RUNTIME_getMouseX() < x
                 or _RUNTIME_getMouseX() > x + current_costume_width
@@ -345,8 +345,8 @@ role ScratchSprite is ScratchEntity begin
         declare targetX as number
         declare targetY as number
 
-        define targetX as (attribute "x" of s)
-        define targetY as (attribute "y" of s)
+        define targetX as cast (attribute "x" of s) to number
+        define targetY as cast (attribute "y" of s) to number
 
         declare dx as number
         declare dy as number
@@ -412,16 +412,16 @@ role ScratchSprite is ScratchEntity begin
 
         declare leg_a_other as number
         declare leg_b_other as number
-        define leg_a_other as attribute "current_costume_width" of obj
-        define leg_b_other as attribute "current_costume_height" of obj
+        define leg_a_other as cast attribute "current_costume_width" of obj to number
+        define leg_b_other as cast attribute "current_costume_height" of obj to number
 
         declare radius_other as number
         define radius_other as 0.5 * mathSqrt(leg_a_other * leg_a_other + leg_b_other * leg_b_other)
 
         declare x_other as number
-        define x_other as attribute "x" of obj
+        define x_other as cast attribute "x" of obj to number
         declare y_other as number
-        define y_other as attribute "y" of obj
+        define y_other as cast attribute "y" of obj to number
 
         declare result as boolean
         define result as not (((mathSqrt((x + x_other)*(x + x_other) + (y + y_other) * (y + y_other)) - radius - radius_other) > 0))
@@ -458,12 +458,12 @@ role ScratchSprite is ScratchEntity begin
     end
 
     // @Category "looks"
-    define turnLeft(deg: number) begin
+    define turnLeft(degrees: number) begin
         setDirection(direction - degrees)
     end
 
     // @Category "looks"
-    define turnRight(deg: number) begin
+    define turnRight(degrees: number) begin
         setDirection(direction + degrees)
     end
 
