@@ -48,10 +48,10 @@ role RuntimeEntity begin
 
     // A random integer in the interval [from, to],
     // that is, both end points are included.
-    extern randomIntegerBetween (from: number, to: number) returns number;
+    extern randomIntegerBetween (from: number, to: number) returns number
 
     // See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
-    extern randomBetween (from: number, to: number) returns number;
+    extern randomBetween (from: number, to: number) returns number
 
     // TODO: Maybe add an approximation for sqrt
     extern mathSqrt (n: number) returns number
@@ -148,6 +148,8 @@ role Observer is RuntimeEntity begin
         define x as cast attribute "x" of obj_id to number
         define y as cast attribute "y" of obj_id to number
 
+        declare width as number
+        declare height as number
         define width as cast attribute "current_costume_width" of obj_id to number
         define height as cast attribute "current_costume_height" of obj_id to number
 
@@ -268,7 +270,7 @@ role ScratchEntity is RuntimeEntity begin
     // @Block "wait <Num> seconds"
     define waitSeconds (secs: number) begin
         // A busy-waiting implementation.
-        // The external method `_RUNTIME_waitSeconds` is intended to
+        // The external methode`_RUNTIME_waitSeconds` is intended to
         // not conduct a busy wait.
         declare waitUntil as number
         define waitUntil as _RUNTIME_seconds() + secs

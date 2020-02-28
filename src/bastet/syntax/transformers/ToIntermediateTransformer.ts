@@ -913,11 +913,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const methodIdent: Identifier = ctx.ident().accept(this).nodeOnly() as Identifier;
         this._activeActorTypes.beginScope(methodIdent.text);
         try {
+            const resultDeclaration = ctx.methodResultDeclaration().accept(this).nodeOnly() as ResultDeclaration;
             return TransformerResult.withNode(new MethodDefinition(
                 methodIdent,
                 ctx.parameterList().accept(this).nodeOnly() as ParameterDeclarationList,
                 ctx.stmtList().accept(this).nodeOnly() as StatementList,
-                ctx.methodResultDeclaration().accept(this).nodeOnly() as ResultDeclaration));
+                resultDeclaration));
         } finally {
             this._activeActorTypes.endScope();
         }
@@ -932,6 +933,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const ident = ctx.ident().accept(this).nodeOnly() as Identifier;
         const resultType = ctx.type().accept(this).nodeOnly() as ScratchType;
         const resultVar = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, resultType));
+        this._activeActorTypes.putVariable(resultVar);
+
         return TransformerResult.withNode(new ResultDeclaration(resultVar));
     }
 
