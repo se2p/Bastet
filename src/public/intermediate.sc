@@ -38,19 +38,60 @@ role RuntimeEntity begin
 
     extern _RUNTIME_signalFailure ()
 
-    extern _RUNTIME_numberFromInterval(from_num: number, to_num: number) returns number
+    extern _RUNTIME_numberFromInterval (from_num: number, to_num: number) returns number
 
-    extern _RUNTIME_integerFromInterval(from_num: number, to_num: number) returns number
+    extern _RUNTIME_integerFromInterval (from_num: number, to_num: number) returns number
 
-    extern _RUNTIME_getImageWidth(ident: string) returns number
+    extern _RUNTIME_getImageWidth (ident: string) returns number
 
-    extern _RUNTIME_getImageHeight(ident: string) returns number
+    extern _RUNTIME_getImageHeight (ident: string) returns number
+
+    // A random integer in the interval [from, to],
+    // that is, both end points are included.
+    extern randomIntegerBetween (intervalStart: number, intervalEnd: number) returns number
+
+    // See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
+    extern randomBetween (intervalStart: number, intervalEnd: number) returns number
 
     // TODO: Maybe add an approximation for sqrt
-    extern mathSqrt(n: number) returns number
+    extern mathSqrt (n: number) returns number
 
     // TODO: Maybe add an approximation for floor
-    extern mathFloor(n: number) returns number
+    extern mathFloor (n: number) returns number
+
+    extern mathAbs (n: number) returns number
+
+    extern mathFloor (n: number) returns number
+
+    extern mathCeiling (n: number) returns number
+
+    extern mathSqrt (n: number) returns number
+
+    extern mathSin (n: number) returns number
+
+    extern mathCos (n: number) returns number
+
+    extern mathTan (n: number) returns number
+
+    extern mathAsin (n: number) returns number
+
+    extern mathAcos (n: number) returns number
+
+    extern mathAtan (n: number) returns number
+
+    extern mathLn(n: number) returns number
+
+    extern mathLog(n: number) returns number
+
+    extern mathPowe(n: number) returns number
+
+    extern mathPowten(n: number) returns number
+
+    extern mathAtan2(n1: number, n2: number) returns number
+
+    extern degToRad(n: number) returns number
+
+    extern radToDeg(n: number) returns number
 
 end
 
@@ -69,29 +110,29 @@ role Observer is RuntimeEntity begin
 
         declare leg_a_fst as number
         declare leg_b_fst as number
-        define leg_a_fst as attribute "current_costume_width" of fst
-        define leg_b_fst as attribute "current_costume_height" of fst
+        define leg_a_fst as cast attribute "current_costume_width" of fst to number
+        define leg_b_fst as cast attribute "current_costume_height" of fst to number
 
         declare radius_fst as number
         define radius_fst as 0.5 * mathSqrt(leg_a_fst * leg_a_fst + leg_b_fst * leg_b_fst)
 
         declare leg_a_snd as number
         declare leg_b_snd as number
-        define leg_a_snd as attribute "current_costume_width" of snd
-        define leg_b_snd as attribute "current_costume_height" of snd
+        define leg_a_snd as cast attribute "current_costume_width" of snd to number
+        define leg_b_snd as cast attribute "current_costume_height" of snd to number
 
         declare radius_snd as number
         define radius_snd as 0.5 * mathSqrt(leg_a_snd * leg_a_snd + leg_b_snd * leg_b_snd)
 
         declare x_fst as number
-        define x_fst as attribute "x" of fst
+        define x_fst as cast attribute "x" of fst to number
         declare y_fst as number
-        define y_fst as attribute "y" of fst
+        define y_fst as cast attribute "y" of fst to number
 
         declare x_snd as number
-        define x_snd as attribute "x" of snd
+        define x_snd as cast attribute "x" of snd to number
         declare y_snd as number
-        define y_snd as attribute "y" of snd
+        define y_snd as cast attribute "y" of snd to number
 
         declare result as boolean
         define result as not (((mathSqrt((x_fst + x_snd)*(x_fst + x_snd) + (y_fst + y_snd) * (y_fst + y_snd)) - radius_fst - radius_snd) > 0))
@@ -104,13 +145,18 @@ role Observer is RuntimeEntity begin
 
         declare x as number
         declare y as number
-        define x as attribute "x" of obj_id
-        define y as attribute "y" of obj_id
+        define x as cast attribute "x" of obj_id to number
+        define y as cast attribute "y" of obj_id to number
+
+        declare width as number
+        declare height as number
+        define width as cast attribute "current_costume_width" of obj_id to number
+        define height as cast attribute "current_costume_height" of obj_id to number
 
         if not (_RUNTIME_getMouseX() < x
-                or _RUNTIME_getMouseX() > x + current_costume_width
+                or _RUNTIME_getMouseX() > x + width
                 or _RUNTIME_getMouseY() < y
-                or _RUNTIME_getMouseY() > y + current_costume_height) then begin
+                or _RUNTIME_getMouseY() > y + height) then begin
 
             define result as false
         end
@@ -125,31 +171,15 @@ role ScratchEntity is RuntimeEntity begin
 
     declare volume as number
 
+    declare current_costume_name as string
+
+    declare current_costume_width as number
+
+    declare current_costume_height as number
+
     declare sound_effect as enum [ "pitch", "pan_left_right" ]
 
     declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
-
-    extern mathSin(n: number) returns number
-
-    extern mathCos(n: number) returns number
-
-    extern mathAtan2(n1: number, n2: number) returns number
-
-    extern degToRad(n: number) returns number
-
-    extern radToDeg(n: number) returns number
-
-    define isStringEqualTo (str1: string, str2: string) begin
-        // TODO
-    end returns result : boolean
-
-    define isStringGreaterThan (str1: string, str2: string) begin
-        // TODO
-    end returns result : boolean
-
-    define isStringLessThan (str1: string, str2: string) begin
-        // TODO
-    end returns result : boolean
 
     // @Category "Looks"
     define changeActiveGraphicTo (id: string) begin
@@ -240,7 +270,7 @@ role ScratchEntity is RuntimeEntity begin
     // @Block "wait <Num> seconds"
     define waitSeconds (secs: number) begin
         // A busy-waiting implementation.
-        // The external method `_RUNTIME_waitSeconds` is intended to
+        // The external methode`_RUNTIME_waitSeconds` is intended to
         // not conduct a busy wait.
         declare waitUntil as number
         define waitUntil as _RUNTIME_seconds() + secs
@@ -351,8 +381,8 @@ role ScratchSprite is ScratchEntity begin
         declare targetX as number
         declare targetY as number
 
-        define targetX as (attribute "x" of s)
-        define targetY as (attribute "y" of s)
+        define targetX as cast (attribute "x" of s) to number
+        define targetY as cast (attribute "y" of s) to number
 
         declare dx as number
         declare dy as number
@@ -418,16 +448,16 @@ role ScratchSprite is ScratchEntity begin
 
         declare leg_a_other as number
         declare leg_b_other as number
-        define leg_a_other as attribute "current_costume_width" of obj
-        define leg_b_other as attribute "current_costume_height" of obj
+        define leg_a_other as cast attribute "current_costume_width" of obj to number
+        define leg_b_other as cast attribute "current_costume_height" of obj to number
 
         declare radius_other as number
         define radius_other as 0.5 * mathSqrt(leg_a_other * leg_a_other + leg_b_other * leg_b_other)
 
         declare x_other as number
-        define x_other as attribute "x" of obj
+        define x_other as cast attribute "x" of obj to number
         declare y_other as number
-        define y_other as attribute "y" of obj
+        define y_other as cast attribute "y" of obj to number
 
         declare result as boolean
         define result as not (((mathSqrt((x + x_other)*(x + x_other) + (y + y_other) * (y + y_other)) - radius - radius_other) > 0))
@@ -464,12 +494,12 @@ role ScratchSprite is ScratchEntity begin
     end
 
     // @Category "looks"
-    define turnLeft(deg: number) begin
+    define turnLeft(degrees: number) begin
         setDirection(direction - degrees)
     end
 
     // @Category "looks"
-    define turnRight(deg: number) begin
+    define turnRight(degrees: number) begin
         setDirection(direction + degrees)
     end
 

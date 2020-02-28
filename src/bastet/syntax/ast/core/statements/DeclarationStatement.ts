@@ -37,7 +37,7 @@ export abstract class DeclarationStatement extends Statement {
 
 export interface VariableDeclaration {
 
-    ident: Identifier;
+    identifier: Identifier;
     type: ScratchType;
 
 }
@@ -52,7 +52,7 @@ export abstract class DeclareVariableStatement extends DeclarationStatement impl
         this._variable = variable;
     }
 
-    get ident(): Identifier {
+    get identifier(): Identifier {
         return this._variable.identifier;
     }
 

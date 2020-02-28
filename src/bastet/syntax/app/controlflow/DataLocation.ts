@@ -22,6 +22,7 @@
 import {ScratchType, ScratchTypeID, VoidType} from "../../ast/core/ScratchType";
 import {Record as ImmRec} from "immutable";
 import {Identifier} from "../../ast/core/Identifier";
+import {Preconditions} from "../../../utils/Preconditions";
 
 export type DataLocationID = string;
 
@@ -149,6 +150,8 @@ export class DummyDataLocationMapper implements DataLocationMapper {
 export class DataLocations {
 
     public static createTypedLocation(id: Identifier, type: ScratchType) {
+        Preconditions.checkNotUndefined(id);
+        Preconditions.checkNotUndefined(type);
         return new TypedDataLocation(id.text, type.typeId);
     }
 

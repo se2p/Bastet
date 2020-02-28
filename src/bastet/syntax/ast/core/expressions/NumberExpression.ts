@@ -84,7 +84,7 @@ export class NumberLiteral extends AbstractNumberExpression {
     private static ZERO: NumberLiteral;
 
     public static zero(): NumberLiteral {
-        if (NumberLiteral.ZERO) {
+        if (!NumberLiteral.ZERO) {
             NumberLiteral.ZERO = new NumberLiteral(0);
         }
         return NumberLiteral.ZERO;

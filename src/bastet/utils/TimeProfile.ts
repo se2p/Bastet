@@ -40,29 +40,33 @@ export class OperationTimeProfile {
     /** Interval of nanoseconds needed on the reference machine(s) */
     private readonly _nsecs: NumIntervalValue;
 
-    /** Program operation to that time measurement is mapped to */
-    private readonly _op: ProgramOperation;
-
-    constructor(nsecs: NumIntervalValue, op: ProgramOperation) {
+    constructor(nsecs: NumIntervalValue) {
         this._nsecs = nsecs;
-        this._op = op;
     }
 
     get nsecs(): NumIntervalValue {
         return this._nsecs;
     }
 
-    get op(): ProgramOperation {
-        return this._op;
-    }
 }
+
+export const NSECS_PER_SEC = 1000000000;
+export const MICSECS_PER_SEC = 1000000;
+export const MILLIS_PER_SEC = 1000;
+export const ONE_MICSEC_IN_NSECS = 1000;
 
 export class StaticTimeProfile implements ProgramTimeProfile {
 
     private readonly _opTimes: Map<OperationId, OperationTimeProfile>;
 
+    private readonly _avgOpProfile: OperationTimeProfile;
+
     constructor() {
         this._opTimes = new Map();
+        this._avgOpProfile = new OperationTimeProfile(
+            new NumIntervalValue(
+                new ConcreteNumber(ONE_MICSEC_IN_NSECS),
+                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 100)));
     }
 
     public widen(op: ProgramOperation, minNanos: number, maxNanos: number) {
@@ -70,7 +74,7 @@ export class StaticTimeProfile implements ProgramTimeProfile {
     }
 
     public getOpProfile(op: ProgramOperation): OperationTimeProfile {
-        throw new ImplementMeException();
+        return this._avgOpProfile;
     }
 
 }

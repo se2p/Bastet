@@ -7,13 +7,10 @@ import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
 import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
-import { MapTypeContext } from "./ScratchParser";
 import { ConcreteActorModeContext } from "./ScratchParser";
 import { ActorRoleModeContext } from "./ScratchParser";
 import { ExternFunctionReturnDefinitionContext } from "./ScratchParser";
 import { ExternVoidReturnDefinitionContext } from "./ScratchParser";
-import { SetAttributeToStatementContext } from "./ScratchParser";
-import { SetAttributeOfToStatementContext } from "./ScratchParser";
 import { StoreEvalResultStatementContext } from "./ScratchParser";
 import { StoreCallResultStatementContext } from "./ScratchParser";
 import { ListVariableExpressionContext } from "./ScratchParser";
@@ -23,6 +20,8 @@ import { ImportAllActorsContext } from "./ScratchParser";
 import { StopAllContext } from "./ScratchParser";
 import { StopThisContext } from "./ScratchParser";
 import { DeleteThisCloneContext } from "./ScratchParser";
+import { NumberExpressionContext } from "./ScratchParser";
+import { StringExpressionContext } from "./ScratchParser";
 import { DeleteAllFromStatementContext } from "./ScratchParser";
 import { DeleteIthFromStatementContext } from "./ScratchParser";
 import { AddElementToStatementContext } from "./ScratchParser";
@@ -48,8 +47,6 @@ import { CreateCloneOfStatementContext } from "./ScratchParser";
 import { BroadcastMessageStatementContext } from "./ScratchParser";
 import { BroadcastAndWaitStatementContext } from "./ScratchParser";
 import { ResetTimerStatementContext } from "./ScratchParser";
-import { ChangeVarByStatementContext } from "./ScratchParser";
-import { ChagenAttributeByStatementContext } from "./ScratchParser";
 import { EpsilonStatementContext } from "./ScratchParser";
 import { AssumeStatementContext } from "./ScratchParser";
 import { SetStatementContext } from "./ScratchParser";
@@ -60,15 +57,13 @@ import { BoolCallStatementExpressionContext } from "./ScratchParser";
 import { NegatedBoolExpressionContext } from "./ScratchParser";
 import { BoolAndExpressionContext } from "./ScratchParser";
 import { BoolOrExpressionContext } from "./ScratchParser";
-import { NumGreaterThanExpressionContext } from "./ScratchParser";
-import { NumLessThanExpressionContext } from "./ScratchParser";
-import { NumEqualsExpressionContext } from "./ScratchParser";
+import { GreaterThanExpressionContext } from "./ScratchParser";
+import { LessThanExpressionContext } from "./ScratchParser";
+import { EqualsExpressionContext } from "./ScratchParser";
 import { StrContainsExpressionContext } from "./ScratchParser";
 import { DefaultBoolExpressionContext } from "./ScratchParser";
 import { UnspecifiedBoolExpressionContext } from "./ScratchParser";
 import { DeclareVariableContext } from "./ScratchParser";
-import { DeclareAttributeContext } from "./ScratchParser";
-import { DeclareAttributeOfContext } from "./ScratchParser";
 import { StringLiteralExpressionContext } from "./ScratchParser";
 import { StringVariableExpressionContext } from "./ScratchParser";
 import { StringParanthExpressionContext } from "./ScratchParser";
@@ -102,9 +97,6 @@ import { TimerExpressionContext } from "./ScratchParser";
 import { LengthOfStringExpressionContext } from "./ScratchParser";
 import { LengthOfListExpressionContext } from "./ScratchParser";
 import { IndexOfExpressionContext } from "./ScratchParser";
-import { NumRandomExpressionContext } from "./ScratchParser";
-import { NumRoundExpressionContext } from "./ScratchParser";
-import { NumFunctExpressionContext } from "./ScratchParser";
 import { NumMulExpressionContext } from "./ScratchParser";
 import { NumDivExpressionContext } from "./ScratchParser";
 import { NumModExpressionContext } from "./ScratchParser";
@@ -178,8 +170,8 @@ import { CoreStringExprContext } from "./ScratchParser";
 import { BoolExprContext } from "./ScratchParser";
 import { CoreBoolExprContext } from "./ScratchParser";
 import { NumExprContext } from "./ScratchParser";
+import { NumOrStringExprContext } from "./ScratchParser";
 import { CoreNumExprContext } from "./ScratchParser";
-import { NumFunctContext } from "./ScratchParser";
 import { ListExprContext } from "./ScratchParser";
 import { ExpressionContext } from "./ScratchParser";
 import { CoreExpressionContext } from "./ScratchParser";
@@ -251,19 +243,6 @@ export interface ScratchListener extends ParseTreeListener {
 	exitListType?: (ctx: ListTypeContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `MapType`
-	 * labeled alternative in `ScratchParser.type`.
-	 * @param ctx the parse tree
-	 */
-	enterMapType?: (ctx: MapTypeContext) => void;
-	/**
-	 * Exit a parse tree produced by the `MapType`
-	 * labeled alternative in `ScratchParser.type`.
-	 * @param ctx the parse tree
-	 */
-	exitMapType?: (ctx: MapTypeContext) => void;
-
-	/**
 	 * Enter a parse tree produced by the `ConcreteActorMode`
 	 * labeled alternative in `ScratchParser.actorMode`.
 	 * @param ctx the parse tree
@@ -314,32 +293,6 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitExternVoidReturnDefinition?: (ctx: ExternVoidReturnDefinitionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `SetAttributeToStatement`
-	 * labeled alternative in `ScratchParser.setStmt`.
-	 * @param ctx the parse tree
-	 */
-	enterSetAttributeToStatement?: (ctx: SetAttributeToStatementContext) => void;
-	/**
-	 * Exit a parse tree produced by the `SetAttributeToStatement`
-	 * labeled alternative in `ScratchParser.setStmt`.
-	 * @param ctx the parse tree
-	 */
-	exitSetAttributeToStatement?: (ctx: SetAttributeToStatementContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `SetAttributeOfToStatement`
-	 * labeled alternative in `ScratchParser.setStmt`.
-	 * @param ctx the parse tree
-	 */
-	enterSetAttributeOfToStatement?: (ctx: SetAttributeOfToStatementContext) => void;
-	/**
-	 * Exit a parse tree produced by the `SetAttributeOfToStatement`
-	 * labeled alternative in `ScratchParser.setStmt`.
-	 * @param ctx the parse tree
-	 */
-	exitSetAttributeOfToStatement?: (ctx: SetAttributeOfToStatementContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `StoreEvalResultStatement`
@@ -457,6 +410,32 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitDeleteThisClone?: (ctx: DeleteThisCloneContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumberExpression`
+	 * labeled alternative in `ScratchParser.numOrStringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumberExpression?: (ctx: NumberExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumberExpression`
+	 * labeled alternative in `ScratchParser.numOrStringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumberExpression?: (ctx: NumberExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `StringExpression`
+	 * labeled alternative in `ScratchParser.numOrStringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterStringExpression?: (ctx: StringExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `StringExpression`
+	 * labeled alternative in `ScratchParser.numOrStringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitStringExpression?: (ctx: StringExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `DeleteAllFromStatement`
@@ -784,32 +763,6 @@ export interface ScratchListener extends ParseTreeListener {
 	exitResetTimerStatement?: (ctx: ResetTimerStatementContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `ChangeVarByStatement`
-	 * labeled alternative in `ScratchParser.commonStmt`.
-	 * @param ctx the parse tree
-	 */
-	enterChangeVarByStatement?: (ctx: ChangeVarByStatementContext) => void;
-	/**
-	 * Exit a parse tree produced by the `ChangeVarByStatement`
-	 * labeled alternative in `ScratchParser.commonStmt`.
-	 * @param ctx the parse tree
-	 */
-	exitChangeVarByStatement?: (ctx: ChangeVarByStatementContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `ChagenAttributeByStatement`
-	 * labeled alternative in `ScratchParser.commonStmt`.
-	 * @param ctx the parse tree
-	 */
-	enterChagenAttributeByStatement?: (ctx: ChagenAttributeByStatementContext) => void;
-	/**
-	 * Exit a parse tree produced by the `ChagenAttributeByStatement`
-	 * labeled alternative in `ScratchParser.commonStmt`.
-	 * @param ctx the parse tree
-	 */
-	exitChagenAttributeByStatement?: (ctx: ChagenAttributeByStatementContext) => void;
-
-	/**
 	 * Enter a parse tree produced by the `EpsilonStatement`
 	 * labeled alternative in `ScratchParser.commonStmt`.
 	 * @param ctx the parse tree
@@ -940,43 +893,43 @@ export interface ScratchListener extends ParseTreeListener {
 	exitBoolOrExpression?: (ctx: BoolOrExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumGreaterThanExpression`
+	 * Enter a parse tree produced by the `GreaterThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumGreaterThanExpression?: (ctx: NumGreaterThanExpressionContext) => void;
+	enterGreaterThanExpression?: (ctx: GreaterThanExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumGreaterThanExpression`
+	 * Exit a parse tree produced by the `GreaterThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumGreaterThanExpression?: (ctx: NumGreaterThanExpressionContext) => void;
+	exitGreaterThanExpression?: (ctx: GreaterThanExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumLessThanExpression`
+	 * Enter a parse tree produced by the `LessThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumLessThanExpression?: (ctx: NumLessThanExpressionContext) => void;
+	enterLessThanExpression?: (ctx: LessThanExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumLessThanExpression`
+	 * Exit a parse tree produced by the `LessThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumLessThanExpression?: (ctx: NumLessThanExpressionContext) => void;
+	exitLessThanExpression?: (ctx: LessThanExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumEqualsExpression`
+	 * Enter a parse tree produced by the `EqualsExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumEqualsExpression?: (ctx: NumEqualsExpressionContext) => void;
+	enterEqualsExpression?: (ctx: EqualsExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumEqualsExpression`
+	 * Exit a parse tree produced by the `EqualsExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumEqualsExpression?: (ctx: NumEqualsExpressionContext) => void;
+	exitEqualsExpression?: (ctx: EqualsExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `StrContainsExpression`
@@ -1029,32 +982,6 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitDeclareVariable?: (ctx: DeclareVariableContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `DeclareAttribute`
-	 * labeled alternative in `ScratchParser.declarationStmt`.
-	 * @param ctx the parse tree
-	 */
-	enterDeclareAttribute?: (ctx: DeclareAttributeContext) => void;
-	/**
-	 * Exit a parse tree produced by the `DeclareAttribute`
-	 * labeled alternative in `ScratchParser.declarationStmt`.
-	 * @param ctx the parse tree
-	 */
-	exitDeclareAttribute?: (ctx: DeclareAttributeContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `DeclareAttributeOf`
-	 * labeled alternative in `ScratchParser.declarationStmt`.
-	 * @param ctx the parse tree
-	 */
-	enterDeclareAttributeOf?: (ctx: DeclareAttributeOfContext) => void;
-	/**
-	 * Exit a parse tree produced by the `DeclareAttributeOf`
-	 * labeled alternative in `ScratchParser.declarationStmt`.
-	 * @param ctx the parse tree
-	 */
-	exitDeclareAttributeOf?: (ctx: DeclareAttributeOfContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `StringLiteralExpression`
@@ -1484,45 +1411,6 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitIndexOfExpression?: (ctx: IndexOfExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `NumRandomExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterNumRandomExpression?: (ctx: NumRandomExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `NumRandomExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitNumRandomExpression?: (ctx: NumRandomExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `NumRoundExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterNumRoundExpression?: (ctx: NumRoundExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `NumRoundExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitNumRoundExpression?: (ctx: NumRoundExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `NumFunctExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterNumFunctExpression?: (ctx: NumFunctExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `NumFunctExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitNumFunctExpression?: (ctx: NumFunctExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `NumMulExpression`
@@ -2354,6 +2242,17 @@ export interface ScratchListener extends ParseTreeListener {
 	exitNumExpr?: (ctx: NumExprContext) => void;
 
 	/**
+	 * Enter a parse tree produced by `ScratchParser.numOrStringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumOrStringExpr?: (ctx: NumOrStringExprContext) => void;
+	/**
+	 * Exit a parse tree produced by `ScratchParser.numOrStringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumOrStringExpr?: (ctx: NumOrStringExprContext) => void;
+
+	/**
 	 * Enter a parse tree produced by `ScratchParser.coreNumExpr`.
 	 * @param ctx the parse tree
 	 */
@@ -2363,17 +2262,6 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitCoreNumExpr?: (ctx: CoreNumExprContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `ScratchParser.numFunct`.
-	 * @param ctx the parse tree
-	 */
-	enterNumFunct?: (ctx: NumFunctContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.numFunct`.
-	 * @param ctx the parse tree
-	 */
-	exitNumFunct?: (ctx: NumFunctContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.listExpr`.

@@ -101,7 +101,7 @@ import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
 import {
     DeclareAttributeOfStatement,
     DeclareAttributeStatement,
-    DeclareStackVariableStatement
+    DeclareStackVariableStatement, DeclareSystemVariableStatement
 } from "../ast/core/statements/DeclarationStatement";
 import {CreateCloneOfStatement} from "../ast/core/statements/CreateCloneOfStatement";
 import {ChangeVarByStatement} from "../ast/core/statements/ChangeVarByStatement";
@@ -523,6 +523,13 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
         return this.doForStatement(node, (() => {
             const renamedDataLoc: DataLocation = this.renameDeclaration(node.variable.dataloc);
             return new DeclareStackVariableStatement(new VariableWithDataLocation(renamedDataLoc));
+        }));
+    }
+
+    visitDeclareSystemVariableStatement(node: DeclareSystemVariableStatement): AstNode {
+        return this.doForStatement(node, (() => {
+            const renamedDataLoc: DataLocation = this.renameDeclaration(node.variable.dataloc);
+            return new DeclareSystemVariableStatement(new VariableWithDataLocation(renamedDataLoc));
         }));
     }
 
