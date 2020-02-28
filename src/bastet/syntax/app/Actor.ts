@@ -43,6 +43,8 @@ import {GREENFLAG_MESSAGE, INIT_MESSAGE} from "../ast/core/Message";
 import {StatementList} from "../ast/core/statements/Statement";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
+import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -197,7 +199,11 @@ export class Actor {
     }
 
     public getMethod(name: string): Method {
-        return Preconditions.checkNotUndefined(this._methodMap.get(name));
+        const result: Method = this._methodMap.get(name);
+        if (!result) {
+            throw new IllegalArgumentException(`Method "${name}" is not defined!`);
+        }
+        return result;
     }
 
     public getScript(id: ScriptId): Script {

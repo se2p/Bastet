@@ -231,7 +231,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         //    an exception if the WORK_TIME timeout would have been reached before
         //    all threads in the list were stepped.
 
-        const stepConcern: Concern = Concerns.defaultSpecificationConcern();
+        const stepConcern: Concern = Concerns.defaultProgramConcern();
 
         const threadsToStep: number[] = this.chooseThreadToStep(fromState);
         if (threadsToStep.length === 0) {

@@ -93,6 +93,30 @@ role RuntimeEntity begin
 
     extern radToDeg(n: number) returns number
 
+    // @Category "Control"
+    // @Block "wait <Num> seconds"
+    define waitSeconds (secs: number) begin
+        // A busy-waiting implementation.
+        // The external methode`_RUNTIME_waitSeconds` is intended to
+        // not conduct a busy wait.
+        declare waitUntil as number
+        define waitUntil as _RUNTIME_seconds() + secs
+        until (_RUNTIME_seconds() < waitUntil) repeat begin
+        end
+    end
+
+    // @Category "Control"
+    // @Block "wait <Num> millis"
+    define waitMillis (millis: number) begin
+        // A busy-waiting implementation.
+        // The external method `_RUNTIME_waitMillis` is intended to
+        // not conduct a busy wait.
+        declare waitUntil as number
+        define waitUntil as _RUNTIME_millis() + millis
+        until (_RUNTIME_millis() < waitUntil) repeat begin
+        end
+    end
+
 end
 
 role Observer is RuntimeEntity begin
@@ -265,30 +289,6 @@ role ScratchEntity is RuntimeEntity begin
     define volume () begin
 
     end returns result : number
-
-    // @Category "Control"
-    // @Block "wait <Num> seconds"
-    define waitSeconds (secs: number) begin
-        // A busy-waiting implementation.
-        // The external methode`_RUNTIME_waitSeconds` is intended to
-        // not conduct a busy wait.
-        declare waitUntil as number
-        define waitUntil as _RUNTIME_seconds() + secs
-        until (_RUNTIME_seconds() < waitUntil) repeat begin
-        end
-    end
-
-    // @Category "Control"
-    // @Block "wait <Num> millis"
-    define waitMillis (millis: number) begin
-        // A busy-waiting implementation.
-        // The external method `_RUNTIME_waitMillis` is intended to
-        // not conduct a busy wait.
-        declare waitUntil as number
-        define waitUntil as _RUNTIME_millis() + millis
-        until (_RUNTIME_millis() < waitUntil) repeat begin
-        end
-    end
 
     // data_setvariableto, sensing_setdragmode, motion_setrotationstyle, looks_seteffectto,
     // sound_seteffectto, sound_setvolumeto;
