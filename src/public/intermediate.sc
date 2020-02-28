@@ -73,6 +73,12 @@ role RuntimeEntity begin
 
     extern mathAcos (n: number) returns number
 
+    extern mathATan (n: number) returns number
+
+    extern mathSin (n: number) returns number
+
+    extern mathCos (n: number) returns number
+
     extern mathLn(n: number) returns number
 
     extern mathLog(n: number) returns number

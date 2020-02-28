@@ -42,7 +42,7 @@ test("Test bool num less 1 unsafe", done => {
     }
 }, utils.timeout);
 
-test("Test bool num less 2 safe", done => {
+xtest("Test bool num less 2 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-less-2_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -52,7 +52,7 @@ test("Test bool num less 2 safe", done => {
     }
 }, utils.timeout);
 
-test("Test bool num less 2 unsafe", done => {
+xtest("Test bool num less 2 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-less-2_UNSAFE.sc"
     let bastet = new Bastet();
     try {

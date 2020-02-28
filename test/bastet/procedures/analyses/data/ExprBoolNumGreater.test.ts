@@ -42,7 +42,7 @@ test("Test bool num greater 1 unsafe", done => {
     }
 }, utils.timeout);
 
-test("Test bool num greater 2 safe", done => {
+xtest("Test bool num greater 2 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-greater-2_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -52,7 +52,7 @@ test("Test bool num greater 2 safe", done => {
     }
 }, utils.timeout);
 
-test("Test bool num greater 2 unsafe", done => {
+xtest("Test bool num greater 2 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-greater-2_UNSAFE.sc"
     let bastet = new Bastet();
     try {

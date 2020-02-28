@@ -22,7 +22,7 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-test("Test bool not 1 safe", done => {
+xtest("Test bool not 1 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-not-1_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -32,7 +32,7 @@ test("Test bool not 1 safe", done => {
     }
 }, utils.timeout);
 
-test("Test bool not 1 unsafe", done => {
+xtest("Test bool not 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-not-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {

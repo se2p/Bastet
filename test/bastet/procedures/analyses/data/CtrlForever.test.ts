@@ -22,7 +22,7 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-test("Test ctrl forever 1 safe", done => {
+xtest("Test ctrl forever 1 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-forever-1_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -32,7 +32,7 @@ test("Test ctrl forever 1 safe", done => {
     }
 }, utils.timeout);
 
-test("Test ctrl forever 1 unsafe", done => {
+xtest("Test ctrl forever 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-forever-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
@@ -42,7 +42,7 @@ test("Test ctrl forever 1 unsafe", done => {
     }
 }, utils.timeout);
 
-test("Test ctrl forever 2 unsafe", done => {
+xtest("Test ctrl forever 2 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-forever-2_UNSAFE.sc"
     let bastet = new Bastet();
     try {
