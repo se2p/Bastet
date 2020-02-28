@@ -25,6 +25,7 @@ import {Identifier} from "./Identifier";
 import {AbstractExpression} from "./expressions/AbstractExpression";
 import {DataLocation} from "../../app/controlflow/DataLocation";
 import {Preconditions} from "../../../utils/Preconditions";
+import {StringLiteral} from "./expressions/StringExpression";
 
 export interface Variable {
 
@@ -60,7 +61,7 @@ export class VariableWithDataLocation extends AbstractExpression implements Vari
 
     constructor(dataloc: DataLocation) {
         const ident = Identifier.of(dataloc.ident);
-        super(ScratchType.fromId(dataloc.type), [ident]);
+        super(ScratchType.fromId(dataloc.type), [new StringLiteral(dataloc.qualifiedName)]);
         this._dataloc = dataloc;
         this._identifier = ident;
     }
