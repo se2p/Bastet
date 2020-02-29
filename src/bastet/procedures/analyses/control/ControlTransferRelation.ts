@@ -361,7 +361,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 result.push(new StoreEvalResultToVariableStatement(storeResultTo, variableWithReturnValue));
             }
        } else {
-            throw new ImplementMeException();
+            // Nothing to do
         }
 
         return result.map((s) => new RawOperation(s));
