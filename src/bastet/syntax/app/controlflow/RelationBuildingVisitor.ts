@@ -19,7 +19,7 @@
  *
  */
 
-import {TransitionRelation, TransitionRelations} from "./TransitionRelation";
+import {TransitionRelation, TransitionRelationBuilder, TransitionRelations} from "./TransitionRelation";
 import {OperationId, ProgramOperation, ProgramOperationFactory, ProgramOperations} from "./ops/ProgramOperation";
 import {ControlLocation} from "./ControlLocation";
 import {CoreCtrlStatementnVisitor, CoreVisitor} from "../../ast/CoreVisitor";
@@ -33,6 +33,7 @@ import {
 import {StatementList} from "../../ast/core/statements/Statement";
 import {AstNode} from "../../ast/AstNode";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {Preconditions} from "../../../utils/Preconditions";
 
 
 export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>, CoreCtrlStatementnVisitor<TransitionRelation> {
@@ -129,13 +130,31 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
             const leaveLoopGuarded = TransitionRelations.forOpSeq(
                 ProgramOperationFactory.negatedAssumeOpFrom(node.condition));
 
-            const result = TransitionRelations.concat(
-                TransitionRelations.concatOpTr(loopHead, ProgramOperations.epsilon(), queryBody),
-                TransitionRelations.forkTransitions(
-                    TransitionRelations.concatTrOpGoto(enterLoopBodyGuarded, ProgramOperations.epsilon(), loopHead),
-                    TransitionRelations.concatTrOpGoto(leaveLoopGuarded, ProgramOperations.epsilon(), loopTerminationLocation)));
+            const loopHeadToQueryBody = TransitionRelations.concatOpTr(loopHead, ProgramOperations.epsilon(), queryBody);
+            const guardedBodyToHead = TransitionRelations.concatTrOpGoto(enterLoopBodyGuarded, ProgramOperations.epsilon(), loopHead);
+            const guardedLoopExit = TransitionRelations.concatTrOpGoto(leaveLoopGuarded, ProgramOperations.epsilon(), loopTerminationLocation);
 
-            return result;
+            Preconditions.checkState(loopHeadToQueryBody.exitLocationSet.size == 1);
+            Preconditions.checkState(loopHeadToQueryBody.entryLocationSet.size == 1);
+
+            Preconditions.checkState(guardedBodyToHead.exitLocationSet.size == 1);
+            Preconditions.checkState(guardedBodyToHead.entryLocationSet.size == 1);
+
+            Preconditions.checkState(guardedLoopExit.exitLocationSet.size == 1);
+            Preconditions.checkState(guardedLoopExit.entryLocationSet.size == 1);
+
+            const builder = new TransitionRelationBuilder();
+            builder.addAllTransitionsOf(loopHeadToQueryBody)
+                .addAllTransitionsOf(guardedBodyToHead)
+                .addAllTransitionsOf(guardedLoopExit)
+                .connectLocations(loopHeadToQueryBody.exitLocationSet, guardedBodyToHead.entryLocationSet)
+                .connectLocations(loopHeadToQueryBody.exitLocationSet, guardedLoopExit.entryLocationSet)
+                .connectLocations(guardedBodyToHead.exitLocationSet, loopHeadToQueryBody.entryLocationSet);
+
+            guardedLoopExit.exitLocationSet.forEach((loc) => builder.addExitLocationWithID(loc));
+            loopHeadToQueryBody.entryLocationSet.forEach((loc) => builder.addEntryLocationWithID(loc));
+
+            return builder.build();
         } finally {
             this._stack.pop();
         }

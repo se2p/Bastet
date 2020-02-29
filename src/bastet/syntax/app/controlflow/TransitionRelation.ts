@@ -139,6 +139,15 @@ export class TransitionRelationBuilder {
         return new TransitionRelation(transitions, locations, entryLocs, exitLocs);
     }
 
+    connectLocations(fromLocations: Iterable<LocationId>, toLocations: Iterable<LocationId>): this {
+        for (const fromLoc of fromLocations) {
+            for (const toLoc of toLocations) {
+                this.addTransitionByIDs(fromLoc, toLoc, ProgramOperations.epsilon());
+            }
+        }
+        return this;
+    }
+
 }
 
 export type TransitionTable = ImmMap<LocationId, ImmMap<LocationId, ImmSet<OperationId>>>;
@@ -461,6 +470,9 @@ export class TransitionRelations {
         for (let centry of casesEntryLocs) {
             builder.addTransition(resultEntryLoc, ControlLocation.for(centry), ProgramOperations.epsilon());
         }
+
+        caseOneGuarded.exitLocationSet.forEach((l) => builder.addExitLocationWithID(l));
+        caseTwoGuarded.exitLocationSet.forEach((l) => builder.addExitLocationWithID(l));
 
         return builder.addEntryLocation(resultEntryLoc).build();
     }

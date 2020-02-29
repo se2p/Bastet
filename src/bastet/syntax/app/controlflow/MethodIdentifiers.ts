@@ -30,6 +30,8 @@ export enum MethodIdentifiers {
 
     _RUNTIME_millis = "_RUNTIME_millis",
 
+    _RUNTIME_micros = "_RUNTIME_micros",
+
     _RUNTIME_waitMillis  = "_RUNTIME_waitMillis",
 
     _BUSY_WAIT_waitMillis  = "waitMillis",
