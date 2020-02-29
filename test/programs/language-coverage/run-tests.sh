@@ -5,7 +5,7 @@ BASTET_ROOT="../../../"
 
 cd $BASTET_ROOT
 
-npm start build
+npm run build
 
 grep_statistic () {
     CONTEXT=$1
