@@ -32,10 +32,10 @@ actor DirectorObserver is Observer begin
     declare actor_1_id as string
     declare actor_2_id as string
 
+    declare actors_touching as boolean
+
     define actor_1_id as "Katze"
     define actor_2_id as "Ball"
-
-    declare actors_touching as boolean
 
     define atomic isBehaviorSatisfied () begin
         define result as false
