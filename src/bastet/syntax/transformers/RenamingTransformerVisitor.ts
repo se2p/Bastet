@@ -558,10 +558,10 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): AstNode {
         return this.doForStatement(node, (() => {
+            // ATTENTION: It is importat to conduct the visit for the RHS first (for a forwards analysis)!
+            const rhs = this.withMode(DataLocationMode.READ_FROM, () => node.toValue.accept(this)) as Expression;
             const assignedDataLoc: DataLocation = this.renameAssigned(node.variable.dataloc);
-            return new StoreEvalResultToVariableStatement(
-                new VariableWithDataLocation(assignedDataLoc),
-                this.withMode(DataLocationMode.READ_FROM, () => node.toValue.accept(this)) as Expression);
+            return new StoreEvalResultToVariableStatement(new VariableWithDataLocation(assignedDataLoc), rhs);
         }));
     }
 

@@ -27,7 +27,7 @@ import {NumberExpression} from "./NumberExpression";
 import {BooleanExpression} from "./BooleanExpression";
 import {Identifier} from "../Identifier";
 import {BinaryExpression} from "./BinaryExpression";
-import {Variable, VariableExpression, VariableWithDataLocation} from "../Variable";
+import {VariableExpression, VariableWithDataLocation} from "../Variable";
 
 export interface StringExpression extends Expression {
 

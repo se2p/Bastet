@@ -53,7 +53,7 @@ export class SSAssigner {
         const id = assignedDataLoc.ident;
         const currentVersion = this.getCurrentVersionOf(id);
 
-        // Update the internal SSA map
+        // Update the internal ssa map
         const newVersion = currentVersion + 1;
         this._ssa = this._ssa.withIndex(id, newVersion);
 

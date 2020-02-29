@@ -25,7 +25,7 @@ import {Identifier} from "./Identifier";
 import {AbstractExpression} from "./expressions/AbstractExpression";
 import {DataLocation} from "../../app/controlflow/DataLocation";
 import {Preconditions} from "../../../utils/Preconditions";
-import {StringLiteral} from "./expressions/StringExpression";
+import {AbstractNode} from "../AstNode";
 
 export interface Variable {
 
@@ -34,6 +34,21 @@ export interface Variable {
     type: ScratchType;
 
     qualifiedName: string;
+
+}
+
+export class QualifiedVariableName extends AbstractNode {
+
+    private readonly _qualifiedName : string;
+
+    constructor(qualifiedName: string) {
+        super([]);
+        this._qualifiedName = qualifiedName;
+    }
+
+    toTreeString(): string {
+        return this._qualifiedName;
+    }
 
 }
 
@@ -61,7 +76,7 @@ export class VariableWithDataLocation extends AbstractExpression implements Vari
 
     constructor(dataloc: DataLocation) {
         const ident = Identifier.of(dataloc.ident);
-        super(ScratchType.fromId(dataloc.type), [new StringLiteral(dataloc.qualifiedName)]);
+        super(ScratchType.fromId(dataloc.type), [new QualifiedVariableName(dataloc.qualifiedName)]);
         this._dataloc = dataloc;
         this._identifier = ident;
     }

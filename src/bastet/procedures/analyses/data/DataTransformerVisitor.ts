@@ -264,13 +264,6 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
         return this._theories.numTheory.isGreaterThan(op1, op2);
     }
 
-    visitNumLessEqualExpression(node: NumLessEqualExpression): B {
-        const numVisitor = new DataNumExpressionVisitor(this._theories.numTheory);
-        const op1: N = node.operand1.accept(numVisitor);
-        const op2: N = node.operand2.accept(numVisitor);
-        return this._theories.numTheory.isLessEqual(op1, op2);
-    }
-
     visitNumLessThanExpression(node: NumLessThanExpression): B {
         const numVisitor = new DataNumExpressionVisitor(this._theories.numTheory);
         const op1: N = node.operand1.accept(numVisitor);
@@ -501,7 +494,7 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
     }
 
     visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): B {
-        // We assume that a wrapping analysis step takes care of SSA.
+        // We assume that a wrapping analysis step takes care of ssa.
         const declaredType = node.variable.type;
         if (declaredType instanceof NumberType) {
             const visitor = new DataNumExpressionVisitor(this._theories.numTheory);
