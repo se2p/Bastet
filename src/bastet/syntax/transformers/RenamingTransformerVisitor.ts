@@ -67,8 +67,8 @@ import {
     BooleanLiteral,
     BooleanVariableExpression,
     NegationExpression,
-    NumEqualsExpression,
-    NumGreaterThanExpression,
+    NumEqualsExpression, NumGreaterEqualExpression,
+    NumGreaterThanExpression, NumLessEqualExpression,
     NumLessThanExpression,
     OrExpression,
     StrContainsExpression,
@@ -350,8 +350,18 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
             node.operand2.accept(this) as NumberExpression);
     }
 
+    visitNumGreaterEqualExpression(node: NumGreaterEqualExpression): AstNode {
+        return new NumGreaterEqualExpression(node.operand1.accept(this) as NumberExpression,
+            node.operand2.accept(this) as NumberExpression);
+    }
+
     visitNumLessThanExpression(node: NumLessThanExpression): AstNode {
         return new NumLessThanExpression(node.operand1.accept(this) as NumberExpression,
+            node.operand2.accept(this) as NumberExpression);
+    }
+
+    visitNumLessEqualExpression(node: NumLessEqualExpression): AstNode {
+        return new NumLessEqualExpression(node.operand1.accept(this) as NumberExpression,
             node.operand2.accept(this) as NumberExpression);
     }
 
