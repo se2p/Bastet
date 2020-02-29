@@ -6,7 +6,7 @@ actor MiniActor is RuntimeEntity begin
         declare a as number
         declare b as number
         define b as 2
-        if a % b > 1 then begin
+        if a mod b > 1 then begin
             _RUNTIME_signalFailure()
         end
     end

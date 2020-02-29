@@ -3,7 +3,7 @@ program Mini1Program
 actor MiniActor is RuntimeEntity begin
 
     define inc (par: number) begin
-        define result as inc + 1
+        define result as par + 1
     end returns result: number
 
     script on startup do begin
