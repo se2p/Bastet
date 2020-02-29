@@ -135,10 +135,6 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
                     TransitionRelations.concatTrOpGoto(enterLoopBodyGuarded, ProgramOperations.epsilon(), loopHead),
                     TransitionRelations.concatTrOpGoto(leaveLoopGuarded, ProgramOperations.epsilon(), loopTerminationLocation)));
 
-            const el = TransitionRelations.eliminateEpsilons(result);
-            console.log(el.toString());
-            console.log(el.entryLocationSet.toArray());
-            console.log(el.exitLocationSet.toArray());
             return result;
         } finally {
             this._stack.pop();

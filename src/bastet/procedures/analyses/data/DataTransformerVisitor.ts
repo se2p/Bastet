@@ -250,6 +250,13 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
         return this._theories.numTheory.isNumberEqualTo(op1, op2);
     }
 
+    visitNumGreaterEqualExpression(node: NumGreaterEqualExpression): B {
+        const numVisitor = new DataNumExpressionVisitor(this._theories.numTheory);
+        const op1: N = node.operand1.accept(numVisitor);
+        const op2: N = node.operand2.accept(numVisitor);
+        return this._theories.numTheory.isGreaterEqual(op1, op2);
+    }
+
     visitNumGreaterThanExpression(node: NumGreaterThanExpression): B {
         const numVisitor = new DataNumExpressionVisitor(this._theories.numTheory);
         const op1: N = node.operand1.accept(numVisitor);
@@ -257,11 +264,11 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
         return this._theories.numTheory.isGreaterThan(op1, op2);
     }
 
-    visitNumGreaterEqualExpression(node: NumGreaterEqualExpression): B {
+    visitNumLessEqualExpression(node: NumLessEqualExpression): B {
         const numVisitor = new DataNumExpressionVisitor(this._theories.numTheory);
         const op1: N = node.operand1.accept(numVisitor);
         const op2: N = node.operand2.accept(numVisitor);
-        return this._theories.numTheory.isGreaterEqual(op1, op2);
+        return this._theories.numTheory.isLessEqual(op1, op2);
     }
 
     visitNumLessThanExpression(node: NumLessThanExpression): B {

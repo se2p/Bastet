@@ -56,6 +56,8 @@ export class DataTransferRelation implements LabeledTransferRelation<DataAbstrac
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
 
+        console.log(op.ast.toTreeString());
+
         let ast: AstNode;
         if (op instanceof AssumeOperation) {
             const assume = op as AssumeOperation;

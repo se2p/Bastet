@@ -187,7 +187,6 @@ export interface RationalNumberTheory<N extends AbstractNumber, B extends Abstra
 
     minus(op1: N, op2: N): N;
 
-
     isGreaterThan(s1: N, s2: N): B;
 
     isGreaterEqual(s1: N, s2: N): B;
