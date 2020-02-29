@@ -37,7 +37,7 @@ import {Statement} from "../../../syntax/ast/core/statements/Statement";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
 import {
-    DivideExpression,
+    DivideExpression, MinusExpression,
     NumberExpression,
     NumberLiteral,
     NumberVariableExpression,
@@ -64,6 +64,7 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
     private readonly _timeProfile: ProgramTimeProfile;
 
     private readonly _globalTimeMicrosVariable: VariableWithDataLocation;
+    private readonly _globalTimeResetMicrosVariable: VariableWithDataLocation;
     private readonly _globalMicrosExpr: NumberExpression;
     private readonly _globalMillisExpr: NumberExpression;
     private readonly _globalSecondsExpr: NumberExpression;
@@ -74,6 +75,9 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
 
         this._globalTimeMicrosVariable = new VariableWithDataLocation(
             DataLocations.createTypedLocation(new Identifier("__global_time_micros"), NumberType.instance()));
+        this._globalTimeResetMicrosVariable = new VariableWithDataLocation(
+            DataLocations.createTypedLocation(new Identifier("__global_reset_micros"), NumberType.instance()));
+
         this._globalMicrosExpr = this._globalTimeMicrosVariable;
         this._globalMillisExpr = new DivideExpression(this._globalTimeMicrosVariable, NumberLiteral.of(1000));
         this._globalSecondsExpr = new DivideExpression(this._globalTimeMicrosVariable, NumberLiteral.of(1000000));
@@ -140,6 +144,15 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
                 } else if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_micros) {
                     return [NumberLiteral.zero(), NumberLiteral.zero(),
                         [ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo, this._globalMicrosExpr))]];
+                } else if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_timerValue) {
+                    return [NumberLiteral.zero(), NumberLiteral.zero(),
+                        [ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo,
+                            new MinusExpression(this._globalTimeMicrosVariable, this._globalTimeResetMicrosVariable)))]];
+                }
+            } else {
+                if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_resetTimer) {
+                    return [NumberLiteral.zero(), NumberLiteral.zero(),
+                        [ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(this._globalTimeResetMicrosVariable, this._globalTimeMicrosVariable))]];
                 }
             }
         }

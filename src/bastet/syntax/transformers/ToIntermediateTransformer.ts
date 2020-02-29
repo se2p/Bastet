@@ -117,7 +117,7 @@ import {
     RenderedMonitoringEventContext,
     RepeatForeverStmtContext,
     RepeatTimesStmtContext,
-    ReplaceElementAtStatementContext,
+    ReplaceElementAtStatementContext, ResetTimerStatementContext,
     ResourceContext,
     ResourceListContext,
     ResourceLocatorContext,
@@ -1728,7 +1728,19 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitTimerExpression(ctx: TimerExpressionContext) : TransformerResult {
-        return TransformerResult.withNode(new TimerExpression());
+        let prepend: StatementList = StatementList.empty();
+
+        const resultVarIdent: Identifier = Identifier.fresh();
+        const resultVar = new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, NumberType.instance()));
+        const resultVarExpr = this.createVariableExpression(NumberType.instance(), resultVarIdent);
+        const declarationStmt = new DeclareStackVariableStatement(resultVar);
+        prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
+
+        const storeCallResultStmt = new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_timerValue),
+            new ExpressionList([]), OptionalAstNode.with(resultVar));
+        prepend = StatementLists.concat(prepend, StatementList.from([storeCallResultStmt]));
+
+        return new TransformerResult(prepend, resultVarExpr);
     }
 
     public visitUnspecifiedBoolExpression(ctx: UnspecifiedBoolExpressionContext) : TransformerResult {
@@ -1769,6 +1781,13 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             secondsTr.statementsToPrepend,
             new CallStatement(Identifier.of(methodToCall),
                 new ExpressionList([secondsTr.node as Expression]), OptionalAstNode.absent()));
+    }
+
+    public visitResetTimerStatement(ctx: ResetTimerStatementContext): TransformerResult {
+        const methodToCall = MethodIdentifiers._RUNTIME_resetTimer;
+        return TransformerResult.withNode(
+            new CallStatement(Identifier.of(methodToCall),
+                new ExpressionList([]), OptionalAstNode.absent()));
     }
 
     public visitWaitUntilStatement(ctx: WaitUntilStatementContext) : TransformerResult {
