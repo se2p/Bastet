@@ -30,23 +30,21 @@ program Task6Spec
 actor DirectorObserver is Observer begin
 
     declare actor_1_id as string
-    define actor_1_id as "Katze"
     declare actor_2_id as string
+
+    define actor_1_id as "Katze"
     define actor_2_id as "Ball"
 
     declare actors_touching as boolean
 
-    define atomic checkBehaviorSatisfied () begin
+    define atomic isBehaviorSatisfied () begin
         define result as false
 
-            if touchingObjects(actor_1_id, actor_2_id) then begin
-                if attribute "bubbleText" of actor_1_id = "Hab ich dich!" then begin
-                    define result as true
-                end
+        if touchingObjects(actor_1_id, actor_2_id) then begin
+            if attribute "bubbleText" of actor_1_id = "Hab ich dich!" then begin
+                define result as true
             end
-
-        // The actual invariant check
-        assert (result)
+        end
     end returns result: boolean
 
     define atomic storeRelevantStateInfosForNext () begin
@@ -58,7 +56,7 @@ actor DirectorObserver is Observer begin
 
     script on bootstrap finished do begin
         // First specification check (base condition)
-        assert(checkBehaviorSatisfied())
+        assert(isBehaviorSatisfied())
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
@@ -66,7 +64,7 @@ actor DirectorObserver is Observer begin
 
     script on statement finished do begin
         // The actual specification check
-        assert(checkBehaviorSatisfied())
+        assert(isBehaviorSatisfied())
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()

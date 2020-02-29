@@ -12,6 +12,7 @@ actor Stage is ScratchStage begin
     declare tempo as number
     declare videoTransparency as number
     declare videoState as string
+
     define volume as 100.0
     define layerOrder as 0.0
     define tempo as 60.0

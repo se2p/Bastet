@@ -26,15 +26,13 @@ program Task7Spec
 
 actor DirectorObserver is Observer begin
 
-
     declare actor_1_id as string
-    define actor_1_id as "Elefant1"
-
     declare actor_1_costume as string
     declare actor_1_prev_costume as string
-
     declare last_change as number
+
     define last_change as _RUNTIME_millis()
+    define actor_1_id as "Elefant1"
 
     define atomic isBehaviorSatisfied () begin
         // (a) Attributes of the first actor
@@ -63,7 +61,7 @@ actor DirectorObserver is Observer begin
 
     script on bootstrap finished do begin
         // First specification check (base condition)
-        assert(checkBehaviorSatisfied())
+        assert(isBehaviorSatisfied())
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()

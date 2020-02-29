@@ -29,7 +29,6 @@ program Task0Spec
 actor DirectorObserver is Observer begin
 
     declare actor_1_id as string
-    define actor_1_id as "Pferd"
     declare mouseTouched as boolean
 
     declare actor_1_color as string
@@ -39,9 +38,11 @@ actor DirectorObserver is Observer begin
     declare actor_1_prev_direction as number
 
     declare last_change as number
+
+    define actor_1_id as "Pferd"
     define last_change as _RUNTIME_millis()
 
-    define atomic checkBehaviorSatisfied () begin
+    define atomic isBehaviorSatisfied () begin
         // (a) Attributes of the first actor
         define actor_1_color as attribute "color" of actor_1_id
         define actor_1_direction as attribute "direction" of actor_1_id
@@ -79,7 +80,7 @@ actor DirectorObserver is Observer begin
 
     script on bootstrap finished do begin
         // First specification check (base condition)
-        assert(checkBehaviorSatisfied())
+        assert(isBehaviorSatisfied())
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
@@ -87,7 +88,7 @@ actor DirectorObserver is Observer begin
 
     script on statement finished do begin
         // The actual specification check
-        assert(checkBehaviorSatisfied())
+        assert(isBehaviorSatisfied())
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
