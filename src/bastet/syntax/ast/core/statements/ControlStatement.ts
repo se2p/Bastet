@@ -79,19 +79,19 @@ export class UntilStatement extends Statement implements ControlStatement {
 
 export class UntilQueriedConditionStatement extends Statement implements ControlStatement {
 
-    private readonly _condition: BooleanExpression;
+    private readonly _untilCondition: BooleanExpression;
     private readonly _conditionQueryStatements: StatementList;
     private readonly _body: StatementList;
 
     constructor(condition: BooleanExpression, conditionQueryStatements: StatementList, body: StatementList) {
         super([conditionQueryStatements, condition, body]);
-        this._condition = condition;
+        this._untilCondition = condition;
         this._conditionQueryStatements = conditionQueryStatements;
         this._body = body;
     }
 
-    get condition(): BooleanExpression {
-        return this._condition;
+    get untilCondition(): BooleanExpression {
+        return this._untilCondition;
     }
 
     get conditionQueryStatements(): StatementList {
