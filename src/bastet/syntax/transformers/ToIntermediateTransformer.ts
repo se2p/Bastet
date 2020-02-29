@@ -660,6 +660,25 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(Identifier.of(ctx.text));
     }
 
+    private buildExpressionArrayFrom<E extends Expression>(elements: RuleNode[]): TransformerResultList<E> {
+        const results: E[] = [];
+
+        let stmtsToPrepend: StatementList = StatementList.empty();
+
+        for (let idc of elements) {
+            const tr: TransformerResult = idc.accept(this);
+            stmtsToPrepend = StatementLists.concat(stmtsToPrepend, tr.statementsToPrepend);
+
+            if (tr.node instanceof Identifier) {
+                results.push(this.produceVariableFromIdentifier(tr.node).node as E);
+            } else {
+                results.push(tr.node as E);
+            }
+        }
+
+        return new TransformerResultList(stmtsToPrepend, results);
+    }
+
     private buildArrayFrom<E extends AstNode>(elements: RuleNode[]): TransformerResultList<E> {
         const results: E[] = [];
 
@@ -965,12 +984,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitExpressionList(ctx: ExpressionListContext) : TransformerResult {
-        const elems = this.buildArrayFrom<Expression>(ctx.expressionListPlain().expression());
+        const elems = this.buildExpressionArrayFrom<Expression>(ctx.expressionListPlain().expression());
         return new TransformerResult(elems.statementsToPrepend, new ExpressionList(elems.nodeList));
     }
 
     public visitExpressionListPlain(ctx: ExpressionListPlainContext): TransformerResult {
-        const elems = this.buildArrayFrom<Expression>(ctx.expression());
+        const elems = this.buildExpressionArrayFrom<Expression>(ctx.expression());
         return new TransformerResult(elems.statementsToPrepend, new ExpressionList(elems.nodeList));
     }
 
