@@ -36,6 +36,16 @@ export class TransitionRelationToDot {
         output.push(`digraph relation {`);
         output.push(`    node [shape=circle, style=filled];`);
 
+        for (const loc of tr.locationSet) {
+            let shape = "circle";
+            if (tr.exitLocationSet.contains(loc)) {
+                shape = "doublecircle";
+            } else if (tr.entryLocationSet.contains(loc)) {
+                shape = "invtriangle";
+            }
+            output.push(`    ${loc} [shape=${shape}]`);
+        }
+
         while (worklist.length > 0) {
             let fromlocid: LocationId = worklist.pop();
             if (!visited.has(fromlocid)) {
