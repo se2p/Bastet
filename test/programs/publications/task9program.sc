@@ -47,13 +47,13 @@ actor Pferd is ScratchSprite begin
               if touchingMousePointer() then begin
                       declare i as number
                       define i as 0
-                      until i == 10 begin
+                      until i = 10 repeat begin
                           turnRight(36.0)
                       end
                   end
               else begin
-                      define color as (62.0 + color)
-                  end
+                  define color as (62.0 + color)
+              end
               wait 1 seconds
           end
       end

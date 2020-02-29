@@ -235,6 +235,14 @@ role ScratchEntity is RuntimeEntity begin
 
     declare sound_effect as enum [ "pitch", "pan_left_right" ]
 
+    declare color_effect_value as number
+    declare fisheye_effect_value as number
+    declare whirl_effect_value as number
+    declare pixelate_effect_value as number
+    declare mosaic_effect_value as number
+    declare brightness_effect_value as number
+    declare ghost_effect_value as number
+
     declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
 
     // @Category "Looks"

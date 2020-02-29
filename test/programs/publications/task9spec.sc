@@ -44,8 +44,8 @@ actor DirectorObserver is Observer begin
 
     define atomic isBehaviorSatisfied () begin
         // (a) Attributes of the first actor
-        define actor_1_color as attribute "color" of actor_1_id
-        define actor_1_direction as attribute "direction" of actor_1_id
+        define actor_1_color as cast attribute "color" of actor_1_id to number
+        define actor_1_direction as cast attribute "direction" of actor_1_id to number
 
         // The actual invariant check
         if not actor_1_color = actor_1_prev_color then begin
