@@ -204,13 +204,10 @@ import {
 import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
     DeclareActorVariableStatement,
-    DeclareAttributeOfStatement,
-    DeclareAttributeStatement,
     DeclareStackVariableStatement,
     VariableDeclaration
 } from "../ast/core/statements/DeclarationStatement";
 import {
-    SetAttributeToStatement,
     StoreEvalResultToVariableStatement
 } from "../ast/core/statements/SetStatement";
 import {Expression} from "../ast/core/expressions/Expression";
@@ -411,7 +408,7 @@ export class ScopeTypeInformation {
     public findTypeOf(ident: Identifier): ScratchType {
         const varDecl = this._variables[ident.text];
         if (varDecl) {
-            return varDecl.type;
+            return varDecl.variableType;
         } else {
             return null;
         }
@@ -620,7 +617,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     private parseOperand(ctx: RuleNode, index: number): TransformerResult {
         const result = this.getArgumentNodes(ctx)[index].accept(this);
-        if (!result.node['type']) {
+        if (!result.node['expressionType']) {
             // Some repair
             if (result.node instanceof Identifier) {
                 return this.produceVariableFromIdentifier(result.node);
@@ -1128,8 +1125,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         Preconditions.checkNotUndefined(op1);
         Preconditions.checkNotUndefined(op2);
 
-        const type1 = Preconditions.checkNotUndefined((op1.node as Expression).type);
-        const type2 = Preconditions.checkNotUndefined((op2.node as Expression).type);
+        const type1 = Preconditions.checkNotUndefined((op1.node as Expression).expressionType);
+        const type2 = Preconditions.checkNotUndefined((op2.node as Expression).expressionType);
 
         if (!(type1 == type2)) {
             console.log(context);
@@ -1144,14 +1141,14 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const tr2 = this.parseOperand2(ctx);
         this.assertEqualOperandTypes(ctx, tr1, tr2);
 
-        if ((tr1.node as Expression).type == NumberType.instance()) {
+        if ((tr1.node as Expression).expressionType == NumberType.instance()) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
                 new NumEqualsExpression(
                     tr1.node as NumberExpression,
                     tr2.node as NumberExpression));
 
-        } if ((tr1.node as Expression).type == StringType.instance()) {
+        } if ((tr1.node as Expression).expressionType == StringType.instance()) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
                 new StrEqualsExpression(
@@ -1168,14 +1165,14 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const tr2 = this.parseOperand2(ctx);
         this.assertEqualOperandTypes(ctx, tr1, tr2);
 
-        if ((tr1.node as Expression).type == NumberType.instance()) {
+        if ((tr1.node as Expression).expressionType == NumberType.instance()) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
                 new NumGreaterThanExpression(
                     tr1.node as NumberExpression,
                     tr2.node as NumberExpression));
 
-        } else if ((tr1.node as Expression).type == StringType.instance()) {
+        } else if ((tr1.node as Expression).expressionType == StringType.instance()) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
                 new StrGreaterThanExpression(
@@ -1192,14 +1189,14 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const tr2 = this.parseOperand2(ctx);
         this.assertEqualOperandTypes(ctx, tr1, tr2);
 
-        if ((tr1.node as Expression).type == NumberType.instance()) {
+        if ((tr1.node as Expression).expressionType == NumberType.instance()) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
                 new NumLessThanExpression(
                     tr1.node as NumberExpression,
                     tr2.node as NumberExpression));
 
-        } else if ((tr1.node as Expression).type == StringType.instance()) {
+        } else if ((tr1.node as Expression).expressionType == StringType.instance()) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
                 new StrLessThanExpression(
@@ -1598,7 +1595,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitNegatedBoolExpression(ctx: NegatedBoolExpressionContext) : TransformerResult {
-        const tr = ctx.coreBoolExpr().accept(this);
+        const tr = this.parseOperand1(ctx);
         return new TransformerResult(
             tr.statementsToPrepend,
             new NegationExpression(tr.node as BooleanExpression));
@@ -1667,7 +1664,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const ident = ctx.variable().accept(this).nodeOnly() as Identifier;
         const varType = this.getTypeOf(ident);
         const exprTr = this.ensureType(ctx, varType, ctx.expression().accept(this));
-        const exprType = (exprTr.node as Expression).type;
+        const exprType = (exprTr.node as Expression).expressionType;
         Preconditions.checkNotUndefined(exprType);
 
         const variable = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, exprType));
@@ -2027,7 +2024,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     private ensureType(context: ParserRuleContext, varType: ScratchType, transformerResult: TransformerResult): TransformerResult {
-        if (transformerResult.node['type'] == varType) {
+        if (transformerResult.node['expressionType'] == varType) {
             return transformerResult;
 
         } else if (transformerResult.node instanceof Identifier) {

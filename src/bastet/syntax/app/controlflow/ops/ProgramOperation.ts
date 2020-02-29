@@ -166,7 +166,7 @@ export class ProgramOperations {
 export class ProgramOperationFactory {
 
     public static createFor(ast: AstNode): ProgramOperation {
-        if (ast['type'] === BooleanType.instance()) {
+        if (ast['expressionType'] === BooleanType.instance()) {
             return this.createAssumeOpFrom(ast as BooleanExpression);
         }
         return new RawOperation(ast);

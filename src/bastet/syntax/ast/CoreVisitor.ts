@@ -43,8 +43,8 @@ import {
     BooleanLiteral,
     BooleanVariableExpression,
     NegationExpression,
-    NumEqualsExpression,
-    NumGreaterThanExpression,
+    NumEqualsExpression, NumGreaterEqualExpression,
+    NumGreaterThanExpression, NumLessEqualExpression,
     NumLessThanExpression,
     OrExpression,
     StrContainsExpression,
@@ -68,7 +68,6 @@ import {IfStatement, RepeatForeverStatement, UntilStatement} from "./core/statem
 import {CallStatement} from "./core/statements/CallStatement";
 import {StatementList} from "./core/statements/Statement";
 import {
-    DeclareAttributeOfStatement,
     DeclareAttributeStatement,
     DeclareStackVariableStatement
 } from "./core/statements/DeclarationStatement";
@@ -96,6 +95,7 @@ import {
 import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
 import {AssumeStatement} from "./core/statements/AssumeStatement";
+import {Variable, VariableWithDataLocation} from "./core/Variable";
 
 export interface CoreVisitor<R> {
 
@@ -108,6 +108,8 @@ export interface CoreNumberExpressionVisitor<R> extends CoreVisitor<R>{
     visitNumberLiteral(node: NumberLiteral): R;
 
     visitNumberVariableExpression(node: NumberVariableExpression): R;
+
+    visitVariableWithDataLocation(node: VariableWithDataLocation): R;
 
     visitStringAsNumberExpression(node: StringAsNumberExpression): R;
 
@@ -161,9 +163,15 @@ export interface CoreBoolExpressionVisitor<R> extends CoreVisitor<R> {
 
     visitNumLessThanExpression(node: NumLessThanExpression): R;
 
+    visitNumLessEqualExpression(node: NumLessEqualExpression): R;
+
+    visitNumGreaterEqualExpression(node: NumGreaterEqualExpression): R;
+
     visitNumEqualsExpression(node: NumEqualsExpression): R;
 
     visitStrContainsExpression(node: StrContainsExpression): R;
+
+    visitVariableWithDataLocation(node: VariableWithDataLocation): R;
 
 }
 
@@ -186,6 +194,8 @@ export interface CoreStringExpressionVisitor<R> extends CoreVisitor<R> {
     visitStringLiteral(node: StringLiteral): R;
 
     visitStringVariableExpression(node: StringVariableExpression): R;
+
+    visitVariableWithDataLocation(node: VariableWithDataLocation): R;
 
 }
 
@@ -216,10 +226,6 @@ export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
     visitAssumeStatement(node: AssumeStatement): R;
 
     visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): R;
-
-    visitDeclareAttributeStatement(node: DeclareAttributeStatement): R;
-
-    visitDeclareAttributeOfStatement(node: DeclareAttributeOfStatement): R;
 
     visitExpressionStatement(node: ExpressionStatement): R;
 

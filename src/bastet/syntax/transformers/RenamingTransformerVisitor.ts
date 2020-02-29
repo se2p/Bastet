@@ -99,7 +99,6 @@ import {ExpressionListExpression, ListVariableExpression} from "../ast/core/expr
 import {ExpressionStatement} from "../ast/core/statements/ExpressionStatement";
 import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
 import {
-    DeclareAttributeOfStatement,
     DeclareAttributeStatement,
     DeclareStackVariableStatement, DeclareSystemVariableStatement
 } from "../ast/core/statements/DeclarationStatement";
@@ -520,10 +519,6 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     visitChangeVarByStatement(node: ChangeVarByStatement): AstNode {
         throw new IllegalArgumentException("Should be replaced by other statements in a preprocessingt step");
-    }
-
-    visitDeclareAttributeOfStatement(node: DeclareAttributeOfStatement): AstNode {
-        throw new IllegalStateException("We assume that 'attributes' are no more used");
     }
 
     visitDeclareAttributeStatement(node: DeclareAttributeStatement): AstNode {

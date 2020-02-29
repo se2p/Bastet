@@ -92,7 +92,6 @@ import {ExpressionListExpression, ListVariableExpression} from "../../../syntax/
 import {ExpressionStatement} from "../../../syntax/ast/core/statements/ExpressionStatement";
 import {EpsilonStatement} from "../../../syntax/ast/core/statements/EpsilonStatement";
 import {
-    DeclareAttributeOfStatement,
     DeclareAttributeStatement,
     DeclareStackVariableStatement, DeclareSystemVariableStatement
 } from "../../../syntax/ast/core/statements/DeclarationStatement";
@@ -143,6 +142,10 @@ export class DataNumExpressionVisitor<N extends AbstractNumber, B extends Abstra
 
     visitVariableWithDataLocation(node: VariableWithDataLocation): N {
         return this._theory.abstractNumberValue(node);
+    }
+
+    visitNumberVariableExpression(node: NumberVariableExpression): N {
+        return this.visitVariableWithDataLocation(node.variable);
     }
 
     visitBoolAsNumberExpression(node: BoolAsNumberExpression): N {
@@ -205,10 +208,6 @@ export class DataNumExpressionVisitor<N extends AbstractNumber, B extends Abstra
         return this._theory.fromConcreteNumber(new ConcreteNumber(node.num));
     }
 
-    visitNumberVariableExpression(node: NumberVariableExpression): N {
-        return this._theory.abstractNumberValue(node.variable);
-    }
-
 }
 
 export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
@@ -234,8 +233,12 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
         return this._theories.boolTheory.fromConcreteBoolean(new ConcreteBoolean(node.value));
     }
 
+    visitVariableWithDataLocation(node: VariableWithDataLocation): B {
+        return this._theories.boolTheory.abstractBooleanValue(node);
+    }
+
     visitBooleanVariableExpression(node: BooleanVariableExpression): B {
-        return this._theories.boolTheory.abstractBooleanValue(node.variable);
+        return this.visitVariableWithDataLocation(node.variable);
     }
 
     visitNegationExpression(node: NegationExpression): B {
@@ -348,6 +351,10 @@ export class DataStringExpressionVisitor implements CoreStringExpressionVisitor<
         throw new ImplementMeException();
     }
 
+    visitVariableWithDataLocation(node: VariableWithDataLocation): AbstractString {
+        throw new ImplementMeException();
+    }
+
 }
 
 export class DataListExpressionVisitor implements CoreListExpressionVisitor<AbstractList> {
@@ -415,10 +422,6 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
     }
 
     visitCreateCloneOfStatement(node: CreateCloneOfStatement): B {
-        throw new ImplementMeException();
-    }
-
-    visitDeclareAttributeOfStatement(node: DeclareAttributeOfStatement): B {
         throw new ImplementMeException();
     }
 
@@ -495,7 +498,7 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
 
     visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): B {
         // We assume that a wrapping analysis step takes care of ssa.
-        const declaredType = node.variable.type;
+        const declaredType = node.variable.expressionType;
         if (declaredType instanceof NumberType) {
             const visitor = new DataNumExpressionVisitor(this._theories.numTheory);
             const value: N = node.toValue.accept(visitor);

@@ -31,7 +31,7 @@ export interface Variable {
 
     identifier: Identifier;
 
-    type: ScratchType;
+    variableType: ScratchType;
 
     qualifiedName: string;
 
@@ -57,7 +57,7 @@ export class VariableExpression extends AbstractExpression {
     private readonly _variable: VariableWithDataLocation;
 
     constructor(variable: VariableWithDataLocation) {
-        super(Preconditions.checkNotUndefined(variable.type),
+        super(Preconditions.checkNotUndefined(variable.expressionType),
             [Preconditions.checkNotUndefined(variable.identifier)]);
         this._variable = variable;
     }
@@ -91,5 +91,9 @@ export class VariableWithDataLocation extends AbstractExpression implements Vari
 
     get dataloc(): DataLocation {
         return this._dataloc;
+    }
+
+    get variableType(): ScratchType {
+        return this.expressionType;
     }
 }

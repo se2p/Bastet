@@ -38,7 +38,7 @@ export class UnaryExpression<A extends AstNode> extends AbstractNode implements 
         return this._operand1;
     }
 
-    get type(): ScratchType {
+    get expressionType(): ScratchType {
         return this._type;
     }
 

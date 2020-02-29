@@ -35,7 +35,7 @@ export class ResultDeclaration extends AbstractNode {
     private readonly _variable: Variable;
 
     constructor(variable: Variable) {
-        super([variable.identifier, variable.type]);
+        super([variable.identifier, variable.variableType]);
         this._variable = variable;
     }
 
@@ -44,7 +44,7 @@ export class ResultDeclaration extends AbstractNode {
     }
 
     get type(): ScratchType {
-        return this._variable.type;
+        return this._variable.variableType;
     }
 
     get variable(): Variable {

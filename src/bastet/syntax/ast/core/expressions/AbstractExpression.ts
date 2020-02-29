@@ -25,16 +25,16 @@ import {ScratchType} from "../ScratchType";
 
 export abstract class AbstractExpression extends AbstractNode implements Expression {
 
-    private readonly _type: ScratchType;
+    private readonly _expressionType: ScratchType;
     private _refId: number;
 
     protected constructor(type: ScratchType, childs: AstNode[]) {
         super(childs);
-        this._type = type;
+        this._expressionType = type;
     }
 
-    get type(): ScratchType {
-        return this._type;
+    get expressionType(): ScratchType {
+        return this._expressionType;
     }
 
     public getRefId(): number {
