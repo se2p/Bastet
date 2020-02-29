@@ -11,11 +11,21 @@ grep_statistic () {
     cat $RESULT_FILE | grep $CONTEXT -A 5 | grep $IDENT | cut -d":" -f2 | cut -d"," -f1
 }
 
+num_or_zero () {
+    VALUE=$1
+    if [[ $VALUE =~ ^-?[0-9]+$ ]]
+    then
+        echo $VALUE
+    else
+        echo "0"
+    fi
+}
+
 parse_results () {
     INPUT_FILE="$1"
     RESULT_FILE="$2"
-    SATISFIED=$(grep_statistic "MultiPropertyAlgorithm" "num_satisfied")
-    VIOLATED=$(grep_statistic "MultiPropertyAlgorithm" "num_violated")
+    SATISFIED=$(num_or_zero `grep_statistic "MultiPropertyAlgorithm" "num_satisfied"`)
+    VIOLATED=$(num_or_zero `grep_statistic "MultiPropertyAlgorithm" "num_violated"`)
     DURATION=$(grep_statistic "MultiPropertyAlgorithm" "duration")
     DURATION=$(printf '%.*f\n' 2 $DURATION)
 
