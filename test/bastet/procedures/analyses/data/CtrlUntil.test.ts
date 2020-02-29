@@ -22,7 +22,7 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-test("Test ctrl until 1 safe", done => {
+xtest("Test ctrl until 1 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-until-1_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -32,7 +32,7 @@ test("Test ctrl until 1 safe", done => {
     }
 }, utils.timeout);
 
-test("Test ctrl until 1 unsafe", done => {
+xtest("Test ctrl until 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-until-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {

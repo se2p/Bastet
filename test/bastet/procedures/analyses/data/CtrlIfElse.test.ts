@@ -22,7 +22,7 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-test("Test ctrl if-else 1 safe", done => {
+xtest("Test ctrl if-else 1 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-if-else-1_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -32,7 +32,7 @@ test("Test ctrl if-else 1 safe", done => {
     }
 }, utils.timeout);
 
-test("Test ctrl if-else 1 unsafe", done => {
+xtest("Test ctrl if-else 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-if-else-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
@@ -42,7 +42,7 @@ test("Test ctrl if-else 1 unsafe", done => {
     }
 }, utils.timeout);
 
-test("Test ctrl if-else 2 safe", done => {
+xtest("Test ctrl if-else 2 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-if-else-2_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -52,7 +52,7 @@ test("Test ctrl if-else 2 safe", done => {
     }
 }, utils.timeout);
 
-test("Test ctrl if-else 2 unsafe", done => {
+xtest("Test ctrl if-else 2 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-if-else-2_UNSAFE.sc"
     let bastet = new Bastet();
     try {

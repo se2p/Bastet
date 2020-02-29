@@ -22,7 +22,7 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-test("Test setstmt define-from-call 1 safe", done => {
+xtest("Test setstmt define-from-call 1 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-call-1_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -32,7 +32,7 @@ test("Test setstmt define-from-call 1 safe", done => {
     }
 }, utils.timeout);
 
-test("Test setstmt define-from-call 1 unsafe", done => {
+xtest("Test setstmt define-from-call 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-call-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
@@ -42,7 +42,7 @@ test("Test setstmt define-from-call 1 unsafe", done => {
     }
 }, utils.timeout);
 
-test("Test setstmt define-from-expr 2 safe", done => {
+xtest("Test setstmt define-from-expr 2 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-expr-1_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -52,7 +52,7 @@ test("Test setstmt define-from-expr 2 safe", done => {
     }
 }, utils.timeout);
 
-test("Test setstmt define-from-expr 2 unsafe", done => {
+xtest("Test setstmt define-from-expr 2 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-expr-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {

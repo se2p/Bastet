@@ -22,7 +22,7 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-test("Test num plus 1 safe", done => {
+xtest("Test num plus 1 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-1_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -32,7 +32,7 @@ test("Test num plus 1 safe", done => {
     }
 }, utils.timeout);
 
-test("Test num plus 2 safe", done => {
+xtest("Test num plus 2 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-2_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -42,7 +42,7 @@ test("Test num plus 2 safe", done => {
     }
 }, utils.timeout);
 
-test("Test num plus 3 safe", done => {
+xtest("Test num plus 3 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-3_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -52,7 +52,7 @@ test("Test num plus 3 safe", done => {
     }
 }, utils.timeout);
 
-test("Test num plus 4 safe", done => {
+xtest("Test num plus 4 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-4_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -62,7 +62,7 @@ test("Test num plus 4 safe", done => {
     }
 }, utils.timeout);
 
-test("Test num plus 4 unsafe", done => {
+xtest("Test num plus 4 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-4_UNSAFE.sc"
     let bastet = new Bastet();
     try {
@@ -72,7 +72,7 @@ test("Test num plus 4 unsafe", done => {
     }
 }, utils.timeout);
 
-test("Test num plus 5 unsafe", done => {
+xtest("Test num plus 5 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-5_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -82,7 +82,7 @@ test("Test num plus 5 unsafe", done => {
     }
 }, utils.timeout);
 
-test("Test num plus 5 unsafe", done => {
+xtest("Test num plus 5 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-5_UNSAFE.sc"
     let bastet = new Bastet();
     try {
