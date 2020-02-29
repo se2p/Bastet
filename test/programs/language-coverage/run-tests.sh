@@ -59,7 +59,7 @@ parse_results () {
     fi    
 }
 
-for f in $(find $TEST_DIR -name "*.sc") 
+for f in $(find $TEST_DIR -name "*.sc" | sort) 
 do
     RESULT_FILE=$(mktemp)
     printf "`basename $f`"
