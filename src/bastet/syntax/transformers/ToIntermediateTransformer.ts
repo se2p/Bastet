@@ -950,7 +950,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitSetStmtList(ctx: SetStmtListContext) : TransformerResult {
         const stmts = this.buildArrayFrom<Statement>(ctx.setStmt());
-        return new TransformerResult(stmts.statementsToPrepend, new StatementList(stmts.nodeList));
+        return TransformerResult.withNode(StatementLists.concat(stmts.statementsToPrepend, new StatementList(stmts.nodeList)));
     }
 
     public visitScript(ctx: ScriptContext) : TransformerResult {
