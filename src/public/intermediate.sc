@@ -28,7 +28,11 @@ role RuntimeEntity begin
     // elapsed since the VM started.
     extern _RUNTIME_seconds () returns number
 
+    extern _RUNTIME_micros () returns number
+
     extern _RUNTIME_waitMillis (ms: number)
+
+    extern _RUNTIME_waitMicros (micros: number)
 
     extern _RUNTIME_waitSeconds (s: number)
 
@@ -109,7 +113,7 @@ role RuntimeEntity begin
         // not conduct a busy wait.
         declare waitUntil as number
         define waitUntil as _RUNTIME_seconds() + secs
-        until (_RUNTIME_seconds() < waitUntil) repeat begin
+        until (_RUNTIME_seconds() > waitUntil) repeat begin
         end
     end
 
@@ -121,7 +125,19 @@ role RuntimeEntity begin
         // not conduct a busy wait.
         declare waitUntil as number
         define waitUntil as _RUNTIME_millis() + millis
-        until (_RUNTIME_millis() < waitUntil) repeat begin
+        until (_RUNTIME_millis() > waitUntil) repeat begin
+        end
+    end
+
+    // @Category "Control"
+    // @Block "wait <Num> micros"
+    define waitMicros (micros: number) begin
+        // A busy-waiting implementation.
+        // The external method `_RUNTIME_waitMicros` is intended to
+        // not conduct a busy wait.
+        declare waitUntil as number
+        define waitUntil as _RUNTIME_micros() + micros
+        until (_RUNTIME_micros() > waitUntil) repeat begin
         end
     end
 
