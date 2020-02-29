@@ -98,11 +98,11 @@ role RuntimeEntity begin
     extern radToDeg(n: number) returns number
 
     // Make sure our direction is always between -179 and 180
-    define wrapClamp(dir: number, min: number, max: number) begin
-            declare range as number
-            declare result as number
-            define range as ((max - min) +1)
-            define result as (dir - (mathFloor((dir - min) / range) * range))
+    define atomic wrapClamp(dir: number, min: number, max: number) begin
+        declare range as number
+        declare result as number
+        define range as ((max - min) +1)
+        define result as (dir - (mathFloor((dir - min) / range) * range))
     end returns result : number
 
     // @Category "Control"
@@ -140,6 +140,14 @@ role RuntimeEntity begin
         until (_RUNTIME_micros() > waitUntil) repeat begin
         end
     end
+
+    define atomic milliseconds() begin
+        define result as _RUNTIME_millis()
+    end returns result: number
+
+    define atomic microseconds() begin
+        define result as _RUNTIME_micros()
+    end returns result: number
 
 end
 

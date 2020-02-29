@@ -142,7 +142,6 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
      * @param f
      */
     public assert(f: Z3FirstOrderFormula): void  {
-        console.log("ASSERT", this._ctx.ast_to_string(f.getAST()));
         this._ctx.solver_assert(this._solver, f.getAST());
     }
 

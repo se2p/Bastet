@@ -511,7 +511,7 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
             return this._theories.boolTheory.and(this._mem, assume);
 
         } else {
-            throw new ImplementMeException;
+            throw new ImplementMeException();
         }
     }
 
