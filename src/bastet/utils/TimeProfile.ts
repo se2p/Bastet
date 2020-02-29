@@ -50,9 +50,6 @@ export class OperationTimeProfile {
 
 }
 
-export const NSECS_PER_SEC = 1000000000;
-export const MICSECS_PER_SEC = 1000000;
-export const MILLIS_PER_SEC = 1000;
 export const ONE_MICSEC_IN_NSECS = 1000;
 
 export class StaticTimeProfile implements ProgramTimeProfile {
@@ -65,8 +62,8 @@ export class StaticTimeProfile implements ProgramTimeProfile {
         this._opTimes = new Map();
         this._avgOpProfile = new OperationTimeProfile(
             new NumIntervalValue(
-                new ConcreteNumber(ONE_MICSEC_IN_NSECS),
-                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 100)));
+                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 500),
+                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 1500)));
     }
 
     public widen(op: ProgramOperation, minNanos: number, maxNanos: number) {

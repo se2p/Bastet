@@ -108,7 +108,15 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     abstractSuccFor(fromState: DataAbstractState, op: ProgramOperation, co: Concern): Iterable<DataAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
-        return this._transferRelation.abstractSuccFor(fromState, op, co);
+
+        const result: DataAbstractState[] = [];
+        for (const r of this._transferRelation.abstractSuccFor(fromState, op, co)) {
+           if (this.refiner.checkIsFeasible(r)) {
+               result.push(r);
+           }
+        }
+
+        return result;
     }
 
     get abstractDomain(): AbstractDomain<ConcreteMemory, DataAbstractState> {

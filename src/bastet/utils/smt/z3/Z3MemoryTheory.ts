@@ -278,6 +278,14 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
         return new Z3NumberFormula(this._ctx.mk_int_symbol(new Sint32(0)));
     }
 
+    isGreaterEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_ge(s1.getAST(), s2.getAST()));
+    }
+
+    isLessEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_le(s1.getAST(), s2.getAST()));
+    }
+
 }
 
 export class Z3StringTheory implements StringTheory<Z3StringFormula> {
