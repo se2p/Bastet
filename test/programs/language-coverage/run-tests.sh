@@ -66,7 +66,7 @@ for f in $(find $TEST_DIR -name "*.sc" | sort)
 do
     RESULT_FILE=$(mktemp)
     printf "`basename $f`"
-     timeout 120 ./scripts/bastet.sh \
+     timeout 90 ./scripts/bastet.sh \
         -P $f \
         -S test/programs/empty.sc \
         -I src/public/intermediate.sc \
