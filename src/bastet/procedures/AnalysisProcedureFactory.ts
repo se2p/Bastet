@@ -115,6 +115,7 @@ export class AnalysisProcedureFactory {
                             console.log(`\t(${index}) ${p.text}`);
                             index++;
                         }
+                        console.log("");
                     }
                 };
 
@@ -129,7 +130,7 @@ export class AnalysisProcedureFactory {
                     printPropertySetAs("UNKNOWN", unknowns);
                 }
 
-                console.log("\nBye.");
+                console.log("Bye.");
 
                 // Store the new result
                 this._result = new MultiPropertyAnalysisResult(satisifed, violated, unknowns, this._statistics);
