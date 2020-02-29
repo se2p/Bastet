@@ -5,6 +5,8 @@ BASTET_ROOT="../../../"
 
 cd $BASTET_ROOT
 
+npm start build
+
 grep_statistic () {
     CONTEXT=$1
     IDENT=$2
@@ -56,6 +58,7 @@ parse_results () {
         printf "\tOK"
     else
         printf "\tBUG"
+        cp $RESULT_FILE "output/test-results/$(basename $INPUT_FILE).bug.log"
     fi    
 }
 
