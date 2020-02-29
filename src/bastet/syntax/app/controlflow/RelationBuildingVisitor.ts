@@ -134,15 +134,6 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
             const guardedBodyToHead = TransitionRelations.concatTrOpGoto(enterLoopBodyGuarded, ProgramOperations.epsilon(), loopHead);
             const guardedLoopExit = TransitionRelations.concatTrOpGoto(leaveLoopGuarded, ProgramOperations.epsilon(), loopTerminationLocation);
 
-            Preconditions.checkState(loopHeadToQueryBody.exitLocationSet.size == 1);
-            Preconditions.checkState(loopHeadToQueryBody.entryLocationSet.size == 1);
-
-            Preconditions.checkState(guardedBodyToHead.exitLocationSet.size == 1);
-            Preconditions.checkState(guardedBodyToHead.entryLocationSet.size == 1);
-
-            Preconditions.checkState(guardedLoopExit.exitLocationSet.size == 1);
-            Preconditions.checkState(guardedLoopExit.entryLocationSet.size == 1);
-
             const builder = new TransitionRelationBuilder();
             builder.addAllTransitionsOf(loopHeadToQueryBody)
                 .addAllTransitionsOf(guardedBodyToHead)
