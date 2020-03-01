@@ -72,6 +72,7 @@ import {ParameterDeclaration} from "../../../syntax/ast/core/ParameterDeclaratio
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
 import {TransitionRelation, TransitionTo} from "../../../syntax/app/controlflow/TransitionRelation";
+import {ScopeTransformerVisitor} from "./DataLocationScoping";
 
 export type Schedule = ImmList<ThreadState>;
 
@@ -122,52 +123,6 @@ class StepInformation {
     get succScopeStack(): ImmList<string> {
         return this._succScopeStack;
     }
-}
-
-export const SCOPE_SEPARATOR = "@";
-
-export class DataLocationScoper implements DataLocationRenamer {
-
-    private readonly _readFromScope: string;
-
-    private readonly _writeToScope: string;
-
-    constructor(readFromScope: ImmList<string>, writeToScope: ImmList<string>) {
-        this._readFromScope = readFromScope.join(SCOPE_SEPARATOR);
-        this._writeToScope = writeToScope.join(SCOPE_SEPARATOR);
-    }
-
-    private isScoped(dataLoc: DataLocation): boolean {
-        return dataLoc.ident.indexOf("@") > -1;
-    }
-
-    renameUsage(dataLoc: DataLocation, usageMode: DataLocationMode, inContextOf: Statement): DataLocation {
-        Preconditions.checkNotUndefined(usageMode);
-
-        if (this.isScoped(dataLoc)) {
-            return dataLoc;
-        }
-
-        if (usageMode == DataLocationMode.ASSINGED_TO) {
-            const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + this._writeToScope;
-            return new TypedDataLocation(newIdent, dataLoc.type);
-
-        } else if (usageMode == DataLocationMode.READ_FROM) {
-            const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + this._readFromScope;
-            return new TypedDataLocation(newIdent, dataLoc.type);
-        }
-
-        throw new ImplementMeException();
-    }
-
-}
-
-export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
-
-    constructor(readFromScope: ImmList<string>, writeToScope: ImmList<string>) {
-        super(new DataLocationScoper(readFromScope, writeToScope));
-    }
-
 }
 
 /**
