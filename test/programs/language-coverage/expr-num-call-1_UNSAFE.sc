@@ -9,7 +9,7 @@ actor MiniActor is RuntimeEntity begin
     script on startup do begin
         declare x as number
         define x as 41
-        if inc (x) = 41 then begin
+        if inc (x) = 42 then begin
             _RUNTIME_signalFailure()
         end
     end
