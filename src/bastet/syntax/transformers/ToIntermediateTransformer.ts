@@ -1735,8 +1735,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 ctx.ident().accept(this).nodeOnly() as Identifier));
     }
 
+    public unquote(str: string): string {
+        return str.replace(/^"(.*)"$/, '$1');
+    }
+
     public visitStringLiteralExpression(ctx: StringLiteralExpressionContext) : TransformerResult {
-        return TransformerResult.withNode(StringLiteral.from(ctx.text));
+        return TransformerResult.withNode(StringLiteral.from(this.unquote(ctx.text)));
     }
 
     public visitStringVariableExpression(ctx: StringVariableExpressionContext) : TransformerResult {
