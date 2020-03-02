@@ -28,7 +28,7 @@ import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataL
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
 import {NumberType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
 import {ConcreteNumber} from "../../../../src/bastet/procedures/domains/ConcreteElements";
-import {Z3FirstOrderLattice} from "../../../../src/bastet/utils/smt/z3/Z3MemoryTheory";
+import {Z3FirstOrderLattice} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
 
 let smt: Z3SMT;
 let ctx;

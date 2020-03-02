@@ -29,7 +29,7 @@ import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
 import {SMTFactory} from "../utils/smt/z3/Z3Wrapper";
 import {DataAnalysis} from "./analyses/data/DataAnalysis";
 import {BDDLibraryFactory} from "../utils/bdd/BDD";
-import {Z3MemoryTheoryInContext} from "../utils/smt/z3/Z3MemoryTheory";
+import {Z3MemoryTheoryInContext} from "../utils/smt/z3/Z3Theories";
 import {SSAAnalysis} from "./analyses/ssa/SSAAnalysis";
 import {BMCAlgorithm} from "./algorithms/BMCAlgorithm";
 import {MultiPropertyAlgorithm} from "./algorithms/MultiPropertyAlgorithm";

@@ -32,7 +32,7 @@ import {
     Z3FirstOrderFormula,
     Z3FirstOrderLattice,
     Z3MemoryTheoryInContext
-} from "./Z3MemoryTheory";
+} from "./Z3Theories";
 import {FirstOrderSolver} from "../../../procedures/domains/FirstOrderDomain";
 import {Sint32, Uint32} from "./ctypes";
 import {BooleanTheory} from "../../../procedures/domains/MemoryTransformer";

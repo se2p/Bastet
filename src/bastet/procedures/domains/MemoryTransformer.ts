@@ -28,7 +28,7 @@ import {AbstractElement} from "../../lattices/Lattice";
 import {AbstractDomain} from "./AbstractDomain";
 import {AbstractStringList} from "./StringListAbstractDomain";
 import {Variable} from "../../syntax/ast/core/Variable";
-import {Z3NumberFormula, Z3StringFormula} from "../../utils/smt/z3/Z3MemoryTheory";
+import {Z3NumberFormula, Z3StringFormula} from "../../utils/smt/z3/Z3Theories";
 
 export interface AbstractValue extends AbstractElement {
 
