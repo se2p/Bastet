@@ -194,7 +194,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         const threadIndexToStep: number = threadsToStep[0];
         const threadToStep: ThreadState = fromState.getThreadStates().get(threadIndexToStep);
-        Preconditions.checkState(threadToStep.getComputationState() === THREAD_STATE_RUNNING || threadToStep.getComputationState() === THREAD_STATE_RUNNING_ATOMIC);
+        Preconditions.checkState(threadToStep.getComputationState() === THREAD_STATE_RUNNING
+            || threadToStep.getComputationState() === THREAD_STATE_RUNNING_ATOMIC);
 
         // Determine the (sequences of) control-flow transition(s) to execute in this step
         // ATTENTION: We assume that each sequence corresponds to an atomic
