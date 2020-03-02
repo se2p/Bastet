@@ -19,7 +19,7 @@
  *
  */
 
-import {AnalysisProcedure, AnalysisResult, MultiPropertyAnalysisResult} from "./AnalysisProcedure";
+import {AnalysisProcedure, MultiPropertyAnalysisResult} from "./AnalysisProcedure";
 import {App} from "../syntax/app/App";
 import {GraphAnalysis} from "./analyses/graph/GraphAnalysis";
 import {ControlAnalysis} from "./analyses/control/ControlAnalysis";

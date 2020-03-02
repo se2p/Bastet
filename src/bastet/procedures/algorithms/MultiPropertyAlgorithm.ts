@@ -25,7 +25,7 @@ import {AbstractElement} from "../../lattices/Lattice";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {Property} from "../../syntax/Property";
 import {App} from "../../syntax/app/App";
-import {Record as ImmRec, Set as ImmSet} from "immutable";
+import {Set as ImmSet} from "immutable";
 import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 import {AnalysisAlgorithm} from "./Algorithm";
 import {Preconditions} from "../../utils/Preconditions";

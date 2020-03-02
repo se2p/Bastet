@@ -28,7 +28,8 @@ import {
     THREAD_STATE_FAILURE,
     THREAD_STATE_RUNNING,
     THREAD_STATE_RUNNING_ATOMIC,
-    THREAD_STATE_YIELD, ThreadComputationState,
+    THREAD_STATE_YIELD,
+    ThreadComputationState,
     ThreadState
 } from "./ControlAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
@@ -59,12 +60,7 @@ import {Logger} from "../../../utils/Logger";
 import {Actor} from "../../../syntax/app/Actor";
 import {Method} from "../../../syntax/app/controlflow/Method";
 import {ReturnStatement} from "../../../syntax/ast/core/statements/ControlStatement";
-import {
-    DataLocationMode,
-    DataLocationRenamer,
-    RenamingTransformerVisitor
-} from "../../../syntax/transformers/RenamingTransformerVisitor";
-import {DataLocation, DataLocations, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
+import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
 import {Statement} from "../../../syntax/ast/core/statements/Statement";
 import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements/DeclarationStatement";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";

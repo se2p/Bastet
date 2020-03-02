@@ -19,7 +19,7 @@
  *
  */
 
-import {Lattice, LatticeWithComplements} from "../../../lattices/Lattice";
+import {LatticeWithComplements} from "../../../lattices/Lattice";
 import {Record as ImmRec} from "immutable"
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";

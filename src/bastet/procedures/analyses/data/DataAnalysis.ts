@@ -37,7 +37,7 @@ import {
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
-import {Lattice, LatticeWithComplements} from "../../../lattices/Lattice";
+import {LatticeWithComplements} from "../../../lattices/Lattice";
 import {DataRefiner} from "./DataRefiner";
 import {Refiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";

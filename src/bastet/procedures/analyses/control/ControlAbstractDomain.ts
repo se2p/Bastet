@@ -32,7 +32,7 @@ import {BootstrapEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Property} from "../../../syntax/Property";
 import {TransRelId} from "../../../syntax/app/controlflow/TransitionRelation";
 import {ScriptId} from "../../../syntax/app/controlflow/Script";
-import {OperationId, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {OperationId} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 
 export const THREAD_STATE_RUNNING = 1;
 export const THREAD_STATE_RUNNING_ATOMIC = 2;

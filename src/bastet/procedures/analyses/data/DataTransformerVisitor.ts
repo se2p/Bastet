@@ -20,24 +20,27 @@
  */
 
 import {
-    CoreBoolExpressionVisitor, CoreListExpressionVisitor, CoreNonCtrlStatementnVisitor,
+    CoreBoolExpressionVisitor,
+    CoreListExpressionVisitor,
+    CoreNonCtrlStatementnVisitor,
     CoreNumberExpressionVisitor,
     CoreStringExpressionVisitor,
     CoreVisitor
 } from "../../../syntax/ast/CoreVisitor";
-import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {
     BoolAsNumberExpression,
     DivideExpression,
     IndexOfExpression,
-    LengthOfStringExpression, LengthOfListExpression,
+    LengthOfListExpression,
+    LengthOfStringExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
     NumberLiteral,
-    NumberVariableExpression, NumFunctExpression,
+    NumberVariableExpression,
+    NumFunctExpression,
     PickRandomFromExpression,
     PlusExpression,
     RoundExpression,
@@ -51,17 +54,20 @@ import {
     JoinStringsExpression,
     NumAsStringExpression,
     ResourceAttributeOfExpression,
-    StringAttributeOfExpression, StringExpression,
+    StringAttributeOfExpression,
     StringLiteral,
     StringVariableExpression
 } from "../../../syntax/ast/core/expressions/StringExpression";
 import {
-    AndExpression, BooleanExpression,
+    AndExpression,
+    BooleanExpression,
     BooleanLiteral,
     BooleanVariableExpression,
     NegationExpression,
-    NumEqualsExpression, NumGreaterEqualExpression,
-    NumGreaterThanExpression, NumLessEqualExpression,
+    NumEqualsExpression,
+    NumGreaterEqualExpression,
+    NumGreaterThanExpression,
+    NumLessEqualExpression,
     NumLessThanExpression,
     OrExpression,
     StrContainsExpression,
@@ -93,7 +99,8 @@ import {ExpressionStatement} from "../../../syntax/ast/core/statements/Expressio
 import {EpsilonStatement} from "../../../syntax/ast/core/statements/EpsilonStatement";
 import {
     DeclareAttributeStatement,
-    DeclareStackVariableStatement, DeclareSystemVariableStatement
+    DeclareStackVariableStatement,
+    DeclareSystemVariableStatement
 } from "../../../syntax/ast/core/statements/DeclarationStatement";
 import {CreateCloneOfStatement} from "../../../syntax/ast/core/statements/CreateCloneOfStatement";
 import {ChangeVarByStatement} from "../../../syntax/ast/core/statements/ChangeVarByStatement";
@@ -105,12 +112,12 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {
     AbstractBoolean,
     AbstractList,
+    AbstractMemoryTheory,
     AbstractNumber,
     AbstractString,
-    AbstractMemoryTheory,
-    MemoryTransformer, RationalNumberTheory
+    RationalNumberTheory
 } from "../../domains/MemoryTransformer";
-import {BooleanType, NumberType, ScratchType, ScratchTypeID, StringType} from "../../../syntax/ast/core/ScratchType";
+import {BooleanType, NumberType, StringType} from "../../../syntax/ast/core/ScratchType";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {
     BooleanFormula,
@@ -119,13 +126,10 @@ import {
     NumberFormula,
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
-import {ConcreteBoolean, ConcreteNumber, ConcreteNumberDomain, ConcreteString} from "../../domains/ConcreteElements";
-import {AbstractElement} from "../../../lattices/Lattice";
-import {Map as ImmMap} from "immutable";
+import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../domains/ConcreteElements";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
-import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
-import {Variable, VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
+import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 
 export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
     S extends AbstractString, L extends AbstractList>

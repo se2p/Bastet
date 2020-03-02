@@ -32,12 +32,13 @@ import {
     DeclareStackVariableStatement,
     DeclareSystemVariableStatement
 } from "../../../syntax/ast/core/statements/DeclarationStatement";
-import {Variable, VariableExpression, VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
+import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {Statement} from "../../../syntax/ast/core/statements/Statement";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
 import {
-    DivideExpression, MinusExpression,
+    DivideExpression,
+    MinusExpression,
     NumberExpression,
     NumberLiteral,
     NumberVariableExpression,
@@ -52,8 +53,6 @@ import {NumberType} from "../../../syntax/ast/core/ScratchType";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
 import {INIT_MESSAGE} from "../../../syntax/ast/core/Message";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {WaitSecsStatement} from "../../../syntax/ast/core/statements/WaitSecsStatement";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
 
