@@ -22,12 +22,12 @@
 import {Expression} from "./Expression";
 import {AbstractExpression} from "./AbstractExpression";
 import {AstNode} from "../../AstNode";
-import {BooleanType, NumberType} from "../ScratchType";
+import {BooleanType} from "../ScratchType";
 import {BinaryExpression} from "./BinaryExpression";
 import {UnaryExpression} from "./UnaryExpression";
 import {StringExpression} from "./StringExpression";
 import {NumberExpression} from "./NumberExpression";
-import {Variable, VariableExpression, VariableWithDataLocation} from "../Variable";
+import {VariableExpression, VariableWithDataLocation} from "../Variable";
 
 export type BooleanLiteralExpression = BooleanExpression;
 

@@ -26,7 +26,6 @@ import {AbstractBoolean, AbstractBooleanDomain, BooleanTheory} from "./MemoryTra
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {ConcreteBoolean, ConcreteDomain} from "./ConcreteElements";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {Identifier} from "../../syntax/ast/core/Identifier";
 import {Record as ImmRec} from "immutable";
 import {Variable} from "../../syntax/ast/core/Variable";
 

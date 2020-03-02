@@ -62,7 +62,8 @@ import {
     DeleteIthFromStatementContext,
     DeleteThisCloneContext,
     EnumTypeContext,
-    EpsilonStatementContext, EqualsExpressionContext,
+    EpsilonStatementContext,
+    EqualsExpressionContext,
     ExpressionListContext,
     ExpressionListPlainContext,
     ExpressionStmtContext,
@@ -71,7 +72,8 @@ import {
     ExternMethodDefinitionListContext,
     ExternMethodResultDeclarationContext,
     ExternVoidReturnDefinitionContext,
-    FunctionReturnDefinitionContext, GreaterThanExpressionContext,
+    FunctionReturnDefinitionContext,
+    GreaterThanExpressionContext,
     IdentContext,
     IdentExpressionContext,
     IfStmtContext,
@@ -88,7 +90,8 @@ import {
     JoinStringsExpressionContext,
     KeyContext,
     LengthOfListExpressionContext,
-    LengthOfStringExpressionContext, LessThanExpressionContext,
+    LengthOfStringExpressionContext,
+    LessThanExpressionContext,
     ListTypeContext,
     ListVariableExpressionContext,
     ListWithElementsExpressionContext,
@@ -117,7 +120,8 @@ import {
     RenderedMonitoringEventContext,
     RepeatForeverStmtContext,
     RepeatTimesStmtContext,
-    ReplaceElementAtStatementContext, ResetTimerStatementContext,
+    ReplaceElementAtStatementContext,
+    ResetTimerStatementContext,
     ResourceContext,
     ResourceListContext,
     ResourceLocatorContext,
@@ -207,16 +211,13 @@ import {
     DeclareStackVariableStatement,
     VariableDeclaration
 } from "../ast/core/statements/DeclarationStatement";
-import {
-    StoreEvalResultToVariableStatement
-} from "../ast/core/statements/SetStatement";
+import {StoreEvalResultToVariableStatement} from "../ast/core/statements/SetStatement";
 import {Expression} from "../ast/core/expressions/Expression";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {ParameterDeclaration, ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {
     BooleanType,
     ListType,
-    MapType,
     NumberType,
     ScratchType,
     StringEnumType,
@@ -259,18 +260,16 @@ import {
     BoolAsNumberExpression,
     DivideExpression,
     IndexOfExpression,
-    LengthOfStringExpression,
     LengthOfListExpression,
+    LengthOfStringExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
     NumberExpression,
     NumberLiteral,
     NumberVariableExpression,
-    PickRandomFromExpression,
     PlusExpression,
-    StringAsNumberExpression,
-    TimerExpression
+    StringAsNumberExpression
 } from "../ast/core/expressions/NumberExpression";
 import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
 import {ExpressionStatement} from "../ast/core/statements/ExpressionStatement";
@@ -284,8 +283,6 @@ import {
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
 import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {CallStatement} from "../ast/core/statements/CallStatement";
-import {ChangeAttributeByStatement} from "../ast/core/statements/ChangeAttributeByStatement";
-import {ChangeVarByStatement} from "../ast/core/statements/ChangeVarByStatement";
 import {CreateCloneOfStatement} from "../ast/core/statements/CreateCloneOfStatement";
 import {
     DeleteThisCloneStatement,
@@ -294,7 +291,6 @@ import {
 } from "../ast/core/statements/TerminationStatement";
 import {SystemMessage} from "../ast/core/Message";
 import {StopOthersInActorStatement} from "../ast/core/statements/StopOthersInActorStatement";
-import {WaitSecsStatement} from "../ast/core/statements/WaitSecsStatement";
 import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";

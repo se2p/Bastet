@@ -25,7 +25,6 @@ import {Identifier} from "./Identifier";
 import {ParameterDeclarationList} from "./ParameterDeclaration";
 import {StatementList} from "./statements/Statement";
 import {ScratchType, VoidType} from "./ScratchType";
-import {StringLiteral} from "./expressions/StringExpression";
 import {Variable, VariableWithDataLocation} from "./Variable";
 import {DataLocations} from "../../app/controlflow/DataLocation";
 

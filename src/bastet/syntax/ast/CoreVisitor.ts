@@ -24,8 +24,8 @@ import {
     BoolAsNumberExpression,
     DivideExpression,
     IndexOfExpression,
-    LengthOfStringExpression,
     LengthOfListExpression,
+    LengthOfStringExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
@@ -43,8 +43,10 @@ import {
     BooleanLiteral,
     BooleanVariableExpression,
     NegationExpression,
-    NumEqualsExpression, NumGreaterEqualExpression,
-    NumGreaterThanExpression, NumLessEqualExpression,
+    NumEqualsExpression,
+    NumGreaterEqualExpression,
+    NumGreaterThanExpression,
+    NumLessEqualExpression,
     NumLessThanExpression,
     OrExpression,
     StrContainsExpression,
@@ -67,10 +69,7 @@ import {ExpressionListExpression, ListVariableExpression} from "./core/expressio
 import {IfStatement, RepeatForeverStatement, UntilStatement} from "./core/statements/ControlStatement";
 import {CallStatement} from "./core/statements/CallStatement";
 import {StatementList} from "./core/statements/Statement";
-import {
-    DeclareAttributeStatement,
-    DeclareStackVariableStatement
-} from "./core/statements/DeclarationStatement";
+import {DeclareStackVariableStatement} from "./core/statements/DeclarationStatement";
 import {ExpressionStatement} from "./core/statements/ExpressionStatement";
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {CreateCloneOfStatement} from "./core/statements/CreateCloneOfStatement";
@@ -95,7 +94,7 @@ import {
 import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
 import {AssumeStatement} from "./core/statements/AssumeStatement";
-import {Variable, VariableWithDataLocation} from "./core/Variable";
+import {VariableWithDataLocation} from "./core/Variable";
 
 export interface CoreVisitor<R> {
 

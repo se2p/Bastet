@@ -23,7 +23,7 @@ import {AbstractNode, OptionalAstNode} from "../../AstNode";
 import {Statement, StatementList} from "./Statement";
 import {BooleanExpression} from "../expressions/BooleanExpression";
 import {NumberExpression} from "../expressions/NumberExpression";
-import {Variable, VariableWithDataLocation} from "../Variable";
+import {VariableWithDataLocation} from "../Variable";
 import {Preconditions} from "../../../../utils/Preconditions";
 
 export interface ControlStatement extends AbstractNode {

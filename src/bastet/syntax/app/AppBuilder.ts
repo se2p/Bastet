@@ -48,7 +48,7 @@ import {Lists} from "../../utils/Lists";
 import {Method} from "./controlflow/Method";
 import {DeclareStackVariableStatement} from "../ast/core/statements/DeclarationStatement";
 import {Identifier} from "../ast/core/Identifier";
-import {Variable, VariableWithDataLocation} from "../ast/core/Variable";
+import {VariableWithDataLocation} from "../ast/core/Variable";
 import {Logger} from "../../utils/Logger";
 import {ReturnStatement} from "../ast/core/statements/ControlStatement";
 

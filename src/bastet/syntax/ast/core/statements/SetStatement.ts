@@ -24,8 +24,7 @@ import {Statement} from "./Statement";
 import {Expression} from "../expressions/Expression";
 import {StringExpression} from "../expressions/StringExpression";
 import {Identifier} from "../Identifier";
-import {ExpressionList} from "../expressions/ExpressionList";
-import {Variable, VariableWithDataLocation} from "../Variable";
+import {VariableWithDataLocation} from "../Variable";
 import {AstNode} from "../../AstNode";
 
 export abstract class SetStatement extends Statement {

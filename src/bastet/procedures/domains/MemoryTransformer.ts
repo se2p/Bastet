@@ -21,14 +21,12 @@
  */
 
 import {Preconditions} from "../../utils/Preconditions";
-import {Identifier} from "../../syntax/ast/core/Identifier";
 import {BooleanType, NumberType, ScratchType, StringType} from "../../syntax/ast/core/ScratchType";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString, ConcreteStringList} from "./ConcreteElements";
 import {AbstractElement} from "../../lattices/Lattice";
 import {AbstractDomain} from "./AbstractDomain";
 import {AbstractStringList} from "./StringListAbstractDomain";
 import {Variable} from "../../syntax/ast/core/Variable";
-import {Z3NumberFormula, Z3StringFormula} from "../../utils/smt/z3/Z3Theories";
 
 export interface AbstractValue extends AbstractElement {
 

@@ -23,7 +23,7 @@ import {Statement} from "./Statement";
 import {Identifier} from "../Identifier";
 import {ScratchType} from "../ScratchType";
 import {StringExpression} from "../expressions/StringExpression";
-import {Variable, VariableWithDataLocation} from "../Variable";
+import {VariableWithDataLocation} from "../Variable";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {AstNode} from "../../AstNode";
 

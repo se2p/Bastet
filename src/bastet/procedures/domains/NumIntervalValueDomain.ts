@@ -33,7 +33,6 @@ import {
     BooleanTheory,
     RationalNumberTheory
 } from "./MemoryTransformer";
-import {Identifier} from "../../syntax/ast/core/Identifier";
 import {Variable} from "../../syntax/ast/core/Variable";
 
 export interface NumIntervalValueAttribs extends AbstractElement {

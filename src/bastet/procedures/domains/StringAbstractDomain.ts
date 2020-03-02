@@ -34,7 +34,6 @@ import {
 import {Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
-import {Identifier} from "../../syntax/ast/core/Identifier";
 import {Variable} from "../../syntax/ast/core/Variable";
 
 export class AbstractStringLattice implements Lattice<AbstractString> {

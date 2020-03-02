@@ -43,7 +43,6 @@ import {GREENFLAG_MESSAGE, INIT_MESSAGE} from "../ast/core/Message";
 import {StatementList} from "../ast/core/statements/Statement";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
-import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 export type ActorMap = { [id:string]: Actor } ;

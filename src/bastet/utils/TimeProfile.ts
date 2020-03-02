@@ -23,7 +23,6 @@
 import {NumIntervalValue} from "../procedures/domains/NumIntervalValueDomain";
 import {OperationId, ProgramOperation} from "../syntax/app/controlflow/ops/ProgramOperation";
 import {ImplementMeException} from "../core/exceptions/ImplementMeException";
-import {WaitSecsStatement} from "../syntax/ast/core/statements/WaitSecsStatement";
 import {ConcreteNumber} from "../procedures/domains/ConcreteElements";
 
 /**

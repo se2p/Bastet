@@ -1,30 +1,26 @@
 // Generated from src/bastet/syntax/parser/grammar/Scratch.g4 by ANTLR 4.7.3-SNAPSHOT
 
 
-import { ATN } from "antlr4ts/atn/ATN";
-import { ATNDeserializer } from "antlr4ts/atn/ATNDeserializer";
-import { FailedPredicateException } from "antlr4ts/FailedPredicateException";
-import { NotNull } from "antlr4ts/Decorators";
-import { NoViableAltException } from "antlr4ts/NoViableAltException";
-import { Override } from "antlr4ts/Decorators";
-import { Parser } from "antlr4ts/Parser";
-import { ParserRuleContext } from "antlr4ts/ParserRuleContext";
-import { ParserATNSimulator } from "antlr4ts/atn/ParserATNSimulator";
-import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
-import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
-import { RecognitionException } from "antlr4ts/RecognitionException";
-import { RuleContext } from "antlr4ts/RuleContext";
+import {ATN} from "antlr4ts/atn/ATN";
+import {ATNDeserializer} from "antlr4ts/atn/ATNDeserializer";
+import {FailedPredicateException} from "antlr4ts/FailedPredicateException";
+import {NoViableAltException} from "antlr4ts/NoViableAltException";
+import {Parser} from "antlr4ts/Parser";
+import {ParserRuleContext} from "antlr4ts/ParserRuleContext";
+import {ParserATNSimulator} from "antlr4ts/atn/ParserATNSimulator";
+import {RecognitionException} from "antlr4ts/RecognitionException";
+import {RuleContext} from "antlr4ts/RuleContext";
 //import { RuleVersion } from "antlr4ts/RuleVersion";
-import { TerminalNode } from "antlr4ts/tree/TerminalNode";
-import { Token } from "antlr4ts/Token";
-import { TokenStream } from "antlr4ts/TokenStream";
-import { Vocabulary } from "antlr4ts/Vocabulary";
-import { VocabularyImpl } from "antlr4ts/VocabularyImpl";
+import {TerminalNode} from "antlr4ts/tree/TerminalNode";
+import {Token} from "antlr4ts/Token";
+import {TokenStream} from "antlr4ts/TokenStream";
+import {Vocabulary} from "antlr4ts/Vocabulary";
+import {VocabularyImpl} from "antlr4ts/VocabularyImpl";
 
 import * as Utils from "antlr4ts/misc/Utils";
 
-import { ScratchListener } from "./ScratchListener";
-import { ScratchVisitor } from "./ScratchVisitor";
+import {ScratchListener} from "./ScratchListener";
+import {ScratchVisitor} from "./ScratchVisitor";
 
 
 export class ScratchParser extends Parser {
@@ -215,58 +211,58 @@ export class ScratchParser extends Parser {
 	public static readonly RULE_message = 72;
 	// tslint:disable:no-trailing-whitespace
 	public static readonly ruleNames: string[] = [
-		"program", "fileType", "importDefinitionList", "importDefinition", "importSelector", 
-		"actorDefinitionList", "actorDefinition", "inheritsFrom", "actorMode", 
-		"actorComponentsDefinition", "resource", "resourceType", "resourceList", 
-		"declarationStmt", "declarationStmtList", "type", "primitiveType", "indexType", 
-		"script", "scriptList", "event", "coreEvent", "externMethodDefinition", 
-		"externMethodResultDeclaration", "externMethodDefinitionList", "methodDefinition", 
-		"methodResultDeclaration", "methodDefinitionList", "methodAttributeList", 
-		"methodAttribute", "parameter", "parameterList", "parameterListPlain", 
-		"stmtList", "atomicBlock", "stmtListPlain", "controlStmt", "coreControlStmt", 
-		"ifStmt", "elseCase", "untilStmt", "repeatTimesStmt", "repeatForeverStmt", 
-		"callStmt", "expressionList", "expressionListPlain", "expressionStmt", 
-		"stmt", "nonCtrlStmt", "coreNonCtrlStmt", "commonStmt", "listStmt", "setStmt", 
-		"setStmtList", "terminationStmt", "stringExpr", "coreStringExpr", "boolExpr", 
-		"coreBoolExpr", "numExpr", "numOrStringExpr", "coreNumExpr", "listExpr", 
-		"expression", "coreExpression", "unspecifiedExpr", "variable", "color", 
+		"program", "fileType", "importDefinitionList", "importDefinition", "importSelector",
+		"actorDefinitionList", "actorDefinition", "inheritsFrom", "actorMode",
+		"actorComponentsDefinition", "resource", "resourceType", "resourceList",
+		"declarationStmt", "declarationStmtList", "type", "primitiveType", "indexType",
+		"script", "scriptList", "event", "coreEvent", "externMethodDefinition",
+		"externMethodResultDeclaration", "externMethodDefinitionList", "methodDefinition",
+		"methodResultDeclaration", "methodDefinitionList", "methodAttributeList",
+		"methodAttribute", "parameter", "parameterList", "parameterListPlain",
+		"stmtList", "atomicBlock", "stmtListPlain", "controlStmt", "coreControlStmt",
+		"ifStmt", "elseCase", "untilStmt", "repeatTimesStmt", "repeatForeverStmt",
+		"callStmt", "expressionList", "expressionListPlain", "expressionStmt",
+		"stmt", "nonCtrlStmt", "coreNonCtrlStmt", "commonStmt", "listStmt", "setStmt",
+		"setStmtList", "terminationStmt", "stringExpr", "coreStringExpr", "boolExpr",
+		"coreBoolExpr", "numExpr", "numOrStringExpr", "coreNumExpr", "listExpr",
+		"expression", "coreExpression", "unspecifiedExpr", "variable", "color",
 		"ident", "number", "key", "resourceLocator", "message",
 	];
 
 	private static readonly _LITERAL_NAMES: Array<string | undefined> = [
-		undefined, "'program'", "'module'", "'import'", "'from'", "'*'", "'begin'", 
-		"'end'", "'is'", "','", "'actor'", "'role'", "'image'", "'sound'", "'declare'", 
-		"'as'", "'list'", "'of'", "'number'", "'boolean'", "'string'", "'enum'", 
-		"'['", "']'", "'script'", "'on'", "'do'", "'never'", "'bootstrap'", "'finished'", 
-		"'startup'", "'started'", "'clone'", "'received'", "'message'", "'in'", 
-		"'reached condition'", "'rendered'", "'statement'", "'extern'", "'returns'", 
-		"'define'", "':'", "'atomic'", "'('", "')'", "'if'", "'then'", "'else'", 
-		"'until'", "'repeat'", "'times'", "'forever'", "'evaluate'", "'@'", "'wait'", 
-		"'seconds'", "'stop'", "'other'", "'scripts'", "'create'", "'broadcast'", 
-		"'and'", "'reset'", "'timer'", "'epsilon'", "'assume'", "'delete'", "'all'", 
-		"'add'", "'to'", "'insert'", "'at'", "'replace'", "'item'", "'by'", "'this'", 
-		"'cast'", "'attribute'", "'resource'", "'join'", "'letter'", "'default'", 
-		"'for'", "'?string'", "'not'", "'or'", "'>'", "'<'", "'='", "'contains'", 
-		"'?bool'", "'length'", "'index'", "'/'", "'mod'", "'+'", "'-'", "'?number'", 
+		undefined, "'program'", "'module'", "'import'", "'from'", "'*'", "'begin'",
+		"'end'", "'is'", "','", "'actor'", "'role'", "'image'", "'sound'", "'declare'",
+		"'as'", "'list'", "'of'", "'number'", "'boolean'", "'string'", "'enum'",
+		"'['", "']'", "'script'", "'on'", "'do'", "'never'", "'bootstrap'", "'finished'",
+		"'startup'", "'started'", "'clone'", "'received'", "'message'", "'in'",
+		"'reached condition'", "'rendered'", "'statement'", "'extern'", "'returns'",
+		"'define'", "':'", "'atomic'", "'('", "')'", "'if'", "'then'", "'else'",
+		"'until'", "'repeat'", "'times'", "'forever'", "'evaluate'", "'@'", "'wait'",
+		"'seconds'", "'stop'", "'other'", "'scripts'", "'create'", "'broadcast'",
+		"'and'", "'reset'", "'timer'", "'epsilon'", "'assume'", "'delete'", "'all'",
+		"'add'", "'to'", "'insert'", "'at'", "'replace'", "'item'", "'by'", "'this'",
+		"'cast'", "'attribute'", "'resource'", "'join'", "'letter'", "'default'",
+		"'for'", "'?string'", "'not'", "'or'", "'>'", "'<'", "'='", "'contains'",
+		"'?bool'", "'length'", "'index'", "'/'", "'mod'", "'+'", "'-'", "'?number'",
 		"'?expr'", "'.'", "'rgba'", "'strid'", "'key'",
 	];
 	private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, "Boolean", 
-		"String", "Bool", "Identifier", "DecimalLiteral", "Whitespace", "Newline", 
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, "Boolean",
+		"String", "Bool", "Identifier", "DecimalLiteral", "Whitespace", "Newline",
 		"BlockComment", "LineComment",
 	];
 	public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(ScratchParser._LITERAL_NAMES, ScratchParser._SYMBOLIC_NAMES, []);

@@ -67,8 +67,10 @@ import {
     BooleanLiteral,
     BooleanVariableExpression,
     NegationExpression,
-    NumEqualsExpression, NumGreaterEqualExpression,
-    NumGreaterThanExpression, NumLessEqualExpression,
+    NumEqualsExpression,
+    NumGreaterEqualExpression,
+    NumGreaterThanExpression,
+    NumLessEqualExpression,
     NumLessThanExpression,
     OrExpression,
     StrContainsExpression,
@@ -100,7 +102,8 @@ import {ExpressionStatement} from "../ast/core/statements/ExpressionStatement";
 import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
 import {
     DeclareAttributeStatement,
-    DeclareStackVariableStatement, DeclareSystemVariableStatement
+    DeclareStackVariableStatement,
+    DeclareSystemVariableStatement
 } from "../ast/core/statements/DeclarationStatement";
 import {CreateCloneOfStatement} from "../ast/core/statements/CreateCloneOfStatement";
 import {ChangeVarByStatement} from "../ast/core/statements/ChangeVarByStatement";

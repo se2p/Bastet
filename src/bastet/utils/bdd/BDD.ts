@@ -23,7 +23,7 @@
 import {List as ImmList, Record as ImmRec} from "immutable"
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../Preconditions";
-import {AbstractElement, Lattice, LatticeWithComplements} from "../../lattices/Lattice";
+import {AbstractElement, LatticeWithComplements} from "../../lattices/Lattice";
 
 export interface PropositionalFormula extends AbstractElement {
 
