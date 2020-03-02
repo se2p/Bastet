@@ -28,6 +28,7 @@ import {AbstractElement} from "../../lattices/Lattice";
 import {AbstractDomain} from "./AbstractDomain";
 import {AbstractStringList} from "./StringListAbstractDomain";
 import {Variable} from "../../syntax/ast/core/Variable";
+import {Z3NumberFormula, Z3StringFormula} from "../../utils/smt/z3/Z3MemoryTheory";
 
 export interface AbstractValue extends AbstractElement {
 
@@ -111,11 +112,11 @@ export interface ListTheory<L extends AbstractList> {
 
 }
 
-export interface StringTheory<S extends AbstractString> {
+export interface StringTheory<S extends AbstractString, B extends AbstractBoolean, N extends AbstractNumber> {
 
     fromConcreteString(str: ConcreteString): S;
 
-    abstractStringValue(id: Identifier): S;
+    abstractStringValue(id: Variable): S;
 
     emptyString(): S;
 
@@ -132,6 +133,12 @@ export interface StringTheory<S extends AbstractString> {
     joinStrings(str1: S, str2: S): S;
 
     ithLetterOf(index: AbstractNumber, str: S): S;
+
+    stringsEqual(str1: S, str2: S): B;
+
+    stringContains(str1: S, str2: S): B;
+
+    lengthOf(str: S): N;
 
 }
 
@@ -425,7 +432,7 @@ export interface AbstractMemoryTheory<M extends AbstractMemory, B extends Abstra
 
     numTheory: RationalNumberTheory<N, B>;
 
-    stringTheory: StringTheory<S>;
+    stringTheory: StringTheory<S, B, N>;
 
     listTheory: ListTheory<L>;
 

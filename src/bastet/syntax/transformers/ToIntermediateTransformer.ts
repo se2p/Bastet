@@ -1551,7 +1551,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             numTr.statementsToPrepend,
             new IthStringItemOfExpression(
                 numTr.node as NumberExpression,
-                ctx.variable().accept(this).nodeOnly() as Identifier));
+                ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation));
     }
 
     public visitJoinStringsExpression(ctx: JoinStringsExpressionContext) : TransformerResult {

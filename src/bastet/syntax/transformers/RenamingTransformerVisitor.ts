@@ -370,19 +370,27 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitStrContainsExpression(node: StrContainsExpression): AstNode {
-        throw new ImplementMeException();
+        return new StrContainsExpression(
+            node.operand1.accept(this) as StringExpression,
+            node.operand2.accept(this) as StringExpression);
     }
 
     visitStrEqualsExpression(node: StrEqualsExpression): AstNode {
-        throw new ImplementMeException();
+        return new StrEqualsExpression(
+            node.operand1.accept(this) as StringExpression,
+            node.operand2.accept(this) as StringExpression);
     }
 
     visitStrGreaterThanExpression(node: StrGreaterThanExpression): AstNode {
-        throw new ImplementMeException();
+        return new StrGreaterThanExpression(
+            node.operand1.accept(this) as StringExpression,
+            node.operand2.accept(this) as StringExpression);
     }
 
     visitStrLessThanExpression(node: StrLessThanExpression): AstNode {
-        throw new ImplementMeException();
+        return new StrLessThanExpression(
+            node.operand1.accept(this) as StringExpression,
+            node.operand2.accept(this) as StringExpression);
     }
 
     visitExpressionListExpression(node: ExpressionListExpression): AstNode {
@@ -398,19 +406,25 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitIthLetterOfStringExpression(node: IthLetterOfStringExpression): AstNode {
-        throw new ImplementMeException();
+        return new IthLetterOfStringExpression(
+            node.index.accept(this) as NumberExpression,
+            node.strExpr.accept(this) as StringExpression);
     }
 
     visitIthStringItemOfExpression(node: IthStringItemOfExpression): AstNode {
-        throw new ImplementMeException();
+        return new IthStringItemOfExpression(
+            node.index.accept(this) as NumberExpression,
+            node.ofVariable.accept(this) as VariableWithDataLocation)
     }
 
     visitJoinStringsExpression(node: JoinStringsExpression): AstNode {
-        throw new ImplementMeException();
+        return new JoinStringsExpression(
+            node.operand1.accept(this) as StringExpression,
+            node.operand2.accept(this) as StringExpression);
     }
 
     visitNumAsStringExpression(node: NumAsStringExpression): AstNode {
-        throw new ImplementMeException();
+        return new NumAsStringExpression(node.num.accept(this) as NumberExpression);
     }
 
     visitResourceAttributeOfExpression(node: ResourceAttributeOfExpression): AstNode {
@@ -426,7 +440,8 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitStringVariableExpression(node: StringVariableExpression): AstNode {
-        throw new ImplementMeException();
+        const renamedDataLoc: DataLocation = this.renameRead(node.variable.dataloc);
+        return new StringVariableExpression(new VariableWithDataLocation(renamedDataLoc));
     }
 
     visitAddElementToStatement(node: AddElementToStatement): AstNode {

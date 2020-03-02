@@ -35,11 +35,12 @@ import {Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
 import {Identifier} from "../../syntax/ast/core/Identifier";
+import {Variable} from "../../syntax/ast/core/Variable";
 
 export class AbstractStringLattice implements Lattice<AbstractString> {
 
     bottom(): AbstractString {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     isIncluded(element1: AbstractString, element2: AbstractString): boolean {
@@ -47,20 +48,20 @@ export class AbstractStringLattice implements Lattice<AbstractString> {
     }
 
     join(element1: AbstractString, element2: AbstractString): AbstractString {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     meet(element1: AbstractString, element2: AbstractString): AbstractString {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     top(): AbstractString {
-        return undefined;
+        throw new ImplementMeException();
     }
 
 }
 
-export class OurStringTheory implements StringTheory<AbstractString> {
+export class OurStringTheory implements StringTheory<AbstractString, AbstractBoolean, AbstractNumber> {
 
     private readonly _dom: AbstractStringDomain;
     private readonly _boolTheory: BooleanTheory<AbstractBoolean>;
@@ -72,44 +73,52 @@ export class OurStringTheory implements StringTheory<AbstractString> {
         this._numTheory = Preconditions.checkNotUndefined(numTheory);
     }
 
-    abstractStringValue(id: Identifier): AbstractString {
-        return undefined;
+    abstractStringValue(id: Variable): AbstractString {
+        throw new ImplementMeException();
     }
 
     bottomString(): AbstractString {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     castBoolAsString(num: AbstractBoolean): AbstractString {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     castNumberAsString(num: AbstractNumber): AbstractString {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     emptyString(): AbstractString {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     fromConcreteString(str: ConcreteString): AbstractString {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     ithLetterOf(index: AbstractNumber, str: AbstractString): AbstractString {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     joinStrings(str1: AbstractString, str2: AbstractString): AbstractString {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     lengthOf(str: AbstractString): AbstractNumber {
-        return undefined;
+        throw new ImplementMeException();
     }
 
     topString(): AbstractString {
-        return undefined;
+        throw new ImplementMeException();
+    }
+
+    stringContains(str1: AbstractString, str2: AbstractString): AbstractBoolean {
+        throw new ImplementMeException();
+    }
+
+    stringsEqual(str1: AbstractString, str2: AbstractString): AbstractBoolean {
+        throw new ImplementMeException();
     }
 
 }
@@ -142,10 +151,6 @@ export class StringAbstractDomain implements AbstractStringDomain {
 
     get lattice(): Lattice<AbstractString> {
         return this._lattice;
-    }
-
-    getTheory(): StringTheory<AbstractString> {
-        throw new ImplementMeException();
     }
 
 }

@@ -51,7 +51,7 @@ import {
     JoinStringsExpression,
     NumAsStringExpression,
     ResourceAttributeOfExpression,
-    StringAttributeOfExpression,
+    StringAttributeOfExpression, StringExpression,
     StringLiteral,
     StringVariableExpression
 } from "../../../syntax/ast/core/expressions/StringExpression";
@@ -119,7 +119,7 @@ import {
     NumberFormula,
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
-import {ConcreteBoolean, ConcreteNumber, ConcreteNumberDomain} from "../../domains/ConcreteElements";
+import {ConcreteBoolean, ConcreteNumber, ConcreteNumberDomain, ConcreteString} from "../../domains/ConcreteElements";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {Map as ImmMap} from "immutable";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
@@ -282,22 +282,29 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
     }
 
     visitOrExpression(node: OrExpression): B {
-        return this._theories.boolTheory.or(node.operand1.accept(this), node.operand2.accept(this));
+        return this._theories.boolTheory.or(
+            node.operand1.accept(this), node.operand2.accept(this));
     }
 
     visitStrContainsExpression(node: StrContainsExpression): B {
-        throw new ImplementMeException();
+        const strVisitor = new DataStringExpressionVisitor(this._theories);
+        return this._theories.stringTheory.stringContains(
+            node.operand1.accept(strVisitor) as S, node.operand2.accept(strVisitor) as S);
     }
 
     visitStrEqualsExpression(node: StrEqualsExpression): B {
-        throw new ImplementMeException();
+        const strVisitor = new DataStringExpressionVisitor(this._theories);
+        return this._theories.stringTheory.stringsEqual(
+            node.operand1.accept(strVisitor) as S, node.operand2.accept(strVisitor) as S);
     }
 
     visitStrGreaterThanExpression(node: StrGreaterThanExpression): B {
+        // ATTENTION: Special semantics of the theory that is implemented
         throw new ImplementMeException();
     }
 
     visitStrLessThanExpression(node: StrLessThanExpression): B {
+        // ATTENTION: Special semantics of the theory that is implemented
         throw new ImplementMeException();
     }
 
@@ -328,11 +335,12 @@ export class DataStringExpressionVisitor implements CoreStringExpressionVisitor<
     }
 
     visitJoinStringsExpression(node: JoinStringsExpression): AbstractString {
-        throw new ImplementMeException();
+        return this._theories.stringTheory.joinStrings(node.operand1.accept(this), node.operand2.accept(this));
     }
 
     visitNumAsStringExpression(node: NumAsStringExpression): AbstractString {
-        throw new ImplementMeException();
+        const numVisitor = new DataNumExpressionVisitor(this._theories.numTheory);
+        return this._theories.stringTheory.castNumberAsString(node.accept(numVisitor));
     }
 
     visitResourceAttributeOfExpression(node: ResourceAttributeOfExpression): AbstractString {
@@ -344,15 +352,15 @@ export class DataStringExpressionVisitor implements CoreStringExpressionVisitor<
     }
 
     visitStringLiteral(node: StringLiteral): AbstractString {
-        throw new ImplementMeException();
+        return this._theories.stringTheory.fromConcreteString(new ConcreteString(node.text));
     }
 
     visitStringVariableExpression(node: StringVariableExpression): AbstractString {
-        throw new ImplementMeException();
+        return this._theories.stringTheory.abstractStringValue(node.variable);
     }
 
     visitVariableWithDataLocation(node: VariableWithDataLocation): AbstractString {
-        throw new ImplementMeException();
+        return this._theories.stringTheory.abstractStringValue(node);
     }
 
 }

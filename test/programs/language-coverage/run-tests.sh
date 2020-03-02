@@ -1,5 +1,7 @@
 #!/bin/bash
 
+NAME_PREFIX="$1"
+
 TEST_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 BASTET_ROOT="../../../"
 
@@ -62,7 +64,7 @@ parse_results () {
     fi    
 }
 
-for f in $(find $TEST_DIR -name "*.sc" | sort) 
+for f in $(find $TEST_DIR -name "*${NAME_PREFIX}*.sc" | sort) 
 do
     RESULT_FILE=$(mktemp)
     printf "`basename $f`"

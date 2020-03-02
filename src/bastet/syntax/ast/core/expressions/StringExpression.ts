@@ -77,6 +77,10 @@ export class NumAsStringExpression extends AbstractStringExpression {
     constructor(num: NumberExpression) {
         super([num]);
     }
+
+    get num(): NumberExpression {
+        return this._num;
+    }
 }
 
 export class BoolAsStringExpression extends AbstractStringExpression {
@@ -88,6 +92,9 @@ export class BoolAsStringExpression extends AbstractStringExpression {
         this._bool = bool;
     }
 
+    get bool(): BooleanExpression {
+        return this._bool;
+    }
 }
 
 export class StringAttributeOfExpression extends AbstractStringExpression {
@@ -101,6 +108,13 @@ export class StringAttributeOfExpression extends AbstractStringExpression {
         this._ofEntity = ofEntity;
     }
 
+    get attribute(): StringExpression {
+        return this._attribute;
+    }
+
+    get ofEntity(): Identifier {
+        return this._ofEntity;
+    }
 }
 
 export class ResourceAttributeOfExpression extends AbstractStringExpression {
@@ -114,6 +128,13 @@ export class ResourceAttributeOfExpression extends AbstractStringExpression {
         this._ofResource = ofResource;
     }
 
+    get attribute(): StringExpression {
+        return this._attribute;
+    }
+
+    get ofResource(): Identifier {
+        return this._ofResource;
+    }
 }
 
 export class JoinStringsExpression extends BinaryExpression<StringExpression, StringExpression> implements StringExpression {
@@ -135,18 +156,32 @@ export class IthLetterOfStringExpression extends AbstractStringExpression {
         this._strExpr = strExpr;
     }
 
+    get index(): NumberExpression {
+        return this._index;
+    }
+
+    get strExpr(): StringExpression {
+        return this._strExpr;
+    }
 }
 
 export class IthStringItemOfExpression extends AbstractStringExpression {
 
     private readonly _index: NumberExpression;
-    private readonly _ofVariable: Identifier;
+    private readonly _ofVariable: VariableWithDataLocation;
 
-    constructor(index: NumberExpression, ofVariable: Identifier) {
+    constructor(index: NumberExpression, ofVariable: VariableWithDataLocation) {
         super([index, ofVariable]);
         this._index = index;
         this._ofVariable = ofVariable;
     }
 
+    get index(): NumberExpression {
+        return this._index;
+    }
+
+    get ofVariable(): VariableWithDataLocation {
+        return this._ofVariable;
+    }
 }
 
