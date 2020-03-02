@@ -1,6 +1,6 @@
 grammar ScratchLiterals;
 
-String : '"' ~('"')+ '"' ;
+String : '"' ~('"')* '"' ;
 
 Bool : 'true' | 'false' ;
 
