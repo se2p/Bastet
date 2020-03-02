@@ -1593,7 +1593,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitLengthOfStringExpression(ctx: LengthOfStringExpressionContext) : TransformerResult {
-        const tr = ctx.stringExpr().accept(this);
+        const tr = this.ensureType(ctx, StringType.instance(), ctx.stringExpr().accept(this));
         return new TransformerResult(tr.statementsToPrepend, new LengthOfStringExpression(tr.node as StringExpression));
     }
 
@@ -1722,14 +1722,14 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitStringAsNumExpression(ctx: StringAsNumExpressionContext) : TransformerResult {
-        const tr = ctx.stringExpr().accept(this);
+        const tr = this.ensureType(ctx, StringType.instance(), ctx.stringExpr().accept(this));
         return new TransformerResult(
             tr.statementsToPrepend,
             new StringAsNumberExpression(tr.node as StringExpression));
     }
 
     public visitStringAttributeOfExpression(ctx: StringAttributeOfExpressionContext) : TransformerResult {
-        const tr = ctx.stringExpr().accept(this);
+        const tr = this.ensureType(ctx, StringType.instance(), ctx.stringExpr().accept(this));
         return new TransformerResult(tr.statementsToPrepend,
             new StringAttributeOfExpression(tr.node as StringExpression,
                 ctx.ident().accept(this).nodeOnly() as Identifier));

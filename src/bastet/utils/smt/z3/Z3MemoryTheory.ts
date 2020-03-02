@@ -198,8 +198,8 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
         throw new ImplementMeException();
     }
 
-    castStringAsNumber(str: AbstractString): Z3NumberFormula {
-        throw new ImplementMeException();
+    castStringAsNumber(str: Z3StringFormula): Z3NumberFormula {
+        return new Z3NumberFormula(this._ctx.mk_str_to_int(str.getAST()));
     }
 
     divide(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
@@ -326,7 +326,7 @@ export class Z3StringTheory extends Z3Theory implements StringTheory<Z3StringFor
     }
 
     lengthOf(str: Z3StringFormula): Z3NumberFormula {
-        throw new ImplementMeException();
+        return new Z3NumberFormula(this._ctx.mk_seq_length(str.getAST()));
     }
 
     topString(): Z3StringFormula {

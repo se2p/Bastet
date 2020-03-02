@@ -124,15 +124,15 @@ export interface StringTheory<S extends AbstractString, B extends AbstractBoolea
 
     bottomString(): S;
 
-    lengthOf(str: S): AbstractNumber;
+    lengthOf(str: S): N;
 
-    castNumberAsString(num: AbstractNumber): S;
+    castNumberAsString(num: N): S;
 
-    castBoolAsString(num: AbstractBoolean): S;
+    castBoolAsString(num: B): S;
 
     joinStrings(str1: S, str2: S): S;
 
-    ithLetterOf(index: AbstractNumber, str: S): S;
+    ithLetterOf(index: N, str: S): S;
 
     stringsEqual(str1: S, str2: S): B;
 

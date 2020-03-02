@@ -260,11 +260,11 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitLengthOListExpression(node: LengthOfListExpression): AstNode {
-        throw new ImplementMeException();
+        return new LengthOfListExpression(node.listVar.accept(this) as VariableWithDataLocation);
     }
 
     visitLengthOfStringExpression(node: LengthOfStringExpression): AstNode {
-        throw new ImplementMeException();
+        return new LengthOfStringExpression(node.str.accept(this) as StringExpression);
     }
 
     visitMinusExpression(node: MinusExpression): AstNode {
