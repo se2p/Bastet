@@ -134,21 +134,10 @@ export class Bastet {
 
         // Create the RAW AST
         const rawAST: RuleNode = scratchParser.parseFile(filepath);
-        {
-            const rawToDotVisitor = new RawAstToDotVisitor();
-            rawAST.accept(rawToDotVisitor);
-            rawToDotVisitor.writeToFile(`output/ast_library_raw_${ident}.dot`);
-        }
         Preconditions.checkState(rawAST instanceof ProgramContext );
 
         const transformer = new ToIntermediateTransformer();
         const intermediateAST: AstNode = transformer.transform(App.empty(), rawAST, typeStorage, config);
-
-        {
-            const astToDotVisitor = new AstToDotVisitor();
-            intermediateAST.accept(astToDotVisitor);
-            astToDotVisitor.writeToFile(`output/ast_library_interm_${ident}.dot`);
-        }
 
         return this.createControlFlowFrom(filepath, intermediateAST, App.empty(), "");
     }
@@ -170,22 +159,10 @@ export class Bastet {
         // Create the RAW AST (no simplifications or generalizations were applied)
         const rawAST: RuleNode = scratchParser.parseFile(filepath);
 
-        {
-            const rawToDotVisitor = new RawAstToDotVisitor();
-            rawAST.accept(rawToDotVisitor);
-            rawToDotVisitor.writeToFile(`output/ast_${ident}_raw.dot`);
-        }
-
         // Transform the AST: Replaces specific statements or expressions
         // by generic constructs.
         const transformer = new ToIntermediateTransformer();
         const intermediateAST: AstNode = transformer.transform(staticLibraryModel, rawAST, typeStorage, config);
-
-        {
-            const astToDotVisitor = new AstToDotVisitor();
-            intermediateAST.accept(astToDotVisitor);
-            astToDotVisitor.writeToFile(`output/ast_${ident}_interm.dot`);
-        }
 
         return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, actorNamePrefix);
     }
