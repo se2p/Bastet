@@ -34,7 +34,7 @@ actor MiniActor is RuntimeEntity begin
             end
         end
 
-        if not (x > 0) then begin
+        if (a > b) and not (x > 0) then begin
             _RUNTIME_signalFailure("This must not happen!")
         end
     end
