@@ -497,8 +497,6 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         let result: ControlAbstractState = succState;
         const steppedThread: IndexedThread = succState.getIndexedThreadState(steppedThreadIndex);
 
-        // TODO: Specification scheduling (also these checks can be done outside the atomic transitions)
-
         const nextOps = this.resolveLeavingOps(steppedThread);
         if (nextOps.length > 0 && steppedThread.threadStatus.getInAtomicMode() > 0) {
             // Finish the atomic operations without interruptions by another thread
@@ -518,8 +516,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         }
 
         // Determine and set the next thread to step
-        const continueWithNextThreadAt: number = this.determineNextNonObserverThreadToStep(result, steppedThread.threadIndex);
-
+        const continueWithNextThreadAt: number = this.determineNextThreadToStep(result, steppedThread.threadIndex);
         if (continueWithNextThreadAt > -1) {
             result = result.withThreadStateUpdate(continueWithNextThreadAt, (ts) =>
                 ts.withComputationState(THREAD_STATE_RUNNING));
@@ -529,8 +526,10 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return [result];
     }
 
-    private determineNextNonObserverThreadToStep(resultBase: ControlAbstractState, steppedThreadIdx: number): number {
+    private determineNextThreadToStep(resultBase: ControlAbstractState, steppedThreadIdx: number): number {
         const threads = resultBase.getThreadStates();
+
+        // TODO: Specification scheduling (also these checks should be done outside the atomic transitions)
 
         let indexToCheck = (steppedThreadIdx + 1) % threads.size;
         let checked = 0;
