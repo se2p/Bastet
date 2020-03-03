@@ -20,9 +20,9 @@
  *
  */
 
-import {LabeledTransferRelation, TransferRelation} from "../TransferRelation";
+import {LabeledTransferRelation, TransferRelation, Transfers} from "../TransferRelation";
 import {
-    ControlAbstractState, MethodCall, RelationLocation,
+    ControlAbstractState, IndexedThread, MethodCall, RelationLocation,
     THREAD_STATE_DONE, THREAD_STATE_FAILURE,
     THREAD_STATE_RUNNING, THREAD_STATE_YIELD,
     ThreadState
@@ -46,7 +46,11 @@ import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
 import {Properties, Property} from "../../../syntax/Property";
 import {Method} from "../../../syntax/app/controlflow/Method";
-import {ReturnStatement} from "../../../syntax/ast/core/statements/ControlStatement";
+import {
+    BeginAtomicStatement,
+    EndAtomicStatement,
+    ReturnStatement
+} from "../../../syntax/ast/core/statements/ControlStatement";
 import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
 import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
@@ -62,27 +66,7 @@ import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
 import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressions/StringExpression";
 import {MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-
-class IndexedThread {
-
-    private readonly _threadStatus: ThreadState;
-
-    private readonly _threadIndex: number;
-
-    constructor(threadStatus: ThreadState, threadIndex: number) {
-        this._threadStatus = Preconditions.checkNotUndefined(threadStatus);
-        this._threadIndex = threadIndex;
-    }
-
-    get threadStatus(): ThreadState {
-        return this._threadStatus;
-    }
-
-    get threadIndex(): number {
-        return this._threadIndex;
-    }
-}
+import {Concerns} from "../../../syntax/Concern";
 
 class StepInformation {
 
@@ -169,7 +153,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         // - Typically all those threads that have been previously scheduled to run.
         // - Running specification (observer) threads become executed first
         const threadsToStep: IndexedThread[] = this.chooseThreadsToStep(fromState);
-        Preconditions.checkState(threadsToStep.length === 1,
+        Preconditions.checkState(threadsToStep.length <= 1,
             "For now, we assume that only one thread is executed concurrently");
 
         for (const threadToStep of threadsToStep) {
@@ -189,7 +173,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
                 // Schedule the threads to run in the next iterations
                 for (const succState of succStates1) {
-                    result = result.concat(this.schedule(fromState, succState, threadToStep));
+                    result = result.concat(this.schedule(fromState, succState, threadToStep.threadIndex));
                 }
             }
         }
@@ -210,7 +194,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         const result: IndexedThread[] = [];
         let index = 0;
         for (const t of fromState.getThreadStates()) {
-            if (t.getComputationState() === THREAD_STATE_RUNNING) {
+            if (t.getComputationState() == THREAD_STATE_RUNNING) {
                 result.push(new IndexedThread(t, index));
             }
             index++;
@@ -260,6 +244,43 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
     private interprete(fromState: ControlAbstractState, threadToStep: IndexedThread,
                        step: StepInformation): ControlAbstractState[] {
+        const result: ControlAbstractState[] = [];
+
+        // Interpretation by this analysis
+        const withControlResults: ControlAbstractState[] = this.interpreteLocal(fromState, threadToStep, step);
+
+        // Interpret the wrapped state by the wrapped analysis
+        const wrappedAnalysisResults: Iterable<AbstractElement> = Transfers.withIntermediateOps(
+            this._wrappedTransferRelation, fromState.wrappedState, step.ops, Concerns.defaultProgramConcern());
+
+        // Combine the result
+        for (const r of withControlResults){
+            Preconditions.checkNotUndefined(r);
+            for (const w of wrappedAnalysisResults) {
+                Preconditions.checkNotUndefined(w);
+                const properties = this.extractFailedForProperties(r.getThreadStates());
+
+                result.push(r.withWrappedState(w)
+                    .withSteppedFor([step.steppedThread.threadIndex])
+                    .withIsTargetFor(properties));
+            }
+        }
+
+        return result;
+    }
+
+    private extractFailedForProperties(sched: ImmList<ThreadState>): ImmSet<Property> {
+        const properties = [];
+        for (const t of sched) {
+            for (const p of t.getFailedFor()) {
+                properties.push(p);
+            }
+        }
+        return ImmSet(properties);
+    }
+
+    private interpreteLocal(fromState: ControlAbstractState, threadToStep: IndexedThread,
+                       step: StepInformation): ControlAbstractState[] {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(threadToStep);
         Preconditions.checkNotUndefined(step);
@@ -282,7 +303,15 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         //
         // Handle different statements that start other threads and wait for them
         //
-        if (stepOp.ast instanceof CallStatement) {
+        if (stepOp.ast instanceof BeginAtomicStatement) {
+            result = result.withThreadStateUpdate(threadToStep.threadIndex,
+                (ts) => ts.withIncrementedAtomic());
+
+        } else if (stepOp.ast instanceof EndAtomicStatement) {
+            result = result.withThreadStateUpdate(threadToStep.threadIndex,
+                (ts) => ts.withDecrementedAtomic());
+
+        } else if (stepOp.ast instanceof CallStatement) {
             // The following lines realize the inter-procedural analysis.
             const calledMethodName = stepOp.ast.calledMethod.text;
 
@@ -290,7 +319,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 const call = stepOp.ast as CallStatement;
                 if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
                     const properties: ImmSet<Property> = Properties.fromArguments(call.args);
-                    result = fromState.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                    result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
                         ts.withComputationState(THREAD_STATE_FAILURE)
                             .withFailedFor(properties));
                 }
@@ -308,7 +337,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                         steppedActor.ident, calledMethod.transitions.ident, entryLocId);
                     const currentScopeStack = steppedThread.getScopeStack();
 
-                    result = fromState.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                    result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
                         ts.withOperations(ImmList(this.scopeOperations(interProcOps, currentScopeStack, succScopeStack).map(op => op.ident)))
                             .withLocation(callToRelationLoc)
                             .withCallStack(succCallStack)
@@ -325,7 +354,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             // Assign the result to the variable that was referenced in the `CallStatement`
             const interProcOps: ProgramOperation[] = this.createStoreCallResultOps(steppedThread, callInformation, stepOp.ast as ReturnStatement);
 
-            result = fromState.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+            result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
                 ts.withOperations(ImmList(this.scopeOperations(interProcOps, steppedThread.getScopeStack(), succScopeStack).map(o => o.ident)))
                     .withLocation(callInformation.getReturnTo())
                     .withCallStack(succReturnCallsTo)
@@ -334,11 +363,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         } else if (stepOp.ast instanceof BroadcastMessageStatement) {
             const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
             const msg: string = this.evaluateToConcreteMessage(stmt.msg);
-            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(fromState, msg);
+            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(result, msg);
 
             // Prepare the waiting threads for running
             for (const waitForThread of waitFor) {
-                result = fromState.withThreadStateUpdate(waitForThread.threadIndex, (ts) =>
+                result = result.withThreadStateUpdate(waitForThread.threadIndex, (ts) =>
                     ts.withComputationState(THREAD_STATE_YIELD));
             }
 
@@ -346,16 +375,16 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             const steppedThread = threadToStep.threadStatus;
             const stmt: BroadcastAndWaitStatement = stepOp.ast as BroadcastAndWaitStatement;
             const msg: string = this.evaluateToConcreteMessage(stmt.msg);
-            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(fromState, msg);
+            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(result, msg);
 
             // Prepare the waiting threads for running
             for (const waitForThread of waitFor) {
-                result = fromState.withThreadStateUpdate(waitForThread.threadIndex, (ts) =>
+                result = result.withThreadStateUpdate(waitForThread.threadIndex, (ts) =>
                     ts.withComputationState(THREAD_STATE_YIELD));
             }
 
             // Wait for all triggered threads to finish
-            result = fromState.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+            result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
                 ts.withWaitingForThreads(
                         steppedThread
                             .getWaitingForThreads()
@@ -464,38 +493,36 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
     }
 
     private schedule(predState: ControlAbstractState, succState: ControlAbstractState,
-                     threadToStep: IndexedThread): ControlAbstractState[] {
+                     steppedThreadIndex: number): ControlAbstractState[] {
         let result: ControlAbstractState = succState;
+        const steppedThread: IndexedThread = succState.getIndexedThreadState(steppedThreadIndex);
 
-        if (succState.getThreadStates().get(threadToStep.threadIndex).getInAtomicMode() > 0) {
-            result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                ts.withComputationState(THREAD_STATE_RUNNING));
+        // TODO: Specification scheduling (also these checks can be done outside the atomic transitions)
+
+        const nextOps = this.resolveLeavingOps(steppedThread);
+        if (nextOps.length > 0 && steppedThread.threadStatus.getInAtomicMode() > 0) {
+            // Finish the atomic operations without interruptions by another thread
+            return [result.withThreadStateUpdate(steppedThread.threadIndex, (ts) =>
+                ts.withComputationState(THREAD_STATE_RUNNING))];
+        }
+
+        if (nextOps.length == 0) {
+            // Set to THREAD_STATE_DONE if on a terminating location
+            result = result.withThreadStateUpdate(steppedThread.threadIndex, (ts) =>
+                ts.withComputationState(THREAD_STATE_DONE));
 
         } else {
-            // The current state is either in RUNNING or RUNNING_ATOMIC (otherwise, we should not have stepped it!)
-            const steppedThread = threadToStep.threadStatus;
+            // YIELD the current state if it is not yet on a terminating control location of the script.
+            result = result.withThreadStateUpdate(steppedThread.threadIndex, (ts) =>
+                ts.withComputationState(THREAD_STATE_YIELD));
+        }
 
-            // YIELD the current state if it is not yet on a terminating control location
-            // of the script.
-            const nextOps = this.resolveLeavingOps(threadToStep);
-            if (nextOps.length == 0) {
-                // Set to THREAD_STATE_DONE if on a terminating location
-                result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                    ts.withComputationState(THREAD_STATE_DONE));
-            }
+        // Determine and set the next thread to step
+        const continueWithNextThreadAt: number = this.determineNextNonObserverThreadToStep(result, steppedThread.threadIndex);
 
-            // Determine and set the next thread to step
-            const nextNonObserverThreadToStep: number = this.determineNextNonObserverThreadToStep(result, threadToStep.threadIndex);
-
-            if (nextOps.length > 0) {
-                result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                    ts.withComputationState(THREAD_STATE_YIELD));
-            }
-
-            if (nextNonObserverThreadToStep > -1) {
-                result = result.withThreadStateUpdate(nextNonObserverThreadToStep, (ts) =>
-                    ts.withComputationState(THREAD_STATE_RUNNING));
-            }
+        if (continueWithNextThreadAt > -1) {
+            result = result.withThreadStateUpdate(continueWithNextThreadAt, (ts) =>
+                ts.withComputationState(THREAD_STATE_RUNNING));
         }
 
         this.checkSchedule(result);
@@ -540,13 +567,16 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
     private checkSchedule(schedOf: ControlAbstractState) {
         let threadIndex = 0;
+        let running = 0;
         for (const ts of schedOf.getThreadStates()) {
             const ops = this.resolveLeavingOps(new IndexedThread(ts, threadIndex));
             if (ts.getComputationState() == THREAD_STATE_RUNNING) {
+                running++;
                 Preconditions.checkState(ops.length > 0);
             }
             threadIndex++;
         }
+        Preconditions.checkState(running <= 1);
     }
 
     private getAllMessageReceiverThreadsFrom(abstractState: ControlAbstractState, msg: string): IndexedThread[] {

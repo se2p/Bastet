@@ -121,7 +121,7 @@ import {CallStatement} from "../ast/core/statements/CallStatement";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {Statement} from "../ast/core/statements/Statement";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {ReturnStatement} from "../ast/core/statements/ControlStatement";
+import {BeginAtomicStatement, EndAtomicStatement, ReturnStatement} from "../ast/core/statements/ControlStatement";
 
 export enum DataLocationMode {
 
@@ -204,6 +204,14 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     private renameDeclaration(dataLoc: DataLocation): DataLocation {
         return this._renamer.renameUsage(dataLoc, DataLocationMode.ASSINGED_TO, this._activeStatement);
+    }
+
+    visitEndAtomicStatement(node: EndAtomicStatement): AstNode {
+        return node;
+    }
+
+    visitBeginAtomicStatement(node: BeginAtomicStatement): AstNode {
+        return node;
     }
 
     visitReturnStatement(node: ReturnStatement): AstNode {

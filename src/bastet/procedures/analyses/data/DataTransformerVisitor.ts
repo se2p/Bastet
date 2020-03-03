@@ -130,6 +130,7 @@ import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../domains/Con
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
+import {BeginAtomicStatement, EndAtomicStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 
 export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
     S extends AbstractString, L extends AbstractList>
@@ -416,6 +417,14 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
         } else if (method.startsWith("_RUNTIME_")) {
             throw new ImplementMeException();
         }
+        return this._mem;
+    }
+
+    visitBeginAtomicStatement(node: BeginAtomicStatement): B {
+        return this._mem;
+    }
+
+    visitEndAtomicStatement(node: EndAtomicStatement): B {
         return this._mem;
     }
 

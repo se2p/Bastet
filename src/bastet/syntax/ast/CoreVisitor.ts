@@ -66,7 +66,12 @@ import {
     StringVariableExpression
 } from "./core/expressions/StringExpression";
 import {ExpressionListExpression, ListVariableExpression} from "./core/expressions/ListExpression";
-import {IfStatement, RepeatForeverStatement, UntilStatement} from "./core/statements/ControlStatement";
+import {
+    BeginAtomicStatement, EndAtomicStatement,
+    IfStatement,
+    RepeatForeverStatement,
+    UntilStatement
+} from "./core/statements/ControlStatement";
 import {CallStatement} from "./core/statements/CallStatement";
 import {StatementList} from "./core/statements/Statement";
 import {DeclareStackVariableStatement} from "./core/statements/DeclarationStatement";
@@ -221,6 +226,10 @@ export interface CoreCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 }
 
 export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
+
+    visitBeginAtomicStatement(node: BeginAtomicStatement): R;
+
+    visitEndAtomicStatement(node: EndAtomicStatement): R;
 
     visitAssumeStatement(node: AssumeStatement): R;
 

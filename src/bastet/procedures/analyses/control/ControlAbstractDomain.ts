@@ -316,6 +316,26 @@ const ControlAbstractStateRecord = ImmRec({
 
 });
 
+export class IndexedThread {
+
+    private readonly _threadStatus: ThreadState;
+
+    private readonly _threadIndex: number;
+
+    constructor(threadStatus: ThreadState, threadIndex: number) {
+        this._threadStatus = Preconditions.checkNotUndefined(threadStatus);
+        this._threadIndex = threadIndex;
+    }
+
+    get threadStatus(): ThreadState {
+        return this._threadStatus;
+    }
+
+    get threadIndex(): number {
+        return this._threadIndex;
+    }
+}
+
 /**
  * A state with SHARED MEMORY
  */
@@ -325,6 +345,10 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
                 steppedThreadIndices: ImmSet<number>) {
         super({threadStates: threadStates, wrappedState: wrappedState, isTargetFor: isTargetFor,
             steppedThreadIndices: steppedThreadIndices});
+    }
+
+    public getIndexedThreadState(atIndex: number): IndexedThread {
+        return new IndexedThread(this.getThreadStates().get(atIndex), atIndex);
     }
 
     public getThreadStates(): ImmList<ThreadState> {
@@ -341,6 +365,18 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
 
     public getSteppedFor(): ImmSet<number> {
         return this.get("steppedThreadIndices");
+    }
+
+    public withWrappedState(wrapped: AbstractElement): ControlAbstractState {
+        return this.set('wrappedState', wrapped);
+    }
+
+    public withSteppedFor(steppedFor: Iterable<number>): ControlAbstractState {
+        return this.set('steppedThreadIndices', ImmSet(steppedFor));
+    }
+
+    public withIsTargetFor(targetFor: Iterable<Property>): ControlAbstractState {
+        return this.set('isTargetFor', ImmSet(targetFor));
     }
 
     public withThreadState(threadIndex: number, setStateTo: ThreadState): ControlAbstractState {
