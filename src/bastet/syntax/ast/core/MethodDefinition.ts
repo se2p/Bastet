@@ -112,15 +112,22 @@ export class MethodDefinition extends MethodSignature {
 
     private readonly _statements: StatementList;
 
-    constructor(ident: Identifier, params: ParameterDeclarationList, statements: StatementList, returns: ResultDeclaration) {
+    private readonly _isAtomic: boolean;
+
+    constructor(ident: Identifier, params: ParameterDeclarationList, statements: StatementList,
+                returns: ResultDeclaration, isAtomic: boolean) {
         super(ident, params, returns, false);
         this._statements = statements;
+        this._isAtomic = isAtomic;
     }
 
     get statements(): StatementList {
         return this._statements;
     }
 
+    get isAtomic(): boolean {
+        return this._isAtomic;
+    }
 }
 
 export class MethodDefinitionList extends AstNodeList<MethodDefinition> {

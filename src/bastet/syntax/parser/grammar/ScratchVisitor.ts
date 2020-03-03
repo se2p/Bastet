@@ -1,190 +1,189 @@
 // Generated from src/bastet/syntax/parser/grammar/Scratch.g4 by ANTLR 4.7.3-SNAPSHOT
 
 
-import {ParseTreeVisitor} from "antlr4ts/tree/ParseTreeVisitor";
+import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
 
-import {
-	ActorComponentsDefinitionContext,
-	ActorDefinitionContext,
-	ActorDefinitionListContext,
-	ActorModeContext,
-	ActorRoleModeContext,
-	AddElementToStatementContext,
-	AfterBootstrapMonitoringEventContext,
-	AfterStatementMonitoringEventContext,
-	AppMessageContext,
-	AssumeStatementContext,
-	AtomicBlockContext,
-	AtomicBlockStatementContext,
-	AttributedStatementContext,
-	BoolAndExpressionContext,
-	BoolAsNumExpressionContext,
-	BoolAsStringExpressionContext,
-	BoolCallStatementExpressionContext,
-	BooleanTypeContext,
-	BoolExprContext,
-	BoolLiteralExpressionContext,
-	BoolOrExpressionContext,
-	BoolParanthExpressionContext,
-	BoolVariableExpressionContext,
-	BootstapEventContext,
-	BroadcastAndWaitStatementContext,
-	BroadcastMessageStatementContext,
-	CallStmtContext,
-	CloneStartEventContext,
-	ColorContext,
-	ColorFromNumExpressionContext,
-	CommonStmtContext,
-	ConcreteActorModeContext,
-	ConditionReachedEventContext,
-	ControlStatementContext,
-	ControlStmtContext,
-	CoreBoolExprContext,
-	CoreControlStmtContext,
-	CoreEventContext,
-	CoreExpressionContext,
-	CoreNonCtrlStmtContext,
-	CoreNumExprContext,
-	CoreStringExprContext,
-	CreateCloneOfStatementContext,
-	DeclarationStmtContext,
-	DeclarationStmtListContext,
-	DeclareVariableContext,
-	DefaultBoolExpressionContext,
-	DefaultNumExprContext,
-	DefaultStringExpressionContext,
-	DeleteAllFromStatementContext,
-	DeleteIthFromStatementContext,
-	DeleteThisCloneContext,
-	ElseCaseContext,
-	EnumTypeContext,
-	EpsilonStatementContext,
-	EqualsExpressionContext,
-	EventContext,
-	ExpressionContext,
-	ExpressionListContext,
-	ExpressionListPlainContext,
-	ExpressionStmtContext,
-	ExternFunctionReturnDefinitionContext,
-	ExternMethodDefinitionContext,
-	ExternMethodDefinitionListContext,
-	ExternMethodResultDeclarationContext,
-	ExternVoidReturnDefinitionContext,
-	FileTypeContext,
-	FlatVariableContext,
-	FunctionReturnDefinitionContext,
-	GreaterThanExpressionContext,
-	IdentContext,
-	IdentExpressionContext,
-	IfStmtContext,
-	ImageResourceContext,
-	ImportAllActorsContext,
-	ImportDefinitionContext,
-	ImportDefinitionListContext,
-	ImportSelectedActorContext,
-	ImportSelectorContext,
-	IndexOfExpressionContext,
-	IndexTypeContext,
-	InheritsFromContext,
-	InsertAtStatementContext,
-	IthLetterOfStringExpressionContext,
-	IthStringItemOfExpressionContext,
-	JoinStringsExpressionContext,
-	KeyContext,
-	LengthOfListExpressionContext,
-	LengthOfStringExpressionContext,
-	LessThanExpressionContext,
-	ListExprContext,
-	ListStmtContext,
-	ListTypeContext,
-	ListVariableExpressionContext,
-	ListWithElementsExpressionContext,
-	MessageContext,
-	MessageReceivedEventContext,
-	MethodAttributeContext,
-	MethodAttributeListContext,
-	MethodDefinitionContext,
-	MethodDefinitionListContext,
-	MethodResultDeclarationContext,
-	NegatedBoolExpressionContext,
-	NeverEventContext,
-	NonControlStatementContext,
-	NonCtrlStmtContext,
-	NumAsStringExpressionContext,
-	NumberContext,
-	NumberExpressionContext,
-	NumberIndexTypeContext,
-	NumberTypeContext,
-	NumBracketsContext,
-	NumCallStatementExpressionContext,
-	NumDivExpressionContext,
-	NumExprContext,
-	NumLiteralExpressionContext,
-	NumMinusExpressionContext,
-	NumModExpressionContext,
-	NumMulExpressionContext,
-	NumOrStringExprContext,
-	NumPlusExpressionContext,
-	NumVariableExpressionContext,
-	ParameterContext,
-	ParameterListContext,
-	ParameterListPlainContext,
-	PrimitiveContext,
-	PrimitiveTypeContext,
-	ProgramContext,
-	QualifiedVariableContext,
-	RenderedMonitoringEventContext,
-	RepeatForeverStmtContext,
-	RepeatTimesStmtContext,
-	ReplaceElementAtStatementContext,
-	ResetTimerStatementContext,
-	ResourceAttributeOfExpressionContext,
-	ResourceContext,
-	ResourceListContext,
-	ResourceLocatorContext,
-	ResourceTypeContext,
-	RGBAColorExpressionContext,
-	ScriptContext,
-	ScriptListContext,
-	SetStatementContext,
-	SetStmtContext,
-	SetStmtListContext,
-	SoundResourceContext,
-	StartupEventContext,
-	StmtContext,
-	StmtListContext,
-	StmtListPlainContext,
-	StopAllContext,
-	StopOthersInActorStatementContext,
-	StopThisContext,
-	StoreCallResultStatementContext,
-	StoreEvalResultStatementContext,
-	StrContainsExpressionContext,
-	StrIdentExpressionContext,
-	StringAsNumExpressionContext,
-	StringAttributeOfExpressionContext,
-	StringCallStatementExpressionContext,
-	StringExprContext,
-	StringExpressionContext,
-	StringIndexTypeContext,
-	StringLiteralExpressionContext,
-	StringParanthExpressionContext,
-	StringTypeContext,
-	StringVariableExpressionContext,
-	SystemMessageContext,
-	TerminationStmtContext,
-	TimerExpressionContext,
-	TypeContext,
-	UnspecifiedBoolExpressionContext,
-	UnspecifiedExprContext,
-	UnspecifiedNumExprContext,
-	UnspecifiedStringExpressionContext,
-	UntilStmtContext,
-	VariableContext,
-	VoidReturnDefinitionContext,
-	WaitSecsStatementContext,
-	WaitUntilStatementContext
-} from "./ScratchParser";
+import { IdentExpressionContext } from "./ScratchParser";
+import { StrIdentExpressionContext } from "./ScratchParser";
+import { PrimitiveContext } from "./ScratchParser";
+import { ListTypeContext } from "./ScratchParser";
+import { ConcreteActorModeContext } from "./ScratchParser";
+import { ActorRoleModeContext } from "./ScratchParser";
+import { ExternFunctionReturnDefinitionContext } from "./ScratchParser";
+import { ExternVoidReturnDefinitionContext } from "./ScratchParser";
+import { StoreEvalResultStatementContext } from "./ScratchParser";
+import { StoreCallResultStatementContext } from "./ScratchParser";
+import { ListVariableExpressionContext } from "./ScratchParser";
+import { ListWithElementsExpressionContext } from "./ScratchParser";
+import { ImportSelectedActorContext } from "./ScratchParser";
+import { ImportAllActorsContext } from "./ScratchParser";
+import { StopAllContext } from "./ScratchParser";
+import { StopThisContext } from "./ScratchParser";
+import { DeleteThisCloneContext } from "./ScratchParser";
+import { NumberExpressionContext } from "./ScratchParser";
+import { StringExpressionContext } from "./ScratchParser";
+import { AtomicMethodContext } from "./ScratchParser";
+import { DeleteAllFromStatementContext } from "./ScratchParser";
+import { DeleteIthFromStatementContext } from "./ScratchParser";
+import { AddElementToStatementContext } from "./ScratchParser";
+import { InsertAtStatementContext } from "./ScratchParser";
+import { ReplaceElementAtStatementContext } from "./ScratchParser";
+import { RGBAColorExpressionContext } from "./ScratchParser";
+import { ColorFromNumExpressionContext } from "./ScratchParser";
+import { NeverEventContext } from "./ScratchParser";
+import { BootstapEventContext } from "./ScratchParser";
+import { AfterBootstrapMonitoringEventContext } from "./ScratchParser";
+import { StartupEventContext } from "./ScratchParser";
+import { CloneStartEventContext } from "./ScratchParser";
+import { MessageReceivedEventContext } from "./ScratchParser";
+import { ConditionReachedEventContext } from "./ScratchParser";
+import { RenderedMonitoringEventContext } from "./ScratchParser";
+import { AfterStatementMonitoringEventContext } from "./ScratchParser";
+import { FunctionReturnDefinitionContext } from "./ScratchParser";
+import { VoidReturnDefinitionContext } from "./ScratchParser";
+import { WaitSecsStatementContext } from "./ScratchParser";
+import { WaitUntilStatementContext } from "./ScratchParser";
+import { StopOthersInActorStatementContext } from "./ScratchParser";
+import { CreateCloneOfStatementContext } from "./ScratchParser";
+import { BroadcastMessageStatementContext } from "./ScratchParser";
+import { BroadcastAndWaitStatementContext } from "./ScratchParser";
+import { ResetTimerStatementContext } from "./ScratchParser";
+import { EpsilonStatementContext } from "./ScratchParser";
+import { AssumeStatementContext } from "./ScratchParser";
+import { SetStatementContext } from "./ScratchParser";
+import { BoolLiteralExpressionContext } from "./ScratchParser";
+import { BoolVariableExpressionContext } from "./ScratchParser";
+import { BoolParanthExpressionContext } from "./ScratchParser";
+import { BoolCallStatementExpressionContext } from "./ScratchParser";
+import { NegatedBoolExpressionContext } from "./ScratchParser";
+import { BoolAndExpressionContext } from "./ScratchParser";
+import { BoolOrExpressionContext } from "./ScratchParser";
+import { GreaterThanExpressionContext } from "./ScratchParser";
+import { LessThanExpressionContext } from "./ScratchParser";
+import { EqualsExpressionContext } from "./ScratchParser";
+import { StrContainsExpressionContext } from "./ScratchParser";
+import { DefaultBoolExpressionContext } from "./ScratchParser";
+import { UnspecifiedBoolExpressionContext } from "./ScratchParser";
+import { DeclareVariableContext } from "./ScratchParser";
+import { StringLiteralExpressionContext } from "./ScratchParser";
+import { StringVariableExpressionContext } from "./ScratchParser";
+import { StringParanthExpressionContext } from "./ScratchParser";
+import { StringCallStatementExpressionContext } from "./ScratchParser";
+import { NumAsStringExpressionContext } from "./ScratchParser";
+import { BoolAsStringExpressionContext } from "./ScratchParser";
+import { StringAttributeOfExpressionContext } from "./ScratchParser";
+import { ResourceAttributeOfExpressionContext } from "./ScratchParser";
+import { JoinStringsExpressionContext } from "./ScratchParser";
+import { IthLetterOfStringExpressionContext } from "./ScratchParser";
+import { IthStringItemOfExpressionContext } from "./ScratchParser";
+import { DefaultStringExpressionContext } from "./ScratchParser";
+import { UnspecifiedStringExpressionContext } from "./ScratchParser";
+import { NumberTypeContext } from "./ScratchParser";
+import { BooleanTypeContext } from "./ScratchParser";
+import { StringTypeContext } from "./ScratchParser";
+import { EnumTypeContext } from "./ScratchParser";
+import { AppMessageContext } from "./ScratchParser";
+import { SystemMessageContext } from "./ScratchParser";
+import { NumberIndexTypeContext } from "./ScratchParser";
+import { StringIndexTypeContext } from "./ScratchParser";
+import { FlatVariableContext } from "./ScratchParser";
+import { QualifiedVariableContext } from "./ScratchParser";
+import { NumLiteralExpressionContext } from "./ScratchParser";
+import { NumVariableExpressionContext } from "./ScratchParser";
+import { NumBracketsContext } from "./ScratchParser";
+import { NumCallStatementExpressionContext } from "./ScratchParser";
+import { StringAsNumExpressionContext } from "./ScratchParser";
+import { BoolAsNumExpressionContext } from "./ScratchParser";
+import { TimerExpressionContext } from "./ScratchParser";
+import { LengthOfStringExpressionContext } from "./ScratchParser";
+import { LengthOfListExpressionContext } from "./ScratchParser";
+import { IndexOfExpressionContext } from "./ScratchParser";
+import { NumMulExpressionContext } from "./ScratchParser";
+import { NumDivExpressionContext } from "./ScratchParser";
+import { NumModExpressionContext } from "./ScratchParser";
+import { NumPlusExpressionContext } from "./ScratchParser";
+import { NumMinusExpressionContext } from "./ScratchParser";
+import { DefaultNumExprContext } from "./ScratchParser";
+import { UnspecifiedNumExprContext } from "./ScratchParser";
+import { ControlStatementContext } from "./ScratchParser";
+import { NonControlStatementContext } from "./ScratchParser";
+import { AtomicBlockStatementContext } from "./ScratchParser";
+import { AttributedStatementContext } from "./ScratchParser";
+import { ImageResourceContext } from "./ScratchParser";
+import { SoundResourceContext } from "./ScratchParser";
+import { ProgramContext } from "./ScratchParser";
+import { FileTypeContext } from "./ScratchParser";
+import { ImportDefinitionListContext } from "./ScratchParser";
+import { ImportDefinitionContext } from "./ScratchParser";
+import { ImportSelectorContext } from "./ScratchParser";
+import { ActorDefinitionListContext } from "./ScratchParser";
+import { ActorDefinitionContext } from "./ScratchParser";
+import { InheritsFromContext } from "./ScratchParser";
+import { ActorModeContext } from "./ScratchParser";
+import { ActorComponentsDefinitionContext } from "./ScratchParser";
+import { ResourceContext } from "./ScratchParser";
+import { ResourceTypeContext } from "./ScratchParser";
+import { ResourceListContext } from "./ScratchParser";
+import { DeclarationStmtContext } from "./ScratchParser";
+import { DeclarationStmtListContext } from "./ScratchParser";
+import { TypeContext } from "./ScratchParser";
+import { PrimitiveTypeContext } from "./ScratchParser";
+import { IndexTypeContext } from "./ScratchParser";
+import { ScriptContext } from "./ScratchParser";
+import { ScriptListContext } from "./ScratchParser";
+import { EventContext } from "./ScratchParser";
+import { CoreEventContext } from "./ScratchParser";
+import { ExternMethodDefinitionContext } from "./ScratchParser";
+import { ExternMethodResultDeclarationContext } from "./ScratchParser";
+import { ExternMethodDefinitionListContext } from "./ScratchParser";
+import { MethodDefinitionContext } from "./ScratchParser";
+import { MethodResultDeclarationContext } from "./ScratchParser";
+import { MethodDefinitionListContext } from "./ScratchParser";
+import { MethodAttributeListContext } from "./ScratchParser";
+import { MethodAttributeContext } from "./ScratchParser";
+import { ParameterContext } from "./ScratchParser";
+import { ParameterListContext } from "./ScratchParser";
+import { ParameterListPlainContext } from "./ScratchParser";
+import { StmtListContext } from "./ScratchParser";
+import { AtomicBlockContext } from "./ScratchParser";
+import { StmtListPlainContext } from "./ScratchParser";
+import { ControlStmtContext } from "./ScratchParser";
+import { CoreControlStmtContext } from "./ScratchParser";
+import { IfStmtContext } from "./ScratchParser";
+import { ElseCaseContext } from "./ScratchParser";
+import { UntilStmtContext } from "./ScratchParser";
+import { RepeatTimesStmtContext } from "./ScratchParser";
+import { RepeatForeverStmtContext } from "./ScratchParser";
+import { CallStmtContext } from "./ScratchParser";
+import { ExpressionListContext } from "./ScratchParser";
+import { ExpressionListPlainContext } from "./ScratchParser";
+import { ExpressionStmtContext } from "./ScratchParser";
+import { StmtContext } from "./ScratchParser";
+import { NonCtrlStmtContext } from "./ScratchParser";
+import { CoreNonCtrlStmtContext } from "./ScratchParser";
+import { CommonStmtContext } from "./ScratchParser";
+import { ListStmtContext } from "./ScratchParser";
+import { SetStmtContext } from "./ScratchParser";
+import { SetStmtListContext } from "./ScratchParser";
+import { TerminationStmtContext } from "./ScratchParser";
+import { StringExprContext } from "./ScratchParser";
+import { CoreStringExprContext } from "./ScratchParser";
+import { BoolExprContext } from "./ScratchParser";
+import { CoreBoolExprContext } from "./ScratchParser";
+import { NumExprContext } from "./ScratchParser";
+import { NumOrStringExprContext } from "./ScratchParser";
+import { CoreNumExprContext } from "./ScratchParser";
+import { ListExprContext } from "./ScratchParser";
+import { ExpressionContext } from "./ScratchParser";
+import { CoreExpressionContext } from "./ScratchParser";
+import { UnspecifiedExprContext } from "./ScratchParser";
+import { VariableContext } from "./ScratchParser";
+import { ColorContext } from "./ScratchParser";
+import { IdentContext } from "./ScratchParser";
+import { NumberContext } from "./ScratchParser";
+import { KeyContext } from "./ScratchParser";
+import { ResourceLocatorContext } from "./ScratchParser";
+import { MessageContext } from "./ScratchParser";
 
 
 /**
@@ -346,6 +345,14 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitStringExpression?: (ctx: StringExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `AtomicMethod`
+	 * labeled alternative in `ScratchParser.methodAttribute`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitAtomicMethod?: (ctx: AtomicMethodContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `DeleteAllFromStatement`

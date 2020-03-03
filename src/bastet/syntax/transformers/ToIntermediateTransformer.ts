@@ -32,7 +32,7 @@ import {
     AfterBootstrapMonitoringEventContext,
     AfterStatementMonitoringEventContext,
     AppMessageContext,
-    AssumeStatementContext,
+    AssumeStatementContext, AtomicMethodContext,
     BoolAndExpressionContext,
     BoolAsNumExpressionContext,
     BoolAsStringExpressionContext,
@@ -921,8 +921,21 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TransformerResult(defs.statementsToPrepend, new ResourceDefinitionList(defs.nodeList));
     }
 
+    private parseIsAtomic(ctx: MethodDefinitionContext): boolean {
+        for (const attrib of ctx.methodAttributeList().methodAttribute()) {
+            if (attrib instanceof AtomicMethodContext) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public visitMethodDefinition(ctx: MethodDefinitionContext) : TransformerResult {
         const methodIdent: Identifier = ctx.ident().accept(this).nodeOnly() as Identifier;
+
+        const isAtomic = this.parseIsAtomic(ctx);
+
         this._activeActorTypes.beginScope(methodIdent.text);
         try {
             const resultDeclaration = ctx.methodResultDeclaration().accept(this).nodeOnly() as ResultDeclaration;
@@ -930,7 +943,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 methodIdent,
                 ctx.parameterList().accept(this).nodeOnly() as ParameterDeclarationList,
                 ctx.stmtList().accept(this).nodeOnly() as StatementList,
-                resultDeclaration));
+                resultDeclaration, isAtomic));
         } finally {
             this._activeActorTypes.endScope();
         }

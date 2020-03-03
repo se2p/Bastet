@@ -133,7 +133,7 @@ methodDefinitionList : methodDefinition* ;
 
 // Attributes that can be assinged to a method
 methodAttributeList : methodAttribute* ;
-methodAttribute : 'atomic' ;
+methodAttribute : 'atomic' # AtomicMethod ;
 
 // A procedure parameter.
 parameter : ident ':' type ;

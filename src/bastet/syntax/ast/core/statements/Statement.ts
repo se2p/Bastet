@@ -40,8 +40,15 @@ export class StatementLists {
 
 export class StatementList extends AstNodeList<Statement> {
 
-    constructor(elements: Statement[]) {
+    private readonly _isAtomic: boolean;
+
+    constructor(elements: Statement[], isAtomic: boolean = false) {
         super(elements);
+        this._isAtomic = isAtomic;
+    }
+
+    get isAtomic(): boolean {
+        return this._isAtomic;
     }
 
     private static readonly EMPTY_STATEMENTLIST: StatementList = new StatementList([]);

@@ -152,3 +152,32 @@ export class ReturnStatement extends Statement implements ControlStatement {
     }
 
 }
+
+export class BeginAtomicStatement extends Statement {
+
+    private readonly _atomicIncrement: number;
+
+    constructor() {
+        super([]);
+        this._atomicIncrement = 1;
+    }
+
+    get atomicIncrement(): number {
+        return this._atomicIncrement;
+    }
+}
+
+export class EndAtomicStatement extends Statement {
+
+    private readonly _atomicIncrement: number;
+
+    constructor() {
+        super([]);
+        this._atomicIncrement = -1;
+    }
+
+    get atomicIncrement(): number {
+        return this._atomicIncrement;
+    }
+}
+

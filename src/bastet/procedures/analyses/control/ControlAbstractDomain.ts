@@ -33,9 +33,9 @@ import {Property} from "../../../syntax/Property";
 import {TransRelId} from "../../../syntax/app/controlflow/TransitionRelation";
 import {ScriptId} from "../../../syntax/app/controlflow/Script";
 import {OperationId} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {Preconditions} from "../../../utils/Preconditions";
 
 export const THREAD_STATE_RUNNING = 1;
-export const THREAD_STATE_RUNNING_ATOMIC = 2;
 export const THREAD_STATE_WAIT = 3;
 export const THREAD_STATE_DONE = 4;
 export const THREAD_STATE_YIELD = 5;
@@ -162,6 +162,9 @@ export interface ThreadStateAttributes {
     /** Scope to uniquely identify currently declared and references variables (data locations) */
     scopeStack: ImmList<string>;
 
+    /** In atomic group? */
+    inAtomicMode: number;
+
 }
 
 const ThreadStateRecord = ImmRec({
@@ -174,17 +177,22 @@ const ThreadStateRecord = ImmRec({
     waitingForThreads: ImmSet<ThreadId>(),
     failedFor: ImmSet<Property>(),
     callStack: ImmList<MethodCall>(),
-    scopeStack: ImmList<string>()
+    scopeStack: ImmList<string>(),
+    inAtomicMode: 0
 });
 
 export class ThreadState extends ThreadStateRecord implements AbstractElement, ThreadStateAttributes {
 
     constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, operations: ImmList<OperationId>,
                 location: RelationLocation, compState: ThreadComputationState, waitingForThreads: ImmSet<ThreadId>,
-                failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, scopeStack: ImmList<string>) {
+                failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, scopeStack: ImmList<string>, inAtomicMode: number) {
         super({threadId: threadId, actorId: actorId, scriptId: scriptId, operations: operations, location: location,
             computationState: compState, waitingForThreads: waitingForThreads,
-            failedFor: failedFor, callStack: callStack, scopeStack: scopeStack});
+            failedFor: failedFor, callStack: callStack, scopeStack: scopeStack, inAtomicMode: inAtomicMode});
+    }
+
+    public getInAtomicMode(): number {
+        return this.get('inAtomicMode');
     }
 
     public getThreadId(): ThreadId {
@@ -253,6 +261,16 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     public withScopeStack(value: ImmList<string>): ThreadState {
         return this.set('scopeStack', value);
+    }
+
+    public withIncrementedAtomic(): ThreadState {
+        return this.set('inAtomicMode', this.getInAtomicMode() + 1);
+    }
+
+    public withDecrementedAtomic(): ThreadState {
+        const newValue = this.getInAtomicMode() - 1;
+        Preconditions.checkState(newValue >= 0);
+        return this.set('inAtomicMode', newValue);
     }
 
 }
@@ -324,6 +342,15 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
     public getSteppedFor(): ImmSet<number> {
         return this.get("steppedThreadIndices");
     }
+
+    public withThreadState(threadIndex: number, setStateTo: ThreadState): ControlAbstractState {
+       return this.set('threadStates', this.getThreadStates().set(threadIndex, setStateTo));
+    }
+
+    public withThreadStateUpdate(threadIndex: number, updateFn: (ts: ThreadState) => ThreadState): ControlAbstractState {
+        const toUpdate = this.getThreadStates().get(threadIndex);
+        return this.withThreadState(threadIndex, updateFn(toUpdate));
+    }
 }
 
 export class ScheduleAbstractStateFactory {
@@ -340,7 +367,7 @@ export class ScheduleAbstractStateFactory {
                 for (const locId of script.transitions.entryLocationSet) {
                     const loc: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, locId);
                     threads = threads.push(new ThreadState(threadId, actor.ident, script.id, ImmList(), loc,
-                        threadState, ImmSet(), ImmSet(), ImmList(), ImmList([actor.ident])));
+                        threadState, ImmSet(), ImmSet(), ImmList(), ImmList([actor.ident]), 0));
                 }
             }
         }
