@@ -253,6 +253,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         // TODO: Implement this
         //  1. Activate the specification check thread (`after statement finished`)
         //  2. Check if threads that wait for certain conditions can continue to run
+        //     (assume certain conditions to hold if this accelerates the analysis without being unsound)
         //
         return [inState];
     }
