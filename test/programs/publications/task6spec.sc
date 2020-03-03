@@ -41,16 +41,15 @@ actor DirectorObserver is Observer begin
     declare actor_2_last_y as number
     declare actor_2_last_x as number
 
-    define actor_1_id as "Zirkusdirektor-rennend"
-    define actor_2_id as "Affe"
-
     declare actor_1_moving_towards_2 as boolean
     declare actor_2_moving_towards_1 as boolean
 
-    define actor_1_moving_towards_2 as true
-
     declare last_change as number
+
     define last_change as _RUNTIME_millis()
+    define actor_1_moving_towards_2 as true
+    define actor_1_id as "Zirkusdirektor-rennend"
+    define actor_2_id as "Affe"
 
     // TODO: Store attributes as 'normal' variables of the actor?
     // TODO: Is the map datatype really needed?
@@ -80,10 +79,10 @@ actor DirectorObserver is Observer begin
         declare actor_1_x_move_towards_2 as boolean
         define actor_1_x_move_towards_2 as (actor_1_last_x = actor_2_last_x)
         if actor_2_last_x < actor_1_last_x then begin
-           define actor_1_x_move_towards_2 as (actor1_x < actor_1_last_x) or (actor1_x = actor_1_last_x)
+           define actor_1_x_move_towards_2 as (actor_1_x < actor_1_last_x) or (actor_1_x = actor_1_last_x)
         end
         if actor_2_last_x > actor_1_last_x then begin
-           define actor_1_x_move_towards_2 as (actor1_x > actor_1_last_x) or (actor1_x = actor_1_last_x)
+           define actor_1_x_move_towards_2 as (actor_1_x > actor_1_last_x) or (actor_1_x = actor_1_last_x)
         end
 
         declare actor_1_y_move_towards_2 as boolean
