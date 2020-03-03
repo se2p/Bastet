@@ -250,7 +250,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
     }
 
     private awaikConditionCheckThreads(inState: ControlAbstractState): ControlAbstractState[] {
-        throw new ImplementMeException();
+        // TODDO: Impelemnt this
+        return [inState];
     }
 
     private interprete(fromState: ControlAbstractState, threadToStep: IndexedThread, step: StepInformation): ControlAbstractState[] {
