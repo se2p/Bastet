@@ -243,17 +243,22 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result;
     }
 
-    private scopeOperations(ops: ProgramOperation[], readFromScope: ImmList<string>, writeToScope: ImmList<string>): ProgramOperation[] {
+    private scopeOperations(ops: ProgramOperation[], readFromScope: ImmList<string>,
+                            writeToScope: ImmList<string>): ProgramOperation[] {
         const scoper = new ScopeTransformerVisitor(readFromScope, writeToScope);
         return ops.map((o) => ProgramOperationFactory.createFor(o.ast.accept(scoper)));
     }
 
     private awaikConditionCheckThreads(inState: ControlAbstractState): ControlAbstractState[] {
-        // TODDO: Impelemnt this
+        // TODO: Implement this
+        //  1. Activate the specification check thread (`after statement finished`)
+        //  2. Check if threads that wait for certain conditions can continue to run
+        //
         return [inState];
     }
 
-    private interprete(fromState: ControlAbstractState, threadToStep: IndexedThread, step: StepInformation): ControlAbstractState[] {
+    private interprete(fromState: ControlAbstractState, threadToStep: IndexedThread,
+                       step: StepInformation): ControlAbstractState[] {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(threadToStep);
         Preconditions.checkNotUndefined(step);
@@ -298,7 +303,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 const succScopeStack = steppedThread.getScopeStack().push(calledMethodName);
 
                 for (const entryLocId of calledMethod.transitions.entryLocationSet) {
-                    const callToRelationLoc: RelationLocation = new RelationLocation(steppedActor.ident, calledMethod.transitions.ident, entryLocId);
+                    const callToRelationLoc: RelationLocation = new RelationLocation(
+                        steppedActor.ident, calledMethod.transitions.ident, entryLocId);
                     const currentScopeStack = steppedThread.getScopeStack();
 
                     result = fromState.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
