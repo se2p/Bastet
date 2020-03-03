@@ -189,8 +189,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
                 // Schedule the threads to run in the next iterations
                 for (const succState of succStates1) {
-                    const scheduledStates: ControlAbstractState[] = this.schedule(fromState, succState, threadToStep);
-                    result = result.concat(scheduledStates);
+                    result = result.concat(this.schedule(fromState, succState, threadToStep));
                 }
             }
         }
