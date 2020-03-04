@@ -31,8 +31,8 @@ import {AstNode, OptionalAstNode} from "../ast/AstNode";
 import {Preconditions} from "../../utils/Preconditions";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {ActorDefinition, ConcreteActorMode} from "../ast/core/ActorDefinition";
-import {NeverEvent} from "../ast/core/CoreEvent";
-import {ScriptDefinitionList} from "../ast/core/ScriptDefinition";
+import {CoreEvent, NeverEvent} from "../ast/core/CoreEvent";
+import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
     MethodDefinitionList,
     MethodDefinitionMap,
@@ -174,6 +174,10 @@ export class AppBuilder {
         return result;
     }
 
+    private shouldRestartOnEvent(script: ScriptDefinition, event: CoreEvent) {
+        return script.isRestart;
+    }
+
     private buildScripts(scriptList: ScriptDefinitionList): Script[] {
         let result: Script[] = [];
         for (let script of scriptList) {
@@ -182,7 +186,8 @@ export class AppBuilder {
             const transRelation = TransitionRelations.eliminateEpsilons(
                 script.stmtList.accept(visitor));
 
-            result.push(new Script(Scripts.freshScriptId(), event, transRelation));
+            result.push(new Script(Scripts.freshScriptId(), event,
+                this.shouldRestartOnEvent(script, event), transRelation));
         }
 
         return result;
@@ -216,7 +221,7 @@ export class AppBuilder {
         const transrelSet = stmtList.accept(visitor);
         const compundTransRel = TransitionRelations.concat(transrelRes,
             TransitionRelations.concat(transrelLocs, transrelSet));
-        return new Script(Scripts.freshScriptId(), NeverEvent.instance(), compundTransRel);
+        return new Script(Scripts.freshScriptId(), NeverEvent.instance(), false, compundTransRel);
     }
 
     private buildResources(resourceListContext: ResourceDefinitionList): AppResourceMap {

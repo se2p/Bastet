@@ -5,6 +5,7 @@ import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 
 import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
+import { RestartScriptContext } from "./ScratchParser";
 import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
 import { ConcreteActorModeContext } from "./ScratchParser";
@@ -131,6 +132,8 @@ import { PrimitiveTypeContext } from "./ScratchParser";
 import { IndexTypeContext } from "./ScratchParser";
 import { ScriptContext } from "./ScratchParser";
 import { ScriptListContext } from "./ScratchParser";
+import { ScriptAttributeListContext } from "./ScratchParser";
+import { ScriptAttributeContext } from "./ScratchParser";
 import { EventContext } from "./ScratchParser";
 import { CoreEventContext } from "./ScratchParser";
 import { ExternMethodDefinitionContext } from "./ScratchParser";
@@ -216,6 +219,19 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitStrIdentExpression?: (ctx: StrIdentExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `RestartScript`
+	 * labeled alternative in `ScratchParser.scriptAttribute`.
+	 * @param ctx the parse tree
+	 */
+	enterRestartScript?: (ctx: RestartScriptContext) => void;
+	/**
+	 * Exit a parse tree produced by the `RestartScript`
+	 * labeled alternative in `ScratchParser.scriptAttribute`.
+	 * @param ctx the parse tree
+	 */
+	exitRestartScript?: (ctx: RestartScriptContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `Primitive`
@@ -1814,6 +1830,28 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitScriptList?: (ctx: ScriptListContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `ScratchParser.scriptAttributeList`.
+	 * @param ctx the parse tree
+	 */
+	enterScriptAttributeList?: (ctx: ScriptAttributeListContext) => void;
+	/**
+	 * Exit a parse tree produced by `ScratchParser.scriptAttributeList`.
+	 * @param ctx the parse tree
+	 */
+	exitScriptAttributeList?: (ctx: ScriptAttributeListContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `ScratchParser.scriptAttribute`.
+	 * @param ctx the parse tree
+	 */
+	enterScriptAttribute?: (ctx: ScriptAttributeContext) => void;
+	/**
+	 * Exit a parse tree produced by `ScratchParser.scriptAttribute`.
+	 * @param ctx the parse tree
+	 */
+	exitScriptAttribute?: (ctx: ScriptAttributeContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.event`.

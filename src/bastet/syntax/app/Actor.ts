@@ -261,7 +261,7 @@ export class Actors {
             const bootstrapTransitions: TransitionRelation =
                 TransitionRelations.eliminateEpsilons(bootstrapStmts.accept(visitor));
             const bootstrapScript: Script = new Script(Scripts.freshScriptId(),
-                BootstrapEvent.instance(), bootstrapTransitions);
+                BootstrapEvent.instance(), false, bootstrapTransitions);
             Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [], [],
                 {}, {}, bootstrapScript, {}, {},
                 [bootstrapScript], []);

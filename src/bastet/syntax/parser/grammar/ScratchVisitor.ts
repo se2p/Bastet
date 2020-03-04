@@ -5,6 +5,7 @@ import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
 
 import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
+import { RestartScriptContext } from "./ScratchParser";
 import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
 import { ConcreteActorModeContext } from "./ScratchParser";
@@ -131,6 +132,8 @@ import { PrimitiveTypeContext } from "./ScratchParser";
 import { IndexTypeContext } from "./ScratchParser";
 import { ScriptContext } from "./ScratchParser";
 import { ScriptListContext } from "./ScratchParser";
+import { ScriptAttributeListContext } from "./ScratchParser";
+import { ScriptAttributeContext } from "./ScratchParser";
 import { EventContext } from "./ScratchParser";
 import { CoreEventContext } from "./ScratchParser";
 import { ExternMethodDefinitionContext } from "./ScratchParser";
@@ -209,6 +212,14 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitStrIdentExpression?: (ctx: StrIdentExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `RestartScript`
+	 * labeled alternative in `ScratchParser.scriptAttribute`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitRestartScript?: (ctx: RestartScriptContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `Primitive`
@@ -1197,6 +1208,20 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitScriptList?: (ctx: ScriptListContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `ScratchParser.scriptAttributeList`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitScriptAttributeList?: (ctx: ScriptAttributeListContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `ScratchParser.scriptAttribute`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitScriptAttribute?: (ctx: ScriptAttributeContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `ScratchParser.event`.

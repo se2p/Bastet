@@ -89,10 +89,14 @@ indexType : 'number' # NumberIndexType
 
 // A script is the central unit that of a Scratch program that
 // defines the behavior (and with it the control and data flow).
-script : 'script' 'on' event 'do' stmtList ;
+script : 'script' 'on' event 'do' scriptAttributeList stmtList ;
 
 // A list of scripts.
 scriptList : script* ;
+
+// Attributes that can be assinged to a script
+scriptAttributeList : scriptAttribute* ;
+scriptAttribute : 'restart' # RestartScript ;
 
 // Scratch programs are written in an event-driven manner.
 // The different events that can trigger the execution

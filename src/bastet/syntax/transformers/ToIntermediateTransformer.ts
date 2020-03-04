@@ -124,7 +124,7 @@ import {
     ResetTimerStatementContext,
     ResourceContext,
     ResourceListContext,
-    ResourceLocatorContext,
+    ResourceLocatorContext, RestartScriptContext,
     ScriptContext,
     ScriptListContext,
     SetStatementContext,
@@ -981,10 +981,21 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(StatementLists.concat(stmts.statementsToPrepend, new StatementList(stmts.nodeList)));
     }
 
+    private parseIsRestart(ctx: ScriptContext): boolean {
+        for (const attrib of ctx.scriptAttributeList().scriptAttribute()) {
+            if (attrib instanceof RestartScriptContext) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public visitScript(ctx: ScriptContext) : TransformerResult {
         return TransformerResult.withNode(new ScriptDefinition(
             ctx.event().accept(this).nodeOnly() as CoreEvent,
-            ctx.stmtList().accept(this).nodeOnly() as StatementList));
+            ctx.stmtList().accept(this).nodeOnly() as StatementList,
+            this.parseIsRestart(ctx)));
     }
 
     public visitScriptList(ctx: ScriptListContext) : TransformerResult {

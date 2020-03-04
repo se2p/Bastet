@@ -42,11 +42,15 @@ export class Script implements WithTransitionRelation {
     /** The transition relation of the script */
     private readonly _transitions: TransitionRelation;
 
-    constructor(id: ScriptId, event: CoreEvent, transitions: TransitionRelation) {
+    /** Restart the script in case the event is triggered? */
+    private readonly _restartOnTriggered: boolean;
+
+    constructor(id: ScriptId, event: CoreEvent, restart: boolean, transitions: TransitionRelation) {
         Preconditions.checkNotUndefined(event);
         Preconditions.checkNotUndefined(transitions);
         this._id = id;
         this._event = event;
+        this._restartOnTriggered = restart;
         this._transitions = transitions;
     }
 
@@ -60,6 +64,10 @@ export class Script implements WithTransitionRelation {
 
     get id(): number {
         return this._id;
+    }
+
+    get restartOnTriggered(): boolean {
+        return this._restartOnTriggered;
     }
 
     public getInitialLocation(): LocationId {

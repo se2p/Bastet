@@ -27,12 +27,16 @@ import {CoreEvent} from "./CoreEvent";
 export class ScriptDefinition extends AbstractNode {
 
     private readonly _event: CoreEvent;
+
     private readonly _stmtList: StatementList;
 
-    constructor(event: CoreEvent, stmtList: StatementList) {
+    private readonly _isRestart: boolean;
+
+    constructor(event: CoreEvent, stmtList: StatementList, restart: boolean) {
         super([event, stmtList]);
         this._event = event;
         this._stmtList = stmtList;
+        this._isRestart = restart;
     }
 
     get event(): CoreEvent {
@@ -43,6 +47,9 @@ export class ScriptDefinition extends AbstractNode {
         return this._stmtList;
     }
 
+    get isRestart(): boolean {
+        return this._isRestart;
+    }
 }
 
 export class ScriptDefinitionList extends AstNodeList<ScriptDefinition> {
