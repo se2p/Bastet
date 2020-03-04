@@ -25,10 +25,24 @@ import {ChooseOperator, StateSet} from "./StateSet";
 import {Preconditions} from "../../utils/Preconditions";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
+import {BastetConfiguration} from "../../utils/BastetConfiguration";
+import {ExportFunction, resolveResultExportFunction} from "../analyses/Analyses";
 
 export const STAT_KEY_REACH_ITERATIONS = "iterations";
 export const STAT_KEY_REACH_REACHED = "reached states";
 export const STAT_KEY_REACH_FRONTIER = "frontier states";
+
+export class ReachabilityAlgorithmConfig extends BastetConfiguration {
+
+    constructor(dict: {}) {
+        super(dict);
+    }
+
+    get dumpGraphAfterIteration(): boolean {
+        return this.getBoolProperty('dump-graph-after-iteration', true);
+    }
+
+}
 
 /**
  * The implementation of this algorithm is inspired by the
@@ -40,11 +54,16 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
     private readonly _analysis: ProgramAnalysis<C, E>;
     private readonly _chooseOp: ChooseOperator<E>;
     private readonly _statistics: AnalysisStatistics;
+    private readonly _config: ReachabilityAlgorithmConfig;
 
-    constructor(analysis: ProgramAnalysis<C, E>, chooseOp: ChooseOperator<E>, statistics: AnalysisStatistics) {
+    private _exportFunction: ExportFunction;
+
+    constructor(config: {}, analysis: ProgramAnalysis<C, E>, chooseOp: ChooseOperator<E>, statistics: AnalysisStatistics) {
+        this._config = new ReachabilityAlgorithmConfig(config);
         this._analysis = Preconditions.checkNotUndefined(analysis);
         this._chooseOp = Preconditions.checkNotUndefined(chooseOp);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
+        this._exportFunction = resolveResultExportFunction(this._analysis);
     }
 
     get analysis(): ProgramAnalysis<C, E> {
@@ -83,6 +102,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
                 reached.removeAll(removeFromReached);
                 reached.addAll(addToReached);
 
+
                 // STOP: Check for coverage (fixed point iteration)
                 const checkStopFor: E = ePrimePrime; // TODO: How does this interact with the 'merge' above
                 if (!this._analysis.stop(checkStopFor, reached)) {
@@ -94,6 +114,8 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
                         return this.takeNoteOfResult(frontier, reached);
                     }
                 }
+
+                this.algorithmMonitoringHook(frontier, reached);
             }
         }
 
@@ -107,4 +129,11 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
         return [frontier, reached];
     }
 
+    private algorithmMonitoringHook(frontier: StateSet<E>, reached: StateSet<E>) {
+        if (this._config.dumpGraphAfterIteration) {
+            if (this._exportFunction) {
+                this._exportFunction(reached, frontier);
+            }
+        }
+    }
 }

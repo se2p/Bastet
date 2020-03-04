@@ -3,6 +3,7 @@
 
 import {Bastet} from "./bastet/Bastet";
 
-new Bastet().run().catch((e) => {
+new Bastet().run().then(() => process.exit(0)).catch((e) => {
     console.error("Running BASTET failed with " + e);
 });
+

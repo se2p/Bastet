@@ -58,6 +58,8 @@ export class AnalysisProcedureFactory {
             private _result: MultiPropertyAnalysisResult;
 
             async run(task: App): Promise<MultiPropertyAnalysisResult> {
+                const config = {};
+
                 const smt = await SMTFactory.createZ3();
                 const bddlib = await BDDLibraryFactory.createBDDLib();
 
@@ -73,7 +75,7 @@ export class AnalysisProcedureFactory {
                 const dataAnalysis = new DataAnalysis(firstOrderLattice, bddlib.lattice, theories, this._statistics);
                 const ssaAnalysis = new SSAAnalysis(task, dataAnalysis, this._statistics);
                 const timeAnalysis = new TimeAnalysis(ssaAnalysis, this._statistics, new StaticTimeProfile());
-                const controlAnalysis = new ControlAnalysis({}, task, timeAnalysis, this._statistics);
+                const controlAnalysis = new ControlAnalysis(config, task, timeAnalysis, this._statistics);
                 const graphAnalysis = new GraphAnalysis(task, controlAnalysis, this._statistics);
                 const outerAnalysis = new StatsAnalysis<GraphConcreteState, GraphAbstractState>(graphAnalysis, this._statistics);
 
@@ -82,7 +84,7 @@ export class AnalysisProcedureFactory {
 
                 const chooseOpConfig = new ChooseOpConfig();
                 const chooseOp = frontier.createChooseOp(chooseOpConfig);
-                const reachabilityAlgorithm = new ReachabilityAlgorithm(outerAnalysis, chooseOp, this._statistics);
+                const reachabilityAlgorithm = new ReachabilityAlgorithm(config, outerAnalysis, chooseOp, this._statistics);
                 const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, outerAnalysis.refiner, outerAnalysis, this._statistics);
                 const multiPropertyAlgorithm = new MultiPropertyAlgorithm(task, bmcAlgorithm, outerAnalysis, this._statistics,
                     (v, s, u, stats) => this.onAnalysisResult(v, s, u, stats));

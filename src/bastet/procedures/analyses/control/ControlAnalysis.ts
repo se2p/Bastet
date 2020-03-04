@@ -44,7 +44,7 @@ import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 
-export class ScheduleAnalysisConfig extends BastetConfiguration {
+export class ControlAnalysisConfig extends BastetConfiguration {
 
     constructor(dict: {}) {
         super(dict);
@@ -60,7 +60,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     WrappingProgramAnalysis<ControlConcreteState, ControlAbstractState>,
     Unwrapper<ControlAbstractState, AbstractElement> {
 
-    private readonly _config: ScheduleAnalysisConfig;
+    private readonly _config: ControlAnalysisConfig;
 
     private readonly _abstractDomain: AbstractDomain<ControlConcreteState, ControlAbstractState>;
 
@@ -75,7 +75,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     private readonly _statistics: AnalysisStatistics;
 
     constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any>, statistics: AnalysisStatistics) {
-        this._config = new ScheduleAnalysisConfig(config);
+        this._config = new ControlAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new ControlAbstractDomain();
@@ -151,7 +151,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
 
     getTransitionLabel(from: ControlAbstractState, to: ControlAbstractState): ProgramOperation[] {
         const result: ProgramOperation[] = [];
-        for (const threadIdx of from.getSteppedFor().values()) {
+        for (const threadIdx of to.getSteppedFor().values()) {
             const steppedThread = from.getThreadStates().get(threadIdx);
             const succThread = to.getThreadStates().get(threadIdx);
             Preconditions.checkArgument(steppedThread.getScriptId() == succThread.getScriptId());

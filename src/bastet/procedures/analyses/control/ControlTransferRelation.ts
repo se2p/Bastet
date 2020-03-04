@@ -26,7 +26,7 @@ import {
     ThreadState
 } from "./ControlAbstractDomain";
 import {AbstractElement} from "../../../lattices/Lattice";
-import {ScheduleAnalysisConfig} from "./ControlAnalysis";
+import {ControlAnalysisConfig} from "./ControlAnalysis";
 import {App} from "../../../syntax/app/App";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
@@ -129,11 +129,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
     private readonly _wrappedTransferRelation: LabeledTransferRelation<AbstractElement>;
 
-    private readonly _config: ScheduleAnalysisConfig;
+    private readonly _config: ControlAnalysisConfig;
 
     private readonly _task: App;
 
-    constructor(config: ScheduleAnalysisConfig, task: App, wrappedTransferRelation: LabeledTransferRelation<AbstractElement>) {
+    constructor(config: ControlAnalysisConfig, task: App, wrappedTransferRelation: LabeledTransferRelation<AbstractElement>) {
         this._task = Preconditions.checkNotUndefined(task);
         this._config = Preconditions.checkNotUndefined(config);
         this._wrappedTransferRelation = Preconditions.checkNotUndefined(wrappedTransferRelation);
@@ -142,6 +142,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(fromState.wrappedState);
+
+        if (fromState.getIsTargetFor().size > 0) {
+            // No successor states after target states
+            return [];
+        }
 
         if (this._config.aggregateAtomicTransitions) {
             throw new ImplementMeException();
@@ -365,8 +370,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
             // Prepare the waiting threads for running
             for (const waitForThread of waitFor) {
-                result = result.withThreadStateUpdate(waitForThread.threadIndex, (ts) =>
-                    ts.withComputationState(ThreadComputationState.THREAD_STATE_YIELD));
+                result = this.restartThread(result, waitForThread.threadIndex);
             }
 
             return [[result, true]]
@@ -378,8 +382,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
             // Prepare the waiting threads for running
             for (const waitForThread of waitFor) {
-                result = result.withThreadStateUpdate(waitForThread.threadIndex, (ts) =>
-                    ts.withComputationState(ThreadComputationState.THREAD_STATE_YIELD));
+                result = this.restartThread(result, waitForThread.threadIndex);
             }
 
             if (waitFor.length > 0) {
