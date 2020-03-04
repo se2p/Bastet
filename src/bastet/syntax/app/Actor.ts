@@ -141,7 +141,7 @@ export class Actor {
 
         this._transRelMap = new ImmutableMap<TransRelId, TransitionRelation>(transRelMap.entries());
 
-        Preconditions.checkArgument(initScript.event === NeverEvent.instance()
+        Preconditions.checkArgument(initScript.event === BootstrapEvent.instance()
             || initScript.event === SingularityEvent.instance());
     }
 

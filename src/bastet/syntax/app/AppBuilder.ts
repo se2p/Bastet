@@ -31,7 +31,7 @@ import {AstNode, OptionalAstNode} from "../ast/AstNode";
 import {Preconditions} from "../../utils/Preconditions";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {ActorDefinition, ConcreteActorMode} from "../ast/core/ActorDefinition";
-import {CoreEvent, NeverEvent} from "../ast/core/CoreEvent";
+import {BootstrapEvent, CoreEvent, NeverEvent} from "../ast/core/CoreEvent";
 import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
     MethodDefinitionList,
@@ -118,7 +118,7 @@ export class AppBuilder {
         const initScript = this.buildInitScript(acd.resourceDefs, acd.declarationStmts, acd.initStmts);
         const methodDefs = this.buildMethodDefs(acd.methodDefs);
         const externalMethodSigs = this.buildExternalMethodSigs(acd.externalMethodDecls);
-        const scripts = this.buildScripts(acd.scriptList);
+        const scripts = this.buildScripts(acd.scriptList).concat([initScript]);
         const methods = this.buildMethods(acd.methodDefs);
 
         let inheritsFromActors: Actor[] = [];
@@ -221,7 +221,7 @@ export class AppBuilder {
         const transrelSet = stmtList.accept(visitor);
         const compundTransRel = TransitionRelations.concat(transrelRes,
             TransitionRelations.concat(transrelLocs, transrelSet));
-        return new Script(Scripts.freshScriptId(), NeverEvent.instance(), false, compundTransRel);
+        return new Script(Scripts.freshScriptId(), BootstrapEvent.instance(), false, compundTransRel);
     }
 
     private buildResources(resourceListContext: ResourceDefinitionList): AppResourceMap {
