@@ -51,6 +51,7 @@ import {Identifier} from "../ast/core/Identifier";
 import {VariableWithDataLocation} from "../ast/core/Variable";
 import {Logger} from "../../utils/Logger";
 import {ReturnStatement} from "../ast/core/statements/ControlStatement";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
 export class AppBuilder {
 
@@ -216,9 +217,17 @@ export class AppBuilder {
     private buildInitScript(resourceListContext: ResourceDefinitionList, declarationStmtList: StatementList,
                                    stmtList: StatementList): Script {
         const visitor = new RelationBuildingVisitor();
-        const transrelRes = resourceListContext.accept(visitor);
-        const transrelLocs = declarationStmtList.accept(visitor);
-        const transrelSet = stmtList.accept(visitor);
+
+        let transrelRes: TransitionRelation;
+        if (resourceListContext.elements.length > 0) {
+            // transrelRes: TransitionRelation = resourceListContext.accept(visitor);
+            throw new ImplementMeException(); // TODO: Ressources not yet supported. Implement this feature!
+        } else {
+            transrelRes = TransitionRelations.epsilon();
+        }
+
+        const transrelLocs: TransitionRelation = declarationStmtList.accept(visitor);
+        const transrelSet: TransitionRelation = stmtList.accept(visitor);
         const compundTransRel = TransitionRelations.concat(transrelRes,
             TransitionRelations.concat(transrelLocs, transrelSet));
         return new Script(Scripts.freshScriptId(), BootstrapEvent.instance(), false, compundTransRel);
