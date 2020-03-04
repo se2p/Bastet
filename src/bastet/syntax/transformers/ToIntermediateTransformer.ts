@@ -607,8 +607,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return result;
     }
 
-    private getOperand1(ctx: RuleNode): RuleNode {
-        return this.getArgumentNodes(ctx)[0];
+    private getOperand1(ctx: RuleNode): ParserRuleContext {
+        return this.getArgumentNodes(ctx)[0] as ParserRuleContext;
     }
 
     private parseOperand(ctx: RuleNode, index: number): TransformerResult {
@@ -633,8 +633,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return this.parseOperand(ctx, 1);
     }
 
-    private getOperand2(ctx: RuleNode): RuleNode {
-        return this.getArgumentNodes(ctx)[1];
+    private getOperand2(ctx: RuleNode): ParserRuleContext {
+        return this.getArgumentNodes(ctx)[1] as ParserRuleContext;
     }
 
     public visitProgram(ctx: ProgramContext): TransformerResult {
@@ -1073,7 +1073,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitUntilStmt (ctx: UntilStmtContext): TransformerResult {
-        const cond: TransformerResult = ctx.boolExpr().accept(this);
+        const cond: TransformerResult = this.ensureType(ctx, BooleanType.instance(), ctx.boolExpr().accept(this));
         const body: TransformerResult = ctx.stmtList().accept(this);
         return TransformerResult.withNode(
             new UntilQueriedConditionStatement(cond.node as BooleanExpression,
@@ -1089,7 +1089,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitIfStmt (ctx: IfStmtContext): TransformerResult {
-        const cond: TransformerResult = ctx.boolExpr().accept(this);
+        const cond: TransformerResult = this.ensureType(ctx, BooleanType.instance(), ctx.boolExpr().accept(this));
         return new TransformerResult(
             cond.statementsToPrepend,
             new IfStatement(
@@ -1300,8 +1300,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TTransformerResult(prepend, resultVarExpr);
     }
 
-    private evaluateIntoBooleanVariable(varExpr: BooleanVariableExpression, expr: RuleNode): TTransformerResult<BooleanVariableExpression> {
-        const tr1: TransformerResult = expr.accept(this);
+    private evaluateIntoBooleanVariable(varExpr: BooleanVariableExpression, expr: ParserRuleContext): TTransformerResult<BooleanVariableExpression> {
+        const tr1: TransformerResult = this.ensureType(expr, BooleanType.instance(),expr.accept(this));
 
         let prepend: StatementList = StatementList.empty();
         prepend = StatementLists.concat(prepend, tr1.statementsToPrepend);

@@ -443,7 +443,7 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitStringAttributeOfExpression(node: StringAttributeOfExpression): AstNode {
-        throw new ImplementMeException();
+        return new StringAttributeOfExpression(node.attribute.accept(this) as StringExpression, node.ofEntity);
     }
 
     visitStringLiteral(node: StringLiteral): AstNode {

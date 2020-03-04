@@ -593,7 +593,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             if (ts.getComputationState() == THREAD_STATE_RUNNING) {
                 running++;
                 if (ops.length == 0) {
-                   throw new IllegalStateException(`Running thread for actor ${ts.getActorId()} and script ${ts.getScriptId()} does not have leaving ops.`);
+                   throw new IllegalStateException(`Thread for actor ${ts.getActorId()}, script ${ts.getScriptId()}, on location ${ts.getRelationLocation().getLocationId()} does not have leaving ops.`);
                 }
             }
             threadIndex++;
