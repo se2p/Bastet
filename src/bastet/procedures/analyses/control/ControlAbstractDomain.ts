@@ -87,6 +87,10 @@ export class RelationLocation extends RelationLocationRecord implements ScriptLo
         return this.get('relation');
     }
 
+    public withLocationId(location: LocationId): RelationLocation {
+        return this.set("location", location);
+    }
+
 }
 
 export interface MethodCallAttributes {

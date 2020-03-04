@@ -68,6 +68,9 @@ import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressi
 import {AfterStatementMonitoringEvent, MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Concerns} from "../../../syntax/Concern";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import {Script} from "../../../syntax/app/controlflow/Script";
+import {getTheOnlyElement} from "../../../utils/Collectionts";
+import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 
 class StepInformation {
 
@@ -494,8 +497,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             const script = actor.getScript(threadState.getScriptId());
 
             if (script.event instanceof AfterStatementMonitoringEvent) {
-                result = result.withThreadStateUpdate(threadIndex, (ts) =>
-                    ts.withComputationState(THREAD_STATE_YIELD));
+                result = this.restartThread(inState, threadIndex);
             }
         }
 
@@ -506,6 +508,15 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return [result];
     }
 
+    private restartThread(baseState: ControlAbstractState, threadIndex: number): ControlAbstractState {
+        const threadState: ThreadState = baseState.getThreadStates().get(threadIndex);
+        const script: Script = this._task.getActorByName(threadState.getActorId()).getScript(threadState.getScriptId());
+        const startLocation: LocationId = getTheOnlyElement(script.transitions.entryLocationSet);
+
+        return baseState.withThreadStateUpdate(threadIndex,
+            (ts) => ts.withComputationState(THREAD_STATE_YIELD)
+                .withLocation(ts.getRelationLocation().withLocationId(startLocation)));
+    }
 
     private schedule(predState: ControlAbstractState, succState: ControlAbstractState,
                      steppedThreadIndex: number): ControlAbstractState[] {
