@@ -12,6 +12,8 @@ import { ConcreteActorModeContext } from "./ScratchParser";
 import { ActorRoleModeContext } from "./ScratchParser";
 import { ExternFunctionReturnDefinitionContext } from "./ScratchParser";
 import { ExternVoidReturnDefinitionContext } from "./ScratchParser";
+import { MessageNameSpaceContext } from "./ScratchParser";
+import { GlobalNameSpaceContext } from "./ScratchParser";
 import { StoreEvalResultStatementContext } from "./ScratchParser";
 import { StoreCallResultStatementContext } from "./ScratchParser";
 import { ListVariableExpressionContext } from "./ScratchParser";
@@ -83,7 +85,7 @@ import { NumberTypeContext } from "./ScratchParser";
 import { BooleanTypeContext } from "./ScratchParser";
 import { StringTypeContext } from "./ScratchParser";
 import { EnumTypeContext } from "./ScratchParser";
-import { AppMessageContext } from "./ScratchParser";
+import { UserMessageContext } from "./ScratchParser";
 import { SystemMessageContext } from "./ScratchParser";
 import { NumberIndexTypeContext } from "./ScratchParser";
 import { StringIndexTypeContext } from "./ScratchParser";
@@ -136,6 +138,7 @@ import { ScriptAttributeListContext } from "./ScratchParser";
 import { ScriptAttributeContext } from "./ScratchParser";
 import { EventContext } from "./ScratchParser";
 import { CoreEventContext } from "./ScratchParser";
+import { MessageNamespaceContext } from "./ScratchParser";
 import { ExternMethodDefinitionContext } from "./ScratchParser";
 import { ExternMethodResultDeclarationContext } from "./ScratchParser";
 import { ExternMethodDefinitionListContext } from "./ScratchParser";
@@ -310,6 +313,32 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitExternVoidReturnDefinition?: (ctx: ExternVoidReturnDefinitionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `MessageNameSpace`
+	 * labeled alternative in `ScratchParser.messageNamespace`.
+	 * @param ctx the parse tree
+	 */
+	enterMessageNameSpace?: (ctx: MessageNameSpaceContext) => void;
+	/**
+	 * Exit a parse tree produced by the `MessageNameSpace`
+	 * labeled alternative in `ScratchParser.messageNamespace`.
+	 * @param ctx the parse tree
+	 */
+	exitMessageNameSpace?: (ctx: MessageNameSpaceContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `GlobalNameSpace`
+	 * labeled alternative in `ScratchParser.messageNamespace`.
+	 * @param ctx the parse tree
+	 */
+	enterGlobalNameSpace?: (ctx: GlobalNameSpaceContext) => void;
+	/**
+	 * Exit a parse tree produced by the `GlobalNameSpace`
+	 * labeled alternative in `ScratchParser.messageNamespace`.
+	 * @param ctx the parse tree
+	 */
+	exitGlobalNameSpace?: (ctx: GlobalNameSpaceContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `StoreEvalResultStatement`
@@ -1235,17 +1264,17 @@ export interface ScratchListener extends ParseTreeListener {
 	exitEnumType?: (ctx: EnumTypeContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `AppMessage`
+	 * Enter a parse tree produced by the `UserMessage`
 	 * labeled alternative in `ScratchParser.message`.
 	 * @param ctx the parse tree
 	 */
-	enterAppMessage?: (ctx: AppMessageContext) => void;
+	enterUserMessage?: (ctx: UserMessageContext) => void;
 	/**
-	 * Exit a parse tree produced by the `AppMessage`
+	 * Exit a parse tree produced by the `UserMessage`
 	 * labeled alternative in `ScratchParser.message`.
 	 * @param ctx the parse tree
 	 */
-	exitAppMessage?: (ctx: AppMessageContext) => void;
+	exitUserMessage?: (ctx: UserMessageContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `SystemMessage`
@@ -1874,6 +1903,17 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitCoreEvent?: (ctx: CoreEventContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `ScratchParser.messageNamespace`.
+	 * @param ctx the parse tree
+	 */
+	enterMessageNamespace?: (ctx: MessageNamespaceContext) => void;
+	/**
+	 * Exit a parse tree produced by `ScratchParser.messageNamespace`.
+	 * @param ctx the parse tree
+	 */
+	exitMessageNamespace?: (ctx: MessageNamespaceContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.externMethodDefinition`.

@@ -37,6 +37,8 @@ import {AppToDot} from "./syntax/app/AppToDot";
 import {IllegalArgumentException} from "./core/exceptions/IllegalArgumentException";
 import {AnalysisStatistics} from "./procedures/analyses/AnalysisStatistics";
 
+const process = require('process');
+
 const commander = require('commander');
 
 /**
@@ -80,12 +82,12 @@ export class Bastet {
 
     public registerOnExitNotifiers() {
         process.on('SIGINT', function() {
-            console.log("Caught interrupt signal");
+            console.log("Caught SIGINT signal");
             process.exit();
         });
 
         process.on('beforeExit', function() {
-            console.log("Caught exit signal");
+            console.log("Caught beforeExit signal");
         });
     }
 

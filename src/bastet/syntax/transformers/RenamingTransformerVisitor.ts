@@ -110,7 +110,7 @@ import {ChangeVarByStatement} from "../ast/core/statements/ChangeVarByStatement"
 import {ChangeAttributeByStatement} from "../ast/core/statements/ChangeAttributeByStatement";
 import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
-import {AstNode, OptionalAstNode} from "../ast/AstNode";
+import {AbsentAstNode, AstNode, OptionalAstNode, PresentAstNode} from "../ast/AstNode";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {DataLocation} from "../app/controlflow/DataLocation";
@@ -122,6 +122,7 @@ import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {Statement} from "../ast/core/statements/Statement";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {BeginAtomicStatement, EndAtomicStatement, ReturnStatement} from "../ast/core/statements/ControlStatement";
+import {SystemMessage, UserMessage} from "../ast/core/Message";
 
 export enum DataLocationMode {
 
@@ -161,6 +162,22 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     visit(node: AstNode): AstNode {
         throw new ImplementMeException();
+    }
+
+    visitAbsentAstNode(node: AbsentAstNode<AstNode>): AstNode {
+        return node;
+    }
+
+    visitPresentAstNode(node: PresentAstNode<AstNode>): AstNode {
+        return OptionalAstNode.with(node.value().accept(this));
+    }
+
+    visitOptionalAstNode(node: OptionalAstNode<AstNode>): AstNode {
+        if (node.isPresent()) {
+            return OptionalAstNode.with(node.value().accept(this));
+        } else {
+            return OptionalAstNode.absent();
+        }
     }
 
     private doForStatement(stmt: Statement, cb: () => AstNode): AstNode {
@@ -483,14 +500,24 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): AstNode {
         return this.doForStatement(node, (() => {
             return new BroadcastAndWaitStatement(
-                node.msg.accept(this) as StringExpression);
+                node.msg.accept(this) as SystemMessage);
         }));
+    }
+
+    visitUserMessage(node: UserMessage): AstNode {
+        return new UserMessage(node.messageid.accept(this) as StringExpression);
+    }
+
+    visitSystemMessage(node: SystemMessage): AstNode {
+       return new SystemMessage(node.namespace,
+           node.messageid.accept(this) as StringExpression,
+           node.payload.accept(this) as OptionalAstNode<Expression>) ;
     }
 
     visitBroadcastMessageStatement(node: BroadcastMessageStatement): AstNode {
         return this.doForStatement(node, (() => {
             return new BroadcastMessageStatement(
-                node.msg.accept(this) as StringExpression);
+                node.msg.accept(this) as SystemMessage);
         }));
     }
 

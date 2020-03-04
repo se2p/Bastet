@@ -52,7 +52,7 @@ import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
 import {NumberType} from "../../../syntax/ast/core/ScratchType";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
-import {INIT_MESSAGE} from "../../../syntax/ast/core/Message";
+import {BOOTSTRAP_MESSAGE} from "../../../syntax/ast/core/Message";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
 
@@ -85,7 +85,7 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
     private isBootstrapOperation(op: ProgramOperation): boolean {
         if (op.ast instanceof BroadcastAndWaitStatement) {
             const bcw = op.ast as BroadcastAndWaitStatement;
-            if (bcw.msg === INIT_MESSAGE.messageid) {
+            if (bcw.msg.messageid == BOOTSTRAP_MESSAGE.messageid) {
                 return true;
             }
         }

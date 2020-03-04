@@ -28,7 +28,7 @@ import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ConcreteDomain} from "../../domains/ConcreteElements";
 import {App} from "../../../syntax/app/App";
-import {BootstrapEvent} from "../../../syntax/ast/core/CoreEvent";
+import {BootstrapEvent, SingularityEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Property} from "../../../syntax/Property";
 import {TransRelId} from "../../../syntax/app/controlflow/TransitionRelation";
 import {ScriptId} from "../../../syntax/app/controlflow/Script";
@@ -410,6 +410,7 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
 export class ScheduleAbstractStateFactory {
 
     static createInitialState(task: App, wrappedState: ImmRec<any>, isTarget) {
+        let singular = false;
         let threads = ImmList<ThreadState>([]);
         for (const actor of task.actors) {
             for (const script of actor.scripts) {
@@ -421,8 +422,10 @@ export class ScheduleAbstractStateFactory {
 
                 const threadId = ThreadStateFactory.freshId();
                 let threadState = ThreadComputationState.THREAD_STATE_WAIT;
-                if (script.event === BootstrapEvent.instance()) {
+                if (script.event === SingularityEvent.instance()) {
+                    Preconditions.checkState(!singular);
                     threadState = ThreadComputationState.THREAD_STATE_RUNNING;
+                    singular = true;
                 }
 
                 for (const locId of script.transitions.entryLocationSet) {

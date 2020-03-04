@@ -23,7 +23,7 @@ import {AbstractNode} from "../AstNode";
 import {StringExpression, StringLiteral} from "./expressions/StringExpression";
 import {BooleanExpression} from "./expressions/BooleanExpression";
 import {StatementList} from "./statements/Statement";
-import {AFTER_BOOTSTRAP_MESSAGE, GREENFLAG_MESSAGE, INIT_MESSAGE, Message} from "./Message";
+import {BOOTSTRAP_FINISHED_MESSAGE, GREENFLAG_MESSAGE, BOOTSTRAP_MESSAGE, Message, SYSTEM_NAMESPACE} from "./Message";
 
 export abstract class CoreEvent extends AbstractNode {
 
@@ -52,7 +52,7 @@ export class MessageReceivedEvent extends CoreEvent {
 export class BootstrapEvent extends MessageReceivedEvent {
 
     constructor() {
-        super(StringLiteral.from("RUNTIME"), INIT_MESSAGE.messageid);
+        super(SYSTEM_NAMESPACE, BOOTSTRAP_MESSAGE.messageid);
     }
 
     private static INSTANCE: BootstrapEvent;
@@ -69,7 +69,7 @@ export class BootstrapEvent extends MessageReceivedEvent {
 export class StartupEvent extends MessageReceivedEvent {
 
     constructor() {
-        super(StringLiteral.from("RUNTIME"), GREENFLAG_MESSAGE.messageid);
+        super(SYSTEM_NAMESPACE, GREENFLAG_MESSAGE.messageid);
     }
 
     private static INSTANCE: StartupEvent;
@@ -100,6 +100,26 @@ export class NeverEvent extends CoreEvent {
 
 }
 
+/**
+ * The Big Bang.
+ */
+export class SingularityEvent extends CoreEvent {
+
+    constructor() {
+        super([]);
+    }
+
+    private static INSTANCE: SingularityEvent;
+
+    public static instance(): SingularityEvent {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new SingularityEvent();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
 export class RenderedMonitoringEvent extends CoreEvent {
 
     constructor() {
@@ -120,7 +140,7 @@ export class RenderedMonitoringEvent extends CoreEvent {
 export class AfterBootstrapMonitoringEvent extends MessageReceivedEvent {
 
     constructor() {
-        super(StringLiteral.from("RUNTIME"), AFTER_BOOTSTRAP_MESSAGE.messageid);
+        super(SYSTEM_NAMESPACE, BOOTSTRAP_FINISHED_MESSAGE.messageid);
     }
 
     private static INSTANCE: AfterBootstrapMonitoringEvent;

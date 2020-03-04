@@ -41,7 +41,7 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
 
         const wrappedLabel: string = element.getWrappedState().accept(this);
         const controlLabel: string = element.getThreadStates()
-            .map((t, i) => `${stepped(i) ? "*" : ""}[${t.getThreadId()} ${t.getActorId()} ${t.getScriptId()} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()}]`)
+            .map((t, i) => `${stepped(i) ? "*" : ""}[${t.getThreadId()} ${t.getActorId()} ${t.getScriptId()} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()} ${t.getWaitingForThreads().join("+")}]`)
             .join("\n");
         return `${controlLabel}\n${wrappedLabel}`;
     }

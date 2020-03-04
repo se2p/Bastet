@@ -35,16 +35,17 @@ import {
     AfterStatementMonitoringEvent,
     BootstrapEvent,
     NeverEvent,
-    RenderedMonitoringEvent
+    RenderedMonitoringEvent, SingularityEvent
 } from "../ast/core/CoreEvent";
 import {TransitionRelation, TransitionRelations, TransRelId} from "./controlflow/TransitionRelation";
 import {Scripts} from "./controlflow/Scripts";
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
-import {AFTER_BOOTSTRAP_MESSAGE, GREENFLAG_MESSAGE, INIT_MESSAGE} from "../ast/core/Message";
+import {BOOTSTRAP_FINISHED_MESSAGE, GREENFLAG_MESSAGE, BOOTSTRAP_MESSAGE} from "../ast/core/Message";
 import {StatementList} from "../ast/core/statements/Statement";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -141,7 +142,7 @@ export class Actor {
         this._transRelMap = new ImmutableMap<TransRelId, TransitionRelation>(transRelMap.entries());
 
         Preconditions.checkArgument(initScript.event === NeverEvent.instance()
-            || initScript.event === BootstrapEvent.instance());
+            || initScript.event === SingularityEvent.instance());
     }
 
     get ident(): string {
@@ -238,7 +239,7 @@ export class Actor {
 
     get isBootstrapper(): boolean {
         for (const s of this.scripts) {
-            if (s.event === BootstrapEvent.instance()) {
+            if (s.event === SingularityEvent.instance()) {
                 return true;
             }
         }
@@ -253,15 +254,16 @@ export class Actors {
     public static defaultBoostraper(): Actor {
         if (!Actors._DEFAULT_BOOTSTRAPPER) {
             const bootstrapStmts = new StatementList([
-                new BroadcastAndWaitStatement(INIT_MESSAGE.messageid),
-                new BroadcastAndWaitStatement(AFTER_BOOTSTRAP_MESSAGE.messageid),
-                new BroadcastMessageStatement(GREENFLAG_MESSAGE.messageid),
+                new EpsilonStatement(),
+                new BroadcastAndWaitStatement(BOOTSTRAP_MESSAGE),
+                new BroadcastAndWaitStatement(BOOTSTRAP_FINISHED_MESSAGE),
+                new BroadcastMessageStatement(GREENFLAG_MESSAGE),
             ]);
             const visitor: RelationBuildingVisitor = new RelationBuildingVisitor();
             const bootstrapTransitions: TransitionRelation =
                 TransitionRelations.eliminateEpsilons(bootstrapStmts.accept(visitor));
             const bootstrapScript: Script = new Script(Scripts.freshScriptId(),
-                BootstrapEvent.instance(), false, bootstrapTransitions);
+                SingularityEvent.instance(), false, bootstrapTransitions);
             Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [], [],
                 {}, {}, bootstrapScript, {}, {},
                 [bootstrapScript], []);

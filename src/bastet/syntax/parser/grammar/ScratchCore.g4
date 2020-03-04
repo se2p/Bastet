@@ -109,11 +109,13 @@ coreEvent :
  |  'bootstrap' 'finished' # AfterBootstrapMonitoringEvent
  |  'startup' # StartupEvent
  |  'started' 'as' 'clone' # CloneStartEvent
- |  'received' 'message' stringExpr 'in' String # MessageReceivedEvent
+ |  'received' 'message' stringExpr messageNamespace # MessageReceivedEvent
  |  'reached condition' boolExpr # ConditionReachedEvent
  |  'rendered' # RenderedMonitoringEvent
  |  'statement' 'finished' # AfterStatementMonitoringEvent
  ;
+
+messageNamespace : 'in' String # MessageNameSpace | #GlobalNameSpace;
 
 // Scratch allows to define procedures, that is,
 // reusable code blocks (also known as 'custom blocks').
@@ -355,11 +357,6 @@ variable :
       ident # FlatVariable
     | ident '.' ident # QualifiedVariable;
 
-color :
-    'rgba' numExpr numExpr numExpr numExpr # RGBAColorExpression
- |  'from' 'number' numExpr # ColorFromNumExpression
- ;
-
 ident :
     Identifier # IdentExpression
     | 'strid' String # StrIdentExpression
@@ -373,6 +370,6 @@ key : 'key' numExpr ;
 
 resourceLocator : String ;
 
-message : stringExpr # AppMessage
+message : stringExpr # UserMessage
     | String '/' stringExpr # SystemMessage
     ;

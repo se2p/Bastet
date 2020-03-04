@@ -70,6 +70,7 @@ import {Script} from "../../../syntax/app/controlflow/Script";
 import {getTheOnlyElement} from "../../../utils/Collectionts";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {StateLabelVisitor} from "../StateVisitors";
+import {SystemMessage} from "../../../syntax/ast/core/Message";
 
 class StepInformation {
 
@@ -360,8 +361,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         } else if (stepOp.ast instanceof BroadcastMessageStatement) {
             const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
-            const msg: string = this.evaluateToConcreteMessage(stmt.msg);
-            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(result, msg);
+            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(result, stmt.msg);
 
             // Prepare the waiting threads for running
             for (const waitForThread of waitFor) {
@@ -374,13 +374,17 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         } else if (stepOp.ast instanceof BroadcastAndWaitStatement) {
             const steppedThread = threadToStep.threadStatus;
             const stmt: BroadcastAndWaitStatement = stepOp.ast as BroadcastAndWaitStatement;
-            const msg: string = this.evaluateToConcreteMessage(stmt.msg);
-            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(result, msg);
+            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(result, stmt.msg);
 
             // Prepare the waiting threads for running
             for (const waitForThread of waitFor) {
                 result = result.withThreadStateUpdate(waitForThread.threadIndex, (ts) =>
                     ts.withComputationState(ThreadComputationState.THREAD_STATE_YIELD));
+            }
+
+            if (waitFor.length > 0) {
+                result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                    ts.withComputationState(ThreadComputationState.THREAD_STATE_WAIT));
             }
 
             // Wait for all triggered threads to finish
@@ -629,7 +633,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         Preconditions.checkState(running <= 1);
     }
 
-    private getAllMessageReceiverThreadsFrom(abstractState: ControlAbstractState, msg: string): IndexedThread[] {
+    private getAllMessageReceiverThreadsFrom(abstractState: ControlAbstractState, msg: SystemMessage): IndexedThread[] {
         const result: IndexedThread[] = [];
         let index = 0;
         for (const t of abstractState.getThreadStates()) {
@@ -640,8 +644,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
             if (script.event instanceof MessageReceivedEvent) {
                 const ev: MessageReceivedEvent = script.event as MessageReceivedEvent;
-                const handled = this.evaluateToConcreteMessage(ev.message);
-                if (msg == handled) {
+                if (this.matchesMessage(ev.message, ev.namespace, msg)) {
                     result.push(new IndexedThread(t, index));
                 }
             }
@@ -650,11 +653,20 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result;
     }
 
-    private evaluateToConcreteMessage(msg: StringExpression) {
+    private evaluateToConcreteMessage(msg: StringExpression): string {
         if (msg instanceof StringLiteral) {
             const lit = msg as StringLiteral;
             return lit.text;
         }
         throw new ImplementMeException();
+    }
+
+    private matchesMessage(message: StringExpression, namespace: StringExpression, msg: SystemMessage) {
+        const msg1_namespace: string = this.evaluateToConcreteMessage(msg.namespace);
+        const msg1_message: string = this.evaluateToConcreteMessage(msg.messageid);
+
+        const msg2_message: string = this.evaluateToConcreteMessage(message);
+
+        return msg1_message == msg2_message;
     }
 }

@@ -12,6 +12,8 @@ import { ConcreteActorModeContext } from "./ScratchParser";
 import { ActorRoleModeContext } from "./ScratchParser";
 import { ExternFunctionReturnDefinitionContext } from "./ScratchParser";
 import { ExternVoidReturnDefinitionContext } from "./ScratchParser";
+import { MessageNameSpaceContext } from "./ScratchParser";
+import { GlobalNameSpaceContext } from "./ScratchParser";
 import { StoreEvalResultStatementContext } from "./ScratchParser";
 import { StoreCallResultStatementContext } from "./ScratchParser";
 import { ListVariableExpressionContext } from "./ScratchParser";
@@ -83,7 +85,7 @@ import { NumberTypeContext } from "./ScratchParser";
 import { BooleanTypeContext } from "./ScratchParser";
 import { StringTypeContext } from "./ScratchParser";
 import { EnumTypeContext } from "./ScratchParser";
-import { AppMessageContext } from "./ScratchParser";
+import { UserMessageContext } from "./ScratchParser";
 import { SystemMessageContext } from "./ScratchParser";
 import { NumberIndexTypeContext } from "./ScratchParser";
 import { StringIndexTypeContext } from "./ScratchParser";
@@ -136,6 +138,7 @@ import { ScriptAttributeListContext } from "./ScratchParser";
 import { ScriptAttributeContext } from "./ScratchParser";
 import { EventContext } from "./ScratchParser";
 import { CoreEventContext } from "./ScratchParser";
+import { MessageNamespaceContext } from "./ScratchParser";
 import { ExternMethodDefinitionContext } from "./ScratchParser";
 import { ExternMethodResultDeclarationContext } from "./ScratchParser";
 import { ExternMethodDefinitionListContext } from "./ScratchParser";
@@ -268,6 +271,22 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitExternVoidReturnDefinition?: (ctx: ExternVoidReturnDefinitionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `MessageNameSpace`
+	 * labeled alternative in `ScratchParser.messageNamespace`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitMessageNameSpace?: (ctx: MessageNameSpaceContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `GlobalNameSpace`
+	 * labeled alternative in `ScratchParser.messageNamespace`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitGlobalNameSpace?: (ctx: GlobalNameSpaceContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `StoreEvalResultStatement`
@@ -838,12 +857,12 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitEnumType?: (ctx: EnumTypeContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `AppMessage`
+	 * Visit a parse tree produced by the `UserMessage`
 	 * labeled alternative in `ScratchParser.message`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitAppMessage?: (ctx: AppMessageContext) => Result;
+	visitUserMessage?: (ctx: UserMessageContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `SystemMessage`
@@ -1236,6 +1255,13 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitCoreEvent?: (ctx: CoreEventContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `ScratchParser.messageNamespace`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitMessageNamespace?: (ctx: MessageNamespaceContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `ScratchParser.externMethodDefinition`.

@@ -31,7 +31,7 @@ import {
     AddElementToStatementContext,
     AfterBootstrapMonitoringEventContext,
     AfterStatementMonitoringEventContext,
-    AppMessageContext,
+    UserMessageContext,
     AssumeStatementContext, AtomicMethodContext,
     BoolAndExpressionContext,
     BoolAsNumExpressionContext,
@@ -289,7 +289,7 @@ import {
     StopAllStatement,
     StopThisStatement
 } from "../ast/core/statements/TerminationStatement";
-import {SystemMessage} from "../ast/core/Message";
+import {SystemMessage, UserMessage} from "../ast/core/Message";
 import {StopOthersInActorStatement} from "../ast/core/statements/StopOthersInActorStatement";
 import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
@@ -1419,14 +1419,14 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     public visitBroadcastAndWaitStatement(ctx: BroadcastAndWaitStatementContext) : TransformerResult {
         const exprTr = ctx.message().accept(this);
         return new TransformerResult(exprTr.statementsToPrepend,
-            new BroadcastAndWaitStatement(exprTr.node as StringExpression));
+            new BroadcastAndWaitStatement(exprTr.node as SystemMessage));
     }
 
     public visitBroadcastMessageStatement(ctx: BroadcastMessageStatementContext) : TransformerResult {
         const exprTr = ctx.message().accept(this);
         return new TransformerResult(
             exprTr.statementsToPrepend,
-            new BroadcastMessageStatement(exprTr.node as StringExpression));
+            new BroadcastMessageStatement(exprTr.node as SystemMessage));
     }
 
     public visitCallStmt(ctx: CallStmtContext) : TransformerResult {
@@ -1587,12 +1587,10 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return ctx.numExpr().accept(this);
     }
 
-    public visitAppMessage(ctx: AppMessageContext) : TransformerResult {
+    public visitUserMessage(ctx: UserMessageContext) : TransformerResult {
         const strTr = ctx.stringExpr().accept(this);
         return new TransformerResult(strTr.statementsToPrepend,
-            new SystemMessage(StringLiteral.from("app"),
-                strTr.node as StringExpression,
-                OptionalAstNode.absent()));
+            new UserMessage(strTr.node as StringExpression));
     }
 
     public visitSystemMessage(ctx: SystemMessageContext) : TransformerResult {
@@ -1629,7 +1627,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const tr = ctx.stringExpr().accept(this);
         return new TransformerResult(
             tr.statementsToPrepend,
-            new MessageReceivedEvent(StringLiteral.from(ctx.String().text),
+            new MessageReceivedEvent(StringLiteral.from(ctx.stringExpr().text),
             tr.node as StringExpression));
     }
 
