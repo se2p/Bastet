@@ -46,6 +46,7 @@ export const INIT_MESSAGE = new AppMessage(StringLiteral.from("__INIT"));
 export const GREENFLAG_MESSAGE = new AppMessage(StringLiteral.from("__STARTUP"));
 export const STARTUP_MESSAGE = GREENFLAG_MESSAGE;
 export const STARTUP_FINISHED_MESSAGE = new AppMessage(StringLiteral.from("__STARTUP_FINISHED"));
+export const AFTER_BOOTSTRAP_MESSAGE = new AppMessage(StringLiteral.from("__AFTER_BOOTSTRAP"));
 
 export class SystemMessage extends AbstractNode implements Message {
 

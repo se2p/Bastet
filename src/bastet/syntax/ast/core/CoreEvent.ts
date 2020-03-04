@@ -23,6 +23,7 @@ import {AbstractNode} from "../AstNode";
 import {StringExpression, StringLiteral} from "./expressions/StringExpression";
 import {BooleanExpression} from "./expressions/BooleanExpression";
 import {StatementList} from "./statements/Statement";
+import {AFTER_BOOTSTRAP_MESSAGE, GREENFLAG_MESSAGE, INIT_MESSAGE, Message} from "./Message";
 
 export abstract class CoreEvent extends AbstractNode {
 
@@ -50,10 +51,8 @@ export class MessageReceivedEvent extends CoreEvent {
 
 export class BootstrapEvent extends MessageReceivedEvent {
 
-    public static readonly MSG: string = "__INIT";
-
     constructor() {
-        super(StringLiteral.from("RUNTIME"), StringLiteral.from(BootstrapEvent.MSG));
+        super(StringLiteral.from("RUNTIME"), INIT_MESSAGE.messageid);
     }
 
     private static INSTANCE: BootstrapEvent;
@@ -69,10 +68,8 @@ export class BootstrapEvent extends MessageReceivedEvent {
 
 export class StartupEvent extends MessageReceivedEvent {
 
-    public static readonly MSG: string = "__STARTUP";
-
     constructor() {
-        super(StringLiteral.from("RUNTIME"), StringLiteral.from(StartupEvent.MSG));
+        super(StringLiteral.from("RUNTIME"), GREENFLAG_MESSAGE.messageid);
     }
 
     private static INSTANCE: StartupEvent;
@@ -120,10 +117,10 @@ export class RenderedMonitoringEvent extends CoreEvent {
 
 }
 
-export class AfterBootstrapMonitoringEvent extends CoreEvent {
+export class AfterBootstrapMonitoringEvent extends MessageReceivedEvent {
 
     constructor() {
-        super([]);
+        super(StringLiteral.from("RUNTIME"), AFTER_BOOTSTRAP_MESSAGE.messageid);
     }
 
     private static INSTANCE: AfterBootstrapMonitoringEvent;

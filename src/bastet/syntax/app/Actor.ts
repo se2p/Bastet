@@ -31,6 +31,7 @@ import {ActorMode} from "../ast/core/ActorDefinition";
 import {Preconditions} from "../../utils/Preconditions";
 import {Method} from "./controlflow/Method";
 import {
+    AfterBootstrapMonitoringEvent,
     AfterStatementMonitoringEvent,
     BootstrapEvent,
     NeverEvent,
@@ -39,7 +40,7 @@ import {
 import {TransitionRelation, TransitionRelations, TransRelId} from "./controlflow/TransitionRelation";
 import {Scripts} from "./controlflow/Scripts";
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
-import {GREENFLAG_MESSAGE, INIT_MESSAGE} from "../ast/core/Message";
+import {AFTER_BOOTSTRAP_MESSAGE, GREENFLAG_MESSAGE, INIT_MESSAGE} from "../ast/core/Message";
 import {StatementList} from "../ast/core/statements/Statement";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
@@ -253,6 +254,7 @@ export class Actors {
         if (!Actors._DEFAULT_BOOTSTRAPPER) {
             const bootstrapStmts = new StatementList([
                 new BroadcastAndWaitStatement(INIT_MESSAGE.messageid),
+                new BroadcastAndWaitStatement(AFTER_BOOTSTRAP_MESSAGE.messageid),
                 new BroadcastMessageStatement(GREENFLAG_MESSAGE.messageid),
             ]);
             const visitor: RelationBuildingVisitor = new RelationBuildingVisitor();
