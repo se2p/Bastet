@@ -65,8 +65,9 @@ import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
 import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements/DeclarationStatement";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
 import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressions/StringExpression";
-import {MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
+import {AfterStatementMonitoringEvent, MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Concerns} from "../../../syntax/Concern";
+import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 
 class StepInformation {
 
@@ -169,7 +170,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 const succStates0: ControlAbstractState[] = this.interprete(fromState, threadToStep, op);
 
                 // Wake up threads (set status YIELD) that have been waiting for a condition to be reached
-                const succStates1: ControlAbstractState[] = mapExpand(succStates0, this.awaikConditionCheckThreads);
+                const succStates1: ControlAbstractState[] = mapExpand(succStates0, (e) => this.awaikConditionCheckThreads(e));
 
                 // Schedule the threads to run in the next iterations
                 for (const succState of succStates1) {
@@ -231,15 +232,6 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                             writeToScope: ImmList<string>): ProgramOperation[] {
         const scoper = new ScopeTransformerVisitor(readFromScope, writeToScope);
         return ops.map((o) => ProgramOperationFactory.createFor(o.ast.accept(scoper)));
-    }
-
-    private awaikConditionCheckThreads(inState: ControlAbstractState): ControlAbstractState[] {
-        // TODO: Implement this
-        //  1. Activate the specification check thread (`after statement finished`)
-        //  2. Check if threads that wait for certain conditions can continue to run
-        //     (assume certain conditions to hold if this accelerates the analysis without being unsound)
-        //
-        return [inState];
     }
 
     private interprete(fromState: ControlAbstractState, threadToStep: IndexedThread,
@@ -492,6 +484,29 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result.map((s) => new RawOperation(s));
     }
 
+    private awaikConditionCheckThreads(inState: ControlAbstractState): ControlAbstractState[] {
+        let result: ControlAbstractState = inState;
+
+        //  1. Activate the specification check thread (`after statement finished`)
+        for (const [threadIndex, threadState] of inState.getThreadStates().entries()) {
+            const actor: Actor = this._task.getActorByName(threadState.getActorId());
+            const isSpecificationThread = actor.isObserver;
+            const script = actor.getScript(threadState.getScriptId());
+
+            if (script.event instanceof AfterStatementMonitoringEvent) {
+                result = result.withThreadStateUpdate(threadIndex, (ts) =>
+                    ts.withComputationState(THREAD_STATE_YIELD));
+            }
+        }
+
+        // TODO: Implement this
+        //  2. Check if threads that wait for certain conditions can continue to run
+        //     (assume certain conditions to hold if this accelerates the analysis without being unsound)
+
+        return [result];
+    }
+
+
     private schedule(predState: ControlAbstractState, succState: ControlAbstractState,
                      steppedThreadIndex: number): ControlAbstractState[] {
         let result: ControlAbstractState = succState;
@@ -529,22 +544,28 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
     private determineNextThreadToStep(resultBase: ControlAbstractState, steppedThreadIdx: number): number {
         const threads = resultBase.getThreadStates();
 
-        // TODO: Specification scheduling (also these checks should be done outside the atomic transitions)
+        let programThreadToRun: number = -1;
 
         let indexToCheck = (steppedThreadIdx + 1) % threads.size;
         let checked = 0;
         while (checked <= threads.size) {
             indexToCheck = (indexToCheck + 1) % threads.size;
             const threadAtIndex = threads.get(indexToCheck);
-            if (this.isNonObserverThread(threadAtIndex)) {
-                if (threadAtIndex.getComputationState() === THREAD_STATE_YIELD) {
+            if (threadAtIndex.getComputationState() === THREAD_STATE_YIELD) {
+                if (this.isObserverThread(threadAtIndex)) {
                     return indexToCheck;
+                } else {
+                    programThreadToRun = indexToCheck;
                 }
             }
             checked++;
         }
 
-        // Continue to execute the previously stepped thread of no other
+        if (programThreadToRun > -1) {
+            return programThreadToRun;
+        }
+
+        // Continue to execute the previously stepped thread if no other
         // is ready to be stepped.
         const stepped = threads.get(steppedThreadIdx);
         if (this.isSteppable(stepped)) {
@@ -559,9 +580,9 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             || thread.getComputationState() == THREAD_STATE_YIELD;
     }
 
-    private isNonObserverThread(thread: ThreadState) {
+    private isObserverThread(thread: ThreadState) {
         const actor = this._task.getActorByName(thread.getActorId());
-        return !actor.isObserver;
+        return actor.isObserver;
     }
 
     private checkSchedule(schedOf: ControlAbstractState) {
@@ -571,7 +592,9 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             const ops = this.resolveLeavingOps(new IndexedThread(ts, threadIndex));
             if (ts.getComputationState() == THREAD_STATE_RUNNING) {
                 running++;
-                Preconditions.checkState(ops.length > 0);
+                if (ops.length == 0) {
+                   throw new IllegalStateException(`Running thread for actor ${ts.getActorId()} and script ${ts.getScriptId()} does not have leaving ops.`);
+                }
             }
             threadIndex++;
         }

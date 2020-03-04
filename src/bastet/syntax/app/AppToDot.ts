@@ -50,11 +50,9 @@ export class AppToDot {
 
     private exportScriptsToDoT(actor: Actor, subfolder: string): void {
         const toDotWriter = new TransitionRelationToDot();
-        let i: number = 1;
         for (let s of actor.scripts) {
-            const target: string = `output/${subfolder}/actor_${actor.ident}_script_${i}.dot`;
+            const target: string = `output/${subfolder}/actor_${actor.ident}_script_${s.id}.dot`;
             toDotWriter.export(s.transitions, target);
-            i++;
         }
         const target: string = `output/${subfolder}/actor_${actor.ident}_script_init.dot`;
         toDotWriter.export(actor.initScript.transitions, target);

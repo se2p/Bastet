@@ -395,6 +395,12 @@ export class ScheduleAbstractStateFactory {
         let threads = ImmList<ThreadState>([]);
         for (const actor of task.actors) {
             for (const script of actor.scripts) {
+                if (script.transitions.transitionTable.size == 0) {
+                    // Ignore empty scripts. We assume that there are
+                    // no running threads with no operations to be processed.
+                    continue;
+                }
+
                 const threadId = ThreadStateFactory.freshId();
                 let threadState = THREAD_STATE_WAIT;
                 if (script.event === BootstrapEvent.instance()) {
