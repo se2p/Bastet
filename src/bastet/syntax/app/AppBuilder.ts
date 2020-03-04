@@ -128,7 +128,7 @@ export class AppBuilder {
             inheritsFromActors.push(a);
         }
 
-        return new Actor(actorDefinition.mode, actorName, inheritsFromActors,
+        return new Actor(actorDefinition.mode, actorName, inheritsFromActors, [],
             resources, datalocs, initScript, methodDefs, externalMethodSigs, scripts, methods);
     }
 
@@ -258,13 +258,13 @@ export class AppBuilder {
         const worklist: Actor[] = [];
         const handled: Set<String> = new Set();
 
-        if (actor.inheritsFrom.length > 0) {
+        if (actor.inheritFrom.length > 0) {
             worklist.push(actor);
         }
 
         while (worklist.length > 0) {
             const work = worklist.pop();
-            for (const f of work.inheritsFrom) {
+            for (const f of work.inheritFrom) {
                 if (handled.has(f.ident)) {
                     throw new IllegalStateException("Cycle in the inheritance relation?");
                 }
@@ -289,7 +289,7 @@ export class AppBuilder {
         const scripts = Lists.concatImmutableLists(main.scripts, secondary.scripts);
         const methods = Lists.concatImmutableLists(main.methods, secondary.methods);
 
-        return new Actor(main.actorMode, main.ident, [],
+        return new Actor(main.actorMode, main.ident, [], [secondary].concat(Array.from(secondary.dissolvedFrom)),
             resources.createMutable(), datalocs.createMutable(),
             initScript, methodDefinitions.createMutable(), externalMethods.createMutable(),
             scripts.createMutable(), methods.createMutable());
@@ -299,8 +299,7 @@ export class AppBuilder {
         const ab = new AppBuilder(App.empty());
 
         const concreteActors: Actor[] = taskModel
-            .actors
-            .filter((a) => a.actorMode == ConcreteActorMode.instance());
+            .actors.filter((a) => a.actorMode == ConcreteActorMode.instance());
 
         const flatActors: ActorMap = {};
         for (const a of concreteActors) {
@@ -310,4 +309,5 @@ export class AppBuilder {
 
         return new App(taskModel.origin, taskModel.ident, flatActors);
     }
+
 }

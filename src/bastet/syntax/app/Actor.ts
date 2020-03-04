@@ -55,7 +55,11 @@ export type ActorId = string;
 export class Actor {
 
     /** An actor can inherit methods or members from another actor. */
-    private readonly _inheritsFrom: Actor[];
+    private readonly _inheritFrom: ImmutableList<Actor>;
+
+    /** An actor can have inherited methods or members from another actor.
+     * The sets `_inheritsFrom` and `_dissolvedFrom` are always disjoint. */
+    private readonly _dissolvedFrom: ImmutableList<Actor>;
 
     /** Mode of the actor. Onle concrete actors can be instantiated as processes. */
     private readonly _actorMode: ActorMode;
@@ -97,6 +101,7 @@ export class Actor {
     private readonly _transRelMap: ImmutableMap<TransRelId, TransitionRelation>;
 
     constructor(mode: ActorMode, ident: string, inheritFrom: Actor[],
+                dissolvedFrom: Actor[],
                 resources: AppResourceMap, datalocs: DataLocationMap,
                 initScript: Script, methodDefs: MethodDefinitionMap,
                 externalMethods: MethodSignatureMap,
@@ -105,7 +110,8 @@ export class Actor {
 
         this._actorMode = Preconditions.checkNotUndefined(mode);
         this._ident = Preconditions.checkNotUndefined(ident);
-        this._inheritsFrom = Preconditions.checkNotUndefined(inheritFrom);
+        this._inheritFrom = Lists.immutableCopyOf(inheritFrom);
+        this._dissolvedFrom = Lists.immutableCopyOf(dissolvedFrom);
         this._initScript = Preconditions.checkNotUndefined(initScript);
         this._resources = Maps.immutableCopyOf(resources);
         this._datalocs = Maps.immutableCopyOf(datalocs);
@@ -141,8 +147,12 @@ export class Actor {
         return this._ident;
     }
 
-    get inheritsFrom(): Actor[] {
-        return this._inheritsFrom;
+    get inheritFrom(): ImmutableList<Actor> {
+        return this._inheritFrom;
+    }
+
+    get dissolvedFrom(): ImmutableList<Actor> {
+        return this._dissolvedFrom;
     }
 
     get datalocs(): IterableIterator<TypedDataLocation> {
@@ -250,7 +260,7 @@ export class Actors {
                 TransitionRelations.eliminateEpsilons(bootstrapStmts.accept(visitor));
             const bootstrapScript: Script = new Script(Scripts.freshScriptId(),
                 BootstrapEvent.instance(), bootstrapTransitions);
-            Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [],
+            Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [], [],
                 {}, {}, bootstrapScript, {}, {},
                 [bootstrapScript], []);
         }
