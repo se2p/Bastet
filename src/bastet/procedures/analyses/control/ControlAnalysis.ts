@@ -169,6 +169,16 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         return result;
     }
 
+    getStateLabel(state: ControlAbstractState): string {
+        const innerLabelingFn = this.wrappedAnalysis['getStateLabel'];
+        const innerLabel = innerLabelingFn ? innerLabelingFn(state) : "?";
+        const controlLabel = state.getThreadStates()
+            .map((e) => `[${e.getActorId()} ${e.getScriptId()} ${e.getRelationLocation().getLocationId()}]`)
+            .join(", ");
+
+        return `${controlLabel} ${innerLabel}`;
+    }
+
     wrapStateSets(frontier: StateSet<ControlAbstractState>, reached: StateSet<ControlAbstractState>): [StateSet<ControlAbstractState>, StateSet<ControlAbstractState>] {
         return [frontier, reached];
     }

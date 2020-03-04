@@ -385,6 +385,10 @@ export class TransitionRelations {
     static concat(tr1: TransitionRelation, tr2: TransitionRelation): TransitionRelation {
         // Exit locations of TR1 with the entry locations of TR2
 
+        if (tr1.exitLocationSet.isEmpty()) {
+            return tr1;
+        }
+
         let locs: ImmSet<LocationId> = tr1.locationSet.merge(tr2.locationSet);
         let entryLocs: ImmSet<LocationId> = tr1.entryLocationSet;
         let exitLocs: ImmSet<LocationId> = tr2.exitLocationSet;
@@ -483,6 +487,10 @@ export class TransitionRelations {
         Preconditions.checkNotUndefined(goto);
         // TODO: Add tests regarding circular references
 
+        if (tr.exitLocationSet.isEmpty()) {
+            return tr;
+        }
+
         let locs = tr.locationSet.add(goto.ident);
 
         let tx: TransitionTable = tr.transitionTable;
@@ -546,10 +554,6 @@ export class TransitionRelations {
             .addExitLocation(controlLocation)
             .addTransition(controlLocation, controlLocation, ProgramOperations.epsilon())
             .build();
-    }
-
-    static continueFrom(loopHead: ControlLocation, transitionRelation: TransitionRelation) {
-        throw new ImplementMeException();
     }
 
     private static buildEquivalenceClasses(tr: TransitionRelation): Map<LocationId, LocationEquivalence> {

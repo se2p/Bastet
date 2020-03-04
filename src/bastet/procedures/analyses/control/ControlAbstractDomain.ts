@@ -21,7 +21,7 @@
 
 import {SingletonStateWrapper} from "../AbstractStates";
 import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
-import {AbstractElement, Lattice} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
 import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable";
 import {ActorId} from "../../../syntax/app/Actor";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
@@ -35,14 +35,15 @@ import {ScriptId} from "../../../syntax/app/controlflow/Script";
 import {OperationId} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Preconditions} from "../../../utils/Preconditions";
 
-export const THREAD_STATE_RUNNING = 1;
-export const THREAD_STATE_WAIT = 3;
-export const THREAD_STATE_DONE = 4;
-export const THREAD_STATE_YIELD = 5;
-export const THREAD_STATE_FAILURE = 6;
-export const THREAD_STATE_UNKNOWN = 0;
+export enum ThreadComputationState {
+    THREAD_STATE_RUNNING = "R",
+    THREAD_STATE_WAIT = "W",
+    THREAD_STATE_DONE = "D",
+    THREAD_STATE_YIELD = "Y",
+    THREAD_STATE_FAILURE = "F",
+    THREAD_STATE_UNKNOWN = "?",
+}
 
-export type ThreadComputationState = number;
 
 export type ThreadId = number;
 
@@ -89,6 +90,10 @@ export class RelationLocation extends RelationLocationRecord implements ScriptLo
 
     public withLocationId(location: LocationId): RelationLocation {
         return this.set("location", location);
+    }
+
+    public toString() {
+        return `${this.getActorId()} ${this.getRelationId()} ${this.getLocationId()}`;
     }
 
 }
@@ -177,7 +182,7 @@ const ThreadStateRecord = ImmRec({
     actorId: "",
     operations: ImmList<OperationId>(),
     location: new RelationLocation("", 0, 0),
-    computationState: THREAD_STATE_UNKNOWN,
+    computationState: ThreadComputationState.THREAD_STATE_UNKNOWN,
     waitingForThreads: ImmSet<ThreadId>(),
     failedFor: ImmSet<Property>(),
     callStack: ImmList<MethodCall>(),
@@ -301,7 +306,7 @@ export interface ControlAbstractStateAttributes extends AbstractElement, Singlet
     threadStates: ImmList<ThreadState>;
 
     /** Wrapped abstract state that stores the actual data of heap and stack */
-    wrappedState: AbstractElement;
+    wrappedState: AbstractState;
 
     /** The threads that have been stepped to get to this state */
     steppedThreadIndices: ImmSet<number>;
@@ -343,7 +348,7 @@ export class IndexedThread {
 /**
  * A state with SHARED MEMORY
  */
-export class ControlAbstractState extends ControlAbstractStateRecord implements AbstractElement {
+export class ControlAbstractState extends ControlAbstractStateRecord implements AbstractState {
 
     constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement, isTargetFor: ImmSet<Property>,
                 steppedThreadIndices: ImmSet<number>) {
@@ -359,7 +364,7 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
         return this.get("threadStates");
     }
 
-    public getWrappedState(): AbstractElement {
+    public getWrappedState(): AbstractState {
         return this.get("wrappedState");
     }
 
@@ -391,6 +396,15 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
         const toUpdate = this.getThreadStates().get(threadIndex);
         return this.withThreadState(threadIndex, updateFn(toUpdate));
     }
+
+    public accept<R>(visitor: AbstractElementVisitor<R>): R {
+        const visitMethod: string = `visit${this.constructor.name}`;
+        if (visitor[visitMethod]) {
+            return visitor[visitMethod](this);
+        } else {
+            return visitor.visit(this);
+        }
+    }
 }
 
 export class ScheduleAbstractStateFactory {
@@ -406,10 +420,11 @@ export class ScheduleAbstractStateFactory {
                 }
 
                 const threadId = ThreadStateFactory.freshId();
-                let threadState = THREAD_STATE_WAIT;
+                let threadState = ThreadComputationState.THREAD_STATE_WAIT;
                 if (script.event === BootstrapEvent.instance()) {
-                    threadState = THREAD_STATE_RUNNING;
+                    threadState = ThreadComputationState.THREAD_STATE_RUNNING;
                 }
+
                 for (const locId of script.transitions.entryLocationSet) {
                     const loc: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, locId);
                     threads = threads.push(new ThreadState(threadId, actor.ident, script.id, ImmList(), loc,

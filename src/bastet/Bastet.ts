@@ -68,12 +68,25 @@ export class Bastet {
             return new NullAnalysisResult(new AnalysisStatistics("NULL", {}));
         }
 
+        this.registerOnExitNotifiers();
+
         const intermLibFilepath: string = cmdlineArguments.intermediateLibrary;
         const programFilepath: string = cmdlineArguments.program;
         const specFilepath: string = cmdlineArguments.specification;
         const configFilepath: string = cmdlineArguments['configuration'] || "./config/default.json";
 
         return this.runFor(configFilepath, intermLibFilepath, programFilepath, specFilepath);
+    }
+
+    public registerOnExitNotifiers() {
+        process.on('SIGINT', function() {
+            console.log("Caught interrupt signal");
+            process.exit();
+        });
+
+        process.on('beforeExit', function() {
+            console.log("Caught exit signal");
+        });
     }
 
     public async runFor(configFilepath: string, libraryFilepath: string, programFilepath: string, specFilepath: string) : Promise<AnalysisResult> {

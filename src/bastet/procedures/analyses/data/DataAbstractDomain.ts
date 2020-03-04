@@ -19,7 +19,7 @@
  *
  */
 
-import {LatticeWithComplements} from "../../../lattices/Lattice";
+import {AbstractElementVisitor, AbstractState, LatticeWithComplements} from "../../../lattices/Lattice";
 import {Record as ImmRec} from "immutable"
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
@@ -44,7 +44,7 @@ const DataAbstractStateRecord = ImmRec({
 
 });
 
-export class DataAbstractState extends DataAbstractStateRecord implements DataAbstractStateAttributes {
+export class DataAbstractState extends DataAbstractStateRecord implements DataAbstractStateAttributes, AbstractState {
 
     blockFormula: FirstOrderFormula;
     summaryFormula: PropositionalFormula;
@@ -59,6 +59,15 @@ export class DataAbstractState extends DataAbstractStateRecord implements DataAb
 
     public withSummaryFormula(value: PropositionalFormula): DataAbstractState {
         return this.set('summaryFormula', value);
+    }
+
+    public accept<R>(visitor: AbstractElementVisitor<R>): R {
+        const visitMethod: string = `visit${this.constructor.name}`;
+        if (visitor[visitMethod]) {
+            return visitor[visitMethod](this);
+        } else {
+            return visitor.visit(this);
+        }
     }
 
 }

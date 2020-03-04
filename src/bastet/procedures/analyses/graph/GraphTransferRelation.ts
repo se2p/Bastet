@@ -22,6 +22,7 @@
 import {TransferRelation} from "../TransferRelation";
 import {GraphAbstractState, GraphAbstractStateFactory} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
+import {StateLabelVisitor} from "../StateVisitors";
 
 export class GraphTransferRelation implements TransferRelation<GraphAbstractState> {
 
@@ -36,7 +37,8 @@ export class GraphTransferRelation implements TransferRelation<GraphAbstractStat
         const result = [];
         const wrappedSuccs = this._wrappedAbstractSucc(fromState.getWrappedState());
         for (const w of wrappedSuccs) {
-            result.push(GraphAbstractStateFactory.withFreshID([fromState.getId()], w));
+            const succState = GraphAbstractStateFactory.withFreshID([fromState.getId()], w);
+            result.push(succState);
         }
 
         return result;

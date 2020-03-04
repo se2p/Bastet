@@ -19,7 +19,11 @@
  *
  */
 
-import {ProgramAnalysis, TransitionLabelProvider, WrappingProgramAnalysis} from "../ProgramAnalysis";
+import {
+    ProgramAnalysis,
+    TransitionLabelProvider,
+    WrappingProgramAnalysis
+} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {
     GraphAbstractDomain,
@@ -40,7 +44,8 @@ import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 
 export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState>,
-    Unwrapper<GraphAbstractState, AbstractElement>, TransitionLabelProvider<GraphAbstractState> {
+    Unwrapper<GraphAbstractState, AbstractElement>,
+    TransitionLabelProvider<GraphAbstractState> {
 
     private readonly _abstractDomain: AbstractDomain<GraphConcreteState, GraphAbstractState>;
 
@@ -132,4 +137,5 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     getTransitionLabel(from: GraphAbstractState, to: GraphAbstractState): ProgramOperation[] {
         return this.wrappedAnalysis['getTransitionLabel'](from.getWrappedState(), to.getWrappedState());
     }
+
 }

@@ -93,9 +93,14 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
 
     visitRepeatForeverStatement(node: RepeatForeverStatement): TransitionRelation {
         const loopBody: TransitionRelation = node.body.accept(this);
-        const loopHead: ControlLocation = ControlLocation.fresh();
-        const headRelation = TransitionRelations.singleton(loopHead);
-        return TransitionRelations.concatAndGoto(headRelation, loopBody, loopHead);
+
+        const builder = TransitionRelation.builder();
+        builder.addAllTransitionsOf(loopBody)
+            .connectLocations(loopBody.exitLocationSet, loopBody.entryLocationSet);
+
+        loopBody.entryLocationSet.forEach((l) => builder.addEntryLocationWithID(l));
+
+        return builder.build();
     }
 
     visitUntilStatement(node: UntilStatement): TransitionRelation {

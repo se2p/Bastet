@@ -20,7 +20,7 @@
  */
 
 import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
-import {AbstractElement, Lattice} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Map as ImmMap, Record as ImmRec} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
@@ -35,7 +35,7 @@ export interface SSAStateAttribs extends AbstractElement, SingletonStateWrapper 
 
     declared: ImmMap<string, ScratchTypeID>;
 
-    wrappedState: AbstractElement;
+    wrappedState: AbstractState;
 
 }
 
@@ -52,7 +52,7 @@ const SSAStateRecord = ImmRec({
 export const NOT_DECLARED_INDEX = 0;
 export const INITIALLY_DECLARED_INDEX = NOT_DECLARED_INDEX + 1;
 
-export class SSAState extends SSAStateRecord implements SSAStateAttribs {
+export class SSAState extends SSAStateRecord implements SSAStateAttribs, AbstractState {
 
     constructor(ssa: ImmMap<string, number>, declared: ImmMap<string, ScratchTypeID>, wrapped: AbstractElement) {
         super({ssa: ssa, declared: declared, wrappedState: wrapped});
@@ -62,7 +62,7 @@ export class SSAState extends SSAStateRecord implements SSAStateAttribs {
         return this.get("ssa");
     }
 
-    public getWrappedState(): AbstractElement {
+    public getWrappedState(): AbstractState {
         return this.get("wrappedState");
     }
 
@@ -96,6 +96,15 @@ export class SSAState extends SSAStateRecord implements SSAStateAttribs {
         const newIndex = this.getIndex(assignementTo) + 1;
         const result = this.withIndex(assignementTo, newIndex);
         return [result, newIndex];
+    }
+
+    public accept<R>(visitor: AbstractElementVisitor<R>): R {
+        const visitMethod: string = `visit${this.constructor.name}`;
+        if (visitor[visitMethod]) {
+            return visitor[visitMethod](this);
+        } else {
+            return visitor.visit(this);
+        }
     }
 
 }

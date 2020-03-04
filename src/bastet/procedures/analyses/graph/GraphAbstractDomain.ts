@@ -20,11 +20,12 @@
  */
 
 import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
-import {AbstractElement, Lattice} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractElementVisitor, Lattice, AbstractState} from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Record as ImmRec, Set as ImmSet} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
 import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
+import {CoreVisitor} from "../../../syntax/ast/CoreVisitor";
 
 export type GraphStateId = number;
 
@@ -48,7 +49,7 @@ const GraphAbstractStateRecord = ImmRec({
     wrappedState: null
 });
 
-export class GraphAbstractState extends GraphAbstractStateRecord implements GraphAbstractStateAttribs {
+export class GraphAbstractState extends GraphAbstractStateRecord implements GraphAbstractStateAttribs, AbstractState {
 
     constructor(id: GraphStateId, preds: ImmSet<GraphStateId>, wrapped: ImmRec<any>) {
         super({id: id, predecessors: preds, wrappedState: wrapped});
@@ -62,8 +63,17 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
         return this.get('predecessors');
     }
 
-    public getWrappedState(): AbstractElement {
+    public getWrappedState(): AbstractState {
         return this.get('wrappedState');
+    }
+
+    public accept<R>(visitor: AbstractElementVisitor<R>): R {
+        const visitMethod: string = `visit${this.constructor.name}`;
+        if (visitor[visitMethod]) {
+            return visitor[visitMethod](this);
+        } else {
+            return visitor.visit(this);
+        }
     }
 }
 
