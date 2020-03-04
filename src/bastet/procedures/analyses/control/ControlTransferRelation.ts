@@ -247,14 +247,14 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         const result: ControlAbstractState[] = [];
 
         // Interpretation by this analysis
-        const withControlResults: ControlAbstractState[] = this.interpreteLocal(fromState, threadToStep, step);
+        const withControlResults: [ControlAbstractState, boolean][] = this.interpreteLocal(fromState, threadToStep, step);
 
-        // Interpret the wrapped state by the wrapped analysis
-        const wrappedAnalysisResults: Iterable<AbstractElement> = Transfers.withIntermediateOps(
-            this._wrappedTransferRelation, fromState.wrappedState, step.ops, Concerns.defaultProgramConcern());
+        for (const [r, considerInterpretationFinished] of withControlResults){
+            // Interpret the wrapped state by the wrapped analysis
+            const wrappedAnalysisResults: Iterable<AbstractElement> = considerInterpretationFinished ? [fromState.getWrappedState()]
+                : Transfers.withIntermediateOps(this._wrappedTransferRelation, fromState.wrappedState, step.ops, Concerns.defaultProgramConcern());
 
-        // Combine the result
-        for (const r of withControlResults){
+            // Combine the result
             Preconditions.checkNotUndefined(r);
             for (const w of wrappedAnalysisResults) {
                 Preconditions.checkNotUndefined(w);
@@ -280,7 +280,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
     }
 
     private interpreteLocal(fromState: ControlAbstractState, threadToStep: IndexedThread,
-                       step: StepInformation): ControlAbstractState[] {
+                       step: StepInformation): [ControlAbstractState, boolean][] {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(threadToStep);
         Preconditions.checkNotUndefined(step);
@@ -437,7 +437,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         // TODO: Produce a state with THREAD_STATE_RUNNING_ATOMIC if isInnerAtomic
 
-        return [result];
+        return [[result, true]];
     }
 
     private getCallingStatement(callInformation: MethodCall): CallStatement {
