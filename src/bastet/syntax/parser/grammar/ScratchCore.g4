@@ -366,8 +366,6 @@ number : DecimalLiteral ;
 
 Boolean : Bool ;
 
-key : 'key' numExpr ;
-
 resourceLocator : String ;
 
 message : stringExpr # UserMessage
