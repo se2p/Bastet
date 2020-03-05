@@ -26,7 +26,7 @@ actor MiniActor is RuntimeEntity begin
     end
 
     script on received message "wauz" do begin
-        define x as 1
+        define x as x + 1
         broadcast "foo"
     end
 
