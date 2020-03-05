@@ -120,6 +120,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
         }
 
         Preconditions.checkState(frontier.isEmpty());
+        this.algorithmMonitoringHook(frontier, reached);
         return this.takeNoteOfResult(frontier, reached);
     }
 

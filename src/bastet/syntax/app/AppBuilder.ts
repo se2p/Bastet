@@ -228,8 +228,9 @@ export class AppBuilder {
 
         const transrelLocs: TransitionRelation = declarationStmtList.accept(visitor);
         const transrelSet: TransitionRelation = stmtList.accept(visitor);
-        const compundTransRel = TransitionRelations.concat(transrelRes,
-            TransitionRelations.concat(transrelLocs, transrelSet));
+        const compundTransRel = TransitionRelations.eliminateEpsilons(
+            TransitionRelations.concat(transrelRes,
+                TransitionRelations.concat(transrelLocs, transrelSet)));
         return new Script(Scripts.freshScriptId(), BootstrapEvent.instance(), false, compundTransRel);
     }
 
