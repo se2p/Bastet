@@ -36,7 +36,7 @@ actor DirectorObserver is Observer begin
 
     define atomic isBehaviorSatisfied () begin
         // (a) Attributes of the first actor
-        define actor_1_costume as attribute "current_costume_name" of actor_1_id
+        define actor_1_costume as attribute "active_graphic_name" of actor_1_id
 
         declare result as boolean
         define result as true

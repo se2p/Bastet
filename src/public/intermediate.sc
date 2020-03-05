@@ -166,16 +166,16 @@ role Observer is RuntimeEntity begin
 
         declare leg_a_fst as number
         declare leg_b_fst as number
-        define leg_a_fst as cast attribute "current_costume_width" of fst to number
-        define leg_b_fst as cast attribute "current_costume_height" of fst to number
+        define leg_a_fst as cast attribute "active_graphic_width" of fst to number
+        define leg_b_fst as cast attribute "active_graphic_height" of fst to number
 
         declare radius_fst as number
         define radius_fst as 0.5 * mathSqrt(leg_a_fst * leg_a_fst + leg_b_fst * leg_b_fst)
 
         declare leg_a_snd as number
         declare leg_b_snd as number
-        define leg_a_snd as cast attribute "current_costume_width" of snd to number
-        define leg_b_snd as cast attribute "current_costume_height" of snd to number
+        define leg_a_snd as cast attribute "active_graphic_width" of snd to number
+        define leg_b_snd as cast attribute "active_graphic_height" of snd to number
 
         declare radius_snd as number
         define radius_snd as 0.5 * mathSqrt(leg_a_snd * leg_a_snd + leg_b_snd * leg_b_snd)
@@ -206,8 +206,8 @@ role Observer is RuntimeEntity begin
 
         declare width as number
         declare height as number
-        define width as cast attribute "current_costume_width" of obj_id to number
-        define height as cast attribute "current_costume_height" of obj_id to number
+        define width as cast attribute "active_graphic_width" of obj_id to number
+        define height as cast attribute "active_graphic_height" of obj_id to number
 
         if not (_RUNTIME_getMouseX() < x
                 or _RUNTIME_getMouseX() > x + width
@@ -222,19 +222,16 @@ end
 
 role ScratchEntity is RuntimeEntity begin
 
-    // 480 * 360 = 172800 pixels
-    declare active_graphic_pixels as list of number
-
+    declare sound_effect as enum [ "pitch", "pan_left_right" ]
     declare volume as number
 
-    declare current_costume_name as string
+    // 480 * 360 = 172800 pixels
+    declare active_graphic_pixels as list of number
+    declare active_graphic_name as string
+    declare active_graphic_width as number
+    declare active_graphic_height as number
 
-    declare current_costume_width as number
-
-    declare current_costume_height as number
-
-    declare sound_effect as enum [ "pitch", "pan_left_right" ]
-
+    declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
     declare color_effect_value as number
     declare fisheye_effect_value as number
     declare whirl_effect_value as number
@@ -243,13 +240,12 @@ role ScratchEntity is RuntimeEntity begin
     declare brightness_effect_value as number
     declare ghost_effect_value as number
 
-    declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
 
     // @Category "Looks"
     define changeActiveGraphicTo (id: string) begin
-        define current_costume_name as id
-        define current_costume_width as _RUNTIME_getImageWidth(id)
-        define current_costume_height as _RUNTIME_getImageHeight(id)
+        define active_graphic_name as id
+        define active_graphic_width as _RUNTIME_getImageWidth(id)
+        define active_graphic_height as _RUNTIME_getImageHeight(id)
     end
 
     // @Category "Looks"
@@ -465,9 +461,9 @@ role ScratchSprite is ScratchEntity begin
         declare result as boolean
 
         if not (_RUNTIME_getMouseX() < x
-                or _RUNTIME_getMouseX() > x + current_costume_width
+                or _RUNTIME_getMouseX() > x + active_graphic_width
                 or _RUNTIME_getMouseY() < y
-                or _RUNTIME_getMouseY() > y + current_costume_height) then begin
+                or _RUNTIME_getMouseY() > y + active_graphic_height) then begin
 
             define result as false
         end
@@ -480,16 +476,16 @@ role ScratchSprite is ScratchEntity begin
         declare leg_a as number
         declare leg_b as number
         // TODO: Query attributes of myself and the other actor
-        define leg_a as current_costume_width
-        define leg_b as current_costume_height
+        define leg_a as active_graphic_width
+        define leg_b as active_graphic_height
 
         declare radius as number
         define radius as 0.5 * mathSqrt(leg_a * leg_a + leg_b * leg_b)
 
         declare leg_a_other as number
         declare leg_b_other as number
-        define leg_a_other as cast attribute "current_costume_width" of obj to number
-        define leg_b_other as cast attribute "current_costume_height" of obj to number
+        define leg_a_other as cast attribute "active_graphic_width" of obj to number
+        define leg_b_other as cast attribute "active_graphic_height" of obj to number
 
         declare radius_other as number
         define radius_other as 0.5 * mathSqrt(leg_a_other * leg_a_other + leg_b_other * leg_b_other)
