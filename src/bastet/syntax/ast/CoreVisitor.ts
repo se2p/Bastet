@@ -100,6 +100,7 @@ import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./c
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
 import {AssumeStatement} from "./core/statements/AssumeStatement";
 import {VariableWithDataLocation} from "./core/Variable";
+import {CastExpression} from "./core/expressions/CastExpression";
 
 export interface CoreVisitor<R> {
 
@@ -108,6 +109,8 @@ export interface CoreVisitor<R> {
 }
 
 export interface CoreNumberExpressionVisitor<R> extends CoreVisitor<R>{
+
+    visitCastExpression(node: CastExpression): R;
 
     visitNumberLiteral(node: NumberLiteral): R;
 
@@ -147,6 +150,8 @@ export interface CoreNumberExpressionVisitor<R> extends CoreVisitor<R>{
 
 export interface CoreBoolExpressionVisitor<R> extends CoreVisitor<R> {
 
+    visitCastExpression(node: CastExpression): R;
+
     visitAndExpression(node: AndExpression): R;
 
     visitOrExpression(node: OrExpression): R;
@@ -180,6 +185,8 @@ export interface CoreBoolExpressionVisitor<R> extends CoreVisitor<R> {
 }
 
 export interface CoreStringExpressionVisitor<R> extends CoreVisitor<R> {
+
+    visitCastExpression(node: CastExpression): R;
 
     visitNumAsStringExpression(node: NumAsStringExpression): R;
 

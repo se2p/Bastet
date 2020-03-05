@@ -37,6 +37,7 @@ import {AppToDot} from "./syntax/app/AppToDot";
 import {IllegalArgumentException} from "./core/exceptions/IllegalArgumentException";
 import {AnalysisStatistics} from "./procedures/analyses/AnalysisStatistics";
 import {NodeSystemLayer} from "./utils/SystemLayer";
+import {type} from "os";
 
 const process = require('process');
 
@@ -154,7 +155,7 @@ export class Bastet {
         const transformer = new ToIntermediateTransformer();
         const intermediateAST: AstNode = transformer.transform(App.empty(), rawAST, typeStorage, config);
 
-        return this.createControlFlowFrom(filepath, intermediateAST, App.empty(), "");
+        return this.createControlFlowFrom(filepath, intermediateAST, App.empty(), typeStorage, "");
     }
 
     /**
@@ -179,12 +180,13 @@ export class Bastet {
         const transformer = new ToIntermediateTransformer();
         const intermediateAST: AstNode = transformer.transform(staticLibraryModel, rawAST, typeStorage, config);
 
-        return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, actorNamePrefix);
+        return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, typeStorage, actorNamePrefix);
     }
 
-    private createControlFlowFrom(programOrigin: string, intermediateSpecAST: AstNode, libraryModule: App, actorNamePrefix?: string): App {
+    private createControlFlowFrom(programOrigin: string, intermediateSpecAST: AstNode, libraryModule: App,
+                                  typeStorage: TypeInformationStorage, actorNamePrefix?: string): App {
         const ab: AppBuilder = new AppBuilder(libraryModule);
-        return ab.buildFromSyntaxTree(programOrigin, intermediateSpecAST, actorNamePrefix);
+        return ab.buildFromSyntaxTree(programOrigin, intermediateSpecAST, typeStorage, actorNamePrefix);
     }
 
 }

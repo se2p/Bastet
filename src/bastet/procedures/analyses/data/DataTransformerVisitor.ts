@@ -43,16 +43,14 @@ import {
     NumFunctExpression,
     PickRandomFromExpression,
     PlusExpression,
-    RoundExpression,
-    StringAsNumberExpression,
+    RoundExpression, StringAsNumberExpression,
     TimerExpression
 } from "../../../syntax/ast/core/expressions/NumberExpression";
 import {
     BoolAsStringExpression,
     IthLetterOfStringExpression,
     IthStringItemOfExpression,
-    JoinStringsExpression,
-    NumAsStringExpression,
+    JoinStringsExpression, NumAsStringExpression,
     ResourceAttributeOfExpression,
     StringAttributeOfExpression,
     StringLiteral,
@@ -132,6 +130,7 @@ import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStateme
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {BeginAtomicStatement, EndAtomicStatement} from "../../../syntax/ast/core/statements/ControlStatement";
+import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpression";
 
 export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
     S extends AbstractString, L extends AbstractList>
@@ -146,6 +145,17 @@ export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends Abstr
     }
 
     visit(node: AstNode): N {
+        throw new ImplementMeException();
+    }
+
+    visitCastExpression(node: CastExpression): N {
+        Preconditions.checkArgument(node.castToType == NumberType.instance());
+
+        if (node.toConvert.expressionType == StringType.instance()) {
+            const stringVisitor = new DataStringExpressionVisitor(this._theories);
+            return this._theory.castStringAsNumber(node.toConvert.accept(stringVisitor));
+        }
+
         throw new ImplementMeException();
     }
 
@@ -319,6 +329,11 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
         throw new ImplementMeException();
     }
 
+    visitCastExpression(node: CastExpression): B {
+        Preconditions.checkArgument(node.castToType == BooleanType.instance());
+        throw new ImplementMeException();
+    }
+
 }
 
 export class DataStringExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
@@ -373,6 +388,11 @@ export class DataStringExpressionVisitor<B extends AbstractBoolean, N extends Ab
 
     visitVariableWithDataLocation(node: VariableWithDataLocation): S {
         return this._theories.stringTheory.abstractStringValue(node);
+    }
+
+    visitCastExpression(node: CastExpression): S {
+        Preconditions.checkArgument(node.castToType == StringType.instance());
+        throw new ImplementMeException();
     }
 
 }

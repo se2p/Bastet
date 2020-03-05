@@ -302,6 +302,7 @@ import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
 import {BastetConfiguration} from "../../utils/BastetConfiguration";
 import {ParsingException} from "../../core/exceptions/ParsingException";
 import {ParserRuleContext} from "antlr4ts";
+import {CastExpression} from "../ast/core/expressions/CastExpression";
 
 const toposort = require('toposort');
 
@@ -564,7 +565,26 @@ export class TypeInformationStorage {
 
     public getInfos(id: Identifier): ActorTypeInformation {
         Preconditions.checkNotUndefined(id);
-        return this._actorTypeInfos[id.text];
+        const result = this._actorTypeInfos[id.text];
+        return Preconditions.checkNotUndefined(result, `No actor with name ${id.text} found`);
+    }
+
+    public getActorList(): Iterable<string> {
+        return Object.keys(this._actorTypeInfos);
+    }
+
+    public static union(storage1: TypeInformationStorage, storage2: TypeInformationStorage): TypeInformationStorage {
+        const result = new TypeInformationStorage();
+
+        for (const actor1 of storage1.getActorList()) {
+            result.putActorTypeInformation(storage1.getInfos(Identifier.of(actor1)));
+        }
+
+        for (const actor2 of storage2.getActorList()) {
+            result.putActorTypeInformation(storage2.getInfos(Identifier.of(actor2)));
+        }
+
+        return result;
     }
 
 }
@@ -1348,12 +1368,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitBoolAsNumExpression(ctx: BoolAsNumExpressionContext) : TransformerResult {
         const exprTr: TransformerResult = ctx.boolExpr().accept(this);
-        return new TransformerResult(exprTr.statementsToPrepend, new BoolAsNumberExpression(exprTr.node as BooleanExpression));
+        return new TransformerResult(exprTr.statementsToPrepend, new CastExpression(exprTr.node as BooleanExpression, NumberType.instance()));
     }
 
     public visitBoolAsStringExpression(ctx: BoolAsStringExpressionContext) : TransformerResult {
         const exprTr: TransformerResult = ctx.boolExpr().accept(this);
-        return new TransformerResult(exprTr.statementsToPrepend, new BoolAsStringExpression(exprTr.node as BooleanExpression));
+        return new TransformerResult(exprTr.statementsToPrepend, new CastExpression(exprTr.node as BooleanExpression, StringType.instance()));
     }
 
     public visitBoolLiteralExpression(ctx: BoolLiteralExpressionContext) : TransformerResult {
@@ -1662,7 +1682,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const tr = ctx.numExpr().accept(this);
         return new TransformerResult(
             tr.statementsToPrepend,
-            new NumAsStringExpression(tr.node as NumberExpression));
+            new CastExpression(tr.node as NumberExpression, StringType.instance()));
     }
 
     public visitParameter(ctx: ParameterContext) : TransformerResult {
@@ -1743,7 +1763,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const tr = this.ensureType(ctx, StringType.instance(), ctx.stringExpr().accept(this));
         return new TransformerResult(
             tr.statementsToPrepend,
-            new StringAsNumberExpression(tr.node as StringExpression));
+            new CastExpression(tr.node as StringExpression, NumberType.instance()));
     }
 
     public visitStringAttributeOfExpression(ctx: StringAttributeOfExpressionContext) : TransformerResult {

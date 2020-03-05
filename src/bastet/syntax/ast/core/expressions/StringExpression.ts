@@ -28,6 +28,19 @@ import {BooleanExpression} from "./BooleanExpression";
 import {Identifier} from "../Identifier";
 import {BinaryExpression} from "./BinaryExpression";
 import {VariableExpression, VariableWithDataLocation} from "../Variable";
+import {Preconditions} from "../../../../utils/Preconditions";
+import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
+import {IllegalArgumentException} from "../../../../core/exceptions/IllegalArgumentException";
+
+export function extractStringLiteral(expression: StringExpression): string {
+    Preconditions.checkNotUndefined(expression);
+
+    if (expression instanceof StringLiteral) {
+        return expression.text;
+    }
+
+    throw new IllegalArgumentException("Unsupported expression type for string literal extraction: " + expression.constructor.name);
+}
 
 export interface StringExpression extends Expression {
 

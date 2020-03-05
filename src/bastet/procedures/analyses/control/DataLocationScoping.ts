@@ -30,6 +30,13 @@ import {DataLocation, TypedDataLocation} from "../../../syntax/app/controlflow/D
 import {Statement} from "../../../syntax/ast/core/statements/Statement";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {extractStringLiteral, StringAttributeOfExpression} from "../../../syntax/ast/core/expressions/StringExpression";
+import {AstNode} from "../../../syntax/ast/AstNode";
+import {App} from "../../../syntax/app/App";
+import {Identifier} from "../../../syntax/ast/core/Identifier";
+import {StringType} from "../../../syntax/ast/core/ScratchType";
+import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpression";
+import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 
 export const SCOPE_SEPARATOR = "@";
 
@@ -44,23 +51,28 @@ export class DataLocationScoper implements DataLocationRenamer {
         this._writeToScope = writeToScope.join(SCOPE_SEPARATOR);
     }
 
-    private isScoped(dataLoc: DataLocation): boolean {
+    private static isScoped(dataLoc: DataLocation): boolean {
         return dataLoc.ident.indexOf("@") > -1;
     }
 
     renameUsage(dataLoc: DataLocation, usageMode: DataLocationMode, inContextOf: Statement): DataLocation {
+        return DataLocationScoper.staticRenameUsage(dataLoc, usageMode, inContextOf, this._writeToScope, this._readFromScope);
+    }
+
+    public static staticRenameUsage(dataLoc: DataLocation, usageMode: DataLocationMode, inContextOf: Statement,
+                              writeToScope: string, readFromScope: string): DataLocation {
         Preconditions.checkNotUndefined(usageMode);
 
-        if (this.isScoped(dataLoc)) {
+        if (DataLocationScoper.isScoped(dataLoc)) {
             return dataLoc;
         }
 
         if (usageMode == DataLocationMode.ASSINGED_TO) {
-            const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + this._writeToScope;
+            const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + writeToScope;
             return new TypedDataLocation(newIdent, dataLoc.type);
 
         } else if (usageMode == DataLocationMode.READ_FROM) {
-            const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + this._readFromScope;
+            const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + readFromScope;
             return new TypedDataLocation(newIdent, dataLoc.type);
         }
 
@@ -71,8 +83,30 @@ export class DataLocationScoper implements DataLocationRenamer {
 
 export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
 
-    constructor(readFromScope: ImmList<string>, writeToScope: ImmList<string>) {
-        super(new DataLocationScoper(readFromScope, writeToScope));
+    private readonly _task: App;
+    private readonly _scoper: DataLocationScoper;
+
+    constructor(task: App, readFromScope: ImmList<string>, writeToScope: ImmList<string>) {
+        const scoper = new DataLocationScoper(readFromScope, writeToScope)
+        super(scoper);
+        this._scoper = scoper;
+        this._task = Preconditions.checkNotUndefined(task);
+    }
+
+    visitStringAttributeOfExpression(node: StringAttributeOfExpression): AstNode {
+        const actorId: Identifier = node.ofEntity;
+        const attributeName: string = extractStringLiteral(node.attribute);
+        const attributeType = this._task.typeStorage.getInfos(actorId).getTypeOf(Identifier.of(attributeName));
+
+        let readAttribute: DataLocation = new TypedDataLocation(attributeName, attributeType.typeId);
+        readAttribute = this._scoper.renameUsage(readAttribute, DataLocationMode.READ_FROM, this._activeStatement);
+        const readVariable = new VariableWithDataLocation(readAttribute);
+
+        if (readVariable.variableType == StringType.instance()) {
+            return readVariable;
+        } else {
+            return new CastExpression(readVariable, StringType.instance());
+        }
     }
 
 }

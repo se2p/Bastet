@@ -35,7 +35,7 @@ export class CodeToApp {
         const typeStorage = new TypeInformationStorage();
         const intermAST: AstNode = transformer.transform(library, rawAST, typeStorage, config);
         const ab: AppBuilder = new AppBuilder(library);
-        return ab.buildFromSyntaxTree("string", intermAST, actorNamePrefix);
+        return ab.buildFromSyntaxTree("string", intermAST, typeStorage, actorNamePrefix);
     }
 
 }

@@ -52,6 +52,7 @@ import {VariableWithDataLocation} from "../ast/core/Variable";
 import {Logger} from "../../utils/Logger";
 import {ReturnStatement} from "../ast/core/statements/ControlStatement";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {TypeInformationStorage} from "../transformers/ToIntermediateTransformer";
 
 export class AppBuilder {
 
@@ -75,7 +76,7 @@ export class AppBuilder {
      * @param actorNamePrefix: A prefix to add to the name of all actors.
      */
     public buildFromSyntaxTree(programOrigin: string, ast: AstNode,
-                               actorNamePrefix: string): App {
+                               typeStorage: TypeInformationStorage, actorNamePrefix: string): App {
 
         Preconditions.checkArgument(ast instanceof ProgramDefinition);
         const programNode: ProgramDefinition = ast as ProgramDefinition;
@@ -84,7 +85,7 @@ export class AppBuilder {
         // TODO/FIXME: Check if adding the prefix to actor names works correctly.
         //      Also references to the actor must be updated.
 
-        return new App(programOrigin, programNode.ident.text, actorMap);
+        return new App(programOrigin, programNode.ident.text, actorMap, typeStorage);
     }
 
     private buildActors(programAST: ProgramDefinition, actorNamePrefix: string): ActorMap {
@@ -322,7 +323,7 @@ export class AppBuilder {
             flatActors[d.ident] = d;
         }
 
-        return new App(taskModel.origin, taskModel.ident, flatActors);
+        return new App(taskModel.origin, taskModel.ident, flatActors, taskModel.typeStorage);
     }
 
 }

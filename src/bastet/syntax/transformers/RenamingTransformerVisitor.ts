@@ -124,6 +124,7 @@ import {Statement} from "../ast/core/statements/Statement";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {BeginAtomicStatement, EndAtomicStatement, ReturnStatement} from "../ast/core/statements/ControlStatement";
 import {SystemMessage, UserMessage} from "../ast/core/Message";
+import {CastExpression} from "../ast/core/expressions/CastExpression";
 
 export enum DataLocationMode {
 
@@ -148,7 +149,7 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     private readonly _renamer: DataLocationRenamer;
 
-    private _activeStatement: Statement;
+    protected _activeStatement: Statement;
 
     private _activeUsageMode: DataLocationMode;
 
@@ -163,6 +164,10 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     visit(node: AstNode): AstNode {
         throw new ImplementMeException();
+    }
+
+    visitCastExpression(node: CastExpression): AstNode {
+        return new CastExpression(node.toConvert.accept(this) as Expression, node.castToType);
     }
 
     visitAbsentAstNode(node: AbsentAstNode<AstNode>): AstNode {

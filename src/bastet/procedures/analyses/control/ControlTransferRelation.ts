@@ -237,7 +237,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
     private scopeOperations(ops: ProgramOperation[], readFromScope: ImmList<string>,
                             writeToScope: ImmList<string>): ProgramOperation[] {
-        const scoper = new ScopeTransformerVisitor(readFromScope, writeToScope);
+        const scoper = new ScopeTransformerVisitor(this._task, readFromScope, writeToScope);
         return ops.map((o) => ProgramOperationFactory.createFor(o.ast.accept(scoper)));
     }
 

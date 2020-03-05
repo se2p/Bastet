@@ -30,6 +30,7 @@ import {CallStatement} from "../ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
 import {Properties, Property} from "../Property";
 import {TransitionRelation, TransRelId} from "./controlflow/TransitionRelation";
+import {TypeInformationStorage} from "../transformers/ToIntermediateTransformer";
 
 
 export class App {
@@ -42,10 +43,13 @@ export class App {
 
     private readonly _transRelById: Map<TransRelId, TransitionRelation>;
 
-    constructor(origin: string, ident: string, actorMap: ActorMap) {
+    private readonly _typeStorage: TypeInformationStorage;
+
+    constructor(origin: string, ident: string, actorMap: ActorMap, typeStorage: TypeInformationStorage) {
         this._origin = Preconditions.checkNotUndefined(origin);
         this._ident = Preconditions.checkNotEmpty(ident);
         this._actorMap = Preconditions.checkIsDic(actorMap);
+        this._typeStorage = Preconditions.checkNotUndefined(typeStorage);
 
         this._transRelById = new Map();
         for (const a of Maps.values(this._actorMap)) {
@@ -53,6 +57,10 @@ export class App {
                 this._transRelById.set(id, r);
             }
         }
+    }
+
+    get typeStorage(): TypeInformationStorage {
+        return this._typeStorage;
     }
 
     get origin(): string {
@@ -127,7 +135,7 @@ export class App {
 
     public static empty(): App {
        if (App.EMPTY_APP == null) {
-           App.EMPTY_APP = new App("", "empty", {});
+           App.EMPTY_APP = new App("", "empty", {}, new TypeInformationStorage());
        }
        return App.EMPTY_APP;
     }
