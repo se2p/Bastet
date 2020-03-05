@@ -31,6 +31,7 @@ import {VariableExpression, VariableWithDataLocation} from "../Variable";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
 import {IllegalArgumentException} from "../../../../core/exceptions/IllegalArgumentException";
+import {ActorExpression} from "./ActorExpression";
 
 export function extractStringLiteral(expression: StringExpression): string {
     Preconditions.checkNotUndefined(expression);
@@ -113,9 +114,9 @@ export class BoolAsStringExpression extends AbstractStringExpression {
 export class StringAttributeOfExpression extends AbstractStringExpression {
 
     private readonly _attribute: StringExpression;
-    private readonly _ofEntity: Identifier;
+    private readonly _ofEntity: ActorExpression;
 
-    constructor(attribute: StringExpression, ofEntity: Identifier) {
+    constructor(attribute: StringExpression, ofEntity: ActorExpression) {
         super([attribute, ofEntity]);
         this._attribute = attribute;
         this._ofEntity = ofEntity;
@@ -125,7 +126,7 @@ export class StringAttributeOfExpression extends AbstractStringExpression {
         return this._attribute;
     }
 
-    get ofEntity(): Identifier {
+    get ofEntity(): ActorExpression {
         return this._ofEntity;
     }
 }

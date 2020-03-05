@@ -71,6 +71,7 @@ declarationStmtList : declarationStmt* ;
 type :
     primitiveType # Primitive
  | 'list' 'of' type # ListType
+ | 'actor' # ActorType
  ;
 
 primitiveType:
@@ -272,8 +273,8 @@ coreStringExpr  :
  |  'cast' numExpr 'to' 'string' # NumAsStringExpression
  |  'cast' boolExpr 'to' 'string' # BoolAsStringExpression
 
- |  'attribute'  stringExpr  'of'  ident  # StringAttributeOfExpression               // query an attribute value of an actor (sprites, the stage)
- |  'resource' 'attribute'  stringExpr 'of'  variable  # ResourceAttributeOfExpression  // query attributes of ressources, for example, the original size
+ |  'attribute'  stringExpr 'of' actorExpr  # StringAttributeOfExpression               // query an attribute value of an actor (sprites, the stage)
+ |  'resource' 'attribute'  stringExpr 'of' variable  # ResourceAttributeOfExpression  // query attributes of ressources, for example, the original size
  |  'join'  stringExpr stringExpr # JoinStringsExpression
  |  'letter'  numExpr 'of'  stringExpr # IthLetterOfStringExpression
  |  'item'  numExpr 'of'  variable # IthStringItemOfExpression
@@ -331,12 +332,20 @@ coreNumExpr  :
  |  coreNumExpr  '-'  coreNumExpr # NumMinusExpression
 
  | 'default' number 'for' coreNumExpr # DefaultNumExpr
- | '?number' # UnspecifiedNumExpr ;
+ | '?number' # UnspecifiedNumExpr
+ ;
 
 listExpr :
     variable # ListVariableExpression
  |  '[' expressionListPlain ']' # ListWithElementsExpression
  ;
+
+actorExpr:
+    variable # ActorVariableExpression
+ | 'locate' 'actor' stringExpr # LocateActorExpression
+ | 'start' 'clone' 'of' actorExpr # StartCloneActorExpression
+ | 'usher' 'actor' stringExpr 'as' ident # UsherActorExpression
+  ;
 
 expression : coreExpression ;
 

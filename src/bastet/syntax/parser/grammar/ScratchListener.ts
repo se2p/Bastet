@@ -8,6 +8,7 @@ import { StrIdentExpressionContext } from "./ScratchParser";
 import { RestartScriptContext } from "./ScratchParser";
 import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
+import { ActorTypeContext } from "./ScratchParser";
 import { ConcreteActorModeContext } from "./ScratchParser";
 import { ActorRoleModeContext } from "./ScratchParser";
 import { ExternFunctionReturnDefinitionContext } from "./ScratchParser";
@@ -23,6 +24,10 @@ import { ImportAllActorsContext } from "./ScratchParser";
 import { StopAllContext } from "./ScratchParser";
 import { StopThisContext } from "./ScratchParser";
 import { DeleteThisCloneContext } from "./ScratchParser";
+import { ActorVariableExpressionContext } from "./ScratchParser";
+import { LocateActorExpressionContext } from "./ScratchParser";
+import { StartCloneActorExpressionContext } from "./ScratchParser";
+import { UsherActorExpressionContext } from "./ScratchParser";
 import { NumberExpressionContext } from "./ScratchParser";
 import { StringExpressionContext } from "./ScratchParser";
 import { AtomicMethodContext } from "./ScratchParser";
@@ -31,8 +36,6 @@ import { DeleteIthFromStatementContext } from "./ScratchParser";
 import { AddElementToStatementContext } from "./ScratchParser";
 import { InsertAtStatementContext } from "./ScratchParser";
 import { ReplaceElementAtStatementContext } from "./ScratchParser";
-import { RGBAColorExpressionContext } from "./ScratchParser";
-import { ColorFromNumExpressionContext } from "./ScratchParser";
 import { NeverEventContext } from "./ScratchParser";
 import { BootstapEventContext } from "./ScratchParser";
 import { AfterBootstrapMonitoringEventContext } from "./ScratchParser";
@@ -180,14 +183,13 @@ import { NumExprContext } from "./ScratchParser";
 import { NumOrStringExprContext } from "./ScratchParser";
 import { CoreNumExprContext } from "./ScratchParser";
 import { ListExprContext } from "./ScratchParser";
+import { ActorExprContext } from "./ScratchParser";
 import { ExpressionContext } from "./ScratchParser";
 import { CoreExpressionContext } from "./ScratchParser";
 import { UnspecifiedExprContext } from "./ScratchParser";
 import { VariableContext } from "./ScratchParser";
-import { ColorContext } from "./ScratchParser";
 import { IdentContext } from "./ScratchParser";
 import { NumberContext } from "./ScratchParser";
-import { KeyContext } from "./ScratchParser";
 import { ResourceLocatorContext } from "./ScratchParser";
 import { MessageContext } from "./ScratchParser";
 
@@ -261,6 +263,19 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitListType?: (ctx: ListTypeContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `ActorType`
+	 * labeled alternative in `ScratchParser.type`.
+	 * @param ctx the parse tree
+	 */
+	enterActorType?: (ctx: ActorTypeContext) => void;
+	/**
+	 * Exit a parse tree produced by the `ActorType`
+	 * labeled alternative in `ScratchParser.type`.
+	 * @param ctx the parse tree
+	 */
+	exitActorType?: (ctx: ActorTypeContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `ConcreteActorMode`
@@ -458,6 +473,58 @@ export interface ScratchListener extends ParseTreeListener {
 	exitDeleteThisClone?: (ctx: DeleteThisCloneContext) => void;
 
 	/**
+	 * Enter a parse tree produced by the `ActorVariableExpression`
+	 * labeled alternative in `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterActorVariableExpression?: (ctx: ActorVariableExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `ActorVariableExpression`
+	 * labeled alternative in `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitActorVariableExpression?: (ctx: ActorVariableExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `LocateActorExpression`
+	 * labeled alternative in `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterLocateActorExpression?: (ctx: LocateActorExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `LocateActorExpression`
+	 * labeled alternative in `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitLocateActorExpression?: (ctx: LocateActorExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `StartCloneActorExpression`
+	 * labeled alternative in `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterStartCloneActorExpression?: (ctx: StartCloneActorExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `StartCloneActorExpression`
+	 * labeled alternative in `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitStartCloneActorExpression?: (ctx: StartCloneActorExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `UsherActorExpression`
+	 * labeled alternative in `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterUsherActorExpression?: (ctx: UsherActorExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `UsherActorExpression`
+	 * labeled alternative in `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitUsherActorExpression?: (ctx: UsherActorExpressionContext) => void;
+
+	/**
 	 * Enter a parse tree produced by the `NumberExpression`
 	 * labeled alternative in `ScratchParser.numOrStringExpr`.
 	 * @param ctx the parse tree
@@ -560,32 +627,6 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitReplaceElementAtStatement?: (ctx: ReplaceElementAtStatementContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `RGBAColorExpression`
-	 * labeled alternative in `ScratchParser.color`.
-	 * @param ctx the parse tree
-	 */
-	enterRGBAColorExpression?: (ctx: RGBAColorExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `RGBAColorExpression`
-	 * labeled alternative in `ScratchParser.color`.
-	 * @param ctx the parse tree
-	 */
-	exitRGBAColorExpression?: (ctx: RGBAColorExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `ColorFromNumExpression`
-	 * labeled alternative in `ScratchParser.color`.
-	 * @param ctx the parse tree
-	 */
-	enterColorFromNumExpression?: (ctx: ColorFromNumExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `ColorFromNumExpression`
-	 * labeled alternative in `ScratchParser.color`.
-	 * @param ctx the parse tree
-	 */
-	exitColorFromNumExpression?: (ctx: ColorFromNumExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `NeverEvent`
@@ -2367,6 +2408,17 @@ export interface ScratchListener extends ParseTreeListener {
 	exitListExpr?: (ctx: ListExprContext) => void;
 
 	/**
+	 * Enter a parse tree produced by `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterActorExpr?: (ctx: ActorExprContext) => void;
+	/**
+	 * Exit a parse tree produced by `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitActorExpr?: (ctx: ActorExprContext) => void;
+
+	/**
 	 * Enter a parse tree produced by `ScratchParser.expression`.
 	 * @param ctx the parse tree
 	 */
@@ -2411,17 +2463,6 @@ export interface ScratchListener extends ParseTreeListener {
 	exitVariable?: (ctx: VariableContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `ScratchParser.color`.
-	 * @param ctx the parse tree
-	 */
-	enterColor?: (ctx: ColorContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.color`.
-	 * @param ctx the parse tree
-	 */
-	exitColor?: (ctx: ColorContext) => void;
-
-	/**
 	 * Enter a parse tree produced by `ScratchParser.ident`.
 	 * @param ctx the parse tree
 	 */
@@ -2442,17 +2483,6 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitNumber?: (ctx: NumberContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `ScratchParser.key`.
-	 * @param ctx the parse tree
-	 */
-	enterKey?: (ctx: KeyContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.key`.
-	 * @param ctx the parse tree
-	 */
-	exitKey?: (ctx: KeyContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.resourceLocator`.

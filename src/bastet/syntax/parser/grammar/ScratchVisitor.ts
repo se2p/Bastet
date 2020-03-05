@@ -8,6 +8,7 @@ import { StrIdentExpressionContext } from "./ScratchParser";
 import { RestartScriptContext } from "./ScratchParser";
 import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
+import { ActorTypeContext } from "./ScratchParser";
 import { ConcreteActorModeContext } from "./ScratchParser";
 import { ActorRoleModeContext } from "./ScratchParser";
 import { ExternFunctionReturnDefinitionContext } from "./ScratchParser";
@@ -23,6 +24,10 @@ import { ImportAllActorsContext } from "./ScratchParser";
 import { StopAllContext } from "./ScratchParser";
 import { StopThisContext } from "./ScratchParser";
 import { DeleteThisCloneContext } from "./ScratchParser";
+import { ActorVariableExpressionContext } from "./ScratchParser";
+import { LocateActorExpressionContext } from "./ScratchParser";
+import { StartCloneActorExpressionContext } from "./ScratchParser";
+import { UsherActorExpressionContext } from "./ScratchParser";
 import { NumberExpressionContext } from "./ScratchParser";
 import { StringExpressionContext } from "./ScratchParser";
 import { AtomicMethodContext } from "./ScratchParser";
@@ -31,8 +36,6 @@ import { DeleteIthFromStatementContext } from "./ScratchParser";
 import { AddElementToStatementContext } from "./ScratchParser";
 import { InsertAtStatementContext } from "./ScratchParser";
 import { ReplaceElementAtStatementContext } from "./ScratchParser";
-import { RGBAColorExpressionContext } from "./ScratchParser";
-import { ColorFromNumExpressionContext } from "./ScratchParser";
 import { NeverEventContext } from "./ScratchParser";
 import { BootstapEventContext } from "./ScratchParser";
 import { AfterBootstrapMonitoringEventContext } from "./ScratchParser";
@@ -180,14 +183,13 @@ import { NumExprContext } from "./ScratchParser";
 import { NumOrStringExprContext } from "./ScratchParser";
 import { CoreNumExprContext } from "./ScratchParser";
 import { ListExprContext } from "./ScratchParser";
+import { ActorExprContext } from "./ScratchParser";
 import { ExpressionContext } from "./ScratchParser";
 import { CoreExpressionContext } from "./ScratchParser";
 import { UnspecifiedExprContext } from "./ScratchParser";
 import { VariableContext } from "./ScratchParser";
-import { ColorContext } from "./ScratchParser";
 import { IdentContext } from "./ScratchParser";
 import { NumberContext } from "./ScratchParser";
-import { KeyContext } from "./ScratchParser";
 import { ResourceLocatorContext } from "./ScratchParser";
 import { MessageContext } from "./ScratchParser";
 
@@ -239,6 +241,14 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitListType?: (ctx: ListTypeContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `ActorType`
+	 * labeled alternative in `ScratchParser.type`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitActorType?: (ctx: ActorTypeContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `ConcreteActorMode`
@@ -361,6 +371,38 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitDeleteThisClone?: (ctx: DeleteThisCloneContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by the `ActorVariableExpression`
+	 * labeled alternative in `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitActorVariableExpression?: (ctx: ActorVariableExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `LocateActorExpression`
+	 * labeled alternative in `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitLocateActorExpression?: (ctx: LocateActorExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `StartCloneActorExpression`
+	 * labeled alternative in `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitStartCloneActorExpression?: (ctx: StartCloneActorExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `UsherActorExpression`
+	 * labeled alternative in `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitUsherActorExpression?: (ctx: UsherActorExpressionContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by the `NumberExpression`
 	 * labeled alternative in `ScratchParser.numOrStringExpr`.
 	 * @param ctx the parse tree
@@ -423,22 +465,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitReplaceElementAtStatement?: (ctx: ReplaceElementAtStatementContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `RGBAColorExpression`
-	 * labeled alternative in `ScratchParser.color`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitRGBAColorExpression?: (ctx: RGBAColorExpressionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `ColorFromNumExpression`
-	 * labeled alternative in `ScratchParser.color`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitColorFromNumExpression?: (ctx: ColorFromNumExpressionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `NeverEvent`
@@ -1551,6 +1577,13 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitListExpr?: (ctx: ListExprContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by `ScratchParser.actorExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitActorExpr?: (ctx: ActorExprContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by `ScratchParser.expression`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -1579,13 +1612,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitVariable?: (ctx: VariableContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `ScratchParser.color`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitColor?: (ctx: ColorContext) => Result;
-
-	/**
 	 * Visit a parse tree produced by `ScratchParser.ident`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -1598,13 +1624,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitNumber?: (ctx: NumberContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `ScratchParser.key`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitKey?: (ctx: KeyContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `ScratchParser.resourceLocator`.

@@ -37,6 +37,7 @@ import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {StringType} from "../../../syntax/ast/core/ScratchType";
 import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpression";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
+import {ActorExpression, ActorVariableExpression} from "../../../syntax/ast/core/expressions/ActorExpression";
 
 export const SCOPE_SEPARATOR = "@";
 
@@ -94,9 +95,14 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
     }
 
     visitStringAttributeOfExpression(node: StringAttributeOfExpression): AstNode {
-        const actorId: Identifier = node.ofEntity;
+        const actorExpr: ActorExpression = node.ofEntity;
+
+        // TODO: The ControlAnalysis must evaluate the `ActorExpression`
+
+        throw new ImplementMeException();
+/*
         const attributeName: string = extractStringLiteral(node.attribute);
-        const attributeType = this._task.typeStorage.getInfos(actorId).getTypeOf(Identifier.of(attributeName));
+        const attributeType = this._task.typeStorage.getInfos(actorExpr).getTypeOf(Identifier.of(attributeName));
 
         let readAttribute: DataLocation = new TypedDataLocation(attributeName, attributeType.typeId);
         readAttribute = this._scoper.renameUsage(readAttribute, DataLocationMode.READ_FROM, this._activeStatement);
@@ -107,6 +113,7 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
         } else {
             return new CastExpression(readVariable, StringType.instance());
         }
+*/
     }
 
 }

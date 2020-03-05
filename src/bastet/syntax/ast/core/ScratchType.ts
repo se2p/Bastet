@@ -84,6 +84,23 @@ export class VoidType extends ScratchType {
 
 }
 
+export class ActorType extends ScratchType {
+
+    private static INSTANCE: ActorType;
+
+    constructor() {
+        super([], SCRATCH_TYPE_ID_SEQ++);
+    }
+
+    static instance(): ActorType {
+        if (this.INSTANCE == null) {
+            this.INSTANCE = new ActorType();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
 export class NumberType extends ScratchType {
 
     private static INSTANCE: NumberType;
@@ -92,7 +109,7 @@ export class NumberType extends ScratchType {
         super([], SCRATCH_TYPE_ID_SEQ++);
     }
 
-    static instance(): VoidType {
+    static instance(): NumberType {
         if (this.INSTANCE == null) {
             this.INSTANCE = new NumberType();
         }
@@ -109,7 +126,7 @@ export class BooleanType extends ScratchType {
         super([], SCRATCH_TYPE_ID_SEQ++);
     }
 
-    static instance(): VoidType {
+    static instance(): BooleanType {
         if (this.INSTANCE == null) {
             this.INSTANCE = new BooleanType();
         }
@@ -126,7 +143,7 @@ export class StringType extends ScratchType {
         super([], SCRATCH_TYPE_ID_SEQ++);
     }
 
-    static instance(): VoidType {
+    static instance(): StringType {
         if (this.INSTANCE == null) {
             this.INSTANCE = new StringType();
         }

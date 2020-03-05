@@ -47,7 +47,6 @@ import {
     BroadcastMessageStatementContext,
     CallStmtContext,
     CloneStartEventContext,
-    ColorFromNumExpressionContext,
     ConcreteActorModeContext,
     ConditionReachedEventContext,
     CoreBoolExprContext,
@@ -88,7 +87,6 @@ import {
     IthLetterOfStringExpressionContext,
     IthStringItemOfExpressionContext,
     JoinStringsExpressionContext,
-    KeyContext,
     LengthOfListExpressionContext,
     LengthOfStringExpressionContext,
     LessThanExpressionContext,
@@ -157,7 +155,7 @@ import {
     VariableContext,
     VoidReturnDefinitionContext,
     WaitSecsStatementContext,
-    WaitUntilStatementContext
+    WaitUntilStatementContext, LocateActorExpressionContext, ActorVariableExpressionContext, ActorTypeContext
 } from "../parser/grammar/ScratchParser";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {Identifier} from "../ast/core/Identifier";
@@ -216,6 +214,7 @@ import {Expression} from "../ast/core/expressions/Expression";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {ParameterDeclaration, ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {
+    ActorType,
     BooleanType,
     ListType,
     NumberType,
@@ -303,6 +302,8 @@ import {BastetConfiguration} from "../../utils/BastetConfiguration";
 import {ParsingException} from "../../core/exceptions/ParsingException";
 import {ParserRuleContext} from "antlr4ts";
 import {CastExpression} from "../ast/core/expressions/CastExpression";
+import {ActorExpression, ActorVariableExpression} from "../ast/core/expressions/ActorExpression";
+import {TransitionRelation} from "../app/controlflow/TransitionRelation";
 
 const toposort = require('toposort');
 
@@ -1099,6 +1100,10 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(NumberType.instance());
     }
 
+    public visitActorType (ctx: ActorTypeContext): TransformerResult {
+        return TransformerResult.withNode(ActorType.instance());
+    }
+
     public visitActorComponentsDefinition (ctx: ActorComponentsDefinitionContext): TransformerResult {
         throw new IllegalStateException("Not expected to be needed.");
     }
@@ -1463,11 +1468,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(new CloneStartEvent());
     }
 
-    public visitColorFromNumExpression(ctx: ColorFromNumExpressionContext) : TransformerResult {
-        // Colors are mapped to numbers
-        return ctx.numExpr().accept(this);
-    }
-
     public visitConditionReachedEvent(ctx: ConditionReachedEventContext) : TransformerResult {
         const exprTr = ctx.boolExpr().accept(this);
         return TransformerResult.withNode(
@@ -1600,11 +1600,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
             new JoinStringsExpression(tr1.node as StringExpression, tr2.node as StringExpression));
-    }
-
-    public visitKey(ctx: KeyContext) : TransformerResult {
-        // Keys are mapped to numbers
-        return ctx.numExpr().accept(this);
     }
 
     public visitUserMessage(ctx: UserMessageContext) : TransformerResult {
@@ -1766,11 +1761,22 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             new CastExpression(tr.node as StringExpression, NumberType.instance()));
     }
 
+    public visitLocateActorExpression(ctx: LocateActorExpressionContext): TransformerResult {
+        throw new ImplementMeException();
+    }
+
+    public visitActorVariableExpression(ctx: ActorVariableExpressionContext): TransformerResult {
+        return ctx.variable().accept(this);
+    }
+
     public visitStringAttributeOfExpression(ctx: StringAttributeOfExpressionContext) : TransformerResult {
-        const tr = this.ensureType(ctx, StringType.instance(), ctx.stringExpr().accept(this));
-        return new TransformerResult(tr.statementsToPrepend,
-            new StringAttributeOfExpression(tr.node as StringExpression,
-                ctx.ident().accept(this).nodeOnly() as Identifier));
+        const trAttribute = this.ensureType(ctx, StringType.instance(), ctx.stringExpr().accept(this));
+        const trActor = this.ensureType(ctx, ActorType.instance(), ctx.actorExpr().accept(this));
+
+        return new TransformerResult(
+            StatementLists.concat(trAttribute.statementsToPrepend, trActor.statementsToPrepend),
+            new StringAttributeOfExpression(trAttribute.node as StringExpression,
+                trActor.node as ActorExpression));
     }
 
     public unquote(str: string): string {
