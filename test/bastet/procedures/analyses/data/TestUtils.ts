@@ -26,7 +26,7 @@ import {AnalysisResult, MultiPropertyAnalysisResult} from "../../../../../src/ba
 let intermediateRelPath = "../../../../../src/public/intermediate.sc";
 let intermediatePath = path.join(__dirname, intermediateRelPath);
 
-let configRelPath = "../../../../config/default.json"
+let configRelPath = "../../../../../config/default.json"
 let configFilePath = path.join(__dirname, configRelPath);
 
 let specRelPath = "../../../../specs/empty.sc"
