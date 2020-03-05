@@ -20,19 +20,19 @@
  *
  */
 
-import fs from "fs";
 
-export interface SystemLayer {
+import {BastetConfiguration} from "../../../src/bastet/utils/BastetConfiguration";
 
-    readFileAsJson(filePath: string): {};
+describe("BastetConfiguration", () => {
 
-}
+    test("Scoped Option", () => {
+        const cfg = new BastetConfiguration({"foo": { "bar": 1}}, ["foo"]);
+        expect(cfg.getProperty("bar")).toEqual(1);
+    });
 
-export class NodeSystemLayer implements SystemLayer {
+    test("Scoped Option Boolean", () => {
+        const cfg = new BastetConfiguration({"foo": { "bar": false}}, ["foo"]);
+        expect(cfg.getProperty("bar", true)).toEqual(false);
+    });
 
-    readFileAsJson(filePath: string): {} {
-        const data: string = fs.readFileSync(filePath, 'utf8');
-        return JSON.parse(data);
-    }
-
-}
+});

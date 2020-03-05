@@ -47,7 +47,7 @@ import {AnalysisStatistics} from "../AnalysisStatistics";
 export class ControlAnalysisConfig extends BastetConfiguration {
 
     constructor(dict: {}) {
-        super(dict);
+        super(dict, ["ControlAnalysis"]);
     }
 
     get aggregateAtomicTransitions(): boolean {

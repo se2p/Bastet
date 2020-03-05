@@ -26,8 +26,11 @@ export class BastetConfiguration {
 
     private readonly dict: {};
 
-    constructor(dict: {}) {
+    private readonly scope: string[];
+
+    constructor(dict: {}, scope: string[]) {
         this.dict = Preconditions.checkNotUndefined(dict);
+        this.scope = Preconditions.checkNotUndefined(scope);
     }
 
     public static loadFromFile(filename: string): BastetConfiguration {
@@ -35,7 +38,19 @@ export class BastetConfiguration {
     }
 
     public getProperty(name: string, def?: any): any {
-        return this.dict[name] || def;
+        let scopeConfig = this.dict;
+        for (const s of this.scope) {
+            scopeConfig = scopeConfig[s];
+            if (!scopeConfig) {
+                return def;
+            }
+        }
+
+        if (scopeConfig[name] === undefined) {
+            return def;
+        } else {
+            return scopeConfig[name];
+        }
     }
 
     public getNumberProperty(name: string, def?: number): number {

@@ -35,7 +35,7 @@ export const STAT_KEY_REACH_FRONTIER = "frontier states";
 export class ReachabilityAlgorithmConfig extends BastetConfiguration {
 
     constructor(dict: {}) {
-        super(dict);
+        super(dict, ['ReachabilityAlgorithm']);
     }
 
     get dumpGraphAfterIteration(): boolean {

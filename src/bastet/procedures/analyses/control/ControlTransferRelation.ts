@@ -69,7 +69,6 @@ import {IllegalStateException} from "../../../core/exceptions/IllegalStateExcept
 import {Script} from "../../../syntax/app/controlflow/Script";
 import {getTheOnlyElement} from "../../../utils/Collectionts";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
-import {StateLabelVisitor} from "../StateVisitors";
 import {SystemMessage} from "../../../syntax/ast/core/Message";
 
 class StepInformation {

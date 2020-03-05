@@ -308,7 +308,7 @@ const toposort = require('toposort');
 export class TransformerConfig extends BastetConfiguration {
 
     constructor(dict: {}) {
-        super(dict);
+        super(dict, ['Transformer']);
     }
 
     get useBusyWaiting(): boolean {

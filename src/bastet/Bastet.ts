@@ -32,10 +32,11 @@ import {AppBuilder} from "./syntax/app/AppBuilder";
 import {ProgramContext} from "./syntax/parser/grammar/ScratchParser";
 import {RuleNode} from "antlr4ts/tree";
 import {AstNode} from "./syntax/ast/AstNode";
-import {AnalysisProcedureConfig, AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
+import {AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
 import {AppToDot} from "./syntax/app/AppToDot";
 import {IllegalArgumentException} from "./core/exceptions/IllegalArgumentException";
 import {AnalysisStatistics} from "./procedures/analyses/AnalysisStatistics";
+import {NodeSystemLayer} from "./utils/SystemLayer";
 
 const process = require('process');
 
@@ -92,7 +93,8 @@ export class Bastet {
     }
 
     public async runFor(configFilepath: string, libraryFilepath: string, programFilepath: string, specFilepath: string) : Promise<AnalysisResult> {
-        const config: AnalysisProcedureConfig = AnalysisProcedureConfig.readFromConfigurationFile(configFilepath);
+        const sl = new NodeSystemLayer();
+        const config: {} = sl.readFileAsJson(configFilepath);
 
         // Build the static task model
         const staticTaskModel: App = this.buildTaskModel(libraryFilepath, programFilepath, specFilepath, config);
@@ -135,7 +137,7 @@ export class Bastet {
         return staticTaskModel;
     }
 
-    private async buildAnalysisProcedure(config: AnalysisProcedureConfig) : Promise<AnalysisProcedure> {
+    private async buildAnalysisProcedure(config: {}) : Promise<AnalysisProcedure> {
         // TODO: Allow for sequences of analyses procedures that can built on the respective previous results.
         return AnalysisProcedureFactory.createAnalysisProcedure(config);
     }

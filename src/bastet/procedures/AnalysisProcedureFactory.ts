@@ -39,18 +39,11 @@ import {AnalysisStatistics} from "./analyses/AnalysisStatistics";
 import {StatsAnalysis} from "./analyses/stats/StatsAnalysis";
 import {TimeAnalysis} from "./analyses/time/TimeAnalysis";
 import {StaticTimeProfile} from "../utils/TimeProfile";
-
-export class AnalysisProcedureConfig {
-
-    static readFromConfigurationFile(configFilepath: string) {
-        return new AnalysisProcedureConfig();
-    }
-
-}
+import {NodeSystemLayer} from "../utils/SystemLayer";
 
 export class AnalysisProcedureFactory {
 
-    public static async createAnalysisProcedure(config: AnalysisProcedureConfig): Promise<AnalysisProcedure> {
+    public static async createAnalysisProcedure(config: {}): Promise<AnalysisProcedure> {
         return new class implements AnalysisProcedure {
 
             private _statistics: AnalysisStatistics;
@@ -58,8 +51,6 @@ export class AnalysisProcedureFactory {
             private _result: MultiPropertyAnalysisResult;
 
             async run(task: App): Promise<MultiPropertyAnalysisResult> {
-                const config = {};
-
                 const smt = await SMTFactory.createZ3();
                 const bddlib = await BDDLibraryFactory.createBDDLib();
 
