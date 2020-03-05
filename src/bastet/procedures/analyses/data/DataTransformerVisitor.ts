@@ -98,6 +98,7 @@ import {ExpressionListExpression, ListVariableExpression} from "../../../syntax/
 import {ExpressionStatement} from "../../../syntax/ast/core/statements/ExpressionStatement";
 import {EpsilonStatement} from "../../../syntax/ast/core/statements/EpsilonStatement";
 import {
+    DeclareActorVariableStatement,
     DeclareAttributeStatement,
     DeclareStackVariableStatement,
     DeclareSystemVariableStatement
@@ -454,6 +455,11 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
 
     visitDeclareAttributeStatement(node: DeclareAttributeStatement): B {
         throw new ImplementMeException();
+    }
+
+    visitDeclareActorVariableStatement(node: DeclareActorVariableStatement): B {
+        // We assume the variables to be initialized with NONDET-values
+        return this._mem;
     }
 
     visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): B {

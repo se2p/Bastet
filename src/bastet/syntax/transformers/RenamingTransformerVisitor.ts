@@ -101,6 +101,7 @@ import {ExpressionListExpression, ListVariableExpression} from "../ast/core/expr
 import {ExpressionStatement} from "../ast/core/statements/ExpressionStatement";
 import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
 import {
+    DeclareActorVariableStatement,
     DeclareAttributeStatement,
     DeclareStackVariableStatement,
     DeclareSystemVariableStatement
@@ -576,6 +577,13 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     visitDeclareAttributeStatement(node: DeclareAttributeStatement): AstNode {
         throw new IllegalStateException("We assume that 'attributes' are no more used");
+    }
+
+    visitDeclareActorVariableStatement(node: DeclareActorVariableStatement): AstNode {
+        return this.doForStatement(node, (() => {
+            const renamedDataLoc: DataLocation = this.renameDeclaration(node.variable.dataloc);
+            return new DeclareActorVariableStatement(new VariableWithDataLocation(renamedDataLoc));
+        }));
     }
 
     visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): AstNode {
