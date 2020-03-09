@@ -537,7 +537,7 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitLocateActorExpression(node: LocateActorExpression): AstNode {
-        return new LocateActorExpression(node.name.accept(this) as StringExpression);
+        return new LocateActorExpression(node.actorName.accept(this) as StringExpression);
     }
 
     visitActorVariableExpression(node: ActorVariableExpression): AstNode {

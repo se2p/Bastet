@@ -183,9 +183,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             Preconditions.checkState(leavingOps.length > 0,
                 "A thread with no leaving ops must NOT be in state THREAD_STATE_RUNNING");
 
-            for (const op of leavingOps) {
-                console.log(op.ops.map((o) => o.ast.toTreeString()));
-
+            for (const op of leavingOps) { // Multiple leaving ops in case of branchings
                 // Interpret the operation `op` for thread `threadToStep` in state `fromState`
                 const succStates0: ControlAbstractState[] = this.interprete(fromState, threadToStep, op);
 
@@ -455,6 +453,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     throw new ImplementMeException();
 
                 } else if (stepOp.ast.toValue instanceof LocateActorExpression) {
+                    const expr = stepOp.ast.toValue as LocateActorExpression;
                     throw new ImplementMeException();
 
                 } else if (stepOp.ast.toValue instanceof StartCloneActorExpression) {
@@ -476,12 +475,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         }
 
         // TODO: Hats to activate:
-        //  - BootStrap
-        //  - AfterBootstrap
-        //  - Startup
         //  - StartedAsClone
-        //  - ReceivedMessage (after a Broadcast op)
-        //  - ReachedCondition (after each user-visible state)
 
         // TODO: Mouse inputs, keyboard inputs, microphone inputs, others?
 

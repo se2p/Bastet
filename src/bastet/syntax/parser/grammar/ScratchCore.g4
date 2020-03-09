@@ -344,7 +344,7 @@ actorExpr:
     variable # ActorVariableExpression
  | 'locate' 'actor' stringExpr # LocateActorExpression
  | 'start' 'clone' 'of' actorExpr # StartCloneActorExpression
- | 'usher' 'actor' stringExpr 'as' ident # UsherActorExpression
+ | 'start' 'actor' stringExpr 'as' ident # UsherActorExpression
   ;
 
 expression : coreExpression ;

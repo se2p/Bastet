@@ -27,6 +27,7 @@ import {ConcreteElement} from "../domains/ConcreteElements";
 import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
 import {BastetConfiguration} from "../../utils/BastetConfiguration";
 import {ExportFunction, resolveResultExportFunction} from "../analyses/Analyses";
+import {AnalysisAlgorithm} from "./Algorithm";
 
 export const STAT_KEY_REACH_ITERATIONS = "iterations";
 export const STAT_KEY_REACH_REACHED = "reached states";
@@ -49,7 +50,7 @@ export class ReachabilityAlgorithmConfig extends BastetConfiguration {
  * reachability algorithm that can be found in the CPA framework;
  * nevertheless, our implementation has important differences.
  */
-export class ReachabilityAlgorithm<C extends ConcreteElement, E extends AbstractElement> {
+export class ReachabilityAlgorithm<C extends ConcreteElement, E extends AbstractElement> implements AnalysisAlgorithm<C, E> {
 
     private readonly _analysis: ProgramAnalysis<C, E>;
     private readonly _chooseOp: ChooseOperator<E>;

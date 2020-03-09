@@ -242,7 +242,7 @@ role ScratchEntity is RuntimeEntity begin
 
 
     // @Category "Looks"
-    define changeActiveGraphicTo (id: string) begin
+    define atomic changeActiveGraphicTo (id: string) begin
         define active_graphic_name as id
         define active_graphic_width as _RUNTIME_getImageWidth(id)
         define active_graphic_height as _RUNTIME_getImageHeight(id)
@@ -250,13 +250,13 @@ role ScratchEntity is RuntimeEntity begin
 
     // @Category "Looks"
     // @Block "change <string as effect> effect by <number as value>
-    define changeGraphicEffectBy (eff:string, val:number) begin
+    define atomic changeGraphicEffectBy (eff:string, val:number) begin
 
     end
 
     // @Category "Looks"
     // @Block "clear graphic effects"
-    define clearGraphicEffects () begin
+    define atomic clearGraphicEffects () begin
 
     end
 
@@ -274,7 +274,7 @@ role ScratchEntity is RuntimeEntity begin
 
     // @Category "Sound"
     // @Block "play sound <sound as snd> until done"
-    define playUntilDone (snd: number) begin
+    define atomic playUntilDone (snd: number) begin
 
     end
 

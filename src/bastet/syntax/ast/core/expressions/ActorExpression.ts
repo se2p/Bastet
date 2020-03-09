@@ -58,15 +58,15 @@ export class ActorVariableExpression extends AbstractActorExpression implements 
 
 export class LocateActorExpression extends AbstractActorExpression {
 
-    private readonly _name: StringExpression;
+    private readonly _actorName: StringExpression;
 
     constructor(name: StringExpression) {
         super([Preconditions.checkNotUndefined(name)]);
-        this._name = name;
+        this._actorName = name;
     }
 
-    get name(): StringExpression {
-        return this._name;
+    get actorName(): StringExpression {
+        return this._actorName;
     }
 }
 
