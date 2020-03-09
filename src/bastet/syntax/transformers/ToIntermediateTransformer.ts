@@ -564,7 +564,7 @@ export class TypeInformationStorage {
         this._actorTypeInfos[ti.actor.text] = ti;
     }
 
-    public getInfos(id: Identifier): ActorTypeInformation {
+    public getActorInfos(id: Identifier): ActorTypeInformation {
         Preconditions.checkNotUndefined(id);
         const result = this._actorTypeInfos[id.text];
         return Preconditions.checkNotUndefined(result, `No actor with name ${id.text} found`);
@@ -578,11 +578,11 @@ export class TypeInformationStorage {
         const result = new TypeInformationStorage();
 
         for (const actor1 of storage1.getActorList()) {
-            result.putActorTypeInformation(storage1.getInfos(Identifier.of(actor1)));
+            result.putActorTypeInformation(storage1.getActorInfos(Identifier.of(actor1)));
         }
 
         for (const actor2 of storage2.getActorList()) {
-            result.putActorTypeInformation(storage2.getInfos(Identifier.of(actor2)));
+            result.putActorTypeInformation(storage2.getActorInfos(Identifier.of(actor2)));
         }
 
         return result;
@@ -837,7 +837,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             if (!inheritesFrom.isEmpty()) {
                 for (let id of inheritesFrom.elements) {
                     const inheritsFromName = id.text;
-                    const baseActorTypeInfos: ActorTypeInformation = this._actorTypeInfos.getInfos(id);
+                    const baseActorTypeInfos: ActorTypeInformation = this._actorTypeInfos.getActorInfos(id);
                     if (!baseActorTypeInfos) {
                         throw new IllegalStateException(`Type infos for ${inheritsFromName} missing`);
                     }
@@ -2090,7 +2090,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         throw new ImplementMeException();
     }
 
-    private ensureType(context: ParserRuleContext, varType: ScratchType, transformerResult: TransformerResult): TransformerResult {
+    private ensureType0(context: ParserRuleContext, varType: ScratchType, transformerResult: TransformerResult): TransformerResult {
         if (transformerResult.node['expressionType'] == varType) {
             return transformerResult;
 
@@ -2101,6 +2101,19 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         } else {
             throw new ParsingException(`Type ${varType.toTreeString()} expected.`, context);
         }
+    }
+
+    private ensureType(context: ParserRuleContext, varType: ScratchType, transformerResult: TransformerResult): TransformerResult {
+        const result = this.ensureType0(context, varType, transformerResult);
+
+        if (result.node instanceof VariableWithDataLocation) {
+            const declaredType: ScratchType = this.getTypeOf(result.node.identifier);
+            if (declaredType.typeId != varType.typeId) {
+                throw new ParsingException(`Expected type ${varType.toTreeString()} differs from declared ${declaredType.toTreeString()}`, context);
+            }
+        }
+
+        return result;
     }
 }
 
