@@ -163,10 +163,10 @@ export class AfterStatementMonitoringEvent extends CoreEvent {
     private static INSTANCE: AfterStatementMonitoringEvent;
 
     public static instance(): AfterStatementMonitoringEvent {
-        if (!this.INSTANCE) {
-            this.INSTANCE = new AfterStatementMonitoringEvent();
+        if (!AfterStatementMonitoringEvent.INSTANCE) {
+            AfterStatementMonitoringEvent.INSTANCE = new AfterStatementMonitoringEvent();
         }
-        return this.INSTANCE;
+        return AfterStatementMonitoringEvent.INSTANCE;
     }
 
 }

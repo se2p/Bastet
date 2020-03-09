@@ -22,7 +22,11 @@
 
 import {LabeledTransferRelation, TransferRelation, Transfers} from "../TransferRelation";
 import {
-    ControlAbstractState, IndexedThread, MethodCall, RelationLocation, ThreadComputationState,
+    ControlAbstractState,
+    IndexedThread,
+    MethodCall,
+    RelationLocation,
+    ThreadComputationState,
     ThreadState
 } from "./ControlAbstractDomain";
 import {AbstractElement} from "../../../lattices/Lattice";
@@ -31,13 +35,14 @@ import {App} from "../../../syntax/app/App";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {TransitionRelation, TransitionTo} from "../../../syntax/app/controlflow/TransitionRelation";
-import {Actor} from "../../../syntax/app/Actor";
+import {Actor, ActorId} from "../../../syntax/app/Actor";
 import {
     ProgramOperation,
     ProgramOperationFactory,
-    ProgramOperations, RawOperation
+    ProgramOperations,
+    RawOperation
 } from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {List as ImmList, Set as ImmSet} from "immutable";
+import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable";
 import {ScopeTransformerVisitor} from "./DataLocationScoping";
 import {mapExpand} from "../../../utils/Functional";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
@@ -69,7 +74,13 @@ import {IllegalStateException} from "../../../core/exceptions/IllegalStateExcept
 import {Script} from "../../../syntax/app/controlflow/Script";
 import {getTheOnlyElement} from "../../../utils/Collectionts";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
-import {SystemMessage} from "../../../syntax/ast/core/Message";
+import {BOOTSTRAP_FINISHED_MESSAGE, SystemMessage} from "../../../syntax/ast/core/Message";
+import {ActorType} from "../../../syntax/ast/core/ScratchType";
+import {
+    LocateActorExpression,
+    StartCloneActorExpression,
+    UsherActorExpression
+} from "../../../syntax/ast/core/expressions/ActorExpression";
 
 class StepInformation {
 
@@ -168,11 +179,13 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             Preconditions.checkState(threadToStep.threadStatus.getComputationState() === ThreadComputationState.THREAD_STATE_RUNNING);
 
             // Determine the operations to execute on for the given thread
-            const leavingOps: StepInformation[] = this.resolveLeavingOps(threadToStep);
+            const leavingOps: StepInformation[] = this.resolveLeavingOps(fromState, threadToStep);
             Preconditions.checkState(leavingOps.length > 0,
                 "A thread with no leaving ops must NOT be in state THREAD_STATE_RUNNING");
 
             for (const op of leavingOps) {
+                console.log(op.ops.map((o) => o.ast.toTreeString()));
+
                 // Interpret the operation `op` for thread `threadToStep` in state `fromState`
                 const succStates0: ControlAbstractState[] = this.interprete(fromState, threadToStep, op);
 
@@ -214,7 +227,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
     /**
      * Returns either a singleton-list or the empty list.
      */
-    private resolveLeavingOps(thread: IndexedThread): StepInformation[] {
+    private resolveLeavingOps(fromState: ControlAbstractState, thread: IndexedThread): StepInformation[] {
         const threadState = thread.threadStatus;
         const fromLocation: RelationLocation = threadState.getRelationLocation();
         const fromRelation: TransitionRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
@@ -228,16 +241,16 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             Preconditions.checkNotUndefined(op);
 
             result.push(new StepInformation(thread, statementTarget, isAtomic,
-                this.scopeOperations([op], threadState.getScopeStack(), threadState.getScopeStack()),
+                this.scopeOperations([op], fromState.getActorScopes(), threadState.getScopeStack(), threadState.getScopeStack()),
                     threadState.getCallStack(), threadState.getScopeStack()));
         }
 
         return result;
     }
 
-    private scopeOperations(ops: ProgramOperation[], readFromScope: ImmList<string>,
+    private scopeOperations(ops: ProgramOperation[], actorScopes: ImmMap<VariableWithDataLocation, string>, readFromScope: ImmList<string>,
                             writeToScope: ImmList<string>): ProgramOperation[] {
-        const scoper = new ScopeTransformerVisitor(this._task, readFromScope, writeToScope);
+        const scoper = new ScopeTransformerVisitor(this._task, actorScopes, readFromScope, writeToScope);
         return ops.map((o) => ProgramOperationFactory.createFor(o.ast.accept(scoper)));
     }
 
@@ -339,7 +352,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     const currentScopeStack = steppedThread.getScopeStack();
 
                     resultList.push([result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                        ts.withOperations(ImmList(this.scopeOperations(interProcOps, currentScopeStack, succScopeStack).map(op => op.ident)))
+                        ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.getActorScopes(), currentScopeStack, succScopeStack).map(op => op.ident)))
                             .withLocation(callToRelationLoc)
                             .withCallStack(succCallStack)
                             .withScopeStack(succScopeStack)), true]);
@@ -358,7 +371,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             const interProcOps: ProgramOperation[] = this.createStoreCallResultOps(steppedThread, callInformation, stepOp.ast as ReturnStatement);
 
             return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                ts.withOperations(ImmList(this.scopeOperations(interProcOps, steppedThread.getScopeStack(), succScopeStack).map(o => o.ident)))
+                ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.actorScopes, steppedThread.getScopeStack(), succScopeStack).map(o => o.ident)))
                     .withLocation(callInformation.getReturnTo())
                     .withCallStack(succReturnCallsTo)
                     .withScopeStack(succScopeStack)), true]];
@@ -370,6 +383,10 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             // Prepare the waiting threads for running
             for (const waitForThread of waitFor) {
                 result = this.restartThread(result, waitForThread.threadIndex);
+            }
+
+            if (stepOp.ast.msg == BOOTSTRAP_FINISHED_MESSAGE) {
+                result = this.activateAfterStepMonitoring(result);
             }
 
             return [[result, true]]
@@ -429,6 +446,33 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         } else if (stepOp.ast instanceof WaitSecsStatement) {
             throw new ImplementMeException();
 
+        } else if (stepOp.ast instanceof StoreEvalResultToVariableStatement) {
+            if (stepOp.ast.variable.variableType == ActorType.instance()) {
+                const variableToSet = stepOp.ast.variable;
+                let setTo: ActorId = null;
+
+                if (stepOp.ast.toValue instanceof VariableWithDataLocation) {
+                    throw new ImplementMeException();
+
+                } else if (stepOp.ast.toValue instanceof LocateActorExpression) {
+                    throw new ImplementMeException();
+
+                } else if (stepOp.ast.toValue instanceof StartCloneActorExpression) {
+                    throw new ImplementMeException();
+
+                } else if (stepOp.ast.toValue instanceof UsherActorExpression) {
+                    throw new ImplementMeException();
+
+                } else {
+                    throw new ImplementMeException();
+                }
+
+                Preconditions.checkNotUndefined(setTo);
+                const actorScopesPrime = result.getActorScopes().set(variableToSet, setTo);
+                result = result.withActorScopes(actorScopesPrime);
+
+                return [[result, true]];
+            }
         }
 
         // TODO: Hats to activate:
@@ -519,7 +563,9 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 const script = actor.getScript(threadState.getScriptId());
 
                 if (script.event instanceof AfterStatementMonitoringEvent) {
-                    result = this.restartThread(inState, threadIndex);
+                    if (threadState.getComputationState() != ThreadComputationState.THREAD_STATE_DISABLED) {
+                        result = this.restartThread(inState, threadIndex);
+                    }
                 }
             }
         }
@@ -546,7 +592,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         let result: ControlAbstractState = succState;
         const steppedThread: IndexedThread = succState.getIndexedThreadState(steppedThreadIndex);
 
-        const nextOps = this.resolveLeavingOps(steppedThread);
+        const nextOps = this.resolveLeavingOps(predState, steppedThread);
         if (nextOps.length > 0 && steppedThread.threadStatus.getInAtomicMode() > 0) {
             // Finish the atomic operations without interruptions by another thread
             return [result.withThreadStateUpdate(steppedThread.threadIndex, (ts) =>
@@ -623,7 +669,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         let threadIndex = 0;
         let running = 0;
         for (const ts of schedOf.getThreadStates()) {
-            const ops = this.resolveLeavingOps(new IndexedThread(ts, threadIndex));
+            const ops = this.resolveLeavingOps(schedOf, new IndexedThread(ts, threadIndex));
             if (ts.getComputationState() == ThreadComputationState.THREAD_STATE_RUNNING) {
                 running++;
                 if (ops.length == 0) {
@@ -670,5 +716,32 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         const msg2_message: string = this.evaluateToConcreteMessage(message);
 
         return msg1_message == msg2_message;
+    }
+
+    /**
+     * Threads that observe state transitions must become active after the boostrapping
+     * process has been finished and not prior to it.
+     *
+     * This function awakes the observing threads and is typically called
+     * after bootstrapping has been finished.
+     *
+     * @param state
+     */
+    private activateAfterStepMonitoring(state: ControlAbstractState) {
+        let result: ControlAbstractState = state;
+
+        for (const [ti, ts] of state.getThreadStates().entries()) {
+            if (ts.getComputationState() == ThreadComputationState.THREAD_STATE_DISABLED) {
+                const threadActor = this._task.getActorByName(ts.getActorId());
+                const threadScript = threadActor.getScript(ts.getScriptId());
+                if (threadScript.event instanceof AfterStatementMonitoringEvent) {
+                    result = result.withThreadStateUpdate(ti,
+                        (t) => t.withComputationState(
+                            ThreadComputationState.THREAD_STATE_RUNNING));
+                }
+            }
+        }
+
+        return result;
     }
 }

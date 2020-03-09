@@ -25,7 +25,7 @@ import {
     DataLocationRenamer,
     RenamingTransformerVisitor
 } from "../../../syntax/transformers/RenamingTransformerVisitor";
-import {List as ImmList} from "immutable";
+import {List as ImmList, Map as ImmMap} from "immutable";
 import {DataLocation, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {Statement} from "../../../syntax/ast/core/statements/Statement";
 import {Preconditions} from "../../../utils/Preconditions";
@@ -38,6 +38,9 @@ import {StringType} from "../../../syntax/ast/core/ScratchType";
 import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpression";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {ActorExpression, ActorVariableExpression} from "../../../syntax/ast/core/expressions/ActorExpression";
+import {ActorId} from "../../../syntax/app/Actor";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 
 export const SCOPE_SEPARATOR = "@";
 
@@ -86,11 +89,14 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
 
     private readonly _task: App;
     private readonly _scoper: DataLocationScoper;
+    private readonly _actorScopes: ImmMap<VariableWithDataLocation, ActorId>;
 
-    constructor(task: App, readFromScope: ImmList<string>, writeToScope: ImmList<string>) {
-        const scoper = new DataLocationScoper(readFromScope, writeToScope)
+    constructor(task: App, actorScopes: ImmMap<VariableWithDataLocation, ActorId>, readFromScope: ImmList<string>,
+                writeToScope: ImmList<string>) {
+        const scoper = new DataLocationScoper(readFromScope, writeToScope);
         super(scoper);
         this._scoper = scoper;
+        this._actorScopes = Preconditions.checkNotUndefined(actorScopes);
         this._task = Preconditions.checkNotUndefined(task);
     }
 
@@ -99,21 +105,30 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
 
         // TODO: The ControlAnalysis must evaluate the `ActorExpression`
 
-        throw new ImplementMeException();
-/*
-        const attributeName: string = extractStringLiteral(node.attribute);
-        const attributeType = this._task.typeStorage.getInfos(actorExpr).getTypeOf(Identifier.of(attributeName));
+        if (node.ofEntity instanceof VariableWithDataLocation) {
+            const actorVar = node.ofEntity as VariableWithDataLocation;
+            const actorScopeName = this._actorScopes.get(actorVar);
+            if (!actorScopeName) {
+                throw new IllegalStateException(`Cannot lookup actor scope for actor variable ${actorVar.toTreeString()}`);
+            }
+            const actorScope = Identifier.of(actorScopeName);
 
-        let readAttribute: DataLocation = new TypedDataLocation(attributeName, attributeType.typeId);
-        readAttribute = this._scoper.renameUsage(readAttribute, DataLocationMode.READ_FROM, this._activeStatement);
-        const readVariable = new VariableWithDataLocation(readAttribute);
+            const attributeName: string = extractStringLiteral(node.attribute);
+            const attributeType = this._task.typeStorage
+                .getActorInfos(actorScope).getTypeOf(Identifier.of(attributeName));
 
-        if (readVariable.variableType == StringType.instance()) {
-            return readVariable;
+            let readAttribute: DataLocation = new TypedDataLocation(attributeName, attributeType.typeId);
+            readAttribute = this._scoper.renameUsage(readAttribute, DataLocationMode.READ_FROM, this._activeStatement);
+            const readVariable = new VariableWithDataLocation(readAttribute);
+
+            if (readVariable.variableType == StringType.instance()) {
+                return readVariable;
+            } else {
+                return new CastExpression(readVariable, StringType.instance());
+            }
         } else {
-            return new CastExpression(readVariable, StringType.instance());
+            throw new IllegalArgumentException("Attributes can only be read from variables of type actor!");
         }
-*/
     }
 
 }

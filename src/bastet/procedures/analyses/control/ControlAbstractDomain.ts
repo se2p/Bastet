@@ -22,18 +22,22 @@
 import {SingletonStateWrapper} from "../AbstractStates";
 import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
 import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
-import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable";
-import {ActorId} from "../../../syntax/app/Actor";
+import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+import {Actor, ActorId} from "../../../syntax/app/Actor";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ConcreteDomain} from "../../domains/ConcreteElements";
 import {App} from "../../../syntax/app/App";
-import {BootstrapEvent, SingularityEvent} from "../../../syntax/ast/core/CoreEvent";
+import {AfterStatementMonitoringEvent, BootstrapEvent, SingularityEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Property} from "../../../syntax/Property";
 import {TransRelId} from "../../../syntax/app/controlflow/TransitionRelation";
 import {ScriptId} from "../../../syntax/app/controlflow/Script";
 import {OperationId} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Preconditions} from "../../../utils/Preconditions";
+import {DataLocations, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
+import {ActorType} from "../../../syntax/ast/core/ScratchType";
+import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
+import {Identifier} from "../../../syntax/ast/core/Identifier";
 
 export enum ThreadComputationState {
     THREAD_STATE_RUNNING = "R",
@@ -41,6 +45,7 @@ export enum ThreadComputationState {
     THREAD_STATE_DONE = "D",
     THREAD_STATE_YIELD = "Y",
     THREAD_STATE_FAILURE = "F",
+    THREAD_STATE_DISABLED = "P",
     THREAD_STATE_UNKNOWN = "?",
 }
 
@@ -194,10 +199,11 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, operations: ImmList<OperationId>,
                 location: RelationLocation, compState: ThreadComputationState, waitingForThreads: ImmSet<ThreadId>,
-                failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, scopeStack: ImmList<string>, inAtomicMode: number) {
+                failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, scopeStack: ImmList<string>,
+                actorScopes: ImmMap<TypedDataLocation, string>,  inAtomicMode: number) {
         super({threadId: threadId, actorId: actorId, scriptId: scriptId, operations: operations, location: location,
-            computationState: compState, waitingForThreads: waitingForThreads,
-            failedFor: failedFor, callStack: callStack, scopeStack: scopeStack, inAtomicMode: inAtomicMode});
+            computationState: compState, waitingForThreads: waitingForThreads, failedFor: failedFor,
+            callStack: callStack, scopeStack: scopeStack, inAtomicMode: inAtomicMode});
     }
 
     public getInAtomicMode(): number {
@@ -311,6 +317,9 @@ export interface ControlAbstractStateAttributes extends AbstractElement, Singlet
     /** The threads that have been stepped to get to this state */
     steppedThreadIndices: ImmSet<number>;
 
+    /** Actor scopes */
+    actorScopes: ImmMap<VariableWithDataLocation, ActorId>;
+
 }
 
 const ControlAbstractStateRecord = ImmRec({
@@ -320,6 +329,8 @@ const ControlAbstractStateRecord = ImmRec({
     steppedThreadIndices: ImmSet<number>(),
 
     wrappedState: null,
+
+    actorScopes: ImmMap<VariableWithDataLocation, ActorId>(),
 
     isTargetFor: ImmSet<Property>()
 
@@ -343,6 +354,7 @@ export class IndexedThread {
     get threadIndex(): number {
         return this._threadIndex;
     }
+
 }
 
 /**
@@ -351,9 +363,9 @@ export class IndexedThread {
 export class ControlAbstractState extends ControlAbstractStateRecord implements AbstractState {
 
     constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement, isTargetFor: ImmSet<Property>,
-                steppedThreadIndices: ImmSet<number>) {
+                steppedThreadIndices: ImmSet<number>, actorScopes: ImmMap<VariableWithDataLocation, ActorId>) {
         super({threadStates: threadStates, wrappedState: wrappedState, isTargetFor: isTargetFor,
-            steppedThreadIndices: steppedThreadIndices});
+            steppedThreadIndices: steppedThreadIndices, actorScopes: actorScopes});
     }
 
     public getIndexedThreadState(atIndex: number): IndexedThread {
@@ -374,6 +386,14 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
 
     public getSteppedFor(): ImmSet<number> {
         return this.get("steppedThreadIndices");
+    }
+
+    public getActorScopes(): ImmMap<VariableWithDataLocation, ActorId> {
+        return this.get('actorScopes');
+    }
+
+    public withActorScopes(scopes: ImmMap<VariableWithDataLocation, ActorId>): ControlAbstractState {
+        return this.set('actorScopes', scopes);
     }
 
     public withWrappedState(wrapped: AbstractElement): ControlAbstractState {
@@ -412,7 +432,11 @@ export class ScheduleAbstractStateFactory {
     static createInitialState(task: App, wrappedState: ImmRec<any>, isTarget) {
         let singular = false;
         let threads = ImmList<ThreadState>([]);
+        let actors = ImmMap<VariableWithDataLocation, ActorId>();
+
         for (const actor of task.actors) {
+            actors = actors.set(new VariableWithDataLocation(
+                DataLocations.createTypedLocation(Identifier.of(actor.ident), ActorType.instance())), actor.ident);
             for (const script of actor.scripts) {
                 if (script.transitions.transitionTable.size == 0) {
                     // Ignore empty scripts. We assume that there are
@@ -422,21 +446,26 @@ export class ScheduleAbstractStateFactory {
 
                 const threadId = ThreadStateFactory.freshId();
                 let threadState = ThreadComputationState.THREAD_STATE_WAIT;
-                if (script.event === SingularityEvent.instance()) {
+
+                if (script.event instanceof SingularityEvent) {
                     Preconditions.checkState(!singular);
                     threadState = ThreadComputationState.THREAD_STATE_RUNNING;
                     singular = true;
+
+                } else if (script.event instanceof AfterStatementMonitoringEvent) {
+                    threadState = ThreadComputationState.THREAD_STATE_DISABLED;
                 }
 
                 for (const locId of script.transitions.entryLocationSet) {
                     const loc: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, locId);
-                    threads = threads.push(new ThreadState(threadId, actor.ident, script.id, ImmList(), loc,
-                        threadState, ImmSet(), ImmSet(), ImmList(), ImmList([actor.ident]), 0));
+                    threads = threads.push(new ThreadState(threadId, actor.ident, script.id, ImmList(),
+                        loc, threadState, ImmSet(), ImmSet(), ImmList(),
+                        ImmList([actor.ident]), ImmMap(), 0));
                 }
             }
         }
 
-        return new ControlAbstractState(threads, wrappedState, isTarget, ImmSet());
+        return new ControlAbstractState(threads, wrappedState, isTarget, ImmSet(), actors);
     }
 }
 

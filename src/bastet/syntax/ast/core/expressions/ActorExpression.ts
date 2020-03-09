@@ -61,7 +61,8 @@ export class LocateActorExpression extends AbstractActorExpression {
     private readonly _name: StringExpression;
 
     constructor(name: StringExpression) {
-        super([name]);
+        super([Preconditions.checkNotUndefined(name)]);
+        this._name = name;
     }
 
     get name(): StringExpression {
@@ -74,7 +75,7 @@ export class StartCloneActorExpression extends AbstractActorExpression {
     private readonly _ofActor: ActorExpression;
 
     constructor(ofActor: ActorExpression) {
-        super([ofActor]);
+        super([Preconditions.checkNotUndefined(ofActor)]);
         this._ofActor = Preconditions.checkNotUndefined(ofActor);
     }
 

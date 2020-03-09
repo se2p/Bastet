@@ -33,11 +33,11 @@ program Task6Spec
 
 actor DirectorObserver is Observer begin
 
-    declare actor_1_id as string
+    declare actor_1 as actor
     declare actor_1_last_y as number
     declare actor_1_last_x as number
 
-    declare actor_2_id as string
+    declare actor_2 as actor
     declare actor_2_last_y as number
     declare actor_2_last_x as number
 
@@ -48,8 +48,6 @@ actor DirectorObserver is Observer begin
 
     define last_change as _RUNTIME_millis()
     define actor_1_moving_towards_2 as true
-    define actor_1_id as "Zirkusdirektor-rennend"
-    define actor_2_id as "Affe"
 
     // TODO: Store attributes as 'normal' variables of the actor?
     // TODO: Is the map datatype really needed?
@@ -60,14 +58,14 @@ actor DirectorObserver is Observer begin
         // (a) Attributes of the first actor
         declare actor_1_x as number
         declare actor_1_y as number
-        define actor_1_x as cast attribute "x" of actor_1_id to number
-        define actor_1_y as cast attribute "y" of actor_1_id to number
+        define actor_1_x as cast attribute "x" of actor_1 to number
+        define actor_1_y as cast attribute "y" of actor_1 to number
 
         // (b) Attributes of the second actor
         declare actor_2_x as number
         declare actor_2_y as number
-        define actor_2_x as cast attribute "x" of actor_2_id to number
-        define actor_2_y as cast attribute "y" of actor_2_id to number
+        define actor_2_x as cast attribute "x" of actor_2 to number
+        define actor_2_y as cast attribute "y" of actor_2 to number
 
         // TODO: Parameterize the code / move to a method.
         //      Map data type needed for this.
@@ -108,18 +106,21 @@ actor DirectorObserver is Observer begin
 
     define atomic storeRelevantStateInfosForNext () begin
         // Actor 1
-        define actor_1_last_x as cast attribute "x" of actor_1_id to number
-        define actor_1_last_y as cast attribute "y" of actor_1_id to number
+        define actor_1_last_x as cast attribute "x" of actor_1 to number
+        define actor_1_last_y as cast attribute "y" of actor_1 to number
 
         // Actor 2
-        define actor_2_last_x as cast attribute "x" of actor_2_id to number
-        define actor_2_last_y as cast attribute "y" of actor_2_id to number
+        define actor_2_last_x as cast attribute "x" of actor_2 to number
+        define actor_2_last_y as cast attribute "y" of actor_2 to number
     end
 
     script on bootstrap do begin
     end
 
     script on bootstrap finished do begin
+        define actor_1 as locate actor "Zirkusdirektor-rennend"
+        define actor_2 as locate actor "Affe"
+
         // First specification check (base condition)
         assert(isBehaviorSatisfied())
 

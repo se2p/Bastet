@@ -20,6 +20,7 @@
  */
 
 import {AbsentAstNode, AbstractNode, OptionalAstNode, PresentAstNode} from "../AstNode";
+import {Preconditions} from "../../../utils/Preconditions";
 
 export class Identifier extends AbstractNode {
 
@@ -29,7 +30,7 @@ export class Identifier extends AbstractNode {
 
     constructor(name: string) {
         super([]);
-        this._name = name;
+        this._name = Preconditions.checkNotUndefined(name);
     }
 
     toTreeString(): string {

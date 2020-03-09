@@ -161,7 +161,7 @@ role Observer is RuntimeEntity begin
     end
 
     // @Category "Specification"
-    define touchingObjects (fst: string, snd: string) begin
+    define touchingObjects (fst: actor, snd: actor) begin
         // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
 
         declare leg_a_fst as number
@@ -196,18 +196,18 @@ role Observer is RuntimeEntity begin
     end returns result : boolean
 
     // @Category "Specification"
-    define touchingMousePointer (obj_id: string) begin
+    define touchingMousePointer (obj: actor) begin
         declare result as boolean
 
         declare x as number
         declare y as number
-        define x as cast attribute "x" of obj_id to number
-        define y as cast attribute "y" of obj_id to number
+        define x as cast attribute "x" of obj to number
+        define y as cast attribute "y" of obj to number
 
         declare width as number
         declare height as number
-        define width as cast attribute "active_graphic_width" of obj_id to number
-        define height as cast attribute "active_graphic_height" of obj_id to number
+        define width as cast attribute "active_graphic_width" of obj to number
+        define height as cast attribute "active_graphic_height" of obj to number
 
         if not (_RUNTIME_getMouseX() < x
                 or _RUNTIME_getMouseX() > x + width
@@ -412,7 +412,7 @@ role ScratchSprite is ScratchEntity begin
     define direction as 90
     define visible as true
 
-    define atomic pointTowards (s: string) begin
+    define atomic pointTowards (s: actor) begin
         // Todo what about random?
         declare targetX as number
         declare targetY as number
@@ -470,7 +470,7 @@ role ScratchSprite is ScratchEntity begin
     end returns result : boolean
 
     // @Category "Sensing"
-    define touchingObject (obj: string) begin
+    define touchingObject (obj: actor) begin
         // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
 
         declare leg_a as number

@@ -354,6 +354,7 @@ coreExpression :
  |  numExpr
  |  boolExpr
  |  listExpr
+ |  actorExpr
 
  |  unspecifiedExpr ;
 

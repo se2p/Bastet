@@ -302,7 +302,7 @@ import {BastetConfiguration} from "../../utils/BastetConfiguration";
 import {ParsingException} from "../../core/exceptions/ParsingException";
 import {ParserRuleContext} from "antlr4ts";
 import {CastExpression} from "../ast/core/expressions/CastExpression";
-import {ActorExpression, ActorVariableExpression} from "../ast/core/expressions/ActorExpression";
+import {ActorExpression, ActorVariableExpression, LocateActorExpression} from "../ast/core/expressions/ActorExpression";
 import {TransitionRelation} from "../app/controlflow/TransitionRelation";
 
 const toposort = require('toposort');
@@ -1762,7 +1762,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitLocateActorExpression(ctx: LocateActorExpressionContext): TransformerResult {
-        throw new ImplementMeException();
+        const nameTr = ctx.stringExpr().accept(this);
+        return new TransformerResult(nameTr.statementsToPrepend, new LocateActorExpression(nameTr.node as StringExpression));
     }
 
     public visitActorVariableExpression(ctx: ActorVariableExpressionContext): TransformerResult {

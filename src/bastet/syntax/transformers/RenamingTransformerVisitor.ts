@@ -21,6 +21,7 @@
  */
 
 import {
+    CoreActorExpressionVisitor,
     CoreBoolExpressionVisitor,
     CoreListExpressionVisitor,
     CoreNonCtrlStatementnVisitor,
@@ -125,6 +126,13 @@ import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentExc
 import {BeginAtomicStatement, EndAtomicStatement, ReturnStatement} from "../ast/core/statements/ControlStatement";
 import {SystemMessage, UserMessage} from "../ast/core/Message";
 import {CastExpression} from "../ast/core/expressions/CastExpression";
+import {
+    ActorExpression,
+    ActorVariableExpression,
+    LocateActorExpression,
+    StartCloneActorExpression, UsherActorExpression
+} from "../ast/core/expressions/ActorExpression";
+import {Identifier} from "../ast/core/Identifier";
 
 export enum DataLocationMode {
 
@@ -145,6 +153,7 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     CoreNumberExpressionVisitor<AstNode>,
     CoreBoolExpressionVisitor<AstNode>,
     CoreStringExpressionVisitor<AstNode>,
+    CoreActorExpressionVisitor<AstNode>,
     CoreListExpressionVisitor<AstNode> {
 
     private readonly _renamer: DataLocationRenamer;
@@ -525,6 +534,25 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
             return new BroadcastMessageStatement(
                 node.msg.accept(this) as SystemMessage);
         }));
+    }
+
+    visitLocateActorExpression(node: LocateActorExpression): AstNode {
+        return new LocateActorExpression(node.name.accept(this) as StringExpression);
+    }
+
+    visitActorVariableExpression(node: ActorVariableExpression): AstNode {
+        const renamedDataLoc: DataLocation = this.renameRead(node.variable.dataloc);
+        return new ActorVariableExpression(new VariableWithDataLocation(renamedDataLoc));
+    }
+
+    visitStartCloneActorExpression(node: StartCloneActorExpression): AstNode {
+        return new StartCloneActorExpression(node.ofActor.accept(this) as ActorExpression);
+    }
+
+    visitUsherActorExpression(node: UsherActorExpression): AstNode {
+       return new UsherActorExpression(
+           node.actorName.accept(this) as StringExpression,
+           node.role.accept(this) as Identifier);
     }
 
     visitCreateCloneOfStatement(node: CreateCloneOfStatement): AstNode {

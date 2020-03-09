@@ -101,6 +101,12 @@ import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
 import {AssumeStatement} from "./core/statements/AssumeStatement";
 import {VariableWithDataLocation} from "./core/Variable";
 import {CastExpression} from "./core/expressions/CastExpression";
+import {
+    ActorVariableExpression,
+    LocateActorExpression,
+    StartCloneActorExpression,
+    UsherActorExpression
+} from "./core/expressions/ActorExpression";
 
 export interface CoreVisitor<R> {
 
@@ -181,6 +187,18 @@ export interface CoreBoolExpressionVisitor<R> extends CoreVisitor<R> {
     visitStrContainsExpression(node: StrContainsExpression): R;
 
     visitVariableWithDataLocation(node: VariableWithDataLocation): R;
+
+}
+
+export interface CoreActorExpressionVisitor<R> extends CoreVisitor<R> {
+
+    visitLocateActorExpression(node: LocateActorExpression): R;
+
+    visitStartCloneActorExpression(node: StartCloneActorExpression): R;
+
+    visitUsherActorExpression(node: UsherActorExpression): R;
+
+    visitActorVariableExpression(node: ActorVariableExpression): R;
 
 }
 
