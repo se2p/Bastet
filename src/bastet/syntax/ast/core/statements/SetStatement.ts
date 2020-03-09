@@ -26,6 +26,7 @@ import {StringExpression} from "../expressions/StringExpression";
 import {Identifier} from "../Identifier";
 import {VariableWithDataLocation} from "../Variable";
 import {AstNode} from "../../AstNode";
+import {Preconditions} from "../../../../utils/Preconditions";
 
 export abstract class SetStatement extends Statement {
 
@@ -87,8 +88,8 @@ export class StoreEvalResultToVariableStatement extends SetStatement {
 
     constructor(variable: VariableWithDataLocation, toValue: Expression) {
         super([variable.identifier, toValue]);
-        this._variable = variable;
-        this._toValue = toValue;
+        this._variable = Preconditions.checkNotUndefined(variable);
+        this._toValue = Preconditions.checkNotUndefined(toValue);
     }
 
     get variable(): VariableWithDataLocation {
