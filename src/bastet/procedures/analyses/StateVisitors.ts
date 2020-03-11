@@ -61,3 +61,32 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
     }
 
 }
+
+export class StateColorVisitor implements AbstractStateVisitor<string> {
+
+    visit(element: AbstractElement): string {
+        return "white";
+    }
+
+    visitControlAbstractState(element: ControlAbstractState): string {
+        if (element.getIsTargetFor().size > 0) {
+            return "crimson";
+        } else {
+            return "white";
+        }
+    }
+
+    visitDataAbstractState(element: DataAbstractState): string {
+        return undefined;
+    }
+
+    visitGraphAbstractState(element: GraphAbstractState): string {
+        return element.getWrappedState().accept(this);
+    }
+
+    visitSSAState(element: SSAState): string {
+        return element.getWrappedState().accept(this);
+    }
+
+}
+

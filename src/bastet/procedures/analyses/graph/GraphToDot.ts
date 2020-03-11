@@ -24,7 +24,7 @@ import {StateSet} from "../../algorithms/StateSet";
 import {GraphAbstractState} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {TransitionLabelProvider} from "../ProgramAnalysis";
-import {StateLabelVisitor} from "../StateVisitors";
+import {StateColorVisitor, StateLabelVisitor} from "../StateVisitors";
 
 export class GraphToDot  {
 
@@ -48,7 +48,8 @@ export class GraphToDot  {
 
     private writeState(e: GraphAbstractState) {
         const stateLabel = e.accept(new StateLabelVisitor());
-        this._dot.push(`    ${e.getId()} [label="${stateLabel}"];`);
+        const stateColor = e.accept(new StateColorVisitor());
+        this._dot.push(`    ${e.getId()} [label="${stateLabel}" color="black" fillcolor="${stateColor}"];`);
     }
 
     private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
