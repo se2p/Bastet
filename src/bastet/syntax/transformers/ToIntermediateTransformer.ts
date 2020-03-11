@@ -162,7 +162,11 @@ import {
     LocateActorExpressionContext,
     ActorVariableExpressionContext,
     ActorTypeContext,
-    EmptyElseCaseContext, PureElseContext, ElseIfCaseContext
+    EmptyElseCaseContext,
+    PureElseContext,
+    ElseIfCaseContext,
+    FullMethodDefinitionContext,
+    RuntimeMethodDefinitionContext
 } from "../parser/grammar/ScratchParser";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {Identifier} from "../ast/core/Identifier";
@@ -571,10 +575,14 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(new ResultDeclaration(resultVar));
     }
 
+    private toMethodDef(ctx: MethodDefinitionContext): FullMethodDefinitionContext|RuntimeMethodDefinitionContext {
+        return ctx as FullMethodDefinitionContext|RuntimeMethodDefinitionContext;
+    }
+
     private precollectMethodSignatures(actorIdent: Identifier, ctx: MethodDefinitionListContext,
                                        ectx: ExternMethodDefinitionListContext) {
 
-        for (let md of ctx.methodDefinition()) {
+        for (let md of ctx.methodDefinition().map((m) => this.toMethodDef(m))) {
             const identTr = md.ident().accept(this);
             const paramsTr = md.parameterList().accept(this);
             const resultTr = md.methodResultDeclaration().accept(this);
@@ -739,7 +747,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TransformerResult(defs.statementsToPrepend, new ResourceDefinitionList(defs.nodeList));
     }
 
-    private parseIsAtomic(ctx: MethodDefinitionContext): boolean {
+    private parseIsAtomic(ctx: RuntimeMethodDefinitionContext|FullMethodDefinitionContext): boolean {
         for (const attrib of ctx.methodAttributeList().methodAttribute()) {
             if (attrib instanceof AtomicMethodContext) {
                 return true;
@@ -749,7 +757,30 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return false;
     }
 
-    public visitMethodDefinition(ctx: MethodDefinitionContext) : TransformerResult {
+    visitMethodDefinition(ctx: MethodDefinitionContext) : TransformerResult {
+        return this.visitSingleChild(ctx);
+    }
+
+    public visitRuntimeMethodDefinition(ctx: RuntimeMethodDefinitionContext) : TransformerResult {
+        const methodIdent: Identifier = ctx.ident().accept(this).nodeOnly() as Identifier;
+
+        const isAtomic = this.parseIsAtomic(ctx);
+
+        this._activeDeclarationScope = this._activeDeclarationScope.beginMethodScope(methodIdent.text);
+        try {
+            throw new ImplementMeException();
+            // const resultDeclaration = ctx.methodResultDeclaration().accept(this).nodeOnly() as ResultDeclaration;
+            // return TransformerResult.withNode(new MethodDefinition(
+            //     methodIdent,
+            //     ctx.parameterList().accept(this).nodeOnly() as ParameterDeclarationList,
+            //     ctx.stmtList().accept(this).nodeOnly() as StatementList,
+            //     resultDeclaration, isAtomic));
+        } finally {
+            this._activeDeclarationScope = this._activeDeclarationScope.endScope();
+        }
+    }
+
+    public visitFullMethodDefinition(ctx: FullMethodDefinitionContext) : TransformerResult {
         const methodIdent: Identifier = ctx.ident().accept(this).nodeOnly() as Identifier;
 
         const isAtomic = this.parseIsAtomic(ctx);

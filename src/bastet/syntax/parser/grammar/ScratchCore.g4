@@ -129,7 +129,11 @@ externMethodResultDeclaration :
     ;
 externMethodDefinitionList : externMethodDefinition* ;
 
-methodDefinition : 'define' methodAttributeList ident parameterList stmtList methodResultDeclaration ;
+methodDefinition :
+      'define' methodAttributeList ident parameterList stmtList methodResultDeclaration # FullMethodDefinition
+    | 'define' methodAttributeList ident parameterList 'in' 'runtime' methodResultDeclaration # RuntimeMethodDefinition
+    ;
+
 methodResultDeclaration :
     'returns' ident ':' type # FunctionReturnDefinition
     | # VoidReturnDefinition

@@ -5,6 +5,8 @@ import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 
 import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
+import { FullMethodDefinitionContext } from "./ScratchParser";
+import { RuntimeMethodDefinitionContext } from "./ScratchParser";
 import { RestartScriptContext } from "./ScratchParser";
 import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
@@ -227,6 +229,32 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitStrIdentExpression?: (ctx: StrIdentExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `FullMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 */
+	enterFullMethodDefinition?: (ctx: FullMethodDefinitionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `FullMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 */
+	exitFullMethodDefinition?: (ctx: FullMethodDefinitionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `RuntimeMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 */
+	enterRuntimeMethodDefinition?: (ctx: RuntimeMethodDefinitionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `RuntimeMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 */
+	exitRuntimeMethodDefinition?: (ctx: RuntimeMethodDefinitionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `RestartScript`
