@@ -392,6 +392,15 @@ export class DataStringExpressionVisitor<B extends AbstractBoolean, N extends Ab
 
     visitCastExpression(node: CastExpression): S {
         Preconditions.checkArgument(node.castToType == StringType.instance());
+
+        if (node.toConvert.expressionType == NumberType.instance()) {
+            const numVisitor = new DataNumExpressionVisitor(this._theories);
+            return this._theories.stringTheory.castNumberAsString(node.toConvert.accept(numVisitor));
+
+        } else if (node.toConvert.expressionType == StringType.instance()) {
+            return node.toConvert.accept(this);
+        }
+
         throw new ImplementMeException();
     }
 

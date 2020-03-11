@@ -68,23 +68,26 @@ export class DataLocationScoper implements DataLocationRenamer {
     public renameUsage(dataLoc: DataLocation, usageMode: DataLocationMode, inContextOf: Statement): DataLocation {
         // Supported scopes: SYSTEM -> ACTOR -> METHOD
         if (usageMode == DataLocationMode.READ_FROM) {
-            const readFromScope = this._typeStorage.reduceToDeclarationScope(this._readFromScope, dataLoc);
-            return this.renameRead(dataLoc, inContextOf);
+            return this.renameRead0(dataLoc, inContextOf);
 
         } else if (usageMode == DataLocationMode.ASSINGED_TO) {
-            const writeToScope = this._typeStorage.reduceToDeclarationScope(this._writeToScope, dataLoc);
             return this.renameWrite(dataLoc, inContextOf);
         }
 
         throw new IllegalStateException("Unsupported DataLocationMode");
     }
 
-    private renameRead(dataLoc: DataLocation, inContextOf: Statement): DataLocation {
+    private renameRead0(dataLoc: DataLocation, inContextOf: Statement): DataLocation {
+        return this.renameRead(dataLoc, inContextOf, this._readFromScope);
+    }
+
+    public renameRead(dataLoc: DataLocation, inContextOf: Statement, readScope: ImmList<string>): DataLocation {
         if (DataLocationScoper.isScoped(dataLoc)) {
             return dataLoc;
         }
 
-        const readFromScope = this._typeStorage.reduceToDeclarationScope(this._readFromScope, dataLoc)
+        const readFromScope = this._typeStorage
+            .reduceToDeclarationScope(readScope, dataLoc)
             .join(SCOPE_SEPARATOR);
 
         const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + readFromScope;
@@ -109,9 +112,9 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
 
     private readonly _task: App;
     private readonly _scoper: DataLocationScoper;
-    private readonly _actorScopes: ImmMap<VariableWithDataLocation, ActorId>;
+    private readonly _actorScopes: ImmMap<DataLocation, ActorId>;
 
-    constructor(task: App, actorScopes: ImmMap<VariableWithDataLocation, ActorId>, readFromScope: ImmList<string>,
+    constructor(task: App, actorScopes: ImmMap<DataLocation, ActorId>, readFromScope: ImmList<string>,
                 writeToScope: ImmList<string>) {
         const scoper = new DataLocationScoper(task.typeStorage, readFromScope, writeToScope);
         super(scoper);
@@ -127,16 +130,18 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
 
         if (node.ofEntity instanceof VariableWithDataLocation) {
             const actorVar = node.ofEntity.accept(this) as VariableWithDataLocation;
-            const actorScopeName: ActorId = this._actorScopes.get(actorVar);
+            const actorScopeName: ActorId = this._actorScopes.get(actorVar.dataloc);
             if (!actorScopeName) {
                 throw new IllegalStateException(`Cannot lookup the actor-scope identifier that is assigned to ${actorVar.toTreeString()}`);
             }
             const attributeName: string = extractStringLiteral(node.attribute);
-            const attributeType = this._task.typeStorage.getSystemScope().findChild(actorScopeName)
+            const attributeType = this._task.typeStorage.getSystemScope()
+                .findChild(actorScopeName)
                 .getTypeOf(Identifier.of(attributeName));
 
+            const readAttributeScope: ImmList<string> = ImmList([actorScopeName]);
             let readAttribute: DataLocation = new TypedDataLocation(attributeName, attributeType.typeId);
-            readAttribute = this._scoper.renameUsage(readAttribute, DataLocationMode.READ_FROM, this._activeStatement);
+            readAttribute = this._scoper.renameRead(readAttribute, this._activeStatement, readAttributeScope);
             const readVariable = new VariableWithDataLocation(readAttribute);
 
             if (readVariable.variableType == StringType.instance()) {

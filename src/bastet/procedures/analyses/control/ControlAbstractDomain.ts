@@ -34,7 +34,7 @@ import {TransRelId} from "../../../syntax/app/controlflow/TransitionRelation";
 import {ScriptId} from "../../../syntax/app/controlflow/Script";
 import {OperationId} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Preconditions} from "../../../utils/Preconditions";
-import {DataLocations, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
+import {DataLocation, DataLocations, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
@@ -317,7 +317,7 @@ export interface ControlAbstractStateAttributes extends AbstractElement, Singlet
     steppedThreadIndices: ImmSet<number>;
 
     /** Actor scopes */
-    actorScopes: ImmMap<VariableWithDataLocation, ActorId>;
+    actorScopes: ImmMap<DataLocation, ActorId>;
 
 }
 
@@ -329,7 +329,7 @@ const ControlAbstractStateRecord = ImmRec({
 
     wrappedState: null,
 
-    actorScopes: ImmMap<VariableWithDataLocation, ActorId>(),
+    actorScopes: ImmMap<DataLocation, ActorId>(),
 
     isTargetFor: ImmSet<Property>()
 
@@ -362,7 +362,7 @@ export class IndexedThread {
 export class ControlAbstractState extends ControlAbstractStateRecord implements AbstractState {
 
     constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement, isTargetFor: ImmSet<Property>,
-                steppedThreadIndices: ImmSet<number>, actorScopes: ImmMap<VariableWithDataLocation, ActorId>) {
+                steppedThreadIndices: ImmSet<number>, actorScopes: ImmMap<DataLocation, ActorId>) {
         super({threadStates: threadStates, wrappedState: wrappedState, isTargetFor: isTargetFor,
             steppedThreadIndices: steppedThreadIndices, actorScopes: actorScopes});
     }
@@ -387,11 +387,11 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
         return this.get("steppedThreadIndices");
     }
 
-    public getActorScopes(): ImmMap<VariableWithDataLocation, ActorId> {
+    public getActorScopes(): ImmMap<DataLocation, ActorId> {
         return this.get('actorScopes');
     }
 
-    public withActorScopes(scopes: ImmMap<VariableWithDataLocation, ActorId>): ControlAbstractState {
+    public withActorScopes(scopes: ImmMap<DataLocation, ActorId>): ControlAbstractState {
         return this.set('actorScopes', scopes);
     }
 
@@ -431,11 +431,10 @@ export class ScheduleAbstractStateFactory {
     static createInitialState(task: App, wrappedState: ImmRec<any>, isTarget) {
         let singular = false;
         let threads = ImmList<ThreadState>([]);
-        let actors = ImmMap<VariableWithDataLocation, ActorId>();
+        let actors = ImmMap<DataLocation, ActorId>();
 
         for (const actor of task.actors) {
-            actors = actors.set(new VariableWithDataLocation(
-                DataLocations.createTypedLocation(Identifier.of(actor.ident), ActorType.instance())), actor.ident);
+            actors = actors.set(DataLocations.createTypedLocation(Identifier.of(actor.ident), ActorType.instance()), actor.ident);
             for (const script of actor.scripts) {
                 if (script.transitions.transitionTable.size == 0) {
                     // Ignore empty scripts. We assume that there are

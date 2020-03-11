@@ -64,7 +64,7 @@ import {Statement} from "../../../syntax/ast/core/statements/Statement";
 import {ParameterDeclaration} from "../../../syntax/ast/core/ParameterDeclaration";
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
-import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
+import {DataLocation, DataLocations} from "../../../syntax/app/controlflow/DataLocation";
 import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements/DeclarationStatement";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
 import {
@@ -251,7 +251,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result;
     }
 
-    private scopeOperations(ops: ProgramOperation[], actorScopes: ImmMap<VariableWithDataLocation, string>, readFromScope: ImmList<string>,
+    private scopeOperations(ops: ProgramOperation[], actorScopes: ImmMap<DataLocation, string>, readFromScope: ImmList<string>,
                             writeToScope: ImmList<string>): ProgramOperation[] {
         const scoper = new ScopeTransformerVisitor(this._task, actorScopes, readFromScope, writeToScope);
         return ops.map((o) => ProgramOperationFactory.createFor(o.ast.accept(scoper)));
@@ -457,7 +457,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 let setTo: ActorId = null;
 
                 if (stepOp.ast.toValue instanceof VariableWithDataLocation) {
-                    const actorIdentifier: ActorId = fromState.getActorScopes().get(stepOp.ast.toValue);
+                    const actorIdentifier: ActorId = fromState.getActorScopes().get(stepOp.ast.toValue.dataloc);
                     setTo = Preconditions.checkNotUndefined(actorIdentifier);
 
                 } else if (stepOp.ast.toValue instanceof LocateActorExpression) {
@@ -485,7 +485,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     throw new IllegalArgumentException("Actor expression did not evaluate to a valid result for: "
                         + stepOp.ast.toTreeString());
                 }
-                const actorScopesPrime = result.getActorScopes().set(variableToSet, setTo);
+                const actorScopesPrime = result.getActorScopes().set(variableToSet.dataloc, setTo);
                 result = result.withActorScopes(actorScopesPrime);
 
                 return [[result, true]];
