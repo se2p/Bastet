@@ -50,6 +50,10 @@ role RuntimeEntity begin
 
     extern _RUNTIME_getImageHeight (ident: string) returns number
 
+    extern _RUNTIME_getGraphicIdByIndex (idx: number) returns string
+
+    extern _RUNTIME_getGraphicIndexById (id: string) returns number
+
     // A random integer in the interval [from, to],
     // that is, both end points are included.
     extern randomIntegerBetween (intervalStart: number, intervalEnd: number) returns number
@@ -149,6 +153,15 @@ role RuntimeEntity begin
         define result as _RUNTIME_micros()
     end returns result: number
 
+    define mod(n: number, mod: number) begin
+        declare result as number
+        define result as n
+
+        until (result - mod < 0) repeat begin
+            define result as (result - mod)
+        end
+    end returns result: number
+
 end
 
 role Observer is RuntimeEntity begin
@@ -230,6 +243,7 @@ role ScratchEntity is RuntimeEntity begin
     declare active_graphic_name as string
     declare active_graphic_width as number
     declare active_graphic_height as number
+    declare num_graphics as number
 
     declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
     declare color_effect_value as number
@@ -545,8 +559,6 @@ role ScratchSprite is ScratchEntity begin
         define direction as wrapClamp(dir, 0-179, 180)
     end
 
-
-
     //    looks_show,            //   "show"
     //    looks_hide,            //   |  "hide"
     //    looks_sayforsecs,      //   |  "say" StringExpr "for" NumExpr  "secs"
@@ -588,7 +600,17 @@ role ScratchStage is ScratchEntity begin
     end
 
     define nextBackdrop () begin
+        declare current_idx as number
+        define current_idx as _RUNTIME_getGraphicIndexById(active_graphic_name)
 
+        define current_idx as mod(current_idx+1, num_graphics)
+
+        declare id as string
+        define id as _RUNTIME_getGraphicIdByIndex(current_idx)
+
+        define active_graphic_name as id
+        define active_graphic_width as _RUNTIME_getImageWidth(id)
+        define active_graphic_height as _RUNTIME_getImageHeight(id)
     end
 
 end
