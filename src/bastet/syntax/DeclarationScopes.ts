@@ -60,19 +60,22 @@ export abstract class ScopeTreeNode<T extends ScopeTreeNode<any>> {
         this._parentScope = parentScope;
         this._scopeLevelName = scopeLevelName;
         this._scopeType = scopeType;
+        this._childs = {};
     }
 
     public findChild(scopeName: string): T {
-        return this._childs[scopeName];
+        if (this._childs.hasOwnProperty(scopeName)) {
+            return this._childs[scopeName];
+        } else {
+            return null;
+        }
     }
 
     protected putChild(name: string, scope: T) {
         this._childs[name] = scope;
     }
 
-    public beginScope(scopeName: string, scopeType: DeclarationScopeType): T {
-        throw new ImplementMeException();
-    }
+    public abstract beginScope(scopeName: string, scopeType: DeclarationScopeType): T;
 
     public endScope(): T {
         return this._parentScope;
@@ -96,6 +99,10 @@ export abstract class ScopeTreeNode<T extends ScopeTreeNode<any>> {
 
     public getChildScopes(): string[] {
         return Object.keys(this._childs);
+    }
+
+    public hasParent(): boolean {
+        return this._parentScope != null;
     }
 }
 
@@ -130,7 +137,11 @@ export class ScopeTypeInformation extends ScopeTreeNode<ScopeTypeInformation> {
     public getMethodSignature(ident: Identifier): MethodSignature {
         let result: MethodSignature = this._methods[ident.text];
         if (!result) {
-            throw new IllegalArgumentException("No method signature for the given identifier: " + ident.text);
+            if (this.hasParent()) {
+                return this.parentScope.getMethodSignature(ident);
+            } else {
+                throw new IllegalArgumentException("No method signature for the given identifier: " + ident.text);
+            }
         }
         return result;
     }
@@ -155,8 +166,13 @@ export class ScopeTypeInformation extends ScopeTreeNode<ScopeTypeInformation> {
     public getTypeOf(ident: Identifier): ScratchType {
         const result = this.findTypeOf(ident);
         if (!result) {
-            throw new IllegalArgumentException(`Variable "${ident.text}" and it's type are unknown. Declaration missing?`)
+            if (this.hasParent()) {
+                return this.parentScope.getTypeOf(ident);
+            } else {
+                throw new IllegalArgumentException(`Variable "${ident.text}" and it's type are unknown. Declaration missing?`);
+            }
         }
+
         return result;
     }
 
@@ -166,6 +182,7 @@ export class ScopeTypeInformation extends ScopeTreeNode<ScopeTypeInformation> {
             result = new ScopeTypeInformation(this, id, scopeType);
             this.putChild(id, result);
         }
+
         return result;
     }
 
@@ -190,6 +207,16 @@ export class ScopeTypeInformation extends ScopeTreeNode<ScopeTypeInformation> {
     public putTypeInformation(ident: Identifier, type: ScratchType) {
         const varDecl = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, type));
         this.putVariable(varDecl);
+    }
+
+    beginScope(scopeName: string, scopeType: DeclarationScopeType): ScopeTypeInformation {
+        let result: ScopeTypeInformation = this.findChild(scopeName);
+        if (!result) {
+            result = new ScopeTypeInformation(this, scopeName, scopeType);
+            this.putChild(scopeName, result);
+        }
+
+        return result;
     }
 
 }
@@ -245,11 +272,13 @@ export class TypeInformationStorage implements TypeInformationProvider {
         systemScopeType = this._systemScope.findTypeOf(ident);
 
         if (usageScope.size > 0) {
-            const actorScope = this._systemScope.findChild(usageScope[0]);
+            const actorScope = this._systemScope.findChild(usageScope.get(0));
+            Preconditions.checkNotUndefined(actorScope, `No scope information for ${usageScope.get(0)}`);
             actorScopeType = actorScope.findTypeOf(ident);
 
             if (usageScope.size > 1) {
-                const methodScope = actorScope.findChild(usageScope[1]);
+                const methodScope = actorScope.findChild(usageScope.get(1));
+                Preconditions.checkNotUndefined(methodScope, `No scope information for ${usageScope.get(1)}`);
                 methodScopeType = methodScope.findTypeOf(ident);
             }
         }

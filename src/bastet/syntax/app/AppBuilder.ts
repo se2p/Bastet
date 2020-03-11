@@ -76,11 +76,11 @@ export class AppBuilder {
      * @param actorNamePrefix: A prefix to add to the name of all actors.
      */
     public buildFromSyntaxTree(programOrigin: string, ast: AstNode,
-                               typeStorage: TypeInformationStorage, actorNamePrefix: string): App {
+                               typeStorage: TypeInformationStorage): App {
 
         Preconditions.checkArgument(ast instanceof ProgramDefinition);
         const programNode: ProgramDefinition = ast as ProgramDefinition;
-        const actorMap: ActorMap = this.buildActors(programNode, actorNamePrefix);
+        const actorMap: ActorMap = this.buildActors(programNode);
 
         // TODO/FIXME: Check if adding the prefix to actor names works correctly.
         //      Also references to the actor must be updated.
@@ -88,31 +88,27 @@ export class AppBuilder {
         return new App(programOrigin, programNode.ident.text, actorMap, typeStorage);
     }
 
-    private buildActors(programAST: ProgramDefinition, actorNamePrefix: string): ActorMap {
+    private buildActors(programAST: ProgramDefinition): ActorMap {
         let result: ActorMap = {};
         const actorDefinitions : ActorDefinition[] = programAST.actors.elements;
 
         for (let actorDefinition of actorDefinitions) {
-            // Flat actor
-            const flatActor: Actor = this.buildActorFlat(actorDefinition, actorNamePrefix);
-
-            this._knownActors[flatActor.ident] = flatActor;
+            const actor: Actor = this.buildActor(actorDefinition);
 
             // Add as result
-            result[flatActor.ident] = flatActor;
+            this._knownActors[actor.ident] = actor;
+            result[actor.ident] = actor;
         }
 
+        // Add the actor that can bootstrap the application
         const boostrapper = Actors.defaultBoostraper();
         result[boostrapper.ident] = boostrapper;
 
         return result;
     }
 
-    private buildActorFlat(actorDefinition: ActorDefinition, actorNamePrefix: string) {
-        let actorName: string = actorDefinition.ident.text;
-        if (actorNamePrefix) {
-            actorName = actorNamePrefix + "_" + actorName;
-        }
+    private buildActor(actorDefinition: ActorDefinition) {
+        const actorName: string = actorDefinition.ident.text;
         const acd = actorDefinition;
 
         const resources = this.buildResources(acd.resourceDefs);

@@ -384,18 +384,19 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     private readonly _methodLibrary: App;
     private readonly _typeStack: Array<ScratchType>;
     private readonly _config: TransformerConfig;
+    private readonly _typeStorage: TypeInformationStorage;
 
     private _actorScope : boolean;
-    private _typeStorage: TypeInformationStorage;
     private _activeDeclarationScope: ScopeTypeInformation;
 
-
-    constructor(config: TransformerConfig, methodLibrary: App, typeInformationStorage: TypeInformationStorage) {
+    constructor(config: TransformerConfig, methodLibrary: App,
+                typeInformationStorage: TypeInformationStorage) {
         this._config = Preconditions.checkNotUndefined(config);
         this._methodLibrary = Preconditions.checkNotUndefined(methodLibrary);
+        this._typeStorage = Preconditions.checkNotUndefined(typeInformationStorage);
+
         this._typeStack = new Array<ScratchType>();
         this._activeDeclarationScope = null;
-        this._typeStorage = typeInformationStorage;
         this._actorScope = false;
     }
 
@@ -946,6 +947,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const initStmt: Statement = new StoreEvalResultToVariableStatement(counterVar, NumberLiteral.of(0));
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt, initStmt]));
 
+        this._activeDeclarationScope.putVariable(counterVar);
+
         // Determine the number of iterations
         const timesTr: TransformerResult = ctx.numExpr().accept(this);
         const times: NumberExpression = timesTr.node as NumberExpression;
@@ -1119,6 +1122,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const resultVarExpr = new BooleanVariableExpression(resultVar);
         const declareVarStmt = new DeclareStackVariableStatement(resultVar);
         const initStmt: Statement = new StoreEvalResultToVariableStatement(resultVar, BooleanLiteral.from(value));
+
+        this._activeDeclarationScope.putVariable(resultVar);
 
         let prepend: StatementList = StatementList.empty();
         prepend = StatementLists.concat(prepend, StatementList.from([declareVarStmt, initStmt]));
@@ -1591,6 +1596,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const declarationStmt = new DeclareStackVariableStatement(resultVar);
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
 
+        this._activeDeclarationScope.putVariable(resultVar);
+
         const storeCallResultStmt = new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_timerValue),
             new ExpressionList([]), OptionalAstNode.with(resultVar));
         prepend = StatementLists.concat(prepend, StatementList.from([storeCallResultStmt]));
@@ -1790,6 +1797,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const declarationStmt = new DeclareStackVariableStatement(resultVar);
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
 
+        this._activeDeclarationScope.putVariable(resultVar);
+
         const argsTr = ctx.expressionList().accept(this);
         const storeCallResultStmt = new CallStatement(methodIdent,
             argsTr.node as ExpressionList, OptionalAstNode.with(resultVar));
@@ -1910,7 +1919,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
 export class ToIntermediateTransformer {
 
-    transform(methodLib: App, origin: RuleNode, typeInformationStorage: TypeInformationStorage, config: {}): AstNode {
+    transform(methodLib: App, origin: RuleNode, typeInformationStorage: TypeInformationStorage,
+              config: {}): AstNode {
         const transformerConfig = new TransformerConfig(config);
         const visitor = new ToIntermediateVisitor(transformerConfig, methodLib, typeInformationStorage);
         return origin.accept(visitor).nodeOnly();

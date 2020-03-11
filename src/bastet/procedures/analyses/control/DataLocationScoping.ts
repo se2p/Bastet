@@ -129,7 +129,7 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
             const actorVar = node.ofEntity.accept(this) as VariableWithDataLocation;
             const actorScopeName: ActorId = this._actorScopes.get(actorVar);
             if (!actorScopeName) {
-                throw new IllegalStateException(`Cannot lookup actor scope for actor variable ${actorVar.toTreeString()}`);
+                throw new IllegalStateException(`Cannot lookup the actor-scope identifier that is assigned to ${actorVar.toTreeString()}`);
             }
             const attributeName: string = extractStringLiteral(node.attribute);
             const attributeType = this._task.typeStorage.getSystemScope().findChild(actorScopeName)
