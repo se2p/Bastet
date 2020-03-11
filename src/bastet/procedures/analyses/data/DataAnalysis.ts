@@ -111,9 +111,9 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
         const result: DataAbstractState[] = [];
         for (const r of this._transferRelation.abstractSuccFor(fromState, op, co)) {
-           if (this.refiner.checkIsFeasible(r)) {
+//           if (this.refiner.checkIsFeasible(r)) {
                result.push(r);
-           }
+//           }
         }
 
         return result;
