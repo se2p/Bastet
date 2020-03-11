@@ -371,6 +371,15 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
         return new IndexedThread(this.getThreadStates().get(atIndex), atIndex);
     }
 
+    public getThreadWithId(threadId: ThreadId): IndexedThread {
+        for (const [index, state] of this.getThreadStates().entries()) {
+            if (state.getThreadId() == threadId) {
+                return new IndexedThread(state, index);
+            }
+        }
+        return null;
+    }
+
     public getThreadStates(): ImmList<ThreadState> {
         return this.get("threadStates");
     }

@@ -281,6 +281,22 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             }
         }
 
+        // Set states do DONE if on the last location and RUNNING
+        return result.map((cs) => this.switchToTerminated(cs));
+    }
+
+    private switchToTerminated(cs: ControlAbstractState) {
+        let result: ControlAbstractState = cs;
+
+        for (const [ti, ts] of result.threadStates.entries()) {
+            if (ts.getComputationState() != ThreadComputationState.THREAD_STATE_FAILURE) {
+                const leaving = this.resolveLeavingOps(cs, new IndexedThread(ts, ti));
+                if (leaving.length == 0) {
+                    result = result.withThreadStateUpdate(ti, (ts) => ts.withComputationState(ThreadComputationState.THREAD_STATE_DONE));
+                }
+            }
+        }
+
         return result;
     }
 
@@ -582,7 +598,24 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             }
         }
 
-        // TODO: Implement this
+        for (const [threadIndex, threadState] of inState.getThreadStates().entries()) {
+            let stillWaitingFor = threadState.getWaitingForThreads();
+            if (stillWaitingFor.size > 0) {
+                for (const waitingForThreadId of threadState.getWaitingForThreads()) {
+                    const waitingFor = inState.getThreadWithId(waitingForThreadId);
+                    if (waitingFor.threadStatus.computationState == ThreadComputationState.THREAD_STATE_DONE) {
+                        stillWaitingFor = stillWaitingFor.remove(waitingForThreadId);
+                    }
+                }
+
+                result = result.withThreadStateUpdate(threadIndex, (ts) => ts.withWaitingForThreads(stillWaitingFor));
+                if (stillWaitingFor.size == 0) {
+                    result = result.withThreadStateUpdate(threadIndex, (ts) => ts.withComputationState(ThreadComputationState.THREAD_STATE_YIELD));
+                }
+            }
+        }
+
+            // TODO: Implement this
         //  2. Check if threads that wait for certain conditions can continue to run
         //     (assume certain conditions to hold if this accelerates the analysis without being unsound)
 
@@ -618,8 +651,10 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         } else {
             // YIELD the current state if it is not yet on a terminating control location of the script.
-            result = result.withThreadStateUpdate(steppedThread.threadIndex, (ts) =>
-                ts.withComputationState(ThreadComputationState.THREAD_STATE_YIELD));
+            if (steppedThread.threadStatus.getComputationState() == ThreadComputationState.THREAD_STATE_RUNNING) {
+                result = result.withThreadStateUpdate(steppedThread.threadIndex, (ts) =>
+                    ts.withComputationState(ThreadComputationState.THREAD_STATE_YIELD));
+            }
         }
 
         // Determine and set the next thread to step
