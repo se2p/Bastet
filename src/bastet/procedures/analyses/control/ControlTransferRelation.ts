@@ -67,7 +67,11 @@ import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
 import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements/DeclarationStatement";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
-import {StringExpression, StringLiteral} from "../../../syntax/ast/core/expressions/StringExpression";
+import {
+    extractStringLiteral,
+    StringExpression,
+    StringLiteral
+} from "../../../syntax/ast/core/expressions/StringExpression";
 import {AfterStatementMonitoringEvent, MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Concerns} from "../../../syntax/Concern";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
@@ -81,6 +85,7 @@ import {
     StartCloneActorExpression,
     UsherActorExpression
 } from "../../../syntax/ast/core/expressions/ActorExpression";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 
 class StepInformation {
 
@@ -445,16 +450,26 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             throw new ImplementMeException();
 
         } else if (stepOp.ast instanceof StoreEvalResultToVariableStatement) {
+            // TODO: Check if some of this code can be moved to the
+            //      Scratch library to allow for a symbolic encoding.
             if (stepOp.ast.variable.variableType == ActorType.instance()) {
                 const variableToSet = stepOp.ast.variable;
                 let setTo: ActorId = null;
 
                 if (stepOp.ast.toValue instanceof VariableWithDataLocation) {
-                    throw new ImplementMeException();
+                    const actorIdentifier: ActorId = fromState.getActorScopes().get(stepOp.ast.toValue);
+                    setTo = Preconditions.checkNotUndefined(actorIdentifier);
 
                 } else if (stepOp.ast.toValue instanceof LocateActorExpression) {
                     const expr = stepOp.ast.toValue as LocateActorExpression;
-                    throw new ImplementMeException();
+                    const searchFor = extractStringLiteral(expr.actorName);
+
+                    // This loop only ensures that an actor with the given name exists.
+                    for (const [actorVar, id] of fromState.getActorScopes().entries()) {
+                        if (id == searchFor) {
+                            setTo = id;
+                        }
+                    }
 
                 } else if (stepOp.ast.toValue instanceof StartCloneActorExpression) {
                     throw new ImplementMeException();
@@ -466,7 +481,10 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     throw new ImplementMeException();
                 }
 
-                Preconditions.checkNotUndefined(setTo);
+                if (!setTo) {
+                    throw new IllegalArgumentException("Actor expression did not evaluate to a valid result for: "
+                        + stepOp.ast.toTreeString());
+                }
                 const actorScopesPrime = result.getActorScopes().set(variableToSet, setTo);
                 result = result.withActorScopes(actorScopesPrime);
 

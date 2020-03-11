@@ -29,7 +29,6 @@ import {List as ImmList, Map as ImmMap} from "immutable";
 import {DataLocation, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {Statement} from "../../../syntax/ast/core/statements/Statement";
 import {Preconditions} from "../../../utils/Preconditions";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {extractStringLiteral, StringAttributeOfExpression} from "../../../syntax/ast/core/expressions/StringExpression";
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {App} from "../../../syntax/app/App";
@@ -37,50 +36,71 @@ import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {StringType} from "../../../syntax/ast/core/ScratchType";
 import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpression";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
-import {ActorExpression, ActorVariableExpression} from "../../../syntax/ast/core/expressions/ActorExpression";
+import {ActorExpression} from "../../../syntax/ast/core/expressions/ActorExpression";
 import {ActorId} from "../../../syntax/app/Actor";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import {TypeInformationStorage} from "../../../syntax/DeclarationScopes";
 
 export const SCOPE_SEPARATOR = "@";
 
 export class DataLocationScoper implements DataLocationRenamer {
 
-    private readonly _readFromScope: string;
+    private readonly _readFromScope: ImmList<string>;
 
-    private readonly _writeToScope: string;
+    private readonly _writeToScope: ImmList<string>;
 
-    constructor(readFromScope: ImmList<string>, writeToScope: ImmList<string>) {
-        this._readFromScope = readFromScope.join(SCOPE_SEPARATOR);
-        this._writeToScope = writeToScope.join(SCOPE_SEPARATOR);
+    private readonly _typeStorage: TypeInformationStorage;
+
+    constructor(typeInformationStorage: TypeInformationStorage, readFromScope: ImmList<string>, writeToScope: ImmList<string>) {
+        this._typeStorage = Preconditions.checkNotUndefined(typeInformationStorage);
+        this._readFromScope = Preconditions.checkNotUndefined(readFromScope);
+        this._writeToScope = Preconditions.checkNotUndefined(writeToScope);
+
+        Preconditions.checkArgument(readFromScope.size > 0, "At least the actor must be in the scope");
+        Preconditions.checkArgument(writeToScope.size > 0, "At least the actor must be in the scope");
     }
 
     private static isScoped(dataLoc: DataLocation): boolean {
         return dataLoc.ident.indexOf("@") > -1;
     }
 
-    renameUsage(dataLoc: DataLocation, usageMode: DataLocationMode, inContextOf: Statement): DataLocation {
-        return DataLocationScoper.staticRenameUsage(dataLoc, usageMode, inContextOf, this._writeToScope, this._readFromScope);
+    public renameUsage(dataLoc: DataLocation, usageMode: DataLocationMode, inContextOf: Statement): DataLocation {
+        // Supported scopes: SYSTEM -> ACTOR -> METHOD
+        if (usageMode == DataLocationMode.READ_FROM) {
+            const readFromScope = this._typeStorage.reduceToDeclarationScope(this._readFromScope, dataLoc);
+            return this.renameRead(dataLoc, inContextOf);
+
+        } else if (usageMode == DataLocationMode.ASSINGED_TO) {
+            const writeToScope = this._typeStorage.reduceToDeclarationScope(this._writeToScope, dataLoc);
+            return this.renameWrite(dataLoc, inContextOf);
+        }
+
+        throw new IllegalStateException("Unsupported DataLocationMode");
     }
 
-    public static staticRenameUsage(dataLoc: DataLocation, usageMode: DataLocationMode, inContextOf: Statement,
-                              writeToScope: string, readFromScope: string): DataLocation {
-        Preconditions.checkNotUndefined(usageMode);
-
+    private renameRead(dataLoc: DataLocation, inContextOf: Statement): DataLocation {
         if (DataLocationScoper.isScoped(dataLoc)) {
             return dataLoc;
         }
 
-        if (usageMode == DataLocationMode.ASSINGED_TO) {
-            const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + writeToScope;
-            return new TypedDataLocation(newIdent, dataLoc.type);
+        const readFromScope = this._typeStorage.reduceToDeclarationScope(this._readFromScope, dataLoc)
+            .join(SCOPE_SEPARATOR);
 
-        } else if (usageMode == DataLocationMode.READ_FROM) {
-            const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + readFromScope;
-            return new TypedDataLocation(newIdent, dataLoc.type);
+        const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + readFromScope;
+        return new TypedDataLocation(newIdent, dataLoc.type);
+    }
+
+    private renameWrite(dataLoc: DataLocation, inContextOf: Statement): DataLocation {
+        if (DataLocationScoper.isScoped(dataLoc)) {
+            return dataLoc;
         }
 
-        throw new ImplementMeException();
+        const writeToScope = this._typeStorage.reduceToDeclarationScope(this._writeToScope, dataLoc)
+            .join(SCOPE_SEPARATOR);
+
+        const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + writeToScope;
+        return new TypedDataLocation(newIdent, dataLoc.type);
     }
 
 }
@@ -93,7 +113,7 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
 
     constructor(task: App, actorScopes: ImmMap<VariableWithDataLocation, ActorId>, readFromScope: ImmList<string>,
                 writeToScope: ImmList<string>) {
-        const scoper = new DataLocationScoper(readFromScope, writeToScope);
+        const scoper = new DataLocationScoper(task.typeStorage, readFromScope, writeToScope);
         super(scoper);
         this._scoper = scoper;
         this._actorScopes = Preconditions.checkNotUndefined(actorScopes);
@@ -106,16 +126,14 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
         // TODO: The ControlAnalysis must evaluate the `ActorExpression`
 
         if (node.ofEntity instanceof VariableWithDataLocation) {
-            const actorVar = node.ofEntity as VariableWithDataLocation;
-            const actorScopeName = this._actorScopes.get(actorVar);
+            const actorVar = node.ofEntity.accept(this) as VariableWithDataLocation;
+            const actorScopeName: ActorId = this._actorScopes.get(actorVar);
             if (!actorScopeName) {
                 throw new IllegalStateException(`Cannot lookup actor scope for actor variable ${actorVar.toTreeString()}`);
             }
-            const actorScope = Identifier.of(actorScopeName);
-
             const attributeName: string = extractStringLiteral(node.attribute);
-            const attributeType = this._task.typeStorage
-                .getActorInfos(actorScope).getTypeOf(Identifier.of(attributeName));
+            const attributeType = this._task.typeStorage.getSystemScope().findChild(actorScopeName)
+                .getTypeOf(Identifier.of(attributeName));
 
             let readAttribute: DataLocation = new TypedDataLocation(attributeName, attributeType.typeId);
             readAttribute = this._scoper.renameUsage(readAttribute, DataLocationMode.READ_FROM, this._activeStatement);

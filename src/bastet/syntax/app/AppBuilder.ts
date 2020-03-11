@@ -52,7 +52,7 @@ import {VariableWithDataLocation} from "../ast/core/Variable";
 import {Logger} from "../../utils/Logger";
 import {ReturnStatement} from "../ast/core/statements/ControlStatement";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {TypeInformationStorage} from "../transformers/ToIntermediateTransformer";
+import {TypeInformationStorage} from "../DeclarationScopes";
 
 export class AppBuilder {
 

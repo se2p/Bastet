@@ -23,7 +23,7 @@ import {App} from "./App";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {Actor} from "./Actor";
 import {Preconditions} from "../../utils/Preconditions";
-import {TypeInformationStorage} from "../transformers/ToIntermediateTransformer";
+import {TypeInformationStorage} from "../DeclarationScopes";
 
 export class ControlFlows {
 

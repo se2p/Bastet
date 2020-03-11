@@ -21,10 +21,11 @@
 
 import {App} from "../app/App";
 import {RuleNode} from "antlr4ts/tree";
-import {ToIntermediateTransformer, TypeInformationStorage} from "./ToIntermediateTransformer";
 import {AppBuilder} from "../app/AppBuilder";
 import {AstNode} from "../ast/AstNode";
 import {TextualProgramParser} from "../parser/TextualProgramParser";
+import {ToIntermediateTransformer} from "./ToIntermediateTransformer";
+import {TypeInformationStorage} from "../DeclarationScopes";
 
 export class CodeToApp {
 

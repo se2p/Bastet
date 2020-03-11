@@ -49,7 +49,6 @@ export enum ThreadComputationState {
     THREAD_STATE_UNKNOWN = "?",
 }
 
-
 export type ThreadId = number;
 
 export interface ControlConcreteState {
@@ -453,6 +452,10 @@ export class ScheduleAbstractStateFactory {
                     singular = true;
 
                 } else if (script.event instanceof AfterStatementMonitoringEvent) {
+                    // This is a hack that would not be needed if threads would
+                    // be scheduled by concern.
+                    // The idea is that monitoring the program should be started
+                    // if the program is fully initialized.
                     threadState = ThreadComputationState.THREAD_STATE_DISABLED;
                 }
 

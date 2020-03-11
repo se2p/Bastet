@@ -30,8 +30,7 @@ import {CallStatement} from "../ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
 import {Properties, Property} from "../Property";
 import {TransitionRelation, TransRelId} from "./controlflow/TransitionRelation";
-import {TypeInformationStorage} from "../transformers/ToIntermediateTransformer";
-
+import {TypeInformationStorage} from "../DeclarationScopes";
 
 export class App {
 

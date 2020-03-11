@@ -102,13 +102,15 @@ export class Actor {
     /** Map from transition relation identifiers to the corresponding transition relation */
     private readonly _transRelMap: ImmutableMap<TransRelId, TransitionRelation>;
 
-    constructor(mode: ActorMode, ident: string, inheritFrom: Actor[],
+    constructor(mode: ActorMode, ident: ActorId, inheritFrom: Actor[],
                 dissolvedFrom: Actor[],
                 resources: AppResourceMap, datalocs: DataLocationMap,
                 initScript: Script, methodDefs: MethodDefinitionMap,
                 externalMethods: MethodSignatureMap,
                 scripts: Script[], methods: Method[]) {
+
         Preconditions.checkNotUndefined(inheritFrom);
+        Preconditions.checkArgument(typeof ident == "string");
 
         this._actorMode = Preconditions.checkNotUndefined(mode);
         this._ident = Preconditions.checkNotUndefined(ident);

@@ -22,7 +22,6 @@
 'use strict';
 
 import {ProgramParserFactory} from "./syntax/parser/ProgramParserFactory";
-import {ToIntermediateTransformer, TypeInformationStorage} from "./syntax/transformers/ToIntermediateTransformer";
 import {ControlFlows} from "./syntax/app/ControlFlows";
 import {App} from "./syntax/app/App";
 import {AnalysisProcedure, AnalysisResult, NullAnalysisResult} from "./procedures/AnalysisProcedure";
@@ -38,6 +37,8 @@ import {IllegalArgumentException} from "./core/exceptions/IllegalArgumentExcepti
 import {AnalysisStatistics} from "./procedures/analyses/AnalysisStatistics";
 import {NodeSystemLayer} from "./utils/SystemLayer";
 import {type} from "os";
+import {TypeInformationStorage} from "./syntax/DeclarationScopes";
+import {ToIntermediateTransformer} from "./syntax/transformers/ToIntermediateTransformer";
 
 const process = require('process');
 
