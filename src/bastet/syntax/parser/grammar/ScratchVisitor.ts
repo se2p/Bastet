@@ -90,6 +90,9 @@ import { StringTypeContext } from "./ScratchParser";
 import { EnumTypeContext } from "./ScratchParser";
 import { UserMessageContext } from "./ScratchParser";
 import { SystemMessageContext } from "./ScratchParser";
+import { PureElseContext } from "./ScratchParser";
+import { ElseIfCaseContext } from "./ScratchParser";
+import { EmptyElseCaseContext } from "./ScratchParser";
 import { NumberIndexTypeContext } from "./ScratchParser";
 import { StringIndexTypeContext } from "./ScratchParser";
 import { FlatVariableContext } from "./ScratchParser";
@@ -897,6 +900,30 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitSystemMessage?: (ctx: SystemMessageContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `PureElse`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPureElse?: (ctx: PureElseContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `ElseIfCase`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitElseIfCase?: (ctx: ElseIfCaseContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `EmptyElseCase`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitEmptyElseCase?: (ctx: EmptyElseCaseContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `NumberIndexType`

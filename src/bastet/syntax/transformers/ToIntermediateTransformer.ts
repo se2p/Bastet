@@ -33,7 +33,8 @@ import {
     AfterBootstrapMonitoringEventContext,
     AfterStatementMonitoringEventContext,
     UserMessageContext,
-    AssumeStatementContext, AtomicMethodContext,
+    AssumeStatementContext,
+    AtomicMethodContext,
     BoolAndExpressionContext,
     BoolAsNumExpressionContext,
     BoolAsStringExpressionContext,
@@ -123,7 +124,8 @@ import {
     ResetTimerStatementContext,
     ResourceContext,
     ResourceListContext,
-    ResourceLocatorContext, RestartScriptContext,
+    ResourceLocatorContext,
+    RestartScriptContext,
     ScriptContext,
     ScriptListContext,
     SetStatementContext,
@@ -156,7 +158,11 @@ import {
     VariableContext,
     VoidReturnDefinitionContext,
     WaitSecsStatementContext,
-    WaitUntilStatementContext, LocateActorExpressionContext, ActorVariableExpressionContext, ActorTypeContext
+    WaitUntilStatementContext,
+    LocateActorExpressionContext,
+    ActorVariableExpressionContext,
+    ActorTypeContext,
+    EmptyElseCaseContext, PureElseContext, ElseIfCaseContext
 } from "../parser/grammar/ScratchParser";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {Identifier} from "../ast/core/Identifier";
@@ -915,14 +921,31 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         }
     }
 
+    public visitEmptyElseCase (ctx: EmptyElseCaseContext): TransformerResult {
+        return TransformerResult.withNode(new StatementList([]));
+    }
+
+    public visitPureElse (ctx: PureElseContext): TransformerResult {
+        return ctx.stmtList().accept(this);
+    }
+
+    public visitElseIfCase (ctx: ElseIfCaseContext): TransformerResult {
+        const ifTr = ctx.ifStmt().accept(this);
+        return TransformerResult.withNode(
+            StatementLists.concat(ifTr.statementsToPrepend, new StatementList([ifTr.node as Statement])));
+    }
+
     public visitIfStmt (ctx: IfStmtContext): TransformerResult {
         const cond: TransformerResult = this.ensureType(ctx, BooleanType.instance(), ctx.boolExpr().accept(this));
+
+        const elseCaseTr = ctx.elseCase().accept(this);
+
         return new TransformerResult(
             cond.statementsToPrepend,
             new IfStatement(
                 cond.node as BooleanExpression,
                 ctx.stmtList().accept(this).nodeOnly() as StatementList,
-                this.statementListFrom(ctx.elseCase().stmtList())));
+                elseCaseTr.nodeOnly() as StatementList));
     }
 
     public visitRepeatForeverStmt (ctx: RepeatForeverStmtContext): TransformerResult {

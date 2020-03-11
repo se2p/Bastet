@@ -179,7 +179,12 @@ coreControlStmt :
 // A conditional statement. Either in the form of an 'if ... then ...'
 // or an 'if ... then ... else ...'.
 ifStmt : 'if' boolExpr 'then' stmtList elseCase ;
-elseCase : 'else' stmtList | ;
+
+elseCase :
+    'else' stmtList # PureElse
+  | 'else' ifStmt # ElseIfCase
+  | # EmptyElseCase
+  ;
 
 // Scratch uses `until` instead of `while` which is in
 // favour of the game-like nature of most programs written in it.

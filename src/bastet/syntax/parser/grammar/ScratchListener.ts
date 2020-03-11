@@ -90,6 +90,9 @@ import { StringTypeContext } from "./ScratchParser";
 import { EnumTypeContext } from "./ScratchParser";
 import { UserMessageContext } from "./ScratchParser";
 import { SystemMessageContext } from "./ScratchParser";
+import { PureElseContext } from "./ScratchParser";
+import { ElseIfCaseContext } from "./ScratchParser";
+import { EmptyElseCaseContext } from "./ScratchParser";
 import { NumberIndexTypeContext } from "./ScratchParser";
 import { StringIndexTypeContext } from "./ScratchParser";
 import { FlatVariableContext } from "./ScratchParser";
@@ -1329,6 +1332,45 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitSystemMessage?: (ctx: SystemMessageContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `PureElse`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 */
+	enterPureElse?: (ctx: PureElseContext) => void;
+	/**
+	 * Exit a parse tree produced by the `PureElse`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 */
+	exitPureElse?: (ctx: PureElseContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `ElseIfCase`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 */
+	enterElseIfCase?: (ctx: ElseIfCaseContext) => void;
+	/**
+	 * Exit a parse tree produced by the `ElseIfCase`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 */
+	exitElseIfCase?: (ctx: ElseIfCaseContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `EmptyElseCase`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 */
+	enterEmptyElseCase?: (ctx: EmptyElseCaseContext) => void;
+	/**
+	 * Exit a parse tree produced by the `EmptyElseCase`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 */
+	exitEmptyElseCase?: (ctx: EmptyElseCaseContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `NumberIndexType`
