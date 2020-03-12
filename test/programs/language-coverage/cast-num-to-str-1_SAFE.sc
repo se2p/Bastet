@@ -9,7 +9,7 @@ actor MiniActor is RuntimeEntity begin
         define n as 42
         define s as cast n to string
 
-        if s = "42" then begin
+        if not (s = "42") then begin
             _RUNTIME_signalFailure()
         end
     end
