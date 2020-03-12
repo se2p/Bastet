@@ -1,9 +1,6 @@
 // Generated from src/bastet/syntax/parser/grammar/Scratch.g4 by ANTLR 4.7.3-SNAPSHOT
 
 
-   import {ScopeTypeInformation, TypeInformationStorage, DeclarationScopeType} from "../../DeclarationScopes";
-
-
 import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 
 import { IdentExpressionContext } from "./ScratchParser";

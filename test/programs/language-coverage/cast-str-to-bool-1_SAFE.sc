@@ -9,7 +9,7 @@ actor MiniActor is RuntimeEntity begin
         define s as "true"
         define b as cast s to boolean
 
-        if b then begin
+        if not b then begin
             _RUNTIME_signalFailure()
         end
     end
