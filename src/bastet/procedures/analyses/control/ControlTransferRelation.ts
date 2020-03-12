@@ -407,10 +407,6 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 result = this.restartThread(result, waitForThread.threadIndex);
             }
 
-            if (stepOp.ast.msg == BOOTSTRAP_FINISHED_MESSAGE) {
-                result = this.activateAfterStepMonitoring(result);
-            }
-
             return [[result, true]]
 
         } else if (stepOp.ast instanceof BroadcastAndWaitStatement) {
@@ -426,6 +422,10 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             if (waitFor.length > 0) {
                 result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
                     ts.withComputationState(ThreadComputationState.THREAD_STATE_WAIT));
+            }
+
+            if (stepOp.ast.msg.isEqualTo(BOOTSTRAP_FINISHED_MESSAGE)) {
+                result = this.activateAfterStepMonitoring(result);
             }
 
             // Wait for all triggered threads to finish
