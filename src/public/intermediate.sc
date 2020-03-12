@@ -50,9 +50,9 @@ role RuntimeEntity begin
 
     extern _RUNTIME_getImageHeight (ident: string) returns number
 
-    extern _RUNTIME_getGraphicIdByIndex (idx: number) returns string
+    runtime _RUNTIME_getGraphicIdByIndex (idx: number) returns string
 
-    extern _RUNTIME_getGraphicIndexById (id: string) returns number
+    runtime _RUNTIME_getGraphicIndexById (id: string) returns number
 
     // A random integer in the interval [from, to],
     // that is, both end points are included.
@@ -600,18 +600,36 @@ role ScratchStage is ScratchEntity begin
     end
 
     define nextBackdrop () begin
-        declare current_idx as number
-        define current_idx as _RUNTIME_getGraphicIndexById(active_graphic_name)
-
-        define current_idx as mod(current_idx+1, num_graphics)
+        declare idx as number
+        define idx as _RUNTIME_getGraphicIndexById(active_graphic_name)
+        define idx as mod(current_idx+1, num_graphics)
 
         declare id as string
         define id as _RUNTIME_getGraphicIdByIndex(current_idx)
 
-        define active_graphic_name as id
-        define active_graphic_width as _RUNTIME_getImageWidth(id)
-        define active_graphic_height as _RUNTIME_getImageHeight(id)
+        changeActiveGraphicTo(id)
     end
 
+    define previousBackdrop() begin
+        declare idx as number
+        define idx as _RUNTIME_getGraphicIndexById(active_graphic_name)
+        define idx as mod(current_idx-1, num_graphics)
+
+        declare id as string
+        define id as _RUNTIME_getGraphicIdByIndex(current_idx)
+
+        changeActiveGraphicTo(id)
+    end
+
+    define randomBackdrop() begin
+         declare idx as number
+         define idx as _RUNTIME_getGraphicIndexById(active_graphic_name)
+         define idx as random(0, num_graphics-1)
+
+         declare id as string
+         define id as _RUNTIME_getGraphicIdByIndex(current_idx)
+
+         changeActiveGraphicTo(id)
+    end
 end
 
