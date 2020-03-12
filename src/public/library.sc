@@ -95,8 +95,6 @@ role RuntimeEntity begin
 
     extern degToRad(n: number) returns number
 
-    extern radToDeg(n: number) returns number
-
     // Make sure our direction is always between -179 and 180
     define atomic wrapClamp(dir: number, min: number, max: number) begin
         declare range as number
