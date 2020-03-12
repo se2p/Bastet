@@ -122,8 +122,8 @@ export class ScratchLexer extends Lexer {
 	public static readonly T__103 = 104;
 	public static readonly T__104 = 105;
 	public static readonly Boolean = 106;
-	public static readonly String = 107;
-	public static readonly Bool = 108;
+	public static readonly Bool = 107;
+	public static readonly String = 108;
 	public static readonly Identifier = 109;
 	public static readonly DecimalLiteral = 110;
 	public static readonly Whitespace = 111;
@@ -155,7 +155,7 @@ export class ScratchLexer extends Lexer {
 		"T__81", "T__82", "T__83", "T__84", "T__85", "T__86", "T__87", "T__88", 
 		"T__89", "T__90", "T__91", "T__92", "T__93", "T__94", "T__95", "T__96", 
 		"T__97", "T__98", "T__99", "T__100", "T__101", "T__102", "T__103", "T__104", 
-		"Boolean", "String", "Bool", "Identifier", "DecimalLiteral", "DecimalIntegerLiteral", 
+		"Boolean", "Bool", "String", "Identifier", "DecimalLiteral", "DecimalIntegerLiteral", 
 		"ExponentPart", "Whitespace", "Newline", "BlockComment", "LineComment",
 	];
 
@@ -193,7 +193,7 @@ export class ScratchLexer extends Lexer {
 		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
 		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
 		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, "Boolean", "String", "Bool", "Identifier", "DecimalLiteral", 
+		undefined, "Boolean", "Bool", "String", "Identifier", "DecimalLiteral", 
 		"Whitespace", "Newline", "BlockComment", "LineComment",
 	];
 	public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(ScratchLexer._LITERAL_NAMES, ScratchLexer._SYMBOLIC_NAMES, []);
@@ -294,8 +294,8 @@ export class ScratchLexer extends Lexer {
 		"c\x03c\x03d\x03d\x03e\x03e\x03e\x03e\x03e\x03e\x03e\x03e\x03f\x03f\x03" +
 		"f\x03f\x03f\x03f\x03f\x03g\x03g\x03g\x03g\x03g\x03g\x03h\x03h\x03h\x03" +
 		"h\x03h\x03h\x03i\x03i\x03j\x03j\x03j\x03j\x03j\x03j\x03k\x03k\x03l\x03" +
-		"l\x07l\u034F\nl\fl\x0El\u0352\vl\x03l\x03l\x03m\x03m\x03m\x03m\x03m\x03" +
-		"m\x03m\x03m\x03m\x05m\u035F\nm\x03n\x03n\x07n\u0363\nn\fn\x0En\u0366\v" +
+		"l\x03l\x03l\x03l\x03l\x03l\x03l\x03l\x05l\u0356\nl\x03m\x03m\x07m\u035A" +
+		"\nm\fm\x0Em\u035D\vm\x03m\x03m\x03n\x03n\x07n\u0363\nn\fn\x0En\u0366\v" +
 		"n\x03o\x03o\x03o\x03o\x07o\u036C\no\fo\x0Eo\u036F\vo\x03o\x05o\u0372\n" +
 		"o\x03o\x03o\x03o\x07o\u0377\no\fo\x0Eo\u037A\vo\x03o\x05o\u037D\no\x03" +
 		"o\x03o\x05o\u0381\no\x05o\u0383\no\x03p\x03p\x03p\x07p\u0388\np\fp\x0E" +
@@ -393,7 +393,7 @@ export class ScratchLexer extends Lexer {
 		"\x02\x02\x02\xC7\u0325\x03\x02\x02\x02\xC9\u0327\x03\x02\x02\x02\xCB\u032F" +
 		"\x03\x02\x02\x02\xCD\u0336\x03\x02\x02\x02\xCF\u033C\x03\x02\x02\x02\xD1" +
 		"\u0342\x03\x02\x02\x02\xD3\u0344\x03\x02\x02\x02\xD5\u034A\x03\x02\x02" +
-		"\x02\xD7\u034C\x03\x02\x02\x02\xD9\u035E\x03\x02\x02\x02\xDB\u0360\x03" +
+		"\x02\xD7\u0355\x03\x02\x02\x02\xD9\u0357\x03\x02\x02\x02\xDB\u0360\x03" +
 		"\x02\x02\x02\xDD\u0382\x03\x02\x02\x02\xDF\u038C\x03\x02\x02\x02\xE1\u038E" +
 		"\x03\x02\x02\x02\xE3\u0398\x03\x02\x02\x02\xE5\u03A3\x03\x02\x02\x02\xE7" +
 		"\u03A7\x03\x02\x02\x02\xE9\u03B5\x03\x02\x02\x02\xEB\xEC\x07r\x02\x02" +
@@ -611,21 +611,21 @@ export class ScratchLexer extends Lexer {
 		"r\x02\x02\u0340\u0341\x07t\x02\x02\u0341\xD0\x03\x02\x02\x02\u0342\u0343" +
 		"\x070\x02\x02\u0343\xD2\x03\x02\x02\x02\u0344\u0345\x07u\x02\x02\u0345" +
 		"\u0346\x07v\x02\x02\u0346\u0347\x07t\x02\x02\u0347\u0348\x07k\x02\x02" +
-		"\u0348\u0349\x07f\x02\x02\u0349\xD4\x03\x02\x02\x02\u034A\u034B\x05\xD9" +
-		"m\x02\u034B\xD6\x03\x02\x02\x02\u034C\u0350\x07$\x02\x02\u034D\u034F\n" +
-		"\x02\x02\x02\u034E\u034D\x03\x02\x02\x02\u034F\u0352\x03\x02\x02\x02\u0350" +
-		"\u034E\x03\x02\x02\x02\u0350\u0351\x03\x02\x02\x02\u0351\u0353\x03\x02" +
-		"\x02\x02\u0352\u0350\x03\x02\x02\x02\u0353\u0354\x07$\x02\x02\u0354\xD8" +
-		"\x03\x02\x02\x02\u0355\u0356\x07v\x02\x02\u0356\u0357\x07t\x02\x02\u0357" +
-		"\u0358\x07w\x02\x02\u0358\u035F\x07g\x02\x02\u0359\u035A\x07h\x02\x02" +
-		"\u035A\u035B\x07c\x02\x02\u035B\u035C\x07n\x02\x02\u035C\u035D\x07u\x02" +
-		"\x02\u035D\u035F\x07g\x02\x02\u035E\u0355\x03\x02\x02\x02\u035E\u0359" +
-		"\x03\x02\x02\x02\u035F\xDA\x03\x02\x02\x02\u0360\u0364\t\x03\x02\x02\u0361" +
-		"\u0363\t\x04\x02\x02\u0362\u0361\x03\x02\x02\x02\u0363\u0366\x03\x02\x02" +
-		"\x02\u0364\u0362\x03\x02\x02\x02\u0364\u0365\x03\x02\x02\x02\u0365\xDC" +
-		"\x03\x02\x02\x02\u0366\u0364\x03\x02\x02\x02\u0367\u0368\x05\xDFp\x02" +
-		"\u0368\u0369\x070\x02\x02\u0369\u036D\t\x05\x02\x02\u036A\u036C\t\x06" +
-		"\x02\x02\u036B\u036A\x03\x02\x02\x02\u036C\u036F\x03\x02\x02\x02\u036D" +
+		"\u0348\u0349\x07f\x02\x02\u0349\xD4\x03\x02\x02\x02\u034A\u034B\x05\xD7" +
+		"l\x02\u034B\xD6\x03\x02\x02\x02\u034C\u034D\x07v\x02\x02\u034D\u034E\x07" +
+		"t\x02\x02\u034E\u034F\x07w\x02\x02\u034F\u0356\x07g\x02\x02\u0350\u0351" +
+		"\x07h\x02\x02\u0351\u0352\x07c\x02\x02\u0352\u0353\x07n\x02\x02\u0353" +
+		"\u0354\x07u\x02\x02\u0354\u0356\x07g\x02\x02\u0355\u034C\x03\x02\x02\x02" +
+		"\u0355\u0350\x03\x02\x02\x02\u0356\xD8\x03\x02\x02\x02\u0357\u035B\x07" +
+		"$\x02\x02\u0358\u035A\n\x02\x02\x02\u0359\u0358\x03\x02\x02\x02\u035A" +
+		"\u035D\x03\x02\x02\x02\u035B\u0359\x03\x02\x02\x02\u035B\u035C\x03\x02" +
+		"\x02\x02\u035C\u035E\x03\x02\x02\x02\u035D\u035B\x03\x02\x02\x02\u035E" +
+		"\u035F\x07$\x02\x02\u035F\xDA\x03\x02\x02\x02\u0360\u0364\t\x03\x02\x02" +
+		"\u0361\u0363\t\x04\x02\x02\u0362\u0361\x03\x02\x02\x02\u0363\u0366\x03" +
+		"\x02\x02\x02\u0364\u0362\x03\x02\x02\x02\u0364\u0365\x03\x02\x02\x02\u0365" +
+		"\xDC\x03\x02\x02\x02\u0366\u0364\x03\x02\x02\x02\u0367\u0368\x05\xDFp" +
+		"\x02\u0368\u0369\x070\x02\x02\u0369\u036D\t\x05\x02\x02\u036A\u036C\t" +
+		"\x06\x02\x02\u036B\u036A\x03\x02\x02\x02\u036C\u036F\x03\x02\x02\x02\u036D" +
 		"\u036B\x03\x02\x02\x02\u036D\u036E\x03\x02\x02\x02\u036E\u0371\x03\x02" +
 		"\x02\x02\u036F\u036D\x03\x02\x02\x02\u0370\u0372\x05\xE1q\x02\u0371\u0370" +
 		"\x03\x02\x02\x02\u0371\u0372\x03\x02\x02\x02\u0372\u0383\x03\x02\x02\x02" +
@@ -663,7 +663,7 @@ export class ScratchLexer extends Lexer {
 		"\x03\x02\x02\x02\u03B8\u03BA\n\v\x02\x02\u03B9\u03B8\x03\x02\x02\x02\u03BA" +
 		"\u03BD\x03\x02\x02\x02\u03BB\u03B9\x03\x02\x02\x02\u03BB\u03BC\x03\x02" +
 		"\x02\x02\u03BC\u03BE\x03\x02\x02\x02\u03BD\u03BB\x03\x02\x02\x02\u03BE" +
-		"\u03BF\bu\x02\x02\u03BF\xEA\x03\x02\x02\x02\x15\x02\u0350\u035E\u0364" +
+		"\u03BF\bu\x02\x02\u03BF\xEA\x03\x02\x02\x02\x15\x02\u0355\u035B\u0364" +
 		"\u036D\u0371\u0378\u037C\u0380\u0382\u0389\u038C\u0390\u0395\u039A\u03A0" +
 		"\u03A3\u03AD\u03BB\x03\b\x02\x02";
 	public static readonly _serializedATN: string = Utils.join(

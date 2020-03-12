@@ -63,6 +63,8 @@ import { BoolLiteralExpressionContext } from "./ScratchParser";
 import { BoolVariableExpressionContext } from "./ScratchParser";
 import { BoolParanthExpressionContext } from "./ScratchParser";
 import { BoolCallStatementExpressionContext } from "./ScratchParser";
+import { NumAsBoolExpressionContext } from "./ScratchParser";
+import { StringAsBoolExpressionContext } from "./ScratchParser";
 import { NegatedBoolExpressionContext } from "./ScratchParser";
 import { BoolAndExpressionContext } from "./ScratchParser";
 import { BoolOrExpressionContext } from "./ScratchParser";
@@ -983,6 +985,32 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitBoolCallStatementExpression?: (ctx: BoolCallStatementExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumAsBoolExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumAsBoolExpression?: (ctx: NumAsBoolExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumAsBoolExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumAsBoolExpression?: (ctx: NumAsBoolExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `StringAsBoolExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterStringAsBoolExpression?: (ctx: StringAsBoolExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `StringAsBoolExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitStringAsBoolExpression?: (ctx: StringAsBoolExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `NegatedBoolExpression`

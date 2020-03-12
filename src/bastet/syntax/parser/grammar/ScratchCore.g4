@@ -300,6 +300,9 @@ coreBoolExpr  :
  |  '(' coreBoolExpr ')' # BoolParanthExpression
  |  callStmt # BoolCallStatementExpression
 
+ |  'cast' numExpr 'to' 'boolean' # NumAsBoolExpression
+ |  'cast' stringExpr 'to' 'boolean' # StringAsBoolExpression
+
  |  'not'  coreBoolExpr # NegatedBoolExpression
  |  coreBoolExpr  'and'  coreBoolExpr # BoolAndExpression
  |  coreBoolExpr  'or'  coreBoolExpr # BoolOrExpression
@@ -323,8 +326,10 @@ numOrStringExpr :
 coreNumExpr  :
     number # NumLiteralExpression
  |  variable # NumVariableExpression
+ |  castExpr # CastExpression
  |  '(' coreNumExpr ')' # NumBrackets
  |  callStmt # NumCallStatementExpression
+
  |  'cast' stringExpr 'to' 'number' # StringAsNumExpression
  |  'cast' boolExpr 'to' 'number' # BoolAsNumExpression
 
@@ -343,6 +348,10 @@ coreNumExpr  :
  | 'default' number 'for' coreNumExpr # DefaultNumExpr
  | '?number' # UnspecifiedNumExpr
  ;
+
+castExpr :
+    'cast' coreExpression 'to' primitiveType
+    ;
 
 listExpr :
     variable # ListVariableExpression
