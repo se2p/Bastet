@@ -61,7 +61,7 @@
         define alpha as wrapClamp(alpha, 0, 360)
         declare result as number
 
-        if alpha > 0 and alpha < 36 then begin
+        if alpha > -1 and alpha < 36 then begin
             assume result < 1
             assume result > 0-0.127
         end else begin
@@ -120,7 +120,7 @@
         define alpha as wrapClamp(alpha, 0, 360)
         declare result as number
 
-        if alpha > 0 and alpha < 36 then begin
+        if alpha > -1 and alpha < 36 then begin
             assume result < 0
             assume result > 0-0.991
         end else begin
@@ -174,3 +174,42 @@
         end
 
     end returns result: number
+
+    define radToDeg(rad: number) begin
+        declare result as number
+        declare negated as boolean
+
+        if rad < 0 then begin
+            define rad as (0-rad)
+            define negated as true
+        end
+
+        declare lower as number
+        declare upper as number
+        declare step as number
+
+        define step as 0.628
+        define lower as 0
+        define upper as step
+
+        define rad as rad - 36
+        until rad < 0 repeat
+            define lower as lower + step
+            define upper as upper + step + 0.001
+            define rad as rad - 36
+        end
+
+        if negated then begin
+            define lower as (0 - lower)
+            define upper as (0 - upper)
+
+            assume result < lower
+            assume result > upper
+        end else if then begin
+            assume result > lower
+            assume result < upper
+        end
+
+    end returns result: number
+
+
