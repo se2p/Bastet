@@ -266,8 +266,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         for (const [r, considerInterpretationFinished] of withControlResults){
             // Interpret the wrapped state by the wrapped analysis
-            const wrappedAnalysisResults: Iterable<AbstractElement> = considerInterpretationFinished ? [r.getWrappedState()]
-                : Transfers.withIntermediateOps(this._wrappedTransferRelation, r.wrappedState, step.ops, Concerns.defaultProgramConcern());
+            const threadToStepPrime = r.getIndexedThreadState(threadToStep.threadIndex);
+            const ops = threadToStepPrime.threadStatus.getOperations().map((oid) => ProgramOperation.for(oid));
+            const wrappedAnalysisResults: Iterable<AbstractElement> = considerInterpretationFinished
+                ? [r.getWrappedState()]
+                : Transfers.withIntermediateOps(this._wrappedTransferRelation, r.wrappedState, ops, Concerns.defaultProgramConcern());
 
             // Combine the result
             Preconditions.checkNotUndefined(r);
@@ -362,26 +365,19 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 const succCallStack = steppedThread.getCallStack()
                     .push(new MethodCall(fromLocation, step.succLoc));
                 const succScopeStack = steppedThread.getScopeStack().push(calledMethodName);
-                const currentScopeStack = steppedThread.getScopeStack();
-
-                const wrappedStatesWithPassedArgs = Transfers.withIntermediateOps(this._wrappedTransferRelation,
-                    fromState.getWrappedState(), this.scopeOperations(interProcOps, fromState.getActorScopes(), currentScopeStack, succScopeStack),
-                    Concerns.defaultProgramConcern());
 
                 const resultList: [ControlAbstractState, boolean][] = [];
 
-                for (const wrappedState of wrappedStatesWithPassedArgs) {
-                    for (const entryLocId of calledMethod.transitions.entryLocationSet) {
-                        const callToRelationLoc: RelationLocation = new RelationLocation(
-                            steppedActor.ident, calledMethod.transitions.ident, entryLocId);
+                for (const entryLocId of calledMethod.transitions.entryLocationSet) {
+                    const callToRelationLoc: RelationLocation = new RelationLocation(
+                        steppedActor.ident, calledMethod.transitions.ident, entryLocId);
+                    const currentScopeStack = steppedThread.getScopeStack();
 
-                        resultList.push([result
-                            .withWrappedState(wrappedState)
-                            .withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                                ts.withLocation(callToRelationLoc)
-                                    .withCallStack(succCallStack)
-                                    .withScopeStack(succScopeStack)), true]);
-                    }
+                    resultList.push([result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                        ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.getActorScopes(), currentScopeStack, succScopeStack).map(op => op.ident)))
+                            .withLocation(callToRelationLoc)
+                            .withCallStack(succCallStack)
+                            .withScopeStack(succScopeStack)), false]);
                 }
 
                 return resultList;
@@ -396,16 +392,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             // Assign the result to the variable that was referenced in the `CallStatement`
             const interProcOps: ProgramOperation[] = this.createStoreCallResultOps(steppedThread, callInformation, stepOp.ast as ReturnStatement);
 
-            const wrappedStatesWithReturnedResult = Transfers.withIntermediateOps(this._wrappedTransferRelation,
-                fromState.getWrappedState(), this.scopeOperations(interProcOps, fromState.actorScopes, steppedThread.getScopeStack(), succScopeStack),
-                Concerns.defaultProgramConcern());
-
-            return wrappedStatesWithReturnedResult.map(w =>
-                [result.withWrappedState(w)
-                    .withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                        ts.withLocation(callInformation.getReturnTo())
-                        .withCallStack(succReturnCallsTo)
-                        .withScopeStack(succScopeStack)), true]);
+            return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.actorScopes, steppedThread.getScopeStack(), succScopeStack).map(o => o.ident)))
+                    .withLocation(callInformation.getReturnTo())
+                    .withCallStack(succReturnCallsTo)
+                    .withScopeStack(succScopeStack)), false]];
 
         } else if (stepOp.ast instanceof BroadcastMessageStatement) {
             const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
