@@ -1222,12 +1222,14 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitBoolAsNumExpression(ctx: BoolAsNumExpressionContext) : TransformerResult {
         const exprTr: TransformerResult = ctx.boolExpr().accept(this);
-        return new TransformerResult(exprTr.statementsToPrepend, new CastExpression(exprTr.node as BooleanExpression, NumberType.instance()));
+        return new TransformerResult(exprTr.statementsToPrepend,
+            new CastExpression(exprTr.node as Expression, NumberType.instance()));
     }
 
     public visitBoolAsStringExpression(ctx: BoolAsStringExpressionContext) : TransformerResult {
         const exprTr: TransformerResult = ctx.boolExpr().accept(this);
-        return new TransformerResult(exprTr.statementsToPrepend, new CastExpression(exprTr.node as BooleanExpression, StringType.instance()));
+        return new TransformerResult(exprTr.statementsToPrepend,
+            new CastExpression(exprTr.node as Expression, StringType.instance()));
     }
 
     public visitBoolLiteralExpression(ctx: BoolLiteralExpressionContext) : TransformerResult {
@@ -1604,10 +1606,10 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitStringAsNumExpression(ctx: StringAsNumExpressionContext) : TransformerResult {
-        const tr = this.ensureType(ctx, StringType.instance(), ctx.stringExpr().accept(this));
+        const tr = ctx.stringExpr().accept(this);
         return new TransformerResult(
             tr.statementsToPrepend,
-            new CastExpression(tr.node as StringExpression, NumberType.instance()));
+            new CastExpression(tr.node as Expression, NumberType.instance()));
     }
 
     public visitLocateActorExpression(ctx: LocateActorExpressionContext): TransformerResult {
@@ -1638,6 +1640,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitStringVariableExpression(ctx: StringVariableExpressionContext) : TransformerResult {
+        // Do not StringVariableExpression here!! (but a type-independent variable)
+        // (to deal with ambiguities in the parsing process)
         return ctx.variable().accept(this);
     }
 

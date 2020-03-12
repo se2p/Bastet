@@ -2,6 +2,39 @@ grammar ScratchCore;
 
 import ScratchLiterals;
 
+@parser::header {
+   import {ScopeTypeInformation, TypeInformationStorage, DeclarationScopeType} from "../../DeclarationScopes";
+}
+
+@parser::members
+{
+    private _typeStorage: TypeInformationStorage;
+
+    private getTypeInformationStorage(): TypeInformationStorage {
+        if (!this._typeStorage) {
+            this._typeStorage = new TypeInformationStorage();
+        }
+        return this._typeStorage;
+    }
+
+    public isStringTyped(): boolean {
+        console.log(this._input.LT(1).text);
+        return false;
+    }
+
+	public storeType(identOffset: number, typeOffset: number): void {
+		const ident = this._input.LT(identOffset).text;
+		const type = this._input.LT(typeOffset).text;
+		console.log(`${ident} ${type}`);
+	}
+
+	public beginScope(name: string, scopeType: DeclarationScopeType): void {
+	}
+
+	public endScope(): void {
+	}
+}
+
 // A program has a name and is composed of a list of actors.
 // The term 'actor' is used to describe one entity in the Scratch world.
 // We use the terms 'script group' and 'entity' as synonyms for 'actor'.
@@ -61,7 +94,10 @@ resourceList : resource* ;
 // Decalration of a variable. Depending on the possition of the
 // declaration statement, the variable is either local to the actor
 // or local to the current stack of a script execution.
-declarationStmt : 'declare' ident 'as' type # DeclareVariable ;
+declarationStmt :
+    {this.storeType(2, 4);}
+    'declare' ident 'as' type # DeclareVariable
+    ;
 
 // A list of variable declarations.
 declarationStmtList : declarationStmt* ;
@@ -135,6 +171,7 @@ methodDefinition :
     ;
 
 methodResultDeclaration :
+    {this.storeType(2, 4);}
     'returns' ident ':' type # FunctionReturnDefinition
     | # VoidReturnDefinition
     ;
@@ -147,7 +184,10 @@ methodAttributeList : methodAttribute* ;
 methodAttribute : 'atomic' # AtomicMethod ;
 
 // A procedure parameter.
-parameter : ident ':' type ;
+parameter :
+    {this.storeType(1, 3);}
+    ident ':' type
+    ;
 
 // A list of method parameters in brackets.
 parameterList : '(' parameterListPlain ')' ;
@@ -273,7 +313,7 @@ terminationStmt :
 
 stringExpr : coreStringExpr ;
 
-coreStringExpr  :
+coreStringExpr :
    String # StringLiteralExpression
  |  variable # StringVariableExpression
  |  '(' coreStringExpr ')' # StringParanthExpression
@@ -326,7 +366,6 @@ numOrStringExpr :
 coreNumExpr  :
     number # NumLiteralExpression
  |  variable # NumVariableExpression
- |  castExpr # CastExpression
  |  '(' coreNumExpr ')' # NumBrackets
  |  callStmt # NumCallStatementExpression
 
@@ -348,10 +387,6 @@ coreNumExpr  :
  | 'default' number 'for' coreNumExpr # DefaultNumExpr
  | '?number' # UnspecifiedNumExpr
  ;
-
-castExpr :
-    'cast' coreExpression 'to' primitiveType
-    ;
 
 listExpr :
     variable # ListVariableExpression
