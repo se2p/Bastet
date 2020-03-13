@@ -46,12 +46,12 @@ parse_results () {
     if [ ! $EXPECTED_VIOLATED -eq "$VIOLATED" ]
     then
         OK=0
-    fi  
+    fi
 
     if [ ! $EXPECTED_SATISFIED -eq "$SATISFIED" ]
     then
         OK=0
-    fi  
+    fi
 
     printf "\t$DURATION\t$VIOLATED\t$SATISFIED"
 
@@ -61,18 +61,18 @@ parse_results () {
     else
         printf "\tBUG"
         cp $RESULT_FILE "output/test-results/$(basename $INPUT_FILE).bug.log"
-    fi    
+    fi
 }
 
-for f in $(find $TEST_DIR -name "*${NAME_PREFIX}*.sc" | sort) 
+for f in $(find $TEST_DIR -name "*${NAME_PREFIX}*.sc" | sort)
 do
     RESULT_FILE=$(mktemp)
     printf "`basename $f`"
      timeout 90 ./scripts/bastet.sh \
         -P $f \
         -S test/programs/empty.sc \
-        -I src/public/intermediate.sc \
-        > $RESULT_FILE 2>&1 
+        -I src/public/library.sc \
+        > $RESULT_FILE 2>&1
     parse_results $f $RESULT_FILE
     rm $RESULT_FILE
     printf "\n"

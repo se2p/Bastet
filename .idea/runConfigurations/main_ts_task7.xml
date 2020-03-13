@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="main.ts task7" type="NodeJSConfigurationType" application-parameters="-P test/programs/publications/task7program.sc -S test/programs/publications/task7spec.sc -I src/public/intermediate.sc" node-parameters="--require ts-node/register" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
+  <configuration default="false" name="main.ts task7" type="NodeJSConfigurationType" application-parameters="-P test/programs/publications/task7program.sc -S test/programs/publications/task7spec.sc -I src/public/library.sc" node-parameters="--require ts-node/register" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
     <method v="2" />
   </configuration>
 </component>

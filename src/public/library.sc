@@ -1,4 +1,4 @@
-module IntermediateModule
+module ScratchLibrary
 
 role RuntimeEntity begin
 
@@ -240,6 +240,7 @@ role ScratchEntity is RuntimeEntity begin
 
     // 480 * 360 = 172800 pixels
     declare active_graphic_pixels as list of number
+    declare active_graphic_index as number
     declare active_graphic_name as string
     declare active_graphic_width as number
     declare active_graphic_height as number

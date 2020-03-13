@@ -20,7 +20,7 @@
  */
 
 import {AbstractNode, OptionalAstNode} from "../AstNode";
-import {StringExpression, StringLiteral} from "./expressions/StringExpression";
+import {extractStringLiteral, StringExpression, StringLiteral} from "./expressions/StringExpression";
 import {Expression} from "./expressions/Expression";
 
 export interface Message {
@@ -53,6 +53,11 @@ export class SystemMessage extends AbstractNode implements Message {
 
     get payload() : OptionalAstNode<Expression> {
         return this._payload
+    }
+
+    public isEqualTo(msg: SystemMessage): boolean {
+       return extractStringLiteral(msg.messageid) == extractStringLiteral(this.messageid)
+           && extractStringLiteral(msg.namespace) == extractStringLiteral(this.namespace);
     }
 
 }

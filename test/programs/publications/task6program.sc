@@ -4,15 +4,15 @@ actor Stage is ScratchStage begin
 
 end
 
-actor Monkey is ScratchSprite begin
+actor strid "Affe" is ScratchSprite begin
 
 end
 
-actor CircusDirector is ScratchSprite begin
+actor strid "Zirkusdirektor-rennend" is ScratchSprite begin
 
     script on startup do begin
         repeat forever begin
-            pointTowards("Monkey")
+            pointTowards(locate actor "Affe")
             moveSteps(1)
         end
     end

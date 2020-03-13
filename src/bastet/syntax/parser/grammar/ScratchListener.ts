@@ -5,6 +5,8 @@ import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 
 import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
+import { FullMethodDefinitionContext } from "./ScratchParser";
+import { RuntimeMethodDefinitionContext } from "./ScratchParser";
 import { RestartScriptContext } from "./ScratchParser";
 import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
@@ -61,6 +63,8 @@ import { BoolLiteralExpressionContext } from "./ScratchParser";
 import { BoolVariableExpressionContext } from "./ScratchParser";
 import { BoolParanthExpressionContext } from "./ScratchParser";
 import { BoolCallStatementExpressionContext } from "./ScratchParser";
+import { NumAsBoolExpressionContext } from "./ScratchParser";
+import { StringAsBoolExpressionContext } from "./ScratchParser";
 import { NegatedBoolExpressionContext } from "./ScratchParser";
 import { BoolAndExpressionContext } from "./ScratchParser";
 import { BoolOrExpressionContext } from "./ScratchParser";
@@ -90,6 +94,9 @@ import { StringTypeContext } from "./ScratchParser";
 import { EnumTypeContext } from "./ScratchParser";
 import { UserMessageContext } from "./ScratchParser";
 import { SystemMessageContext } from "./ScratchParser";
+import { PureElseContext } from "./ScratchParser";
+import { ElseIfCaseContext } from "./ScratchParser";
+import { EmptyElseCaseContext } from "./ScratchParser";
 import { NumberIndexTypeContext } from "./ScratchParser";
 import { StringIndexTypeContext } from "./ScratchParser";
 import { FlatVariableContext } from "./ScratchParser";
@@ -224,6 +231,32 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitStrIdentExpression?: (ctx: StrIdentExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `FullMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 */
+	enterFullMethodDefinition?: (ctx: FullMethodDefinitionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `FullMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 */
+	exitFullMethodDefinition?: (ctx: FullMethodDefinitionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `RuntimeMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 */
+	enterRuntimeMethodDefinition?: (ctx: RuntimeMethodDefinitionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `RuntimeMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 */
+	exitRuntimeMethodDefinition?: (ctx: RuntimeMethodDefinitionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `RestartScript`
@@ -954,6 +987,32 @@ export interface ScratchListener extends ParseTreeListener {
 	exitBoolCallStatementExpression?: (ctx: BoolCallStatementExpressionContext) => void;
 
 	/**
+	 * Enter a parse tree produced by the `NumAsBoolExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumAsBoolExpression?: (ctx: NumAsBoolExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumAsBoolExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumAsBoolExpression?: (ctx: NumAsBoolExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `StringAsBoolExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterStringAsBoolExpression?: (ctx: StringAsBoolExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `StringAsBoolExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitStringAsBoolExpression?: (ctx: StringAsBoolExpressionContext) => void;
+
+	/**
 	 * Enter a parse tree produced by the `NegatedBoolExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
@@ -1329,6 +1388,45 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitSystemMessage?: (ctx: SystemMessageContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `PureElse`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 */
+	enterPureElse?: (ctx: PureElseContext) => void;
+	/**
+	 * Exit a parse tree produced by the `PureElse`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 */
+	exitPureElse?: (ctx: PureElseContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `ElseIfCase`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 */
+	enterElseIfCase?: (ctx: ElseIfCaseContext) => void;
+	/**
+	 * Exit a parse tree produced by the `ElseIfCase`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 */
+	exitElseIfCase?: (ctx: ElseIfCaseContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `EmptyElseCase`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 */
+	enterEmptyElseCase?: (ctx: EmptyElseCaseContext) => void;
+	/**
+	 * Exit a parse tree produced by the `EmptyElseCase`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 */
+	exitEmptyElseCase?: (ctx: EmptyElseCaseContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `NumberIndexType`

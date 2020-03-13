@@ -154,6 +154,10 @@ export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends Abstr
         if (node.toConvert.expressionType == StringType.instance()) {
             const stringVisitor = new DataStringExpressionVisitor(this._theories);
             return this._theory.castStringAsNumber(node.toConvert.accept(stringVisitor));
+
+        } else if (node.toConvert.expressionType == BooleanType.instance()) {
+            const boolVisitor = new DataBoolExpressionVisitor(this._theories);
+            return this._theory.castBoolAsNumber(node.toConvert.accept(boolVisitor));
         }
 
         throw new ImplementMeException();
@@ -331,6 +335,18 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
 
     visitCastExpression(node: CastExpression): B {
         Preconditions.checkArgument(node.castToType == BooleanType.instance());
+
+        if (node.toConvert.expressionType == StringType.instance()) {
+            const stringVisitor = new DataStringExpressionVisitor(this._theories);
+            throw new ImplementMeException();
+
+        } else if (node.toConvert.expressionType == NumberType.instance()) {
+            const numVisitor = new DataNumExpressionVisitor(this._theories);
+            const numFormula = node.toConvert.accept(numVisitor);
+            return this._theories.boolTheory.not(
+                this._theories.numTheory.isNumberEqualTo(numFormula, this._theories.numTheory.zero()));
+        }
+
         throw new ImplementMeException();
     }
 
@@ -392,6 +408,15 @@ export class DataStringExpressionVisitor<B extends AbstractBoolean, N extends Ab
 
     visitCastExpression(node: CastExpression): S {
         Preconditions.checkArgument(node.castToType == StringType.instance());
+
+        if (node.toConvert.expressionType == NumberType.instance()) {
+            const numVisitor = new DataNumExpressionVisitor(this._theories);
+            return this._theories.stringTheory.castNumberAsString(node.toConvert.accept(numVisitor));
+
+        } else if (node.toConvert.expressionType == StringType.instance()) {
+            return node.toConvert.accept(this);
+        }
+
         throw new ImplementMeException();
     }
 

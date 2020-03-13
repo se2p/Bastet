@@ -23,7 +23,7 @@ import path from "path"
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import {AnalysisResult, MultiPropertyAnalysisResult} from "../../../../../src/bastet/procedures/AnalysisProcedure";
 
-let intermediateRelPath = "../../../../../src/public/intermediate.sc";
+let intermediateRelPath = "../../../../../src/public/library.sc";
 let intermediatePath = path.join(__dirname, intermediateRelPath);
 
 let configRelPath = "../../../../../config/default.json"

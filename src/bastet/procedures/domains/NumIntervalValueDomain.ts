@@ -190,6 +190,10 @@ export class NumIntervalTheory implements RationalNumberTheory<NumIntervalValue,
         throw new ImplementMeException();
     }
 
+    ifThenElse(cond: AbstractBoolean, thenResult: NumIntervalValue, elseResult: NumIntervalValue): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
 }
 
 export class NumIntervalValueDomain implements AbstractNumberDomain {

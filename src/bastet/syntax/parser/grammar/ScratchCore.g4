@@ -61,7 +61,9 @@ resourceList : resource* ;
 // Decalration of a variable. Depending on the possition of the
 // declaration statement, the variable is either local to the actor
 // or local to the current stack of a script execution.
-declarationStmt : 'declare' ident 'as' type # DeclareVariable ;
+declarationStmt :
+    'declare' ident 'as' type # DeclareVariable
+    ;
 
 // A list of variable declarations.
 declarationStmtList : declarationStmt* ;
@@ -129,7 +131,11 @@ externMethodResultDeclaration :
     ;
 externMethodDefinitionList : externMethodDefinition* ;
 
-methodDefinition : 'define' methodAttributeList ident parameterList stmtList methodResultDeclaration ;
+methodDefinition :
+      'define' methodAttributeList ident parameterList stmtList methodResultDeclaration # FullMethodDefinition
+    | 'define' methodAttributeList ident parameterList 'in' 'runtime' methodResultDeclaration # RuntimeMethodDefinition
+    ;
+
 methodResultDeclaration :
     'returns' ident ':' type # FunctionReturnDefinition
     | # VoidReturnDefinition
@@ -143,7 +149,9 @@ methodAttributeList : methodAttribute* ;
 methodAttribute : 'atomic' # AtomicMethod ;
 
 // A procedure parameter.
-parameter : ident ':' type ;
+parameter :
+    ident ':' type
+    ;
 
 // A list of method parameters in brackets.
 parameterList : '(' parameterListPlain ')' ;
@@ -179,7 +187,12 @@ coreControlStmt :
 // A conditional statement. Either in the form of an 'if ... then ...'
 // or an 'if ... then ... else ...'.
 ifStmt : 'if' boolExpr 'then' stmtList elseCase ;
-elseCase : 'else' stmtList | ;
+
+elseCase :
+    'else' stmtList # PureElse
+  | 'else' ifStmt # ElseIfCase
+  | # EmptyElseCase
+  ;
 
 // Scratch uses `until` instead of `while` which is in
 // favour of the game-like nature of most programs written in it.
@@ -264,7 +277,7 @@ terminationStmt :
 
 stringExpr : coreStringExpr ;
 
-coreStringExpr  :
+coreStringExpr :
    String # StringLiteralExpression
  |  variable # StringVariableExpression
  |  '(' coreStringExpr ')' # StringParanthExpression
@@ -291,6 +304,9 @@ coreBoolExpr  :
  |  '(' coreBoolExpr ')' # BoolParanthExpression
  |  callStmt # BoolCallStatementExpression
 
+ |  'cast' numExpr 'to' 'boolean' # NumAsBoolExpression
+ |  'cast' stringExpr 'to' 'boolean' # StringAsBoolExpression
+
  |  'not'  coreBoolExpr # NegatedBoolExpression
  |  coreBoolExpr  'and'  coreBoolExpr # BoolAndExpression
  |  coreBoolExpr  'or'  coreBoolExpr # BoolOrExpression
@@ -316,6 +332,7 @@ coreNumExpr  :
  |  variable # NumVariableExpression
  |  '(' coreNumExpr ')' # NumBrackets
  |  callStmt # NumCallStatementExpression
+
  |  'cast' stringExpr 'to' 'number' # StringAsNumExpression
  |  'cast' boolExpr 'to' 'number' # BoolAsNumExpression
 

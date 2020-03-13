@@ -5,6 +5,8 @@ import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
 
 import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
+import { FullMethodDefinitionContext } from "./ScratchParser";
+import { RuntimeMethodDefinitionContext } from "./ScratchParser";
 import { RestartScriptContext } from "./ScratchParser";
 import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
@@ -61,6 +63,8 @@ import { BoolLiteralExpressionContext } from "./ScratchParser";
 import { BoolVariableExpressionContext } from "./ScratchParser";
 import { BoolParanthExpressionContext } from "./ScratchParser";
 import { BoolCallStatementExpressionContext } from "./ScratchParser";
+import { NumAsBoolExpressionContext } from "./ScratchParser";
+import { StringAsBoolExpressionContext } from "./ScratchParser";
 import { NegatedBoolExpressionContext } from "./ScratchParser";
 import { BoolAndExpressionContext } from "./ScratchParser";
 import { BoolOrExpressionContext } from "./ScratchParser";
@@ -90,6 +94,9 @@ import { StringTypeContext } from "./ScratchParser";
 import { EnumTypeContext } from "./ScratchParser";
 import { UserMessageContext } from "./ScratchParser";
 import { SystemMessageContext } from "./ScratchParser";
+import { PureElseContext } from "./ScratchParser";
+import { ElseIfCaseContext } from "./ScratchParser";
+import { EmptyElseCaseContext } from "./ScratchParser";
 import { NumberIndexTypeContext } from "./ScratchParser";
 import { StringIndexTypeContext } from "./ScratchParser";
 import { FlatVariableContext } from "./ScratchParser";
@@ -217,6 +224,22 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitStrIdentExpression?: (ctx: StrIdentExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `FullMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitFullMethodDefinition?: (ctx: FullMethodDefinitionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `RuntimeMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitRuntimeMethodDefinition?: (ctx: RuntimeMethodDefinitionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `RestartScript`
@@ -667,6 +690,22 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitBoolCallStatementExpression?: (ctx: BoolCallStatementExpressionContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by the `NumAsBoolExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitNumAsBoolExpression?: (ctx: NumAsBoolExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `StringAsBoolExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitStringAsBoolExpression?: (ctx: StringAsBoolExpressionContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by the `NegatedBoolExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
@@ -897,6 +936,30 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitSystemMessage?: (ctx: SystemMessageContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `PureElse`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPureElse?: (ctx: PureElseContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `ElseIfCase`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitElseIfCase?: (ctx: ElseIfCaseContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `EmptyElseCase`
+	 * labeled alternative in `ScratchParser.elseCase`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitEmptyElseCase?: (ctx: EmptyElseCaseContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `NumberIndexType`

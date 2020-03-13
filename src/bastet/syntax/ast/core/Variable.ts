@@ -96,4 +96,8 @@ export class VariableWithDataLocation extends AbstractExpression implements Vari
     get variableType(): ScratchType {
         return this.expressionType;
     }
+
+    toString() {
+        return this.qualifiedName;
+    }
 }

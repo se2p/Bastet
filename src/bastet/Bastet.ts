@@ -22,7 +22,6 @@
 'use strict';
 
 import {ProgramParserFactory} from "./syntax/parser/ProgramParserFactory";
-import {ToIntermediateTransformer, TypeInformationStorage} from "./syntax/transformers/ToIntermediateTransformer";
 import {ControlFlows} from "./syntax/app/ControlFlows";
 import {App} from "./syntax/app/App";
 import {AnalysisProcedure, AnalysisResult, NullAnalysisResult} from "./procedures/AnalysisProcedure";
@@ -38,6 +37,8 @@ import {IllegalArgumentException} from "./core/exceptions/IllegalArgumentExcepti
 import {AnalysisStatistics} from "./procedures/analyses/AnalysisStatistics";
 import {NodeSystemLayer} from "./utils/SystemLayer";
 import {type} from "os";
+import {TypeInformationStorage} from "./syntax/DeclarationScopes";
+import {ToIntermediateTransformer} from "./syntax/transformers/ToIntermediateTransformer";
 
 const process = require('process');
 
@@ -119,10 +120,10 @@ export class Bastet {
         const staticLibraryModel: App = this.parseFromIntermediateCode("library", libraryFilepath, typeStorage, config);
 
         // Parse the program (a Scratch program) into an intermediate AST
-        const staticProgramModel: App = this.parseFromRawCode("program", "", programFilepath, staticLibraryModel, typeStorage, config);
+        const staticProgramModel: App = this.parseFromRawCode("program", programFilepath, staticLibraryModel, typeStorage, config);
 
         // Parse the specification (also a Scratch program) into an intermediate AST
-        const staticSpecModel: App = this.parseFromRawCode("spec", "__spec", specFilepath, staticLibraryModel, typeStorage, config);
+        const staticSpecModel: App = this.parseFromRawCode("spec", specFilepath, staticLibraryModel, typeStorage, config);
 
         // Create the control-flow structure of the verification task
         const staticTaskModelWithInheritance: App = ControlFlows.unionOf(staticLibraryModel,
@@ -155,7 +156,7 @@ export class Bastet {
         const transformer = new ToIntermediateTransformer();
         const intermediateAST: AstNode = transformer.transform(App.empty(), rawAST, typeStorage, config);
 
-        return this.createControlFlowFrom(filepath, intermediateAST, App.empty(), typeStorage, "");
+        return this.createControlFlowFrom(filepath, intermediateAST, App.empty(), typeStorage);
     }
 
     /**
@@ -164,7 +165,7 @@ export class Bastet {
      *
      * @param filepath
      */
-    private parseFromRawCode(ident: string, actorNamePrefix: string, filepath: string,
+    private parseFromRawCode(ident: string, filepath: string,
                              staticLibraryModel: App, typeStorage: TypeInformationStorage,
                              config: {}): App {
         Preconditions.checkNotEmpty(filepath);
@@ -180,13 +181,13 @@ export class Bastet {
         const transformer = new ToIntermediateTransformer();
         const intermediateAST: AstNode = transformer.transform(staticLibraryModel, rawAST, typeStorage, config);
 
-        return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, typeStorage, actorNamePrefix);
+        return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, typeStorage);
     }
 
     private createControlFlowFrom(programOrigin: string, intermediateSpecAST: AstNode, libraryModule: App,
-                                  typeStorage: TypeInformationStorage, actorNamePrefix?: string): App {
+                                  typeStorage: TypeInformationStorage): App {
         const ab: AppBuilder = new AppBuilder(libraryModule);
-        return ab.buildFromSyntaxTree(programOrigin, intermediateSpecAST, typeStorage, actorNamePrefix);
+        return ab.buildFromSyntaxTree(programOrigin, intermediateSpecAST, typeStorage);
     }
 
 }

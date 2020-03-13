@@ -77,7 +77,7 @@ export class AnalysisProcedureFactory {
                 const chooseOp = frontier.createChooseOp(chooseOpConfig);
                 const reachabilityAlgorithm = new ReachabilityAlgorithm(config, outerAnalysis, chooseOp, this._statistics);
                 const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, outerAnalysis.refiner, outerAnalysis, this._statistics);
-                const multiPropertyAlgorithm = new MultiPropertyAlgorithm(task, bmcAlgorithm, outerAnalysis, this._statistics,
+                const multiPropertyAlgorithm = new MultiPropertyAlgorithm(config, task, bmcAlgorithm, outerAnalysis, this._statistics,
                     (v, s, u, stats) => this.onAnalysisResult(v, s, u, stats));
 
                 const initialStates: GraphAbstractState[] = outerAnalysis.initialStatesFor(task);

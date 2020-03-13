@@ -193,8 +193,8 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
         throw new ImplementMeException();
     }
 
-    castBoolAsNumber(val: AbstractBoolean): Z3NumberFormula {
-        throw new ImplementMeException();
+    castBoolAsNumber(val: Z3BooleanFormula): Z3NumberFormula {
+        return this.ifThenElse(val, this.one(), this.zero());
     }
 
     castStringAsNumber(str: Z3StringFormula): Z3NumberFormula {
@@ -248,7 +248,8 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
     }
 
     one(): Z3NumberFormula {
-        return new Z3NumberFormula(this._ctx.mk_int_symbol(new Sint32(1)));
+        return new Z3NumberFormula(
+            this._ctx.mk_int(new Sint32(1), this._ctx.mk_int_sort()));
     }
 
     plus(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
@@ -266,7 +267,8 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
     }
 
     zero(): Z3NumberFormula {
-        return new Z3NumberFormula(this._ctx.mk_int_symbol(new Sint32(0)));
+        return new Z3NumberFormula(
+            this._ctx.mk_int(new Sint32(0), this._ctx.mk_int_sort()));
     }
 
     isGreaterEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
@@ -275,6 +277,10 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
 
     isLessEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
         return new Z3BooleanFormula(this._ctx.mk_le(s1.getAST(), s2.getAST()));
+    }
+
+    ifThenElse(cond: Z3BooleanFormula, thenResult: Z3NumberFormula, elseResult: Z3NumberFormula): Z3NumberFormula {
+        return new Z3NumberFormula(this._ctx.mk_ite(cond.getAST(), thenResult.getAST(), elseResult.getAST()));
     }
 
 }
@@ -338,6 +344,10 @@ export class Z3StringTheory extends Z3Theory implements StringTheory<Z3StringFor
 
     stringsEqual(str1: Z3StringFormula, str2: Z3StringFormula): Z3BooleanFormula {
         return new Z3BooleanFormula(this._ctx.mk_eq(str1.getAST(), str2.getAST()));
+    }
+
+    ifThenElse(cond: Z3BooleanFormula, thenResult: Z3StringFormula, elseResult: Z3StringFormula): Z3StringFormula {
+        return new Z3StringFormula(this._ctx.mk_ite(cond.getAST(), thenResult.getAST(), elseResult.getAST()));
     }
 
 }
