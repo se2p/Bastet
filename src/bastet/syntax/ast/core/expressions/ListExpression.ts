@@ -41,4 +41,8 @@ export class ExpressionListExpression extends AbstractExpression implements List
         super(ListType.withElementType(elementType), [elements]);
         this._elements = elements;
     }
+
+    get elements(): ExpressionList {
+        return this._elements;
+    }
 }

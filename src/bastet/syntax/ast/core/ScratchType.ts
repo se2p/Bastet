@@ -197,6 +197,9 @@ export class ListType extends ScratchType {
         return result;
     }
 
+    get elementType(): ScratchType {
+        return this._elementType;
+    }
 }
 
 export class MapType extends ScratchType {

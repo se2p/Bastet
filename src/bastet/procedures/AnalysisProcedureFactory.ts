@@ -39,7 +39,6 @@ import {AnalysisStatistics} from "./analyses/AnalysisStatistics";
 import {StatsAnalysis} from "./analyses/stats/StatsAnalysis";
 import {TimeAnalysis} from "./analyses/time/TimeAnalysis";
 import {StaticTimeProfile} from "../utils/TimeProfile";
-import {NodeSystemLayer} from "../utils/SystemLayer";
 
 export class AnalysisProcedureFactory {
 
@@ -65,8 +64,8 @@ export class AnalysisProcedureFactory {
 
                 const dataAnalysis = new DataAnalysis(firstOrderLattice, bddlib.lattice, theories, this._statistics);
                 const ssaAnalysis = new SSAAnalysis(task, dataAnalysis, this._statistics);
-                const timeAnalysis = new TimeAnalysis(ssaAnalysis, this._statistics, new StaticTimeProfile());
-                const controlAnalysis = new ControlAnalysis(config, task, timeAnalysis, this._statistics);
+                // const timeAnalysis = new TimeAnalysis(ssaAnalysis, this._statistics, new StaticTimeProfile());
+                const controlAnalysis = new ControlAnalysis(config, task, ssaAnalysis, this._statistics);
                 const graphAnalysis = new GraphAnalysis(task, controlAnalysis, this._statistics);
                 const outerAnalysis = new StatsAnalysis<GraphConcreteState, GraphAbstractState>(graphAnalysis, this._statistics);
 

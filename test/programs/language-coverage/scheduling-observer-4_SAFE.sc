@@ -12,7 +12,7 @@ actor DirexObserver is Observer begin
     define atomic isBehaviorSatisfied () begin
         declare curr as number
         define curr as cast attribute "x" of direx to number
-        define result as (last_x < curr)
+        define result as (last_x < curr) and (curr < 3)
     end returns result: boolean
 
     script on bootstrap finished do begin
