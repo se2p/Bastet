@@ -362,7 +362,7 @@ export class Z3ListTheory implements ListTheory<Z3ListFormula> {
 
 }
 
-export class Z3MemoryTheoryInContext implements AbstractMemoryTheory<Z3Formula, Z3BooleanFormula, Z3NumberFormula, Z3StringFormula, Z3ListFormula> {
+export class Z3TheoriesInContext implements AbstractMemoryTheory<Z3Formula, Z3BooleanFormula, Z3NumberFormula, Z3StringFormula, Z3ListFormula> {
 
     private readonly _boolTheory: BooleanTheory<Z3BooleanFormula>;
 

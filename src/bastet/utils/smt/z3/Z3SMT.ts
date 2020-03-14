@@ -23,7 +23,7 @@
 import {LibZ3InContext, LibZ3NonContext, Z3_solver} from "./libz3";
 import {Preconditions} from "../../Preconditions";
 import {WasmJSInstance} from "./WasmInstance";
-import {Z3FirstOrderFormula, Z3FirstOrderLattice, Z3MemoryTheoryInContext} from "./Z3Theories";
+import {Z3FirstOrderFormula, Z3FirstOrderLattice, Z3TheoriesInContext} from "./Z3Theories";
 import {FirstOrderSolver} from "../../../procedures/domains/FirstOrderDomain";
 import {Sint32, Uint32} from "./ctypes";
 import {BooleanTheory} from "../../../procedures/domains/MemoryTransformer";
@@ -184,8 +184,8 @@ export class Z3SMT extends LibZ3NonContext {
         return new Z3ProverEnvironment(ctx);
     }
 
-    public createTheory(ctx: LibZ3InContext): Z3MemoryTheoryInContext {
-        return new Z3MemoryTheoryInContext(ctx);
+    public createTheory(ctx: LibZ3InContext): Z3TheoriesInContext {
+        return new Z3TheoriesInContext(ctx);
     }
 
     public createLattice(prover: Z3ProverEnvironment, boolTheory: BooleanTheory<Z3FirstOrderFormula>): Z3FirstOrderLattice {

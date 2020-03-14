@@ -29,7 +29,7 @@ import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
 import {SMTFactory} from "../utils/smt/z3/Z3SMT";
 import {DataAnalysis} from "./analyses/data/DataAnalysis";
 import {BDDLibraryFactory} from "../utils/bdd/BDD";
-import {Z3MemoryTheoryInContext} from "../utils/smt/z3/Z3Theories";
+import {Z3TheoriesInContext} from "../utils/smt/z3/Z3Theories";
 import {SSAAnalysis} from "./analyses/ssa/SSAAnalysis";
 import {BMCAlgorithm} from "./algorithms/BMCAlgorithm";
 import {MultiPropertyAlgorithm} from "./algorithms/MultiPropertyAlgorithm";
@@ -58,7 +58,7 @@ export class AnalysisProcedureFactory {
 
                 // TODO: Delete the context after the analysis is no more in use
                 const defaultContect = smt.createContext();
-                const theories = new Z3MemoryTheoryInContext(defaultContect);
+                const theories = new Z3TheoriesInContext(defaultContect);
                 const prover = smt.createProver(defaultContect);
                 const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
