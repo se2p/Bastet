@@ -26,7 +26,7 @@ import {ControlAnalysis} from "./analyses/control/ControlAnalysis";
 import {GraphAbstractState, GraphConcreteState} from "./analyses/graph/GraphAbstractDomain";
 import {ReachabilityAlgorithm} from "./algorithms/ReachabilityAlgorithm";
 import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
-import {SMTFactory} from "../utils/smt/z3/Z3Wrapper";
+import {SMTFactory} from "../utils/smt/z3/Z3SMT";
 import {DataAnalysis} from "./analyses/data/DataAnalysis";
 import {BDDLibraryFactory} from "../utils/bdd/BDD";
 import {Z3MemoryTheoryInContext} from "../utils/smt/z3/Z3Theories";

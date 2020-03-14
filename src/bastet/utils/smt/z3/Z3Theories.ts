@@ -39,7 +39,7 @@ import {Preconditions} from "../../Preconditions";
 import {Ptr, Sint32, Uint32} from "./ctypes";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {SMTFirstOrderLattice} from "../../../procedures/domains/FirstOrderDomain";
-import {Z3ProverEnvironment} from "./Z3Wrapper";
+import {Z3ProverEnvironment} from "./Z3SMT";
 import {Variable} from "../../../syntax/ast/core/Variable";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;
