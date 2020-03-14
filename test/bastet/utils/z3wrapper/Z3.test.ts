@@ -38,7 +38,7 @@ let prover;
 beforeAll( async (done) => {
     smt = await SMTFactory.createZ3();
     ctx = smt.createContext();
-    theories = smt.createTheory(ctx);
+    theories = smt.createTheories(ctx);
     prover = smt.createProver(ctx);
     done();
 });

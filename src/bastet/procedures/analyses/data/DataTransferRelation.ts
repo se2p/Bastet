@@ -24,7 +24,7 @@ import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {DataTransformerVisitor} from "./DataTransformerVisitor";
-import {AbstractMemoryTheory} from "../../domains/MemoryTransformer";
+import {AbstractTheories} from "../../domains/MemoryTransformer";
 import {Preconditions} from "../../../utils/Preconditions";
 import {
     BooleanFormula,
@@ -41,9 +41,9 @@ export class DataTransferRelation implements LabeledTransferRelation<DataAbstrac
 
     private readonly _abstDomain: DataAbstractDomain;
 
-    private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
+    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
-    constructor(abstDomain: DataAbstractDomain, theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
+    constructor(abstDomain: DataAbstractDomain, theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
         this._abstDomain = Preconditions.checkNotUndefined(abstDomain);
         this._theories = Preconditions.checkNotUndefined(theories);
     }

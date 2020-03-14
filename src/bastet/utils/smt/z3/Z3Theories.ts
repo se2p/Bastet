@@ -24,7 +24,7 @@ import {FirstOrderFormula} from "../../ConjunctiveNormalForm";
 import {
     AbstractBoolean,
     AbstractList,
-    AbstractMemoryTheory,
+    AbstractTheories,
     AbstractNumber,
     AbstractString,
     BooleanTheory,
@@ -362,7 +362,7 @@ export class Z3ListTheory implements ListTheory<Z3ListFormula> {
 
 }
 
-export class Z3TheoriesInContext implements AbstractMemoryTheory<Z3Formula, Z3BooleanFormula, Z3NumberFormula, Z3StringFormula, Z3ListFormula> {
+export class Z3Theories implements AbstractTheories<Z3Formula, Z3BooleanFormula, Z3NumberFormula, Z3StringFormula, Z3ListFormula> {
 
     private readonly _boolTheory: BooleanTheory<Z3BooleanFormula>;
 
@@ -396,6 +396,14 @@ export class Z3TheoriesInContext implements AbstractMemoryTheory<Z3Formula, Z3Bo
 
     get stringTheory(): StringTheory<Z3StringFormula, Z3BooleanFormula, Z3NumberFormula> {
         return this._stringTheory;
+    }
+
+    public simplify(e: Z3Formula): Z3Formula {
+        const simplifiedAst: Z3_ast = this._ctx.simplify(e.getAST());
+        if (e instanceof Z3BooleanFormula) {
+            return new Z3BooleanFormula(simplifiedAst);
+        }
+        throw new ImplementMeException();
     }
 
 }
