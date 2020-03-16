@@ -111,7 +111,7 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {
     AbstractBoolean,
     AbstractList,
-    AbstractMemoryTheory,
+    AbstractTheories,
     AbstractNumber,
     AbstractString,
     RationalNumberTheory
@@ -136,10 +136,10 @@ export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends Abstr
     S extends AbstractString, L extends AbstractList>
     implements CoreNumberExpressionVisitor<N> {
 
-    private readonly _theories: AbstractMemoryTheory<B, B, N, S, L>;
+    private readonly _theories: AbstractTheories<B, B, N, S, L>;
     private readonly _theory: RationalNumberTheory<N, B>;
 
-    constructor(theories: AbstractMemoryTheory<B, B, N, S, L>) {
+    constructor(theories: AbstractTheories<B, B, N, S, L>) {
         this._theories = Preconditions.checkNotUndefined(theories);
         this._theory = Preconditions.checkNotUndefined(theories.numTheory);
     }
@@ -154,6 +154,10 @@ export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends Abstr
         if (node.toConvert.expressionType == StringType.instance()) {
             const stringVisitor = new DataStringExpressionVisitor(this._theories);
             return this._theory.castStringAsNumber(node.toConvert.accept(stringVisitor));
+
+        } else if (node.toConvert.expressionType == BooleanType.instance()) {
+            const boolVisitor = new DataBoolExpressionVisitor(this._theories);
+            return this._theory.castBoolAsNumber(node.toConvert.accept(boolVisitor));
         }
 
         throw new ImplementMeException();
@@ -236,9 +240,9 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
     implements CoreBoolExpressionVisitor<B> {
 
     private readonly _base: B;
-    private readonly _theories: AbstractMemoryTheory<B, B, N, S, L>;
+    private readonly _theories: AbstractTheories<B, B, N, S, L>;
 
-    constructor(theories: AbstractMemoryTheory<B, B, N, S, L>) {
+    constructor(theories: AbstractTheories<B, B, N, S, L>) {
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
@@ -331,6 +335,18 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
 
     visitCastExpression(node: CastExpression): B {
         Preconditions.checkArgument(node.castToType == BooleanType.instance());
+
+        if (node.toConvert.expressionType == StringType.instance()) {
+            const stringVisitor = new DataStringExpressionVisitor(this._theories);
+            throw new ImplementMeException();
+
+        } else if (node.toConvert.expressionType == NumberType.instance()) {
+            const numVisitor = new DataNumExpressionVisitor(this._theories);
+            const numFormula = node.toConvert.accept(numVisitor);
+            return this._theories.boolTheory.not(
+                this._theories.numTheory.isNumberEqualTo(numFormula, this._theories.numTheory.zero()));
+        }
+
         throw new ImplementMeException();
     }
 
@@ -339,9 +355,9 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
 export class DataStringExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
     S extends AbstractString, L extends AbstractList> implements CoreStringExpressionVisitor<S> {
 
-    private readonly _theories: AbstractMemoryTheory<B, B, N, S, L>;
+    private readonly _theories: AbstractTheories<B, B, N, S, L>;
 
-    constructor(theories: AbstractMemoryTheory<B, B, N, S, L>) {
+    constructor(theories: AbstractTheories<B, B, N, S, L>) {
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
@@ -408,9 +424,9 @@ export class DataStringExpressionVisitor<B extends AbstractBoolean, N extends Ab
 
 export class DataListExpressionVisitor implements CoreListExpressionVisitor<AbstractList> {
 
-    private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
+    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
-    constructor(theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
+    constructor(theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
@@ -433,9 +449,9 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
     implements CoreVisitor<B>, CoreNonCtrlStatementnVisitor<B> {
 
     private readonly _mem: B;
-    private readonly _theories: AbstractMemoryTheory<B, B, N, S, L>;
+    private readonly _theories: AbstractTheories<B, B, N, S, L>;
 
-    constructor(base: B, theories: AbstractMemoryTheory<B, B, N, S, L>) {
+    constructor(base: B, theories: AbstractTheories<B, B, N, S, L>) {
         this._mem = Preconditions.checkNotUndefined(base);
         this._theories = Preconditions.checkNotUndefined(theories);
     }

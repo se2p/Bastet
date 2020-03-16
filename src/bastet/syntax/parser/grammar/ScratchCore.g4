@@ -61,7 +61,9 @@ resourceList : resource* ;
 // Decalration of a variable. Depending on the possition of the
 // declaration statement, the variable is either local to the actor
 // or local to the current stack of a script execution.
-declarationStmt : 'declare' ident 'as' type # DeclareVariable ;
+declarationStmt :
+    'declare' ident 'as' type # DeclareVariable
+    ;
 
 // A list of variable declarations.
 declarationStmtList : declarationStmt* ;
@@ -147,7 +149,9 @@ methodAttributeList : methodAttribute* ;
 methodAttribute : 'atomic' # AtomicMethod ;
 
 // A procedure parameter.
-parameter : ident ':' type ;
+parameter :
+    ident ':' type
+    ;
 
 // A list of method parameters in brackets.
 parameterList : '(' parameterListPlain ')' ;
@@ -251,7 +255,7 @@ commonStmt  :
  ;
 
 listStmt :
-    'delete' 'all' 'of' variable # DeleteAllFromStatement
+    'delete' 'all' 'from' variable # DeleteAllFromStatement
  |  'delete'  numExpr  'of'  variable # DeleteIthFromStatement
  |  'add'  stringExpr  'to'  variable # AddElementToStatement
  |  'insert'  stringExpr  'at'  numExpr  'of'  variable # InsertAtStatement
@@ -273,7 +277,7 @@ terminationStmt :
 
 stringExpr : coreStringExpr ;
 
-coreStringExpr  :
+coreStringExpr :
    String # StringLiteralExpression
  |  variable # StringVariableExpression
  |  '(' coreStringExpr ')' # StringParanthExpression
@@ -283,7 +287,7 @@ coreStringExpr  :
  |  'cast' boolExpr 'to' 'string' # BoolAsStringExpression
 
  |  'attribute'  stringExpr 'of' actorExpr  # StringAttributeOfExpression               // query an attribute value of an actor (sprites, the stage)
- |  'resource' 'attribute'  stringExpr 'of' variable  # ResourceAttributeOfExpression  // query attributes of ressources, for example, the original size
+
  |  'join'  stringExpr stringExpr # JoinStringsExpression
  |  'letter'  numExpr 'of'  stringExpr # IthLetterOfStringExpression
  |  'item'  numExpr 'of'  variable # IthStringItemOfExpression
@@ -299,6 +303,9 @@ coreBoolExpr  :
  |  variable # BoolVariableExpression
  |  '(' coreBoolExpr ')' # BoolParanthExpression
  |  callStmt # BoolCallStatementExpression
+
+ |  'cast' numExpr 'to' 'boolean' # NumAsBoolExpression
+ |  'cast' stringExpr 'to' 'boolean' # StringAsBoolExpression
 
  |  'not'  coreBoolExpr # NegatedBoolExpression
  |  coreBoolExpr  'and'  coreBoolExpr # BoolAndExpression
@@ -325,6 +332,7 @@ coreNumExpr  :
  |  variable # NumVariableExpression
  |  '(' coreNumExpr ')' # NumBrackets
  |  callStmt # NumCallStatementExpression
+
  |  'cast' stringExpr 'to' 'number' # StringAsNumExpression
  |  'cast' boolExpr 'to' 'number' # BoolAsNumExpression
 

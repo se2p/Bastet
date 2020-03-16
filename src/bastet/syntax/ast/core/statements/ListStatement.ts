@@ -22,7 +22,7 @@
 import {Statement} from "./Statement";
 import {NumberExpression} from "../expressions/NumberExpression";
 import {StringExpression} from "../expressions/StringExpression";
-import {Variable} from "../Variable";
+import {Variable, VariableWithDataLocation} from "../Variable";
 
 export interface ListStatement {
 
@@ -30,68 +30,107 @@ export interface ListStatement {
 
 export class DeleteAllFromStatement extends Statement implements ListStatement {
 
-    private readonly _listVariable: Variable;
+    private readonly _listVariable: VariableWithDataLocation;
 
-    constructor(listVariable: Variable) {
+    constructor(listVariable: VariableWithDataLocation) {
         super([listVariable.identifier]);
         this._listVariable = listVariable;
     }
 
+    get listVariable(): VariableWithDataLocation {
+        return this._listVariable;
+    }
 }
 
 export class DeleteIthFromStatement extends Statement implements ListStatement {
 
-    private readonly _listVariable: Variable;
+    private readonly _listVariable: VariableWithDataLocation;
     private readonly _index: NumberExpression;
 
-    constructor(listVariable: Variable, index: NumberExpression) {
+    constructor(listVariable: VariableWithDataLocation, index: NumberExpression) {
         super([listVariable.identifier, index]);
         this._listVariable = listVariable;
         this._index = index;
     }
 
+    get listVariable(): VariableWithDataLocation {
+        return this._listVariable;
+    }
+
+    get index(): NumberExpression {
+        return this._index;
+    }
 }
 
 export class AddElementToStatement extends Statement implements ListStatement {
 
-    private readonly _listVariable: Variable;
+    private readonly _listVariable: VariableWithDataLocation;
     private readonly _element: StringExpression;
 
-    constructor(listVariable: Variable, element: StringExpression) {
+    constructor(listVariable: VariableWithDataLocation, element: StringExpression) {
         super([listVariable.identifier, element]);
         this._listVariable = listVariable;
         this._element = element;
     }
 
+    get listVariable(): VariableWithDataLocation {
+        return this._listVariable;
+    }
+
+    get element(): StringExpression {
+        return this._element;
+    }
 }
 
 export class InsertAtStatement extends Statement implements ListStatement {
 
-    private readonly _listVariable: Variable;
+    private readonly _listVariable: VariableWithDataLocation;
     private readonly _index: NumberExpression;
     private readonly _element: StringExpression;
 
-    constructor(listVariable: Variable, index: NumberExpression, element: StringExpression) {
+    constructor(listVariable: VariableWithDataLocation, index: NumberExpression, element: StringExpression) {
         super([listVariable.identifier, index, element]);
         this._listVariable = listVariable;
         this._index = index;
         this._element = element;
     }
 
+    get listVariable(): VariableWithDataLocation {
+        return this._listVariable;
+    }
+
+    get index(): NumberExpression {
+        return this._index;
+    }
+
+    get element(): StringExpression {
+        return this._element;
+    }
 }
 
 export class ReplaceElementAtStatement extends Statement implements ListStatement {
 
-    private readonly _listVariable: Variable;
+    private readonly _listVariable: VariableWithDataLocation;
     private readonly _index: NumberExpression;
     private readonly _element: StringExpression;
 
-    constructor(listVariable: Variable, index: NumberExpression, element: StringExpression) {
+    constructor(listVariable: VariableWithDataLocation, index: NumberExpression, element: StringExpression) {
         super([listVariable.identifier, index, element]);
         this._listVariable = listVariable;
         this._index = index;
         this._element = element;
     }
 
+    get listVariable(): VariableWithDataLocation {
+        return this._listVariable;
+    }
+
+    get index(): NumberExpression {
+        return this._index;
+    }
+
+    get element(): StringExpression {
+        return this._element;
+    }
 }
 

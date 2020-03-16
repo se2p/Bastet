@@ -114,4 +114,35 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
         return this._wrappedAnalysis;
     }
 
+    get statistics(): AnalysisStatistics {
+        return this._statistics;
+    }
+
+    get succStats(): AnalysisStatistics {
+        return this._succStats;
+    }
+
+    get widenStats(): AnalysisStatistics {
+        return this._widenStats;
+    }
+
+    get stopStats(): AnalysisStatistics {
+        return this._stopStats;
+    }
+
+    get mergeStats(): AnalysisStatistics {
+        return this._mergeStats;
+    }
+
+    get targetStats(): AnalysisStatistics {
+        return this._targetStats;
+    }
+
+    get otherStats(): AnalysisStatistics {
+        return this._otherStats;
+    }
+
+    get joinStats(): AnalysisStatistics {
+        return this._joinStats;
+    }
 }

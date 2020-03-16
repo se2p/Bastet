@@ -3,13 +3,13 @@ program Mini1Program
 actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
-        declare b as boolean
         declare s as string
+        declare n as number
 
-        define s as "true"
-        define b as cast s to boolean
+        define n as 42
+        define s as cast n to string
 
-        if b then begin
+        if not (s = "42") then begin
             _RUNTIME_signalFailure()
         end
     end

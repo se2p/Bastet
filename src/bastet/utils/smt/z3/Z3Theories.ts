@@ -24,7 +24,7 @@ import {FirstOrderFormula} from "../../ConjunctiveNormalForm";
 import {
     AbstractBoolean,
     AbstractList,
-    AbstractMemoryTheory,
+    AbstractTheories,
     AbstractNumber,
     AbstractString,
     BooleanTheory,
@@ -39,7 +39,7 @@ import {Preconditions} from "../../Preconditions";
 import {Ptr, Sint32, Uint32} from "./ctypes";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {SMTFirstOrderLattice} from "../../../procedures/domains/FirstOrderDomain";
-import {Z3ProverEnvironment} from "./Z3Wrapper";
+import {Z3ProverEnvironment} from "./Z3SMT";
 import {Variable} from "../../../syntax/ast/core/Variable";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;
@@ -193,8 +193,8 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
         throw new ImplementMeException();
     }
 
-    castBoolAsNumber(val: AbstractBoolean): Z3NumberFormula {
-        throw new ImplementMeException();
+    castBoolAsNumber(val: Z3BooleanFormula): Z3NumberFormula {
+        return this.ifThenElse(val, this.one(), this.zero());
     }
 
     castStringAsNumber(str: Z3StringFormula): Z3NumberFormula {
@@ -248,7 +248,8 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
     }
 
     one(): Z3NumberFormula {
-        return new Z3NumberFormula(this._ctx.mk_int_symbol(new Sint32(1)));
+        return new Z3NumberFormula(
+            this._ctx.mk_int(new Sint32(1), this._ctx.mk_int_sort()));
     }
 
     plus(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
@@ -266,7 +267,8 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
     }
 
     zero(): Z3NumberFormula {
-        return new Z3NumberFormula(this._ctx.mk_int_symbol(new Sint32(0)));
+        return new Z3NumberFormula(
+            this._ctx.mk_int(new Sint32(0), this._ctx.mk_int_sort()));
     }
 
     isGreaterEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
@@ -275,6 +277,10 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
 
     isLessEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
         return new Z3BooleanFormula(this._ctx.mk_le(s1.getAST(), s2.getAST()));
+    }
+
+    ifThenElse(cond: Z3BooleanFormula, thenResult: Z3NumberFormula, elseResult: Z3NumberFormula): Z3NumberFormula {
+        return new Z3NumberFormula(this._ctx.mk_ite(cond.getAST(), thenResult.getAST(), elseResult.getAST()));
     }
 
 }
@@ -340,6 +346,10 @@ export class Z3StringTheory extends Z3Theory implements StringTheory<Z3StringFor
         return new Z3BooleanFormula(this._ctx.mk_eq(str1.getAST(), str2.getAST()));
     }
 
+    ifThenElse(cond: Z3BooleanFormula, thenResult: Z3StringFormula, elseResult: Z3StringFormula): Z3StringFormula {
+        return new Z3StringFormula(this._ctx.mk_ite(cond.getAST(), thenResult.getAST(), elseResult.getAST()));
+    }
+
 }
 
 export class Z3ListTheory implements ListTheory<Z3ListFormula> {
@@ -352,7 +362,7 @@ export class Z3ListTheory implements ListTheory<Z3ListFormula> {
 
 }
 
-export class Z3MemoryTheoryInContext implements AbstractMemoryTheory<Z3Formula, Z3BooleanFormula, Z3NumberFormula, Z3StringFormula, Z3ListFormula> {
+export class Z3Theories implements AbstractTheories<Z3Formula, Z3BooleanFormula, Z3NumberFormula, Z3StringFormula, Z3ListFormula> {
 
     private readonly _boolTheory: BooleanTheory<Z3BooleanFormula>;
 
@@ -386,6 +396,14 @@ export class Z3MemoryTheoryInContext implements AbstractMemoryTheory<Z3Formula, 
 
     get stringTheory(): StringTheory<Z3StringFormula, Z3BooleanFormula, Z3NumberFormula> {
         return this._stringTheory;
+    }
+
+    public simplify(e: Z3Formula): Z3Formula {
+        const simplifiedAst: Z3_ast = this._ctx.simplify(e.getAST());
+        if (e instanceof Z3BooleanFormula) {
+            return new Z3BooleanFormula(simplifiedAst);
+        }
+        throw new ImplementMeException();
     }
 
 }

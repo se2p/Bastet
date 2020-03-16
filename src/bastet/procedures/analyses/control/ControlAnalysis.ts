@@ -163,9 +163,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
                const withinRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
                result.push(withinRelation.transitionBetween(fromLocation.getLocationId(), toLocation.getLocationId()));
             } else {
-
+                return steppedThread.getOperations().map(oid => ProgramOperation.for(oid)).toArray();
             }
         }
+
         return result;
     }
 

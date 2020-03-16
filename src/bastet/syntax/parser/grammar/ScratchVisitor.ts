@@ -63,6 +63,8 @@ import { BoolLiteralExpressionContext } from "./ScratchParser";
 import { BoolVariableExpressionContext } from "./ScratchParser";
 import { BoolParanthExpressionContext } from "./ScratchParser";
 import { BoolCallStatementExpressionContext } from "./ScratchParser";
+import { NumAsBoolExpressionContext } from "./ScratchParser";
+import { StringAsBoolExpressionContext } from "./ScratchParser";
 import { NegatedBoolExpressionContext } from "./ScratchParser";
 import { BoolAndExpressionContext } from "./ScratchParser";
 import { BoolOrExpressionContext } from "./ScratchParser";
@@ -686,6 +688,22 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitBoolCallStatementExpression?: (ctx: BoolCallStatementExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `NumAsBoolExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitNumAsBoolExpression?: (ctx: NumAsBoolExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `StringAsBoolExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitStringAsBoolExpression?: (ctx: StringAsBoolExpressionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `NegatedBoolExpression`

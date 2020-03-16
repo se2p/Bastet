@@ -61,6 +61,7 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
                 Preconditions.checkState(this._analysis.target(targetState).length > 0);
 
                 // Check the feasibility with the refiner
+                console.log("BMC: Checking feasibility.")
                 if (this._refiner.checkIsFeasible(targetState)) {
                     return [frontier, reached];
                 } else {

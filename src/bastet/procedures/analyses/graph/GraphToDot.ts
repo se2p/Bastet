@@ -25,6 +25,7 @@ import {GraphAbstractState} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {TransitionLabelProvider} from "../ProgramAnalysis";
 import {StateColorVisitor, StateLabelVisitor} from "../StateVisitors";
+import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 
 export class GraphToDot  {
 
@@ -53,7 +54,9 @@ export class GraphToDot  {
     }
 
     private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
-        const transLabels = GraphToDot.escapeForDot(this._transLabProvider.getTransitionLabel(from, to).toString());
+        const visitor = new CorePrintVisitor();
+        const transLabels = GraphToDot.escapeForDot(this._transLabProvider.getTransitionLabel(from, to)
+            .map(o => o.ast.accept(visitor)).join(";"));
         this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabels}"];`);
     }
 

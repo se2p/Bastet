@@ -28,6 +28,9 @@ import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
 import {BastetConfiguration} from "../../utils/BastetConfiguration";
 import {ExportFunction, resolveResultExportFunction} from "../analyses/Analyses";
 import {AnalysisAlgorithm} from "./Algorithm";
+import {StatsAnalysis} from "../analyses/stats/StatsAnalysis";
+
+const { performance } = require('perf_hooks');
 
 export const STAT_KEY_REACH_ITERATIONS = "iterations";
 export const STAT_KEY_REACH_REACHED = "reached states";
@@ -59,12 +62,24 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
 
     private _exportFunction: ExportFunction;
 
+    private _lastOutputTime: number;
+    private _lastTimeForMerge: number;
+    private _lastTimeForStop: number;
+    private _lastTimeForSucc: number;
+    private _lastTimeForWiden: number;
+
     constructor(config: {}, analysis: ProgramAnalysis<C, E>, chooseOp: ChooseOperator<E>, statistics: AnalysisStatistics) {
         this._config = new ReachabilityAlgorithmConfig(config);
         this._analysis = Preconditions.checkNotUndefined(analysis);
         this._chooseOp = Preconditions.checkNotUndefined(chooseOp);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._exportFunction = resolveResultExportFunction(this._analysis);
+
+        this._lastOutputTime = performance.now();
+        this._lastTimeForMerge = 0;
+        this._lastTimeForStop = 0;
+        this._lastTimeForSucc = 0;
+        this._lastTimeForWiden = 0;
     }
 
     get analysis(): ProgramAnalysis<C, E> {
@@ -128,6 +143,25 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
     private takeNoteOfResult(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
         this._statistics.put(STAT_KEY_REACH_REACHED, reached.getSize());
         this._statistics.put(STAT_KEY_REACH_FRONTIER, frontier.getSize());
+
+        const statAnalysis: StatsAnalysis<any, any> = this._analysis as StatsAnalysis<any, any>;
+
+        const elapsed = performance.now() - this._lastOutputTime;
+        if (elapsed > 10000) {
+            const timeForWiden = statAnalysis.widenStats.contextTimer.duration;
+            const timeForStop = statAnalysis.stopStats.contextTimer.duration;
+            const timeForSucc = statAnalysis.succStats.contextTimer.duration;
+            const timeForMerge = statAnalysis.mergeStats.contextTimer.duration;
+
+            console.log(`Reached ${reached.getSize()} states, ${frontier.getSize()} in frontier, succ ${timeForSucc - this._lastTimeForSucc}, merge ${timeForMerge - this._lastTimeForMerge}, stop ${timeForStop - this._lastTimeForStop}, widen ${timeForWiden - this._lastTimeForWiden}`);
+
+            this._lastOutputTime = performance.now();
+            this._lastTimeForWiden = timeForWiden;
+            this._lastTimeForStop = timeForStop;
+            this._lastTimeForSucc = timeForSucc;
+            this._lastTimeForMerge = timeForMerge;
+        }
+
         return [frontier, reached];
     }
 

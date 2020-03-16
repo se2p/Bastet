@@ -4,14 +4,15 @@ actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
         declare b as boolean
-        declare s as string
+        declare n as number
 
-        define s as "true"
-        define b as cast s to boolean
+        define b as true
+        define n as cast b to number
 
-        if b then begin
+        if not (n = 1) then begin
             _RUNTIME_signalFailure()
         end
     end
 
 end
+

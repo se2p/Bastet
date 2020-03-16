@@ -76,7 +76,7 @@ import {AfterStatementMonitoringEvent, MessageReceivedEvent} from "../../../synt
 import {Concerns} from "../../../syntax/Concern";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {Script} from "../../../syntax/app/controlflow/Script";
-import {getTheOnlyElement} from "../../../utils/Collectionts";
+import {getTheOnlyElement} from "../../../utils/Collections";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {BOOTSTRAP_FINISHED_MESSAGE, SystemMessage} from "../../../syntax/ast/core/Message";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
@@ -266,8 +266,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         for (const [r, considerInterpretationFinished] of withControlResults){
             // Interpret the wrapped state by the wrapped analysis
-            const wrappedAnalysisResults: Iterable<AbstractElement> = considerInterpretationFinished ? [r.getWrappedState()]
-                : Transfers.withIntermediateOps(this._wrappedTransferRelation, r.wrappedState, step.ops, Concerns.defaultProgramConcern());
+            const threadToStepPrime = r.getIndexedThreadState(threadToStep.threadIndex);
+            const ops = threadToStepPrime.threadStatus.getOperations().map((oid) => ProgramOperation.for(oid));
+            const wrappedAnalysisResults: Iterable<AbstractElement> = considerInterpretationFinished
+                ? [r.getWrappedState()]
+                : Transfers.withIntermediateOps(this._wrappedTransferRelation, r.wrappedState, ops, Concerns.defaultProgramConcern());
 
             // Combine the result
             Preconditions.checkNotUndefined(r);
@@ -374,7 +377,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                         ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.getActorScopes(), currentScopeStack, succScopeStack).map(op => op.ident)))
                             .withLocation(callToRelationLoc)
                             .withCallStack(succCallStack)
-                            .withScopeStack(succScopeStack)), true]);
+                            .withScopeStack(succScopeStack)), false]);
                 }
 
                 return resultList;
@@ -393,7 +396,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.actorScopes, steppedThread.getScopeStack(), succScopeStack).map(o => o.ident)))
                     .withLocation(callInformation.getReturnTo())
                     .withCallStack(succReturnCallsTo)
-                    .withScopeStack(succScopeStack)), true]];
+                    .withScopeStack(succScopeStack)), false]];
 
         } else if (stepOp.ast instanceof BroadcastMessageStatement) {
             const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
@@ -402,10 +405,6 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             // Prepare the waiting threads for running
             for (const waitForThread of waitFor) {
                 result = this.restartThread(result, waitForThread.threadIndex);
-            }
-
-            if (stepOp.ast.msg == BOOTSTRAP_FINISHED_MESSAGE) {
-                result = this.activateAfterStepMonitoring(result);
             }
 
             return [[result, true]]
@@ -423,6 +422,10 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             if (waitFor.length > 0) {
                 result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
                     ts.withComputationState(ThreadComputationState.THREAD_STATE_WAIT));
+            }
+
+            if (stepOp.ast.msg.isEqualTo(BOOTSTRAP_FINISHED_MESSAGE)) {
+                result = this.activateAfterStepMonitoring(result);
             }
 
             // Wait for all triggered threads to finish

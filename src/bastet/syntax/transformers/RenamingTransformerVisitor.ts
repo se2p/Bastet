@@ -176,7 +176,24 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitCastExpression(node: CastExpression): AstNode {
-        return new CastExpression(node.toConvert.accept(this) as Expression, node.castToType);
+        const result = new CastExpression(node.toConvert.accept(this) as Expression, node.castToType);
+
+        // TODO: Check if the following simplification should be moved to another (new?) visitor
+
+        // Remove needless cast (1)
+        if (result.toConvert.expressionType == result.castToType) {
+            return result.toConvert;
+        }
+
+        // Remove needless cast (2)
+        if (result.toConvert instanceof CastExpression) {
+            const innerCast = result.toConvert as CastExpression;
+            if (innerCast.toConvert.expressionType == result.castToType) {
+                return innerCast.toConvert;
+            }
+        }
+
+        return result;
     }
 
     visitAbsentAstNode(node: AbsentAstNode<AstNode>): AstNode {

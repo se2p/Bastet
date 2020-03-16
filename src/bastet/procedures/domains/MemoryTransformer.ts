@@ -138,6 +138,8 @@ export interface StringTheory<S extends AbstractString, B extends AbstractBoolea
 
     lengthOf(str: S): N;
 
+    ifThenElse(cond: B, thenResult: S, elseResult: S): S;
+
 }
 
 export interface StringTheoryAssumes {
@@ -201,6 +203,8 @@ export interface RationalNumberTheory<N extends AbstractNumber, B extends Abstra
     isLessEqual(s1: N, s2: N): B;
 
     isNumberEqualTo(s1: N, s2: N): B;
+
+    ifThenElse(cond: B, thenResult: N, elseResult: N): N;
 
 }
 
@@ -423,8 +427,15 @@ export abstract class MemoryTransformer<M extends AbstractMemory> implements Mem
 
 }
 
-export interface AbstractMemoryTheory<M extends AbstractMemory, B extends AbstractBoolean,
-    N extends AbstractNumber, S extends AbstractString, L extends AbstractList> {
+export interface TheoryIndependent<E extends AbstractElement> {
+
+    simplify(element: E): E;
+
+}
+
+export interface AbstractTheories<M extends AbstractMemory, B extends AbstractBoolean,
+    N extends AbstractNumber, S extends AbstractString, L extends AbstractList> 
+    extends TheoryIndependent<M> {
 
     boolTheory: BooleanTheory<B>;
 
