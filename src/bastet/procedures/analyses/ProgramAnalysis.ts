@@ -78,7 +78,7 @@ export interface TargetOperator<E extends AbstractElement> {
 
 export interface MergeIntoOperator<E extends AbstractElement> {
 
-    mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): Iterable<E>;
+    mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): StateSet<E>;
 
 }
 

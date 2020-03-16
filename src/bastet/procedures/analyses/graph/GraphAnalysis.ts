@@ -20,6 +20,7 @@
  */
 
 import {
+    MergeIntoOperator,
     ProgramAnalysis,
     TransitionLabelProvider,
     WrappingProgramAnalysis
@@ -42,7 +43,22 @@ import {Property} from "../../../syntax/Property";
 import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {StandardMergeIntoOperator} from "../Operators";
+import {NoMergeIntoOperator, StandardMergeIntoOperator} from "../Operators";
+import {BastetConfiguration} from "../../../utils/BastetConfiguration";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+
+
+export class GraphAnalysisConfig extends BastetConfiguration {
+
+    constructor(dict: {}) {
+        super(dict, ['GraphAnalysis']);
+    }
+
+    get mergeIntoOperator(): string {
+        return this.getStringProperty('mergeIntoOperator', 'NoMergeIntoOperator');
+    }
+
+}
 
 export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState>,
     Unwrapper<GraphAbstractState, AbstractElement>,
@@ -60,17 +76,29 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
 
     private readonly _statistics: AnalysisStatistics;
 
-    private readonly _mergeIntoOp: StandardMergeIntoOperator<any>;
+    private readonly _mergeIntoOp: MergeIntoOperator<GraphAbstractState>;
 
-    constructor(task: App, wrappedAnalysis: ProgramAnalysis<any, any>, statistics: AnalysisStatistics) {
+    private readonly _config: GraphAnalysisConfig;
+
+    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysis<any, any>, statistics: AnalysisStatistics) {
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
 
+        this._config = new GraphAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new GraphAbstractDomain();
         this._transferRelation = new GraphTransferRelation((e) => this._wrappedAnalysis.abstractSucc(e));
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
-        this._mergeIntoOp = new StandardMergeIntoOperator(wrappedAnalysis, wrappedAnalysis);
+
+        if (this._config.mergeIntoOperator == 'NoMergeIntoOperator') {
+            this._mergeIntoOp = new NoMergeIntoOperator<GraphAbstractState>();
+
+        } else if (this._config.mergeIntoOperator == 'StandardMergeIntoOperator') {
+            this._mergeIntoOp = new StandardMergeIntoOperator(wrappedAnalysis, wrappedAnalysis);
+
+        } else {
+            throw new IllegalArgumentException("Illegal configuration value");
+        }
     }
 
     abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {

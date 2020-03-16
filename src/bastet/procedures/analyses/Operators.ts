@@ -25,6 +25,14 @@ import {StateSet} from "../algorithms/StateSet";
 import {AbstractElement} from "../../lattices/Lattice";
 import {Preconditions} from "../../utils/Preconditions";
 
+export class NoMergeIntoOperator<E extends AbstractElement> implements MergeIntoOperator<E> {
+
+    mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): StateSet<E> {
+        return reached;
+    }
+
+}
+
 export class StandardMergeIntoOperator<E extends AbstractElement> implements MergeIntoOperator<E> {
 
     private readonly _mergeOp: MergeOperator<E>;
