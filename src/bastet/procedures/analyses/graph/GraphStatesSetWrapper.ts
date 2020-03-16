@@ -25,6 +25,8 @@ import {ChooseOpConfig, StateSet} from "../../algorithms/StateSet";
 import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
+import {GraphPath, GraphPathSet} from "./GraphPath";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export abstract class DelegatingStateSetWrapper<E extends AbstractElement> implements StateSet<E> {
 
@@ -143,6 +145,14 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Delega
         // Remove the state itself
         this._idToStateMap.delete(element.getId());
         return super.remove(element);
+    }
+
+    public chooseRandomPathTo(element: E): GraphPath {
+        throw new ImplementMeException();
+    }
+
+    public queryAllPathsTo(element: E): GraphPathSet {
+        throw new ImplementMeException();
     }
 
 }

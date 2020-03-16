@@ -31,4 +31,7 @@ export class CreateCloneOfStatement extends Statement {
         this._cloneOf = cloneOf;
     }
 
+    get cloneOf(): StringExpression {
+        return this._cloneOf;
+    }
 }

@@ -76,7 +76,7 @@ import {AfterStatementMonitoringEvent, MessageReceivedEvent} from "../../../synt
 import {Concerns} from "../../../syntax/Concern";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {Script} from "../../../syntax/app/controlflow/Script";
-import {getTheOnlyElement} from "../../../utils/Collectionts";
+import {getTheOnlyElement} from "../../../utils/Collections";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {BOOTSTRAP_FINISHED_MESSAGE, SystemMessage} from "../../../syntax/ast/core/Message";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";

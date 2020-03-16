@@ -24,7 +24,7 @@ import {FirstOrderFormula} from "../../ConjunctiveNormalForm";
 import {
     AbstractBoolean,
     AbstractList,
-    AbstractMemoryTheory,
+    AbstractTheories,
     AbstractNumber,
     AbstractString,
     BooleanTheory,
@@ -39,7 +39,7 @@ import {Preconditions} from "../../Preconditions";
 import {Ptr, Sint32, Uint32} from "./ctypes";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {SMTFirstOrderLattice} from "../../../procedures/domains/FirstOrderDomain";
-import {Z3ProverEnvironment} from "./Z3Wrapper";
+import {Z3ProverEnvironment} from "./Z3SMT";
 import {Variable} from "../../../syntax/ast/core/Variable";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;
@@ -362,7 +362,7 @@ export class Z3ListTheory implements ListTheory<Z3ListFormula> {
 
 }
 
-export class Z3MemoryTheoryInContext implements AbstractMemoryTheory<Z3Formula, Z3BooleanFormula, Z3NumberFormula, Z3StringFormula, Z3ListFormula> {
+export class Z3Theories implements AbstractTheories<Z3Formula, Z3BooleanFormula, Z3NumberFormula, Z3StringFormula, Z3ListFormula> {
 
     private readonly _boolTheory: BooleanTheory<Z3BooleanFormula>;
 
@@ -396,6 +396,14 @@ export class Z3MemoryTheoryInContext implements AbstractMemoryTheory<Z3Formula, 
 
     get stringTheory(): StringTheory<Z3StringFormula, Z3BooleanFormula, Z3NumberFormula> {
         return this._stringTheory;
+    }
+
+    public simplify(e: Z3Formula): Z3Formula {
+        const simplifiedAst: Z3_ast = this._ctx.simplify(e.getAST());
+        if (e instanceof Z3BooleanFormula) {
+            return new Z3BooleanFormula(simplifiedAst);
+        }
+        throw new ImplementMeException();
     }
 
 }

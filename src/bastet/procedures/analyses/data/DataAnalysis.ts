@@ -28,7 +28,7 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {DataTransferRelation} from "./DataTransferRelation";
 import {ConcreteMemory} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
-import {AbstractMemoryTheory} from "../../domains/MemoryTransformer";
+import {AbstractTheories} from "../../domains/MemoryTransformer";
 import {
     BooleanFormula,
     FirstOrderFormula,
@@ -48,7 +48,7 @@ import {Concern} from "../../../syntax/Concern";
 export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState>,
     LabeledTransferRelation<DataAbstractState> {
 
-    private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
+    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
     private readonly _abstractDomain: DataAbstractDomain;
 
@@ -59,7 +59,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     private readonly _statistics: AnalysisStatistics;
 
     constructor(folLattice: LatticeWithComplements<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
-                theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>,
+                theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>,
                 statistics: AnalysisStatistics) {
         Preconditions.checkNotUndefined(folLattice);
         Preconditions.checkNotUndefined(propLattice);

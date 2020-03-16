@@ -255,7 +255,7 @@ commonStmt  :
  ;
 
 listStmt :
-    'delete' 'all' 'of' variable # DeleteAllFromStatement
+    'delete' 'all' 'from' variable # DeleteAllFromStatement
  |  'delete'  numExpr  'of'  variable # DeleteIthFromStatement
  |  'add'  stringExpr  'to'  variable # AddElementToStatement
  |  'insert'  stringExpr  'at'  numExpr  'of'  variable # InsertAtStatement
@@ -287,7 +287,7 @@ coreStringExpr :
  |  'cast' boolExpr 'to' 'string' # BoolAsStringExpression
 
  |  'attribute'  stringExpr 'of' actorExpr  # StringAttributeOfExpression               // query an attribute value of an actor (sprites, the stage)
- |  'resource' 'attribute'  stringExpr 'of' variable  # ResourceAttributeOfExpression  // query attributes of ressources, for example, the original size
+
  |  'join'  stringExpr stringExpr # JoinStringsExpression
  |  'letter'  numExpr 'of'  stringExpr # IthLetterOfStringExpression
  |  'item'  numExpr 'of'  variable # IthStringItemOfExpression

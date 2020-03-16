@@ -427,8 +427,15 @@ export abstract class MemoryTransformer<M extends AbstractMemory> implements Mem
 
 }
 
-export interface AbstractMemoryTheory<M extends AbstractMemory, B extends AbstractBoolean,
-    N extends AbstractNumber, S extends AbstractString, L extends AbstractList> {
+export interface TheoryIndependent<E extends AbstractElement> {
+
+    simplify(element: E): E;
+
+}
+
+export interface AbstractTheories<M extends AbstractMemory, B extends AbstractBoolean,
+    N extends AbstractNumber, S extends AbstractString, L extends AbstractList> 
+    extends TheoryIndependent<M> {
 
     boolTheory: BooleanTheory<B>;
 

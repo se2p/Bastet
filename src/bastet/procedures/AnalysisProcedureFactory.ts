@@ -26,10 +26,10 @@ import {ControlAnalysis} from "./analyses/control/ControlAnalysis";
 import {GraphAbstractState, GraphConcreteState} from "./analyses/graph/GraphAbstractDomain";
 import {ReachabilityAlgorithm} from "./algorithms/ReachabilityAlgorithm";
 import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
-import {SMTFactory} from "../utils/smt/z3/Z3Wrapper";
+import {SMTFactory} from "../utils/smt/z3/Z3SMT";
 import {DataAnalysis} from "./analyses/data/DataAnalysis";
 import {BDDLibraryFactory} from "../utils/bdd/BDD";
-import {Z3MemoryTheoryInContext} from "../utils/smt/z3/Z3Theories";
+import {Z3Theories} from "../utils/smt/z3/Z3Theories";
 import {SSAAnalysis} from "./analyses/ssa/SSAAnalysis";
 import {BMCAlgorithm} from "./algorithms/BMCAlgorithm";
 import {MultiPropertyAlgorithm} from "./algorithms/MultiPropertyAlgorithm";
@@ -39,7 +39,6 @@ import {AnalysisStatistics} from "./analyses/AnalysisStatistics";
 import {StatsAnalysis} from "./analyses/stats/StatsAnalysis";
 import {TimeAnalysis} from "./analyses/time/TimeAnalysis";
 import {StaticTimeProfile} from "../utils/TimeProfile";
-import {NodeSystemLayer} from "../utils/SystemLayer";
 
 export class AnalysisProcedureFactory {
 
@@ -59,14 +58,14 @@ export class AnalysisProcedureFactory {
 
                 // TODO: Delete the context after the analysis is no more in use
                 const defaultContect = smt.createContext();
-                const theories = new Z3MemoryTheoryInContext(defaultContect);
+                const theories = new Z3Theories(defaultContect);
                 const prover = smt.createProver(defaultContect);
                 const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
                 const dataAnalysis = new DataAnalysis(firstOrderLattice, bddlib.lattice, theories, this._statistics);
                 const ssaAnalysis = new SSAAnalysis(task, dataAnalysis, this._statistics);
-                const timeAnalysis = new TimeAnalysis(ssaAnalysis, this._statistics, new StaticTimeProfile());
-                const controlAnalysis = new ControlAnalysis(config, task, timeAnalysis, this._statistics);
+                // const timeAnalysis = new TimeAnalysis(ssaAnalysis, this._statistics, new StaticTimeProfile());
+                const controlAnalysis = new ControlAnalysis(config, task, ssaAnalysis, this._statistics);
                 const graphAnalysis = new GraphAnalysis(task, controlAnalysis, this._statistics);
                 const outerAnalysis = new StatsAnalysis<GraphConcreteState, GraphAbstractState>(graphAnalysis, this._statistics);
 

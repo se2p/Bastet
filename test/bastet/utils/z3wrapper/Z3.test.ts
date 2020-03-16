@@ -22,7 +22,7 @@
 
 import {Z3_config, Z3_context} from "../../../../src/bastet/utils/smt/z3/libz3";
 import {Ptr, Uint32} from "../../../../src/bastet/utils/smt/z3/ctypes";
-import {SMTFactory, Z3SMT} from "../../../../src/bastet/utils/smt/z3/Z3Wrapper";
+import {SMTFactory, Z3SMT} from "../../../../src/bastet/utils/smt/z3/Z3SMT";
 import {VariableWithDataLocation} from "../../../../src/bastet/syntax/ast/core/Variable";
 import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataLocation";
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
@@ -38,7 +38,7 @@ let prover;
 beforeAll( async (done) => {
     smt = await SMTFactory.createZ3();
     ctx = smt.createContext();
-    theories = smt.createTheory(ctx);
+    theories = smt.createTheories(ctx);
     prover = smt.createProver(ctx);
     done();
 });
