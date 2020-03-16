@@ -317,6 +317,7 @@ import {ActorExpression, ActorVariableExpression, LocateActorExpression} from ".
 import {TransitionRelation} from "../app/controlflow/TransitionRelation";
 import {ScopeTypeInformation, TypeInformationStorage} from "../DeclarationScopes";
 import instantiate = WebAssembly.instantiate;
+import {LookupTransformer} from "./LookupTransformer";
 
 const toposort = require('toposort');
 
@@ -365,7 +366,7 @@ class TTransformerResult<T extends AstNode> {
 
 }
 
-class TransformerResult extends TTransformerResult<AstNode> {
+export class TransformerResult extends TTransformerResult<AstNode> {
 
 }
 const STATEMENT_MATCHER = /(?<method>[A-Za-z0-9_]*)StatementContext/;
@@ -399,9 +400,11 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     private _actorScope : boolean;
     private _activeDeclarationScope: ScopeTypeInformation;
+    private _filePath: string;
+    private imageLookupMethods: Map<Identifier, MethodDefinition> = new Map();
 
     constructor(config: TransformerConfig, methodLibrary: App,
-                typeInformationStorage: TypeInformationStorage) {
+                typeInformationStorage: TypeInformationStorage, filePath: string) {
         this._config = Preconditions.checkNotUndefined(config);
         this._methodLibrary = Preconditions.checkNotUndefined(methodLibrary);
         this._typeStorage = Preconditions.checkNotUndefined(typeInformationStorage);
@@ -409,6 +412,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         this._typeStack = new Array<ScratchType>();
         this._activeDeclarationScope = null;
         this._actorScope = false;
+        this._filePath = filePath;
     }
 
     get typeStorage(): TypeInformationStorage {
@@ -666,6 +670,9 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 // Resource declarations and definitions
                 resouceDefs = ctx.actorComponentsDefinition().resourceList().accept(this);
                 initStatements = StatementLists.concat(initStatements, resouceDefs.statementsToPrepend);
+
+                let imageLookup = LookupTransformer.transformResourceDefs(resouceDefs, this._filePath)
+                this.imageLookupMethods.set(ident, imageLookup);
 
                 // Variable declarations and initializations
                 declarations = ctx.actorComponentsDefinition().declarationStmtList().accept(this);
@@ -1993,9 +2000,9 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 export class ToIntermediateTransformer {
 
     transform(methodLib: App, origin: RuleNode, typeInformationStorage: TypeInformationStorage,
-              config: {}): AstNode {
+              config: {}, filePath: string): AstNode {
         const transformerConfig = new TransformerConfig(config);
-        const visitor = new ToIntermediateVisitor(transformerConfig, methodLib, typeInformationStorage);
+        const visitor = new ToIntermediateVisitor(transformerConfig, methodLib, typeInformationStorage, filePath);
         return origin.accept(visitor).nodeOnly();
     }
 

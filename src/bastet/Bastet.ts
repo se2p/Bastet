@@ -154,7 +154,7 @@ export class Bastet {
         Preconditions.checkState(rawAST instanceof ProgramContext );
 
         const transformer = new ToIntermediateTransformer();
-        const intermediateAST: AstNode = transformer.transform(App.empty(), rawAST, typeStorage, config);
+        const intermediateAST: AstNode = transformer.transform(App.empty(), rawAST, typeStorage, config, filepath);
 
         return this.createControlFlowFrom(filepath, intermediateAST, App.empty(), typeStorage);
     }
@@ -179,7 +179,7 @@ export class Bastet {
         // Transform the AST: Replaces specific statements or expressions
         // by generic constructs.
         const transformer = new ToIntermediateTransformer();
-        const intermediateAST: AstNode = transformer.transform(staticLibraryModel, rawAST, typeStorage, config);
+        const intermediateAST: AstNode = transformer.transform(staticLibraryModel, rawAST, typeStorage, config, filepath);
 
         return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, typeStorage);
     }
