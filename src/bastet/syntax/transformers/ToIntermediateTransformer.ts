@@ -398,6 +398,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     private readonly _config: TransformerConfig;
     private readonly _typeStorage: TypeInformationStorage;
 
+    private _currentActor: Identifier;
     private _actorScope : boolean;
     private _activeDeclarationScope: ScopeTypeInformation;
     private _filePath: string;
@@ -636,6 +637,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
         // Identifier and inheritance information
         const ident = ctx.ident().accept(this).nodeOnly() as Identifier;
+        this._currentActor = ident;
+
         const inheritesFrom: InheritsFromList = ctx.inheritsFrom().accept(this).nodeOnly();
 
         // Role
