@@ -44,6 +44,7 @@ import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState>,
     LabeledTransferRelation<DataAbstractState> {
@@ -129,5 +130,9 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     wrapStateSets(frontier: StateSet<DataAbstractState>, reached: StateSet<DataAbstractState>): [StateSet<DataAbstractState>, StateSet<DataAbstractState>] {
         return [frontier, reached];
+    }
+
+    mergeInto(state: DataAbstractState, reached: StateSet<DataAbstractState>, unwrapper: (AbstractElement) => DataAbstractState, wrapper: (E) => AbstractElement): StateSet<DataAbstractState> {
+        throw new ImplementMeException();
     }
 }

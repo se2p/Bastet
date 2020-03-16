@@ -36,6 +36,7 @@ import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
 import {GraphAbstractState} from "../graph/GraphAbstractDomain";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 
 export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, SSAState>,
@@ -120,6 +121,10 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
 
     wrapStateSets(frontier: StateSet<SSAState>, reached: StateSet<SSAState>): [StateSet<SSAState>, StateSet<SSAState>] {
         return [frontier, reached];
+    }
+
+    mergeInto(state: SSAState, reached: StateSet<SSAState>, unwrapper: (AbstractElement) => SSAState, wrapper: (E) => AbstractElement): StateSet<SSAState> {
+        throw new ImplementMeException();
     }
 
 }

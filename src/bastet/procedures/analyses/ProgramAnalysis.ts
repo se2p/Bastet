@@ -29,7 +29,9 @@ import {Property} from "../../syntax/Property";
 import {StateSet} from "../algorithms/StateSet";
 import {Concern} from "../../syntax/Concern";
 
-export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement> {
+export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement>
+   extends AbstractSuccOperator<E>, JoinOperator<E>, TargetOperator<E>, MergeIntoOperator<E>,
+       MergeOperator<E>, StopOperator<E>, WidenOperator<E> {
 
     abstractDomain: AbstractDomain<C, E>;
 
@@ -39,12 +41,7 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
 
     merge(state1: E, state2: E): boolean;
 
-    /**
-     * Determine candidates to add (and possibly remove) from the sets `reached` and `frontier`
-     * @param state
-     * @param reached
-     */
-    // mergeIntoSets(state: E, reached: StateSet<E>): [Iterable<E>, Iterable<E>];
+    mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): StateSet<E>;
 
     /** Delegates to `join` of the abstract domain */
     join(state1: E, state2: E): E;
@@ -58,6 +55,48 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
     initialStatesFor(task: App): E[];
 
     wrapStateSets(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>];
+
+}
+
+export interface AbstractSuccOperator<E extends AbstractElement> {
+
+    abstractSucc(fromState: E): Iterable<E>;
+
+}
+
+export interface JoinOperator<E extends AbstractElement> {
+
+    join(state1: E, state2: E): E;
+
+}
+
+export interface TargetOperator<E extends AbstractElement> {
+
+    target(state: E): Property[];
+
+}
+
+export interface MergeIntoOperator<E extends AbstractElement> {
+
+    mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): Iterable<E>;
+
+}
+
+export interface MergeOperator<E extends AbstractElement> {
+
+    merge(state1: E, state2: E): boolean;
+
+}
+
+export interface StopOperator<E extends AbstractElement> {
+
+    stop(state: E, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => E): boolean;
+
+}
+
+export interface WidenOperator<E extends AbstractElement> {
+
+    widen(state: E): E;
 
 }
 

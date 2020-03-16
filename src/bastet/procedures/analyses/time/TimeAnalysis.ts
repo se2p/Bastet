@@ -34,6 +34,7 @@ import {TimeTransferRelation} from "./TimeTransferRelation";
 import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement>
     implements WrappingProgramAnalysis<C, E>,
@@ -108,6 +109,10 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement>
 
     unwrap(e: E): E {
         return e;
+    }
+
+    mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): StateSet<E> {
+        throw new ImplementMeException();
     }
 
 }

@@ -42,6 +42,7 @@ import {Property} from "../../../syntax/Property";
 import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {StandardMergeIntoOperator} from "../Operators";
 
 export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState>,
     Unwrapper<GraphAbstractState, AbstractElement>,
@@ -59,6 +60,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
 
     private readonly _statistics: AnalysisStatistics;
 
+    private readonly _mergeIntoOp: StandardMergeIntoOperator<any>;
+
     constructor(task: App, wrappedAnalysis: ProgramAnalysis<any, any>, statistics: AnalysisStatistics) {
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
 
@@ -67,6 +70,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         this._abstractDomain = new GraphAbstractDomain();
         this._transferRelation = new GraphTransferRelation((e) => this._wrappedAnalysis.abstractSucc(e));
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
+        this._mergeIntoOp = new StandardMergeIntoOperator(wrappedAnalysis, wrappedAnalysis);
     }
 
     abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
@@ -80,6 +84,12 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     merge(state1: GraphAbstractState, state2: GraphAbstractState): boolean {
         // MERGE-SEP
         return false;
+    }
+
+    mergeInto(state: GraphAbstractState, reached: StateSet<GraphAbstractState>,
+              unwrapper: (AbstractElement) => GraphAbstractState,
+              wrapper: (E) => AbstractElement): StateSet<GraphAbstractState> {
+        return this._mergeIntoOp.mergeInto(state, reached, unwrapper, wrapper);
     }
 
     stop(state: GraphAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => GraphAbstractState): boolean {

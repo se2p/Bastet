@@ -41,6 +41,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
     private readonly _widenStats: AnalysisStatistics;
     private readonly _stopStats: AnalysisStatistics;
     private readonly _mergeStats: AnalysisStatistics;
+    private readonly _mergeIntoStats: AnalysisStatistics;
     private readonly _targetStats: AnalysisStatistics;
     private readonly _otherStats: AnalysisStatistics;
     private readonly _joinStats: AnalysisStatistics;
@@ -51,6 +52,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
         this._widenStats = this._statistics.withContext("widening");
         this._stopStats = this._statistics.withContext("stop");
         this._mergeStats = this._statistics.withContext("merge");
+        this._mergeIntoStats = this._statistics.withContext("mergeInto");
         this._joinStats = this._statistics.withContext("join");
         this._targetStats = this._statistics.withContext("target");
         this._otherStats = this._statistics.withContext("other");
@@ -85,6 +87,12 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
     stop(state: E, reached: Iterable<AbstractElement>, unwrapper: (E) => E): boolean {
         return this._stopStats.runWithTimer(() => {
             return this._wrappedAnalysis.stop(state, reached, (e) => this.unwrap(unwrapper(e)));
+        });
+    }
+
+    mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): StateSet<E> {
+        return this._mergeIntoStats.runWithTimer(() => {
+            return this._wrappedAnalysis.mergeInto(state, reached, (e) => this.unwrap(unwrapper(e)), (e) => e);
         });
     }
 
