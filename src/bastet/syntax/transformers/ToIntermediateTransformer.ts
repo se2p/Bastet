@@ -402,7 +402,9 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     private _actorScope : boolean;
     private _activeDeclarationScope: ScopeTypeInformation;
     private _filePath: string;
-    private imageLookupMethods: Map<Identifier, MethodDefinition> = new Map();
+    private graphicLookupMethods: Map<Identifier, MethodDefinition> = new Map();
+    private indexByIdLookupMethods: Map<Identifier, MethodDefinition> = new Map();
+    private idByIndexLookupMethods: Map<Identifier, MethodDefinition> = new Map();
 
     constructor(config: TransformerConfig, methodLibrary: App,
                 typeInformationStorage: TypeInformationStorage, filePath: string) {
@@ -674,8 +676,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 resouceDefs = ctx.actorComponentsDefinition().resourceList().accept(this);
                 initStatements = StatementLists.concat(initStatements, resouceDefs.statementsToPrepend);
 
-                let imageLookup = LookupTransformer.transformResourceDefs(resouceDefs, this._filePath)
-                this.imageLookupMethods.set(ident, imageLookup);
+                let graphicPixelLookup = LookupTransformer.buildGrapicPixelLookup(this._currentActor, resouceDefs, this._filePath)
+                this.graphicLookupMethods.set(ident, graphicPixelLookup);
+                let idByIndexLookup = LookupTransformer.buildIdByIndexLookup(this._currentActor, resouceDefs, this._filePath)
+                this.idByIndexLookupMethods.set(ident, idByIndexLookup);
+                let indexByIdLookup = LookupTransformer.buildIndexByIdLookup(this._currentActor, resouceDefs, this._filePath)
+                this.indexByIdLookupMethods.set(ident, indexByIdLookup);
 
                 // Variable declarations and initializations
                 declarations = ctx.actorComponentsDefinition().declarationStmtList().accept(this);
