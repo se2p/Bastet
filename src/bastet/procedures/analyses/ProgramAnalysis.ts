@@ -42,7 +42,7 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
     /** Delegates to `join` of the abstract domain */
     join(state1: E, state2: E): E;
 
-    stop(state: E, reached: Iterable<E>): boolean;
+    stop(state: E, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => E): boolean;
 
     widen(state: E): E;
 
@@ -79,3 +79,4 @@ export interface WrappingProgramAnalysis<C extends ConcreteElement, E extends Ab
     wrappedAnalysis: ProgramAnalysis<any, any>;
 
 }
+

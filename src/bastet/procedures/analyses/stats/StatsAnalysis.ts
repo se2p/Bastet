@@ -28,9 +28,11 @@ import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
-import {Refiner} from "../Refiner";
+import {Refiner, Unwrapper} from "../Refiner";
+import {GraphAbstractState} from "../graph/GraphAbstractDomain";
 
-export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement> implements WrappingProgramAnalysis<C, E> {
+export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
+    implements WrappingProgramAnalysis<C, E>, Unwrapper<E, E> {
 
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
 
@@ -80,9 +82,9 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
         });
     }
 
-    stop(state: E, reached: Iterable<E>): boolean {
+    stop(state: E, reached: Iterable<AbstractElement>, unwrapper: (E) => E): boolean {
         return this._stopStats.runWithTimer(() => {
-            return this._wrappedAnalysis.stop(state, reached);
+            return this._wrappedAnalysis.stop(state, reached, (e) => this.unwrap(unwrapper(e)));
         });
     }
 
@@ -145,4 +147,10 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
     get joinStats(): AnalysisStatistics {
         return this._joinStats;
     }
+
+    unwrap(e: E): E {
+        return e;
+    }
+
 }
+

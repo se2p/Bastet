@@ -28,15 +28,17 @@ import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
-import {Refiner} from "../Refiner";
+import {Refiner, Unwrapper} from "../Refiner";
 import {ProgramTimeProfile} from "../../../utils/TimeProfile";
 import {TimeTransferRelation} from "./TimeTransferRelation";
 import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
 
-export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement> implements WrappingProgramAnalysis<C, E>,
-    LabeledTransferRelation<E>{
+export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement>
+    implements WrappingProgramAnalysis<C, E>,
+        Unwrapper<E, E>,
+        LabeledTransferRelation<E>{
 
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
 
@@ -76,8 +78,8 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement> 
         return this._wrappedAnalysis.merge(state1, state2);
     }
 
-    stop(state: E, reached: Iterable<E>): boolean {
-        return this._wrappedAnalysis.stop(state, reached);
+    stop(state: E, reached: Iterable<AbstractElement>, unwrapper: (e: AbstractElement) => E): boolean {
+        return this._wrappedAnalysis.stop(state, reached, unwrapper);
     }
 
     target(state: E): Property[] {
@@ -102,6 +104,10 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement> 
 
     get wrappedAnalysis(): ProgramAnalysis<any, any> {
         return this._wrappedAnalysis;
+    }
+
+    unwrap(e: E): E {
+        return e;
     }
 
 }

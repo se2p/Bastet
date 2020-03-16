@@ -37,7 +37,7 @@ import {
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
-import {LatticeWithComplements} from "../../../lattices/Lattice";
+import {AbstractElement, LatticeWithComplements} from "../../../lattices/Lattice";
 import {DataRefiner} from "./DataRefiner";
 import {Refiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
@@ -84,9 +84,9 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return false;
     }
 
-    stop(state: DataAbstractState, reached: Iterable<DataAbstractState>): boolean {
+    stop(state: DataAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => DataAbstractState): boolean {
         for (const r of reached) {
-            if (r.equals(state)) {
+            if (unwrapper(r).equals(state)) {
                 return true;
             }
         }

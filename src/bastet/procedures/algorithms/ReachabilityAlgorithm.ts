@@ -105,23 +105,11 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
                 const ePrimePrime: E = this._analysis.widen(ePrime);
 
                 // MERGE: If desired, merge certain states
-                const removeFromReached: Set<E> = new Set<E>();
-                const addToReached: Set<E> = new Set<E>();
-                const relevantReached: StateSet<E> = reached.getStateSet(ePrimePrime);
-                for (let r of relevantReached) {
-                    if (this._analysis.merge(ePrimePrime, r)) {
-                        const ePrimePrimePrime = this._analysis.join(ePrimePrime, r);
-                        removeFromReached.add(r);
-                        addToReached.add(ePrimePrimePrime);
-                    }
-                }
-                reached.removeAll(removeFromReached);
-                reached.addAll(addToReached);
-
+                [frontier, reached] = this.merge(ePrimePrime, frontier, reached);
 
                 // STOP: Check for coverage (fixed point iteration)
                 const checkStopFor: E = ePrimePrime; // TODO: How does this interact with the 'merge' above
-                if (!this._analysis.stop(checkStopFor, reached)) {
+                if (!this._analysis.stop(checkStopFor, reached, (s) => s)) {
                     frontier.add(checkStopFor);
                     reached.add(checkStopFor);
 
@@ -171,5 +159,25 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
                 this._exportFunction(reached, frontier);
             }
         }
+    }
+
+    private merge(ePrimePrime: E, frontier: StateSet<E>, reached: StateSet<E>) {
+        // TODO: Move this method to the `ProgramAnalysis` interface
+        //  and the corresponding analysis (the code below should
+        //  belong to the `GraphAnalysis`)
+        const removeFromReached: Set<E> = new Set<E>();
+        const addToReached: Set<E> = new Set<E>();
+        const relevantReached: StateSet<E> = reached.getStateSet(ePrimePrime);
+        for (let r of relevantReached) {
+            if (this._analysis.merge(ePrimePrime, r)) {
+                const ePrimePrimePrime = this._analysis.join(ePrimePrime, r);
+                removeFromReached.add(r);
+                addToReached.add(ePrimePrimePrime);
+            }
+        }
+        reached.removeAll(removeFromReached);
+        reached.addAll(addToReached);
+
+        return [frontier, reached];
     }
 }
