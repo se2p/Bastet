@@ -2,7 +2,7 @@
 
     "ReachabilityAlgorithm": {
 
-        "dump-graph-after-iteration": false
+        "dump-graph-after-iteration": true
 
     }
 

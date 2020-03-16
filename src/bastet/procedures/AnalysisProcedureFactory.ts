@@ -90,7 +90,7 @@ export class AnalysisProcedureFactory {
             }
 
             private onAnalysisResult(violated: ImmSet<Property>, satisifed: ImmSet<Property>, unknowns: ImmSet<Property>, mpaStatistics: AnalysisStatistics) {
-                const analysisDurtionMSec = mpaStatistics.contextTimer.duration.toFixed(3);
+                const analysisDurtionMSec = mpaStatistics.contextTimer.totalDuration.toFixed(3);
 
                 mpaStatistics.put("num_violated", violated.size);
                 mpaStatistics.put("num_unknown", unknowns.size);

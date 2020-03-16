@@ -148,10 +148,10 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
 
         const elapsed = performance.now() - this._lastOutputTime;
         if (elapsed > 10000) {
-            const timeForWiden = statAnalysis.widenStats.contextTimer.duration;
-            const timeForStop = statAnalysis.stopStats.contextTimer.duration;
-            const timeForSucc = statAnalysis.succStats.contextTimer.duration;
-            const timeForMerge = statAnalysis.mergeStats.contextTimer.duration;
+            const timeForWiden = statAnalysis.widenStats.contextTimer.totalDuration;
+            const timeForStop = statAnalysis.stopStats.contextTimer.totalDuration;
+            const timeForSucc = statAnalysis.succStats.contextTimer.totalDuration;
+            const timeForMerge = statAnalysis.mergeStats.contextTimer.totalDuration;
 
             console.log(`Reached ${reached.getSize()} states, ${frontier.getSize()} in frontier, succ ${timeForSucc - this._lastTimeForSucc}, merge ${timeForMerge - this._lastTimeForMerge}, stop ${timeForStop - this._lastTimeForStop}, widen ${timeForWiden - this._lastTimeForWiden}`);
 
