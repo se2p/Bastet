@@ -39,6 +39,13 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
 
     merge(state1: E, state2: E): boolean;
 
+    /**
+     * Determine candidates to add (and possibly remove) from the sets `reached` and `frontier`
+     * @param state
+     * @param reached
+     */
+    // mergeIntoSets(state: E, reached: StateSet<E>): [Iterable<E>, Iterable<E>];
+
     /** Delegates to `join` of the abstract domain */
     join(state1: E, state2: E): E;
 
