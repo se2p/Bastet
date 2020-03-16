@@ -73,7 +73,7 @@ import {
     StringLiteral
 } from "../../../syntax/ast/core/expressions/StringExpression";
 import {AfterStatementMonitoringEvent, MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
-import {Concerns} from "../../../syntax/Concern";
+import {Concern, Concerns} from "../../../syntax/Concern";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {Script} from "../../../syntax/app/controlflow/Script";
 import {getTheOnlyElement} from "../../../utils/Collections";
@@ -573,21 +573,32 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result.map((s) => new RawOperation(s));
     }
 
-    private wasMonitoringStep(toState: ControlAbstractState) {
+    private isProgramConcern(concern: Concern) {
+        return concern == Concerns.defaultProgramConcern();
+    }
+
+    private getStepConcern(toState: ControlAbstractState): Concern {
+        let result: Concern = null;
         for (const threadIndex of toState.getSteppedFor()) {
             const threadState = toState.getThreadStates().get(threadIndex);
-            if (this.isObserverThread(threadState)) {
-                return true;
+            const actorConcern = this._task.getActorByName(threadState.getActorId()).concern;
+            if (result == null) {
+                result = actorConcern;
+            } else {
+                Preconditions.checkState(result == actorConcern);
             }
         }
-        return false;
+
+        return result;
     }
 
     private awaikConditionCheckThreads(inState: ControlAbstractState): ControlAbstractState[] {
         let result: ControlAbstractState = inState;
 
+        const concern = this.getStepConcern(inState);
+
         //  1. Activate the specification check thread (`after statement finished`)
-        if (!this.wasMonitoringStep(inState)) {
+        if (this.isProgramConcern(concern)) {
             for (const [threadIndex, threadState] of inState.getThreadStates().entries()) {
                 const actor: Actor = this._task.getActorByName(threadState.getActorId());
                 const isSpecificationThread = actor.isObserver;
@@ -787,7 +798,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 if (threadScript.event instanceof AfterStatementMonitoringEvent) {
                     result = result.withThreadStateUpdate(ti,
                         (t) => t.withComputationState(
-                            ThreadComputationState.THREAD_STATE_RUNNING));
+                            ThreadComputationState.THREAD_STATE_DONE));
                 }
             }
         }

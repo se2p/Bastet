@@ -31,7 +31,13 @@ import {AstNode, OptionalAstNode} from "../ast/AstNode";
 import {Preconditions} from "../../utils/Preconditions";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {ActorDefinition, ConcreteActorMode} from "../ast/core/ActorDefinition";
-import {BootstrapEvent, CoreEvent, NeverEvent} from "../ast/core/CoreEvent";
+import {
+    AfterBootstrapMonitoringEvent,
+    AfterStatementMonitoringEvent,
+    BootstrapEvent,
+    CoreEvent,
+    NeverEvent
+} from "../ast/core/CoreEvent";
 import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
     MethodDefinitionList,
@@ -53,6 +59,7 @@ import {Logger} from "../../utils/Logger";
 import {ReturnStatement} from "../ast/core/statements/ControlStatement";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {TypeInformationStorage} from "../DeclarationScopes";
+import {Concern, Concerns} from "../Concern";
 
 export class AppBuilder {
 
@@ -118,6 +125,7 @@ export class AppBuilder {
         const externalMethodSigs = this.buildExternalMethodSigs(acd.externalMethodDecls);
         const scripts = this.buildScripts(acd.scriptList).concat([initScript]);
         const methods = this.buildMethods(acd.methodDefs);
+        const concern = this.determineConcern(actorDefinition);
 
         let inheritsFromActors: Actor[] = [];
         for (let aid of actorDefinition.inheritsFrom.elements) {
@@ -127,7 +135,20 @@ export class AppBuilder {
         }
 
         return new Actor(actorDefinition.mode, actorName, inheritsFromActors, [],
-            resources, datalocs, initScript, methodDefs, externalMethodSigs, scripts, methods);
+            concern, resources, datalocs, initScript, methodDefs, externalMethodSigs, scripts, methods);
+    }
+
+    private determineConcern(actorDef: ActorDefinition): Concern {
+        Preconditions.checkNotUndefined(actorDef);
+
+        const isSpecificationActor = actorDef.scriptList.elements.find((sd) => sd.event instanceof AfterStatementMonitoringEvent
+            || sd.event instanceof AfterBootstrapMonitoringEvent) != null;
+
+        if (isSpecificationActor) {
+            return Concerns.defaultSpecificationConcern();
+        }
+
+        return Concerns.defaultProgramConcern();
     }
 
     private buildMethods(methodDefs: MethodDefinitionList): Method[] {
@@ -276,13 +297,13 @@ export class AppBuilder {
 
         while (worklist.length > 0) {
             const work = worklist.pop();
-            for (const f of work.inheritFrom) {
-                if (handled.has(f.ident)) {
+            for (const copyFrom of work.inheritFrom) {
+                if (handled.has(copyFrom.ident)) {
                     throw new IllegalStateException("Cycle in the inheritance relation?");
                 }
-                result = this.concatActors(result, f);
-                handled.add(f.ident);
-                worklist.push(f);
+                result = this.concatActors(result, copyFrom);
+                handled.add(copyFrom.ident);
+                worklist.push(copyFrom);
             }
         }
 
@@ -301,8 +322,15 @@ export class AppBuilder {
         const scripts = Lists.concatImmutableLists(main.scripts, secondary.scripts);
         const methods = Lists.concatImmutableLists(main.methods, secondary.methods);
 
+        // TODO: The way we dedetermine the concern of an actor is somehow hacky.
+        //  We could take advantage of the inheritance relation
+        let concern: Concern = main.concern;
+        if (secondary.concern == Concerns.defaultSpecificationConcern()) {
+            concern = Concerns.defaultSpecificationConcern();
+        }
+
         return new Actor(main.actorMode, main.ident, [], [secondary].concat(Array.from(secondary.dissolvedFrom)),
-            resources.createMutable(), datalocs.createMutable(),
+            concern, resources.createMutable(), datalocs.createMutable(),
             initScript, methodDefinitions.createMutable(), externalMethods.createMutable(),
             scripts.createMutable(), methods.createMutable());
     }

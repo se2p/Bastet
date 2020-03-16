@@ -109,7 +109,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     exportAnalysisResult(reachedPrime: StateSet<GraphAbstractState>, frontierPrime: StateSet<GraphAbstractState>) {
-        const exporter = new GraphToDot(this, reachedPrime, frontierPrime);
+        const exporter = new GraphToDot(this._task, this, reachedPrime, frontierPrime);
         exporter.writeToFile(`output/reachability-graph.dot`);
     }
 

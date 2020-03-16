@@ -24,12 +24,34 @@
 
 import {AbstractStateVisitor} from "./AbstractStates";
 import {AbstractElement} from "../../lattices/Lattice";
-import {ControlAbstractState} from "./control/ControlAbstractDomain";
+import {ControlAbstractState, ThreadState} from "./control/ControlAbstractDomain";
 import {DataAbstractState} from "./data/DataAbstractDomain";
 import {GraphAbstractState} from "./graph/GraphAbstractDomain";
 import {SSAState} from "./ssa/SSAAbstractDomain";
+import {Actor} from "../../syntax/app/Actor";
+import {Script} from "../../syntax/app/controlflow/Script";
+import {App} from "../../syntax/app/App";
+import {Preconditions} from "../../utils/Preconditions";
+import {CorePrintVisitor} from "../../syntax/ast/CorePrintVisitor";
 
 export class StateLabelVisitor implements AbstractStateVisitor<string> {
+
+    private readonly _task: App;
+
+    constructor(task: App) {
+        this._task = Preconditions.checkNotUndefined(task);
+    }
+
+    private formatActorScriptThreadDetails(cs: ControlAbstractState, t: ThreadState, threadIndex: number): string {
+        const steppedForIndices = cs.getSteppedFor();
+        const wasStepped = (i) => { return steppedForIndices.contains(i) };
+
+        const actor = this._task.getActorByName(t.getActorId());
+        const script = actor.getScript(t.getScriptId());
+
+        const astVisitor = new CorePrintVisitor();
+        return `${wasStepped(threadIndex) ? "*" : ""}[${t.getThreadId()} ${t.getActorId()} ${t.getScriptId()} ${script.event.accept(astVisitor)} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()} ${t.getWaitingForThreads().join("+")}]`;
+    }
 
     visit(element: AbstractElement): string {
         return "";
@@ -37,11 +59,11 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
 
     visitControlAbstractState(element: ControlAbstractState): string {
         const steppedForIndices = element.getSteppedFor();
-        const stepped = (i) => { return steppedForIndices.contains(i) };
+        const wasStepped = (i) => { return steppedForIndices.contains(i) };
 
         const wrappedLabel: string = element.getWrappedState().accept(this);
         const controlLabel: string = element.getThreadStates()
-            .map((t, i) => `${stepped(i) ? "*" : ""}[${t.getThreadId()} ${t.getActorId()} ${t.getScriptId()} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()} ${t.getWaitingForThreads().join("+")}]`)
+            .map((t, i) => this.formatActorScriptThreadDetails(element, t, i))
             .join("\n");
         return `${controlLabel}\n${wrappedLabel}`;
     }

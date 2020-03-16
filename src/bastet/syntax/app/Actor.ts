@@ -46,6 +46,7 @@ import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
+import {Concern, Concerns} from "../Concern";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -68,6 +69,9 @@ export class Actor {
 
     /** Unique identifier of the actor */
     private readonly _ident: ActorId;
+
+    /** The concern of the actor. Used for scheduling decisions. */
+    private readonly _concern: Concern;
 
     /** Set of the actor's resources */
     private readonly _resources: ImmutableMap<string, AppResource>;
@@ -103,7 +107,7 @@ export class Actor {
     private readonly _transRelMap: ImmutableMap<TransRelId, TransitionRelation>;
 
     constructor(mode: ActorMode, ident: ActorId, inheritFrom: Actor[],
-                dissolvedFrom: Actor[],
+                dissolvedFrom: Actor[], concern: Concern,
                 resources: AppResourceMap, datalocs: DataLocationMap,
                 initScript: Script, methodDefs: MethodDefinitionMap,
                 externalMethods: MethodSignatureMap,
@@ -124,6 +128,7 @@ export class Actor {
         this._scripts = Lists.immutableCopyOf(scripts);
         this._methods = Lists.immutableCopyOf(methods);
         this._isObserver = this.deterineIsObserver();
+        this._concern = Preconditions.checkNotUndefined(concern);
 
         const transRelMap: Map<TransRelId, TransitionRelation> = new Map<TransRelId, TransitionRelation>();
 
@@ -173,6 +178,10 @@ export class Actor {
 
     get resourceMap(): ImmutableMap<string, AppResource> {
         return this._resources;
+    }
+
+    get concern(): Concern {
+        return this._concern;
     }
 
     get initScript(): Script {
@@ -267,6 +276,7 @@ export class Actors {
             const bootstrapScript: Script = new Script(Scripts.freshScriptId(),
                 SingularityEvent.instance(), false, bootstrapTransitions);
             Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [], [],
+                Concerns.highestPriorityConcern(),
                 {}, {}, bootstrapScript, {}, {},
                 [bootstrapScript], []);
         }
