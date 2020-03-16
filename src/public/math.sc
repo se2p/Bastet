@@ -1,3 +1,4 @@
+role MathActor begin
 
     define mathAtan(n: number) begin
         declare result as number
@@ -61,7 +62,7 @@
         define alpha as wrapClamp(alpha, 0, 360)
         declare result as number
 
-        if alpha > -1 and alpha < 36 then begin
+        if alpha > (0-1) and alpha < 36 then begin
             assume result < 1
             assume result > 0-0.127
         end else begin
@@ -120,7 +121,7 @@
         define alpha as wrapClamp(alpha, 0, 360)
         declare result as number
 
-        if alpha > -1 and alpha < 36 then begin
+        if alpha > (0-1) and alpha < 36 then begin
             assume result < 0
             assume result > 0-0.991
         end else begin
@@ -175,6 +176,9 @@
 
     end returns result: number
 
+
+
+
     define radToDeg(rad: number) begin
         declare result as number
         declare negated as boolean
@@ -205,11 +209,11 @@
 
             assume result < lower
             assume result > upper
-        end else if then begin
+        end else begin
             assume result > lower
             assume result < upper
         end
 
     end returns result: number
 
-
+end
