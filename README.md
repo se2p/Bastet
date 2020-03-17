@@ -49,7 +49,7 @@ We recommend to use the `bastet.sh` wrapper script (can be started from an Unix 
 ./scripts/bastet.sh \
     --program test/programs/mini1program.sc \
     --specification test/programs/empty.sc \
-    --intermediateLibrary src/public/intermediate.sc
+    --intermediateLibrary src/public/library.sc
 ```
 
 ## Publications and Citing
