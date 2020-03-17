@@ -93,7 +93,15 @@ import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./c
 import {EpsilonStatement} from "./core/statements/EpsilonStatement";
 import {ExpressionStatement} from "./core/statements/ExpressionStatement";
 import {ResetTimerStatement} from "./core/statements/ResetTimerStatement";
-import {ActorType, BooleanType, ListType, NumberType, ScratchType, StringType} from "./core/ScratchType";
+import {
+    ActorType,
+    BooleanType,
+    ListType,
+    NumberType,
+    ScratchType,
+    StringEnumType,
+    StringType
+} from "./core/ScratchType";
 import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
@@ -120,6 +128,10 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
 
     visitCloneStartEvent(node: CloneStartEvent): string {
         return `started as clone`;
+    }
+
+    visitStringEnumType(node: StringEnumType): string {
+        return `enum [${node.values.accept(this)}]`
     }
 
     visitConditionReachedEvent(node: ConditionReachedEvent): string {

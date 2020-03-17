@@ -137,12 +137,15 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
                 if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_seconds) {
                     return [NumberLiteral.zero(), NumberLiteral.zero(),
                         [ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo, this._globalSecondsExpr))]];
+
                 } else if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_millis) {
                     return [NumberLiteral.zero(), NumberLiteral.zero(),
                         [ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo, this._globalMillisExpr))]];
+
                 } else if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_micros) {
                     return [NumberLiteral.zero(), NumberLiteral.zero(),
                         [ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo, this._globalMicrosExpr))]];
+
                 } else if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_timerValue) {
                     return [NumberLiteral.zero(), NumberLiteral.zero(),
                         [ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo,

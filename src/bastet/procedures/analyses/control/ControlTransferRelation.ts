@@ -37,6 +37,7 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {TransitionRelation, TransitionTo} from "../../../syntax/app/controlflow/TransitionRelation";
 import {Actor, ActorId} from "../../../syntax/app/Actor";
 import {
+    OperationId,
     ProgramOperation,
     ProgramOperationFactory,
     ProgramOperations,
@@ -164,7 +165,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         }
 
         if (this._config.aggregateAtomicTransitions) {
-            throw new ImplementMeException();
+            // Do not provide intermediate abstract states for atomic operations?
+            // This might cause problems if interpolation procedures are applied.
+            // It would be better tu just use a projection of the ARG in case
+            // details of atomic code blocks should be hidden (to the user).
+            throw new IllegalStateException("We always produce intermediate states of atomic code blocks for given reasons.");
         } else {
             return this.abstractSuccSingleStep(fromState);
         }
@@ -268,9 +273,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             // Interpret the wrapped state by the wrapped analysis
             const threadToStepPrime = r.getIndexedThreadState(threadToStep.threadIndex);
             const ops = threadToStepPrime.threadStatus.getOperations().map((oid) => ProgramOperation.for(oid));
+            const opsConcern = this._task.getActorByName(threadToStepPrime.threadStatus.getActorId()).concern;
+
             const wrappedAnalysisResults: Iterable<AbstractElement> = considerInterpretationFinished
                 ? [r.getWrappedState()]
-                : Transfers.withIntermediateOps(this._wrappedTransferRelation, r.wrappedState, ops, Concerns.defaultProgramConcern());
+                : Transfers.withIntermediateOps(this._wrappedTransferRelation, r.wrappedState, ops, opsConcern);
 
             // Combine the result
             Preconditions.checkNotUndefined(r);
@@ -314,6 +321,78 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
     }
 
     private interpreteLocal(fromState: ControlAbstractState, threadToStep: IndexedThread,
+                            step: StepInformation): [ControlAbstractState, boolean][] {
+       const result0: [ControlAbstractState, boolean][] = this.interpreteLocal0(fromState, threadToStep, step);
+
+       const resultPrime: [ControlAbstractState, boolean][] = [];
+       for (const [cs, handled] of result0) {
+          if (handled) {
+              resultPrime.push([cs, handled]);
+          } else {
+              const threadToStepPrime = cs.getIndexedThreadState(threadToStep.threadIndex).threadStatus;
+              const stepOps = threadToStepPrime.getOperations().map((oid) => ProgramOperation.for(oid));
+
+              let unhandledOps: ImmList<OperationId> = ImmList();
+              let csPrime = cs;
+              for (const stepOp of stepOps) {
+                  if (stepOp.ast instanceof StoreEvalResultToVariableStatement) {
+                      // TODO: Check if some of this code can be moved to the
+                      //      Scratch library to allow for a symbolic encoding.
+                      if (stepOp.ast.variable.variableType == ActorType.instance()) {
+                          const variableToSet = stepOp.ast.variable;
+                          let setTo: ActorId = null;
+
+                          if (stepOp.ast.toValue instanceof VariableWithDataLocation) {
+                              const actorIdentifier: ActorId = fromState.getActorScopes().get(stepOp.ast.toValue.dataloc);
+                              setTo = Preconditions.checkNotUndefined(actorIdentifier);
+
+                          } else if (stepOp.ast.toValue instanceof LocateActorExpression) {
+                              const expr = stepOp.ast.toValue as LocateActorExpression;
+                              const searchFor = extractStringLiteral(expr.actorName);
+
+                              // This loop only ensures that an actor with the given name exists.
+                              for (const [actorVar, id] of fromState.getActorScopes().entries()) {
+                                  if (id == searchFor) {
+                                      setTo = id;
+                                  }
+                              }
+
+                          } else if (stepOp.ast.toValue instanceof StartCloneActorExpression) {
+                              throw new ImplementMeException();
+
+                          } else if (stepOp.ast.toValue instanceof UsherActorExpression) {
+                              throw new ImplementMeException();
+
+                          } else {
+                              throw new ImplementMeException();
+                          }
+
+                          if (!setTo) {
+                              throw new IllegalArgumentException("Actor expression did not evaluate to a valid result for: "
+                                  + stepOp.ast.toTreeString());
+                          }
+                          const actorScopesPrime = csPrime.getActorScopes().set(variableToSet.dataloc, setTo);
+                          csPrime = csPrime.withActorScopes(actorScopesPrime);
+
+                      } else {
+                          unhandledOps = unhandledOps.push(stepOp.ident);
+                      }
+                  } else {
+                      unhandledOps = unhandledOps.push(stepOp.ident);
+                  }
+              }
+
+              csPrime = csPrime.withThreadStateUpdate(threadToStep.threadIndex,
+                  (ts) => ts.withOperations(unhandledOps));
+
+              resultPrime.push([csPrime, unhandledOps.size == 0])
+          }
+       }
+
+       return resultPrime;
+    }
+
+    private interpreteLocal0(fromState: ControlAbstractState, threadToStep: IndexedThread,
                        step: StepInformation): [ControlAbstractState, boolean][] {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(threadToStep);
@@ -467,48 +546,6 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         } else if (stepOp.ast instanceof WaitSecsStatement) {
             throw new ImplementMeException();
-
-        } else if (stepOp.ast instanceof StoreEvalResultToVariableStatement) {
-            // TODO: Check if some of this code can be moved to the
-            //      Scratch library to allow for a symbolic encoding.
-            if (stepOp.ast.variable.variableType == ActorType.instance()) {
-                const variableToSet = stepOp.ast.variable;
-                let setTo: ActorId = null;
-
-                if (stepOp.ast.toValue instanceof VariableWithDataLocation) {
-                    const actorIdentifier: ActorId = fromState.getActorScopes().get(stepOp.ast.toValue.dataloc);
-                    setTo = Preconditions.checkNotUndefined(actorIdentifier);
-
-                } else if (stepOp.ast.toValue instanceof LocateActorExpression) {
-                    const expr = stepOp.ast.toValue as LocateActorExpression;
-                    const searchFor = extractStringLiteral(expr.actorName);
-
-                    // This loop only ensures that an actor with the given name exists.
-                    for (const [actorVar, id] of fromState.getActorScopes().entries()) {
-                        if (id == searchFor) {
-                            setTo = id;
-                        }
-                    }
-
-                } else if (stepOp.ast.toValue instanceof StartCloneActorExpression) {
-                    throw new ImplementMeException();
-
-                } else if (stepOp.ast.toValue instanceof UsherActorExpression) {
-                    throw new ImplementMeException();
-
-                } else {
-                    throw new ImplementMeException();
-                }
-
-                if (!setTo) {
-                    throw new IllegalArgumentException("Actor expression did not evaluate to a valid result for: "
-                        + stepOp.ast.toTreeString());
-                }
-                const actorScopesPrime = result.getActorScopes().set(variableToSet.dataloc, setTo);
-                result = result.withActorScopes(actorScopesPrime);
-
-                return [[result, true]];
-            }
         }
 
         // TODO: Hats to activate:

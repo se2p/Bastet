@@ -43,7 +43,7 @@ export class ReachabilityAlgorithmConfig extends BastetConfiguration {
     }
 
     get dumpGraphAfterIteration(): boolean {
-        return this.getBoolProperty('dump-graph-after-iteration', true);
+        return this.getBoolProperty('dump-graph-after-iteration', false);
     }
 
 }
