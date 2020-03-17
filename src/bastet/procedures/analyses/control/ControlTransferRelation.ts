@@ -273,9 +273,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             // Interpret the wrapped state by the wrapped analysis
             const threadToStepPrime = r.getIndexedThreadState(threadToStep.threadIndex);
             const ops = threadToStepPrime.threadStatus.getOperations().map((oid) => ProgramOperation.for(oid));
+            const opsConcern = this._task.getActorByName(threadToStepPrime.threadStatus.getActorId()).concern;
+
             const wrappedAnalysisResults: Iterable<AbstractElement> = considerInterpretationFinished
                 ? [r.getWrappedState()]
-                : Transfers.withIntermediateOps(this._wrappedTransferRelation, r.wrappedState, ops, Concerns.defaultProgramConcern());
+                : Transfers.withIntermediateOps(this._wrappedTransferRelation, r.wrappedState, ops, opsConcern);
 
             // Combine the result
             Preconditions.checkNotUndefined(r);
