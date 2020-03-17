@@ -405,6 +405,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     private graphicLookupMethods: Map<Identifier, MethodDefinition> = new Map();
     private indexByIdLookupMethods: Map<Identifier, MethodDefinition> = new Map();
     private idByIndexLookupMethods: Map<Identifier, MethodDefinition> = new Map();
+    private numGraphicsMethods: Map<Identifier, MethodDefinition> = new Map();
 
     constructor(config: TransformerConfig, methodLibrary: App,
                 typeInformationStorage: TypeInformationStorage, filePath: string) {
@@ -676,12 +677,15 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 resouceDefs = ctx.actorComponentsDefinition().resourceList().accept(this);
                 initStatements = StatementLists.concat(initStatements, resouceDefs.statementsToPrepend);
 
-                let graphicPixelLookup = LookupTransformer.buildGrapicPixelLookup(this._currentActor, resouceDefs, this._filePath)
-                this.graphicLookupMethods.set(ident, graphicPixelLookup);
-                let idByIndexLookup = LookupTransformer.buildIdByIndexLookup(this._currentActor, resouceDefs, this._filePath)
-                this.idByIndexLookupMethods.set(ident, idByIndexLookup);
-                let indexByIdLookup = LookupTransformer.buildIndexByIdLookup(this._currentActor, resouceDefs, this._filePath)
-                this.indexByIdLookupMethods.set(ident, indexByIdLookup);
+        //        let graphicPixelLookup = LookupTransformer.buildGrapicPixelLookup(this._currentActor, resouceDefs, this._filePath)
+        //        this.graphicLookupMethods.set(ident, graphicPixelLookup);
+        //        let idByIndexLookup = LookupTransformer.buildIdByIndexLookup(this._currentActor, resouceDefs, this._filePath)
+        //        this.idByIndexLookupMethods.set(ident, idByIndexLookup);
+        //        let indexByIdLookup = LookupTransformer.buildIndexByIdLookup(this._currentActor, resouceDefs, this._filePath)
+        //        this.indexByIdLookupMethods.set(ident, indexByIdLookup);
+        //        let numGraphics = LookupTransformer.buildGetNumGraphics(this._currentActor, resouceDefs, this._filePath)
+        //        this.numGraphicsMethods.set(ident, numGraphics);
+
 
                 // Variable declarations and initializations
                 declarations = ctx.actorComponentsDefinition().declarationStmtList().accept(this);

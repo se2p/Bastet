@@ -42,7 +42,6 @@ export class LookupTransformer {
     private static _data: Map<Identifier, Map<string, string>> = new Map();
 
     public static buildGrapicPixelLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
-        console.log(resourceDefs.node.children)
 
         let actorResources: Map<string, string> = new Map();
         this._data.set(actor, actorResources)
@@ -83,7 +82,6 @@ export class LookupTransformer {
     }
 
     public static buildIndexByIdLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
-        console.log(resourceDefs.node.children)
 
         let actorResources: Map<string, string> = new Map();
         this._data.set(actor, actorResources)
@@ -125,7 +123,6 @@ export class LookupTransformer {
     }
 
     public static buildIdByIndexLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
-        console.log(resourceDefs.node.children)
 
         let actorResources: Map<string, string> = new Map();
         this._data.set(actor, actorResources)
@@ -166,6 +163,38 @@ export class LookupTransformer {
             stmtList, resultDecl, true);
     }
 
+    public static buildGetNumGraphics(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
+
+        let actorResources: Map<string, string> = new Map();
+        this._data.set(actor, actorResources)
+
+        let dirName = path.dirname(filePath);
+
+        let methodIdent = new Identifier("_RUNTIME_getGraphicIdByIndex");
+
+        let paramDecl = new ParameterDeclaration(new Identifier("idx"), new NumberType());
+        let paramDeclList = new ParameterDeclarationList([paramDecl]);
+
+        let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", new NumberType().typeId));
+        let stmts = [];
+        let idxCount = 0;
+        for (let child of resourceDefs.node.children) {
+            let fileName = (<ResourceDefinition>child).resourceLocator.uri
+            fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
+            let uri = path.join(dirName, fileName)
+            LookupTransformer.loadImage(uri, actorResources)
+            idxCount++;
+        }
+
+        let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(idxCount))
+        stmts.push(stmt)
+        let stmtList = new StatementList(stmts)
+
+        let resultDecl = new ResultDeclaration(resultVarDecl)
+        return new MethodDefinition(
+            methodIdent, paramDeclList,
+            stmtList, resultDecl, true);
+    }
 
     private static loadImage(uniqueName: string, actorResources: Map<string, string>): string {
         let path = uniqueName;

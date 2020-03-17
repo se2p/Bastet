@@ -50,9 +50,9 @@ role RuntimeEntity begin
 
     extern _RUNTIME_getImageHeight (ident: string) returns number
 
-    runtime _RUNTIME_getGraphicIdByIndex (idx: number) returns string
+    define _RUNTIME_getGraphicIdByIndex (idx: number) in runtime returns result: string end
 
-    runtime _RUNTIME_getGraphicIndexById (id: string) returns number
+    define _RUNTIME_getGraphicIndexById (id: string) in runtime returns result: number end
 
     // A random integer in the interval [from, to],
     // that is, both end points are included.
@@ -152,16 +152,6 @@ role RuntimeEntity begin
     define atomic microseconds() begin
         define result as _RUNTIME_micros()
     end returns result: number
-
-    define mod(n: number, mod: number) begin
-        declare result as number
-        define result as n
-
-        until (result - mod < 0) repeat begin
-            define result as (result - mod)
-        end
-    end returns result: number
-
 end
 
 role Observer is RuntimeEntity begin
@@ -244,7 +234,6 @@ role ScratchEntity is RuntimeEntity begin
     declare active_graphic_name as string
     declare active_graphic_width as number
     declare active_graphic_height as number
-    declare num_graphics as number
 
     declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
     declare color_effect_value as number
@@ -603,7 +592,7 @@ role ScratchStage is ScratchEntity begin
     define nextBackdrop () begin
         declare idx as number
         define idx as _RUNTIME_getGraphicIndexById(active_graphic_name)
-        define idx as mod(current_idx+1, num_graphics)
+        define idx as (current_idx+1) mod _RUNTIME_getNumGraphics()
 
         declare id as string
         define id as _RUNTIME_getGraphicIdByIndex(current_idx)
@@ -614,7 +603,7 @@ role ScratchStage is ScratchEntity begin
     define previousBackdrop() begin
         declare idx as number
         define idx as _RUNTIME_getGraphicIndexById(active_graphic_name)
-        define idx as mod(current_idx-1, num_graphics)
+        define idx as (current_idx-1) mod _RUNTIME_getNumGraphics()
 
         declare id as string
         define id as _RUNTIME_getGraphicIdByIndex(current_idx)
@@ -625,7 +614,7 @@ role ScratchStage is ScratchEntity begin
     define randomBackdrop() begin
          declare idx as number
          define idx as _RUNTIME_getGraphicIndexById(active_graphic_name)
-         define idx as random(0, num_graphics-1)
+         define idx as random(0, _RUNTIME_getNumGraphics()-1)
 
          declare id as string
          define id as _RUNTIME_getGraphicIdByIndex(current_idx)
