@@ -25,14 +25,30 @@ import {Identifier} from "./Identifier";
 import {AbstractExpression} from "./expressions/AbstractExpression";
 import {DataLocation} from "../../app/controlflow/DataLocation";
 import {Preconditions} from "../../../utils/Preconditions";
+import {AbstractNode} from "../AstNode";
 
 export interface Variable {
 
     identifier: Identifier;
 
-    type: ScratchType;
+    variableType: ScratchType;
 
     qualifiedName: string;
+
+}
+
+export class QualifiedVariableName extends AbstractNode {
+
+    private readonly _qualifiedName : string;
+
+    constructor(qualifiedName: string) {
+        super([]);
+        this._qualifiedName = qualifiedName;
+    }
+
+    toTreeString(): string {
+        return this._qualifiedName;
+    }
 
 }
 
@@ -41,7 +57,7 @@ export class VariableExpression extends AbstractExpression {
     private readonly _variable: VariableWithDataLocation;
 
     constructor(variable: VariableWithDataLocation) {
-        super(Preconditions.checkNotUndefined(variable.type),
+        super(Preconditions.checkNotUndefined(variable.expressionType),
             [Preconditions.checkNotUndefined(variable.identifier)]);
         this._variable = variable;
     }
@@ -59,9 +75,10 @@ export class VariableWithDataLocation extends AbstractExpression implements Vari
     private readonly _identifier: Identifier;
 
     constructor(dataloc: DataLocation) {
-        super(ScratchType.fromId(dataloc.type), []);
+        const ident = Identifier.of(dataloc.ident);
+        super(ScratchType.fromId(dataloc.type), [new QualifiedVariableName(dataloc.qualifiedName)]);
         this._dataloc = dataloc;
-        this._identifier = Identifier.of(dataloc.ident);
+        this._identifier = ident;
     }
 
     get identifier(): Identifier {
@@ -74,5 +91,13 @@ export class VariableWithDataLocation extends AbstractExpression implements Vari
 
     get dataloc(): DataLocation {
         return this._dataloc;
+    }
+
+    get variableType(): ScratchType {
+        return this.expressionType;
+    }
+
+    toString() {
+        return this.qualifiedName;
     }
 }

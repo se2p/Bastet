@@ -42,20 +42,20 @@ export class Transfers {
 
     public static withIntermediateTransfersBefore<W extends AbstractElement>(
         transferRealtion: LabeledTransferRelation<W>, fromState: W,
-        intermediateStmts: Statement[], op: ProgramOperation, co: Concern): W[] {
+        intermediateStmts: Statement[], ops: ProgramOperation[], co: Concern): W[] {
 
-        const ops: ProgramOperation[] = [];
+        let toRun: ProgramOperation[] = [];
         for (const stmt of intermediateStmts) {
             const timeOp: ProgramOperation = ProgramOperationFactory.createFor(stmt);
-            ops.push(timeOp);
+            toRun.push(timeOp);
         }
-        ops.push(op);
+        toRun = toRun.concat(ops);
 
-        return Transfers.withIntermediateOps(transferRealtion, fromState, ops, co);
+        return Transfers.withIntermediateOps(transferRealtion, fromState, toRun, co);
     }
 
     public static withIntermediateOps<W extends AbstractElement>(
-        transferRealtion: LabeledTransferRelation<W>, fromState: W, ops: ProgramOperation[], co: Concern): W[] {
+        transferRealtion: LabeledTransferRelation<W>, fromState: W, ops: Iterable<ProgramOperation>, co: Concern): W[] {
 
         let result: W[] = [fromState];
         for (const toExecute of ops) {

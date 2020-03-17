@@ -19,10 +19,29 @@
  *
  */
 
-import {AbstractElement} from "../../lattices/Lattice";
+import {AbstractElement, AbstractElementVisitor} from "../../lattices/Lattice";
+import {GraphAbstractState} from "./graph/GraphAbstractDomain";
+import {ControlAbstractState} from "./control/ControlAbstractDomain";
+import {SSAState} from "./ssa/SSAAbstractDomain";
+import {DataAbstractState} from "./data/DataAbstractDomain";
 
 export interface SingletonStateWrapper {
 
     wrappedState: AbstractElement;
 
 }
+
+export interface AbstractStateVisitor<T> extends AbstractElementVisitor<T> {
+
+    visit(element: AbstractElement): T;
+
+    visitGraphAbstractState(element: GraphAbstractState): T;
+
+    visitControlAbstractState(element: ControlAbstractState): T;
+
+    visitSSAState(element: SSAState): T;
+
+    visitDataAbstractState(element: DataAbstractState): T;
+
+}
+

@@ -46,7 +46,7 @@ export class BinaryExpression<A extends AstNode, B extends AstNode> extends Abst
         return this._operand2;
     }
 
-    get type(): ScratchType {
+    get expressionType(): ScratchType {
         return this._type;
     }
 

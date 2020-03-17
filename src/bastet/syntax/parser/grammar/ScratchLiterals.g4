@@ -1,8 +1,8 @@
 grammar ScratchLiterals;
 
-String : '"' ~('"')+ '"' ;
-
 Bool : 'true' | 'false' ;
+
+String : '"' ~('"')* '"' ;
 
 Identifier  :   ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')* ;
 

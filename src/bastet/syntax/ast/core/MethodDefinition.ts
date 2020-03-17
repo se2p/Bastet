@@ -25,7 +25,6 @@ import {Identifier} from "./Identifier";
 import {ParameterDeclarationList} from "./ParameterDeclaration";
 import {StatementList} from "./statements/Statement";
 import {ScratchType, VoidType} from "./ScratchType";
-import {StringLiteral} from "./expressions/StringExpression";
 import {Variable, VariableWithDataLocation} from "./Variable";
 import {DataLocations} from "../../app/controlflow/DataLocation";
 
@@ -35,7 +34,7 @@ export class ResultDeclaration extends AbstractNode {
     private readonly _variable: Variable;
 
     constructor(variable: Variable) {
-        super([variable.identifier, variable.type]);
+        super([variable.identifier, variable.variableType]);
         this._variable = variable;
     }
 
@@ -44,7 +43,7 @@ export class ResultDeclaration extends AbstractNode {
     }
 
     get type(): ScratchType {
-        return this._variable.type;
+        return this._variable.variableType;
     }
 
     get variable(): Variable {
@@ -113,15 +112,22 @@ export class MethodDefinition extends MethodSignature {
 
     private readonly _statements: StatementList;
 
-    constructor(ident: Identifier, params: ParameterDeclarationList, statements: StatementList, returns: ResultDeclaration) {
+    private readonly _isAtomic: boolean;
+
+    constructor(ident: Identifier, params: ParameterDeclarationList, statements: StatementList,
+                returns: ResultDeclaration, isAtomic: boolean) {
         super(ident, params, returns, false);
         this._statements = statements;
+        this._isAtomic = isAtomic;
     }
 
     get statements(): StatementList {
         return this._statements;
     }
 
+    get isAtomic(): boolean {
+        return this._isAtomic;
+    }
 }
 
 export class MethodDefinitionList extends AstNodeList<MethodDefinition> {

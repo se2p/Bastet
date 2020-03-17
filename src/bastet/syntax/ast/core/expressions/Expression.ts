@@ -24,7 +24,7 @@ import {AstNode} from "../../AstNode";
 
 export interface Expression extends AstNode {
 
-    type: ScratchType;
+    expressionType: ScratchType;
 
 }
 

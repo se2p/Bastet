@@ -28,8 +28,8 @@ import {
 import {
     ControlAbstractDomain,
     ControlAbstractState,
-    ScheduleAbstractStateFactory,
-    ControlConcreteState
+    ControlConcreteState,
+    ScheduleAbstractStateFactory
 } from "./ControlAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
@@ -38,18 +38,17 @@ import {LabeledTransferRelationImpl} from "../TransferRelation";
 import {Preconditions} from "../../../utils/Preconditions";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {AbstractElement} from "../../../lattices/Lattice";
-import {GraphAbstractState} from "../graph/GraphAbstractDomain";
 import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
-export class ScheduleAnalysisConfig extends BastetConfiguration {
+export class ControlAnalysisConfig extends BastetConfiguration {
 
     constructor(dict: {}) {
-        super(dict);
+        super(dict, ["ControlAnalysis"]);
     }
 
     get aggregateAtomicTransitions(): boolean {
@@ -62,7 +61,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     WrappingProgramAnalysis<ControlConcreteState, ControlAbstractState>,
     Unwrapper<ControlAbstractState, AbstractElement> {
 
-    private readonly _config: ScheduleAnalysisConfig;
+    private readonly _config: ControlAnalysisConfig;
 
     private readonly _abstractDomain: AbstractDomain<ControlConcreteState, ControlAbstractState>;
 
@@ -77,7 +76,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     private readonly _statistics: AnalysisStatistics;
 
     constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any>, statistics: AnalysisStatistics) {
-        this._config = new ScheduleAnalysisConfig(config);
+        this._config = new ControlAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new ControlAbstractDomain();
@@ -100,15 +99,15 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         return false;
     }
 
-    stop(state: ControlAbstractState, reached: Iterable<ControlAbstractState>): boolean {
-        for (const r of reached) {
-            if (state.getThreadStates().equals(r.getThreadStates())) {
-                const w = state.getWrappedState();
-                if (this._wrappedAnalysis.stop(w, [r.getWrappedState()])) {
-                    return true;
-                }
-            }
-        }
+    stop(state: ControlAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => ControlAbstractState): boolean {
+        // for (const r of reached) {
+        //     if (state.getThreadStates().equals(r.getThreadStates())) {
+        //         const w = state.getWrappedState();
+        //         if (this._wrappedAnalysis.stop(w, [r.getWrappedState()])) {
+        //             return true;
+        //         }
+        //     }
+        // }
         return false;
     }
 
@@ -151,12 +150,43 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         });
     }
 
-    getTransitionLabel(from: ControlAbstractState, to: ControlAbstractState): ProgramOperation {
-        throw new ImplementMeException();
+    getTransitionLabel(from: ControlAbstractState, to: ControlAbstractState): ProgramOperation[] {
+        const result: ProgramOperation[] = [];
+        for (const threadIdx of to.getSteppedFor().values()) {
+            const steppedThread = from.getThreadStates().get(threadIdx);
+            const succThread = to.getThreadStates().get(threadIdx);
+            Preconditions.checkArgument(steppedThread.getScriptId() == succThread.getScriptId());
+
+            const fromLocation = steppedThread.getRelationLocation();
+            const toLocation = succThread.getRelationLocation();
+
+            if (fromLocation.getRelationId() == toLocation.getRelationId()) {
+               const withinRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
+               result.push(withinRelation.transitionBetween(fromLocation.getLocationId(), toLocation.getLocationId()));
+            } else {
+                return steppedThread.getOperations().map(oid => ProgramOperation.for(oid)).toArray();
+            }
+        }
+
+        return result;
+    }
+
+    getStateLabel(state: ControlAbstractState): string {
+        const innerLabelingFn = this.wrappedAnalysis['getStateLabel'];
+        const innerLabel = innerLabelingFn ? innerLabelingFn(state) : "?";
+        const controlLabel = state.getThreadStates()
+            .map((e) => `[${e.getActorId()} ${e.getScriptId()} ${e.getRelationLocation().getLocationId()}]`)
+            .join(", ");
+
+        return `${controlLabel} ${innerLabel}`;
     }
 
     wrapStateSets(frontier: StateSet<ControlAbstractState>, reached: StateSet<ControlAbstractState>): [StateSet<ControlAbstractState>, StateSet<ControlAbstractState>] {
         return [frontier, reached];
+    }
+
+    mergeInto(state: ControlAbstractState, reached: StateSet<ControlAbstractState>, unwrapper: (AbstractElement) => ControlAbstractState, wrapper: (E) => AbstractElement): StateSet<ControlAbstractState> {
+        throw new ImplementMeException();
     }
 
 }

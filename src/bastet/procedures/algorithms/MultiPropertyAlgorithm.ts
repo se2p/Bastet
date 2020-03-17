@@ -25,16 +25,29 @@ import {AbstractElement} from "../../lattices/Lattice";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {Property} from "../../syntax/Property";
 import {App} from "../../syntax/app/App";
-import {Record as ImmRec, Set as ImmSet} from "immutable";
+import {Set as ImmSet} from "immutable";
 import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 import {AnalysisAlgorithm} from "./Algorithm";
 import {Preconditions} from "../../utils/Preconditions";
 import {StateSet} from "./StateSet";
 import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
+import {BastetConfiguration} from "../../utils/BastetConfiguration";
 
 export type ResultCallback = (violated: ImmSet<Property>, satisfied: ImmSet<Property>, unknown: ImmSet<Property>, stats: AnalysisStatistics) => void;
 
 export const STAT_KEY_MPA_ITERATIONS = "iterations";
+
+export class MultiPropertyAlgorithmConfig extends BastetConfiguration {
+
+    constructor(dict: {}) {
+        super(dict, ['MultiPropertyAlgorithm']);
+    }
+
+    get shouldTerminateAfterViolation(): boolean {
+        return this.getBoolProperty('should-terminate-after-violation', true);
+    }
+
+}
 
 export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends AbstractElement> implements AnalysisAlgorithm<C, E>{
 
@@ -50,7 +63,10 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
 
     private readonly _statistics: AnalysisStatistics;
 
-    constructor(task: App, algorithm: AnalysisAlgorithm<C, E>, analysis: ProgramAnalysis<C, E>, stats: AnalysisStatistics, resultCallback: ResultCallback) {
+    private readonly _config: MultiPropertyAlgorithmConfig;
+
+    constructor(config: {}, task: App, algorithm: AnalysisAlgorithm<C, E>, analysis: ProgramAnalysis<C, E>, stats: AnalysisStatistics, resultCallback: ResultCallback) {
+        this._config = new MultiPropertyAlgorithmConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAlgorithm = Preconditions.checkNotUndefined(algorithm);
         this._analysis = Preconditions.checkNotUndefined(analysis);
@@ -63,6 +79,7 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
         let violated: ImmSet<Property> = ImmSet();
         let satisfied: ImmSet<Property> = ImmSet();
         let unknown: ImmSet<Property> = this._properties;
+        Preconditions.checkArgument(unknown.size > 0, "There must be at least one property to check.");
 
         this._statistics.contextTimer.start();
         try {
@@ -70,22 +87,29 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
                 this._statistics.increment(STAT_KEY_MPA_ITERATIONS);
                 [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);
 
+                // Handle property violations
                 if (reached.getAddedLast().length > 0) {
                     Preconditions.checkState(reached.getAddedLast().length > 0);
                     const lastState = reached.getAddedLast()[0];
                     const targetProperties = ImmSet<Property>(this._analysis.target(lastState));
                     violated = violated.union(targetProperties);
                     unknown = unknown.subtract(violated);
+
+                    if (this._config.shouldTerminateAfterViolation) {
+                        if (targetProperties.size > 0) {
+                            return [frontier, reached];
+                        }
+                    }
                 }
             } while (!frontier.isEmpty());
 
             satisfied = unknown.subtract(violated);
             unknown = unknown.subtract(satisfied);
+
         } finally {
             this._statistics.contextTimer.stop();
+            this._resultCallback(violated, satisfied, unknown, this._statistics);
         }
-
-        this._resultCallback(violated, satisfied, unknown, this._statistics);
 
         return [frontier, reached];
     }

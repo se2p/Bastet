@@ -20,7 +20,7 @@
  *
  */
 
-import {Record as ImmRec, Set as ImmSet, Map as ImmMap} from "immutable";
+import {Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {Preconditions} from "../utils/Preconditions";
 
 export interface ConcernAttributes {

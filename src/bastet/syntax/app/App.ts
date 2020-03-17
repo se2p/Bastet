@@ -24,13 +24,15 @@ import {Maps} from "../../utils/Maps";
 import {MethodDefinition, MethodDefinitionList} from "../ast/core/MethodDefinition";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {Record as ImmRec, Set as ImmSet} from "immutable";
-import {OperationID, ProgramOperation} from "./controlflow/ops/ProgramOperation";
-import {LocationID} from "./controlflow/ControlLocation";
+import {Set as ImmSet} from "immutable";
+import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
 import {CallStatement} from "../ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
 import {Properties, Property} from "../Property";
-
+import {TransitionRelation, TransRelId} from "./controlflow/TransitionRelation";
+import {TypeInformationStorage} from "../DeclarationScopes";
+import {Method} from "./controlflow/Method";
+import {Script} from "./controlflow/Script";
 
 export class App {
 
@@ -40,10 +42,26 @@ export class App {
 
     private readonly _actorMap: ActorMap;
 
-    constructor(origin: string, ident: string, actorMap: ActorMap) {
+    private readonly _transRelById: Map<TransRelId, TransitionRelation>;
+
+    private readonly _typeStorage: TypeInformationStorage;
+
+    constructor(origin: string, ident: string, actorMap: ActorMap, typeStorage: TypeInformationStorage) {
         this._origin = Preconditions.checkNotUndefined(origin);
         this._ident = Preconditions.checkNotEmpty(ident);
         this._actorMap = Preconditions.checkIsDic(actorMap);
+        this._typeStorage = Preconditions.checkNotUndefined(typeStorage);
+
+        this._transRelById = new Map();
+        for (const a of Maps.values(this._actorMap)) {
+            for (const [id, r] of a.transRelMap.entries()) {
+                this._transRelById.set(id, r);
+            }
+        }
+    }
+
+    get typeStorage(): TypeInformationStorage {
+        return this._typeStorage;
     }
 
     get origin(): string {
@@ -72,20 +90,18 @@ export class App {
 
     public getProperties(): ImmSet<Property> {
         let result = ImmSet<Property>();
-        for (const a of this.actors.values()) {
+        const transitivelyCalled = new Set<CallStatement>();
+
+        for (const a of this.actors) {
             for (const s of a.scripts) {
-                for (const l of s.transitions.locationSet) {
-                    for (const ts of s.transitions.transitionsFrom(l)) {
-                        const op = ProgramOperation.for(ts.opId);
-                        if (op.ast instanceof CallStatement) {
-                            const call = op.ast as CallStatement;
-                            if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
-                                const properties = Properties.fromArguments(call.args);
-                                result = result.union(properties);
-                            }
-                        }
-                    }
-                }
+                a.transitivelyCalled(s.transitions).forEach((cs) => transitivelyCalled.add(cs));
+            }
+        }
+
+        for (const call of transitivelyCalled) {
+            if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
+                const properties = Properties.fromArguments(call.args);
+                result = result.union(properties);
             }
         }
 
@@ -97,6 +113,10 @@ export class App {
             throw new IllegalArgumentException(`Actor with name "${name}" is unknown!`);
         }
         return this._actorMap[name];
+    }
+
+    public getTransitionRelationById(id: TransRelId): TransitionRelation {
+        return this._transRelById.get(id);
     }
 
     public getMethodDefinition(methodName: string): MethodDefinitionList {
@@ -114,7 +134,7 @@ export class App {
 
     public static empty(): App {
        if (App.EMPTY_APP == null) {
-           App.EMPTY_APP = new App("", "empty", {});
+           App.EMPTY_APP = new App("", "empty", {}, new TypeInformationStorage());
        }
        return App.EMPTY_APP;
     }

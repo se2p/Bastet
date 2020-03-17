@@ -31,18 +31,26 @@ import {ActorMode} from "../ast/core/ActorDefinition";
 import {Preconditions} from "../../utils/Preconditions";
 import {Method} from "./controlflow/Method";
 import {
+    AfterBootstrapMonitoringEvent,
     AfterStatementMonitoringEvent,
     BootstrapEvent,
     NeverEvent,
-    RenderedMonitoringEvent
+    RenderedMonitoringEvent, SingularityEvent
 } from "../ast/core/CoreEvent";
-import {TransitionRelation, TransitionRelations} from "./controlflow/TransitionRelation";
+import {TransitionRelation, TransitionRelations, TransRelId} from "./controlflow/TransitionRelation";
 import {Scripts} from "./controlflow/Scripts";
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
-import {GREENFLAG_MESSAGE, INIT_MESSAGE} from "../ast/core/Message";
+import {BOOTSTRAP_FINISHED_MESSAGE, GREENFLAG_MESSAGE, BOOTSTRAP_MESSAGE} from "../ast/core/Message";
 import {StatementList} from "../ast/core/statements/Statement";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
+import {Concern, Concerns} from "../Concern";
+import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
+import {CallStatement} from "../ast/core/statements/CallStatement";
+import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
+import {Properties} from "../Property";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -54,13 +62,20 @@ export type ActorId = string;
 export class Actor {
 
     /** An actor can inherit methods or members from another actor. */
-    private readonly _inheritsFrom: Actor[];
+    private readonly _inheritFrom: ImmutableList<Actor>;
+
+    /** An actor can have inherited methods or members from another actor.
+     * The sets `_inheritsFrom` and `_dissolvedFrom` are always disjoint. */
+    private readonly _dissolvedFrom: ImmutableList<Actor>;
 
     /** Mode of the actor. Onle concrete actors can be instantiated as processes. */
     private readonly _actorMode: ActorMode;
 
     /** Unique identifier of the actor */
     private readonly _ident: ActorId;
+
+    /** The concern of the actor. Used for scheduling decisions. */
+    private readonly _concern: Concern;
 
     /** Set of the actor's resources */
     private readonly _resources: ImmutableMap<string, AppResource>;
@@ -92,16 +107,23 @@ export class Actor {
     /** Is the actor an observer, used to check if the spec is satisfied? */
     private readonly _isObserver: boolean;
 
-    constructor(mode: ActorMode, ident: string, inheritFrom: Actor[],
+    /** Map from transition relation identifiers to the corresponding transition relation */
+    private readonly _transRelMap: ImmutableMap<TransRelId, TransitionRelation>;
+
+    constructor(mode: ActorMode, ident: ActorId, inheritFrom: Actor[],
+                dissolvedFrom: Actor[], concern: Concern,
                 resources: AppResourceMap, datalocs: DataLocationMap,
                 initScript: Script, methodDefs: MethodDefinitionMap,
                 externalMethods: MethodSignatureMap,
                 scripts: Script[], methods: Method[]) {
+
         Preconditions.checkNotUndefined(inheritFrom);
+        Preconditions.checkArgument(typeof ident == "string");
 
         this._actorMode = Preconditions.checkNotUndefined(mode);
         this._ident = Preconditions.checkNotUndefined(ident);
-        this._inheritsFrom = Preconditions.checkNotUndefined(inheritFrom);
+        this._inheritFrom = Lists.immutableCopyOf(inheritFrom);
+        this._dissolvedFrom = Lists.immutableCopyOf(dissolvedFrom);
         this._initScript = Preconditions.checkNotUndefined(initScript);
         this._resources = Maps.immutableCopyOf(resources);
         this._datalocs = Maps.immutableCopyOf(datalocs);
@@ -110,29 +132,40 @@ export class Actor {
         this._scripts = Lists.immutableCopyOf(scripts);
         this._methods = Lists.immutableCopyOf(methods);
         this._isObserver = this.deterineIsObserver();
+        this._concern = Preconditions.checkNotUndefined(concern);
+
+        const transRelMap: Map<TransRelId, TransitionRelation> = new Map<TransRelId, TransitionRelation>();
 
         const scriptMap: Map<ScriptId, Script> = new Map<ScriptId, Script>();
         for (const s of this._scripts) {
             scriptMap.set(s.id, s);
+            transRelMap.set(s.transitions.ident, s.transitions);
         }
         this._scriptMap = new ImmutableMap<ScriptId, Script>(scriptMap.entries());
 
         const methodMap: Map<string, Method> = new Map<string, Method>();
         for (const m of this._methods) {
             methodMap.set(m.ident.text, m);
+            transRelMap.set(m.transitions.ident, m.transitions);
         }
         this._methodMap = new ImmutableMap<string, Method>(methodMap.entries());
 
-        Preconditions.checkArgument(initScript.event === NeverEvent.instance()
-            || initScript.event === BootstrapEvent.instance());
+        this._transRelMap = new ImmutableMap<TransRelId, TransitionRelation>(transRelMap.entries());
+
+        Preconditions.checkArgument(initScript.event === BootstrapEvent.instance()
+            || initScript.event === SingularityEvent.instance());
     }
 
     get ident(): string {
         return this._ident;
     }
 
-    get inheritsFrom(): Actor[] {
-        return this._inheritsFrom;
+    get inheritFrom(): ImmutableList<Actor> {
+        return this._inheritFrom;
+    }
+
+    get dissolvedFrom(): ImmutableList<Actor> {
+        return this._dissolvedFrom;
     }
 
     get datalocs(): IterableIterator<TypedDataLocation> {
@@ -151,6 +184,10 @@ export class Actor {
         return this._resources;
     }
 
+    get concern(): Concern {
+        return this._concern;
+    }
+
     get initScript(): Script {
         return this._initScript;
     }
@@ -161,6 +198,10 @@ export class Actor {
 
     get methodMap(): ImmutableMap<string, MethodDefinition> {
         return this._methodDefinitions;
+    }
+
+    get transRelMap(): ImmutableMap<TransRelId, TransitionRelation> {
+        return this._transRelMap;
     }
 
     get externalMethodMap(): ImmutableMap<string, MethodSignature> {
@@ -180,11 +221,19 @@ export class Actor {
     }
 
     public isExternalMethod(name: string) {
-        return this._externalMethodSignatures.get(name) !== null;
+        return this._externalMethodSignatures.get(name) != null;
     }
 
     public getMethod(name: string): Method {
-        return Preconditions.checkNotUndefined(this._methodMap.get(name));
+        const result: Method = this.findMethod(name);
+        if (!result) {
+            throw new IllegalArgumentException(`Method "${name}" is not defined!`);
+        }
+        return result;
+    }
+
+    public findMethod(name: string): Method {
+        return this._methodMap.get(name);
     }
 
     public getScript(id: ScriptId): Script {
@@ -209,11 +258,37 @@ export class Actor {
 
     get isBootstrapper(): boolean {
         for (const s of this.scripts) {
-            if (s.event === BootstrapEvent.instance()) {
+            if (s.event === SingularityEvent.instance()) {
                 return true;
             }
         }
         return false;
+    }
+
+    public transitivelyCalled(from: TransitionRelation): Set<CallStatement> {
+        const result = new Set<CallStatement>();
+
+        const addToResult = function(a: Actor, tr: TransitionRelation) {
+            for (const l of tr.locationSet) {
+                for (const ts of tr.transitionsFrom(l)) {
+                    const op = ProgramOperation.for(ts.opId);
+                    if (op.ast instanceof CallStatement) {
+                        const call = op.ast as CallStatement;
+                        if (!result.has(call)) {
+                            result.add(call);
+                            const calledMethodDef: Method = a.findMethod(call.calledMethod.text);
+                            if (calledMethodDef) {
+                                addToResult(a, calledMethodDef.transitions);
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        addToResult(this, from);
+
+        return result;
     }
 }
 
@@ -224,15 +299,18 @@ export class Actors {
     public static defaultBoostraper(): Actor {
         if (!Actors._DEFAULT_BOOTSTRAPPER) {
             const bootstrapStmts = new StatementList([
-                new BroadcastAndWaitStatement(INIT_MESSAGE.messageid),
-                new BroadcastMessageStatement(GREENFLAG_MESSAGE.messageid),
+                new EpsilonStatement(),
+                new BroadcastAndWaitStatement(BOOTSTRAP_MESSAGE),
+                new BroadcastAndWaitStatement(BOOTSTRAP_FINISHED_MESSAGE),
+                new BroadcastMessageStatement(GREENFLAG_MESSAGE),
             ]);
             const visitor: RelationBuildingVisitor = new RelationBuildingVisitor();
             const bootstrapTransitions: TransitionRelation =
                 TransitionRelations.eliminateEpsilons(bootstrapStmts.accept(visitor));
             const bootstrapScript: Script = new Script(Scripts.freshScriptId(),
-                BootstrapEvent.instance(), bootstrapTransitions);
-            Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [],
+                SingularityEvent.instance(), false, bootstrapTransitions);
+            Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [], [],
+                Concerns.highestPriorityConcern(),
                 {}, {}, bootstrapScript, {}, {},
                 [bootstrapScript], []);
         }

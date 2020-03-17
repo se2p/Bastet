@@ -28,9 +28,11 @@ import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
-import {Refiner} from "../Refiner";
+import {Refiner, Unwrapper} from "../Refiner";
+import {GraphAbstractState} from "../graph/GraphAbstractDomain";
 
-export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement> implements WrappingProgramAnalysis<C, E> {
+export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
+    implements WrappingProgramAnalysis<C, E>, Unwrapper<E, E> {
 
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
 
@@ -39,6 +41,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
     private readonly _widenStats: AnalysisStatistics;
     private readonly _stopStats: AnalysisStatistics;
     private readonly _mergeStats: AnalysisStatistics;
+    private readonly _mergeIntoStats: AnalysisStatistics;
     private readonly _targetStats: AnalysisStatistics;
     private readonly _otherStats: AnalysisStatistics;
     private readonly _joinStats: AnalysisStatistics;
@@ -49,6 +52,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
         this._widenStats = this._statistics.withContext("widening");
         this._stopStats = this._statistics.withContext("stop");
         this._mergeStats = this._statistics.withContext("merge");
+        this._mergeIntoStats = this._statistics.withContext("mergeInto");
         this._joinStats = this._statistics.withContext("join");
         this._targetStats = this._statistics.withContext("target");
         this._otherStats = this._statistics.withContext("other");
@@ -80,9 +84,15 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
         });
     }
 
-    stop(state: E, reached: Iterable<E>): boolean {
+    stop(state: E, reached: Iterable<AbstractElement>, unwrapper: (E) => E): boolean {
         return this._stopStats.runWithTimer(() => {
-            return this._wrappedAnalysis.stop(state, reached);
+            return this._wrappedAnalysis.stop(state, reached, (e) => this.unwrap(unwrapper(e)));
+        });
+    }
+
+    mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): StateSet<E> {
+        return this._mergeIntoStats.runWithTimer(() => {
+            return this._wrappedAnalysis.mergeInto(state, reached, (e) => this.unwrap(unwrapper(e)), (e) => e);
         });
     }
 
@@ -114,4 +124,41 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
         return this._wrappedAnalysis;
     }
 
+    get statistics(): AnalysisStatistics {
+        return this._statistics;
+    }
+
+    get succStats(): AnalysisStatistics {
+        return this._succStats;
+    }
+
+    get widenStats(): AnalysisStatistics {
+        return this._widenStats;
+    }
+
+    get stopStats(): AnalysisStatistics {
+        return this._stopStats;
+    }
+
+    get mergeStats(): AnalysisStatistics {
+        return this._mergeStats;
+    }
+
+    get targetStats(): AnalysisStatistics {
+        return this._targetStats;
+    }
+
+    get otherStats(): AnalysisStatistics {
+        return this._otherStats;
+    }
+
+    get joinStats(): AnalysisStatistics {
+        return this._joinStats;
+    }
+
+    unwrap(e: E): E {
+        return e;
+    }
+
 }
+

@@ -1,4 +1,3 @@
-
 /*
  *   BASTET Program Analysis and Verification Framework
  *
@@ -21,10 +20,9 @@
  *
  */
 
-import {Uint8, Ptr, Void, Uint32, Sint32, Float, Double, Uint64, Sint64} from './ctypes'
+import {Double, Float, Ptr, Sint32, Sint64, Uint32, Uint64, Uint8} from './ctypes'
 import {WasmJSInstance} from "./WasmInstance";
 import {Preconditions} from "../../Preconditions";
-import {FirstOrderFormula} from "../../ConjunctiveNormalForm";
 
 export class Z3_lbool extends Uint8 {};
 export class Z3_tactic extends Ptr { };

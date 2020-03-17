@@ -1,4 +1,4 @@
-program Task7Spec
+program Task0Spec
 
 /**
  * ## Task 9 "
@@ -9,12 +9,12 @@ program Task7Spec
  *      The horse must switch color at least every 1 seconds or turn around if the mouse touches the horse.
  *
  * Precondition:
- *      There exists one actor with the role of the horse.
+ *      There exists one actor with the id "Pferd".
  *
  * Interpretations and considerations:
  *
  * Rewrite without explicit actor names:
- *    Given at max one actor it always changes its color after 1 second or is turning if the mouse touches the sprite
+ *    Given at one actor with the id "Pferd" it always changes its color after 1 second or is turning if the mouse touches the sprite
  *
  *   EXISTS a in _RUNTIME_getAllActors():
  *     FORALL trace in PROGRAM_TRACES:
@@ -28,8 +28,6 @@ program Task7Spec
 
 actor DirectorObserver is Observer begin
 
-    declare observer_state as enum ["INIT", "STARTUP_FINISHED"]
-
     declare actor_1_id as string
     declare mouseTouched as boolean
 
@@ -40,12 +38,14 @@ actor DirectorObserver is Observer begin
     declare actor_1_prev_direction as number
 
     declare last_change as number
+
+    define actor_1_id as "Pferd"
     define last_change as _RUNTIME_millis()
 
-    define atomic checkBehaviorSatisfied () begin
+    define atomic isBehaviorSatisfied () begin
         // (a) Attributes of the first actor
-        define actor_1_color as attribute "color" of actor_1_id
-        define actor_1_direction as attribute "direction" of actor_1_id
+        define actor_1_color as cast attribute "color" of actor_1_id to number
+        define actor_1_direction as cast attribute "direction" of actor_1_id to number
 
         // The actual invariant check
         if not actor_1_color = actor_1_prev_color then begin
@@ -64,7 +64,6 @@ actor DirectorObserver is Observer begin
             end
         end
 
-        // TODO: Check if changed within the last 1000 msec
        if last_change - _RUNTIME_millis > 1000 and mouseTouched then begin
            define result as false
        end
@@ -80,22 +79,16 @@ actor DirectorObserver is Observer begin
     end
 
     script on bootstrap finished do begin
-        if observer_state = "INIT" then begin
-        end else begin
-            // First specification check (base condition)
-            assert(checkBehaviorSatisfied())
-        end
+        // First specification check (base condition)
+        assert(isBehaviorSatisfied())
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
     end
 
     script on statement finished do begin
-        if observer_state = "INIT" then begin
-        end else begin
-            // The actual specification check
-            assert(checkBehaviorSatisfied())
-        end
+        // The actual specification check
+        assert(isBehaviorSatisfied())
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()

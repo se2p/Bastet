@@ -22,7 +22,6 @@
 'use strict';
 
 import {ProgramParserFactory} from "./syntax/parser/ProgramParserFactory";
-import {ToIntermediateTransformer, TypeInformationStorage} from "./syntax/transformers/ToIntermediateTransformer";
 import {ControlFlows} from "./syntax/app/ControlFlows";
 import {App} from "./syntax/app/App";
 import {AnalysisProcedure, AnalysisResult, NullAnalysisResult} from "./procedures/AnalysisProcedure";
@@ -30,14 +29,18 @@ import {ProgramParser} from "./syntax/parser/ProgramParser";
 import {Preconditions} from "./utils/Preconditions";
 import {AppBuilder} from "./syntax/app/AppBuilder";
 import {ProgramContext} from "./syntax/parser/grammar/ScratchParser";
-import {RawAstToDotVisitor} from "./syntax/parser/RawAstToDotVisitor";
 import {RuleNode} from "antlr4ts/tree";
 import {AstNode} from "./syntax/ast/AstNode";
-import {AstToDotVisitor} from "./syntax/ast/AstToDotVisitor";
-import {AnalysisProcedureConfig, AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
+import {AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
 import {AppToDot} from "./syntax/app/AppToDot";
 import {IllegalArgumentException} from "./core/exceptions/IllegalArgumentException";
 import {AnalysisStatistics} from "./procedures/analyses/AnalysisStatistics";
+import {NodeSystemLayer} from "./utils/SystemLayer";
+import {type} from "os";
+import {TypeInformationStorage} from "./syntax/DeclarationScopes";
+import {ToIntermediateTransformer} from "./syntax/transformers/ToIntermediateTransformer";
+
+const process = require('process');
 
 const commander = require('commander');
 
@@ -70,6 +73,8 @@ export class Bastet {
             return new NullAnalysisResult(new AnalysisStatistics("NULL", {}));
         }
 
+        this.registerOnExitNotifiers();
+
         const intermLibFilepath: string = cmdlineArguments.intermediateLibrary;
         const programFilepath: string = cmdlineArguments.program;
         const specFilepath: string = cmdlineArguments.specification;
@@ -78,8 +83,20 @@ export class Bastet {
         return this.runFor(configFilepath, intermLibFilepath, programFilepath, specFilepath);
     }
 
+    public registerOnExitNotifiers() {
+        process.on('SIGINT', function() {
+            console.log("Caught SIGINT signal");
+            process.exit();
+        });
+
+        process.on('beforeExit', function() {
+            console.log("Caught beforeExit signal");
+        });
+    }
+
     public async runFor(configFilepath: string, libraryFilepath: string, programFilepath: string, specFilepath: string) : Promise<AnalysisResult> {
-        const config: AnalysisProcedureConfig = AnalysisProcedureConfig.readFromConfigurationFile(configFilepath);
+        const sl = new NodeSystemLayer();
+        const config: {} = sl.readFileAsJson(configFilepath);
 
         // Build the static task model
         const staticTaskModel: App = this.buildTaskModel(libraryFilepath, programFilepath, specFilepath, config);
@@ -103,10 +120,10 @@ export class Bastet {
         const staticLibraryModel: App = this.parseFromIntermediateCode("library", libraryFilepath, typeStorage, config);
 
         // Parse the program (a Scratch program) into an intermediate AST
-        const staticProgramModel: App = this.parseFromRawCode("program", "", programFilepath, staticLibraryModel, typeStorage, config);
+        const staticProgramModel: App = this.parseFromRawCode("program", programFilepath, staticLibraryModel, typeStorage, config);
 
         // Parse the specification (also a Scratch program) into an intermediate AST
-        const staticSpecModel: App = this.parseFromRawCode("spec", "__spec", specFilepath, staticLibraryModel, typeStorage, config);
+        const staticSpecModel: App = this.parseFromRawCode("spec", specFilepath, staticLibraryModel, typeStorage, config);
 
         // Create the control-flow structure of the verification task
         const staticTaskModelWithInheritance: App = ControlFlows.unionOf(staticLibraryModel,
@@ -122,7 +139,7 @@ export class Bastet {
         return staticTaskModel;
     }
 
-    private async buildAnalysisProcedure(config: AnalysisProcedureConfig) : Promise<AnalysisProcedure> {
+    private async buildAnalysisProcedure(config: {}) : Promise<AnalysisProcedure> {
         // TODO: Allow for sequences of analyses procedures that can built on the respective previous results.
         return AnalysisProcedureFactory.createAnalysisProcedure(config);
     }
@@ -134,23 +151,12 @@ export class Bastet {
 
         // Create the RAW AST
         const rawAST: RuleNode = scratchParser.parseFile(filepath);
-        {
-            const rawToDotVisitor = new RawAstToDotVisitor();
-            rawAST.accept(rawToDotVisitor);
-            rawToDotVisitor.writeToFile(`output/ast_library_raw_${ident}.dot`);
-        }
         Preconditions.checkState(rawAST instanceof ProgramContext );
 
         const transformer = new ToIntermediateTransformer();
         const intermediateAST: AstNode = transformer.transform(App.empty(), rawAST, typeStorage, config);
 
-        {
-            const astToDotVisitor = new AstToDotVisitor();
-            intermediateAST.accept(astToDotVisitor);
-            astToDotVisitor.writeToFile(`output/ast_library_interm_${ident}.dot`);
-        }
-
-        return this.createControlFlowFrom(filepath, intermediateAST, App.empty(), "");
+        return this.createControlFlowFrom(filepath, intermediateAST, App.empty(), typeStorage);
     }
 
     /**
@@ -159,7 +165,7 @@ export class Bastet {
      *
      * @param filepath
      */
-    private parseFromRawCode(ident: string, actorNamePrefix: string, filepath: string,
+    private parseFromRawCode(ident: string, filepath: string,
                              staticLibraryModel: App, typeStorage: TypeInformationStorage,
                              config: {}): App {
         Preconditions.checkNotEmpty(filepath);
@@ -170,29 +176,18 @@ export class Bastet {
         // Create the RAW AST (no simplifications or generalizations were applied)
         const rawAST: RuleNode = scratchParser.parseFile(filepath);
 
-        {
-            const rawToDotVisitor = new RawAstToDotVisitor();
-            rawAST.accept(rawToDotVisitor);
-            rawToDotVisitor.writeToFile(`output/ast_${ident}_raw.dot`);
-        }
-
         // Transform the AST: Replaces specific statements or expressions
         // by generic constructs.
         const transformer = new ToIntermediateTransformer();
         const intermediateAST: AstNode = transformer.transform(staticLibraryModel, rawAST, typeStorage, config);
 
-        {
-            const astToDotVisitor = new AstToDotVisitor();
-            intermediateAST.accept(astToDotVisitor);
-            astToDotVisitor.writeToFile(`output/ast_${ident}_interm.dot`);
-        }
-
-        return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, actorNamePrefix);
+        return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, typeStorage);
     }
 
-    private createControlFlowFrom(programOrigin: string, intermediateSpecAST: AstNode, libraryModule: App, actorNamePrefix?: string): App {
+    private createControlFlowFrom(programOrigin: string, intermediateSpecAST: AstNode, libraryModule: App,
+                                  typeStorage: TypeInformationStorage): App {
         const ab: AppBuilder = new AppBuilder(libraryModule);
-        return ab.buildFromSyntaxTree(programOrigin, intermediateSpecAST, actorNamePrefix);
+        return ab.buildFromSyntaxTree(programOrigin, intermediateSpecAST, typeStorage);
     }
 
 }

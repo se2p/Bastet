@@ -21,13 +21,13 @@
 
 import {WithIdent} from "../../../utils/WithIdent";
 
-export type LocationID = number;
+export type LocationId = number;
 
 export class ControlLocation implements WithIdent {
 
-    private readonly _id: LocationID
+    private readonly _id: LocationId
 
-    private constructor(id: LocationID) {
+    private constructor(id: LocationId) {
         this._id = id
     }
 
@@ -35,11 +35,11 @@ export class ControlLocation implements WithIdent {
         return this._id
     }
 
-    private static locations: Map<LocationID, ControlLocation> = new Map();
-    private static compounds: Map<LocationID, Map<LocationID, ControlLocation>> = new Map();
+    private static locations: Map<LocationId, ControlLocation> = new Map();
+    private static compounds: Map<LocationId, Map<LocationId, ControlLocation>> = new Map();
     private static locationSequence: number = 0;
 
-    private static newLocationID(): LocationID {
+    private static newLocationID(): LocationId {
         if (isNaN(ControlLocation.locationSequence)) {
             ControlLocation.locationSequence = 0;
         }
@@ -48,7 +48,7 @@ export class ControlLocation implements WithIdent {
     }
 
     public static compound(majorLoc: ControlLocation, minorLoc: ControlLocation): ControlLocation {
-        let compoundOnMajor: Map<LocationID, ControlLocation> = this.compounds.get(majorLoc.ident);
+        let compoundOnMajor: Map<LocationId, ControlLocation> = this.compounds.get(majorLoc.ident);
         if (!compoundOnMajor) {
             compoundOnMajor = new Map();
             this.compounds.set(majorLoc.ident, compoundOnMajor);
@@ -57,7 +57,7 @@ export class ControlLocation implements WithIdent {
         let result: ControlLocation = compoundOnMajor.get(minorLoc.ident);
         if (!result) {
             // Create a new compound location
-            let compLocId: LocationID = this.newLocationID();
+            let compLocId: LocationId = this.newLocationID();
             result = new ControlLocation(compLocId);
 
             // Store the pairing that resulted in the compound location
@@ -70,7 +70,7 @@ export class ControlLocation implements WithIdent {
         return result;
     }
 
-    public static for(id: LocationID): ControlLocation {
+    public static for(id: LocationId): ControlLocation {
         let result: ControlLocation = this.locations.get(id);
         if (!result) {
             result = new ControlLocation(id);
@@ -88,7 +88,7 @@ export class ControlLocation implements WithIdent {
      *
      * @param offset
      */
-    public static setFreshLocationIdOffset(offset: LocationID): void {
+    public static setFreshLocationIdOffset(offset: LocationId): void {
         ControlLocation.locationSequence = Math.max(offset, ControlLocation.locationSequence);
     }
 

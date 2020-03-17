@@ -24,6 +24,9 @@ import {StateSet} from "../../algorithms/StateSet";
 import {GraphAbstractState} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {TransitionLabelProvider} from "../ProgramAnalysis";
+import {StateColorVisitor, StateLabelVisitor} from "../StateVisitors";
+import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
+import {App} from "../../../syntax/app/App";
 
 export class GraphToDot  {
 
@@ -32,11 +35,14 @@ export class GraphToDot  {
     private _idseq: number;
     private _reached: StateSet<GraphAbstractState>;
     private _frontier: StateSet<GraphAbstractState>;
-    private _transLabProvider: TransitionLabelProvider;
+    private _transLabProvider: TransitionLabelProvider<GraphAbstractState>;
+    private _task: App;
 
-    constructor(transLabProvider: TransitionLabelProvider,
+    constructor(task: App,
+                transLabProvider: TransitionLabelProvider<GraphAbstractState>,
                 reached: StateSet<GraphAbstractState>,
                 frontier: StateSet<GraphAbstractState>) {
+        this._task = Preconditions.checkNotUndefined(task);
         this._transLabProvider = Preconditions.checkNotUndefined(transLabProvider);
         this._reached = Preconditions.checkNotUndefined(reached);
         this._frontier = Preconditions.checkNotUndefined(frontier);
@@ -46,13 +52,16 @@ export class GraphToDot  {
     }
 
     private writeState(e: GraphAbstractState) {
-        const stateLabel = "";
-        this._dot.push(`    ${e.getId()} [label="${stateLabel}"];`);
+        const stateLabel = e.accept(new StateLabelVisitor(this._task));
+        const stateColor = e.accept(new StateColorVisitor());
+        this._dot.push(`    ${e.getId()} [label="${stateLabel}" color="black" fillcolor="${stateColor}"];`);
     }
 
     private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
-        const transLabel = "";
-        this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabel}"];`);
+        const visitor = new CorePrintVisitor();
+        const transLabels = GraphToDot.escapeForDot(this._transLabProvider.getTransitionLabel(from, to)
+            .map(o => o.ast.accept(visitor)).join(";"));
+        this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabels}"];`);
     }
 
     private export() {
@@ -83,7 +92,7 @@ export class GraphToDot  {
             + `\n}\n`);
     }
 
-    private static escpace(text: string): string {
+    private static escapeForDot(text: string): string {
         const search = "\"";
         const replacement = "\\\"";
         return text.replace(new RegExp(search, 'g'), replacement);

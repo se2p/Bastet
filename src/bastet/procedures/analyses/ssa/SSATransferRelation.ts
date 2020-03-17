@@ -28,7 +28,6 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {SSAssigner, SSATransformerVisitor} from "./SSATransformerVisitor";
 import {BooleanExpression} from "../../../syntax/ast/core/expressions/BooleanExpression";
-import {DummyDataLocationMapper} from "../../../syntax/app/controlflow/DataLocation";
 import {Concern} from "../../../syntax/Concern";
 
 export class SSATransferRelation implements LabeledTransferRelation<SSAState> {

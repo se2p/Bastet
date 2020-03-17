@@ -21,17 +21,18 @@
 
 import {Statement} from "./Statement";
 import {StringExpression} from "../expressions/StringExpression";
+import {SystemMessage} from "../Message";
 
 export class BroadcastAndWaitStatement extends Statement {
 
-    private readonly _msg: StringExpression;
+    private readonly _msg: SystemMessage;
 
-    constructor(msg: StringExpression) {
+    constructor(msg: SystemMessage) {
         super([msg]);
         this._msg = msg;
     }
 
-    get msg(): StringExpression {
+    get msg(): SystemMessage {
         return this._msg;
     }
 }

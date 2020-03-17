@@ -42,12 +42,15 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
     private readonly _refiner: Refiner<E>;
 
     private readonly _statistics: AnalysisStatistics;
+    private readonly _feasibilityCheckStats: AnalysisStatistics;
 
     constructor(wrappedAlgorithm: AnalysisAlgorithm<C, E>, refiner: Refiner<E>, analysis: ProgramAnalysis<C, E>, statistics: AnalysisStatistics) {
         this._wrappedAlgorithm = Preconditions.checkNotUndefined(wrappedAlgorithm);
         this._refiner = Preconditions.checkNotUndefined(refiner);
         this._analysis = Preconditions.checkNotUndefined(analysis);
+
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
+        this._feasibilityCheckStats = this._statistics.withContext("FeasibilityCheck");
     }
 
     public run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
@@ -61,10 +64,20 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
                 Preconditions.checkState(this._analysis.target(targetState).length > 0);
 
                 // Check the feasibility with the refiner
-                if (this._refiner.checkIsFeasible(targetState)) {
-                    return [frontier, reached];
-                } else {
-                    reached.remove(targetState);
+                let isFeasible: boolean;
+                console.group("BMC Feasibility Check");
+                this._feasibilityCheckStats.startTimer();
+                try {
+                    isFeasible = this._refiner.checkIsFeasible(targetState);
+                    if (isFeasible) {
+                        return [frontier, reached];
+                    } else {
+                        reached.remove(targetState);
+                    }
+                } finally {
+                    this._feasibilityCheckStats.stopTimer();
+                    console.log(`${isFeasible ? "Feasible" : "Infeasible"} ${this._feasibilityCheckStats.contextTimer.lastIntervalDuration}`)
+                    console.groupEnd();
                 }
             }
         } while (!frontier.isEmpty());

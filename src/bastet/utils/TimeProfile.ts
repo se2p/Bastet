@@ -21,9 +21,8 @@
  */
 
 import {NumIntervalValue} from "../procedures/domains/NumIntervalValueDomain";
-import {OperationID, ProgramOperation} from "../syntax/app/controlflow/ops/ProgramOperation";
+import {OperationId, ProgramOperation} from "../syntax/app/controlflow/ops/ProgramOperation";
 import {ImplementMeException} from "../core/exceptions/ImplementMeException";
-import {WaitSecsStatement} from "../syntax/ast/core/statements/WaitSecsStatement";
 import {ConcreteNumber} from "../procedures/domains/ConcreteElements";
 
 /**
@@ -40,29 +39,30 @@ export class OperationTimeProfile {
     /** Interval of nanoseconds needed on the reference machine(s) */
     private readonly _nsecs: NumIntervalValue;
 
-    /** Program operation to that time measurement is mapped to */
-    private readonly _op: ProgramOperation;
-
-    constructor(nsecs: NumIntervalValue, op: ProgramOperation) {
+    constructor(nsecs: NumIntervalValue) {
         this._nsecs = nsecs;
-        this._op = op;
     }
 
     get nsecs(): NumIntervalValue {
         return this._nsecs;
     }
 
-    get op(): ProgramOperation {
-        return this._op;
-    }
 }
+
+export const ONE_MICSEC_IN_NSECS = 1000;
 
 export class StaticTimeProfile implements ProgramTimeProfile {
 
-    private readonly _opTimes: Map<OperationID, OperationTimeProfile>;
+    private readonly _opTimes: Map<OperationId, OperationTimeProfile>;
+
+    private readonly _avgOpProfile: OperationTimeProfile;
 
     constructor() {
         this._opTimes = new Map();
+        this._avgOpProfile = new OperationTimeProfile(
+            new NumIntervalValue(
+                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 500),
+                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 1500)));
     }
 
     public widen(op: ProgramOperation, minNanos: number, maxNanos: number) {
@@ -70,7 +70,7 @@ export class StaticTimeProfile implements ProgramTimeProfile {
     }
 
     public getOpProfile(op: ProgramOperation): OperationTimeProfile {
-        throw new ImplementMeException();
+        return this._avgOpProfile;
     }
 
 }

@@ -23,7 +23,7 @@
 
 import {Refiner} from "../Refiner";
 import {DataAbstractState} from "./DataAbstractDomain";
-import {Lattice, LatticeWithComplements} from "../../../lattices/Lattice";
+import {LatticeWithComplements} from "../../../lattices/Lattice";
 
 export class DataRefiner implements Refiner<DataAbstractState> {
 

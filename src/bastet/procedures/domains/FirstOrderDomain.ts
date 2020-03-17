@@ -24,7 +24,7 @@
 import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {ConcreteDomain, ConcreteElement} from "./ConcreteElements";
 import {FirstOrderFormula} from "../../utils/ConjunctiveNormalForm";
-import {Lattice, LatticeWithComplements} from "../../lattices/Lattice";
+import {LatticeWithComplements} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
 import {BooleanTheory} from "./MemoryTransformer";

@@ -10,6 +10,7 @@ actor Stage is ScratchStage begin
       declare tempo as number
       declare videoTransparency as number
       declare videoState as string
+
       define volume as 100.0
       define layerOrder as 0.0
       define tempo as 60.0
@@ -20,6 +21,7 @@ actor Stage is ScratchStage begin
 actor Pferd is ScratchSprite begin
       sound  Plopp "83a9787d4cb6f3b7632b4ddfebf74367.wav"
       image  Pferd "8b75453ccca4324df1d5aebb3b2191ee.svg"
+
       declare volume as number
       declare layerOrder as number
       declare visible as boolean
@@ -43,13 +45,15 @@ actor Pferd is ScratchSprite begin
       script on startup do begin
           repeat forever begin
               if touchingMousePointer() then begin
-                      repeat 10 times begin
+                      declare i as number
+                      define i as 0
+                      until i = 10 repeat begin
                           turnRight(36.0)
                       end
                   end
               else begin
-                      define color as (62.0 + color)
-                  end
+                  define color as (62.0 + color)
+              end
               wait 1 seconds
           end
       end

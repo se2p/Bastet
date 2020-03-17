@@ -23,7 +23,8 @@ import {AbstractNode, OptionalAstNode} from "../../AstNode";
 import {Statement, StatementList} from "./Statement";
 import {BooleanExpression} from "../expressions/BooleanExpression";
 import {NumberExpression} from "../expressions/NumberExpression";
-import {Variable, VariableWithDataLocation} from "../Variable";
+import {VariableWithDataLocation} from "../Variable";
+import {Preconditions} from "../../../../utils/Preconditions";
 
 export interface ControlStatement extends AbstractNode {
 
@@ -78,19 +79,19 @@ export class UntilStatement extends Statement implements ControlStatement {
 
 export class UntilQueriedConditionStatement extends Statement implements ControlStatement {
 
-    private readonly _condition: BooleanExpression;
+    private readonly _untilCondition: BooleanExpression;
     private readonly _conditionQueryStatements: StatementList;
     private readonly _body: StatementList;
 
     constructor(condition: BooleanExpression, conditionQueryStatements: StatementList, body: StatementList) {
         super([conditionQueryStatements, condition, body]);
-        this._condition = condition;
+        this._untilCondition = condition;
         this._conditionQueryStatements = conditionQueryStatements;
         this._body = body;
     }
 
-    get condition(): BooleanExpression {
-        return this._condition;
+    get untilCondition(): BooleanExpression {
+        return this._untilCondition;
     }
 
     get conditionQueryStatements(): StatementList {
@@ -142,7 +143,8 @@ export class ReturnStatement extends Statement implements ControlStatement {
     private readonly _resultVariable: OptionalAstNode<VariableWithDataLocation>;
 
     constructor(resultVariable: OptionalAstNode<VariableWithDataLocation>) {
-        super([resultVariable]);
+        super([Preconditions.checkNotUndefined(resultVariable)]);
+        this._resultVariable = resultVariable;
     }
 
     get resultVariable(): OptionalAstNode<VariableWithDataLocation> {
@@ -150,3 +152,32 @@ export class ReturnStatement extends Statement implements ControlStatement {
     }
 
 }
+
+export class BeginAtomicStatement extends Statement {
+
+    private readonly _atomicIncrement: number;
+
+    constructor() {
+        super([]);
+        this._atomicIncrement = 1;
+    }
+
+    get atomicIncrement(): number {
+        return this._atomicIncrement;
+    }
+}
+
+export class EndAtomicStatement extends Statement {
+
+    private readonly _atomicIncrement: number;
+
+    constructor() {
+        super([]);
+        this._atomicIncrement = -1;
+    }
+
+    get atomicIncrement(): number {
+        return this._atomicIncrement;
+    }
+}
+

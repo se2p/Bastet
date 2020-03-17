@@ -21,13 +21,12 @@
 
 import {Expression} from "./Expression";
 import {AbstractExpression} from "./AbstractExpression";
-import {Identifier} from "../Identifier";
 import {NumberType} from "../ScratchType";
 import {AstNode} from "../../AstNode";
 import {StringExpression, StringLiteral} from "./StringExpression";
 import {BooleanExpression} from "./BooleanExpression";
 import {BinaryExpression} from "./BinaryExpression";
-import {Variable, VariableExpression, VariableWithDataLocation} from "../Variable";
+import {VariableExpression, VariableWithDataLocation} from "../Variable";
 
 export interface NumberExpression extends Expression {
 
@@ -84,7 +83,7 @@ export class NumberLiteral extends AbstractNumberExpression {
     private static ZERO: NumberLiteral;
 
     public static zero(): NumberLiteral {
-        if (NumberLiteral.ZERO) {
+        if (!NumberLiteral.ZERO) {
             NumberLiteral.ZERO = new NumberLiteral(0);
         }
         return NumberLiteral.ZERO;

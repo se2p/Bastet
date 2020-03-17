@@ -21,13 +21,14 @@
  */
 
 import {Preconditions} from "../../utils/Preconditions";
-import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 
 const { performance } = require('perf_hooks');
 
 export class PerfTimer {
 
-    private _duartion: number;
+    private _lastIntervalDuration: number;
+
+    private _totalDuartion: number;
 
     private _startTime: number;
 
@@ -37,11 +38,13 @@ export class PerfTimer {
 
     constructor(onStopCallback: (timer: PerfTimer) => void) {
         this._onStopCallback = onStopCallback;
-        this._duartion = 0;
+        this._totalDuartion = 0;
+        this._lastIntervalDuration = 0;
     }
 
     public start() {
         this._startTime = performance.now();
+        this._stopTime = 0;
     }
 
     public stop(): number {
@@ -51,17 +54,20 @@ export class PerfTimer {
 
     public stopWith(commonTimeMsec: number): number {
         this._stopTime = commonTimeMsec;
-        this._duartion = this._duartion + this.lastIntervalDuration;
+
+        this._lastIntervalDuration = this._stopTime - this._startTime;
+        this._totalDuartion = this._totalDuartion + this._lastIntervalDuration;
+
         this._onStopCallback(this);
-        return this.duration;
+        return this.totalDuration;
     }
 
-    get lastIntervalDuration() : number {
-        return this._stopTime - this._startTime;
+    get lastIntervalDuration(): number {
+        return this._lastIntervalDuration;
     }
 
-    get duration() : number {
-        return this._duartion;
+    get totalDuration() : number {
+        return this._totalDuartion;
     }
 }
 
@@ -77,7 +83,7 @@ export class AnalysisStatistics {
         this._statisticsTree = Preconditions.checkNotUndefined(context);
         this._name = Preconditions.checkNotEmpty(name);
         this._contextTimer = new PerfTimer((t) => {
-            this._statisticsTree['duration'] = t.duration;
+            this._statisticsTree['duration'] = t.totalDuration;
         });
     }
 

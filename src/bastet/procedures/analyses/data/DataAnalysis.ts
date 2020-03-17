@@ -28,7 +28,7 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {DataTransferRelation} from "./DataTransferRelation";
 import {ConcreteMemory} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
-import {AbstractMemoryTheory} from "../../domains/MemoryTransformer";
+import {AbstractTheories} from "../../domains/MemoryTransformer";
 import {
     BooleanFormula,
     FirstOrderFormula,
@@ -37,18 +37,19 @@ import {
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
-import {Lattice, LatticeWithComplements} from "../../../lattices/Lattice";
+import {AbstractElement, LatticeWithComplements} from "../../../lattices/Lattice";
 import {DataRefiner} from "./DataRefiner";
 import {Refiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState>,
     LabeledTransferRelation<DataAbstractState> {
 
-    private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
+    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
     private readonly _abstractDomain: DataAbstractDomain;
 
@@ -59,7 +60,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     private readonly _statistics: AnalysisStatistics;
 
     constructor(folLattice: LatticeWithComplements<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
-                theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>,
+                theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>,
                 statistics: AnalysisStatistics) {
         Preconditions.checkNotUndefined(folLattice);
         Preconditions.checkNotUndefined(propLattice);
@@ -84,9 +85,9 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return false;
     }
 
-    stop(state: DataAbstractState, reached: Iterable<DataAbstractState>): boolean {
+    stop(state: DataAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => DataAbstractState): boolean {
         for (const r of reached) {
-            if (r.equals(state)) {
+            if (unwrapper(r).equals(state)) {
                 return true;
             }
         }
@@ -108,7 +109,15 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     abstractSuccFor(fromState: DataAbstractState, op: ProgramOperation, co: Concern): Iterable<DataAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
-        return this._transferRelation.abstractSuccFor(fromState, op, co);
+
+        const result: DataAbstractState[] = [];
+        for (const r of this._transferRelation.abstractSuccFor(fromState, op, co)) {
+//           if (this.refiner.checkIsFeasible(r)) {
+               result.push(r);
+//           }
+        }
+
+        return result;
     }
 
     get abstractDomain(): AbstractDomain<ConcreteMemory, DataAbstractState> {
@@ -121,5 +130,9 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     wrapStateSets(frontier: StateSet<DataAbstractState>, reached: StateSet<DataAbstractState>): [StateSet<DataAbstractState>, StateSet<DataAbstractState>] {
         return [frontier, reached];
+    }
+
+    mergeInto(state: DataAbstractState, reached: StateSet<DataAbstractState>, unwrapper: (AbstractElement) => DataAbstractState, wrapper: (E) => AbstractElement): StateSet<DataAbstractState> {
+        throw new ImplementMeException();
     }
 }

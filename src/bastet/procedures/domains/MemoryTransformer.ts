@@ -21,7 +21,6 @@
  */
 
 import {Preconditions} from "../../utils/Preconditions";
-import {Identifier} from "../../syntax/ast/core/Identifier";
 import {BooleanType, NumberType, ScratchType, StringType} from "../../syntax/ast/core/ScratchType";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString, ConcreteStringList} from "./ConcreteElements";
 import {AbstractElement} from "../../lattices/Lattice";
@@ -111,11 +110,11 @@ export interface ListTheory<L extends AbstractList> {
 
 }
 
-export interface StringTheory<S extends AbstractString> {
+export interface StringTheory<S extends AbstractString, B extends AbstractBoolean, N extends AbstractNumber> {
 
     fromConcreteString(str: ConcreteString): S;
 
-    abstractStringValue(id: Identifier): S;
+    abstractStringValue(id: Variable): S;
 
     emptyString(): S;
 
@@ -123,15 +122,23 @@ export interface StringTheory<S extends AbstractString> {
 
     bottomString(): S;
 
-    lengthOf(str: S): AbstractNumber;
+    lengthOf(str: S): N;
 
-    castNumberAsString(num: AbstractNumber): S;
+    castNumberAsString(num: N): S;
 
-    castBoolAsString(num: AbstractBoolean): S;
+    castBoolAsString(num: B): S;
 
     joinStrings(str1: S, str2: S): S;
 
-    ithLetterOf(index: AbstractNumber, str: S): S;
+    ithLetterOf(index: N, str: S): S;
+
+    stringsEqual(str1: S, str2: S): B;
+
+    stringContains(str1: S, str2: S): B;
+
+    lengthOf(str: S): N;
+
+    ifThenElse(cond: B, thenResult: S, elseResult: S): S;
 
 }
 
@@ -187,12 +194,17 @@ export interface RationalNumberTheory<N extends AbstractNumber, B extends Abstra
 
     minus(op1: N, op2: N): N;
 
-
     isGreaterThan(s1: N, s2: N): B;
+
+    isGreaterEqual(s1: N, s2: N): B;
 
     isLessThan(s1: N, s2: N): B;
 
+    isLessEqual(s1: N, s2: N): B;
+
     isNumberEqualTo(s1: N, s2: N): B;
+
+    ifThenElse(cond: B, thenResult: N, elseResult: N): N;
 
 }
 
@@ -415,14 +427,21 @@ export abstract class MemoryTransformer<M extends AbstractMemory> implements Mem
 
 }
 
-export interface AbstractMemoryTheory<M extends AbstractMemory, B extends AbstractBoolean,
-    N extends AbstractNumber, S extends AbstractString, L extends AbstractList> {
+export interface TheoryIndependent<E extends AbstractElement> {
+
+    simplify(element: E): E;
+
+}
+
+export interface AbstractTheories<M extends AbstractMemory, B extends AbstractBoolean,
+    N extends AbstractNumber, S extends AbstractString, L extends AbstractList> 
+    extends TheoryIndependent<M> {
 
     boolTheory: BooleanTheory<B>;
 
     numTheory: RationalNumberTheory<N, B>;
 
-    stringTheory: StringTheory<S>;
+    stringTheory: StringTheory<S, B, N>;
 
     listTheory: ListTheory<L>;
 

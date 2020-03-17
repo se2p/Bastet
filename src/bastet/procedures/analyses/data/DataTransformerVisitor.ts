@@ -20,48 +20,52 @@
  */
 
 import {
-    CoreBoolExpressionVisitor, CoreListExpressionVisitor, CoreNonCtrlStatementnVisitor,
+    CoreBoolExpressionVisitor,
+    CoreListExpressionVisitor,
+    CoreNonCtrlStatementnVisitor,
     CoreNumberExpressionVisitor,
     CoreStringExpressionVisitor,
     CoreVisitor
 } from "../../../syntax/ast/CoreVisitor";
-import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {
     BoolAsNumberExpression,
     DivideExpression,
     IndexOfExpression,
-    LengthOfStringExpression, LengthOfListExpression,
+    LengthOfListExpression,
+    LengthOfStringExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
     NumberLiteral,
-    NumberVariableExpression, NumFunctExpression,
+    NumberVariableExpression,
+    NumFunctExpression,
     PickRandomFromExpression,
     PlusExpression,
-    RoundExpression,
-    StringAsNumberExpression,
+    RoundExpression, StringAsNumberExpression,
     TimerExpression
 } from "../../../syntax/ast/core/expressions/NumberExpression";
 import {
     BoolAsStringExpression,
     IthLetterOfStringExpression,
     IthStringItemOfExpression,
-    JoinStringsExpression,
-    NumAsStringExpression,
+    JoinStringsExpression, NumAsStringExpression,
     ResourceAttributeOfExpression,
     StringAttributeOfExpression,
     StringLiteral,
     StringVariableExpression
 } from "../../../syntax/ast/core/expressions/StringExpression";
 import {
-    AndExpression, BooleanExpression,
+    AndExpression,
+    BooleanExpression,
     BooleanLiteral,
     BooleanVariableExpression,
     NegationExpression,
     NumEqualsExpression,
+    NumGreaterEqualExpression,
     NumGreaterThanExpression,
+    NumLessEqualExpression,
     NumLessThanExpression,
     OrExpression,
     StrContainsExpression,
@@ -92,9 +96,10 @@ import {ExpressionListExpression, ListVariableExpression} from "../../../syntax/
 import {ExpressionStatement} from "../../../syntax/ast/core/statements/ExpressionStatement";
 import {EpsilonStatement} from "../../../syntax/ast/core/statements/EpsilonStatement";
 import {
-    DeclareAttributeOfStatement,
+    DeclareActorVariableStatement,
     DeclareAttributeStatement,
-    DeclareStackVariableStatement
+    DeclareStackVariableStatement,
+    DeclareSystemVariableStatement
 } from "../../../syntax/ast/core/statements/DeclarationStatement";
 import {CreateCloneOfStatement} from "../../../syntax/ast/core/statements/CreateCloneOfStatement";
 import {ChangeVarByStatement} from "../../../syntax/ast/core/statements/ChangeVarByStatement";
@@ -106,12 +111,12 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {
     AbstractBoolean,
     AbstractList,
+    AbstractTheories,
     AbstractNumber,
     AbstractString,
-    AbstractMemoryTheory,
-    MemoryTransformer, RationalNumberTheory
+    RationalNumberTheory
 } from "../../domains/MemoryTransformer";
-import {BooleanType, NumberType, ScratchType, ScratchTypeID} from "../../../syntax/ast/core/ScratchType";
+import {ActorType, BooleanType, NumberType, StringType} from "../../../syntax/ast/core/ScratchType";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {
     BooleanFormula,
@@ -120,24 +125,51 @@ import {
     NumberFormula,
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
-import {ConcreteBoolean, ConcreteNumber, ConcreteNumberDomain} from "../../domains/ConcreteElements";
-import {AbstractElement} from "../../../lattices/Lattice";
-import {Map as ImmMap} from "immutable";
+import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../domains/ConcreteElements";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
-import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
+import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
+import {BeginAtomicStatement, EndAtomicStatement} from "../../../syntax/ast/core/statements/ControlStatement";
+import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpression";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 
-export class DataNumExpressionVisitor<N extends AbstractNumber, B extends AbstractBoolean>
+export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
+    S extends AbstractString, L extends AbstractList>
     implements CoreNumberExpressionVisitor<N> {
 
+    private readonly _theories: AbstractTheories<B, B, N, S, L>;
     private readonly _theory: RationalNumberTheory<N, B>;
 
-    constructor(theory: RationalNumberTheory<N, B>) {
-        this._theory = Preconditions.checkNotUndefined(theory);
+    constructor(theories: AbstractTheories<B, B, N, S, L>) {
+        this._theories = Preconditions.checkNotUndefined(theories);
+        this._theory = Preconditions.checkNotUndefined(theories.numTheory);
     }
 
     visit(node: AstNode): N {
         throw new ImplementMeException();
+    }
+
+    visitCastExpression(node: CastExpression): N {
+        Preconditions.checkArgument(node.castToType == NumberType.instance());
+
+        if (node.toConvert.expressionType == StringType.instance()) {
+            const stringVisitor = new DataStringExpressionVisitor(this._theories);
+            return this._theory.castStringAsNumber(node.toConvert.accept(stringVisitor));
+
+        } else if (node.toConvert.expressionType == BooleanType.instance()) {
+            const boolVisitor = new DataBoolExpressionVisitor(this._theories);
+            return this._theory.castBoolAsNumber(node.toConvert.accept(boolVisitor));
+        }
+
+        throw new ImplementMeException();
+    }
+
+    visitVariableWithDataLocation(node: VariableWithDataLocation): N {
+        return this._theory.abstractNumberValue(node);
+    }
+
+    visitNumberVariableExpression(node: NumberVariableExpression): N {
+        return this.visitVariableWithDataLocation(node.variable);
     }
 
     visitBoolAsNumberExpression(node: BoolAsNumberExpression): N {
@@ -157,7 +189,8 @@ export class DataNumExpressionVisitor<N extends AbstractNumber, B extends Abstra
     }
 
     visitLengthOfStringExpression(node: LengthOfStringExpression): N {
-        throw new ImplementMeException();
+        const stringVisitor = new DataStringExpressionVisitor(this._theories);
+        return this._theories.stringTheory.lengthOf(node.str.accept(stringVisitor) as S);
     }
 
     visitMinusExpression(node: MinusExpression): N {
@@ -189,7 +222,8 @@ export class DataNumExpressionVisitor<N extends AbstractNumber, B extends Abstra
     }
 
     visitStringAsNumberExpression(node: StringAsNumberExpression): N {
-        throw new ImplementMeException();
+        const stringVisitor = new DataStringExpressionVisitor(this._theories);
+        return this._theory.castStringAsNumber(node.toConvert.accept(stringVisitor))
     }
 
     visitTimerExpression(node: TimerExpression): N {
@@ -200,10 +234,6 @@ export class DataNumExpressionVisitor<N extends AbstractNumber, B extends Abstra
         return this._theory.fromConcreteNumber(new ConcreteNumber(node.num));
     }
 
-    visitNumberVariableExpression(node: NumberVariableExpression): N {
-        return this._theory.abstractNumberValue(node.variable);
-    }
-
 }
 
 export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
@@ -211,9 +241,9 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
     implements CoreBoolExpressionVisitor<B> {
 
     private readonly _base: B;
-    private readonly _theories: AbstractMemoryTheory<B, B, N, S, L>;
+    private readonly _theories: AbstractTheories<B, B, N, S, L>;
 
-    constructor(theories: AbstractMemoryTheory<B, B, N, S, L>) {
+    constructor(theories: AbstractTheories<B, B, N, S, L>) {
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
@@ -229,8 +259,12 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
         return this._theories.boolTheory.fromConcreteBoolean(new ConcreteBoolean(node.value));
     }
 
+    visitVariableWithDataLocation(node: VariableWithDataLocation): B {
+        return this._theories.boolTheory.abstractBooleanValue(node);
+    }
+
     visitBooleanVariableExpression(node: BooleanVariableExpression): B {
-        return this._theories.boolTheory.abstractBooleanValue(node.variable);
+        return this.visitVariableWithDataLocation(node.variable);
     }
 
     visitNegationExpression(node: NegationExpression): B {
@@ -239,93 +273,151 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
     }
 
     visitNumEqualsExpression(node: NumEqualsExpression): B {
-        const numVisitor = new DataNumExpressionVisitor(this._theories.numTheory);
+        const numVisitor = new DataNumExpressionVisitor(this._theories);
         const op1: N = node.operand1.accept(numVisitor);
         const op2: N = node.operand2.accept(numVisitor);
         return this._theories.numTheory.isNumberEqualTo(op1, op2);
     }
 
+    visitNumGreaterEqualExpression(node: NumGreaterEqualExpression): B {
+        const numVisitor = new DataNumExpressionVisitor(this._theories);
+        const op1: N = node.operand1.accept(numVisitor);
+        const op2: N = node.operand2.accept(numVisitor);
+        return this._theories.numTheory.isGreaterEqual(op1, op2);
+    }
+
     visitNumGreaterThanExpression(node: NumGreaterThanExpression): B {
-        const numVisitor = new DataNumExpressionVisitor(this._theories.numTheory);
+        const numVisitor = new DataNumExpressionVisitor(this._theories);
         const op1: N = node.operand1.accept(numVisitor);
         const op2: N = node.operand2.accept(numVisitor);
         return this._theories.numTheory.isGreaterThan(op1, op2);
     }
 
     visitNumLessThanExpression(node: NumLessThanExpression): B {
-        const numVisitor = new DataNumExpressionVisitor(this._theories.numTheory);
+        const numVisitor = new DataNumExpressionVisitor(this._theories);
         const op1: N = node.operand1.accept(numVisitor);
         const op2: N = node.operand2.accept(numVisitor);
         return this._theories.numTheory.isLessThan(op1, op2);
     }
 
+    visitNumLessEqualExpression(node: NumLessEqualExpression): B {
+        const numVisitor = new DataNumExpressionVisitor(this._theories);
+        const op1: N = node.operand1.accept(numVisitor);
+        const op2: N = node.operand2.accept(numVisitor);
+        return this._theories.numTheory.isLessEqual(op1, op2);
+    }
+
     visitOrExpression(node: OrExpression): B {
-        return this._theories.boolTheory.or(node.operand1.accept(this), node.operand2.accept(this));
+        return this._theories.boolTheory.or(
+            node.operand1.accept(this), node.operand2.accept(this));
     }
 
     visitStrContainsExpression(node: StrContainsExpression): B {
-        throw new ImplementMeException();
+        const strVisitor = new DataStringExpressionVisitor(this._theories);
+        return this._theories.stringTheory.stringContains(
+            node.operand1.accept(strVisitor) as S, node.operand2.accept(strVisitor) as S);
     }
 
     visitStrEqualsExpression(node: StrEqualsExpression): B {
-        throw new ImplementMeException();
+        const strVisitor = new DataStringExpressionVisitor(this._theories);
+        return this._theories.stringTheory.stringsEqual(
+            node.operand1.accept(strVisitor) as S, node.operand2.accept(strVisitor) as S);
     }
 
     visitStrGreaterThanExpression(node: StrGreaterThanExpression): B {
+        // ATTENTION: Special semantics of the theory that is implemented
         throw new ImplementMeException();
     }
 
     visitStrLessThanExpression(node: StrLessThanExpression): B {
+        // ATTENTION: Special semantics of the theory that is implemented
+        throw new ImplementMeException();
+    }
+
+    visitCastExpression(node: CastExpression): B {
+        Preconditions.checkArgument(node.castToType == BooleanType.instance());
+
+        if (node.toConvert.expressionType == StringType.instance()) {
+            const stringVisitor = new DataStringExpressionVisitor(this._theories);
+            throw new ImplementMeException();
+
+        } else if (node.toConvert.expressionType == NumberType.instance()) {
+            const numVisitor = new DataNumExpressionVisitor(this._theories);
+            const numFormula = node.toConvert.accept(numVisitor);
+            return this._theories.boolTheory.not(
+                this._theories.numTheory.isNumberEqualTo(numFormula, this._theories.numTheory.zero()));
+        }
+
         throw new ImplementMeException();
     }
 
 }
 
-export class DataStringExpressionVisitor implements CoreStringExpressionVisitor<AbstractString> {
+export class DataStringExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
+    S extends AbstractString, L extends AbstractList> implements CoreStringExpressionVisitor<S> {
 
-    private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
+    private readonly _theories: AbstractTheories<B, B, N, S, L>;
 
-    constructor(theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
+    constructor(theories: AbstractTheories<B, B, N, S, L>) {
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
-    visit(node: AstNode): AbstractString {
+    visit(node: AstNode): S {
         throw new ImplementMeException();
     }
 
-    visitBoolAsStringExpression(node: BoolAsStringExpression): AbstractString {
+    visitBoolAsStringExpression(node: BoolAsStringExpression): S {
         throw new ImplementMeException();
     }
 
-    visitIthLetterOfStringExpression(node: IthLetterOfStringExpression): AbstractString {
+    visitIthLetterOfStringExpression(node: IthLetterOfStringExpression): S {
         throw new ImplementMeException();
     }
 
-    visitIthStringItemOfExpression(node: IthStringItemOfExpression): AbstractString {
+    visitIthStringItemOfExpression(node: IthStringItemOfExpression): S {
         throw new ImplementMeException();
     }
 
-    visitJoinStringsExpression(node: JoinStringsExpression): AbstractString {
+    visitJoinStringsExpression(node: JoinStringsExpression): S {
+        return this._theories.stringTheory.joinStrings(node.operand1.accept(this), node.operand2.accept(this));
+    }
+
+    visitNumAsStringExpression(node: NumAsStringExpression): S {
+        const numVisitor = new DataNumExpressionVisitor(this._theories);
+        return this._theories.stringTheory.castNumberAsString(node.accept(numVisitor));
+    }
+
+    visitResourceAttributeOfExpression(node: ResourceAttributeOfExpression): S {
         throw new ImplementMeException();
     }
 
-    visitNumAsStringExpression(node: NumAsStringExpression): AbstractString {
+    visitStringAttributeOfExpression(node: StringAttributeOfExpression): S {
         throw new ImplementMeException();
     }
 
-    visitResourceAttributeOfExpression(node: ResourceAttributeOfExpression): AbstractString {
-        throw new ImplementMeException();
+    visitStringLiteral(node: StringLiteral): S {
+        return this._theories.stringTheory.fromConcreteString(new ConcreteString(node.text));
     }
 
-    visitStringAttributeOfExpression(node: StringAttributeOfExpression): AbstractString {
-        throw new ImplementMeException();
+    visitStringVariableExpression(node: StringVariableExpression): S {
+        return this._theories.stringTheory.abstractStringValue(node.variable);
     }
 
-    visitStringLiteral(node: StringLiteral): AbstractString {
-        throw new ImplementMeException();
+    visitVariableWithDataLocation(node: VariableWithDataLocation): S {
+        return this._theories.stringTheory.abstractStringValue(node);
     }
 
-    visitStringVariableExpression(node: StringVariableExpression): AbstractString {
+    visitCastExpression(node: CastExpression): S {
+        Preconditions.checkArgument(node.castToType == StringType.instance());
+
+        if (node.toConvert.expressionType == NumberType.instance()) {
+            const numVisitor = new DataNumExpressionVisitor(this._theories);
+            return this._theories.stringTheory.castNumberAsString(node.toConvert.accept(numVisitor));
+
+        } else if (node.toConvert.expressionType == StringType.instance()) {
+            return node.toConvert.accept(this);
+        }
+
         throw new ImplementMeException();
     }
 
@@ -333,9 +425,9 @@ export class DataStringExpressionVisitor implements CoreStringExpressionVisitor<
 
 export class DataListExpressionVisitor implements CoreListExpressionVisitor<AbstractList> {
 
-    private readonly _theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
+    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
 
-    constructor(theories: AbstractMemoryTheory<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
+    constructor(theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
@@ -358,9 +450,9 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
     implements CoreVisitor<B>, CoreNonCtrlStatementnVisitor<B> {
 
     private readonly _mem: B;
-    private readonly _theories: AbstractMemoryTheory<B, B, N, S, L>;
+    private readonly _theories: AbstractTheories<B, B, N, S, L>;
 
-    constructor(base: B, theories: AbstractMemoryTheory<B, B, N, S, L>) {
+    constructor(base: B, theories: AbstractTheories<B, B, N, S, L>) {
         this._mem = Preconditions.checkNotUndefined(base);
         this._theories = Preconditions.checkNotUndefined(theories);
     }
@@ -369,8 +461,18 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
         const method = node.calledMethod.text;
         if (method == MethodIdentifiers._RUNTIME_signalFailure) {
             return this._mem;
+        } else if (method.startsWith("_RUNTIME_")) {
+            throw new ImplementMeException();
         }
-        throw new ImplementMeException();
+        return this._mem;
+    }
+
+    visitBeginAtomicStatement(node: BeginAtomicStatement): B {
+        return this._mem;
+    }
+
+    visitEndAtomicStatement(node: EndAtomicStatement): B {
+        return this._mem;
     }
 
     visitAddElementToStatement(node: AddElementToStatement): B {
@@ -397,15 +499,21 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
         throw new ImplementMeException();
     }
 
-    visitDeclareAttributeOfStatement(node: DeclareAttributeOfStatement): B {
-        throw new ImplementMeException();
-    }
-
     visitDeclareAttributeStatement(node: DeclareAttributeStatement): B {
         throw new ImplementMeException();
     }
 
+    visitDeclareActorVariableStatement(node: DeclareActorVariableStatement): B {
+        // We assume the variables to be initialized with NONDET-values
+        return this._mem;
+    }
+
     visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): B {
+        // We assume the variables to be initialized with NONDET-values
+        return this._mem;
+    }
+
+    visitDeclareSystemVariableStatement(node: DeclareSystemVariableStatement): B {
         // We assume the variables to be initialized with NONDET-values
         return this._mem;
     }
@@ -468,10 +576,10 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
     }
 
     visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): B {
-        // We assume that a wrapping analysis step takes care of SSA.
-        const declaredType = node.variable.type;
+        // We assume that a wrapping analysis step takes care of ssa.
+        const declaredType = node.variable.expressionType;
         if (declaredType instanceof NumberType) {
-            const visitor = new DataNumExpressionVisitor(this._theories.numTheory);
+            const visitor = new DataNumExpressionVisitor(this._theories);
             const value: N = node.toValue.accept(visitor);
             const assignTo = this._theories.numTheory.abstractNumberValue(node.variable);
             const assume: B = this._theories.numTheory.isNumberEqualTo(assignTo, value);
@@ -484,8 +592,19 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
             const assume: B = this._theories.boolTheory.equal(assignTo, value);
             return this._theories.boolTheory.and(this._mem, assume);
 
+        } else if (declaredType instanceof StringType) {
+            const visitor = new DataStringExpressionVisitor(this._theories);
+            const value: S = node.toValue.accept(visitor);
+            const assignTo = this._theories.stringTheory.abstractStringValue(node.variable);
+            const assume: B = this._theories.stringTheory.stringsEqual(assignTo, value);
+            return this._theories.boolTheory.and(this._mem, assume);
+
+        } else if (declaredType instanceof ActorType) {
+            // Handled by the control analysis
+            throw new IllegalArgumentException("This operation should have been handled by the control analysis!");
+
         } else {
-            throw new ImplementMeException;
+            throw new ImplementMeException();
         }
     }
 

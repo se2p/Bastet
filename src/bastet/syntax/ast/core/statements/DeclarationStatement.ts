@@ -23,7 +23,7 @@ import {Statement} from "./Statement";
 import {Identifier} from "../Identifier";
 import {ScratchType} from "../ScratchType";
 import {StringExpression} from "../expressions/StringExpression";
-import {Variable, VariableWithDataLocation} from "../Variable";
+import {VariableWithDataLocation} from "../Variable";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {AstNode} from "../../AstNode";
 
@@ -37,8 +37,8 @@ export abstract class DeclarationStatement extends Statement {
 
 export interface VariableDeclaration {
 
-    ident: Identifier;
-    type: ScratchType;
+    identifier: Identifier;
+    variableType: ScratchType;
 
 }
 
@@ -48,16 +48,16 @@ export abstract class DeclareVariableStatement extends DeclarationStatement impl
 
     constructor(variable: VariableWithDataLocation) {
         Preconditions.checkNotUndefined(variable);
-        super([variable.identifier, variable.type]);
+        super([variable.identifier, variable.expressionType]);
         this._variable = variable;
     }
 
-    get ident(): Identifier {
+    get identifier(): Identifier {
         return this._variable.identifier;
     }
 
-    get type(): ScratchType {
-        return this._variable.type;
+    get variableType(): ScratchType {
+        return this._variable.expressionType;
     }
 
     get variable(): VariableWithDataLocation {
@@ -95,46 +95,21 @@ export class DeclareSystemVariableStatement extends DeclareVariableStatement {
 export class DeclareAttributeStatement extends DeclarationStatement {
 
     private readonly _attribute: StringExpression;
-    private readonly _type: ScratchType;
+    private readonly _attributeType: ScratchType;
 
     constructor(attribute: StringExpression, type: ScratchType) {
         super([attribute, type]);
         this._attribute = attribute;
-        this._type = type;
+        this._attributeType = type;
     }
 
-    get type(): ScratchType {
-        return this._type;
-    }
-
-    get attribute(): StringExpression {
-        return this._attribute;
-    }
-}
-
-export class DeclareAttributeOfStatement extends DeclarationStatement {
-
-    private readonly _attribute: StringExpression;
-    private readonly _type: ScratchType;
-    private readonly _of: Identifier;
-
-    constructor(attribute: StringExpression, type: ScratchType, of: Identifier) {
-        super([attribute, type, of]);
-        this._attribute = attribute;
-        this._type = type;
-        this._of = of;
+    get attributeType(): ScratchType {
+        return this._attributeType;
     }
 
     get attribute(): StringExpression {
         return this._attribute;
     }
 
-    get type(): ScratchType {
-        return this._type;
-    }
-
-    get of(): Identifier {
-        return this._of;
-    }
 }
 

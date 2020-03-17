@@ -18,7 +18,7 @@ actor MiniActor is RuntimeEntity begin
             define b as 3
         end
 
-        if ((x < y) and (a = 1)) then begin
+        if ((x < y) and (b = 2)) then begin
             // Unreachable
             _RUNTIME_signalFailure()
         end

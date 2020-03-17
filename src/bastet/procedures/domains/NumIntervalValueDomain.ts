@@ -33,7 +33,6 @@ import {
     BooleanTheory,
     RationalNumberTheory
 } from "./MemoryTransformer";
-import {Identifier} from "../../syntax/ast/core/Identifier";
 import {Variable} from "../../syntax/ast/core/Variable";
 
 export interface NumIntervalValueAttribs extends AbstractElement {
@@ -180,6 +179,18 @@ export class NumIntervalTheory implements RationalNumberTheory<NumIntervalValue,
     }
 
     zero(): NumIntervalValue {
+        throw new ImplementMeException();
+    }
+
+    isGreaterEqual(s1: NumIntervalValue, s2: NumIntervalValue): AbstractBoolean {
+        throw new ImplementMeException();
+    }
+
+    isLessEqual(s1: NumIntervalValue, s2: NumIntervalValue): AbstractBoolean {
+        throw new ImplementMeException();
+    }
+
+    ifThenElse(cond: AbstractBoolean, thenResult: NumIntervalValue, elseResult: NumIntervalValue): NumIntervalValue {
         throw new ImplementMeException();
     }
 

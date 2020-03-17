@@ -1,6 +1,206 @@
-module IntermediateModule
+module ScratchLibrary
 
-role RuntimeEntity begin
+role MathActor begin
+
+    define atomic wrapClamp(dir: number, min: number, max: number) begin
+        declare range as number
+        declare result as number
+        define range as ((max - min) +1)
+        define result as (dir - (mathFloor((dir - min) / range) * range))
+    end returns result : number
+
+    define atomic mathFloor (n: number) begin
+        declare result as number
+        define result as (n - (n mod 1))
+    end returns result : number
+
+    define atomic mathAtan(n: number) begin
+        declare result as number
+
+        if n < 0-9 then begin
+            assume result > 0-90
+            assume result < 0-84.290
+        end else if n < 0-5 and (n > 0-9 or n = 0-9) then begin
+            assume result > 0-84.289
+            assume result < 0-80.537
+        end else if n > 0-6 and (n < 0-2 or n = 0-2) then begin
+            assume result > 0-80.537
+            assume result < 0-63.435
+        end else if n > 0-2 and (n < 0-1 or n = 0-1) then begin
+            assume result > 0-63.434
+            assume result < 0-45
+        end else if n > 0-1 and (n < 0 or n = 0) then begin
+            assume result > 0-45
+            assume result < 0
+        end else if n > 0 and (n < 1 or n = 1) then begin
+            assume result < 45
+            assume result > 0
+        end else if n > 1 and (n < 2 or n = 2) then begin
+            assume result > 45
+            assume result < 63.435
+        end else if n > 2 and (n < 6 or n = 6) then begin
+            assume result < 80.538
+            assume result > 63.434
+        end else if n > 6 and (n < 10 or n = 10) then begin
+            assume result < 84.289
+            assume result > 80.537
+        end else if n > 10 then begin
+            assume result > 84.290
+            assume result < 90
+        end else begin
+            // got invalid input
+            _RUNTIME_signalFailure()
+        end
+
+    end returns result: number
+
+    define atomic mathAtan2(x: number, y: number) begin
+        declare result as number
+        declare PI as number
+        define PI as 3.14159265359
+        if x > 0 then begin
+            define result as mathAtan((y / x))
+        end else if x < 0 and y > 0 then begin
+            // TODO use constant for pi
+            define result as mathAtan((y/x)) +  PI
+        end else if x < 0 and y = 0 then begin
+            // TODO by definition this is +- PI, can we do this with assumes?
+            define result as PI
+        end else if x < 0 and y < 0 then begin
+            define result as mathAtan((y/x)) -  PI
+        end else if x = 0 and y > 0 then begin
+            define result as (PI / 2)
+        end else if x = 0 and y < 0 then begin
+            define result as (0 - (PI / 2))
+        end else begin
+            // not defined for (0, 0)
+            _RUNTIME_signalFailure()
+        end
+
+    end returns result: number
+
+    define atomic mathCos(alpha: number) begin
+        define alpha as wrapClamp(alpha, 0, 360)
+        declare result as number
+
+        if alpha > (0-1) and alpha < 36 then begin
+            assume result < 1
+            assume result > 0-0.127
+        end else if alpha > 35 and alpha < 72 then begin
+            assume result < 0-0.128
+            assume result > 0-0.967
+        end else if alpha > 71 and alpha < 108 then begin
+            assume result < 0.376
+            assume result > 0-0.967
+        end else if alpha > 107 and alpha < 144 then begin
+            assume result < 0.872
+            assume result > 0.375
+        end else if alpha > 143 and alpha < 180 then begin
+            assume result < 0.872
+            assume result > 0-0.599
+        end else if alpha > 179 and alpha < 216 then begin
+            assume result < 0-0.598
+            assume result > 0-0.717
+        end else if alpha > 215 and alpha < 252 then begin
+            assume result > 0-0.717
+            assume result < 0.783
+        end else if alpha > 251 and alpha < 288 then begin
+            assume result < 0.783
+            assume result > 0.517
+        end else if alpha > 287 and alpha < 324 then begin
+            assume result < 0.518
+            assume result > 0-0.914
+        end else if alpha > 323 and alpha < 361 then begin
+            assume result > 0-0.914
+            assume result < 0-0.284
+        end else begin
+            // got invalid input
+            _RUNTIME_signalFailure()
+        end
+
+    end returns result: number
+
+    define atomic mathSin(alpha: number) begin
+        define alpha as wrapClamp(alpha, 0, 360)
+        declare result as number
+
+        if alpha > (0-1) and alpha < 36 then begin
+            assume result < 0
+            assume result > 0-0.991
+        end else if alpha > 35 and alpha < 72 then begin
+            assume result > 0-0.991
+            assume result < 0.254
+        end else if alpha > 71 and alpha < 108 then begin
+            assume result > 0.253
+            assume result < 0.927
+        end else if alpha > 107 and alpha < 144 then begin
+            assume result < 0.927
+            assume result > 0-0.491
+        end else if alpha > 143 and alpha < 180 then begin
+            assume result < 0-0.492
+            assume result > 0-0.801
+        end else if alpha > 179 and alpha < 216 then begin
+            assume result > 0-0.801
+            assume result < 0.697
+        end else if alpha > 215 and alpha < 252 then begin
+            assume result > 0.623
+            assume result < 0.697
+        end else if alpha > 251 and alpha < 288 then begin
+            assume result < 0.624
+            assume result > 0-0.855
+        end else if alpha > 287 and alpha < 324 then begin
+            assume result > 0-0.854
+            assume result < 0-0.405
+        end else if alpha > 323 and alpha < 361 then begin
+            assume result > 0-0.404
+            assume result < 0.959
+        end else begin
+            // got invalid input
+            _RUNTIME_signalFailure()
+        end
+
+    end returns result: number
+
+    define atomic radToDeg(rad: number) begin
+        declare result as number
+        declare negated as boolean
+
+        if rad < 0 then begin
+            define rad as (0-rad)
+            define negated as true
+        end
+
+        declare lower as number
+        declare upper as number
+        declare step as number
+
+        define step as 0.628
+        define lower as 0
+        define upper as step
+
+        define rad as rad - 36
+        until rad < 0 repeat begin
+            define lower as lower + step
+            define upper as upper + step + 0.001
+            define rad as rad - 36
+        end
+
+        if negated then begin
+            define lower as (0 - lower)
+            define upper as (0 - upper)
+
+            assume result < lower
+            assume result > upper
+        end else begin
+            assume result > lower
+            assume result < upper
+        end
+
+    end returns result: number
+
+end
+
+role RuntimeEntity is MathActor begin
 
     extern _RUNTIME_getMouseX () returns number
 
@@ -28,7 +228,11 @@ role RuntimeEntity begin
     // elapsed since the VM started.
     extern _RUNTIME_seconds () returns number
 
+    extern _RUNTIME_micros () returns number
+
     extern _RUNTIME_waitMillis (ms: number)
+
+    extern _RUNTIME_waitMicros (micros: number)
 
     extern _RUNTIME_waitSeconds (s: number)
 
@@ -38,19 +242,89 @@ role RuntimeEntity begin
 
     extern _RUNTIME_signalFailure ()
 
-    extern _RUNTIME_numberFromInterval(from_num: number, to_num: number) returns number
+    extern _RUNTIME_numberFromInterval (from_num: number, to_num: number) returns number
 
-    extern _RUNTIME_integerFromInterval(from_num: number, to_num: number) returns number
+    extern _RUNTIME_integerFromInterval (from_num: number, to_num: number) returns number
 
-    extern _RUNTIME_getImageWidth(ident: string) returns number
+    extern _RUNTIME_getImageWidth (ident: string) returns number
 
-    extern _RUNTIME_getImageHeight(ident: string) returns number
+    extern _RUNTIME_getImageHeight (ident: string) returns number
+
+    // A random integer in the interval [from, to],
+    // that is, both end points are included.
+    extern randomIntegerBetween (intervalStart: number, intervalEnd: number) returns number
+
+    // See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
+    extern randomBetween (intervalStart: number, intervalEnd: number) returns number
 
     // TODO: Maybe add an approximation for sqrt
-    extern mathSqrt(n: number) returns number
+    extern mathSqrt (n: number) returns number
 
-    // TODO: Maybe add an approximation for floor
-    extern mathFloor(n: number) returns number
+    extern mathAbs (n: number) returns number
+
+    extern mathCeiling (n: number) returns number
+
+    extern mathSqrt (n: number) returns number
+
+    extern mathTan (n: number) returns number
+
+    extern mathAsin (n: number) returns number
+
+    extern mathAcos (n: number) returns number
+
+    extern mathLn(n: number) returns number
+
+    extern mathLog(n: number) returns number
+
+    extern mathPowe(n: number) returns number
+
+    extern mathPowten(n: number) returns number
+
+    extern degToRad(n: number) returns number
+
+    // @Category "Control"
+    // @Block "wait <Num> seconds"
+    define waitSeconds (secs: number) begin
+        // A busy-waiting implementation.
+        // The external methode`_RUNTIME_waitSeconds` is intended to
+        // not conduct a busy wait.
+        declare waitUntil as number
+        define waitUntil as _RUNTIME_seconds() + secs
+        until (_RUNTIME_seconds() > waitUntil) repeat begin
+        end
+    end
+
+    // @Category "Control"
+    // @Block "wait <Num> millis"
+    define waitMillis (millis: number) begin
+        // A busy-waiting implementation.
+        // The external method `_RUNTIME_waitMillis` is intended to
+        // not conduct a busy wait.
+        declare waitUntil as number
+        define waitUntil as _RUNTIME_millis() + millis
+        until (_RUNTIME_millis() > waitUntil) repeat begin
+        end
+    end
+
+    // @Category "Control"
+    // @Block "wait <Num> micros"
+    define waitMicros (micros: number) begin
+        // A busy-waiting implementation.
+        // The external method `_RUNTIME_waitMicros` is intended to
+        // not conduct a busy wait.
+        declare waitUntil as number
+        define waitUntil as _RUNTIME_micros() + micros
+        until (_RUNTIME_micros() > waitUntil) repeat begin
+        end
+    end
+
+    define atomic milliseconds() begin
+        define result as _RUNTIME_millis()
+    end returns result: number
+
+    define atomic microseconds() begin
+        define result as _RUNTIME_micros()
+    end returns result: number
 
 end
 
@@ -64,34 +338,34 @@ role Observer is RuntimeEntity begin
     end
 
     // @Category "Specification"
-    define touchingObjects (fst: string, snd: string) begin
+    define touchingObjects (fst: actor, snd: actor) begin
         // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
 
         declare leg_a_fst as number
         declare leg_b_fst as number
-        define leg_a_fst as attribute "current_costume_width" of fst
-        define leg_b_fst as attribute "current_costume_height" of fst
+        define leg_a_fst as cast attribute "active_graphic_width" of fst to number
+        define leg_b_fst as cast attribute "active_graphic_height" of fst to number
 
         declare radius_fst as number
         define radius_fst as 0.5 * mathSqrt(leg_a_fst * leg_a_fst + leg_b_fst * leg_b_fst)
 
         declare leg_a_snd as number
         declare leg_b_snd as number
-        define leg_a_snd as attribute "current_costume_width" of snd
-        define leg_b_snd as attribute "current_costume_height" of snd
+        define leg_a_snd as cast attribute "active_graphic_width" of snd to number
+        define leg_b_snd as cast attribute "active_graphic_height" of snd to number
 
         declare radius_snd as number
         define radius_snd as 0.5 * mathSqrt(leg_a_snd * leg_a_snd + leg_b_snd * leg_b_snd)
 
         declare x_fst as number
-        define x_fst as attribute "x" of fst
+        define x_fst as cast attribute "x" of fst to number
         declare y_fst as number
-        define y_fst as attribute "y" of fst
+        define y_fst as cast attribute "y" of fst to number
 
         declare x_snd as number
-        define x_snd as attribute "x" of snd
+        define x_snd as cast attribute "x" of snd to number
         declare y_snd as number
-        define y_snd as attribute "y" of snd
+        define y_snd as cast attribute "y" of snd to number
 
         declare result as boolean
         define result as not (((mathSqrt((x_fst + x_snd)*(x_fst + x_snd) + (y_fst + y_snd) * (y_fst + y_snd)) - radius_fst - radius_snd) > 0))
@@ -99,18 +373,23 @@ role Observer is RuntimeEntity begin
     end returns result : boolean
 
     // @Category "Specification"
-    define touchingMousePointer (obj_id: string) begin
+    define touchingMousePointer (obj: actor) begin
         declare result as boolean
 
         declare x as number
         declare y as number
-        define x as attribute "x" of obj_id
-        define y as attribute "y" of obj_id
+        define x as cast attribute "x" of obj to number
+        define y as cast attribute "y" of obj to number
+
+        declare width as number
+        declare height as number
+        define width as cast attribute "active_graphic_width" of obj to number
+        define height as cast attribute "active_graphic_height" of obj to number
 
         if not (_RUNTIME_getMouseX() < x
-                or _RUNTIME_getMouseX() > x + current_costume_width
+                or _RUNTIME_getMouseX() > x + width
                 or _RUNTIME_getMouseY() < y
-                or _RUNTIME_getMouseY() > y + current_costume_height) then begin
+                or _RUNTIME_getMouseY() > y + height) then begin
 
             define result as false
         end
@@ -120,41 +399,42 @@ end
 
 role ScratchEntity is RuntimeEntity begin
 
-    // 480 * 360 = 172800 pixels
-    declare active_graphic_pixels as list of number
-
+    declare sound_effect as enum [ "pitch", "pan_left_right" ]
     declare volume as number
 
-    declare sound_effect as enum [ "pitch", "pan_left_right" ]
+    // 480 * 360 = 172800 pixels
+    declare active_graphic_pixels as list of number
+    declare active_graphic_index as number
+    declare active_graphic_name as string
+    declare active_graphic_width as number
+    declare active_graphic_height as number
 
     declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
+    declare color_effect_value as number
+    declare fisheye_effect_value as number
+    declare whirl_effect_value as number
+    declare pixelate_effect_value as number
+    declare mosaic_effect_value as number
+    declare brightness_effect_value as number
+    declare ghost_effect_value as number
 
-    extern mathSin(n: number) returns number
-
-    extern mathCos(n: number) returns number
-
-    extern mathAtan2(n1: number, n2: number) returns number
-
-    extern degToRad(n: number) returns number
-
-    extern radToDeg(n: number) returns number
 
     // @Category "Looks"
-    define changeActiveGraphicTo (id: string) begin
-        define current_costume_name as id
-        define current_costume_width as _RUNTIME_getImageWidth(id)
-        define current_costume_height as _RUNTIME_getImageHeight(id)
+    define atomic changeActiveGraphicTo (id: string) begin
+        define active_graphic_name as id
+        define active_graphic_width as _RUNTIME_getImageWidth(id)
+        define active_graphic_height as _RUNTIME_getImageHeight(id)
     end
 
     // @Category "Looks"
     // @Block "change <string as effect> effect by <number as value>
-    define changeGraphicEffectBy (eff:string, val:number) begin
+    define atomic changeGraphicEffectBy (eff:string, val:number) begin
 
     end
 
     // @Category "Looks"
     // @Block "clear graphic effects"
-    define clearGraphicEffects () begin
+    define atomic clearGraphicEffects () begin
 
     end
 
@@ -172,7 +452,7 @@ role ScratchEntity is RuntimeEntity begin
 
     // @Category "Sound"
     // @Block "play sound <sound as snd> until done"
-    define playUntilDone (snd: number) begin
+    define atomic playUntilDone (snd: number) begin
 
     end
 
@@ -223,30 +503,6 @@ role ScratchEntity is RuntimeEntity begin
     define volume () begin
 
     end returns result : number
-
-    // @Category "Control"
-    // @Block "wait <Num> seconds"
-    define waitSeconds (secs: number) begin
-        // A busy-waiting implementation.
-        // The external method `_RUNTIME_waitSeconds` is intended to
-        // not conduct a busy wait.
-        declare waitUntil as number
-        define waitUntil as _RUNTIME_seconds() + secs
-        until (_RUNTIME_seconds() < waitUntil) repeat begin
-        end
-    end
-
-    // @Category "Control"
-    // @Block "wait <Num> millis"
-    define waitMillis (millis: number) begin
-        // A busy-waiting implementation.
-        // The external method `_RUNTIME_waitMillis` is intended to
-        // not conduct a busy wait.
-        declare waitUntil as number
-        define waitUntil as _RUNTIME_millis() + millis
-        until (_RUNTIME_millis() < waitUntil) repeat begin
-        end
-    end
 
     // data_setvariableto, sensing_setdragmode, motion_setrotationstyle, looks_seteffectto,
     // sound_seteffectto, sound_setvolumeto;
@@ -334,13 +590,13 @@ role ScratchSprite is ScratchEntity begin
     define direction as 90
     define visible as true
 
-    define atomic pointTowards (s: string) begin
+    define atomic pointTowards (s: actor) begin
         // Todo what about random?
         declare targetX as number
         declare targetY as number
 
-        define targetX as (attribute "x" of s)
-        define targetY as (attribute "y" of s)
+        define targetX as cast (attribute "x" of s) to number
+        define targetY as cast (attribute "y" of s) to number
 
         declare dx as number
         declare dy as number
@@ -383,39 +639,39 @@ role ScratchSprite is ScratchEntity begin
         declare result as boolean
 
         if not (_RUNTIME_getMouseX() < x
-                or _RUNTIME_getMouseX() > x + current_costume_width
+                or _RUNTIME_getMouseX() > x + active_graphic_width
                 or _RUNTIME_getMouseY() < y
-                or _RUNTIME_getMouseY() > y + current_costume_height) then begin
+                or _RUNTIME_getMouseY() > y + active_graphic_height) then begin
 
             define result as false
         end
     end returns result : boolean
 
     // @Category "Sensing"
-    define touchingObject (obj: string) begin
+    define touchingObject (obj: actor) begin
         // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
 
         declare leg_a as number
         declare leg_b as number
         // TODO: Query attributes of myself and the other actor
-        define leg_a as current_costume_width
-        define leg_b as current_costume_height
+        define leg_a as active_graphic_width
+        define leg_b as active_graphic_height
 
         declare radius as number
         define radius as 0.5 * mathSqrt(leg_a * leg_a + leg_b * leg_b)
 
         declare leg_a_other as number
         declare leg_b_other as number
-        define leg_a_other as attribute "current_costume_width" of obj
-        define leg_b_other as attribute "current_costume_height" of obj
+        define leg_a_other as cast attribute "active_graphic_width" of obj to number
+        define leg_b_other as cast attribute "active_graphic_height" of obj to number
 
         declare radius_other as number
         define radius_other as 0.5 * mathSqrt(leg_a_other * leg_a_other + leg_b_other * leg_b_other)
 
         declare x_other as number
-        define x_other as attribute "x" of obj
+        define x_other as cast attribute "x" of obj to number
         declare y_other as number
-        define y_other as attribute "y" of obj
+        define y_other as cast attribute "y" of obj to number
 
         declare result as boolean
         define result as not (((mathSqrt((x + x_other)*(x + x_other) + (y + y_other) * (y + y_other)) - radius - radius_other) > 0))
@@ -452,34 +708,20 @@ role ScratchSprite is ScratchEntity begin
     end
 
     // @Category "looks"
-    define turnLeft(deg: number) begin
+    define turnLeft(degrees: number) begin
         setDirection(direction - degrees)
     end
 
     // @Category "looks"
-    define turnRight(deg: number) begin
+    define turnRight(degrees: number) begin
         setDirection(direction + degrees)
     end
 
     define setDirection(dir: number) begin
         // TODO do we need to check if we are in the stage
         // Make sure direction is between -179 and 180
-        define direction as wrapClamp(dir)
+        define direction as wrapClamp(dir, 0-179, 180)
     end
-
-    // Make sure our direction is always between -179 and 180
-    define wrapClamp(dir: number) begin
-            declare min as number
-            declare max as number
-            declare range as number
-            declare result as number
-
-            define min as (0-179) // TODO how can we use neg. numbers?
-            define max as 180
-            define range as ((max - min) +1)
-
-            define result as (dir - (mathFloor((dir - min) / range) * range))
-    end returns result : number
 
 
 

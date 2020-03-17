@@ -21,21 +21,22 @@
 
 import {App} from "../app/App";
 import {RuleNode} from "antlr4ts/tree";
-import {ToIntermediateTransformer, TypeInformationStorage} from "./ToIntermediateTransformer";
 import {AppBuilder} from "../app/AppBuilder";
 import {AstNode} from "../ast/AstNode";
 import {TextualProgramParser} from "../parser/TextualProgramParser";
+import {ToIntermediateTransformer} from "./ToIntermediateTransformer";
+import {TypeInformationStorage} from "../DeclarationScopes";
 
 export class CodeToApp {
 
-    public static codeToApp(code: string, library: App, config: {}, actorNamePrefix: string = ""): App {
+    public static codeToApp(code: string, library: App, config: {}): App {
         const scratchParser = new TextualProgramParser();
         const rawAST: RuleNode = scratchParser.parseSource("string", code);
         const transformer = new ToIntermediateTransformer();
         const typeStorage = new TypeInformationStorage();
         const intermAST: AstNode = transformer.transform(library, rawAST, typeStorage, config);
         const ab: AppBuilder = new AppBuilder(library);
-        return ab.buildFromSyntaxTree("string", intermAST, actorNamePrefix);
+        return ab.buildFromSyntaxTree("string", intermAST, typeStorage);
     }
 
 }

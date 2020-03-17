@@ -19,7 +19,12 @@
  *
  */
 
-import {ProgramAnalysis, TransitionLabelProvider, WrappingProgramAnalysis} from "../ProgramAnalysis";
+import {
+    MergeIntoOperator,
+    ProgramAnalysis,
+    TransitionLabelProvider,
+    WrappingProgramAnalysis
+} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {
     GraphAbstractDomain,
@@ -37,9 +42,27 @@ import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
 import {AnalysisStatistics} from "../AnalysisStatistics";
+import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {NoMergeIntoOperator, StandardMergeIntoOperator} from "../Operators";
+import {BastetConfiguration} from "../../../utils/BastetConfiguration";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+
+
+export class GraphAnalysisConfig extends BastetConfiguration {
+
+    constructor(dict: {}) {
+        super(dict, ['GraphAnalysis']);
+    }
+
+    get mergeIntoOperator(): string {
+        return this.getStringProperty('mergeIntoOperator', 'NoMergeIntoOperator');
+    }
+
+}
 
 export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState>,
-    Unwrapper<GraphAbstractState, AbstractElement> {
+    Unwrapper<GraphAbstractState, AbstractElement>,
+    TransitionLabelProvider<GraphAbstractState> {
 
     private readonly _abstractDomain: AbstractDomain<GraphConcreteState, GraphAbstractState>;
 
@@ -53,14 +76,29 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
 
     private readonly _statistics: AnalysisStatistics;
 
-    constructor(task: App, wrappedAnalysis: ProgramAnalysis<any, any>, statistics: AnalysisStatistics) {
+    private readonly _mergeIntoOp: MergeIntoOperator<GraphAbstractState>;
+
+    private readonly _config: GraphAnalysisConfig;
+
+    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysis<any, any>, statistics: AnalysisStatistics) {
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
 
+        this._config = new GraphAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new GraphAbstractDomain();
         this._transferRelation = new GraphTransferRelation((e) => this._wrappedAnalysis.abstractSucc(e));
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
+
+        if (this._config.mergeIntoOperator == 'NoMergeIntoOperator') {
+            this._mergeIntoOp = new NoMergeIntoOperator<GraphAbstractState>();
+
+        } else if (this._config.mergeIntoOperator == 'StandardMergeIntoOperator') {
+            this._mergeIntoOp = new StandardMergeIntoOperator(wrappedAnalysis, wrappedAnalysis);
+
+        } else {
+            throw new IllegalArgumentException("Illegal configuration value");
+        }
     }
 
     abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
@@ -76,14 +114,14 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         return false;
     }
 
-    stop(state: GraphAbstractState, reached: Iterable<GraphAbstractState>): boolean {
-        for (const r of reached) {
-            const w: AbstractElement = state.getWrappedState();
-            if (this._wrappedAnalysis.stop(w, [r.getWrappedState()])) {
-                return true;
-            }
-        }
-        return false;
+    mergeInto(state: GraphAbstractState, reached: StateSet<GraphAbstractState>,
+              unwrapper: (AbstractElement) => GraphAbstractState,
+              wrapper: (E) => AbstractElement): StateSet<GraphAbstractState> {
+        return this._mergeIntoOp.mergeInto(state, reached, unwrapper, wrapper);
+    }
+
+    stop(state: GraphAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => GraphAbstractState): boolean {
+        return this._wrappedAnalysis.stop(state.getWrappedState(), reached, (e) => this.unwrap(unwrapper(e)));
     }
 
     target(state: GraphAbstractState): Property[] {
@@ -102,20 +140,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         } );
     }
 
-    private determineTransLabProvider(from: ProgramAnalysis<any, any>): TransitionLabelProvider {
-        if ('getTransitionLabel' in from) {
-            return from as TransitionLabelProvider;
-        } else if ('wrappedAnalysis' in from) {
-            const wrapper = from as WrappingProgramAnalysis<any, any>
-            return this.determineTransLabProvider(wrapper.wrappedAnalysis);
-        } else {
-            return null;
-        }
-    }
-
     exportAnalysisResult(reachedPrime: StateSet<GraphAbstractState>, frontierPrime: StateSet<GraphAbstractState>) {
-        const trp = this.determineTransLabProvider(this.wrappedAnalysis);
-        const exporter = new GraphToDot(trp, reachedPrime, frontierPrime);
+        const exporter = new GraphToDot(this._task, this, reachedPrime, frontierPrime);
         exporter.writeToFile(`output/reachability-graph.dot`);
     }
 
@@ -139,4 +165,9 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         const wrappedReached = new GraphReachedSetWrapper(reached, frontier);
         return [frontier, wrappedReached];
     }
+
+    getTransitionLabel(from: GraphAbstractState, to: GraphAbstractState): ProgramOperation[] {
+        return this.wrappedAnalysis['getTransitionLabel'](from.getWrappedState(), to.getWrappedState());
+    }
+
 }

@@ -19,10 +19,10 @@
  *
  */
 
-import {TransitionRelation} from "./TransitionRelation";
+import {TransitionRelation, WithTransitionRelation} from "./TransitionRelation";
 import {CoreEvent} from "../../ast/core/CoreEvent";
 import {Preconditions} from "../../../utils/Preconditions";
-import {LocationID} from "./ControlLocation";
+import {LocationId} from "./ControlLocation";
 
 
 export type ScriptId = number;
@@ -31,7 +31,7 @@ export type ScriptId = number;
  * A single script, which represents the control flow
  * of a program or a fraction of a program.
  */
-export class Script {
+export class Script implements WithTransitionRelation {
 
     /** A unique identifier of this script */
     private readonly _id: ScriptId;
@@ -42,11 +42,15 @@ export class Script {
     /** The transition relation of the script */
     private readonly _transitions: TransitionRelation;
 
-    constructor(id: ScriptId, event: CoreEvent, transitions: TransitionRelation) {
+    /** Restart the script in case the event is triggered? */
+    private readonly _restartOnTriggered: boolean;
+
+    constructor(id: ScriptId, event: CoreEvent, restart: boolean, transitions: TransitionRelation) {
         Preconditions.checkNotUndefined(event);
         Preconditions.checkNotUndefined(transitions);
         this._id = id;
         this._event = event;
+        this._restartOnTriggered = restart;
         this._transitions = transitions;
     }
 
@@ -62,8 +66,13 @@ export class Script {
         return this._id;
     }
 
-    public getInitialLocation(): LocationID {
+    get restartOnTriggered(): boolean {
+        return this._restartOnTriggered;
+    }
+
+    public getInitialLocation(): LocationId {
         Preconditions.checkState(this.transitions.entryLocationSet.size === 1);
         return this.transitions.entryLocationSet.values().next().value;
     }
+
 }

@@ -19,14 +19,20 @@
  *
  */
 
-import {TransitionRelation, TransitionRelations} from "./TransitionRelation";
-import {OperationID, ProgramOperation, ProgramOperationFactory, ProgramOperations} from "./ops/ProgramOperation";
+import {TransitionRelation, TransitionRelationBuilder, TransitionRelations} from "./TransitionRelation";
+import {OperationId, ProgramOperation, ProgramOperationFactory, ProgramOperations} from "./ops/ProgramOperation";
 import {ControlLocation} from "./ControlLocation";
 import {CoreCtrlStatementnVisitor, CoreVisitor} from "../../ast/CoreVisitor";
 import {CallStatement} from "../../ast/core/statements/CallStatement";
-import {IfStatement, RepeatForeverStatement, UntilStatement} from "../../ast/core/statements/ControlStatement";
+import {
+    IfStatement,
+    RepeatForeverStatement,
+    UntilQueriedConditionStatement,
+    UntilStatement
+} from "../../ast/core/statements/ControlStatement";
 import {StatementList} from "../../ast/core/statements/Statement";
 import {AstNode} from "../../ast/AstNode";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 
 
 export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>, CoreCtrlStatementnVisitor<TransitionRelation> {
@@ -87,22 +93,51 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
 
     visitRepeatForeverStatement(node: RepeatForeverStatement): TransitionRelation {
         const loopBody: TransitionRelation = node.body.accept(this);
-        const loopHead: ControlLocation = ControlLocation.fresh();
-        const headRelation = TransitionRelations.singleton(loopHead);
-        return TransitionRelations.concatAndGoto(headRelation, loopBody, loopHead);
+
+        const builder = TransitionRelation.builder();
+        builder.addAllTransitionsOf(loopBody)
+            .connectLocations(loopBody.exitLocationSet, loopBody.entryLocationSet);
+
+        loopBody.entryLocationSet.forEach((l) => builder.addEntryLocationWithID(l));
+
+        return builder.build();
     }
 
     visitUntilStatement(node: UntilStatement): TransitionRelation {
-        this._stack.push("visitUntilStatement");
+        throw new IllegalArgumentException("Not expected. Transform to UntilQueriedConditionStatement before!");
+    }
+
+    visitUntilQueriedConditionStatement(node: UntilQueriedConditionStatement): TransitionRelation {
+        this._stack.push("visitUntilQueriedConditionStatement");
         try {
             const loopHead: ControlLocation = ControlLocation.fresh();
-            const loopBody: TransitionRelation = node.body.accept(this);
-            const condAssumeOp = ProgramOperationFactory.createAssumeOpFrom(node.cond);
+            const loopTerminationLocation: ControlLocation = ControlLocation.fresh();
 
-            return TransitionRelations.concatAndGoto(
-                TransitionRelations.singleton(loopHead),
-                TransitionRelations.concat(TransitionRelations.forOpSeq(condAssumeOp), loopBody),
-                loopHead);
+            const queryBody: TransitionRelation = node.conditionQueryStatements.accept(this);
+            const loopBody: TransitionRelation = node.body.accept(this);
+
+            const enterLoopBodyGuarded = TransitionRelations.concat(
+                TransitionRelations.forOpSeq(ProgramOperationFactory.negatedAssumeOpFrom(node.untilCondition)), loopBody);
+
+            const leaveLoopGuarded = TransitionRelations.forOpSeq(
+                ProgramOperationFactory.createAssumeOpFrom(node.untilCondition));
+
+            const loopHeadToQueryBody = TransitionRelations.concatOpTr(loopHead, ProgramOperations.epsilon(), queryBody);
+            const guardedBodyToHead = TransitionRelations.concatTrOpGoto(enterLoopBodyGuarded, ProgramOperations.epsilon(), loopHead);
+            const guardedLoopExit = TransitionRelations.concatTrOpGoto(leaveLoopGuarded, ProgramOperations.epsilon(), loopTerminationLocation);
+
+            const builder = new TransitionRelationBuilder();
+            builder.addAllTransitionsOf(loopHeadToQueryBody)
+                .addAllTransitionsOf(guardedBodyToHead)
+                .addAllTransitionsOf(guardedLoopExit)
+                .connectLocations(loopHeadToQueryBody.exitLocationSet, guardedBodyToHead.entryLocationSet)
+                .connectLocations(loopHeadToQueryBody.exitLocationSet, guardedLoopExit.entryLocationSet)
+                .connectLocations(guardedBodyToHead.exitLocationSet, loopHeadToQueryBody.entryLocationSet);
+
+            guardedLoopExit.exitLocationSet.forEach((loc) => builder.addExitLocationWithID(loc));
+            loopHeadToQueryBody.entryLocationSet.forEach((loc) => builder.addEntryLocationWithID(loc));
+
+            return builder.build();
         } finally {
             this._stack.pop();
         }
@@ -111,7 +146,7 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
     visit(node: AstNode): TransitionRelation {
         this._stack.push("visit");
         try {
-            const opid: OperationID = ProgramOperations.constructOp(node);
+            const opid: OperationId = ProgramOperations.constructOp(node);
             return TransitionRelations.forOpSeq(ProgramOperation.for(opid));
         } finally {
             this._stack.pop();

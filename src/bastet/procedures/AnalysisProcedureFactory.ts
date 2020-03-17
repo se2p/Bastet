@@ -19,17 +19,17 @@
  *
  */
 
-import {AnalysisProcedure, AnalysisResult, MultiPropertyAnalysisResult} from "./AnalysisProcedure";
+import {AnalysisProcedure, MultiPropertyAnalysisResult} from "./AnalysisProcedure";
 import {App} from "../syntax/app/App";
 import {GraphAnalysis} from "./analyses/graph/GraphAnalysis";
 import {ControlAnalysis} from "./analyses/control/ControlAnalysis";
 import {GraphAbstractState, GraphConcreteState} from "./analyses/graph/GraphAbstractDomain";
 import {ReachabilityAlgorithm} from "./algorithms/ReachabilityAlgorithm";
 import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
-import {SMTFactory} from "../utils/smt/z3/Z3Wrapper";
+import {SMTFactory} from "../utils/smt/z3/Z3SMT";
 import {DataAnalysis} from "./analyses/data/DataAnalysis";
 import {BDDLibraryFactory} from "../utils/bdd/BDD";
-import {Z3MemoryTheoryInContext} from "../utils/smt/z3/Z3MemoryTheory";
+import {Z3Theories} from "../utils/smt/z3/Z3Theories";
 import {SSAAnalysis} from "./analyses/ssa/SSAAnalysis";
 import {BMCAlgorithm} from "./algorithms/BMCAlgorithm";
 import {MultiPropertyAlgorithm} from "./algorithms/MultiPropertyAlgorithm";
@@ -37,18 +37,12 @@ import {Property} from "../syntax/Property";
 import {Set as ImmSet} from "immutable";
 import {AnalysisStatistics} from "./analyses/AnalysisStatistics";
 import {StatsAnalysis} from "./analyses/stats/StatsAnalysis";
-
-export class AnalysisProcedureConfig {
-
-    static readFromConfigurationFile(configFilepath: string) {
-        return new AnalysisProcedureConfig();
-    }
-
-}
+import {TimeAnalysis} from "./analyses/time/TimeAnalysis";
+import {StaticTimeProfile} from "../utils/TimeProfile";
 
 export class AnalysisProcedureFactory {
 
-    public static async createAnalysisProcedure(config: AnalysisProcedureConfig): Promise<AnalysisProcedure> {
+    public static async createAnalysisProcedure(config: {}): Promise<AnalysisProcedure> {
         return new class implements AnalysisProcedure {
 
             private _statistics: AnalysisStatistics;
@@ -64,14 +58,15 @@ export class AnalysisProcedureFactory {
 
                 // TODO: Delete the context after the analysis is no more in use
                 const defaultContect = smt.createContext();
-                const theories = new Z3MemoryTheoryInContext(defaultContect);
+                const theories = new Z3Theories(defaultContect);
                 const prover = smt.createProver(defaultContect);
                 const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
-                const memAnalysis = new DataAnalysis(firstOrderLattice, bddlib.lattice, theories, this._statistics);
-                const ssaAnalysis = new SSAAnalysis(task, memAnalysis, this._statistics);
-                const schedAnalysis = new ControlAnalysis({}, task, ssaAnalysis, this._statistics);
-                const graphAnalysis = new GraphAnalysis(task, schedAnalysis, this._statistics);
+                const dataAnalysis = new DataAnalysis(firstOrderLattice, bddlib.lattice, theories, this._statistics);
+                const ssaAnalysis = new SSAAnalysis(task, dataAnalysis, this._statistics);
+                const timeAnalysis = new TimeAnalysis(ssaAnalysis, this._statistics, new StaticTimeProfile());
+                const controlAnalysis = new ControlAnalysis(config, task, timeAnalysis, this._statistics);
+                const graphAnalysis = new GraphAnalysis(config, task, controlAnalysis, this._statistics);
                 const outerAnalysis = new StatsAnalysis<GraphConcreteState, GraphAbstractState>(graphAnalysis, this._statistics);
 
                 const frontier: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
@@ -79,9 +74,9 @@ export class AnalysisProcedureFactory {
 
                 const chooseOpConfig = new ChooseOpConfig();
                 const chooseOp = frontier.createChooseOp(chooseOpConfig);
-                const reachabilityAlgorithm = new ReachabilityAlgorithm(outerAnalysis, chooseOp, this._statistics);
+                const reachabilityAlgorithm = new ReachabilityAlgorithm(config, outerAnalysis, chooseOp, this._statistics);
                 const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, outerAnalysis.refiner, outerAnalysis, this._statistics);
-                const multiPropertyAlgorithm = new MultiPropertyAlgorithm(task, bmcAlgorithm, outerAnalysis, this._statistics,
+                const multiPropertyAlgorithm = new MultiPropertyAlgorithm(config, task, bmcAlgorithm, outerAnalysis, this._statistics,
                     (v, s, u, stats) => this.onAnalysisResult(v, s, u, stats));
 
                 const initialStates: GraphAbstractState[] = outerAnalysis.initialStatesFor(task);
@@ -95,7 +90,7 @@ export class AnalysisProcedureFactory {
             }
 
             private onAnalysisResult(violated: ImmSet<Property>, satisifed: ImmSet<Property>, unknowns: ImmSet<Property>, mpaStatistics: AnalysisStatistics) {
-                const analysisDurtionMSec = mpaStatistics.contextTimer.duration.toFixed(3);
+                const analysisDurtionMSec = mpaStatistics.contextTimer.totalDuration.toFixed(3);
 
                 mpaStatistics.put("num_violated", violated.size);
                 mpaStatistics.put("num_unknown", unknowns.size);
@@ -112,6 +107,7 @@ export class AnalysisProcedureFactory {
                             console.log(`\t(${index}) ${p.text}`);
                             index++;
                         }
+                        console.log("");
                     }
                 };
 
@@ -119,14 +115,14 @@ export class AnalysisProcedureFactory {
                 console.log(`\nAnalysis finished after ${analysisDurtionMSec} msec.\n`);
 
                 if (violated.isEmpty() && satisifed.isEmpty() && unknowns.isEmpty()) {
-                    console.log('No violations found. Full specification SATISFIED.')
+                    console.log('The analysis terminated with neither proofs nor counterexamples. Incomplete?')
                 } else {
                     printPropertySetAs("VIOLATED", violated);
                     printPropertySetAs("SATISFIED", satisifed);
                     printPropertySetAs("UNKNOWN", unknowns);
                 }
 
-                console.log("\nBye.");
+                console.log("Bye.");
 
                 // Store the new result
                 this._result = new MultiPropertyAnalysisResult(satisifed, violated, unknowns, this._statistics);

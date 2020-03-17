@@ -19,6 +19,7 @@
  *
  */
 
+import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable";
 import {ErrorNode, ParseTree, RuleNode, TerminalNode} from "antlr4ts/tree";
 import {ScratchVisitor} from "../parser/grammar/ScratchVisitor";
 import {AbsentAstNode, AstNode, OptionalAstNode, PresentAstNode} from "../ast/AstNode";
@@ -31,8 +32,9 @@ import {
     AddElementToStatementContext,
     AfterBootstrapMonitoringEventContext,
     AfterStatementMonitoringEventContext,
-    AppMessageContext,
+    UserMessageContext,
     AssumeStatementContext,
+    AtomicMethodContext,
     BoolAndExpressionContext,
     BoolAsNumExpressionContext,
     BoolAsStringExpressionContext,
@@ -46,18 +48,13 @@ import {
     BroadcastAndWaitStatementContext,
     BroadcastMessageStatementContext,
     CallStmtContext,
-    ChagenAttributeByStatementContext,
-    ChangeVarByStatementContext,
     CloneStartEventContext,
-    ColorFromNumExpressionContext,
     ConcreteActorModeContext,
     ConditionReachedEventContext,
     CoreBoolExprContext,
     CoreStringExprContext,
     CreateCloneOfStatementContext,
     DeclarationStmtListContext,
-    DeclareAttributeContext,
-    DeclareAttributeOfContext,
     DeclareVariableContext,
     DefaultBoolExpressionContext,
     DefaultNumExprContext,
@@ -67,6 +64,7 @@ import {
     DeleteThisCloneContext,
     EnumTypeContext,
     EpsilonStatementContext,
+    EqualsExpressionContext,
     ExpressionListContext,
     ExpressionListPlainContext,
     ExpressionStmtContext,
@@ -76,6 +74,7 @@ import {
     ExternMethodResultDeclarationContext,
     ExternVoidReturnDefinitionContext,
     FunctionReturnDefinitionContext,
+    GreaterThanExpressionContext,
     IdentContext,
     IdentExpressionContext,
     IfStmtContext,
@@ -90,13 +89,12 @@ import {
     IthLetterOfStringExpressionContext,
     IthStringItemOfExpressionContext,
     JoinStringsExpressionContext,
-    KeyContext,
     LengthOfListExpressionContext,
     LengthOfStringExpressionContext,
+    LessThanExpressionContext,
     ListTypeContext,
     ListVariableExpressionContext,
     ListWithElementsExpressionContext,
-    MapTypeContext,
     MessageReceivedEventContext,
     MethodDefinitionContext,
     MethodDefinitionListContext,
@@ -108,17 +106,11 @@ import {
     NumBracketsContext,
     NumCallStatementExpressionContext,
     NumDivExpressionContext,
-    NumEqualsExpressionContext,
-    NumFunctContext,
-    NumFunctExpressionContext,
-    NumGreaterThanExpressionContext,
-    NumLessThanExpressionContext,
     NumLiteralExpressionContext,
     NumMinusExpressionContext,
     NumModExpressionContext,
     NumMulExpressionContext,
     NumPlusExpressionContext,
-    NumRandomExpressionContext,
     NumVariableExpressionContext,
     ParameterContext,
     ParameterListContext,
@@ -129,13 +121,13 @@ import {
     RepeatForeverStmtContext,
     RepeatTimesStmtContext,
     ReplaceElementAtStatementContext,
+    ResetTimerStatementContext,
     ResourceContext,
     ResourceListContext,
     ResourceLocatorContext,
+    RestartScriptContext,
     ScriptContext,
     ScriptListContext,
-    SetAttributeOfToStatementContext,
-    SetAttributeToStatementContext,
     SetStatementContext,
     SetStmtListContext,
     SoundResourceContext,
@@ -148,8 +140,6 @@ import {
     StoreCallResultStatementContext,
     StoreEvalResultStatementContext,
     StrContainsExpressionContext,
-    StrEqualsExpressionContext,
-    StrGreaterThanExpressionContext,
     StrIdentExpressionContext,
     StringAsNumExpressionContext,
     StringAttributeOfExpressionContext,
@@ -158,7 +148,6 @@ import {
     StringParanthExpressionContext,
     StringTypeContext,
     StringVariableExpressionContext,
-    StrLessThanExpressionContext,
     SystemMessageContext,
     TimerExpressionContext,
     UnspecifiedBoolExpressionContext,
@@ -166,11 +155,18 @@ import {
     UnspecifiedNumExprContext,
     UnspecifiedStringExpressionContext,
     UntilStmtContext,
-    VarContainsExpressionContext,
     VariableContext,
     VoidReturnDefinitionContext,
     WaitSecsStatementContext,
-    WaitUntilStatementContext
+    WaitUntilStatementContext,
+    LocateActorExpressionContext,
+    ActorVariableExpressionContext,
+    ActorTypeContext,
+    EmptyElseCaseContext,
+    PureElseContext,
+    ElseIfCaseContext,
+    FullMethodDefinitionContext,
+    RuntimeMethodDefinitionContext, FlatVariableContext, NumAsBoolExpressionContext
 } from "../parser/grammar/ScratchParser";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {Identifier} from "../ast/core/Identifier";
@@ -221,23 +217,17 @@ import {
 import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
     DeclareActorVariableStatement,
-    DeclareAttributeOfStatement,
-    DeclareAttributeStatement,
     DeclareStackVariableStatement,
     VariableDeclaration
 } from "../ast/core/statements/DeclarationStatement";
-import {
-    SetAttributeToStatement,
-    StoreCallResultToVariableStatement,
-    StoreEvalResultToVariableStatement
-} from "../ast/core/statements/SetStatement";
+import {StoreEvalResultToVariableStatement} from "../ast/core/statements/SetStatement";
 import {Expression} from "../ast/core/expressions/Expression";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {ParameterDeclaration, ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {
+    ActorType,
     BooleanType,
     ListType,
-    MapType,
     NumberType,
     ScratchType,
     StringEnumType,
@@ -280,18 +270,16 @@ import {
     BoolAsNumberExpression,
     DivideExpression,
     IndexOfExpression,
-    LengthOfStringExpression,
     LengthOfListExpression,
+    LengthOfStringExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
     NumberExpression,
     NumberLiteral,
     NumberVariableExpression,
-    PickRandomFromExpression,
     PlusExpression,
-    StringAsNumberExpression,
-    TimerExpression
+    StringAsNumberExpression
 } from "../ast/core/expressions/NumberExpression";
 import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
 import {ExpressionStatement} from "../ast/core/statements/ExpressionStatement";
@@ -305,33 +293,37 @@ import {
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
 import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {CallStatement} from "../ast/core/statements/CallStatement";
-import {ChangeAttributeByStatement} from "../ast/core/statements/ChangeAttributeByStatement";
-import {ChangeVarByStatement} from "../ast/core/statements/ChangeVarByStatement";
 import {CreateCloneOfStatement} from "../ast/core/statements/CreateCloneOfStatement";
 import {
     DeleteThisCloneStatement,
     StopAllStatement,
     StopThisStatement
 } from "../ast/core/statements/TerminationStatement";
-import {SystemMessage} from "../ast/core/Message";
+import {SystemMessage, UserMessage} from "../ast/core/Message";
 import {StopOthersInActorStatement} from "../ast/core/statements/StopOthersInActorStatement";
-import {WaitSecsStatement} from "../ast/core/statements/WaitSecsStatement";
 import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {App} from "../app/App";
 import {VariableWithDataLocation} from "../ast/core/Variable";
-import {DataLocations} from "../app/controlflow/DataLocation";
+import {DataLocation, DataLocations} from "../app/controlflow/DataLocation";
 import {AssumeStatement} from "../ast/core/statements/AssumeStatement";
 import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
 import {BastetConfiguration} from "../../utils/BastetConfiguration";
+import {ParsingException} from "../../core/exceptions/ParsingException";
+import {ParserRuleContext} from "antlr4ts";
+import {CastExpression} from "../ast/core/expressions/CastExpression";
+import {ActorExpression, ActorVariableExpression, LocateActorExpression} from "../ast/core/expressions/ActorExpression";
+import {TransitionRelation} from "../app/controlflow/TransitionRelation";
+import {ScopeTypeInformation, TypeInformationStorage} from "../DeclarationScopes";
+import instantiate = WebAssembly.instantiate;
 
 const toposort = require('toposort');
 
 export class TransformerConfig extends BastetConfiguration {
 
     constructor(dict: {}) {
-        super(dict);
+        super(dict, ['Transformer']);
     }
 
     get useBusyWaiting(): boolean {
@@ -398,105 +390,33 @@ class TransformerResultList<E extends AstNode> {
     }
 }
 
-export class ActorTypeInformation {
-
-    private readonly _actor: Identifier;
-
-    private _methods: {[id: string]: MethodSignature};
-
-    private _actorVariables: {[id: string]: VariableDeclaration};
-
-    constructor(actor: Identifier) {
-        this._actor = actor;
-        this._methods = {};
-        this._actorVariables = {};
-    }
-
-    public putMethod(signature: MethodSignature) {
-        this._methods[signature.ident.text] = signature;
-    }
-
-    public putVariable(v: VariableDeclaration) {
-        this._actorVariables[v.ident.text] = v;
-    }
-
-    public getMethodResultType(ident: Identifier): ScratchType {
-        return this.getMethodSignature(ident).returns.type;
-    }
-
-    public getMethodSignature(ident: Identifier): MethodSignature {
-        let result: MethodSignature = this._methods[ident.text];
-        if (!result) {
-            throw new IllegalArgumentException("No method signature for the given identifier: " + ident.text);
-        }
-        return result;
-    }
-
-    public addAllFrom(infos: ActorTypeInformation) {
-        Preconditions.checkNotUndefined(infos);
-
-        for (let m of Object.values(infos.methods)) {
-            this.putMethod(m);
-        }
-
-        for (let v of Object.values(infos.variables)) {
-            this.putVariable(v);
-        }
-    }
-
-    get variables(): {[id: string]: VariableDeclaration} {
-        return this._actorVariables;
-    }
-
-    get methods(): {[id: string]: MethodSignature} {
-        return this._methods;
-    }
-
-    get actor(): Identifier {
-        return this._actor;
-    }
-}
-
-export class TypeInformationStorage {
-
-    private _actorTypeInfos: {[id: string]: ActorTypeInformation};
-
-    constructor() {
-        this._actorTypeInfos = {};
-    }
-
-    public putActorTypeInformation(ti: ActorTypeInformation) {
-        Preconditions.checkNotUndefined(ti);
-        this._actorTypeInfos[ti.actor.text] = ti;
-    }
-
-    public getInfos(id: Identifier): ActorTypeInformation {
-        Preconditions.checkNotUndefined(id);
-        return this._actorTypeInfos[id.text];
-    }
-
-}
-
 class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
-    private _actorTypeInfos: TypeInformationStorage;
-    private _activeActorTypes: ActorTypeInformation;
     private readonly _methodLibrary: App;
     private readonly _typeStack: Array<ScratchType>;
-    private _actorScope : boolean;
     private readonly _config: TransformerConfig;
+    private readonly _typeStorage: TypeInformationStorage;
 
-    constructor(config: TransformerConfig, methodLibrary: App, typeInformationStorage: TypeInformationStorage) {
+    private _actorScope : boolean;
+    private _activeDeclarationScope: ScopeTypeInformation;
+
+    constructor(config: TransformerConfig, methodLibrary: App,
+                typeInformationStorage: TypeInformationStorage) {
         this._config = Preconditions.checkNotUndefined(config);
         this._methodLibrary = Preconditions.checkNotUndefined(methodLibrary);
+        this._typeStorage = Preconditions.checkNotUndefined(typeInformationStorage);
+
         this._typeStack = new Array<ScratchType>();
-        this._activeActorTypes = null;
-        this._actorTypeInfos = typeInformationStorage;
+        this._activeDeclarationScope = null;
         this._actorScope = false;
     }
 
-    get actorTypeInfos(): TypeInformationStorage {
-        return this._actorTypeInfos;
+    get typeStorage(): TypeInformationStorage {
+        return this._typeStorage;
+    }
+
+    private getTypeOf(ident: Identifier): ScratchType {
+        return this._activeDeclarationScope.getTypeOf(ident);
     }
 
     private getArgumentNodes(ctx: RuleNode): RuleNode[] {
@@ -507,15 +427,38 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 result.push(child as RuleNode);
             }
         }
+
         return result;
     }
 
-    private getOperand1(ctx: RuleNode): RuleNode {
-        return this.getArgumentNodes(ctx)[0];
+    private getOperand1(ctx: RuleNode): ParserRuleContext {
+        return this.getArgumentNodes(ctx)[0] as ParserRuleContext;
     }
 
-    private getOperand2(ctx: RuleNode): RuleNode {
-        return this.getArgumentNodes(ctx)[1];
+    private parseOperand(ctx: RuleNode, index: number): TransformerResult {
+        const result = this.getArgumentNodes(ctx)[index].accept(this);
+        if (!result.node['expressionType']) {
+            // Some repair
+            if (result.node instanceof Identifier) {
+                return this.produceVariableFromIdentifier(result.node);
+            }
+
+            throw new IllegalArgumentException("Operands must always be expressions!");
+        }
+
+        return result;
+    }
+
+    private parseOperand1(ctx: RuleNode): TransformerResult {
+        return this.parseOperand(ctx, 0);
+    }
+
+    private parseOperand2(ctx: RuleNode): TransformerResult {
+        return this.parseOperand(ctx, 1);
+    }
+
+    private getOperand2(ctx: RuleNode): ParserRuleContext {
+        return this.getArgumentNodes(ctx)[1] as ParserRuleContext;
     }
 
     public visitProgram(ctx: ProgramContext): TransformerResult {
@@ -534,7 +477,26 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitStrIdentExpression(ctx: StrIdentExpressionContext): TransformerResult {
-        return TransformerResult.withNode(Identifier.of(ctx.text));
+        return TransformerResult.withNode(Identifier.of(this.unquote(ctx.String().text)));
+    }
+
+    private buildExpressionArrayFrom<E extends Expression>(elements: RuleNode[]): TransformerResultList<E> {
+        const results: E[] = [];
+
+        let stmtsToPrepend: StatementList = StatementList.empty();
+
+        for (let idc of elements) {
+            const tr: TransformerResult = idc.accept(this);
+            stmtsToPrepend = StatementLists.concat(stmtsToPrepend, tr.statementsToPrepend);
+
+            if (tr.node instanceof Identifier) {
+                results.push(this.produceVariableFromIdentifier(tr.node).node as E);
+            } else {
+                results.push(tr.node as E);
+            }
+        }
+
+        return new TransformerResultList(stmtsToPrepend, results);
     }
 
     private buildArrayFrom<E extends AstNode>(elements: RuleNode[]): TransformerResultList<E> {
@@ -614,15 +576,19 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(new ResultDeclaration(resultVar));
     }
 
+    private toMethodDef(ctx: MethodDefinitionContext): FullMethodDefinitionContext|RuntimeMethodDefinitionContext {
+        return ctx as FullMethodDefinitionContext|RuntimeMethodDefinitionContext;
+    }
+
     private precollectMethodSignatures(actorIdent: Identifier, ctx: MethodDefinitionListContext,
                                        ectx: ExternMethodDefinitionListContext) {
 
-        for (let md of ctx.methodDefinition()) {
+        for (let md of ctx.methodDefinition().map((m) => this.toMethodDef(m))) {
             const identTr = md.ident().accept(this);
             const paramsTr = md.parameterList().accept(this);
             const resultTr = md.methodResultDeclaration().accept(this);
 
-            this._activeActorTypes.putMethod(new MethodSignature(
+            this._activeDeclarationScope.putMethod(new MethodSignature(
                 identTr.nodeOnly(),
                 paramsTr.node as ParameterDeclarationList,
                 resultTr.nodeOnly(),
@@ -635,7 +601,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             const paramsTr = md.parameterList().accept(this);
             const resultTr = md.externMethodResultDeclaration().accept(this);
 
-            this._activeActorTypes.putMethod(new MethodSignature(
+            this._activeDeclarationScope.putMethod(new MethodSignature(
                 identTr.nodeOnly(),
                 paramsTr.node as ParameterDeclarationList,
                 resultTr.nodeOnly(),
@@ -672,17 +638,16 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const actorMode: ActorMode = ctx.actorMode().accept(this).nodeOnly();
         Preconditions.checkNotUndefined(actorMode);
 
-        this._activeActorTypes = new ActorTypeInformation(ident);
+        this._activeDeclarationScope = this._typeStorage.beginActorScope(ident.text);
         try {
-            this._actorTypeInfos.putActorTypeInformation(this._activeActorTypes);
             if (!inheritesFrom.isEmpty()) {
                 for (let id of inheritesFrom.elements) {
                     const inheritsFromName = id.text;
-                    const baseActorTypeInfos: ActorTypeInformation = this._actorTypeInfos.getInfos(id);
+                    const baseActorTypeInfos: ScopeTypeInformation = this._typeStorage.beginActorScope(inheritsFromName);
                     if (!baseActorTypeInfos) {
                         throw new IllegalStateException(`Type infos for ${inheritsFromName} missing`);
                     }
-                    this._activeActorTypes.addAllFrom(baseActorTypeInfos);
+                    this._activeDeclarationScope.addAllFrom(baseActorTypeInfos);
                 }
             }
 
@@ -738,7 +703,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 scripts.node as ScriptDefinitionList));
 
         } finally {
-            this._activeActorTypes = null;
+            this._activeDeclarationScope = this._activeDeclarationScope.endScope();
         }
     }
 
@@ -783,12 +748,55 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TransformerResult(defs.statementsToPrepend, new ResourceDefinitionList(defs.nodeList));
     }
 
-    public visitMethodDefinition(ctx: MethodDefinitionContext) : TransformerResult {
-        return TransformerResult.withNode(new MethodDefinition(
-            ctx.ident().accept(this).nodeOnly() as Identifier,
-            ctx.parameterList().accept(this).nodeOnly() as ParameterDeclarationList,
-            ctx.stmtList().accept(this).nodeOnly() as StatementList,
-            ctx.methodResultDeclaration().accept(this).nodeOnly() as ResultDeclaration));
+    private parseIsAtomic(ctx: RuntimeMethodDefinitionContext|FullMethodDefinitionContext): boolean {
+        for (const attrib of ctx.methodAttributeList().methodAttribute()) {
+            if (attrib instanceof AtomicMethodContext) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    visitMethodDefinition(ctx: MethodDefinitionContext) : TransformerResult {
+        return this.visitSingleChild(ctx);
+    }
+
+    public visitRuntimeMethodDefinition(ctx: RuntimeMethodDefinitionContext) : TransformerResult {
+        const methodIdent: Identifier = ctx.ident().accept(this).nodeOnly() as Identifier;
+
+        const isAtomic = this.parseIsAtomic(ctx);
+
+        this._activeDeclarationScope = this._activeDeclarationScope.beginMethodScope(methodIdent.text);
+        try {
+            throw new ImplementMeException();
+            // const resultDeclaration = ctx.methodResultDeclaration().accept(this).nodeOnly() as ResultDeclaration;
+            // return TransformerResult.withNode(new MethodDefinition(
+            //     methodIdent,
+            //     ctx.parameterList().accept(this).nodeOnly() as ParameterDeclarationList,
+            //     ctx.stmtList().accept(this).nodeOnly() as StatementList,
+            //     resultDeclaration, isAtomic));
+        } finally {
+            this._activeDeclarationScope = this._activeDeclarationScope.endScope();
+        }
+    }
+
+    public visitFullMethodDefinition(ctx: FullMethodDefinitionContext) : TransformerResult {
+        const methodIdent: Identifier = ctx.ident().accept(this).nodeOnly() as Identifier;
+
+        const isAtomic = this.parseIsAtomic(ctx);
+
+        this._activeDeclarationScope = this._activeDeclarationScope.beginMethodScope(methodIdent.text);
+        try {
+            const resultDeclaration = ctx.methodResultDeclaration().accept(this).nodeOnly() as ResultDeclaration;
+            return TransformerResult.withNode(new MethodDefinition(
+                methodIdent,
+                ctx.parameterList().accept(this).nodeOnly() as ParameterDeclarationList,
+                ctx.stmtList().accept(this).nodeOnly() as StatementList,
+                resultDeclaration, isAtomic));
+        } finally {
+            this._activeDeclarationScope = this._activeDeclarationScope.endScope();
+        }
     }
 
     public visitMethodDefinitionList(ctx: MethodDefinitionListContext) : TransformerResult {
@@ -800,6 +808,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const ident = ctx.ident().accept(this).nodeOnly() as Identifier;
         const resultType = ctx.type().accept(this).nodeOnly() as ScratchType;
         const resultVar = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, resultType));
+        this._activeDeclarationScope.putVariable(resultVar);
+
         return TransformerResult.withNode(new ResultDeclaration(resultVar));
     }
 
@@ -818,13 +828,24 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitSetStmtList(ctx: SetStmtListContext) : TransformerResult {
         const stmts = this.buildArrayFrom<Statement>(ctx.setStmt());
-        return new TransformerResult(stmts.statementsToPrepend, new StatementList(stmts.nodeList));
+        return TransformerResult.withNode(StatementLists.concat(stmts.statementsToPrepend, new StatementList(stmts.nodeList)));
+    }
+
+    private parseIsRestart(ctx: ScriptContext): boolean {
+        for (const attrib of ctx.scriptAttributeList().scriptAttribute()) {
+            if (attrib instanceof RestartScriptContext) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public visitScript(ctx: ScriptContext) : TransformerResult {
         return TransformerResult.withNode(new ScriptDefinition(
             ctx.event().accept(this).nodeOnly() as CoreEvent,
-            ctx.stmtList().accept(this).nodeOnly() as StatementList));
+            ctx.stmtList().accept(this).nodeOnly() as StatementList,
+            this.parseIsRestart(ctx)));
     }
 
     public visitScriptList(ctx: ScriptListContext) : TransformerResult {
@@ -833,12 +854,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitExpressionList(ctx: ExpressionListContext) : TransformerResult {
-        const elems = this.buildArrayFrom<Expression>(ctx.expressionListPlain().expression());
+        const elems = this.buildExpressionArrayFrom<Expression>(ctx.expressionListPlain().expression());
         return new TransformerResult(elems.statementsToPrepend, new ExpressionList(elems.nodeList));
     }
 
     public visitExpressionListPlain(ctx: ExpressionListPlainContext): TransformerResult {
-        const elems = this.buildArrayFrom<Expression>(ctx.expression());
+        const elems = this.buildExpressionArrayFrom<Expression>(ctx.expression());
         return new TransformerResult(elems.statementsToPrepend, new ExpressionList(elems.nodeList));
     }
 
@@ -854,23 +875,32 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitStmtList(ctx: StmtListContext): TransformerResult {
-        let result: StatementList = StatementList.empty();
+        try {
+            let result: StatementList = StatementList.empty();
 
-        for (let idc of ctx.stmtListPlain().stmt()) {
-            const tr: TransformerResult = idc.accept(this);
-            result = StatementLists.concat(result, tr.statementsToPrepend);
-            const trs: StatementList = new StatementList([ tr.node as Statement ]);
-            result = StatementLists.concat(result, trs);
+            for (let idc of ctx.stmtListPlain().stmt()) {
+                const tr: TransformerResult = idc.accept(this);
+                result = StatementLists.concat(result, tr.statementsToPrepend);
+                const trs: StatementList = new StatementList([tr.node as Statement]);
+                result = StatementLists.concat(result, trs);
+            }
+
+            if (ctx.terminationStmt()) {
+                const tr: TransformerResult = ctx.terminationStmt().accept(this);
+                result = StatementLists.concat(result, tr.statementsToPrepend);
+                const trs: StatementList = new StatementList([tr.node as Statement]);
+                result = StatementLists.concat(result, trs);
+            }
+
+            return TransformerResult.withNode(result);
+
+        } catch (e) {
+           if (e.constructor.name == "ParsingException") {
+               throw e;
+           } else {
+               throw new ParsingException(e.message, ctx);
+           }
         }
-
-        if (ctx.terminationStmt()) {
-            const tr: TransformerResult = ctx.terminationStmt().accept(this);
-            result = StatementLists.concat(result, tr.statementsToPrepend);
-            const trs: StatementList = new StatementList([ tr.node as Statement ]);
-            result = StatementLists.concat(result, trs);
-        }
-
-        return TransformerResult.withNode(result);
     }
 
     public visitStmtListPlain(ctx: StmtListPlainContext): TransformerResult {
@@ -899,8 +929,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(NumberType.instance());
     }
 
-    public visitMapType (ctx: MapTypeContext): TransformerResult {
-        return TransformerResult.withNode(MapType.withIndexType(ctx.indexType().accept(this).nodeOnly() as ScratchType));
+    public visitActorType (ctx: ActorTypeContext): TransformerResult {
+        return TransformerResult.withNode(ActorType.instance());
     }
 
     public visitActorComponentsDefinition (ctx: ActorComponentsDefinitionContext): TransformerResult {
@@ -908,7 +938,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitUntilStmt (ctx: UntilStmtContext): TransformerResult {
-        const cond: TransformerResult = ctx.boolExpr().accept(this);
+        const cond: TransformerResult = this.ensureType(ctx, BooleanType.instance(), ctx.boolExpr().accept(this));
         const body: TransformerResult = ctx.stmtList().accept(this);
         return TransformerResult.withNode(
             new UntilQueriedConditionStatement(cond.node as BooleanExpression,
@@ -923,14 +953,31 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         }
     }
 
+    public visitEmptyElseCase (ctx: EmptyElseCaseContext): TransformerResult {
+        return TransformerResult.withNode(new StatementList([]));
+    }
+
+    public visitPureElse (ctx: PureElseContext): TransformerResult {
+        return ctx.stmtList().accept(this);
+    }
+
+    public visitElseIfCase (ctx: ElseIfCaseContext): TransformerResult {
+        const ifTr = ctx.ifStmt().accept(this);
+        return TransformerResult.withNode(
+            StatementLists.concat(ifTr.statementsToPrepend, new StatementList([ifTr.node as Statement])));
+    }
+
     public visitIfStmt (ctx: IfStmtContext): TransformerResult {
-        const cond: TransformerResult = ctx.boolExpr().accept(this);
+        const cond: TransformerResult = this.ensureType(ctx, BooleanType.instance(), ctx.boolExpr().accept(this));
+
+        const elseCaseTr = ctx.elseCase().accept(this);
+
         return new TransformerResult(
             cond.statementsToPrepend,
             new IfStatement(
                 cond.node as BooleanExpression,
                 ctx.stmtList().accept(this).nodeOnly() as StatementList,
-                this.statementListFrom(ctx.elseCase().stmtList())));
+                elseCaseTr.nodeOnly() as StatementList));
     }
 
     public visitRepeatForeverStmt (ctx: RepeatForeverStmtContext): TransformerResult {
@@ -955,6 +1002,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const initStmt: Statement = new StoreEvalResultToVariableStatement(counterVar, NumberLiteral.of(0));
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt, initStmt]));
 
+        this._activeDeclarationScope.putVariable(counterVar);
+
         // Determine the number of iterations
         const timesTr: TransformerResult = ctx.numExpr().accept(this);
         const times: NumberExpression = timesTr.node as NumberExpression;
@@ -973,8 +1022,9 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitNumDivExpression(ctx: NumDivExpressionContext) : TransformerResult {
-        const tr1 = this.getOperand1(ctx).accept(this);
-        const tr2 = this.getOperand2(ctx).accept(this);
+        const tr1 = this.parseOperand1(ctx);
+        const tr2 = this.parseOperand2(ctx);
+
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
             new DivideExpression(
@@ -982,63 +1032,91 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 tr2.node as NumberExpression));
     }
 
-    public visitNumEqualsExpression(ctx: NumEqualsExpressionContext) : TransformerResult {
-        const tr1 = this.getOperand1(ctx).accept(this);
-        const tr2 = this.getOperand2(ctx).accept(this);
-        return new TransformerResult(
-            StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new NumEqualsExpression(
-                tr1.node as NumberExpression,
-                tr2.node as NumberExpression));
+    private assertEqualOperandTypes(context: RuleNode, op1: TransformerResult, op2: TransformerResult): ScratchType {
+        Preconditions.checkNotUndefined(context);
+        Preconditions.checkNotUndefined(op1);
+        Preconditions.checkNotUndefined(op2);
+
+        const type1 = Preconditions.checkNotUndefined((op1.node as Expression).expressionType);
+        const type2 = Preconditions.checkNotUndefined((op2.node as Expression).expressionType);
+
+        if (!(type1 == type2)) {
+            console.log(context);
+            throw new IllegalArgumentException(`Types are not equal: ${type1.toTreeString()} vs ${type2.toTreeString()}`);
+        }
+
+        return type1;
     }
 
-    public visitNumFunct(ctx: NumFunctContext) : TransformerResult {
-        return TransformerResult.withNode(new StringLiteral(ctx.text));
+    public visitEqualsExpression(ctx: EqualsExpressionContext) : TransformerResult {
+        const tr1 = this.parseOperand1(ctx);
+        const tr2 = this.parseOperand2(ctx);
+        this.assertEqualOperandTypes(ctx, tr1, tr2);
+
+        if ((tr1.node as Expression).expressionType == NumberType.instance()) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new NumEqualsExpression(
+                    tr1.node as NumberExpression,
+                    tr2.node as NumberExpression));
+
+        } if ((tr1.node as Expression).expressionType == StringType.instance()) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new StrEqualsExpression(
+                    tr1.node as StringExpression,
+                    tr2.node as StringExpression));
+
+        } else {
+            throw new ImplementMeException();
+        }
     }
 
-    public visitNumFunctExpression(ctx: NumFunctExpressionContext) : TransformerResult {
-        let prepend: StatementList = StatementList.empty();
+    public visitGreaterThanExpression(ctx: GreaterThanExpressionContext) : TransformerResult {
+        const tr1 = this.parseOperand1(ctx);
+        const tr2 = this.parseOperand2(ctx);
+        this.assertEqualOperandTypes(ctx, tr1, tr2);
 
-        // Declare and initialize a fresh variable for the result
-        const resultVarIdent: Identifier = Identifier.fresh();
-        const resultVar = new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, NumberType.instance()));
-        const resultVarExpr = new NumberVariableExpression(resultVar);
-        const declarationStmt = new DeclareStackVariableStatement(resultVar);
-        const initStmt: Statement = new StoreEvalResultToVariableStatement(resultVar, NumberLiteral.of(0));
-        prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt, initStmt]));
+        if ((tr1.node as Expression).expressionType == NumberType.instance()) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new NumGreaterThanExpression(
+                    tr1.node as NumberExpression,
+                    tr2.node as NumberExpression));
 
-        // Function call
-        // - Arguments
-        const argsTr = ctx.coreNumExpr().accept(this);
-        const callArgs = new ExpressionList([argsTr.node as Expression]);
-        prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
-        // - The actual call statement
-        const callMethodIdent = Identifier.of((ctx.numFunct().accept(this).nodeOnly() as StringLiteral).text);
-        const resultDataLocVar = new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, NumberType.instance()));
-        const callStmt = new CallStatement(callMethodIdent, callArgs, OptionalAstNode.with(resultDataLocVar));
-        prepend = StatementLists.concat(prepend, new StatementList([callStmt]));
+        } else if ((tr1.node as Expression).expressionType == StringType.instance()) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new StrGreaterThanExpression(
+                    tr1.node as StringExpression,
+                    tr2.node as StringExpression));
 
-        return new TransformerResult(prepend, resultVarExpr);
+        } else {
+            throw new ImplementMeException();
+        }
     }
 
-    public visitNumGreaterThanExpression(ctx: NumGreaterThanExpressionContext) : TransformerResult {
-        const tr1 = this.getOperand1(ctx).accept(this);
-        const tr2 = this.getOperand2(ctx).accept(this);
-        return new TransformerResult(
-            StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new NumGreaterThanExpression(
-                tr1.node as NumberExpression,
-                tr2.node as NumberExpression));
-    }
+    public visitLessThanExpression(ctx: LessThanExpressionContext) : TransformerResult {
+        const tr1 = this.parseOperand1(ctx);
+        const tr2 = this.parseOperand2(ctx);
+        this.assertEqualOperandTypes(ctx, tr1, tr2);
 
-    public visitNumLessThanExpression(ctx: NumLessThanExpressionContext) : TransformerResult {
-        const tr1 = this.getOperand1(ctx).accept(this);
-        const tr2 = this.getOperand2(ctx).accept(this);
-        return new TransformerResult(
-            StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new NumLessThanExpression(
-                tr1.node as NumberExpression,
-                tr2.node as NumberExpression));
+        if ((tr1.node as Expression).expressionType == NumberType.instance()) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new NumLessThanExpression(
+                    tr1.node as NumberExpression,
+                    tr2.node as NumberExpression));
+
+        } else if ((tr1.node as Expression).expressionType == StringType.instance()) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new StrLessThanExpression(
+                    tr1.node as StringExpression,
+                    tr2.node as StringExpression));
+        } else {
+            throw new ImplementMeException();
+        }
     }
 
     public visitNumLiteralExpression(ctx: NumLiteralExpressionContext) : TransformerResult {
@@ -1046,8 +1124,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitNumMinusExpression(ctx: NumMinusExpressionContext) : TransformerResult {
-        const tr1 = this.getOperand1(ctx).accept(this);
-        const tr2 = this.getOperand2(ctx).accept(this);
+        const tr1 = this.parseOperand1(ctx);
+        const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
             new MinusExpression(
@@ -1056,8 +1134,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitNumModExpression(ctx: NumModExpressionContext) : TransformerResult {
-        const tr1 = this.getOperand1(ctx).accept(this);
-        const tr2 = this.getOperand2(ctx).accept(this);
+        const tr1 = this.parseOperand1(ctx);
+        const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
             new ModuloExpression(
@@ -1066,8 +1144,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitNumMulExpression(ctx: NumMulExpressionContext) : TransformerResult {
-        const tr1 = this.getOperand1(ctx).accept(this);
-        const tr2 = this.getOperand2(ctx).accept(this);
+        const tr1 = this.parseOperand1(ctx);
+        const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
             new MultiplyExpression(
@@ -1076,8 +1154,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitNumPlusExpression(ctx: NumPlusExpressionContext) : TransformerResult {
-        const tr1 = this.getOperand1(ctx).accept(this);
-        const tr2 = this.getOperand2(ctx).accept(this);
+        const tr1 = this.parseOperand1(ctx);
+        const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
             new PlusExpression(
@@ -1085,22 +1163,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 tr2.node as NumberExpression));
     }
 
-    public visitNumRandomExpression(ctx: NumRandomExpressionContext) : TransformerResult {
-        // We support this as a native operation.
-        // This is useful if dealing with non-det data that can be in a specific range
-        const tr1 = this.getOperand1(ctx).accept(this);
-        const tr2 = this.getOperand2(ctx).accept(this);
-        return new TransformerResult(
-            StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new PickRandomFromExpression(
-                tr1.node as NumberExpression,
-                tr2.node as NumberExpression));
-    }
-
     public visitNumVariableExpression(ctx: NumVariableExpressionContext) : TransformerResult {
-        const ident = ctx.variable().accept(this).nodeOnly() as Identifier;
-        const variable = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, NumberType.instance()));
-        return TransformerResult.withNode(new NumberVariableExpression(variable));
+        return ctx.variable().accept(this);
     }
 
     public visitNumber(ctx: NumberContext) : TransformerResult {
@@ -1114,14 +1178,16 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const declareVarStmt = new DeclareStackVariableStatement(resultVar);
         const initStmt: Statement = new StoreEvalResultToVariableStatement(resultVar, BooleanLiteral.from(value));
 
+        this._activeDeclarationScope.putVariable(resultVar);
+
         let prepend: StatementList = StatementList.empty();
         prepend = StatementLists.concat(prepend, StatementList.from([declareVarStmt, initStmt]));
 
         return new TTransformerResult(prepend, resultVarExpr);
     }
 
-    private evaluateIntoBooleanVariable(varExpr: BooleanVariableExpression, expr: RuleNode): TTransformerResult<BooleanVariableExpression> {
-        const tr1: TransformerResult = expr.accept(this);
+    private evaluateIntoBooleanVariable(varExpr: BooleanVariableExpression, expr: ParserRuleContext): TTransformerResult<BooleanVariableExpression> {
+        const tr1: TransformerResult = this.ensureType(expr, BooleanType.instance(),expr.accept(this));
 
         let prepend: StatementList = StatementList.empty();
         prepend = StatementLists.concat(prepend, tr1.statementsToPrepend);
@@ -1157,12 +1223,14 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitBoolAsNumExpression(ctx: BoolAsNumExpressionContext) : TransformerResult {
         const exprTr: TransformerResult = ctx.boolExpr().accept(this);
-        return new TransformerResult(exprTr.statementsToPrepend, new BoolAsNumberExpression(exprTr.node as BooleanExpression));
+        return new TransformerResult(exprTr.statementsToPrepend,
+            new CastExpression(exprTr.node as Expression, NumberType.instance()));
     }
 
     public visitBoolAsStringExpression(ctx: BoolAsStringExpressionContext) : TransformerResult {
         const exprTr: TransformerResult = ctx.boolExpr().accept(this);
-        return new TransformerResult(exprTr.statementsToPrepend, new BoolAsStringExpression(exprTr.node as BooleanExpression));
+        return new TransformerResult(exprTr.statementsToPrepend,
+            new CastExpression(exprTr.node as Expression, StringType.instance()));
     }
 
     public visitBoolLiteralExpression(ctx: BoolLiteralExpressionContext) : TransformerResult {
@@ -1197,39 +1265,25 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitBoolVariableExpression(ctx: BoolVariableExpressionContext) : TransformerResult {
-        const ident = ctx.variable().accept(this).nodeOnly() as Identifier;
-        const variable = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, BooleanType.instance()));
-        return TransformerResult.withNode(new BooleanVariableExpression(variable));
+        return ctx.variable().accept(this);
     }
 
     private constructBinaryOp(ctx: RuleNode, constr: new (n1:AstNode, n2:AstNode) => AstNode) : TransformerResult {
-        const tr1 = this.getOperand1(ctx).accept(this);
-        const tr2 = this.getOperand2(ctx).accept(this);
+        const tr1 = this.parseOperand1(ctx);
+        const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
             new constr(tr1.node, tr2.node));
     }
 
     public visitStrContainsExpression(ctx: StrContainsExpressionContext) : TransformerResult {
-        const tr1 = this.getOperand1(ctx).accept(this);
-        const tr2 = this.getOperand2(ctx).accept(this);
+        const tr1 = this.parseOperand1(ctx);
+        const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
             new StrContainsExpression(
                 tr1.node as StringExpression,
                 tr2.node as StringExpression));
-    }
-
-    public visitStrEqualsExpression(ctx: StrEqualsExpressionContext) : TransformerResult {
-        return this.constructBinaryOp(ctx, StrEqualsExpression);
-    }
-
-    public visitStrGreaterThanExpression(ctx: StrGreaterThanExpressionContext) : TransformerResult {
-        return this.constructBinaryOp(ctx, StrGreaterThanExpression);
-    }
-
-    public visitStrLessThanExpression(ctx: StrLessThanExpressionContext) : TransformerResult {
-        return this.constructBinaryOp(ctx, StrLessThanExpression);
     }
 
     public visitAddElementToStatement(ctx: AddElementToStatementContext) : TransformerResult {
@@ -1242,14 +1296,14 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     public visitBroadcastAndWaitStatement(ctx: BroadcastAndWaitStatementContext) : TransformerResult {
         const exprTr = ctx.message().accept(this);
         return new TransformerResult(exprTr.statementsToPrepend,
-            new BroadcastAndWaitStatement(exprTr.node as StringExpression));
+            new BroadcastAndWaitStatement(exprTr.node as SystemMessage));
     }
 
     public visitBroadcastMessageStatement(ctx: BroadcastMessageStatementContext) : TransformerResult {
         const exprTr = ctx.message().accept(this);
         return new TransformerResult(
             exprTr.statementsToPrepend,
-            new BroadcastMessageStatement(exprTr.node as StringExpression));
+            new BroadcastMessageStatement(exprTr.node as SystemMessage));
     }
 
     public visitCallStmt(ctx: CallStmtContext) : TransformerResult {
@@ -1262,32 +1316,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 OptionalAstNode.absent<VariableWithDataLocation>()));
     }
 
-    public visitChagenAttributeByStatement(ctx: ChagenAttributeByStatementContext) : TransformerResult {
-        const attributeTr = ctx.stringExpr().accept(this);
-        const valueTr = ctx.numExpr().accept(this);
-        return new TransformerResult(
-            StatementLists.concat(attributeTr.statementsToPrepend, valueTr.statementsToPrepend),
-            new ChangeAttributeByStatement(
-                attributeTr.node as StringExpression,
-                valueTr.node as NumberExpression));
-    }
-
-    public visitChangeVarByStatement(ctx: ChangeVarByStatementContext) : TransformerResult {
-        const exprTr = ctx.expression().accept(this);
-        return new TransformerResult(
-            exprTr.statementsToPrepend,
-            new ChangeVarByStatement(
-                ctx.variable().accept(this).node as VariableWithDataLocation,
-                exprTr.node as Expression));
-    }
-
     public visitCloneStartEvent(ctx: CloneStartEventContext) : TransformerResult {
         return TransformerResult.withNode(new CloneStartEvent());
-    }
-
-    public visitColorFromNumExpression(ctx: ColorFromNumExpressionContext) : TransformerResult {
-        // Colors are mapped to numbers
-        return ctx.numExpr().accept(this);
     }
 
     public visitConditionReachedEvent(ctx: ConditionReachedEventContext) : TransformerResult {
@@ -1304,30 +1334,14 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             new CreateCloneOfStatement(strTr.node as StringExpression));
     }
 
-    public visitDeclareAttribute(ctx: DeclareAttributeContext) : TransformerResult {
-        const strTr = ctx.stringExpr().accept(this);
-        return new TransformerResult(
-            strTr.statementsToPrepend,
-            new DeclareAttributeStatement(strTr.node as StringExpression,
-                ctx.type().accept(this).node as ScratchType));
-    }
-
-    public visitDeclareAttributeOf(ctx: DeclareAttributeOfContext) : TransformerResult {
-        const strTr = ctx.stringExpr().accept(this);
-        return new TransformerResult(
-            strTr.statementsToPrepend,
-            new DeclareAttributeOfStatement(
-                strTr.node as StringExpression,
-                ctx.type().accept(this).nodeOnly() as ScratchType,
-                ctx.ident().accept(this).nodeOnly() as Identifier));
-    }
-
     public visitDeclareVariable(ctx: DeclareVariableContext) : TransformerResult {
         const type = ctx.type().accept(this).nodeOnly() as ScratchType;
         const ident = ctx.ident().accept(this).nodeOnly() as Identifier;
 
         const dataLoc = DataLocations.createTypedLocation(ident, type);
         const variable = new VariableWithDataLocation(dataLoc);
+
+        this._activeDeclarationScope.putVariable(variable);
 
         if (this._actorScope) {
             return TransformerResult.withNode(
@@ -1429,28 +1443,21 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             numTr.statementsToPrepend,
             new IthStringItemOfExpression(
                 numTr.node as NumberExpression,
-                ctx.variable().accept(this).nodeOnly() as Identifier));
+                ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation));
     }
 
     public visitJoinStringsExpression(ctx: JoinStringsExpressionContext) : TransformerResult {
-        const tr1 = this.getOperand1(ctx).accept(this);
-        const tr2 = this.getOperand2(ctx).accept(this);
+        const tr1 = this.parseOperand1(ctx);
+        const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
             new JoinStringsExpression(tr1.node as StringExpression, tr2.node as StringExpression));
     }
 
-    public visitKey(ctx: KeyContext) : TransformerResult {
-        // Keys are mapped to numbers
-        return ctx.numExpr().accept(this);
-    }
-
-    public visitAppMessage(ctx: AppMessageContext) : TransformerResult {
+    public visitUserMessage(ctx: UserMessageContext) : TransformerResult {
         const strTr = ctx.stringExpr().accept(this);
         return new TransformerResult(strTr.statementsToPrepend,
-            new SystemMessage(StringLiteral.from("app"),
-                strTr.node as StringExpression,
-                OptionalAstNode.absent()));
+            new UserMessage(strTr.node as StringExpression));
     }
 
     public visitSystemMessage(ctx: SystemMessageContext) : TransformerResult {
@@ -1471,7 +1478,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitLengthOfStringExpression(ctx: LengthOfStringExpressionContext) : TransformerResult {
-        const tr = ctx.stringExpr().accept(this);
+        const tr = this.ensureType(ctx, StringType.instance(), ctx.stringExpr().accept(this));
         return new TransformerResult(tr.statementsToPrepend, new LengthOfStringExpression(tr.node as StringExpression));
     }
 
@@ -1487,12 +1494,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const tr = ctx.stringExpr().accept(this);
         return new TransformerResult(
             tr.statementsToPrepend,
-            new MessageReceivedEvent(StringLiteral.from(ctx.String().text),
+            new MessageReceivedEvent(StringLiteral.from(ctx.stringExpr().text),
             tr.node as StringExpression));
     }
 
     public visitNegatedBoolExpression(ctx: NegatedBoolExpressionContext) : TransformerResult {
-        const tr = ctx.coreBoolExpr().accept(this);
+        const tr = this.parseOperand1(ctx);
         return new TransformerResult(
             tr.statementsToPrepend,
             new NegationExpression(tr.node as BooleanExpression));
@@ -1522,17 +1529,16 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const tr = ctx.numExpr().accept(this);
         return new TransformerResult(
             tr.statementsToPrepend,
-            new NumAsStringExpression(tr.node as NumberExpression));
+            new CastExpression(tr.node as NumberExpression, StringType.instance()));
     }
 
     public visitParameter(ctx: ParameterContext) : TransformerResult {
-        return TransformerResult.withNode(
-            new ParameterDeclaration(ctx.ident().accept(this).nodeOnly() as Identifier,
-            ctx.type().accept(this).node as ScratchType));
-    }
+        const ident: Identifier = ctx.ident().accept(this).nodeOnly() as Identifier;
+        const type: ScratchType = ctx.type().accept(this).node as ScratchType;
 
-    public visitQualifiedVariable(ctx: QualifiedVariableContext) : TransformerResult {
-        throw new ImplementMeException();
+        this._activeDeclarationScope.putTypeInformation(ident, type);
+
+        return TransformerResult.withNode(new ParameterDeclaration(ident, type));
     }
 
     public visitReplaceElementAtStatement(ctx: ReplaceElementAtStatementContext) : TransformerResult {
@@ -1554,25 +1560,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(ImageResourceType.instance());
     }
 
-    public visitSetAttributeOfToStatement(ctx: SetAttributeOfToStatementContext) : TransformerResult {
-        throw new ImplementMeException();
-    }
-
-    public visitSetAttributeToStatement(ctx: SetAttributeToStatementContext) : TransformerResult {
-        const tr = ctx.expression().accept(this);
-        return new TransformerResult(
-            tr.statementsToPrepend,
-            new SetAttributeToStatement(
-                StringLiteral.from(ctx.String().text) as StringExpression,
-                tr.node as Expression));
-    }
-
     public visitStoreEvalResultStatement(ctx: StoreEvalResultStatementContext) : TransformerResult {
-
-        const ident = ctx.variable().accept(this).nodeOnly() as Identifier;
-        const exprTr = ctx.expression().accept(this);
-        const exprType = (exprTr.node as Expression).type;
-        const variable = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, exprType));
+        const variable = ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation;
+        const varType = ScratchType.fromId(variable.dataloc.type);
+        const exprTr = this.ensureType(ctx, varType, ctx.expression().accept(this));
+        const exprType = (exprTr.node as Expression).expressionType;
+        Preconditions.checkNotUndefined(exprType);
 
         return new TransformerResult(
             exprTr.statementsToPrepend,
@@ -1584,7 +1577,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const methodIdent = ctx.callStmt().ident().accept(this).nodeOnly() as Identifier;
         const toVar = ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation;
         return new TransformerResult(exprListTr.statementsToPrepend,
-            new StoreCallResultToVariableStatement(methodIdent, exprListTr.node as ExpressionList, toVar));
+            new CallStatement(methodIdent, exprListTr.node as ExpressionList, OptionalAstNode.with(toVar)));
     }
 
     public visitStartupEvent(ctx: StartupEventContext) : TransformerResult {
@@ -1607,32 +1600,73 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return ctx.coreStringExpr().accept(this);
     }
 
-    public visitStringAsNumExpression(ctx: StringAsNumExpressionContext) : TransformerResult {
-        const tr = ctx.stringExpr().accept(this);
+    public visitNumAsBoolExpression(ctx: NumAsBoolExpressionContext): TransformerResult {
+        const tr = ctx.numExpr().accept(this);
+        Preconditions.checkArgument(!(tr.node instanceof Identifier));
+
         return new TransformerResult(
             tr.statementsToPrepend,
-            new StringAsNumberExpression(tr.node as StringExpression));
+            new CastExpression(tr.node as Expression, BooleanType.instance()));
+    }
+
+    public visitStringAsNumExpression(ctx: StringAsNumExpressionContext) : TransformerResult {
+        const tr = ctx.stringExpr().accept(this);
+        Preconditions.checkArgument(!(tr.node instanceof Identifier));
+
+        return new TransformerResult(
+            tr.statementsToPrepend,
+            new CastExpression(tr.node as Expression, NumberType.instance()));
+    }
+
+    public visitLocateActorExpression(ctx: LocateActorExpressionContext): TransformerResult {
+        const nameTr = ctx.stringExpr().accept(this);
+        return new TransformerResult(nameTr.statementsToPrepend, new LocateActorExpression(nameTr.node as StringExpression));
+    }
+
+    public visitActorVariableExpression(ctx: ActorVariableExpressionContext): TransformerResult {
+        return ctx.variable().accept(this);
     }
 
     public visitStringAttributeOfExpression(ctx: StringAttributeOfExpressionContext) : TransformerResult {
-        const tr = ctx.stringExpr().accept(this);
-        return new TransformerResult(tr.statementsToPrepend,
-            new StringAttributeOfExpression(tr.node as StringExpression,
-                ctx.ident().accept(this).nodeOnly() as Identifier));
+        const trAttribute = this.ensureType(ctx, StringType.instance(), ctx.stringExpr().accept(this));
+        const trActor = this.ensureType(ctx, ActorType.instance(), ctx.actorExpr().accept(this));
+
+        return new TransformerResult(
+            StatementLists.concat(trAttribute.statementsToPrepend, trActor.statementsToPrepend),
+            new StringAttributeOfExpression(trAttribute.node as StringExpression,
+                trActor.node as ActorExpression));
+    }
+
+    public unquote(str: string): string {
+        return str.replace(/^"(.*)"$/, '$1');
     }
 
     public visitStringLiteralExpression(ctx: StringLiteralExpressionContext) : TransformerResult {
-        return TransformerResult.withNode(StringLiteral.from(ctx.text));
+        return TransformerResult.withNode(StringLiteral.from(this.unquote(ctx.text)));
     }
 
     public visitStringVariableExpression(ctx: StringVariableExpressionContext) : TransformerResult {
-        const ident = ctx.variable().accept(this).nodeOnly() as Identifier;
-        const variable = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, StringType.instance()));
-        return TransformerResult.withNode(new StringVariableExpression(variable));
+        // Do not StringVariableExpression here!! (but a type-independent variable)
+        // (to deal with ambiguities in the parsing process)
+        return ctx.variable().accept(this);
     }
 
     public visitTimerExpression(ctx: TimerExpressionContext) : TransformerResult {
-        return TransformerResult.withNode(new TimerExpression());
+        let prepend: StatementList = StatementList.empty();
+
+        const resultVarIdent: Identifier = Identifier.fresh();
+        const resultVar = new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, NumberType.instance()));
+        const resultVarExpr = this.createVariableExpression(NumberType.instance(), resultVarIdent);
+        const declarationStmt = new DeclareStackVariableStatement(resultVar);
+        prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
+
+        this._activeDeclarationScope.putVariable(resultVar);
+
+        const storeCallResultStmt = new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_timerValue),
+            new ExpressionList([]), OptionalAstNode.with(resultVar));
+        prepend = StatementLists.concat(prepend, StatementList.from([storeCallResultStmt]));
+
+        return new TransformerResult(prepend, resultVarExpr);
     }
 
     public visitUnspecifiedBoolExpression(ctx: UnspecifiedBoolExpressionContext) : TransformerResult {
@@ -1651,14 +1685,24 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         throw new ImplementMeException();
     }
 
-    public visitVarContainsExpression(ctx: VarContainsExpressionContext) : TransformerResult {
+    public visitVariable(ctx: VariableContext) : TransformerResult {
+        const varIdent = new Identifier(ctx.text);
+        return this.produceVariableFromIdentifier(varIdent);
+    }
+
+    public visitFlatVariable(ctx: FlatVariableContext): TransformerResult {
+        const varIdent = new Identifier(ctx.ident().text);
+        return this.produceVariableFromIdentifier(varIdent);
+    }
+
+    public visitQualifiedVariable(ctx: QualifiedVariableContext): TransformerResult {
         throw new ImplementMeException();
     }
 
-    public visitVariable(ctx: VariableContext) : TransformerResult {
-        // ATTENTION: Contrary to the name of this method, the result is a `Identifier`.
-        //   Type-specific variable visitors return `VariableWithDataLocation`!
-        return TransformerResult.withNode(Identifier.of(ctx.text));
+    private produceVariableFromIdentifier(varIdent: Identifier): TransformerResult {
+        const varType = this.getTypeOf(varIdent);
+        Preconditions.checkNotUndefined(varType);
+        return TransformerResult.withNode(new VariableWithDataLocation(DataLocations.createTypedLocation(varIdent, varType)));
     }
 
     public visitWaitSecsStatement(ctx: WaitSecsStatementContext) : TransformerResult {
@@ -1672,6 +1716,13 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             secondsTr.statementsToPrepend,
             new CallStatement(Identifier.of(methodToCall),
                 new ExpressionList([secondsTr.node as Expression]), OptionalAstNode.absent()));
+    }
+
+    public visitResetTimerStatement(ctx: ResetTimerStatementContext): TransformerResult {
+        const methodToCall = MethodIdentifiers._RUNTIME_resetTimer;
+        return TransformerResult.withNode(
+            new CallStatement(Identifier.of(methodToCall),
+                new ExpressionList([]), OptionalAstNode.absent()));
     }
 
     public visitWaitUntilStatement(ctx: WaitUntilStatementContext) : TransformerResult {
@@ -1733,8 +1784,10 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         // FIXME: Magic strings
         if (type.constructor.name == "NumberType") {
             return new NumberVariableExpression(variable);
+
         } else if (type.constructor.name == "StringType") {
             return new StringVariableExpression(variable);
+
         } else if (type.constructor.name == "BooleanType") {
             return new BooleanVariableExpression(variable);
         }
@@ -1806,7 +1859,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         let prepend: StatementList = StatementList.empty();
 
         const methodIdent = ctx.ident().accept(this).nodeOnly() as Identifier;
-        const methodSig = this._activeActorTypes.getMethodSignature(methodIdent);
+        const methodSig = this._activeDeclarationScope.getMethodSignature(methodIdent);
 
         Preconditions.checkNotUndefined(methodSig);
         const resultVarType: ScratchType = methodSig.returns.type;
@@ -1817,9 +1870,11 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const declarationStmt = new DeclareStackVariableStatement(resultVar);
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
 
+        this._activeDeclarationScope.putVariable(resultVar);
+
         const argsTr = ctx.expressionList().accept(this);
-        const storeCallResultStmt = new StoreCallResultToVariableStatement(methodIdent,
-            argsTr.node as ExpressionList, resultVar);
+        const storeCallResultStmt = new CallStatement(methodIdent,
+            argsTr.node as ExpressionList, OptionalAstNode.with(resultVar));
         prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
         prepend = StatementLists.concat(prepend, StatementList.from([storeCallResultStmt]));
 
@@ -1908,11 +1963,37 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         throw new ImplementMeException();
     }
 
+    private ensureType0(context: ParserRuleContext, varType: ScratchType, transformerResult: TransformerResult): TransformerResult {
+        if (transformerResult.node['expressionType'] == varType) {
+            return transformerResult;
+
+        } else if (transformerResult.node instanceof Identifier) {
+            const varExpr = new VariableWithDataLocation(DataLocations.createTypedLocation(transformerResult.node, varType));
+            return new TransformerResult(transformerResult.statementsToPrepend, varExpr);
+
+        } else {
+            throw new ParsingException(`Type ${varType.toTreeString()} expected.`, context);
+        }
+    }
+
+    private ensureType(context: ParserRuleContext, varType: ScratchType, transformerResult: TransformerResult): TransformerResult {
+        const result = this.ensureType0(context, varType, transformerResult);
+
+        if (result.node instanceof VariableWithDataLocation) {
+            const declaredType: ScratchType = this.getTypeOf(result.node.identifier);
+            if (declaredType.typeId != varType.typeId) {
+                throw new ParsingException(`Expected type ${varType.toTreeString()} differs from declared ${declaredType.toTreeString()}`, context);
+            }
+        }
+
+        return result;
+    }
 }
 
 export class ToIntermediateTransformer {
 
-    transform(methodLib: App, origin: RuleNode, typeInformationStorage: TypeInformationStorage, config: {}): AstNode {
+    transform(methodLib: App, origin: RuleNode, typeInformationStorage: TypeInformationStorage,
+              config: {}): AstNode {
         const transformerConfig = new TransformerConfig(config);
         const visitor = new ToIntermediateVisitor(transformerConfig, methodLib, typeInformationStorage);
         return origin.accept(visitor).nodeOnly();

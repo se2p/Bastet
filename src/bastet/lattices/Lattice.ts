@@ -25,6 +25,18 @@ export interface AbstractElement extends ImmRec<any> {
 
 }
 
+export interface AbstractElementVisitor<T> {
+
+    visit(element: AbstractElement): T;
+
+}
+
+export interface AbstractState extends AbstractElement {
+
+    accept<T>(visitor: AbstractElementVisitor<T>): T;
+
+}
+
 export interface Lattice<E extends AbstractElement> {
 
     /**

@@ -23,6 +23,7 @@ import {AbstractNode} from "../AstNode";
 import {StringExpression, StringLiteral} from "./expressions/StringExpression";
 import {BooleanExpression} from "./expressions/BooleanExpression";
 import {StatementList} from "./statements/Statement";
+import {BOOTSTRAP_FINISHED_MESSAGE, GREENFLAG_MESSAGE, BOOTSTRAP_MESSAGE, Message, SYSTEM_NAMESPACE} from "./Message";
 
 export abstract class CoreEvent extends AbstractNode {
 
@@ -50,10 +51,8 @@ export class MessageReceivedEvent extends CoreEvent {
 
 export class BootstrapEvent extends MessageReceivedEvent {
 
-    public static readonly MSG: string = "__INIT";
-
     constructor() {
-        super(StringLiteral.from("RUNTIME"), StringLiteral.from(BootstrapEvent.MSG));
+        super(SYSTEM_NAMESPACE, BOOTSTRAP_MESSAGE.messageid);
     }
 
     private static INSTANCE: BootstrapEvent;
@@ -69,10 +68,8 @@ export class BootstrapEvent extends MessageReceivedEvent {
 
 export class StartupEvent extends MessageReceivedEvent {
 
-    public static readonly MSG: string = "__STARTUP";
-
     constructor() {
-        super(StringLiteral.from("RUNTIME"), StringLiteral.from(StartupEvent.MSG));
+        super(SYSTEM_NAMESPACE, GREENFLAG_MESSAGE.messageid);
     }
 
     private static INSTANCE: StartupEvent;
@@ -103,6 +100,26 @@ export class NeverEvent extends CoreEvent {
 
 }
 
+/**
+ * The Big Bang.
+ */
+export class SingularityEvent extends CoreEvent {
+
+    constructor() {
+        super([]);
+    }
+
+    private static INSTANCE: SingularityEvent;
+
+    public static instance(): SingularityEvent {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new SingularityEvent();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
 export class RenderedMonitoringEvent extends CoreEvent {
 
     constructor() {
@@ -120,10 +137,10 @@ export class RenderedMonitoringEvent extends CoreEvent {
 
 }
 
-export class AfterBootstrapMonitoringEvent extends CoreEvent {
+export class AfterBootstrapMonitoringEvent extends MessageReceivedEvent {
 
     constructor() {
-        super([]);
+        super(SYSTEM_NAMESPACE, BOOTSTRAP_FINISHED_MESSAGE.messageid);
     }
 
     private static INSTANCE: AfterBootstrapMonitoringEvent;
@@ -146,10 +163,10 @@ export class AfterStatementMonitoringEvent extends CoreEvent {
     private static INSTANCE: AfterStatementMonitoringEvent;
 
     public static instance(): AfterStatementMonitoringEvent {
-        if (!this.INSTANCE) {
-            this.INSTANCE = new AfterStatementMonitoringEvent();
+        if (!AfterStatementMonitoringEvent.INSTANCE) {
+            AfterStatementMonitoringEvent.INSTANCE = new AfterStatementMonitoringEvent();
         }
-        return this.INSTANCE;
+        return AfterStatementMonitoringEvent.INSTANCE;
     }
 
 }

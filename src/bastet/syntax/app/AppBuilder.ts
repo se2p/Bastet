@@ -31,8 +31,14 @@ import {AstNode, OptionalAstNode} from "../ast/AstNode";
 import {Preconditions} from "../../utils/Preconditions";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {ActorDefinition, ConcreteActorMode} from "../ast/core/ActorDefinition";
-import {NeverEvent} from "../ast/core/CoreEvent";
-import {ScriptDefinitionList} from "../ast/core/ScriptDefinition";
+import {
+    AfterBootstrapMonitoringEvent,
+    AfterStatementMonitoringEvent,
+    BootstrapEvent,
+    CoreEvent,
+    NeverEvent
+} from "../ast/core/CoreEvent";
+import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
     MethodDefinitionList,
     MethodDefinitionMap,
@@ -48,9 +54,12 @@ import {Lists} from "../../utils/Lists";
 import {Method} from "./controlflow/Method";
 import {DeclareStackVariableStatement} from "../ast/core/statements/DeclarationStatement";
 import {Identifier} from "../ast/core/Identifier";
-import {Variable, VariableWithDataLocation} from "../ast/core/Variable";
+import {VariableWithDataLocation} from "../ast/core/Variable";
 import {Logger} from "../../utils/Logger";
 import {ReturnStatement} from "../ast/core/statements/ControlStatement";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {TypeInformationStorage} from "../DeclarationScopes";
+import {Concern, Concerns} from "../Concern";
 
 export class AppBuilder {
 
@@ -74,43 +83,39 @@ export class AppBuilder {
      * @param actorNamePrefix: A prefix to add to the name of all actors.
      */
     public buildFromSyntaxTree(programOrigin: string, ast: AstNode,
-                               actorNamePrefix: string): App {
+                               typeStorage: TypeInformationStorage): App {
 
         Preconditions.checkArgument(ast instanceof ProgramDefinition);
         const programNode: ProgramDefinition = ast as ProgramDefinition;
-        const actorMap: ActorMap = this.buildActors(programNode, actorNamePrefix);
+        const actorMap: ActorMap = this.buildActors(programNode);
 
         // TODO/FIXME: Check if adding the prefix to actor names works correctly.
         //      Also references to the actor must be updated.
 
-        return new App(programOrigin, programNode.ident.text, actorMap);
+        return new App(programOrigin, programNode.ident.text, actorMap, typeStorage);
     }
 
-    private buildActors(programAST: ProgramDefinition, actorNamePrefix: string): ActorMap {
+    private buildActors(programAST: ProgramDefinition): ActorMap {
         let result: ActorMap = {};
         const actorDefinitions : ActorDefinition[] = programAST.actors.elements;
 
         for (let actorDefinition of actorDefinitions) {
-            // Flat actor
-            const flatActor: Actor = this.buildActorFlat(actorDefinition, actorNamePrefix);
-
-            this._knownActors[flatActor.ident] = flatActor;
+            const actor: Actor = this.buildActor(actorDefinition);
 
             // Add as result
-            result[flatActor.ident] = flatActor;
+            this._knownActors[actor.ident] = actor;
+            result[actor.ident] = actor;
         }
 
+        // Add the actor that can bootstrap the application
         const boostrapper = Actors.defaultBoostraper();
         result[boostrapper.ident] = boostrapper;
 
         return result;
     }
 
-    private buildActorFlat(actorDefinition: ActorDefinition, actorNamePrefix: string) {
-        let actorName: string = actorDefinition.ident.text;
-        if (actorNamePrefix) {
-            actorName = actorNamePrefix + "_" + actorName;
-        }
+    private buildActor(actorDefinition: ActorDefinition) {
+        const actorName: string = actorDefinition.ident.text;
         const acd = actorDefinition;
 
         const resources = this.buildResources(acd.resourceDefs);
@@ -118,8 +123,9 @@ export class AppBuilder {
         const initScript = this.buildInitScript(acd.resourceDefs, acd.declarationStmts, acd.initStmts);
         const methodDefs = this.buildMethodDefs(acd.methodDefs);
         const externalMethodSigs = this.buildExternalMethodSigs(acd.externalMethodDecls);
-        const scripts = this.buildScripts(acd.scriptList);
+        const scripts = this.buildScripts(acd.scriptList).concat([initScript]);
         const methods = this.buildMethods(acd.methodDefs);
+        const concern = this.determineConcern(actorDefinition);
 
         let inheritsFromActors: Actor[] = [];
         for (let aid of actorDefinition.inheritsFrom.elements) {
@@ -128,8 +134,21 @@ export class AppBuilder {
             inheritsFromActors.push(a);
         }
 
-        return new Actor(actorDefinition.mode, actorName, inheritsFromActors,
-            resources, datalocs, initScript, methodDefs, externalMethodSigs, scripts, methods);
+        return new Actor(actorDefinition.mode, actorName, inheritsFromActors, [],
+            concern, resources, datalocs, initScript, methodDefs, externalMethodSigs, scripts, methods);
+    }
+
+    private determineConcern(actorDef: ActorDefinition): Concern {
+        Preconditions.checkNotUndefined(actorDef);
+
+        const isSpecificationActor = actorDef.scriptList.elements.find((sd) => sd.event instanceof AfterStatementMonitoringEvent
+            || sd.event instanceof AfterBootstrapMonitoringEvent) != null;
+
+        if (isSpecificationActor) {
+            return Concerns.defaultSpecificationConcern();
+        }
+
+        return Concerns.defaultProgramConcern();
     }
 
     private buildMethods(methodDefs: MethodDefinitionList): Method[] {
@@ -174,6 +193,10 @@ export class AppBuilder {
         return result;
     }
 
+    private shouldRestartOnEvent(script: ScriptDefinition, event: CoreEvent) {
+        return script.isRestart;
+    }
+
     private buildScripts(scriptList: ScriptDefinitionList): Script[] {
         let result: Script[] = [];
         for (let script of scriptList) {
@@ -182,7 +205,8 @@ export class AppBuilder {
             const transRelation = TransitionRelations.eliminateEpsilons(
                 script.stmtList.accept(visitor));
 
-            result.push(new Script(Scripts.freshScriptId(), event, transRelation));
+            result.push(new Script(Scripts.freshScriptId(), event,
+                this.shouldRestartOnEvent(script, event), transRelation));
         }
 
         return result;
@@ -211,12 +235,21 @@ export class AppBuilder {
     private buildInitScript(resourceListContext: ResourceDefinitionList, declarationStmtList: StatementList,
                                    stmtList: StatementList): Script {
         const visitor = new RelationBuildingVisitor();
-        const transrelRes = resourceListContext.accept(visitor);
-        const transrelLocs = declarationStmtList.accept(visitor);
-        const transrelSet = stmtList.accept(visitor);
-        const compundTransRel = TransitionRelations.concat(transrelRes,
-            TransitionRelations.concat(transrelLocs, transrelSet));
-        return new Script(Scripts.freshScriptId(), NeverEvent.instance(), compundTransRel);
+
+        let transrelRes: TransitionRelation;
+        if (resourceListContext.elements.length > 0) {
+            // transrelRes: TransitionRelation = resourceListContext.accept(visitor);
+            throw new ImplementMeException(); // TODO: Ressources not yet supported. Implement this feature!
+        } else {
+            transrelRes = TransitionRelations.epsilon();
+        }
+
+        const transrelLocs: TransitionRelation = declarationStmtList.accept(visitor);
+        const transrelSet: TransitionRelation = stmtList.accept(visitor);
+        const compundTransRel = TransitionRelations.eliminateEpsilons(
+            TransitionRelations.concat(transrelRes,
+                TransitionRelations.concat(transrelLocs, transrelSet)));
+        return new Script(Scripts.freshScriptId(), BootstrapEvent.instance(), false, compundTransRel);
     }
 
     private buildResources(resourceListContext: ResourceDefinitionList): AppResourceMap {
@@ -258,19 +291,19 @@ export class AppBuilder {
         const worklist: Actor[] = [];
         const handled: Set<String> = new Set();
 
-        if (actor.inheritsFrom.length > 0) {
+        if (actor.inheritFrom.length > 0) {
             worklist.push(actor);
         }
 
         while (worklist.length > 0) {
             const work = worklist.pop();
-            for (const f of work.inheritsFrom) {
-                if (handled.has(f.ident)) {
+            for (const copyFrom of work.inheritFrom) {
+                if (handled.has(copyFrom.ident)) {
                     throw new IllegalStateException("Cycle in the inheritance relation?");
                 }
-                result = this.concatActors(result, f);
-                handled.add(f.ident);
-                worklist.push(f);
+                result = this.concatActors(result, copyFrom);
+                handled.add(copyFrom.ident);
+                worklist.push(copyFrom);
             }
         }
 
@@ -289,8 +322,15 @@ export class AppBuilder {
         const scripts = Lists.concatImmutableLists(main.scripts, secondary.scripts);
         const methods = Lists.concatImmutableLists(main.methods, secondary.methods);
 
-        return new Actor(main.actorMode, main.ident, [],
-            resources.createMutable(), datalocs.createMutable(),
+        // TODO: The way we dedetermine the concern of an actor is somehow hacky.
+        //  We could take advantage of the inheritance relation
+        let concern: Concern = main.concern;
+        if (secondary.concern == Concerns.defaultSpecificationConcern()) {
+            concern = Concerns.defaultSpecificationConcern();
+        }
+
+        return new Actor(main.actorMode, main.ident, [], [secondary].concat(Array.from(secondary.dissolvedFrom)),
+            concern, resources.createMutable(), datalocs.createMutable(),
             initScript, methodDefinitions.createMutable(), externalMethods.createMutable(),
             scripts.createMutable(), methods.createMutable());
     }
@@ -299,8 +339,7 @@ export class AppBuilder {
         const ab = new AppBuilder(App.empty());
 
         const concreteActors: Actor[] = taskModel
-            .actors
-            .filter((a) => a.actorMode == ConcreteActorMode.instance());
+            .actors.filter((a) => a.actorMode == ConcreteActorMode.instance());
 
         const flatActors: ActorMap = {};
         for (const a of concreteActors) {
@@ -308,6 +347,7 @@ export class AppBuilder {
             flatActors[d.ident] = d;
         }
 
-        return new App(taskModel.origin, taskModel.ident, flatActors);
+        return new App(taskModel.origin, taskModel.ident, flatActors, taskModel.typeStorage);
     }
+
 }

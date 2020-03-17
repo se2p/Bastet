@@ -20,32 +20,15 @@
  */
 
 import {AbstractNode, OptionalAstNode} from "../AstNode";
-import {StringExpression, StringLiteral} from "./expressions/StringExpression";
+import {extractStringLiteral, StringExpression, StringLiteral} from "./expressions/StringExpression";
 import {Expression} from "./expressions/Expression";
 
 export interface Message {
 
 }
 
-export class AppMessage extends AbstractNode implements Message {
-
-    private readonly _messageid: StringLiteral;
-
-    constructor(messageid: StringLiteral) {
-        super([messageid]);
-        this._messageid = messageid;
-    }
-
-    get messageid() : StringLiteral {
-        return this._messageid;
-    }
-
-}
-
-export const INIT_MESSAGE = new AppMessage(StringLiteral.from("__INIT"));
-export const GREENFLAG_MESSAGE = new AppMessage(StringLiteral.from("__STARTUP"));
-export const STARTUP_MESSAGE = GREENFLAG_MESSAGE;
-export const STARTUP_FINISHED_MESSAGE = new AppMessage(StringLiteral.from("__STARTUP_FINISHED"));
+export const SYSTEM_NAMESPACE = StringLiteral.from("SYSTEM");
+export const USER_NAMESPACE = StringLiteral.from("USER");
 
 export class SystemMessage extends AbstractNode implements Message {
 
@@ -72,4 +55,24 @@ export class SystemMessage extends AbstractNode implements Message {
         return this._payload
     }
 
+    public isEqualTo(msg: SystemMessage): boolean {
+       return extractStringLiteral(msg.messageid) == extractStringLiteral(this.messageid)
+           && extractStringLiteral(msg.namespace) == extractStringLiteral(this.namespace);
+    }
+
 }
+
+export class UserMessage extends SystemMessage implements Message {
+
+    constructor(messageid: StringExpression) {
+        super(USER_NAMESPACE, messageid, OptionalAstNode.absent());
+    }
+
+}
+
+export const BOOTSTRAP_MESSAGE = new SystemMessage(SYSTEM_NAMESPACE, StringLiteral.from("__BOOTSTRAP"), OptionalAstNode.absent());
+export const BOOTSTRAP_FINISHED_MESSAGE = new SystemMessage(SYSTEM_NAMESPACE, StringLiteral.from("__BOOTSTRAP_FINISHED"), OptionalAstNode.absent());
+export const GREENFLAG_MESSAGE = new SystemMessage(SYSTEM_NAMESPACE, StringLiteral.from("__STARTUP"), OptionalAstNode.absent());
+export const STARTUP_MESSAGE = GREENFLAG_MESSAGE;
+export const STARTUP_FINISHED_MESSAGE = new SystemMessage(SYSTEM_NAMESPACE, StringLiteral.from("__STARTUP_FINISHED"), OptionalAstNode.absent());
+

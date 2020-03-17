@@ -27,7 +27,21 @@ import {NumberExpression} from "./NumberExpression";
 import {BooleanExpression} from "./BooleanExpression";
 import {Identifier} from "../Identifier";
 import {BinaryExpression} from "./BinaryExpression";
-import {Variable, VariableExpression, VariableWithDataLocation} from "../Variable";
+import {VariableExpression, VariableWithDataLocation} from "../Variable";
+import {Preconditions} from "../../../../utils/Preconditions";
+import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
+import {IllegalArgumentException} from "../../../../core/exceptions/IllegalArgumentException";
+import {ActorExpression} from "./ActorExpression";
+
+export function extractStringLiteral(expression: StringExpression): string {
+    Preconditions.checkNotUndefined(expression);
+
+    if (expression instanceof StringLiteral) {
+        return expression.text;
+    }
+
+    throw new IllegalArgumentException("Unsupported expression type for string literal extraction: " + expression.constructor.name);
+}
 
 export interface StringExpression extends Expression {
 
@@ -77,6 +91,10 @@ export class NumAsStringExpression extends AbstractStringExpression {
     constructor(num: NumberExpression) {
         super([num]);
     }
+
+    get num(): NumberExpression {
+        return this._num;
+    }
 }
 
 export class BoolAsStringExpression extends AbstractStringExpression {
@@ -88,19 +106,29 @@ export class BoolAsStringExpression extends AbstractStringExpression {
         this._bool = bool;
     }
 
+    get bool(): BooleanExpression {
+        return this._bool;
+    }
 }
 
 export class StringAttributeOfExpression extends AbstractStringExpression {
 
     private readonly _attribute: StringExpression;
-    private readonly _ofEntity: Identifier;
+    private readonly _ofEntity: ActorExpression;
 
-    constructor(attribute: StringExpression, ofEntity: Identifier) {
+    constructor(attribute: StringExpression, ofEntity: ActorExpression) {
         super([attribute, ofEntity]);
         this._attribute = attribute;
         this._ofEntity = ofEntity;
     }
 
+    get attribute(): StringExpression {
+        return this._attribute;
+    }
+
+    get ofEntity(): ActorExpression {
+        return this._ofEntity;
+    }
 }
 
 export class ResourceAttributeOfExpression extends AbstractStringExpression {
@@ -114,6 +142,13 @@ export class ResourceAttributeOfExpression extends AbstractStringExpression {
         this._ofResource = ofResource;
     }
 
+    get attribute(): StringExpression {
+        return this._attribute;
+    }
+
+    get ofResource(): Identifier {
+        return this._ofResource;
+    }
 }
 
 export class JoinStringsExpression extends BinaryExpression<StringExpression, StringExpression> implements StringExpression {
@@ -135,18 +170,32 @@ export class IthLetterOfStringExpression extends AbstractStringExpression {
         this._strExpr = strExpr;
     }
 
+    get index(): NumberExpression {
+        return this._index;
+    }
+
+    get strExpr(): StringExpression {
+        return this._strExpr;
+    }
 }
 
 export class IthStringItemOfExpression extends AbstractStringExpression {
 
     private readonly _index: NumberExpression;
-    private readonly _ofVariable: Identifier;
+    private readonly _ofVariable: VariableWithDataLocation;
 
-    constructor(index: NumberExpression, ofVariable: Identifier) {
+    constructor(index: NumberExpression, ofVariable: VariableWithDataLocation) {
         super([index, ofVariable]);
         this._index = index;
         this._ofVariable = ofVariable;
     }
 
+    get index(): NumberExpression {
+        return this._index;
+    }
+
+    get ofVariable(): VariableWithDataLocation {
+        return this._ofVariable;
+    }
 }
 

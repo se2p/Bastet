@@ -25,26 +25,61 @@ import {ChooseOperator, StateSet} from "./StateSet";
 import {Preconditions} from "../../utils/Preconditions";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
+import {BastetConfiguration} from "../../utils/BastetConfiguration";
+import {ExportFunction, resolveResultExportFunction} from "../analyses/Analyses";
+import {AnalysisAlgorithm} from "./Algorithm";
+import {StatsAnalysis} from "../analyses/stats/StatsAnalysis";
+
+const { performance } = require('perf_hooks');
 
 export const STAT_KEY_REACH_ITERATIONS = "iterations";
 export const STAT_KEY_REACH_REACHED = "reached states";
 export const STAT_KEY_REACH_FRONTIER = "frontier states";
+
+export class ReachabilityAlgorithmConfig extends BastetConfiguration {
+
+    constructor(dict: {}) {
+        super(dict, ['ReachabilityAlgorithm']);
+    }
+
+    get dumpGraphAfterIteration(): boolean {
+        return this.getBoolProperty('dump-graph-after-iteration', false);
+    }
+
+}
 
 /**
  * The implementation of this algorithm is inspired by the
  * reachability algorithm that can be found in the CPA framework;
  * nevertheless, our implementation has important differences.
  */
-export class ReachabilityAlgorithm<C extends ConcreteElement, E extends AbstractElement> {
+export class ReachabilityAlgorithm<C extends ConcreteElement, E extends AbstractElement> implements AnalysisAlgorithm<C, E> {
 
     private readonly _analysis: ProgramAnalysis<C, E>;
     private readonly _chooseOp: ChooseOperator<E>;
     private readonly _statistics: AnalysisStatistics;
+    private readonly _config: ReachabilityAlgorithmConfig;
 
-    constructor(analysis: ProgramAnalysis<C, E>, chooseOp: ChooseOperator<E>, statistics: AnalysisStatistics) {
+    private _exportFunction: ExportFunction;
+
+    private _lastOutputTime: number;
+    private _lastTimeForMerge: number;
+    private _lastTimeForStop: number;
+    private _lastTimeForSucc: number;
+    private _lastTimeForWiden: number;
+
+    constructor(config: {}, analysis: ProgramAnalysis<C, E>, chooseOp: ChooseOperator<E>, statistics: AnalysisStatistics) {
+        this._config = new ReachabilityAlgorithmConfig(config);
         this._analysis = Preconditions.checkNotUndefined(analysis);
         this._chooseOp = Preconditions.checkNotUndefined(chooseOp);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
+        this._exportFunction = resolveResultExportFunction(this._analysis);
+
+        this._lastOutputTime = performance.now();
+        this._lastTimeForMerge = 0;
+        this._lastTimeForStop = 0;
+        this._lastTimeForSucc = 0;
+        this._lastTimeForWiden = 0;
     }
 
     get analysis(): ProgramAnalysis<C, E> {
@@ -70,22 +105,11 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
                 const ePrimePrime: E = this._analysis.widen(ePrime);
 
                 // MERGE: If desired, merge certain states
-                const removeFromReached: Set<E> = new Set<E>();
-                const addToReached: Set<E> = new Set<E>();
-                const relevantReached: StateSet<E> = reached.getStateSet(ePrimePrime);
-                for (let r of relevantReached) {
-                    if (this._analysis.merge(ePrimePrime, r)) {
-                        const ePrimePrimePrime = this._analysis.join(ePrimePrime, r);
-                        removeFromReached.add(r);
-                        addToReached.add(ePrimePrimePrime);
-                    }
-                }
-                reached.removeAll(removeFromReached);
-                reached.addAll(addToReached);
+                reached = this._analysis.mergeInto(ePrimePrime, reached, (s) => s, (s) => s);
 
                 // STOP: Check for coverage (fixed point iteration)
                 const checkStopFor: E = ePrimePrime; // TODO: How does this interact with the 'merge' above
-                if (!this._analysis.stop(checkStopFor, reached)) {
+                if (!this._analysis.stop(checkStopFor, reached, (s) => s)) {
                     frontier.add(checkStopFor);
                     reached.add(checkStopFor);
 
@@ -94,17 +118,47 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
                         return this.takeNoteOfResult(frontier, reached);
                     }
                 }
+
+                this.algorithmMonitoringHook(frontier, reached);
             }
         }
 
         Preconditions.checkState(frontier.isEmpty());
+        this.algorithmMonitoringHook(frontier, reached);
         return this.takeNoteOfResult(frontier, reached);
     }
 
     private takeNoteOfResult(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
         this._statistics.put(STAT_KEY_REACH_REACHED, reached.getSize());
         this._statistics.put(STAT_KEY_REACH_FRONTIER, frontier.getSize());
+
+        const statAnalysis: StatsAnalysis<any, any> = this._analysis as StatsAnalysis<any, any>;
+
+        const elapsed = performance.now() - this._lastOutputTime;
+        if (elapsed > 10000) {
+            const timeForWiden = statAnalysis.widenStats.contextTimer.totalDuration;
+            const timeForStop = statAnalysis.stopStats.contextTimer.totalDuration;
+            const timeForSucc = statAnalysis.succStats.contextTimer.totalDuration;
+            const timeForMerge = statAnalysis.mergeStats.contextTimer.totalDuration;
+
+            console.log(`Reached ${reached.getSize()} states, ${frontier.getSize()} in frontier, succ ${timeForSucc - this._lastTimeForSucc}, merge ${timeForMerge - this._lastTimeForMerge}, stop ${timeForStop - this._lastTimeForStop}, widen ${timeForWiden - this._lastTimeForWiden}, heap ${process.memoryUsage().heapUsed / 1024 / 1024}`);
+
+            this._lastOutputTime = performance.now();
+            this._lastTimeForWiden = timeForWiden;
+            this._lastTimeForStop = timeForStop;
+            this._lastTimeForSucc = timeForSucc;
+            this._lastTimeForMerge = timeForMerge;
+        }
+
         return [frontier, reached];
+    }
+
+    private algorithmMonitoringHook(frontier: StateSet<E>, reached: StateSet<E>) {
+        if (this._config.dumpGraphAfterIteration) {
+            if (this._exportFunction) {
+                this._exportFunction(reached, frontier);
+            }
+        }
     }
 
 }
