@@ -82,7 +82,6 @@ import { StringCallStatementExpressionContext } from "./ScratchParser";
 import { NumAsStringExpressionContext } from "./ScratchParser";
 import { BoolAsStringExpressionContext } from "./ScratchParser";
 import { StringAttributeOfExpressionContext } from "./ScratchParser";
-import { ResourceAttributeOfExpressionContext } from "./ScratchParser";
 import { JoinStringsExpressionContext } from "./ScratchParser";
 import { IthLetterOfStringExpressionContext } from "./ScratchParser";
 import { IthStringItemOfExpressionContext } from "./ScratchParser";
@@ -840,14 +839,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitStringAttributeOfExpression?: (ctx: StringAttributeOfExpressionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `ResourceAttributeOfExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitResourceAttributeOfExpression?: (ctx: ResourceAttributeOfExpressionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `JoinStringsExpression`
