@@ -26,7 +26,7 @@ import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "i
 import {Actor, ActorId} from "../../../syntax/app/Actor";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {ConcreteDomain} from "../../domains/ConcreteElements";
+import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 import {App} from "../../../syntax/app/App";
 import {AfterStatementMonitoringEvent, BootstrapEvent, SingularityEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Property} from "../../../syntax/Property";
@@ -38,6 +38,7 @@ import {DataLocation, DataLocations, TypedDataLocation} from "../../../syntax/ap
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
+import {GraphAbstractStateLattice} from "../graph/GraphAbstractDomain";
 
 /**
  * Current thread state that is active or becomes active if...
@@ -490,9 +491,46 @@ export class ScheduleAbstractStateFactory {
     }
 }
 
+export class ControlLattice implements Lattice<ControlAbstractState> {
+
+    private readonly _wrapped: Lattice<AbstractElement>;
+
+    constructor(wrapped: Lattice<AbstractElement>) {
+        this._wrapped = Preconditions.checkNotUndefined(wrapped);
+    }
+
+    bottom(): ControlAbstractState {
+        throw new ImplementMeException();
+    }
+
+    isIncluded(element1: ControlAbstractState, element2: ControlAbstractState): boolean {
+        throw new ImplementMeException();
+    }
+
+    join(element1: ControlAbstractState, element2: ControlAbstractState): ControlAbstractState {
+        throw new ImplementMeException();
+    }
+
+    meet(element1: ControlAbstractState, element2: ControlAbstractState): ControlAbstractState {
+        throw new ImplementMeException();
+    }
+
+    top(): ControlAbstractState {
+        throw new ImplementMeException();
+    }
+
+}
+
 export class ControlAbstractDomain implements AbstractDomain<ControlConcreteState, ControlAbstractState> {
 
-    lattice: Lattice<ControlAbstractState>;
+    private readonly _lattice: Lattice<ControlAbstractState>;
+
+    private readonly _wrapped: AbstractDomain<ConcreteElement, AbstractElement>;
+
+    constructor(wrapped: AbstractDomain<ConcreteElement, AbstractElement>) {
+        this._wrapped = Preconditions.checkNotUndefined(wrapped);
+        this._lattice = new ControlLattice(wrapped.lattice);
+    }
 
     abstract(elements: Iterable<ControlConcreteState>): ControlAbstractState {
         throw new ImplementMeException();
@@ -508,6 +546,10 @@ export class ControlAbstractDomain implements AbstractDomain<ControlConcreteStat
 
     get concreteDomain(): ConcreteDomain<ControlConcreteState> {
         throw new ImplementMeException();
+    }
+
+    get lattice(): Lattice<ControlAbstractState> {
+        return this._lattice;
     }
 
 }

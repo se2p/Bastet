@@ -102,11 +102,15 @@ export class DataAbstractStateLattice implements LatticeWithComplements<DataAbst
     }
 
     join(element1: DataAbstractState, element2: DataAbstractState): DataAbstractState {
-        throw new ImplementMeException();
+        return element1
+            .withBlockFormula(this._folLattice.join(element1.blockFormula, element2.blockFormula))
+            .withSummaryFormula(this._propLattice.join(element1.summaryFormula, element2.summaryFormula));
     }
 
     meet(element1: DataAbstractState, element2: DataAbstractState): DataAbstractState {
-        throw new ImplementMeException();
+        return element1
+            .withBlockFormula(this._folLattice.meet(element1.blockFormula, element2.blockFormula))
+            .withSummaryFormula(this._propLattice.meet(element1.summaryFormula, element2.summaryFormula));
     }
 
     top(): DataAbstractState {

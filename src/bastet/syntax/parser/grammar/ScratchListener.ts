@@ -82,7 +82,6 @@ import { StringCallStatementExpressionContext } from "./ScratchParser";
 import { NumAsStringExpressionContext } from "./ScratchParser";
 import { BoolAsStringExpressionContext } from "./ScratchParser";
 import { StringAttributeOfExpressionContext } from "./ScratchParser";
-import { ResourceAttributeOfExpressionContext } from "./ScratchParser";
 import { JoinStringsExpressionContext } from "./ScratchParser";
 import { IthLetterOfStringExpressionContext } from "./ScratchParser";
 import { IthStringItemOfExpressionContext } from "./ScratchParser";
@@ -1232,19 +1231,6 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitStringAttributeOfExpression?: (ctx: StringAttributeOfExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `ResourceAttributeOfExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterResourceAttributeOfExpression?: (ctx: ResourceAttributeOfExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `ResourceAttributeOfExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitResourceAttributeOfExpression?: (ctx: ResourceAttributeOfExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `JoinStringsExpression`

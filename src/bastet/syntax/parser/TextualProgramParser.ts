@@ -19,13 +19,28 @@
  *
  */
 
-import {CharStreams, CommonTokenStream} from 'antlr4ts';
+import {BailErrorStrategy, CharStreams, CommonTokenStream, TokenStream} from 'antlr4ts';
 import {ScratchLexer} from "./grammar/ScratchLexer";
 import {ProgramContext, ScratchParser} from "./grammar/ScratchParser";
 import fs from "fs";
 import path from "path";
 import {ProgramParser} from "./ProgramParser";
 import {Preconditions} from "../../utils/Preconditions";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {ParsingException} from "../../core/exceptions/ParsingException";
+
+class MyScratchCoreParser extends ScratchParser {
+
+    constructor(input: TokenStream) {
+        super(input);
+        this._errHandler = new BailErrorStrategy();
+    }
+
+    get errorHandler(): BailErrorStrategy {
+        return this._errHandler as BailErrorStrategy;
+    }
+
+}
 
 export class TextualProgramParser implements ProgramParser {
 
@@ -53,12 +68,15 @@ export class TextualProgramParser implements ProgramParser {
         const tokenStream = new CommonTokenStream(lexer);
 
         // Create the parser
-        const parser = new ScratchParser(tokenStream);
+        const parser = new MyScratchCoreParser(tokenStream);
 
         // Parse the program and construct the AST
-        const programContext = parser.program();
+        try {
+            return parser.program();
 
-        return programContext;
+        } catch (e) {
+            throw new ParsingException("Parsing failed! Please make sure that the input program adheres to the grammar.", e.cause.ctx);
+        }
     }
 
 }

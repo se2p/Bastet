@@ -10,9 +10,9 @@ cd $BASTET_ROOT
 npm run build
 
 grep_statistic () {
-    CONTEXT=$1
-    IDENT=$2
-    cat $RESULT_FILE | grep $CONTEXT -A 5 | grep $IDENT | cut -d":" -f2 | cut -d"," -f1
+    CONTEXT="$1"
+    IDENT="$2"
+    cat $RESULT_FILE | grep $CONTEXT -A 5 | grep "$IDENT" | cut -d":" -f2 | cut -d"," -f1
 }
 
 num_or_zero () {
@@ -31,6 +31,7 @@ parse_results () {
     SATISFIED=$(num_or_zero `grep_statistic "MultiPropertyAlgorithm" "num_satisfied"`)
     VIOLATED=$(num_or_zero `grep_statistic "MultiPropertyAlgorithm" "num_violated"`)
     DURATION=$(grep_statistic "MultiPropertyAlgorithm" "duration")
+    REACHED=$(grep_statistic "ReachabilityAlgorithm" "reached states")
     DURATION=$(printf '%.*f\n' 2 $DURATION)
 
     if [[ $INPUT_FILE == *_SAFE.sc ]]
@@ -53,7 +54,7 @@ parse_results () {
         OK=0
     fi
 
-    printf "\t$DURATION\t$VIOLATED\t$SATISFIED"
+    printf "\t$DURATION\t$REACHED\t$VIOLATED\t$SATISFIED"
 
     if [ $OK -eq 1 ]
     then
@@ -68,7 +69,7 @@ for f in $(find $TEST_DIR -name "*${NAME_PREFIX}*.sc" | sort)
 do
     RESULT_FILE=$(mktemp)
     printf "`basename $f`"
-     timeout 90 ./scripts/bastet.sh \
+     timeout 360 ./scripts/bastet.sh \
         -P $f \
         -S test/programs/empty.sc \
         -I src/public/library.sc \

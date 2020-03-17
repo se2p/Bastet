@@ -24,11 +24,65 @@ import {JoinOperator, MergeIntoOperator, MergeOperator} from "./ProgramAnalysis"
 import {StateSet} from "../algorithms/StateSet";
 import {AbstractElement} from "../../lattices/Lattice";
 import {Preconditions} from "../../utils/Preconditions";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {Unwrapper} from "./Refiner";
 
 export class NoMergeIntoOperator<E extends AbstractElement> implements MergeIntoOperator<E> {
 
     mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): StateSet<E> {
         return reached;
+    }
+
+}
+
+export class MergeJoinOperator<E extends AbstractElement> implements MergeOperator<E> {
+
+    merge(state1: E, state2: E): boolean {
+        return true;
+    }
+
+}
+
+export class MergeSepOperator<E extends AbstractElement> implements MergeOperator<E> {
+
+    merge(state1: E, state2: E): boolean {
+        return false;
+    }
+
+}
+
+export class StandardMergeOperatorFactory {
+
+    public static create<E extends AbstractElement>(operatorName: string): MergeOperator<E> {
+        Preconditions.checkNotUndefined(operatorName);
+
+        if (operatorName.toUpperCase() == "SEP") {
+            return new MergeSepOperator();
+        } else if (operatorName.toUpperCase() == "JOIN") {
+            return new MergeJoinOperator();
+        } else {
+            throw new IllegalArgumentException("No valid configuration value for the merge operator");
+        }
+    }
+
+    static createDelegator<E extends AbstractElement, W extends AbstractElement>(
+        wrappedMergeOp: MergeOperator<W>, unwrapper: Unwrapper<E, W>): MergeOperator<E> {
+        return undefined;
+    }
+}
+
+export class DelegatingMergeOperator<E extends AbstractElement, W extends AbstractElement> implements MergeOperator<E>{
+
+    private readonly _wrapped: MergeOperator<W>;
+    private readonly _unwrapper: Unwrapper<E, W>;
+
+    constructor(wrapped: MergeOperator<W>, unwrapper: Unwrapper<E, W>) {
+        this._wrapped = Preconditions.checkNotUndefined(wrapped);
+        this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
+    }
+
+    merge(state1: E, state2: E): boolean {
+        return this._wrapped.merge(this._unwrapper.unwrap(state1), this._unwrapper.unwrap(state2));
     }
 
 }

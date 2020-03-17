@@ -5,7 +5,7 @@ import ScratchLiterals;
 // A program has a name and is composed of a list of actors.
 // The term 'actor' is used to describe one entity in the Scratch world.
 // We use the terms 'script group' and 'entity' as synonyms for 'actor'.
-program : fileType ident importDefinitionList actorDefinitionList ;
+program : fileType ident importDefinitionList actorDefinitionList EOF ;
 
 fileType : 'program' | 'module' ;
 
