@@ -43,6 +43,7 @@ import {AbstractElement} from "../../../lattices/Lattice";
 import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -98,15 +99,15 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         return false;
     }
 
-    stop(state: ControlAbstractState, reached: Iterable<ControlAbstractState>): boolean {
-        for (const r of reached) {
-            if (state.getThreadStates().equals(r.getThreadStates())) {
-                const w = state.getWrappedState();
-                if (this._wrappedAnalysis.stop(w, [r.getWrappedState()])) {
-                    return true;
-                }
-            }
-        }
+    stop(state: ControlAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => ControlAbstractState): boolean {
+        // for (const r of reached) {
+        //     if (state.getThreadStates().equals(r.getThreadStates())) {
+        //         const w = state.getWrappedState();
+        //         if (this._wrappedAnalysis.stop(w, [r.getWrappedState()])) {
+        //             return true;
+        //         }
+        //     }
+        // }
         return false;
     }
 
@@ -182,6 +183,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
 
     wrapStateSets(frontier: StateSet<ControlAbstractState>, reached: StateSet<ControlAbstractState>): [StateSet<ControlAbstractState>, StateSet<ControlAbstractState>] {
         return [frontier, reached];
+    }
+
+    mergeInto(state: ControlAbstractState, reached: StateSet<ControlAbstractState>, unwrapper: (AbstractElement) => ControlAbstractState, wrapper: (E) => AbstractElement): StateSet<ControlAbstractState> {
+        throw new ImplementMeException();
     }
 
 }

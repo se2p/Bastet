@@ -46,6 +46,11 @@ import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
+import {Concern, Concerns} from "../Concern";
+import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
+import {CallStatement} from "../ast/core/statements/CallStatement";
+import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
+import {Properties} from "../Property";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -68,6 +73,9 @@ export class Actor {
 
     /** Unique identifier of the actor */
     private readonly _ident: ActorId;
+
+    /** The concern of the actor. Used for scheduling decisions. */
+    private readonly _concern: Concern;
 
     /** Set of the actor's resources */
     private readonly _resources: ImmutableMap<string, AppResource>;
@@ -103,7 +111,7 @@ export class Actor {
     private readonly _transRelMap: ImmutableMap<TransRelId, TransitionRelation>;
 
     constructor(mode: ActorMode, ident: ActorId, inheritFrom: Actor[],
-                dissolvedFrom: Actor[],
+                dissolvedFrom: Actor[], concern: Concern,
                 resources: AppResourceMap, datalocs: DataLocationMap,
                 initScript: Script, methodDefs: MethodDefinitionMap,
                 externalMethods: MethodSignatureMap,
@@ -124,6 +132,7 @@ export class Actor {
         this._scripts = Lists.immutableCopyOf(scripts);
         this._methods = Lists.immutableCopyOf(methods);
         this._isObserver = this.deterineIsObserver();
+        this._concern = Preconditions.checkNotUndefined(concern);
 
         const transRelMap: Map<TransRelId, TransitionRelation> = new Map<TransRelId, TransitionRelation>();
 
@@ -175,6 +184,10 @@ export class Actor {
         return this._resources;
     }
 
+    get concern(): Concern {
+        return this._concern;
+    }
+
     get initScript(): Script {
         return this._initScript;
     }
@@ -212,11 +225,15 @@ export class Actor {
     }
 
     public getMethod(name: string): Method {
-        const result: Method = this._methodMap.get(name);
+        const result: Method = this.findMethod(name);
         if (!result) {
             throw new IllegalArgumentException(`Method "${name}" is not defined!`);
         }
         return result;
+    }
+
+    public findMethod(name: string): Method {
+        return this._methodMap.get(name);
     }
 
     public getScript(id: ScriptId): Script {
@@ -247,6 +264,32 @@ export class Actor {
         }
         return false;
     }
+
+    public transitivelyCalled(from: TransitionRelation): Set<CallStatement> {
+        const result = new Set<CallStatement>();
+
+        const addToResult = function(a: Actor, tr: TransitionRelation) {
+            for (const l of tr.locationSet) {
+                for (const ts of tr.transitionsFrom(l)) {
+                    const op = ProgramOperation.for(ts.opId);
+                    if (op.ast instanceof CallStatement) {
+                        const call = op.ast as CallStatement;
+                        if (!result.has(call)) {
+                            result.add(call);
+                            const calledMethodDef: Method = a.findMethod(call.calledMethod.text);
+                            if (calledMethodDef) {
+                                addToResult(a, calledMethodDef.transitions);
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        addToResult(this, from);
+
+        return result;
+    }
 }
 
 export class Actors {
@@ -267,6 +310,7 @@ export class Actors {
             const bootstrapScript: Script = new Script(Scripts.freshScriptId(),
                 SingularityEvent.instance(), false, bootstrapTransitions);
             Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [], [],
+                Concerns.highestPriorityConcern(),
                 {}, {}, bootstrapScript, {}, {},
                 [bootstrapScript], []);
         }

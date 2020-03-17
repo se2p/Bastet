@@ -116,7 +116,7 @@ import {
     AbstractString,
     RationalNumberTheory
 } from "../../domains/MemoryTransformer";
-import {BooleanType, NumberType, StringType} from "../../../syntax/ast/core/ScratchType";
+import {ActorType, BooleanType, NumberType, StringType} from "../../../syntax/ast/core/ScratchType";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {
     BooleanFormula,
@@ -131,6 +131,7 @@ import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifie
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {BeginAtomicStatement, EndAtomicStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpression";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 
 export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
     S extends AbstractString, L extends AbstractList>
@@ -597,6 +598,10 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
             const assignTo = this._theories.stringTheory.abstractStringValue(node.variable);
             const assume: B = this._theories.stringTheory.stringsEqual(assignTo, value);
             return this._theories.boolTheory.and(this._mem, assume);
+
+        } else if (declaredType instanceof ActorType) {
+            // Handled by the control analysis
+            throw new IllegalArgumentException("This operation should have been handled by the control analysis!");
 
         } else {
             throw new ImplementMeException();

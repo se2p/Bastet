@@ -26,6 +26,7 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {TransitionLabelProvider} from "../ProgramAnalysis";
 import {StateColorVisitor, StateLabelVisitor} from "../StateVisitors";
 import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
+import {App} from "../../../syntax/app/App";
 
 export class GraphToDot  {
 
@@ -35,10 +36,13 @@ export class GraphToDot  {
     private _reached: StateSet<GraphAbstractState>;
     private _frontier: StateSet<GraphAbstractState>;
     private _transLabProvider: TransitionLabelProvider<GraphAbstractState>;
+    private _task: App;
 
-    constructor(transLabProvider: TransitionLabelProvider<GraphAbstractState>,
+    constructor(task: App,
+                transLabProvider: TransitionLabelProvider<GraphAbstractState>,
                 reached: StateSet<GraphAbstractState>,
                 frontier: StateSet<GraphAbstractState>) {
+        this._task = Preconditions.checkNotUndefined(task);
         this._transLabProvider = Preconditions.checkNotUndefined(transLabProvider);
         this._reached = Preconditions.checkNotUndefined(reached);
         this._frontier = Preconditions.checkNotUndefined(frontier);
@@ -48,7 +52,7 @@ export class GraphToDot  {
     }
 
     private writeState(e: GraphAbstractState) {
-        const stateLabel = e.accept(new StateLabelVisitor());
+        const stateLabel = e.accept(new StateLabelVisitor(this._task));
         const stateColor = e.accept(new StateColorVisitor());
         this._dot.push(`    ${e.getId()} [label="${stateLabel}" color="black" fillcolor="${stateColor}"];`);
     }

@@ -107,9 +107,7 @@ export class TransitionRelationBuilder {
     }
 
     public addAllTransitionsOf(input: TransitionRelation): this {
-        // Check disjointness of the locations
-        const locIntersection = input.locationSet.intersect(this._locations.keys());
-        Preconditions.checkArgument(locIntersection.isEmpty(), "The set of locations must be disjoint");
+        Preconditions.checkNotUndefined(input);
 
         // Add all transitions
         for (let from of input.locationSet) {
@@ -194,10 +192,12 @@ export class TransitionRelation {
                 entryLocs: ImmSet<LocationId>, exitLocs: ImmSet<LocationId>) {
         TransitionRelation.TRANS_REL_ID_SEQ = (TransitionRelation.TRANS_REL_ID_SEQ || 0) + 1;
         this._ident = TransitionRelation.TRANS_REL_ID_SEQ;
-        this._transitions = transitions;
-        this._locations = locations;
-        this._entryLocations = entryLocs;
-        this._exitLocations = exitLocs;
+
+        this._transitions = Preconditions.checkNotUndefined(transitions);
+        this._locations = Preconditions.checkNotUndefined(locations);
+        this._entryLocations = Preconditions.checkNotUndefined(entryLocs);
+        this._exitLocations = Preconditions.checkNotUndefined(exitLocs);
+
         entryLocs.forEach((l) => Preconditions.checkArgument(this._locations.contains(l)));
         this._closureTerminators = new Map();
     }

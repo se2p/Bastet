@@ -39,8 +39,18 @@ import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 
+/**
+ * Current thread state that is active or becomes active if...
+ */
 export enum ThreadComputationState {
+    /**
+     * ... the thread is supposed to perform a transition next.
+     */
     THREAD_STATE_RUNNING = "R",
+
+    /**
+     * ... the thread is waiting for other threads to finish.
+     */
     THREAD_STATE_WAIT = "W",
     THREAD_STATE_DONE = "D",
     THREAD_STATE_YIELD = "Y",

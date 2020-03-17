@@ -64,9 +64,9 @@ export class AnalysisProcedureFactory {
 
                 const dataAnalysis = new DataAnalysis(firstOrderLattice, bddlib.lattice, theories, this._statistics);
                 const ssaAnalysis = new SSAAnalysis(task, dataAnalysis, this._statistics);
-                // const timeAnalysis = new TimeAnalysis(ssaAnalysis, this._statistics, new StaticTimeProfile());
-                const controlAnalysis = new ControlAnalysis(config, task, ssaAnalysis, this._statistics);
-                const graphAnalysis = new GraphAnalysis(task, controlAnalysis, this._statistics);
+                const timeAnalysis = new TimeAnalysis(ssaAnalysis, this._statistics, new StaticTimeProfile());
+                const controlAnalysis = new ControlAnalysis(config, task, timeAnalysis, this._statistics);
+                const graphAnalysis = new GraphAnalysis(config, task, controlAnalysis, this._statistics);
                 const outerAnalysis = new StatsAnalysis<GraphConcreteState, GraphAbstractState>(graphAnalysis, this._statistics);
 
                 const frontier: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
@@ -90,7 +90,7 @@ export class AnalysisProcedureFactory {
             }
 
             private onAnalysisResult(violated: ImmSet<Property>, satisifed: ImmSet<Property>, unknowns: ImmSet<Property>, mpaStatistics: AnalysisStatistics) {
-                const analysisDurtionMSec = mpaStatistics.contextTimer.duration.toFixed(3);
+                const analysisDurtionMSec = mpaStatistics.contextTimer.totalDuration.toFixed(3);
 
                 mpaStatistics.put("num_violated", violated.size);
                 mpaStatistics.put("num_unknown", unknowns.size);
@@ -115,7 +115,7 @@ export class AnalysisProcedureFactory {
                 console.log(`\nAnalysis finished after ${analysisDurtionMSec} msec.\n`);
 
                 if (violated.isEmpty() && satisifed.isEmpty() && unknowns.isEmpty()) {
-                    console.log('No violations found. Full specification SATISFIED.')
+                    console.log('The analysis terminated with neither proofs nor counterexamples. Incomplete?')
                 } else {
                     printPropertySetAs("VIOLATED", violated);
                     printPropertySetAs("SATISFIED", satisifed);

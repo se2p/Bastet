@@ -35,6 +35,8 @@ import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
+import {GraphAbstractState} from "../graph/GraphAbstractDomain";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 
 export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, SSAState>,
@@ -81,14 +83,8 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return false;
     }
 
-    stop(state: SSAState, reached: Iterable<SSAState>): boolean {
-        for (const r of reached) {
-            const w: AbstractElement = state.getWrappedState();
-            if (this._wrappedAnalysis.stop(w, [r.getWrappedState()])) {
-                return true;
-            }
-        }
-        return false;
+    stop(state: SSAState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => SSAState): boolean {
+        return this._wrappedAnalysis.stop(state.getWrappedState(), reached, (e) => this.unwrap(unwrapper(e)));
     }
 
     target(state: SSAState): Property[] {
@@ -125,6 +121,10 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
 
     wrapStateSets(frontier: StateSet<SSAState>, reached: StateSet<SSAState>): [StateSet<SSAState>, StateSet<SSAState>] {
         return [frontier, reached];
+    }
+
+    mergeInto(state: SSAState, reached: StateSet<SSAState>, unwrapper: (AbstractElement) => SSAState, wrapper: (E) => AbstractElement): StateSet<SSAState> {
+        throw new ImplementMeException();
     }
 
 }

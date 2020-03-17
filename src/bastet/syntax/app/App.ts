@@ -31,6 +31,8 @@ import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
 import {Properties, Property} from "../Property";
 import {TransitionRelation, TransRelId} from "./controlflow/TransitionRelation";
 import {TypeInformationStorage} from "../DeclarationScopes";
+import {Method} from "./controlflow/Method";
+import {Script} from "./controlflow/Script";
 
 export class App {
 
@@ -88,20 +90,18 @@ export class App {
 
     public getProperties(): ImmSet<Property> {
         let result = ImmSet<Property>();
-        for (const a of this.actors.values()) {
+        const transitivelyCalled = new Set<CallStatement>();
+
+        for (const a of this.actors) {
             for (const s of a.scripts) {
-                for (const l of s.transitions.locationSet) {
-                    for (const ts of s.transitions.transitionsFrom(l)) {
-                        const op = ProgramOperation.for(ts.opId);
-                        if (op.ast instanceof CallStatement) {
-                            const call = op.ast as CallStatement;
-                            if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
-                                const properties = Properties.fromArguments(call.args);
-                                result = result.union(properties);
-                            }
-                        }
-                    }
-                }
+                a.transitivelyCalled(s.transitions).forEach((cs) => transitivelyCalled.add(cs));
+            }
+        }
+
+        for (const call of transitivelyCalled) {
+            if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
+                const properties = Properties.fromArguments(call.args);
+                result = result.union(properties);
             }
         }
 

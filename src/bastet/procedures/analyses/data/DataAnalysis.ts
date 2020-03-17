@@ -37,13 +37,14 @@ import {
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
-import {LatticeWithComplements} from "../../../lattices/Lattice";
+import {AbstractElement, LatticeWithComplements} from "../../../lattices/Lattice";
 import {DataRefiner} from "./DataRefiner";
 import {Refiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState>,
     LabeledTransferRelation<DataAbstractState> {
@@ -84,9 +85,9 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return false;
     }
 
-    stop(state: DataAbstractState, reached: Iterable<DataAbstractState>): boolean {
+    stop(state: DataAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => DataAbstractState): boolean {
         for (const r of reached) {
-            if (r.equals(state)) {
+            if (unwrapper(r).equals(state)) {
                 return true;
             }
         }
@@ -129,5 +130,9 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     wrapStateSets(frontier: StateSet<DataAbstractState>, reached: StateSet<DataAbstractState>): [StateSet<DataAbstractState>, StateSet<DataAbstractState>] {
         return [frontier, reached];
+    }
+
+    mergeInto(state: DataAbstractState, reached: StateSet<DataAbstractState>, unwrapper: (AbstractElement) => DataAbstractState, wrapper: (E) => AbstractElement): StateSet<DataAbstractState> {
+        throw new ImplementMeException();
     }
 }
