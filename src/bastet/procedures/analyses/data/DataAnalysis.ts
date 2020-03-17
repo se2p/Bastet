@@ -19,7 +19,7 @@
  *
  */
 
-import {ProgramAnalysisWithLabels} from "../ProgramAnalysis";
+import {MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
 import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
@@ -45,6 +45,21 @@ import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {BastetConfiguration} from "../../../utils/BastetConfiguration";
+import {MergeJoinOperator, MergeSepOperator, StandardMergeOperatorFactory} from "../Operators";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+
+export class DataAnalysisConfig extends BastetConfiguration {
+
+    constructor(dict: {}) {
+        super(dict, ['DataAnalysis']);
+    }
+
+    get mergeOperator(): string {
+        return this.getStringProperty('merge-operator', 'SEP');
+    }
+
+}
 
 export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState>,
     LabeledTransferRelation<DataAbstractState> {
@@ -59,17 +74,23 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     private readonly _statistics: AnalysisStatistics;
 
-    constructor(folLattice: LatticeWithComplements<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
+    private readonly _config: DataAnalysisConfig;
+
+    private readonly _mergeOp: MergeOperator<DataAbstractState>;
+
+    constructor(config:{}, folLattice: LatticeWithComplements<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
                 theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>,
                 statistics: AnalysisStatistics) {
         Preconditions.checkNotUndefined(folLattice);
         Preconditions.checkNotUndefined(propLattice);
 
+        this._config = new DataAnalysisConfig(config);
         this._theories = Preconditions.checkNotUndefined(theories);
         this._abstractDomain = new DataAbstractDomain(folLattice, propLattice);
         this._transferRelation = new DataTransferRelation(this._abstractDomain, this._theories);
         this._refiner = new DataRefiner(this._abstractDomain.lattice);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
+        this._mergeOp = StandardMergeOperatorFactory.create(this._config.mergeOperator);
     }
 
     abstractSucc(fromState: DataAbstractState): Iterable<DataAbstractState> {
@@ -81,8 +102,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     }
 
     merge(state1: DataAbstractState, state2: DataAbstractState): boolean {
-        // MERGE-SEP
-        return false;
+        return this._mergeOp.merge(state1, state2);
     }
 
     stop(state: DataAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => DataAbstractState): boolean {

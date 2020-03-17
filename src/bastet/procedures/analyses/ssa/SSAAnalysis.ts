@@ -19,7 +19,7 @@
  *
  */
 
-import {ProgramAnalysis, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
+import {MergeOperator, ProgramAnalysis, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {AbstractElement} from "../../../lattices/Lattice";
@@ -37,7 +37,17 @@ import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
 import {GraphAbstractState} from "../graph/GraphAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {StandardMergeOperatorFactory} from "../Operators";
+import {BastetConfiguration} from "../../../utils/BastetConfiguration";
+import {SSAMergeOperator} from "./SSAMergeOperator";
 
+export class SSAAnalysisConfig extends BastetConfiguration {
+
+    constructor(dict: {}) {
+        super(dict, ['SSAAnalysis']);
+    }
+
+}
 
 export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, SSAState>,
     LabeledTransferRelation<SSAState>,
@@ -55,7 +65,12 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
 
     private readonly _statistics: AnalysisStatistics;
 
-    constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any>, statistics: AnalysisStatistics) {
+    private readonly _mergeOp: MergeOperator<SSAState>;
+
+    private readonly _config: SSAAnalysisConfig;
+
+    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any>, statistics: AnalysisStatistics) {
+        this._config = new SSAAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new SSAAbstractDomain(wrappedAnalysis.abstractDomain);
@@ -64,6 +79,7 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         this._transferRelation = new SSATransferRelation(wrappedTr);
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
+        this._mergeOp = new SSAMergeOperator(this.wrappedAnalysis, this.wrappedAnalysis);
     }
 
     abstractSucc(fromState: SSAState): Iterable<SSAState> {
@@ -79,8 +95,7 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
     }
 
     merge(state1: SSAState, state2: SSAState): boolean {
-        // MERGE-SEP
-        return false;
+        return this._mergeOp.merge(state1, state2);
     }
 
     stop(state: SSAState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => SSAState): boolean {
