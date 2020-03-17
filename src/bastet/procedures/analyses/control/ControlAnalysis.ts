@@ -79,7 +79,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         this._config = new ControlAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
-        this._abstractDomain = new ControlAbstractDomain();
+        this._abstractDomain = new ControlAbstractDomain(wrappedAnalysis.abstractDomain);
         this._transferRelation = new ControlTransferRelation(this._config, task,
             new LabeledTransferRelationImpl((e) => this._wrappedAnalysis.abstractSucc(e),
                 (e, op, co) => this._wrappedAnalysis.abstractSuccFor(e, op, co)));
@@ -96,7 +96,19 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     }
 
     merge(state1: ControlAbstractState, state2: ControlAbstractState): boolean {
-        return false;
+        if (!state1.getSteppedFor().equals(state2.getSteppedFor())) {
+            return false;
+        }
+
+        if (!state1.getThreadStates().equals(state2.getThreadStates())) {
+            return false;
+        }
+
+        if (!state1.getIsTargetFor().equals(state2.getIsTargetFor())) {
+            return false;
+        }
+
+        return true;
     }
 
     stop(state: ControlAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => ControlAbstractState): boolean {

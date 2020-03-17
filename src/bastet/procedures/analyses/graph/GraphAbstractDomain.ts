@@ -25,7 +25,7 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {Record as ImmRec, Set as ImmSet} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
 import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
-import {CoreVisitor} from "../../../syntax/ast/CoreVisitor";
+import {Preconditions} from "../../../utils/Preconditions";
 
 export type GraphStateId = number;
 
@@ -123,6 +123,12 @@ export class GraphAbstractStateBuilder {
 
 export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
 
+    private readonly _wrappedLattice: Lattice<AbstractElement>;
+
+    constructor(wrappedLattice: Lattice<AbstractElement>) {
+        this._wrappedLattice = Preconditions.checkNotUndefined(wrappedLattice);
+    }
+
     bottom(): GraphAbstractState {
         throw new ImplementMeException();
     }
@@ -147,6 +153,12 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
 export class GraphAbstractDomain implements AbstractDomain<GraphConcreteState, GraphAbstractState> {
 
     private readonly _lattice: GraphAbstractStateLattice;
+    private readonly _wrapped: AbstractDomain<ConcreteElement, AbstractElement>;
+
+    constructor(wrapped: AbstractDomain<ConcreteElement, AbstractElement>) {
+        this._wrapped = Preconditions.checkNotUndefined(wrapped);
+        this._lattice = new GraphAbstractStateLattice(wrapped.lattice);
+    }
 
     get lattice(): Lattice<GraphAbstractState> {
         return this._lattice;

@@ -43,9 +43,10 @@ import {Property} from "../../../syntax/Property";
 import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {NoMergeIntoOperator, StandardMergeIntoOperator} from "../Operators";
+import {DelegatingMergeOperator, NoMergeIntoOperator, StandardMergeIntoOperator} from "../Operators";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 
 
 export class GraphAnalysisConfig extends BastetConfiguration {
@@ -76,6 +77,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
 
     private readonly _statistics: AnalysisStatistics;
 
+    private readonly _mergeOp: DelegatingMergeOperator<GraphAbstractState, any>;
+
     private readonly _mergeIntoOp: MergeIntoOperator<GraphAbstractState>;
 
     private readonly _config: GraphAnalysisConfig;
@@ -86,15 +89,16 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         this._config = new GraphAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
-        this._abstractDomain = new GraphAbstractDomain();
+        this._abstractDomain = new GraphAbstractDomain(wrappedAnalysis.abstractDomain);
         this._transferRelation = new GraphTransferRelation((e) => this._wrappedAnalysis.abstractSucc(e));
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
+        this._mergeOp = new DelegatingMergeOperator(this.wrappedAnalysis, this);
 
         if (this._config.mergeIntoOperator == 'NoMergeIntoOperator') {
             this._mergeIntoOp = new NoMergeIntoOperator<GraphAbstractState>();
 
         } else if (this._config.mergeIntoOperator == 'StandardMergeIntoOperator') {
-            this._mergeIntoOp = new StandardMergeIntoOperator(wrappedAnalysis, wrappedAnalysis);
+            this._mergeIntoOp = new StandardMergeIntoOperator(this, this);
 
         } else {
             throw new IllegalArgumentException("Illegal configuration value");
@@ -110,8 +114,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     merge(state1: GraphAbstractState, state2: GraphAbstractState): boolean {
-        // MERGE-SEP
-        return false;
+        return this._mergeOp.merge(state1, state2);
     }
 
     mergeInto(state: GraphAbstractState, reached: StateSet<GraphAbstractState>,
