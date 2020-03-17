@@ -79,6 +79,7 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
         let violated: ImmSet<Property> = ImmSet();
         let satisfied: ImmSet<Property> = ImmSet();
         let unknown: ImmSet<Property> = this._properties;
+        Preconditions.checkArgument(unknown.size > 0, "There must be at least one property to check.");
 
         this._statistics.contextTimer.start();
         try {
@@ -86,6 +87,7 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
                 this._statistics.increment(STAT_KEY_MPA_ITERATIONS);
                 [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);
 
+                // Handle property violations
                 if (reached.getAddedLast().length > 0) {
                     Preconditions.checkState(reached.getAddedLast().length > 0);
                     const lastState = reached.getAddedLast()[0];

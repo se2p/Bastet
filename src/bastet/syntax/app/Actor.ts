@@ -47,6 +47,10 @@ import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessage
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
 import {Concern, Concerns} from "../Concern";
+import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
+import {CallStatement} from "../ast/core/statements/CallStatement";
+import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
+import {Properties} from "../Property";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -221,11 +225,15 @@ export class Actor {
     }
 
     public getMethod(name: string): Method {
-        const result: Method = this._methodMap.get(name);
+        const result: Method = this.findMethod(name);
         if (!result) {
             throw new IllegalArgumentException(`Method "${name}" is not defined!`);
         }
         return result;
+    }
+
+    public findMethod(name: string): Method {
+        return this._methodMap.get(name);
     }
 
     public getScript(id: ScriptId): Script {
@@ -255,6 +263,32 @@ export class Actor {
             }
         }
         return false;
+    }
+
+    public transitivelyCalled(from: TransitionRelation): Set<CallStatement> {
+        const result = new Set<CallStatement>();
+
+        const addToResult = function(a: Actor, tr: TransitionRelation) {
+            for (const l of tr.locationSet) {
+                for (const ts of tr.transitionsFrom(l)) {
+                    const op = ProgramOperation.for(ts.opId);
+                    if (op.ast instanceof CallStatement) {
+                        const call = op.ast as CallStatement;
+                        if (!result.has(call)) {
+                            result.add(call);
+                            const calledMethodDef: Method = a.findMethod(call.calledMethod.text);
+                            if (calledMethodDef) {
+                                addToResult(a, calledMethodDef.transitions);
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        addToResult(this, from);
+
+        return result;
     }
 }
 
