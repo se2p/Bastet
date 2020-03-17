@@ -250,11 +250,15 @@ role RuntimeEntity is MathActor begin
 
     extern _RUNTIME_getImageHeight (ident: string) returns number
 
-    define _RUNTIME_getGraphicIdByIndex (idx: number) in runtime returns result: string end
+//    extern getGraphicIdByIndex (idx: number) returns string
+//
+//    extern getGraphicIndexById (id: string) returns number
+//
+//    extern getGraphicPixels (id: string) returns string
+//
+//    extern getNumGraphics () returns string
 
-    define _RUNTIME_getGraphicIndexById (id: string) in runtime returns result: number end
 
-    define _RUNTIME_getGraphicPixels (id: string) in runtime returns result: string end
 
     // A random integer in the interval [from, to],
     // that is, both end points are included.
@@ -287,6 +291,14 @@ role RuntimeEntity is MathActor begin
     extern mathPowten(n: number) returns number
 
     extern degToRad(n: number) returns number
+
+    define getGraphicIdByIndex (idx: number) in runtime returns result: string
+
+    define getGraphicIndexById (id: string) in runtime returns result: number
+
+    define getGraphicPixels (id: string) in runtime returns result: string
+
+    define getNumGraphics () in runtime returns result: number
 
     // @Category "Control"
     // @Block "wait <Num> seconds"
@@ -760,6 +772,9 @@ end
 
 role ScratchStage is ScratchEntity begin
 
+    declare current_idx as number
+    define current_idx as 0
+
     define switchBackdropTo (id: string) begin
         changeActiveImageTo(id)
     end
@@ -770,33 +785,33 @@ role ScratchStage is ScratchEntity begin
 
     define nextBackdrop () begin
         declare idx as number
-        define idx as _RUNTIME_getGraphicIndexById(active_graphic_name)
-        define idx as (current_idx+1) mod _RUNTIME_getNumGraphics()
+        define idx as getGraphicIndexById(active_graphic_name)
+        define idx as (current_idx+1) mod getNumGraphics()
 
         declare id as string
-        define id as _RUNTIME_getGraphicIdByIndex(current_idx)
+        define id as getGraphicIdByIndex(current_idx)
 
         changeActiveGraphicTo(id)
     end
 
     define previousBackdrop() begin
         declare idx as number
-        define idx as _RUNTIME_getGraphicIndexById(active_graphic_name)
-        define idx as (current_idx-1) mod _RUNTIME_getNumGraphics()
+        define idx as getGraphicIndexById(active_graphic_name)
+        define idx as (current_idx-1) mod getNumGraphics()
 
         declare id as string
-        define id as _RUNTIME_getGraphicIdByIndex(current_idx)
+        define id as getGraphicIdByIndex(current_idx)
 
         changeActiveGraphicTo(id)
     end
 
     define randomBackdrop() begin
          declare idx as number
-         define idx as _RUNTIME_getGraphicIndexById(active_graphic_name)
-         define idx as random(0, _RUNTIME_getNumGraphics()-1)
+         define idx as getGraphicIndexById(active_graphic_name)
+         define idx as randomIntegerBetween(0, getNumGraphics()-1)
 
          declare id as string
-         define id as _RUNTIME_getGraphicIdByIndex(current_idx)
+         define id as getGraphicIdByIndex(current_idx)
 
          changeActiveGraphicTo(id)
     end
