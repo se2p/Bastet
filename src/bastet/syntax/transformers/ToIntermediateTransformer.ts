@@ -677,14 +677,14 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 resouceDefs = ctx.actorComponentsDefinition().resourceList().accept(this);
                 initStatements = StatementLists.concat(initStatements, resouceDefs.statementsToPrepend);
 
-        //        let graphicPixelLookup = LookupTransformer.buildGrapicPixelLookup(this._currentActor, resouceDefs, this._filePath)
-        //        this.graphicLookupMethods.set(ident, graphicPixelLookup);
-        //        let idByIndexLookup = LookupTransformer.buildIdByIndexLookup(this._currentActor, resouceDefs, this._filePath)
-        //        this.idByIndexLookupMethods.set(ident, idByIndexLookup);
-        //        let indexByIdLookup = LookupTransformer.buildIndexByIdLookup(this._currentActor, resouceDefs, this._filePath)
-        //        this.indexByIdLookupMethods.set(ident, indexByIdLookup);
-        //        let numGraphics = LookupTransformer.buildGetNumGraphics(this._currentActor, resouceDefs, this._filePath)
-        //        this.numGraphicsMethods.set(ident, numGraphics);
+                let graphicPixelLookup = LookupTransformer.buildGrapicPixelLookup(this._currentActor, resouceDefs, this._filePath)
+                this.graphicLookupMethods.set(ident, graphicPixelLookup);
+                let idByIndexLookup = LookupTransformer.buildIdByIndexLookup(this._currentActor, resouceDefs, this._filePath)
+                this.idByIndexLookupMethods.set(ident, idByIndexLookup);
+                let indexByIdLookup = LookupTransformer.buildIndexByIdLookup(this._currentActor, resouceDefs, this._filePath)
+                this.indexByIdLookupMethods.set(ident, indexByIdLookup);
+                let numGraphics = LookupTransformer.buildGetNumGraphics(this._currentActor, resouceDefs, this._filePath)
+                this.numGraphicsMethods.set(ident, numGraphics);
 
 
                 // Variable declarations and initializations
@@ -789,7 +789,23 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
         this._activeDeclarationScope = this._activeDeclarationScope.beginMethodScope(methodIdent.text);
         try {
-            throw new ImplementMeException();
+            if (methodIdent.text.includes("getGraphicIdByIndex")) {
+                return TransformerResult.withNode(this.idByIndexLookupMethods.get(this._currentActor))
+            } else if (methodIdent.text.includes("getGraphicIndexById")) {
+                return TransformerResult.withNode(this.indexByIdLookupMethods.get(this._currentActor))
+            } else if (methodIdent.text.includes("getNumGraphics")) {
+                return TransformerResult.withNode(this.numGraphicsMethods.get(this._currentActor))
+            } else if (methodIdent.text.includes("getGraphicPixels")) {
+                return TransformerResult.withNode(this.graphicLookupMethods.get(this._currentActor))
+            } else if (methodIdent.text.includes("getImageHeight")) {
+                throw new ImplementMeException()
+            } else if (methodIdent.text.includes("getImageWidth")) {
+                throw new ImplementMeException()
+            } else {
+                throw new ImplementMeException()
+            }
+
+
             // const resultDeclaration = ctx.methodResultDeclaration().accept(this).nodeOnly() as ResultDeclaration;
             // return TransformerResult.withNode(new MethodDefinition(
             //     methodIdent,

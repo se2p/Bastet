@@ -309,6 +309,8 @@ role RuntimeEntity is MathActor begin
 
     define _RUNTIME_getGraphicIndexById (id: string) in runtime returns result: number end
 
+    define _RUNTIME_getGraphicPixels (id: string) in runtime returns result: string end
+
     // A random integer in the interval [from, to],
     // that is, both end points are included.
     extern randomIntegerBetween (intervalStart: number, intervalEnd: number) returns number
