@@ -116,6 +116,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     merge(state1: GraphAbstractState, state2: GraphAbstractState): GraphAbstractState {
         return GraphAbstractStateFactory.withFreshID(
             state1.getPredecessors().union(state2.getPredecessors()),
+            state1.getMergeOf().union(state2.getMergeOf()),
             this._wrappedAnalysis.merge(state1.getWrappedState(), state2.getWrappedState()));
     }
 
@@ -124,6 +125,11 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     stop(state: GraphAbstractState, reached: Iterable<GraphAbstractState>, unwrapper: (GraphAbstractState) => GraphAbstractState): boolean {
+        for (const r of reached) {
+            if (r.getMergeOf().contains(state.getId())) {
+                return true;
+            }
+        }
         return this._wrappedAnalysis.stop(state.getWrappedState(), reached, (e) => this.unwrap(unwrapper(e)));
     }
 
@@ -139,7 +145,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     initialStatesFor(task: App): GraphAbstractState[] {
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            return GraphAbstractStateFactory.withFreshID([], w);
+            return GraphAbstractStateFactory.withFreshID([],[],  w);
         } );
     }
 

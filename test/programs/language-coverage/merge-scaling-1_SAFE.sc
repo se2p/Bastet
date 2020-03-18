@@ -14,7 +14,7 @@ actor MiniActor is RuntimeEntity begin
         end
 
         if (a1 > 0) then begin
-            if (r > 0) then begin
+            if not (r > 0) then begin
                 _RUNTIME_signalFailure()
             end
         end

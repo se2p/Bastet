@@ -39,6 +39,8 @@ export interface GraphAbstractStateAttribs extends AbstractElement, SingletonSta
 
     predecessors: ImmSet<GraphStateId>;
 
+    mergeOf: ImmSet<GraphStateId>;
+
     wrappedState: ImmRec<any>;
 
 }
@@ -46,13 +48,14 @@ export interface GraphAbstractStateAttribs extends AbstractElement, SingletonSta
 const GraphAbstractStateRecord = ImmRec({
     id: 0,
     predecessors: ImmSet<GraphStateId>([]),
-    wrappedState: null
+    wrappedState: null,
+    mergeOf: ImmSet<GraphStateId>([])
 });
 
 export class GraphAbstractState extends GraphAbstractStateRecord implements GraphAbstractStateAttribs, AbstractState {
 
-    constructor(id: GraphStateId, preds: ImmSet<GraphStateId>, wrapped: ImmRec<any>) {
-        super({id: id, predecessors: preds, wrappedState: wrapped});
+    constructor(id: GraphStateId, preds: ImmSet<GraphStateId>, mergeOf: ImmSet<GraphStateId>, wrapped: ImmRec<any>) {
+        super({id: id, predecessors: preds, wrappedState: wrapped, mergeOf: mergeOf});
     }
 
     public getId(): number {
@@ -61,6 +64,10 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
 
     public getPredecessors(): ImmSet<GraphStateId> {
         return this.get('predecessors');
+    }
+
+    public getMergeOf(): ImmSet<GraphStateId> {
+        return this.get('mergeOf');
     }
 
     public getWrappedState(): AbstractState {
@@ -81,44 +88,14 @@ export class GraphAbstractStateFactory {
 
     private static STATE_ID_SEQ: number;
 
-    public static withFreshID(preds: Iterable<GraphStateId>, wrapped: ImmRec<any>): GraphAbstractState {
+    public static withFreshID(preds: Iterable<GraphStateId>, mergeOf: Iterable<GraphStateId>, wrapped: ImmRec<any>): GraphAbstractState {
         if (!GraphAbstractStateFactory.STATE_ID_SEQ) {
             GraphAbstractStateFactory.STATE_ID_SEQ = 0;
         }
         const freshId = GraphAbstractStateFactory.STATE_ID_SEQ++;
-        return new GraphAbstractState(freshId, ImmSet(preds), wrapped);
+        return new GraphAbstractState(freshId, ImmSet(preds), ImmSet(mergeOf).union([freshId]), wrapped);
     }
 
-}
-
-export class GraphAbstractStateBuilder {
-
-    private _id: GraphStateId;
-    private _predecessors: GraphStateId[];
-    private _wrappedState: ImmRec<any>;
-
-    constructor() {
-        this._predecessors = [];
-    }
-
-    public setId(id: GraphStateId): GraphAbstractStateBuilder {
-        this._id = id;
-        return this;
-    }
-
-    public addPredecessors(id: GraphStateId): GraphAbstractStateBuilder {
-        this._predecessors.push(id);
-        return this;
-    }
-
-    public setWrappedState(state: ImmRec<any>) : GraphAbstractStateBuilder {
-        this._wrappedState = state;
-        return this;
-    }
-
-    public build(): GraphAbstractStateAttribs {
-        return new GraphAbstractState(this._id, ImmSet(this._predecessors), this._wrappedState);
-    }
 }
 
 export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
@@ -140,6 +117,7 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
     join(element1: GraphAbstractState, element2: GraphAbstractState): GraphAbstractState {
         return GraphAbstractStateFactory.withFreshID(
             element1.getPredecessors().union(element2.getPredecessors()),
+            element1.getMergeOf().union(element2.getMergeOf()),
             this._wrappedLattice.join(element1.getWrappedState(), element2.getWrappedState()));
     }
 

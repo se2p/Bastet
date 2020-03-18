@@ -122,14 +122,17 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     }
 
     stop(state: ControlAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => ControlAbstractState): boolean {
-        // for (const r of reached) {
-        //     if (state.getThreadStates().equals(r.getThreadStates())) {
-        //         const w = state.getWrappedState();
-        //         if (this._wrappedAnalysis.stop(w, [r.getWrappedState()])) {
-        //             return true;
-        //         }
-        //     }
-        // }
+        // TODO: Rewrite this?
+        for (const r of reached) {
+            const cs = unwrapper(r);
+            if (state.getThreadStates().equals(cs.getThreadStates())) {
+                const w = state.getWrappedState();
+                if (this._wrappedAnalysis.stop(w, [cs.getWrappedState()], (e) => this.unwrap(e))) {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 

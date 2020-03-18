@@ -103,7 +103,7 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
     }
 
     stop(state: SSAState, reached: Iterable<F>, unwrapper: (F) => SSAState): boolean {
-        return this._wrappedAnalysis.stop(state.getWrappedState(), reached, (e) => this.unwrap(unwrapper(e)));
+        return this._wrappedAnalysis.stop(state.getWrappedState(), reached, (e) => e.getWrappedState());
     }
 
     target(state: SSAState): Property[] {
