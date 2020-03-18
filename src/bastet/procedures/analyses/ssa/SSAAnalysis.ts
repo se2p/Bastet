@@ -22,7 +22,7 @@
 import {MergeOperator, ProgramAnalysis, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
-import {AbstractElement} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferRelation";
@@ -49,13 +49,13 @@ export class SSAAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, SSAState>,
+export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWithLabels<ConcreteElement, SSAState, F>,
     LabeledTransferRelation<SSAState>,
     Unwrapper<SSAState, AbstractElement> {
 
     private readonly _abstractDomain: AbstractDomain<ConcreteElement, SSAState>;
 
-    private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
+    private readonly _wrappedAnalysis: ProgramAnalysis<any, any, F>;
 
     private readonly _transferRelation: SSATransferRelation;
 
@@ -69,7 +69,7 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
 
     private readonly _config: SSAAnalysisConfig;
 
-    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any>, statistics: AnalysisStatistics) {
+    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics) {
         this._config = new SSAAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
@@ -94,11 +94,15 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return this._abstractDomain.lattice.join(state1, state2);
     }
 
-    merge(state1: SSAState, state2: SSAState): boolean {
+    shouldMerge(state1: SSAState, state2: SSAState): boolean {
+        return this._mergeOp.shouldMerge(state1, state2);
+    }
+
+    merge(state1: SSAState, state2: SSAState): SSAState {
         return this._mergeOp.merge(state1, state2);
     }
 
-    stop(state: SSAState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => SSAState): boolean {
+    stop(state: SSAState, reached: Iterable<F>, unwrapper: (F) => SSAState): boolean {
         return this._wrappedAnalysis.stop(state.getWrappedState(), reached, (e) => this.unwrap(unwrapper(e)));
     }
 
@@ -123,23 +127,27 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return this._abstractDomain;
     }
 
-    get wrappedAnalysis(): ProgramAnalysis<any, any> {
+    get wrappedAnalysis(): ProgramAnalysis<any, any, F> {
         return this._wrappedAnalysis;
     }
 
     initialStatesFor(task: App): SSAState[] {
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            return new SSAState(ImmMap({}), ImmMap({}), w);
+            return new SSAState(ImmMap({}), w);
         } );
     }
 
-    wrapStateSets(frontier: StateSet<SSAState>, reached: StateSet<SSAState>): [StateSet<SSAState>, StateSet<SSAState>] {
-        return [frontier, reached];
+    createStateSets(): [StateSet<F>, StateSet<F>] {
+        return this.wrappedAnalysis.createStateSets();
     }
 
-    mergeInto(state: SSAState, reached: StateSet<SSAState>, unwrapper: (AbstractElement) => SSAState, wrapper: (E) => AbstractElement): StateSet<SSAState> {
+    mergeInto(state: SSAState, frontier: StateSet<F>, reached: StateSet<F>, unwrapper: (F) => SSAState, wrapper: (E) => F): [StateSet<F>, StateSet<F>] {
         throw new ImplementMeException();
+    }
+
+    partitionOf(ofState: SSAState, reached: StateSet<F>): Iterable<F> {
+        return this.wrappedAnalysis.partitionOf(ofState.getWrappedState(), reached);
     }
 
 }

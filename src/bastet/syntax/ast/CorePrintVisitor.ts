@@ -263,7 +263,7 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitPlusExpression(node: PlusExpression): string {
-        return `${node.operand1.accept(this)} / ${node.operand2.accept(this)}`;
+        return `${node.operand1.accept(this)} + ${node.operand2.accept(this)}`;
     }
 
     visitStringAsNumberExpression(node: StringAsNumberExpression): string {

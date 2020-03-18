@@ -21,76 +21,14 @@
  */
 
 
-import {ChooseOpConfig, StateSet} from "../../algorithms/StateSet";
+import {ChooseOpConfig, OrderedStateSet, StateSet} from "../../algorithms/StateSet";
 import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {GraphPath, GraphPathSet} from "./GraphPath";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
-export abstract class DelegatingStateSetWrapper<E extends AbstractElement> implements StateSet<E> {
-
-    protected readonly _wrappedReached: StateSet<E>;
-
-    constructor(wrappedReached: StateSet<E>) {
-        this._wrappedReached = Preconditions.checkNotUndefined(wrappedReached);
-    }
-
-    [Symbol.iterator](): IterableIterator<E> {
-        return this._wrappedReached[Symbol.iterator]();
-    }
-
-    add(element: E) {
-        return this._wrappedReached.add(element);
-    }
-
-    addAll(elements: Iterable<E>) {
-        return this._wrappedReached.addAll(elements);
-    }
-
-    addRootSates(elements: Iterable<E>) {
-        return this._wrappedReached.addRootSates(elements);
-    }
-
-    createChooseOp(config: ChooseOpConfig) {
-        return this._wrappedReached.createChooseOp(config);
-    }
-
-    getAddedLast(): E[] {
-        return this._wrappedReached.getAddedLast();
-    }
-
-    getRootStates(): Set<E> {
-        return this._wrappedReached.getRootStates();
-    }
-
-    getStateSet(inPartitionOf: E): StateSet<E> {
-        return this._wrappedReached.getStateSet(inPartitionOf);
-    }
-
-    isEmpty(): boolean {
-        return this._wrappedReached.isEmpty();
-    }
-
-    isRootState(element: E): boolean {
-        return this._wrappedReached.isRootState(element);
-    }
-
-    remove(element: E) {
-        return this._wrappedReached.remove(element);
-    }
-
-    removeAll(elements: Iterable<E>) {
-        return this._wrappedReached.removeAll(elements);
-    }
-
-    getSize(): number {
-        return this._wrappedReached.getSize();
-    }
-
-}
-
-export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DelegatingStateSetWrapper<E> {
+export class GraphReachedSetWrapper<E extends GraphAbstractState> extends OrderedStateSet<GraphAbstractState> {
 
     private readonly _frontierSet: StateSet<E>;
 
@@ -98,17 +36,21 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Delega
 
     private readonly _idToStateMap: Map<GraphStateId, E>;
 
-    constructor(wrappedReached: StateSet<E>, frontierSet: StateSet<E>) {
-        super(wrappedReached);
+    constructor(frontierSet: StateSet<E>) {
+        super();
         this._frontierSet = Preconditions.checkNotUndefined(frontierSet);
         this._children = new Map<GraphStateId, GraphStateId[]>();
         this._idToStateMap = new Map<GraphStateId, E>();
     }
 
     public add(element: E): any {
+        console.log(element.toString());
+
         // A `GraphAbstractState` has only references to the parents.
         // This wrapper has to keep track of the children, too.
         for (const parentId of element.getPredecessors()) {
+            Preconditions.checkState(this._idToStateMap.has(parentId));
+
             const parentChilds = this._children.get(parentId) || [];
             parentChilds.push(element.getId());
             this._children.set(parentId, parentChilds);
@@ -124,7 +66,7 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Delega
         Preconditions.checkNotUndefined(element);
 
         // Set the list of children to the empty list before recurring. Avoids an infinite loop.
-        const toRemove: GraphStateId[] = this._children.get(element.getId());
+        const toRemove: GraphStateId[] = this._children.get(element.getId()) || [];
         this._children.set(element.getId(), []);
 
         // Remove the children recursively
@@ -139,6 +81,8 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Delega
     }
 
     public remove(element: E): any {
+        console.log("REMOVE: " + element.toString());
+
         // Remove all children
         this.removeChildren(element);
 

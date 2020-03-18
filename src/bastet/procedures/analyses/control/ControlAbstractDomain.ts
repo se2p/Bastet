@@ -508,7 +508,19 @@ export class ControlLattice implements Lattice<ControlAbstractState> {
     }
 
     join(element1: ControlAbstractState, element2: ControlAbstractState): ControlAbstractState {
-        throw new ImplementMeException();
+        if (!element1.getThreadStates().equals(element2.getThreadStates())) {
+            return this.top();
+        }
+
+        if (!element1.getActorScopes().equals(element2.getActorScopes())) {
+            return this.top();
+        }
+
+        Preconditions.checkArgument(element1.getSteppedFor().equals(element2.getSteppedFor()));
+
+        return element1
+            .withWrappedState(this._wrapped.join(element1.getWrappedState(), element2.getWrappedState()))
+            .withIsTargetFor(element1.getIsTargetFor().union(element2.getIsTargetFor()));
     }
 
     meet(element1: ControlAbstractState, element2: ControlAbstractState): ControlAbstractState {

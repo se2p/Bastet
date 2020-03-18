@@ -37,7 +37,7 @@ import {
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
-import {AbstractElement, LatticeWithComplements} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractState, LatticeWithComplements} from "../../../lattices/Lattice";
 import {DataRefiner} from "./DataRefiner";
 import {Refiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
@@ -56,12 +56,12 @@ export class DataAnalysisConfig extends BastetConfiguration {
     }
 
     get mergeOperator(): string {
-        return this.getStringProperty('merge-operator', 'SEP');
+        return this.getStringProperty('merge-operator', 'JOIN');
     }
 
 }
 
-export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState>,
+export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState, AbstractState>,
     LabeledTransferRelation<DataAbstractState> {
 
     private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
@@ -90,7 +90,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         this._transferRelation = new DataTransferRelation(this._abstractDomain, this._theories);
         this._refiner = new DataRefiner(this._abstractDomain.lattice);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
-        this._mergeOp = StandardMergeOperatorFactory.create(this._config.mergeOperator);
+        this._mergeOp = StandardMergeOperatorFactory.create(this._config.mergeOperator, this._abstractDomain);
     }
 
     abstractSucc(fromState: DataAbstractState): Iterable<DataAbstractState> {
@@ -101,8 +101,12 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return this._abstractDomain.lattice.join(state1, state2);
     }
 
-    merge(state1: DataAbstractState, state2: DataAbstractState): boolean {
-        return this._mergeOp.merge(state1, state2);
+    shouldMerge(state1: DataAbstractState, state2: DataAbstractState): boolean {
+        return this._mergeOp.shouldMerge(state1, state2);
+    }
+
+    merge(state1: DataAbstractState, state2: DataAbstractState): DataAbstractState {
+        return this.join(state1, state2);
     }
 
     stop(state: DataAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => DataAbstractState): boolean {
@@ -148,11 +152,16 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return this._refiner;
     }
 
-    wrapStateSets(frontier: StateSet<DataAbstractState>, reached: StateSet<DataAbstractState>): [StateSet<DataAbstractState>, StateSet<DataAbstractState>] {
-        return [frontier, reached];
-    }
-
-    mergeInto(state: DataAbstractState, reached: StateSet<DataAbstractState>, unwrapper: (AbstractElement) => DataAbstractState, wrapper: (E) => AbstractElement): StateSet<DataAbstractState> {
+    createStateSets(): [StateSet<AbstractState>, StateSet<AbstractState>] {
         throw new ImplementMeException();
     }
+
+    mergeInto(state: DataAbstractState, frontier: StateSet<AbstractState>, reached: StateSet<AbstractState>, unwrapper: (AbstractElement) => DataAbstractState, wrapper: (E) => AbstractElement): [StateSet<AbstractState>, StateSet<AbstractState>] {
+        throw new ImplementMeException();
+    }
+
+    partitionOf(ofState: DataAbstractState, reached: StateSet<AbstractState>): Iterable<AbstractState> {
+        return reached;
+    }
+
 }

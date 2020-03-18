@@ -20,46 +20,62 @@
  *
  */
 
-import {JoinOperator, MergeIntoOperator, MergeOperator} from "./ProgramAnalysis";
+import {JoinOperator, MergeIntoOperator, MergeOperator, PartitionOperator} from "./ProgramAnalysis";
 import {StateSet} from "../algorithms/StateSet";
-import {AbstractElement} from "../../lattices/Lattice";
+import {AbstractElement, AbstractState} from "../../lattices/Lattice";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {Unwrapper} from "./Refiner";
+import {Unwrapper, Wrapper} from "./Refiner";
+import {AbstractDomain} from "../domains/AbstractDomain";
+import {ConcreteElement} from "../domains/ConcreteElements";
 
-export class NoMergeIntoOperator<E extends AbstractElement> implements MergeIntoOperator<E> {
+export class NoMergeIntoOperator<E extends AbstractState, F extends AbstractState> implements MergeIntoOperator<E, F> {
 
-    mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): StateSet<E> {
-        return reached;
+    mergeInto(state: E, frontier: StateSet<F>, reached: StateSet<F>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): [StateSet<F>, StateSet<F>] {
+        return [frontier, reached];
     }
 
 }
 
 export class MergeJoinOperator<E extends AbstractElement> implements MergeOperator<E> {
 
-    merge(state1: E, state2: E): boolean {
+    private readonly _domain: AbstractDomain<ConcreteElement, E>;
+
+    constructor(domain: AbstractDomain<ConcreteElement, E>) {
+        this._domain = domain;
+    }
+
+    shouldMerge(state1: E, state2: E): boolean {
         return true;
+    }
+
+    merge(state1: E, state2: E): E {
+        return this._domain.lattice.join(state1, state2);
     }
 
 }
 
 export class MergeSepOperator<E extends AbstractElement> implements MergeOperator<E> {
 
-    merge(state1: E, state2: E): boolean {
+    shouldMerge(state1: E, state2: E): boolean {
         return false;
+    }
+
+    merge(state1: E, state2: E): E {
+        return state2;
     }
 
 }
 
 export class StandardMergeOperatorFactory {
 
-    public static create<E extends AbstractElement>(operatorName: string): MergeOperator<E> {
+    public static create<E extends AbstractElement>(operatorName: string, domain: AbstractDomain<any, E>): MergeOperator<E> {
         Preconditions.checkNotUndefined(operatorName);
 
         if (operatorName.toUpperCase() == "SEP") {
             return new MergeSepOperator();
         } else if (operatorName.toUpperCase() == "JOIN") {
-            return new MergeJoinOperator();
+            return new MergeJoinOperator(domain);
         } else {
             throw new IllegalArgumentException("No valid configuration value for the merge operator");
         }
@@ -71,49 +87,40 @@ export class StandardMergeOperatorFactory {
     }
 }
 
-export class DelegatingMergeOperator<E extends AbstractElement, W extends AbstractElement> implements MergeOperator<E>{
-
-    private readonly _wrapped: MergeOperator<W>;
-    private readonly _unwrapper: Unwrapper<E, W>;
-
-    constructor(wrapped: MergeOperator<W>, unwrapper: Unwrapper<E, W>) {
-        this._wrapped = Preconditions.checkNotUndefined(wrapped);
-        this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
-    }
-
-    merge(state1: E, state2: E): boolean {
-        return this._wrapped.merge(this._unwrapper.unwrap(state1), this._unwrapper.unwrap(state2));
-    }
-
-}
-
-export class StandardMergeIntoOperator<E extends AbstractElement> implements MergeIntoOperator<E> {
+export class StandardMergeIntoOperator<E extends AbstractElement, F extends AbstractState> implements MergeIntoOperator<E, F> {
 
     private readonly _mergeOp: MergeOperator<E>;
 
     private readonly _joinOp: JoinOperator<E>;
 
-    constructor(mergeOp: MergeOperator<E>, joinOp: JoinOperator<E>) {
+    private readonly _partOp: PartitionOperator<E, F>;
+
+    constructor(partitionOp: PartitionOperator<E, F>, mergeOp: MergeOperator<E>, joinOp: JoinOperator<E>) {
         this._mergeOp = Preconditions.checkNotUndefined(mergeOp);
         this._joinOp = Preconditions.checkNotUndefined(joinOp);
+        this._partOp = Preconditions.checkNotUndefined(partitionOp);
     }
 
-    public mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): StateSet<E> {
-        const removeFromReached: Set<E> = new Set<E>();
-        const addToReached: Set<E> = new Set<E>();
-        const relevantReached: StateSet<E> = reached.getStateSet(state);
+    public mergeInto(state: E, frontier: StateSet<F>, reached: StateSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [StateSet<F>, StateSet<F>] {
+        const removeFromReached: Set<F> = new Set<F>();
+        const addToReached: Set<F> = new Set<F>();
+        const relevantReached: Iterable<F> = this._partOp.partitionOf(state, reached);
 
         for (let r of relevantReached) {
-            if (this._mergeOp.merge(state, r)) {
-                const ePrimePrimePrime = this._joinOp.join(state, r);
+            if (this._mergeOp.shouldMerge(state, unwrapper(r))) {
+                const ePrimePrimePrime: F = wrapper(this._mergeOp.merge(state, unwrapper(r)));
                 removeFromReached.add(r);
                 addToReached.add(ePrimePrimePrime);
             }
         }
+
+        frontier.removeAll(removeFromReached);
+        frontier.addAll(addToReached);
+
         reached.removeAll(removeFromReached);
         reached.addAll(addToReached);
 
-        return reached;
+        return [frontier, reached];
     }
 
 }
