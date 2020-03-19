@@ -202,6 +202,20 @@ export class TransitionTo {
     }
 }
 
+export class Transition extends TransitionTo {
+
+    private readonly _source: LocationId;
+
+    constructor(from: LocationId, op: OperationId, to: LocationId) {
+        super(op, to);
+        this._source = from;
+    }
+
+    get source(): number {
+        return this._source;
+    }
+}
+
 export type TransRelId = number;
 
 export class TransitionLoop {
@@ -229,6 +243,10 @@ export class TransitionLoop {
     get nestedLoops(): Iterable<TransitionLoop> {
         return this._nestedLoops;
     }
+
+    public toString(): string {
+        return `${this.loopHead} ${this.loopNodes}, ${this.nestedLoops}`;
+    }
 }
 
 export class TransitionRelation {
@@ -247,11 +265,13 @@ export class TransitionRelation {
 
     private _loops: ImmList<TransitionLoop>;
 
-    private _inBodyOfLoop: ImmMap<LocationId, LocationId>;
+    private _inBodyOfLoop: ImmMap<LocationId, TransitionLoop>;
 
     private _dom: ControlDominance;
 
     private _backwards: TransitionRelation = null;
+
+    private _backEdges: ImmList<Transition>;
 
     private _flatTransitions: ImmList<[LocationId, OperationId, LocationId]>;
 
@@ -345,7 +365,7 @@ export class TransitionRelation {
     public getLoops(): ImmList<TransitionLoop> {
         if (!this._loops) {
             const result: TransitionLoop[] = [];
-            const inLoopBodyOf: Map<LocationId, LocationId> = new Map();
+            const inLoopBodyOf: Map<LocationId, TransitionLoop> = new Map();
             const loopDominates: [LocationId, LocationId][] = [];
             for (const l of this.loopHeads) {
                 for (const m of this.loopHeads) {
@@ -360,16 +380,27 @@ export class TransitionRelation {
             // Inner loops first
             const sorted = toposort(loopDominates).reverse();
             for (const loopHead of sorted) {
-                const inBody: LocationId[] = [];
-                for (const l of this.locationSet) {
-                    if (this.dominance.isDominatedBy(l, loopHead)) {
-                        if (!inLoopBodyOf.get(l)) {
-                            inLoopBodyOf.set(l, loopHead);
+                const bodyNodes: Set<LocationId> = new Set();
+                const nestedIn: Set<TransitionLoop> = new Set();
+                for (const t of this.getBackEdges()) {
+                    if (t.target == loopHead) {
+                        const toAdd = this.collectNodesBackwardsFromReaching(t.source, t.target);
+                        toAdd.forEach((l) => bodyNodes.add(l));
+                        for (const l of toAdd) {
+                            const nestedBody = inLoopBodyOf.get(l);
+                            if (nestedBody) {
+                                nestedIn.add(nestedBody);
+                            }
                         }
-                        inBody.push(l);
                     }
                 }
-                result.push(new TransitionLoop(loopHead, inBody, []));
+
+                const loop = new TransitionLoop(loopHead, bodyNodes, nestedIn);
+                result.push(loop);
+
+                for (const l of loop.loopNodes) {
+                    inLoopBodyOf.set(l, loop);
+                }
             }
 
             this._loops = ImmList(result);
@@ -377,6 +408,28 @@ export class TransitionRelation {
         }
 
         return this._loops;
+    }
+
+    private collectNodesBackwardsFromReaching(source: LocationId, target: LocationId): Set<LocationId> {
+        const result: Set<LocationId> = new Set();
+
+        const worklist: Array<LocationId> = new Array<LocationId>();
+        worklist.push(source);
+
+        while (worklist.length > 0) {
+            const work = worklist.pop();
+            if (!result.has(work)) {
+                if (target != work) {
+                    result.add(work);
+                    const tset = this.transitionsTo(work);
+                    for (const t of tset) {
+                        worklist.push(t.target);
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     get loopHeads(): ImmSet<LocationId> {
@@ -483,6 +536,23 @@ export class TransitionRelation {
         return this._ident;
     }
 
+    private getBackEdges(): ImmList<Transition> {
+        if (!this._backEdges) {
+            const result: Transition[] = [];
+
+            for (const [from, op, to] of this.transitions) {
+                const isBackEdge = this.dominance.getDfsNumber(from) > this.dominance.getDfsNumber(to);
+                if (isBackEdge) {
+                    result.push(new Transition(from, op, to));
+                }
+            }
+
+            this._backEdges = ImmList(result);
+        }
+
+        return this._backEdges;
+    }
+
     /**
      * A loop head is the successor node v of a back-edge (u->v)
      * and dominates the predecessor node (u).
@@ -490,17 +560,15 @@ export class TransitionRelation {
     private computeNaturalLoopHeads(): ImmSet<LocationId> {
         const result = new Set<LocationId>();
 
-        for (const [from, op, to] of this.transitions) {
-            const isBackEdge = this.dominance.getDfsNumber(from) > this.dominance.getDfsNumber(to);
-            if (isBackEdge) {
-                if (this.dominance.isDominatedBy(from, to)) {
-                    result.add(to);
-                }
+        this.getBackEdges().forEach(t => {
+            if (this.dominance.isDominatedBy(t.source, t.target)) {
+                result.add(t.target);
             }
-        }
+        });
 
         return ImmSet<LocationId>(result);
     }
+
 }
 
 export class LocationEquivalence {

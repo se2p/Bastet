@@ -173,7 +173,7 @@ describe("TransitionRelations", () => {
                 expect(tr.loopHeads.contains(1)).toBe(true);
                 expect(tr.loopHeads.contains(2)).toBe(true);
 
-                console.log(tr.getLoops().map((l) => l.loopNodes.toString()));
+                console.log(tr.getLoops().map((l) => l.toString()));
             });
         });
 
