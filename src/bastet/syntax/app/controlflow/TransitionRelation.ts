@@ -23,9 +23,11 @@ import {OperationId, ProgramOperation, ProgramOperations} from "./ops/ProgramOpe
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ControlLocation, LocationId} from "./ControlLocation";
-import {Map as ImmMap, Set as ImmSet, List as ImmList} from "immutable"
+import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
 import {Preconditions} from "../../../utils/Preconditions";
 import {ControlDominance, DominanceMode} from "./Dominators";
+
+const toposort = require('toposort');
 
 export type TargetId = LocationId;
 export type SourceId = LocationId;
@@ -202,6 +204,33 @@ export class TransitionTo {
 
 export type TransRelId = number;
 
+export class TransitionLoop {
+
+    private readonly _loopHead: LocationId;
+
+    private readonly _loopNodes: ImmSet<LocationId>;
+
+    private readonly _nestedLoops: ImmList<TransitionLoop>;
+
+    constructor(loopHead: number, loopNodes: Iterable<LocationId>, nestedLoops: Iterable<TransitionLoop>) {
+        this._loopHead = loopHead;
+        this._loopNodes = ImmSet(loopNodes);
+        this._nestedLoops = ImmList(nestedLoops);
+    }
+
+    get loopHead(): number {
+        return this._loopHead;
+    }
+
+    get loopNodes(): ImmSet<LocationId> {
+        return this._loopNodes;
+    }
+
+    get nestedLoops(): Iterable<TransitionLoop> {
+        return this._nestedLoops;
+    }
+}
+
 export class TransitionRelation {
 
     private readonly _ident: TransRelId;
@@ -215,6 +244,12 @@ export class TransitionRelation {
     private readonly _exitLocations: ImmSet<LocationId>;
 
     private _loopHeads: ImmSet<LocationId>;
+
+    private _loops: ImmList<TransitionLoop>;
+
+    private _inBodyOfLoop: ImmMap<LocationId, LocationId>;
+
+    private _dom: ControlDominance;
 
     private _backwards: TransitionRelation = null;
 
@@ -296,6 +331,52 @@ export class TransitionRelation {
 
     get locations(): IterableIterator<ControlLocation> {
         throw new ImplementMeException();
+    }
+
+    get dominance(): ControlDominance {
+        if (!this._dom) {
+            this._dom = new ControlDominance(this, DominanceMode.FORWARDS);
+            this._dom.computeDominators();
+        }
+
+        return this._dom;
+    }
+
+    public getLoops(): ImmList<TransitionLoop> {
+        if (!this._loops) {
+            const result: TransitionLoop[] = [];
+            const inLoopBodyOf: Map<LocationId, LocationId> = new Map();
+            const loopDominates: [LocationId, LocationId][] = [];
+            for (const l of this.loopHeads) {
+                for (const m of this.loopHeads) {
+                    if (this.dominance.isDominatedBy(l, m)) {
+                        if (l != m) {
+                            loopDominates.push([m, l]);
+                        }
+                    }
+                }
+            }
+
+            // Inner loops first
+            const sorted = toposort(loopDominates).reverse();
+            for (const loopHead of sorted) {
+                const inBody: LocationId[] = [];
+                for (const l of this.locationSet) {
+                    if (this.dominance.isDominatedBy(l, loopHead)) {
+                        if (!inLoopBodyOf.get(l)) {
+                            inLoopBodyOf.set(l, loopHead);
+                        }
+                        inBody.push(l);
+                    }
+                }
+                result.push(new TransitionLoop(loopHead, inBody, []));
+            }
+
+            this._loops = ImmList(result);
+            this._inBodyOfLoop = ImmMap(inLoopBodyOf);
+        }
+
+        return this._loops;
     }
 
     get loopHeads(): ImmSet<LocationId> {
@@ -409,13 +490,10 @@ export class TransitionRelation {
     private computeNaturalLoopHeads(): ImmSet<LocationId> {
         const result = new Set<LocationId>();
 
-        const dom = new ControlDominance(this, DominanceMode.FORWARDS);
-        dom.computeDominators();
-
         for (const [from, op, to] of this.transitions) {
-            const isBackEdge = dom.getDfsNumber(from) > dom.getDfsNumber(to);
+            const isBackEdge = this.dominance.getDfsNumber(from) > this.dominance.getDfsNumber(to);
             if (isBackEdge) {
-                if (dom.isDominatedBy(from, to)) {
+                if (this.dominance.isDominatedBy(from, to)) {
                     result.add(to);
                 }
             }

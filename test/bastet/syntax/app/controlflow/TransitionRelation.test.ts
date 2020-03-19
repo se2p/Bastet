@@ -168,10 +168,12 @@ describe("TransitionRelations", () => {
                 .build();
 
 
-            it("one loop head identified", () => {
+            it("two loop heads identified", () => {
                 expect(tr.loopHeads.size).toEqual(2);
                 expect(tr.loopHeads.contains(1)).toBe(true);
                 expect(tr.loopHeads.contains(2)).toBe(true);
+
+                console.log(tr.getLoops().map((l) => l.loopNodes.toString()));
             });
         });
 
