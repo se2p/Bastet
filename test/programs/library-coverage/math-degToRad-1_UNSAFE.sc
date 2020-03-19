@@ -3,13 +3,13 @@ program Mini1Program
 actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
-        declare rad as number
-        define rad as 5
-
         declare deg as number
-        define deg as radToDeg(rad)
+        define deg as 50
 
-        if deg < 286 or deg > 287 then begin
+        declare rad as number
+        define rad as degToRad(deg)
+
+        if rad < 0.871 or rad > 0.9 then begin
         end else begin
             _RUNTIME_signalFailure()
         end
