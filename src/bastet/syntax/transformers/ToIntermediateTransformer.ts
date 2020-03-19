@@ -789,6 +789,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
         this._activeDeclarationScope = this._activeDeclarationScope.beginMethodScope(methodIdent.text);
         try {
+            // TODO This surely can be done nicer
             if (methodIdent.text.includes("getGraphicIdByIndex")) {
                 return TransformerResult.withNode(this.idByIndexLookupMethods.get(this._currentActor))
             } else if (methodIdent.text.includes("getGraphicIndexById")) {

@@ -441,6 +441,7 @@ role ScratchEntity is RuntimeEntity begin
         define active_graphic_name as id
         define active_graphic_width as _RUNTIME_getImageWidth(id)
         define active_graphic_height as _RUNTIME_getImageHeight(id)
+        //FIXME Set graphic pixels, this is currently not done as we do not supports lists yet
     end
 
     // @Category "Looks"
@@ -776,7 +777,7 @@ role ScratchStage is ScratchEntity begin
     define current_idx as 0
 
     define switchBackdropTo (id: string) begin
-        changeActiveImageTo(id)
+        changeActiveGraphicTo(id)
     end
 
     define switchBackdropToAndWait (id: string) begin

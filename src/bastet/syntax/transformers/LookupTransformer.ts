@@ -44,7 +44,7 @@ export class LookupTransformer {
     public static buildGrapicPixelLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
 
         let actorResources: Map<string, string> = new Map();
-        this._data.set(actor, actorResources)
+        this._data.set(actor, actorResources);
 
         let dirName = path.dirname(filePath);
 
@@ -54,28 +54,28 @@ export class LookupTransformer {
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", new StringType().typeId));
-        let stmts = []
+        let stmts = [];
         for (let child of resourceDefs.node.children) {
 
-            let name = (<ResourceDefinition>child).ident.text
-            let fileName = (<ResourceDefinition>child).resourceLocator.uri
+            let name = (<ResourceDefinition>child).ident.text;
+            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
             fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
-            let uri = path.join(dirName, fileName)
+            let uri = path.join(dirName, fileName);
 
             let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", new StringType().typeId));
             let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
 
-            let s = LookupTransformer.loadImage(uri, actorResources)
+            let s = LookupTransformer.loadImage(uri, actorResources);
             let resourceData = new StringLiteral(s);
 
-            let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, resourceData)
-            let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty())
+            let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, resourceData);
+            let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
             stmts.push(ifStmt)
         }
 
-        let stmtList = new StatementList(stmts)
+        let stmtList = new StatementList(stmts);
 
-        let resultDecl = new ResultDeclaration(resultVarDecl)
+        let resultDecl = new ResultDeclaration(resultVarDecl);
         return new MethodDefinition(
             methodIdent, paramDeclList,
             stmtList, resultDecl, true);
@@ -84,7 +84,7 @@ export class LookupTransformer {
     public static buildIndexByIdLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
 
         let actorResources: Map<string, string> = new Map();
-        this._data.set(actor, actorResources)
+        this._data.set(actor, actorResources);
 
         let dirName = path.dirname(filePath);
 
@@ -94,29 +94,29 @@ export class LookupTransformer {
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", new StringType().typeId));
-        let stmts = []
+        let stmts = [];
         let idxCount = 0;
         for (let child of resourceDefs.node.children) {
 
-            let name = (<ResourceDefinition>child).ident.text
-            let fileName = (<ResourceDefinition>child).resourceLocator.uri
+            let name = (<ResourceDefinition>child).ident.text;
+            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
             fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
-            let uri = path.join(dirName, fileName)
+            let uri = path.join(dirName, fileName);
 
             let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", new StringType().typeId));
             let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
 
-            LookupTransformer.loadImage(uri, actorResources)
+            LookupTransformer.loadImage(uri, actorResources);
 
-            let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(idxCount))
-            let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty())
-            stmts.push(ifStmt)
+            let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(idxCount));
+            let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
+            stmts.push(ifStmt);
             idxCount++;
         }
 
-        let stmtList = new StatementList(stmts)
+        let stmtList = new StatementList(stmts);
 
-        let resultDecl = new ResultDeclaration(resultVarDecl)
+        let resultDecl = new ResultDeclaration(resultVarDecl);
         return new MethodDefinition(
             methodIdent, paramDeclList,
             stmtList, resultDecl, true);
@@ -125,7 +125,7 @@ export class LookupTransformer {
     public static buildIdByIndexLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
 
         let actorResources: Map<string, string> = new Map();
-        this._data.set(actor, actorResources)
+        this._data.set(actor, actorResources);
 
         let dirName = path.dirname(filePath);
 
@@ -135,29 +135,29 @@ export class LookupTransformer {
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", new StringType().typeId));
-        let stmts = []
+        let stmts = [];
         let idxCount = 0;
         for (let child of resourceDefs.node.children) {
 
-            let name = (<ResourceDefinition>child).ident.text
-            let fileName = (<ResourceDefinition>child).resourceLocator.uri
+            let name = (<ResourceDefinition>child).ident.text;
+            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
             fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
-            let uri = path.join(dirName, fileName)
+            let uri = path.join(dirName, fileName);
 
             let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", new StringType().typeId));
             let cond = new NumEqualsExpression(varWithDataLoc, new NumberLiteral(idxCount));
 
-            LookupTransformer.loadImage(uri, actorResources)
+            LookupTransformer.loadImage(uri, actorResources);
 
-            let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new StringLiteral(name))
-            let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty())
-            stmts.push(ifStmt)
+            let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new StringLiteral(name));
+            let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
+            stmts.push(ifStmt);
             idxCount++;
         }
 
-        let stmtList = new StatementList(stmts)
+        let stmtList = new StatementList(stmts);
 
-        let resultDecl = new ResultDeclaration(resultVarDecl)
+        let resultDecl = new ResultDeclaration(resultVarDecl);
         return new MethodDefinition(
             methodIdent, paramDeclList,
             stmtList, resultDecl, true);
@@ -166,7 +166,7 @@ export class LookupTransformer {
     public static buildGetNumGraphics(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
 
         let actorResources: Map<string, string> = new Map();
-        this._data.set(actor, actorResources)
+        this._data.set(actor, actorResources);
 
         let dirName = path.dirname(filePath);
 
@@ -179,18 +179,18 @@ export class LookupTransformer {
         let stmts = [];
         let idxCount = 0;
         for (let child of resourceDefs.node.children) {
-            let fileName = (<ResourceDefinition>child).resourceLocator.uri
+            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
             fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
-            let uri = path.join(dirName, fileName)
-            LookupTransformer.loadImage(uri, actorResources)
+            let uri = path.join(dirName, fileName);
+            LookupTransformer.loadImage(uri, actorResources);
             idxCount++;
         }
 
-        let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(idxCount))
-        stmts.push(stmt)
-        let stmtList = new StatementList(stmts)
+        let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(idxCount));
+        stmts.push(stmt);
+        let stmtList = new StatementList(stmts);
 
-        let resultDecl = new ResultDeclaration(resultVarDecl)
+        let resultDecl = new ResultDeclaration(resultVarDecl);
         return new MethodDefinition(
             methodIdent, paramDeclList,
             stmtList, resultDecl, true);
@@ -207,6 +207,10 @@ export class LookupTransformer {
 
             actorResources.set(uniqueName, fileData);
 
+//            var parser = new DOMParser()
+//            let svgDom = parser.parseFromString(f.toString(), 'text/xml')
+//            let svgTag = svgDom.documentElement
+//
             return fileData
         }
     }

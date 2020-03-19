@@ -237,12 +237,14 @@ export class AppBuilder {
         const visitor = new RelationBuildingVisitor();
 
         let transrelRes: TransitionRelation;
-        if (resourceListContext.elements.length > 0) {
-            // transrelRes: TransitionRelation = resourceListContext.accept(visitor);
-            throw new ImplementMeException(); // TODO: Ressources not yet supported. Implement this feature!
-        } else {
-            transrelRes = TransitionRelations.epsilon();
-        }
+        //if (resourceListContext.elements.length > 0) {
+        //    // transrelRes: TransitionRelation = resourceListContext.accept(visitor);
+        //    throw new ImplementMeException(); // TODO: Ressources not yet supported. Implement this feature!
+        //} else {
+        //    transrelRes = TransitionRelations.epsilon();
+        //}
+
+        transrelRes = TransitionRelations.epsilon();
 
         const transrelLocs: TransitionRelation = declarationStmtList.accept(visitor);
         const transrelSet: TransitionRelation = stmtList.accept(visitor);
