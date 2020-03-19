@@ -47,6 +47,8 @@ export class NodeInfo {
      */
     private _semi: number;
 
+    private _dfs: number;
+
     /**
      * Set of vertices whose semi-dominator this vertice is.
      */
@@ -59,10 +61,19 @@ export class NodeInfo {
         this._pred = new Set<LocationId>();
         this._bucket = new Set<LocationId>();
         this._semi = 0;
+        this._dfs = -1;
     }
 
     get parent(): number {
         return this._parent;
+    }
+
+    get dfs(): number {
+        return this._dfs;
+    }
+
+    set dfs(value: number) {
+        this._dfs = value;
     }
 
     set parent(value: number) {
@@ -119,7 +130,7 @@ export enum DominanceMode {
  * Lengauer and Tarjan,
  * "A Fast Algorithm for Finding Dominators in a Flow Graph", 1977
  */
-export class ControlDominanceComputer {
+export class ControlDominance {
 
     private readonly _mode: DominanceMode;
 
@@ -136,9 +147,11 @@ export class ControlDominanceComputer {
     constructor(tr: TransitionRelation, mode: DominanceMode) {
         this._dfs_number = 0;
         this._tr = Preconditions.checkNotUndefined(tr);
-        this._entry = Preconditions.checkNotUndefined(getTheOnlyElement(tr.entryLocations).ident);
+        this._entry = getTheOnlyElement(tr.entryLocationSet);
         this._mode = mode;
         this._nodes = tr.locationSet;
+        this._map = new Map<LocationId, NodeInfo>();
+        this._dominatedBy = new Map<LocationId, LocationId>();
         this._vertex = new Array<LocationId>();
         for (let i = 0; i < tr.locationSet.size + 1; i++) {
             this._vertex.push(-1);
@@ -253,11 +266,16 @@ export class ControlDominanceComputer {
         }
     }
 
+    public getDfsNumber(pNode: LocationId): number {
+        return this.getNodeInfo(pNode).dfs;
+    }
+
     private dfs(pNode: LocationId): void {
         this._dfs_number = this._dfs_number + 1;
 
         const infov: NodeInfo = this._map.get(pNode);
         infov.semi = this._dfs_number;
+        infov.dfs = this._dfs_number;
         infov.label = pNode;
         infov.ancestor = null;
 

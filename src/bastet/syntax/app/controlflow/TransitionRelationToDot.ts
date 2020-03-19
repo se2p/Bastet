@@ -37,13 +37,21 @@ export class TransitionRelationToDot {
         output.push(`    node [shape=circle, style=filled];`);
 
         for (const loc of tr.locationSet) {
+            let penwidth = 1;
             let shape = "circle";
             if (tr.exitLocationSet.contains(loc)) {
                 shape = "doublecircle";
             } else if (tr.entryLocationSet.contains(loc)) {
                 shape = "invtriangle";
+            } else if (tr.loopHeads.contains(loc)) {
+                shape = "egg";
             }
-            output.push(`    ${loc} [shape=${shape}]`);
+
+            if (tr.loopHeads.contains(loc)) {
+                penwidth = 3;
+            }
+
+            output.push(`    ${loc} [shape=${shape} penwidth=${penwidth}]`);
         }
 
         while (worklist.length > 0) {
