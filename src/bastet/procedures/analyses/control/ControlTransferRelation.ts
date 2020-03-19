@@ -284,9 +284,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             for (const w of wrappedAnalysisResults) {
                 Preconditions.checkNotUndefined(w);
                 const properties = this.extractFailedForProperties(r.getThreadStates());
+                const allowMerge = this.determineAllowMerge(r.getThreadStates());
 
                 result.push(r.withWrappedState(w)
                     .withSteppedFor([step.steppedThread.threadIndex])
+                    .withAllowMerge(allowMerge)
                     .withIsTargetFor(properties));
             }
         }
@@ -841,5 +843,16 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         }
 
         return result;
+    }
+
+    private determineAllowMerge(threadStates: Iterable<ThreadState>): boolean {
+       for (const t of threadStates) {
+           const relation: TransitionRelation = this._task.getTransitionRelationById(t.getRelationLocation().getRelationId());
+           if (relation.isLoopHead(t.getRelationLocation().getLocationId())) {
+               return false;
+           }
+       }
+
+       return true;
     }
 }

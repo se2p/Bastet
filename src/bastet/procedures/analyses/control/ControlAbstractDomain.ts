@@ -330,6 +330,9 @@ export interface ControlAbstractStateAttributes extends AbstractElement, Singlet
     /** Actor scopes */
     actorScopes: ImmMap<DataLocation, ActorId>;
 
+    /** Not mergable because on a loop head? */
+    allowMerge: boolean;
+
 }
 
 const ControlAbstractStateRecord = ImmRec({
@@ -342,7 +345,9 @@ const ControlAbstractStateRecord = ImmRec({
 
     actorScopes: ImmMap<DataLocation, ActorId>(),
 
-    isTargetFor: ImmSet<Property>()
+    isTargetFor: ImmSet<Property>(),
+
+    allowMerge: true
 
 });
 
@@ -373,9 +378,9 @@ export class IndexedThread {
 export class ControlAbstractState extends ControlAbstractStateRecord implements AbstractState {
 
     constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement, isTargetFor: ImmSet<Property>,
-                steppedThreadIndices: ImmSet<number>, actorScopes: ImmMap<DataLocation, ActorId>) {
+                steppedThreadIndices: ImmSet<number>, actorScopes: ImmMap<DataLocation, ActorId>, allowMerge: boolean) {
         super({threadStates: threadStates, wrappedState: wrappedState, isTargetFor: isTargetFor,
-            steppedThreadIndices: steppedThreadIndices, actorScopes: actorScopes});
+            steppedThreadIndices: steppedThreadIndices, actorScopes: actorScopes, allowMerge: allowMerge});
     }
 
     public getIndexedThreadState(atIndex: number): IndexedThread {
@@ -393,6 +398,10 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
 
     public getThreadStates(): ImmList<ThreadState> {
         return this.get("threadStates");
+    }
+
+    public getAllowMerge(): boolean {
+        return this.get("allowMerge");
     }
 
     public getWrappedState(): AbstractState {
@@ -425,6 +434,10 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
 
     public withIsTargetFor(targetFor: Iterable<Property>): ControlAbstractState {
         return this.set('isTargetFor', ImmSet(targetFor));
+    }
+
+    public withAllowMerge(allowMerge: boolean): ControlAbstractState {
+        return this.set('allowMerge', allowMerge);
     }
 
     public withThreadState(threadIndex: number, setStateTo: ThreadState): ControlAbstractState {
@@ -487,7 +500,7 @@ export class ScheduleAbstractStateFactory {
             }
         }
 
-        return new ControlAbstractState(threads, wrappedState, isTarget, ImmSet(), actors);
+        return new ControlAbstractState(threads, wrappedState, isTarget, ImmSet(), actors, false);
     }
 }
 

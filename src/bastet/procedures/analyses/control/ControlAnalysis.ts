@@ -96,6 +96,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     }
 
     shouldMerge(state1: ControlAbstractState, state2: ControlAbstractState): boolean {
+        if (!state1.allowMerge || !state1.allowMerge) {
+            return false;
+        }
+
         if (!state1.getSteppedFor().equals(state2.getSteppedFor())) {
             return false;
         }
@@ -107,6 +111,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         if (!state1.getIsTargetFor().equals(state2.getIsTargetFor())) {
             return false;
         }
+
 
         return this.wrappedAnalysis.shouldMerge(state1.getWrappedState(), state2.getWrappedState());
     }

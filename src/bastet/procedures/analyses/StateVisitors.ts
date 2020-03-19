@@ -112,3 +112,32 @@ export class StateColorVisitor implements AbstractStateVisitor<string> {
 
 }
 
+export class PenSizeVisitor implements AbstractStateVisitor<number> {
+
+    visit(element: AbstractElement): number {
+        return 1;
+    }
+
+    visitControlAbstractState(element: ControlAbstractState): number {
+        if (element.getAllowMerge()) {
+            return 1
+        } else {
+            return 3;
+        }
+    }
+
+    visitGraphAbstractState(element: GraphAbstractState): number {
+        return element.getWrappedState().accept(this);
+    }
+
+    visitDataAbstractState(element: DataAbstractState): number {
+        return 1;
+    }
+
+    visitSSAState(element: SSAState): number {
+        return element.getWrappedState().accept(this);
+    }
+
+}
+
+
