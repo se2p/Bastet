@@ -72,6 +72,8 @@ export class LookupTransformer {
             let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
             stmts.push(ifStmt)
         }
+        //todo add default case
+
 
         let stmtList = new StatementList(stmts);
 
@@ -88,7 +90,7 @@ export class LookupTransformer {
 
         let dirName = path.dirname(filePath);
 
-        let methodIdent = new Identifier("_RUNTIME_getGraphicIdByIndex");
+        let methodIdent = new Identifier("getGraphicIdByIndex");
 
         let paramDecl = new ParameterDeclaration(new Identifier("id"), new StringType());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
@@ -113,6 +115,7 @@ export class LookupTransformer {
             stmts.push(ifStmt);
             idxCount++;
         }
+        //TODO add default case
 
         let stmtList = new StatementList(stmts);
 
@@ -129,7 +132,7 @@ export class LookupTransformer {
 
         let dirName = path.dirname(filePath);
 
-        let methodIdent = new Identifier("_RUNTIME_getGraphicIdByIndex");
+        let methodIdent = new Identifier("getGraphicIdByIndex");
 
         let paramDecl = new ParameterDeclaration(new Identifier("idx"), new NumberType());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
@@ -154,6 +157,7 @@ export class LookupTransformer {
             stmts.push(ifStmt);
             idxCount++;
         }
+        //TODO add default case
 
         let stmtList = new StatementList(stmts);
 
@@ -170,10 +174,9 @@ export class LookupTransformer {
 
         let dirName = path.dirname(filePath);
 
-        let methodIdent = new Identifier("_RUNTIME_getGraphicIdByIndex");
+        let methodIdent = new Identifier("getNumGraphics");
 
-        let paramDecl = new ParameterDeclaration(new Identifier("idx"), new NumberType());
-        let paramDeclList = new ParameterDeclarationList([paramDecl]);
+        let paramDeclList = new ParameterDeclarationList([]);
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", new NumberType().typeId));
         let stmts = [];

@@ -785,8 +785,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     public visitRuntimeMethodDefinition(ctx: RuntimeMethodDefinitionContext) : TransformerResult {
         const methodIdent: Identifier = ctx.ident().accept(this).nodeOnly() as Identifier;
 
-        const isAtomic = this.parseIsAtomic(ctx);
-
         this._activeDeclarationScope = this._activeDeclarationScope.beginMethodScope(methodIdent.text);
         try {
             // TODO This surely can be done nicer
