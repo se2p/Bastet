@@ -119,11 +119,7 @@ export class PenSizeVisitor implements AbstractStateVisitor<number> {
     }
 
     visitControlAbstractState(element: ControlAbstractState): number {
-        if (element.getAllowMerge()) {
-            return 1
-        } else {
-            return 3;
-        }
+        return element.getWrappedState().accept(this);
     }
 
     visitGraphAbstractState(element: GraphAbstractState): number {

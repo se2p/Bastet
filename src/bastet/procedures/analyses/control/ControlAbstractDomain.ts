@@ -183,6 +183,9 @@ export interface ThreadStateAttributes {
     /** Stack of method call and return locations to enable the inter-procedural analysis */
     callStack: ImmList<MethodCall>;
 
+    /** Stack of loop bodies entered (represented by the loop head location) */
+    loopStack: ImmList<RelationLocation>;
+
     /** Scope to uniquely identify currently declared and references variables (data locations) */
     scopeStack: ImmList<string>;
 
@@ -201,6 +204,7 @@ const ThreadStateRecord = ImmRec({
     waitingForThreads: ImmSet<ThreadId>(),
     failedFor: ImmSet<Property>(),
     callStack: ImmList<MethodCall>(),
+    loopStack: ImmList<RelationLocation>(),
     scopeStack: ImmList<string>(),
     inAtomicMode: 0
 });
@@ -209,11 +213,11 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, operations: ImmList<OperationId>,
                 location: RelationLocation, compState: ThreadComputationState, waitingForThreads: ImmSet<ThreadId>,
-                failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, scopeStack: ImmList<string>,
-                actorScopes: ImmMap<TypedDataLocation, string>,  inAtomicMode: number) {
+                failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, loopStack: ImmList<RelationLocation>,
+                scopeStack: ImmList<string>, actorScopes: ImmMap<TypedDataLocation, string>,  inAtomicMode: number) {
         super({threadId: threadId, actorId: actorId, scriptId: scriptId, operations: operations, location: location,
             computationState: compState, waitingForThreads: waitingForThreads, failedFor: failedFor,
-            callStack: callStack, scopeStack: scopeStack, inAtomicMode: inAtomicMode});
+            callStack: callStack, loopStack: loopStack, scopeStack: scopeStack, inAtomicMode: inAtomicMode});
     }
 
     public getInAtomicMode(): number {
@@ -242,6 +246,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     public getCallStack(): ImmList<MethodCall> {
         return this.get('callStack');
+    }
+
+    public getLoopStack(): ImmList<RelationLocation> {
+        return this.get('loopStack');
     }
 
     public getScopeStack(): ImmList<string> {
@@ -274,6 +282,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     public withOperations(value: ImmList<OperationId>): ThreadState {
         return this.set('operations', value);
+    }
+
+    public withLoopStack(value: ImmList<RelationLocation>): ThreadState {
+        return this.set('loopStack', value);
     }
 
     public withCallStack(value: ImmList<MethodCall>): ThreadState {
@@ -330,9 +342,6 @@ export interface ControlAbstractStateAttributes extends AbstractElement, Singlet
     /** Actor scopes */
     actorScopes: ImmMap<DataLocation, ActorId>;
 
-    /** Not mergable because on a loop head? */
-    allowMerge: boolean;
-
 }
 
 const ControlAbstractStateRecord = ImmRec({
@@ -346,8 +355,6 @@ const ControlAbstractStateRecord = ImmRec({
     actorScopes: ImmMap<DataLocation, ActorId>(),
 
     isTargetFor: ImmSet<Property>(),
-
-    allowMerge: true
 
 });
 
@@ -378,9 +385,9 @@ export class IndexedThread {
 export class ControlAbstractState extends ControlAbstractStateRecord implements AbstractState {
 
     constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement, isTargetFor: ImmSet<Property>,
-                steppedThreadIndices: ImmSet<number>, actorScopes: ImmMap<DataLocation, ActorId>, allowMerge: boolean) {
+                steppedThreadIndices: ImmSet<number>, actorScopes: ImmMap<DataLocation, ActorId>) {
         super({threadStates: threadStates, wrappedState: wrappedState, isTargetFor: isTargetFor,
-            steppedThreadIndices: steppedThreadIndices, actorScopes: actorScopes, allowMerge: allowMerge});
+            steppedThreadIndices: steppedThreadIndices, actorScopes: actorScopes});
     }
 
     public getIndexedThreadState(atIndex: number): IndexedThread {
@@ -398,10 +405,6 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
 
     public getThreadStates(): ImmList<ThreadState> {
         return this.get("threadStates");
-    }
-
-    public getAllowMerge(): boolean {
-        return this.get("allowMerge");
     }
 
     public getWrappedState(): AbstractState {
@@ -434,10 +437,6 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
 
     public withIsTargetFor(targetFor: Iterable<Property>): ControlAbstractState {
         return this.set('isTargetFor', ImmSet(targetFor));
-    }
-
-    public withAllowMerge(allowMerge: boolean): ControlAbstractState {
-        return this.set('allowMerge', allowMerge);
     }
 
     public withThreadState(threadIndex: number, setStateTo: ThreadState): ControlAbstractState {
@@ -494,13 +493,13 @@ export class ScheduleAbstractStateFactory {
                 for (const locId of script.transitions.entryLocationSet) {
                     const loc: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, locId);
                     threads = threads.push(new ThreadState(threadId, actor.ident, script.id, ImmList(),
-                        loc, threadState, ImmSet(), ImmSet(), ImmList(),
+                        loc, threadState, ImmSet(), ImmSet(), ImmList(), ImmList(),
                         ImmList([actor.ident]), ImmMap(), 0));
                 }
             }
         }
 
-        return new ControlAbstractState(threads, wrappedState, isTarget, ImmSet(), actors, false);
+        return new ControlAbstractState(threads, wrappedState, isTarget, ImmSet(), actors);
     }
 }
 

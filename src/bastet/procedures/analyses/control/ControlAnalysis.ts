@@ -44,6 +44,7 @@ import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {DataAbstractState} from "../data/DataAbstractDomain";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -88,7 +89,14 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
-        return this._transferRelation.abstractSucc(fromState);
+        const result: ControlAbstractState[] = [];
+        for (const r of this._transferRelation.abstractSucc(fromState)) {
+            if (!this.steppedOnLoophead(r) || this.refiner.checkIsFeasible(r)) {
+                result.push(r);
+            }
+        }
+
+        return result;
     }
 
     join(state1: ControlAbstractState, state2: ControlAbstractState): ControlAbstractState {
@@ -96,10 +104,6 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     }
 
     shouldMerge(state1: ControlAbstractState, state2: ControlAbstractState): boolean {
-        if (!state1.allowMerge || !state1.allowMerge) {
-            return false;
-        }
-
         if (!state1.getSteppedFor().equals(state2.getSteppedFor())) {
             return false;
         }
@@ -219,4 +223,18 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         return this.wrappedAnalysis.partitionOf(ofState, reached);
     }
 
+    private steppedOnLoophead(r: ControlAbstractState) {
+        const steppedThreads = r.getSteppedFor().map((i) => r.getIndexedThreadState(i));
+
+        for (const t of steppedThreads) {
+            const ts = t.threadStatus;
+            const actor = this._task.getActorByName(ts.getActorId());
+            const script = actor.getScript(ts.getScriptId());
+            if (script.transitions.isLoopHead(ts.getRelationLocation().getLocationId())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

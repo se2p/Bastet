@@ -44,8 +44,6 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Ordere
     }
 
     public add(element: E): any {
-        console.log(element.toString());
-
         // A `GraphAbstractState` has only references to the parents.
         // This wrapper has to keep track of the children, too.
         for (const parentId of element.getPredecessors()) {
@@ -81,8 +79,6 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Ordere
     }
 
     public remove(element: E): any {
-        console.log("REMOVE: " + element.toString());
-
         // Remove all children
         this.removeChildren(element);
 

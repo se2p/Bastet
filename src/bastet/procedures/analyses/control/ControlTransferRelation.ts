@@ -34,7 +34,7 @@ import {ControlAnalysisConfig} from "./ControlAnalysis";
 import {App} from "../../../syntax/app/App";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {TransitionRelation, TransitionTo} from "../../../syntax/app/controlflow/TransitionRelation";
+import {TransitionLoop, TransitionRelation, TransitionTo} from "../../../syntax/app/controlflow/TransitionRelation";
 import {Actor, ActorId} from "../../../syntax/app/Actor";
 import {
     OperationId,
@@ -134,6 +134,39 @@ class StepInformation {
 
     get succScopeStack(): ImmList<string> {
         return this._succScopeStack;
+    }
+}
+
+enum LoopActionType {
+    NONE,
+    ENTERING,
+    LEAVING
+}
+
+class LoopAction {
+
+    private readonly _type: LoopActionType;
+
+    private readonly _loop: TransitionLoop;
+
+    private readonly _loopHead: RelationLocation;
+
+    constructor(type: LoopActionType, loop: TransitionLoop, loopHead: RelationLocation) {
+        this._type = type;
+        this._loop = loop;
+        this._loopHead = loopHead;
+    }
+
+    get loopHead(): RelationLocation {
+        return this._loopHead;
+    }
+
+    get type(): LoopActionType {
+        return this._type;
+    }
+
+    get loop(): TransitionLoop {
+        return this._loop;
     }
 }
 
@@ -284,11 +317,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             for (const w of wrappedAnalysisResults) {
                 Preconditions.checkNotUndefined(w);
                 const properties = this.extractFailedForProperties(r.getThreadStates());
-                const allowMerge = this.determineAllowMerge(r.getThreadStates());
-
                 result.push(r.withWrappedState(w)
                     .withSteppedFor([step.steppedThread.threadIndex])
-                    .withAllowMerge(allowMerge)
                     .withIsTargetFor(properties));
             }
         }
@@ -394,6 +424,27 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
        return resultPrime;
     }
 
+    private getLoopAction(predRelLoc: RelationLocation, succRelLoc: RelationLocation): LoopAction {
+        const predRel = this._task.getTransitionRelationById(predRelLoc.getRelationId());
+        const succRel = this._task.getTransitionRelationById(succRelLoc.getRelationId());
+
+        if (predRel.isLoopHead(predRelLoc.location)) {
+            const predIsLoopHeadOf: TransitionLoop = predRel.getIsInLoopBodyOf(predRelLoc.getLocationId());
+            const predLoop: TransitionLoop = predRel.getIsInLoopBodyOf(predRelLoc.getLocationId());
+            const succLoop: TransitionLoop = succRel.getIsInLoopBodyOf(succRelLoc.getLocationId());
+
+            if (predIsLoopHeadOf == succLoop) {
+                // case 1: succ is in the same loop --> entering or re-entering the loop
+                return new LoopAction(LoopActionType.ENTERING, succLoop, predRelLoc);
+            } else {
+                // case 2: succ is not the same loop --> leaving the loop
+                return new LoopAction(LoopActionType.LEAVING, predIsLoopHeadOf, predRelLoc);
+            }
+        } else {
+            return new LoopAction(LoopActionType.NONE, null, null);
+        }
+    }
+
     private interpreteLocal0(fromState: ControlAbstractState, threadToStep: IndexedThread,
                        step: StepInformation): [ControlAbstractState, boolean][] {
         Preconditions.checkNotUndefined(fromState);
@@ -412,6 +463,29 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 .withOperations(ImmList(step.ops.map(o => o.ident)))
                 .withCallStack(step.succCallStack)
                 .withScopeStack(step.succScopeStack));
+
+        // A new loop iteration? Or a loop iteration ended?
+        const predRelLoc = step.steppedThread.threadStatus.getRelationLocation();
+        const succRelLoc = step.succLoc;
+        const predLoopStack = step.steppedThread.threadStatus.getLoopStack();
+
+        const loopAction = this.getLoopAction(predRelLoc, succRelLoc);
+        switch (loopAction.type) {
+            case LoopActionType.ENTERING: {
+                const newLoopStack: ImmList<RelationLocation> = predLoopStack.push(loopAction.loopHead);
+                result = result.withThreadStateUpdate(threadToStep.threadIndex,
+                    (ts) =>
+                        ts.withLoopStack(newLoopStack));
+                break;
+            }
+            case LoopActionType.LEAVING: {
+                const newLoopStack = this.popLoop(predLoopStack);
+                result = result.withThreadStateUpdate(threadToStep.threadIndex,
+                    (ts) =>
+                        ts.withLoopStack(newLoopStack));
+                break;
+            }
+        }
 
         // TODO: Where and how to handle the `clone` statement?
 
@@ -845,14 +919,22 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result;
     }
 
-    private determineAllowMerge(threadStates: Iterable<ThreadState>): boolean {
-       for (const t of threadStates) {
-           const relation: TransitionRelation = this._task.getTransitionRelationById(t.getRelationLocation().getRelationId());
-           if (relation.isLoopHead(t.getRelationLocation().getLocationId())) {
-               return false;
-           }
-       }
+    private popLoop(predLoopStack: ImmList<RelationLocation>): ImmList<RelationLocation> {
+        // TODO: Write tests for this method
+        if (predLoopStack.size > 1) {
+            let i = predLoopStack.size-1;
+            const topElement = predLoopStack.get(i);
 
-       return true;
+            while (i > 0) {
+                if (!predLoopStack.get(i).equals(topElement)) {
+                    break;
+                }
+                i--;
+            }
+            return predLoopStack.slice(0, i);
+
+        } else {
+            return ImmList();
+        }
     }
 }

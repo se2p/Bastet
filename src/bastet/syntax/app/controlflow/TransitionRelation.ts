@@ -222,22 +222,24 @@ export class TransitionLoop {
 
     private readonly _loopHead: LocationId;
 
-    private readonly _loopNodes: ImmSet<LocationId>;
+    private readonly _bodyNodes: ImmSet<LocationId>;
 
     private readonly _nestedLoops: ImmList<TransitionLoop>;
 
-    constructor(loopHead: number, loopNodes: Iterable<LocationId>, nestedLoops: Iterable<TransitionLoop>) {
+    constructor(loopHead: LocationId, loopNodes: Iterable<LocationId>, nestedLoops: Iterable<TransitionLoop>) {
         this._loopHead = loopHead;
-        this._loopNodes = ImmSet(loopNodes);
+        this._bodyNodes = ImmSet(loopNodes);
         this._nestedLoops = ImmList(nestedLoops);
+        // ATTENTION: The loop head must not be element of `loopNodes`!
+        Preconditions.checkArgument(!this._bodyNodes.has(loopHead));
     }
 
     get loopHead(): number {
         return this._loopHead;
     }
 
-    get loopNodes(): ImmSet<LocationId> {
-        return this._loopNodes;
+    get bodyNodes(): ImmSet<LocationId> {
+        return this._bodyNodes;
     }
 
     get nestedLoops(): Iterable<TransitionLoop> {
@@ -245,7 +247,7 @@ export class TransitionLoop {
     }
 
     public toString(): string {
-        return `${this.loopHead} ${this.loopNodes}, ${this.nestedLoops}`;
+        return `${this.loopHead} ${this.bodyNodes}, ${this.nestedLoops}`;
     }
 }
 
@@ -362,6 +364,12 @@ export class TransitionRelation {
         return this._dom;
     }
 
+    public getIsInLoopBodyOf(loc: LocationId): TransitionLoop {
+        Preconditions.checkNotUndefined(this.getLoops());
+        Preconditions.checkNotUndefined(this._inBodyOfLoop);
+        return this._inBodyOfLoop.get(loc);
+    }
+
     public getLoops(): ImmList<TransitionLoop> {
         if (!this._loops) {
             const result: TransitionLoop[] = [];
@@ -398,7 +406,7 @@ export class TransitionRelation {
                 const loop = new TransitionLoop(loopHead, bodyNodes, nestedIn);
                 result.push(loop);
 
-                for (const l of loop.loopNodes) {
+                for (const l of loop.bodyNodes) {
                     inLoopBodyOf.set(l, loop);
                 }
             }

@@ -114,9 +114,6 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
             }
         }
 
-        console.log("OLD: ", Array.from(removeFromReached).map((e) => e.toString()));
-        console.log("NEW: ", Array.from(addToReached).map((e) => e.toString()));
-
         frontier.removeAll(removeFromReached);
         frontier.addAll(addToReached);
 
