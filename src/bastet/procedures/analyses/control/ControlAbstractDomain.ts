@@ -193,7 +193,7 @@ export interface ThreadStateAttributes {
 
 const ThreadStateRecord = ImmRec({
     threadId: -1,
-    scriptId: -1,
+    scriptId: "",
     actorId: "",
     operations: ImmList<OperationId>(),
     location: new RelationLocation("", 0, 0),

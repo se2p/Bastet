@@ -220,6 +220,19 @@ export class ScopeTypeInformation extends ScopeTreeNode<ScopeTypeInformation> {
         return result;
     }
 
+    dump() {
+        for (const m of Object.keys(this.methods)) {
+            console.log(m);
+        }
+        for (const v of Object.keys(this.variables)) {
+            console.log(v);
+        }
+        for (const c of Object.keys(this.childs)) {
+            console.log(`------ ${c} ----`);
+            this.findChild(c).dump();
+        }
+    }
+
 }
 
 export class TypeInformationStorage implements TypeInformationProvider {
@@ -333,5 +346,9 @@ export class TypeInformationStorage implements TypeInformationProvider {
         } else {
             throw new IllegalStateException();
         }
+    }
+
+    dump(): void {
+        this._systemScope.dump();
     }
 }

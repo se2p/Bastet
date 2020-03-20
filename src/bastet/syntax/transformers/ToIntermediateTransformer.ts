@@ -843,10 +843,16 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitScript(ctx: ScriptContext) : TransformerResult {
-        return TransformerResult.withNode(new ScriptDefinition(
-            ctx.event().accept(this).nodeOnly() as CoreEvent,
-            ctx.stmtList().accept(this).nodeOnly() as StatementList,
-            this.parseIsRestart(ctx)));
+        const scriptIdent = Identifier.freshWithPrefix("script");
+        this._activeDeclarationScope = this._activeDeclarationScope.beginMethodScope(scriptIdent.text);
+        try {
+            return TransformerResult.withNode(new ScriptDefinition(scriptIdent,
+                ctx.event().accept(this).nodeOnly() as CoreEvent,
+                ctx.stmtList().accept(this).nodeOnly() as StatementList,
+                this.parseIsRestart(ctx)));
+        } finally {
+            this._activeDeclarationScope = this._activeDeclarationScope.endScope();
+        }
     }
 
     public visitScriptList(ctx: ScriptListContext) : TransformerResult {

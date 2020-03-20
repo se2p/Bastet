@@ -23,8 +23,16 @@ import {AbstractNode} from "../AstNode";
 import {StatementList} from "./statements/Statement";
 import {AstNodeList} from "../AstNodeList";
 import {CoreEvent} from "./CoreEvent";
+import {Identifier} from "./Identifier";
+import {Preconditions} from "../../../utils/Preconditions";
 
 export class ScriptDefinition extends AbstractNode {
+
+    /**
+     * The script identifier is used to scope variables
+     * that were declared local to the script.
+     */
+    private readonly _ident: Identifier;
 
     private readonly _event: CoreEvent;
 
@@ -32,10 +40,11 @@ export class ScriptDefinition extends AbstractNode {
 
     private readonly _isRestart: boolean;
 
-    constructor(event: CoreEvent, stmtList: StatementList, restart: boolean) {
+    constructor(ident: Identifier, event: CoreEvent, stmtList: StatementList, restart: boolean) {
         super([event, stmtList]);
-        this._event = event;
-        this._stmtList = stmtList;
+        this._ident = Preconditions.checkNotUndefined(ident);
+        this._event = Preconditions.checkNotUndefined(event);
+        this._stmtList = Preconditions.checkNotUndefined(stmtList);
         this._isRestart = restart;
     }
 
@@ -49,6 +58,10 @@ export class ScriptDefinition extends AbstractNode {
 
     get isRestart(): boolean {
         return this._isRestart;
+    }
+
+    get ident(): Identifier {
+        return this._ident;
     }
 }
 
