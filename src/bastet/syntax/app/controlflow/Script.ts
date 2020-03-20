@@ -19,7 +19,7 @@
  *
  */
 
-import {TransitionRelation, WithTransitionRelation} from "./TransitionRelation";
+import {TransitionRelation, TransitionRelations, WithTransitionRelation} from "./TransitionRelation";
 import {CoreEvent} from "../../ast/core/CoreEvent";
 import {Preconditions} from "../../../utils/Preconditions";
 import {LocationId} from "./ControlLocation";
@@ -52,7 +52,7 @@ export class Script implements WithTransitionRelation {
         this._id = id;
         this._event = event;
         this._restartOnTriggered = restart;
-        this._transitions = transitions;
+        this._transitions = TransitionRelations.named(transitions, id.text);
     }
 
     get transitions(): TransitionRelation {

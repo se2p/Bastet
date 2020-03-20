@@ -291,7 +291,7 @@ export class TypeInformationStorage implements TypeInformationProvider {
             actorScopeType = actorScope.findTypeOf(ident);
 
             if (usageScope.size > 1) {
-                const methodScope = actorScope.findChild(usageScope.get(1));
+                const methodScope = actorScope.getChildScope(usageScope.get(1), DeclarationScopeType.METHOD);
                 Preconditions.checkNotUndefined(methodScope, `No scope information for ${usageScope.get(1)}`);
                 methodScopeType = methodScope.findTypeOf(ident);
             }

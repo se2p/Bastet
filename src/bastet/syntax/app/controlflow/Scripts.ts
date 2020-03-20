@@ -47,14 +47,14 @@ export class Scripts {
     public static concat(script1: Script, script2: Script) : Script {
         Preconditions.checkArgument(script1.event === script2.event);
         const newTR = TransitionRelations.concat(script1.transitions, script2.transitions);
-        return new Script(Identifier.fresh(), script1.event, script1.restartOnTriggered, newTR);
+        return new Script(Identifier.freshWithPrefix("concat"), script1.event, script1.restartOnTriggered, newTR);
     }
 
     private static EMPTY_SCRIPT: Script;
 
     static empty() {
         if (!Scripts.EMPTY_SCRIPT) {
-            Scripts.EMPTY_SCRIPT = new Script(Identifier.fresh(),
+            Scripts.EMPTY_SCRIPT = new Script(Identifier.freshWithPrefix("empty"),
                 NeverEvent.instance(), false, TransitionRelations.epsilon());
         }
         return Scripts.EMPTY_SCRIPT;

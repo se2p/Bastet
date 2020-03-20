@@ -256,7 +256,9 @@ export class AppBuilder {
         const compundTransRel = TransitionRelations.eliminateEpsilons(
             TransitionRelations.concat(transrelRes,
                 TransitionRelations.concat(transrelLocs, transrelSet)));
-        return new Script(Identifier.freshWithPrefix("init"), BootstrapEvent.instance(), false, compundTransRel);
+
+        const scriptId = Identifier.freshWithPrefix("init");
+        return new Script(scriptId, BootstrapEvent.instance(), false, compundTransRel);
     }
 
     private buildResources(resourceListContext: ResourceDefinitionList): AppResourceMap {
