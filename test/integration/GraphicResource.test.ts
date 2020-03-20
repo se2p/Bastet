@@ -32,7 +32,7 @@ test("Test getNumGraphics 1 safe", done => {
     }
 }, utils.timeout);
 
-test("Test getNumGraphics 1 safe", done => {
+test("Test getNumGraphics 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getNumGraphics-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
@@ -45,6 +45,17 @@ test("Test getNumGraphics 1 safe", done => {
 
 test("Test getNumGraphics 2 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getNumGraphics-2_SAFE.sc"
+    let bastet = new Bastet();
+    try {
+        utils.execute(bastet, fixtureRelPath, done)
+    } catch (error) {
+        done(error)
+    }
+}, utils.timeout);
+
+
+test("Test getImageHeight 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getImageHeight-1_SAFE.sc"
     let bastet = new Bastet();
     try {
         utils.execute(bastet, fixtureRelPath, done)

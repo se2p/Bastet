@@ -259,10 +259,6 @@ role RuntimeEntity is MathActor begin
 
     extern _RUNTIME_integerFromInterval (from_num: number, to_num: number) returns number
 
-    extern _RUNTIME_getImageWidth (ident: string) returns number
-
-    extern _RUNTIME_getImageHeight (ident: string) returns number
-
     // A random integer in the interval [from, to],
     // that is, both end points are included.
     extern randomIntegerBetween (intervalStart: number, intervalEnd: number) returns number
@@ -298,6 +294,10 @@ role RuntimeEntity is MathActor begin
     define getGraphicIndexById (id: string) in runtime returns result: number
 
     define getGraphicPixels (id: string) in runtime returns result: string
+
+    define getImageWidth (ident: string) in runtime returns result: number
+
+    define getImageHeight (ident: string) in runtime returns result: number
 
     define getNumGraphics () in runtime returns result: number
 
@@ -440,8 +440,8 @@ role ScratchEntity is RuntimeEntity begin
     // @Category "Looks"
     define atomic changeActiveGraphicTo (id: string) begin
         define active_graphic_name as id
-        define active_graphic_width as _RUNTIME_getImageWidth(id)
-        define active_graphic_height as _RUNTIME_getImageHeight(id)
+        define active_graphic_width as getImageWidth(id)
+        define active_graphic_height as getImageHeight(id)
         //FIXME Set graphic pixels, this is currently not done as we do not supports lists yet
     end
 

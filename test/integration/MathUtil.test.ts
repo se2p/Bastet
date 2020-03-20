@@ -23,7 +23,7 @@
 import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-xtest("Test WrapClamp 1 safe", done => {
+test("Test WrapClamp 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-WrapClamp-1_SAFE.sc"
     let bastet = new Bastet();
     try {
