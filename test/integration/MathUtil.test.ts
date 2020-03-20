@@ -33,8 +33,29 @@ test("Test WrapClamp 1 safe", done => {
     }
 }, utils.timeout);
 
+test("Test WrapClamp 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-WrapClamp-1_UNSAFE.sc"
+    let bastet = new Bastet();
+    try {
+        utils.execute(bastet, fixtureRelPath, done)
+    } catch (error) {
+        done(error)
+    }
+}, utils.timeout);
+
+
 test("Test MathFloor 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-MathFloor-1_SAFE.sc"
+    let bastet = new Bastet();
+    try {
+        utils.execute(bastet, fixtureRelPath, done)
+    } catch (error) {
+        done(error)
+    }
+}, utils.timeout);
+
+test("Test MathFloor 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-MathFloor-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
         utils.execute(bastet, fixtureRelPath, done)
