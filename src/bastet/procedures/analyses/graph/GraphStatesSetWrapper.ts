@@ -82,6 +82,17 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Ordere
         // Remove all children
         this.removeChildren(element);
 
+        // Remove child from parent
+        for (const parent of element.getPredecessors()) {
+            const newParentChilds: GraphStateId[] = [];
+            for (const c of this._children.get(parent) || []) {
+                if (c != element.getId()) {
+                    newParentChilds.push(c);
+                }
+            }
+            this._children.set(parent, newParentChilds);
+        }
+
         // Remove the state itself
         this._idToStateMap.delete(element.getId());
         return super.remove(element);

@@ -51,6 +51,7 @@ import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
 import {CallStatement} from "../ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
 import {Properties} from "../Property";
+import {Identifier} from "../ast/core/Identifier";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -307,7 +308,7 @@ export class Actors {
             const visitor: RelationBuildingVisitor = new RelationBuildingVisitor();
             const bootstrapTransitions: TransitionRelation =
                 TransitionRelations.eliminateEpsilons(bootstrapStmts.accept(visitor));
-            const bootstrapScript: Script = new Script(Scripts.freshScriptId(),
+            const bootstrapScript: Script = new Script(Identifier.freshWithPrefix("bootscript"),
                 SingularityEvent.instance(), false, bootstrapTransitions);
             Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [], [],
                 Concerns.highestPriorityConcern(),

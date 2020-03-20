@@ -19,13 +19,14 @@
  *
  */
 
-import {TransitionRelation, WithTransitionRelation} from "./TransitionRelation";
+import {TransitionRelation, TransitionRelations, WithTransitionRelation} from "./TransitionRelation";
 import {CoreEvent} from "../../ast/core/CoreEvent";
 import {Preconditions} from "../../../utils/Preconditions";
 import {LocationId} from "./ControlLocation";
+import {Identifier} from "../../ast/core/Identifier";
 
 
-export type ScriptId = number;
+export type ScriptId = string;
 
 /**
  * A single script, which represents the control flow
@@ -34,7 +35,7 @@ export type ScriptId = number;
 export class Script implements WithTransitionRelation {
 
     /** A unique identifier of this script */
-    private readonly _id: ScriptId;
+    private readonly _id: Identifier;
 
     /** This script is triggered by the following event */
     private readonly _event: CoreEvent;
@@ -45,13 +46,13 @@ export class Script implements WithTransitionRelation {
     /** Restart the script in case the event is triggered? */
     private readonly _restartOnTriggered: boolean;
 
-    constructor(id: ScriptId, event: CoreEvent, restart: boolean, transitions: TransitionRelation) {
+    constructor(id: Identifier, event: CoreEvent, restart: boolean, transitions: TransitionRelation) {
         Preconditions.checkNotUndefined(event);
         Preconditions.checkNotUndefined(transitions);
         this._id = id;
         this._event = event;
         this._restartOnTriggered = restart;
-        this._transitions = transitions;
+        this._transitions = TransitionRelations.named(transitions, id.text);
     }
 
     get transitions(): TransitionRelation {
@@ -62,8 +63,8 @@ export class Script implements WithTransitionRelation {
         return this._event;
     }
 
-    get id(): number {
-        return this._id;
+    get id(): string {
+        return this._id.text;
     }
 
     get restartOnTriggered(): boolean {

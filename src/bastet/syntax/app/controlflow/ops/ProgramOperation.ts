@@ -30,7 +30,7 @@ export type OperationId = number;
 
 export abstract class ProgramOperation implements WithIdent {
 
-    private readonly _ast: AstNode|null;
+    private readonly _ast: AstNode;
 
     private readonly _id: OperationId;
 
@@ -106,6 +106,7 @@ export class NoopProgramOperation extends ProgramOperation {
     toString(): string {
         return "epsilon";
     }
+
 }
 
 export class ProgramOperations {
@@ -113,7 +114,6 @@ export class ProgramOperations {
     private static opCodeToIdMap: Map<string, OperationId> = new Map();
     private static idToAstMap: Map<OperationId, AstNode> = new Map();
     private static opMap: Map<OperationId, ProgramOperation> = new Map();
-    private static readonly EPSILON_OP = new NoopProgramOperation();
     private static idSequencePos: OperationId;
 
     public static fresh(): OperationId {
@@ -157,7 +157,12 @@ export class ProgramOperations {
         ProgramOperations.opMap.set(op.ident, op);
     }
 
+    private static EPSILON_OP: ProgramOperation;
+
     public static epsilon(): ProgramOperation {
+        if (!ProgramOperations.EPSILON_OP) {
+            ProgramOperations.EPSILON_OP = new RawOperation(new EpsilonStatement());
+        }
         return ProgramOperations.EPSILON_OP;
     }
 

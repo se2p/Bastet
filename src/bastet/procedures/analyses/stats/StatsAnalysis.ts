@@ -162,6 +162,10 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         return this._joinStats;
     }
 
+    get mergeIntoStats(): AnalysisStatistics {
+        return this._mergeIntoStats;
+    }
+
     unwrap(e: E): E {
         return e;
     }

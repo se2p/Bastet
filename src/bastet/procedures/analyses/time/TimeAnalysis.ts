@@ -49,12 +49,15 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, 
 
     private readonly _transfer: TimeTransferRelation<any>;
 
-    constructor(wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics,
+    private readonly _task: App;
+
+    constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics,
                 timeProfile: ProgramTimeProfile) {
+        this._task = Preconditions.checkNotUndefined(task);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._timeProfile = Preconditions.checkNotUndefined(timeProfile);
-        this._transfer = new TimeTransferRelation(timeProfile,
+        this._transfer = new TimeTransferRelation(task, timeProfile,
             new LabeledTransferRelationImpl(null,
             (from, op, co) => wrappedAnalysis.abstractSuccFor(from, op, co)));
     }

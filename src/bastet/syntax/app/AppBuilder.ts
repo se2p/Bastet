@@ -60,6 +60,8 @@ import {ReturnStatement} from "../ast/core/statements/ControlStatement";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {TypeInformationStorage} from "../DeclarationScopes";
 import {Concern, Concerns} from "../Concern";
+import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 export class AppBuilder {
 
@@ -187,6 +189,9 @@ export class AppBuilder {
             // 4. Eliminate epsilon transitions
             methodTr = TransitionRelations.eliminateEpsilons(methodTr);
 
+            // 5. Assign a name to the transition relation
+            methodTr = TransitionRelations.named(methodTr, m.ident.text);
+
             result.push(new Method(m, methodTr));
         }
 
@@ -200,12 +205,14 @@ export class AppBuilder {
     private buildScripts(scriptList: ScriptDefinitionList): Script[] {
         let result: Script[] = [];
         for (let script of scriptList) {
+            const scriptId: Identifier = script.ident;
             const event = script.event;
             const visitor = new RelationBuildingVisitor();
-            const transRelation = TransitionRelations.eliminateEpsilons(
-                script.stmtList.accept(visitor));
+            const transRelation = TransitionRelations.named(
+                TransitionRelations.eliminateEpsilons(
+                    script.stmtList.accept(visitor)), scriptId.text);
 
-            result.push(new Script(Scripts.freshScriptId(), event,
+            result.push(new Script(scriptId, event,
                 this.shouldRestartOnEvent(script, event), transRelation));
         }
 
@@ -251,7 +258,9 @@ export class AppBuilder {
         const compundTransRel = TransitionRelations.eliminateEpsilons(
             TransitionRelations.concat(transrelRes,
                 TransitionRelations.concat(transrelLocs, transrelSet)));
-        return new Script(Scripts.freshScriptId(), BootstrapEvent.instance(), false, compundTransRel);
+
+        const scriptId = Identifier.freshWithPrefix("init");
+        return new Script(scriptId, BootstrapEvent.instance(), false, compundTransRel);
     }
 
     private buildResources(resourceListContext: ResourceDefinitionList): AppResourceMap {
@@ -318,6 +327,9 @@ export class AppBuilder {
         //      inheriting actors?
         const resources = Maps.mergeImmutableMaps(main.resourceMap, secondary.resourceMap);
         const initScript = Scripts.concat(secondary.initScript, main.initScript);
+        // The init script must not use stack variables (only global or actor scoped).
+        this.ensureNoStackVariables(initScript);
+
         const methodDefinitions = Maps.mergeImmutableMaps(main.methodMap, secondary.methodMap);
         const externalMethods = Maps.mergeImmutableMaps(main.externalMethodMap, secondary.externalMethodMap);
         const datalocs = Maps.mergeImmutableMaps(main.datalocMap, secondary.datalocMap);
@@ -352,4 +364,12 @@ export class AppBuilder {
         return new App(taskModel.origin, taskModel.ident, flatActors, taskModel.typeStorage);
     }
 
+    private ensureNoStackVariables(initScript: Script) {
+        for (const [f, o, t] of initScript.transitions.transitions) {
+            const op = ProgramOperation.for(o);
+            if (op instanceof DeclareStackVariableStatement) {
+                throw new IllegalArgumentException();
+            }
+        }
+    }
 }

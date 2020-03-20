@@ -19,7 +19,7 @@
  *
  */
 
-import {MergeOperator, ProgramAnalysis, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
+import {MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
@@ -55,7 +55,7 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
 
     private readonly _abstractDomain: AbstractDomain<ConcreteElement, SSAState>;
 
-    private readonly _wrappedAnalysis: ProgramAnalysis<any, any, F>;
+    private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, AbstractState, F>;
 
     private readonly _transferRelation: SSATransferRelation;
 
@@ -79,7 +79,7 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         this._transferRelation = new SSATransferRelation(wrappedTr);
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
-        this._mergeOp = new SSAMergeOperator(this.wrappedAnalysis, this.wrappedAnalysis);
+        this._mergeOp = new SSAMergeOperator(this._task, this.wrappedAnalysis, this.wrappedAnalysis);
     }
 
     abstractSucc(fromState: SSAState): Iterable<SSAState> {
@@ -127,7 +127,7 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return this._abstractDomain;
     }
 
-    get wrappedAnalysis(): ProgramAnalysis<any, any, F> {
+    get wrappedAnalysis(): ProgramAnalysisWithLabels<any, any, F> {
         return this._wrappedAnalysis;
     }
 

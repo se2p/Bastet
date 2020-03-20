@@ -114,11 +114,11 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
             }
         }
 
-        frontier.removeAll(removeFromReached);
         frontier.addAll(addToReached);
+        frontier.removeAll(removeFromReached);
 
-        reached.removeAll(removeFromReached);
         reached.addAll(addToReached);
+        reached.removeAll(removeFromReached);
 
         return [frontier, reached];
     }

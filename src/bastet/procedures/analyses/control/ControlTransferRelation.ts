@@ -265,6 +265,10 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result;
     }
 
+    private buildScopeStack(actorName: string, relationName: string): ImmList<string> {
+        return ImmList([actorName, relationName]);
+    }
+
     /**
      * Returns either a singleton-list or the empty list.
      */
@@ -281,9 +285,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             const statementTarget = new RelationLocation(threadActor.ident, fromRelation.ident, t.target);
             Preconditions.checkNotUndefined(op);
 
+            const scopeStack: ImmList<string> = this.buildScopeStack(threadActor.ident, fromRelation.name);
+
             result.push(new StepInformation(thread, statementTarget, isAtomic,
-                this.scopeOperations([op], fromState.getActorScopes(), threadState.getScopeStack(), threadState.getScopeStack()),
-                    threadState.getCallStack(), threadState.getScopeStack()));
+                this.scopeOperations([op], fromState.getActorScopes(), scopeStack, scopeStack),
+                    threadState.getCallStack(), scopeStack));
         }
 
         return result;
@@ -455,14 +461,14 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         const stepOp = step.ops[0];
         const steppedActor = this._task.getActorByName(step.steppedThread.threadStatus.getActorId());
         const fromLocation = step.steppedThread.threadStatus.getRelationLocation();
+        const fromRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
 
         // Set the new control location
         let result: ControlAbstractState = fromState.withThreadStateUpdate(threadToStep.threadIndex,
             (ts) =>
                 ts.withLocation(step.succLoc)
                 .withOperations(ImmList(step.ops.map(o => o.ident)))
-                .withCallStack(step.succCallStack)
-                .withScopeStack(step.succScopeStack));
+                .withCallStack(step.succCallStack));
 
         // A new loop iteration? Or a loop iteration ended?
         const predRelLoc = step.steppedThread.threadStatus.getRelationLocation();
@@ -519,20 +525,20 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 const interProcOps: ProgramOperation[] = this.createPassArgumentsOps(calledMethod, stepOp.ast.args);
                 const succCallStack = steppedThread.getCallStack()
                     .push(new MethodCall(fromLocation, step.succLoc));
-                const succScopeStack = steppedThread.getScopeStack().push(calledMethodName);
 
                 const resultList: [ControlAbstractState, boolean][] = [];
 
                 for (const entryLocId of calledMethod.transitions.entryLocationSet) {
                     const callToRelationLoc: RelationLocation = new RelationLocation(
                         steppedActor.ident, calledMethod.transitions.ident, entryLocId);
-                    const currentScopeStack = steppedThread.getScopeStack();
+                    const currentScopeStack = this.buildScopeStack(steppedActor.ident, fromRelation.name);
+                    const succRelation = this._task.getTransitionRelationById(callToRelationLoc.getRelationId());
+                    const succScopeStack = this.buildScopeStack(steppedActor.ident, succRelation.name);
 
                     resultList.push([result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
                         ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.getActorScopes(), currentScopeStack, succScopeStack).map(op => op.ident)))
                             .withLocation(callToRelationLoc)
-                            .withCallStack(succCallStack)
-                            .withScopeStack(succScopeStack)), false]);
+                            .withCallStack(succCallStack)), false]);
                 }
 
                 return resultList;
@@ -542,16 +548,17 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             const steppedThread = threadToStep.threadStatus;
             const callInformation: MethodCall = steppedThread.getCallStack().get(steppedThread.getCallStack().size-1);
             const succReturnCallsTo: ImmList<MethodCall> = steppedThread.getCallStack().pop();
-            const succScopeStack: ImmList<string> = steppedThread.getScopeStack().pop();
+            const succRelation = this._task.getTransitionRelationById(callInformation.getReturnTo().getRelationId());
+            const predScopeStack = this.buildScopeStack(steppedActor.ident, fromRelation.name);
+            const succScopeStack = this.buildScopeStack(steppedActor.ident, succRelation.name);
 
             // Assign the result to the variable that was referenced in the `CallStatement`
             const interProcOps: ProgramOperation[] = this.createStoreCallResultOps(steppedThread, callInformation, stepOp.ast as ReturnStatement);
 
             return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.actorScopes, steppedThread.getScopeStack(), succScopeStack).map(o => o.ident)))
+                ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.actorScopes, predScopeStack, succScopeStack).map(o => o.ident)))
                     .withLocation(callInformation.getReturnTo())
-                    .withCallStack(succReturnCallsTo)
-                    .withScopeStack(succScopeStack)), false]];
+                    .withCallStack(succReturnCallsTo)), false]];
 
         } else if (stepOp.ast instanceof BroadcastMessageStatement) {
             const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
