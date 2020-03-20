@@ -114,11 +114,14 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
             }
         }
 
-        frontier.removeAll(removeFromReached);
-        frontier.addAll(addToReached);
+        console.log("R: " + Array.from(removeFromReached).map(e => e.toString()))
+        console.log("A: " + Array.from(addToReached).map(e => e.toString()))
 
-        reached.removeAll(removeFromReached);
+        frontier.addAll(addToReached);
+        frontier.removeAll(removeFromReached);
+
         reached.addAll(addToReached);
+        reached.removeAll(removeFromReached);
 
         return [frontier, reached];
     }

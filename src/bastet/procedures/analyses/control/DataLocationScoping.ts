@@ -26,7 +26,7 @@ import {
     RenamingTransformerVisitor
 } from "../../../syntax/transformers/RenamingTransformerVisitor";
 import {List as ImmList, Map as ImmMap} from "immutable";
-import {DataLocation, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
+import {DataLocation, TypedDataLocation, VAR_SCOPING_SPLITTER} from "../../../syntax/app/controlflow/DataLocation";
 import {Statement} from "../../../syntax/ast/core/statements/Statement";
 import {Preconditions} from "../../../utils/Preconditions";
 import {extractStringLiteral, StringAttributeOfExpression} from "../../../syntax/ast/core/expressions/StringExpression";
@@ -42,7 +42,7 @@ import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgument
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {TypeInformationStorage} from "../../../syntax/DeclarationScopes";
 
-export const SCOPE_SEPARATOR = "@";
+export const SCOPE_SEPARATOR = VAR_SCOPING_SPLITTER;
 
 export class DataLocationScoper implements DataLocationRenamer {
 
@@ -90,7 +90,7 @@ export class DataLocationScoper implements DataLocationRenamer {
             .reduceToDeclarationScope(readScope, dataLoc)
             .join(SCOPE_SEPARATOR);
 
-        const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + readFromScope;
+        const newIdent: string = readFromScope + SCOPE_SEPARATOR + dataLoc.ident;
         return new TypedDataLocation(newIdent, dataLoc.type);
     }
 
@@ -102,7 +102,7 @@ export class DataLocationScoper implements DataLocationRenamer {
         const writeToScope = this._typeStorage.reduceToDeclarationScope(this._writeToScope, dataLoc)
             .join(SCOPE_SEPARATOR);
 
-        const newIdent: string = dataLoc.ident + SCOPE_SEPARATOR + writeToScope;
+        const newIdent: string = writeToScope + SCOPE_SEPARATOR + dataLoc.ident;
         return new TypedDataLocation(newIdent, dataLoc.type);
     }
 
