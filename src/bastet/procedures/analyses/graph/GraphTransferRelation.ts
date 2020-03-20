@@ -37,7 +37,7 @@ export class GraphTransferRelation implements TransferRelation<GraphAbstractStat
         const result = [];
         const wrappedSuccs = this._wrappedAbstractSucc(fromState.getWrappedState());
         for (const w of wrappedSuccs) {
-            const succState = GraphAbstractStateFactory.withFreshID([fromState.getId()], w);
+            const succState = GraphAbstractStateFactory.withFreshID([fromState.getId()], [], w);
             result.push(succState);
         }
 

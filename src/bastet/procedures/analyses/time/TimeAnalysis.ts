@@ -20,7 +20,7 @@
  */
 
 import {ProgramAnalysis, ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
-import {AbstractElement} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ConcreteElement} from "../../domains/ConcreteElements";
@@ -36,12 +36,12 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
-export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement>
-    implements WrappingProgramAnalysis<C, E>,
+export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
+    implements WrappingProgramAnalysis<C, E, F>,
         Unwrapper<E, E>,
         LabeledTransferRelation<E>{
 
-    private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
+    private readonly _wrappedAnalysis: ProgramAnalysis<any, any, F>;
 
     private readonly _statistics: AnalysisStatistics;
 
@@ -49,7 +49,7 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement>
 
     private readonly _transfer: TimeTransferRelation<any>;
 
-    constructor(wrappedAnalysis: ProgramAnalysisWithLabels<any, any>, statistics: AnalysisStatistics,
+    constructor(wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics,
                 timeProfile: ProgramTimeProfile) {
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
@@ -75,11 +75,15 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement>
         return this._wrappedAnalysis.join(state1, state2);
     }
 
-    merge(state1: E, state2: E): boolean {
+    merge(state1: E, state2: E): E {
         return this._wrappedAnalysis.merge(state1, state2);
     }
 
-    stop(state: E, reached: Iterable<AbstractElement>, unwrapper: (e: AbstractElement) => E): boolean {
+    shouldMerge(state1: E, state2: E): boolean {
+        return this._wrappedAnalysis.shouldMerge(state1, state2);
+    }
+
+    stop(state: E, reached: Iterable<F>, unwrapper: (e: F) => E): boolean {
         return this._wrappedAnalysis.stop(state, reached, unwrapper);
     }
 
@@ -91,8 +95,8 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement>
         return this._wrappedAnalysis.widen(state);
     }
 
-    wrapStateSets(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
-        return this._wrappedAnalysis.wrapStateSets(frontier, reached);
+    createStateSets(): [StateSet<F>, StateSet<F>] {
+        return this._wrappedAnalysis.createStateSets();
     }
 
     get abstractDomain(): AbstractDomain<C, E> {
@@ -103,7 +107,7 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement>
         return this._wrappedAnalysis.refiner;
     }
 
-    get wrappedAnalysis(): ProgramAnalysis<any, any> {
+    get wrappedAnalysis(): ProgramAnalysis<any, any, F> {
         return this._wrappedAnalysis;
     }
 
@@ -111,8 +115,11 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement>
         return e;
     }
 
-    mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): StateSet<E> {
+    mergeInto(state: E, frontier: StateSet<F>, reached: StateSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [StateSet<F>, StateSet<F>] {
         throw new ImplementMeException();
     }
 
+    partitionOf(ofState: E, reached: StateSet<F>): Iterable<F> {
+        return this._wrappedAnalysis.partitionOf(ofState, reached);
+    }
 }

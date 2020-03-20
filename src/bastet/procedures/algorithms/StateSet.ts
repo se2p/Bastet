@@ -128,37 +128,37 @@ export class OrderedStateSet<E extends AbstractElement> extends AbstractStateSet
         return this._states[Symbol.iterator]();
     }
 
-    addRootSates(elements: Iterable<E>) {
+    public addRootSates(elements: Iterable<E>) {
         this._root = new Set(elements);
         this.addAll(elements);
     }
 
-    isRootState(element: E): boolean {
+    public isRootState(element: E): boolean {
         return this._root.has(element);
     }
 
-    getRootStates(): Set<E> {
+    public getRootStates(): Set<E> {
         return this._root;
     }
 
-    add(element: E) {
+    public add(element: E) {
         this._states.add(element);
         this._addedLast = [element];
     }
 
-    getStateSet(inPartitionOf: E): StateSet<E> {
+    public getStateSet(inPartitionOf: E): StateSet<E> {
         return this;
     }
 
-    getAddedLast(): E[] {
+    public getAddedLast(): E[] {
         return this._addedLast;
     }
 
-    isEmpty(): boolean {
+    public isEmpty(): boolean {
         return this._states.size == 0;
     }
 
-    remove(element: E) {
+    public remove(element: E) {
         this._addedLast = this._addedLast.filter((e) => e != element);
         this._states.delete(element);
     }
@@ -172,7 +172,7 @@ export class OrderedStateSet<E extends AbstractElement> extends AbstractStateSet
         }
     }
 
-    getSize(): number {
+    public getSize(): number {
         return this._states.size;
     }
 }

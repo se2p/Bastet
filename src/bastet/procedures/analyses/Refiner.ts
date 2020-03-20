@@ -36,6 +36,12 @@ export interface Unwrapper<E extends AbstractElement, W extends AbstractElement>
 
 }
 
+export interface Wrapper<E extends AbstractElement, W extends AbstractElement> {
+
+    wrap(e: W): E;
+
+}
+
 export class WrappingRefiner<E extends AbstractElement, W extends AbstractElement> implements Refiner<E>{
 
     private readonly _wrapped: Refiner<W>;

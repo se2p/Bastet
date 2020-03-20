@@ -20,7 +20,7 @@
  */
 
 import {AbstractDomain} from "../domains/AbstractDomain";
-import {AbstractElement} from "../../lattices/Lattice";
+import {AbstractElement, AbstractState} from "../../lattices/Lattice";
 import {App} from "../../syntax/app/App";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
@@ -29,32 +29,24 @@ import {Property} from "../../syntax/Property";
 import {StateSet} from "../algorithms/StateSet";
 import {Concern} from "../../syntax/Concern";
 
-export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement>
-   extends AbstractSuccOperator<E>, JoinOperator<E>, TargetOperator<E>, MergeIntoOperator<E>,
-       MergeOperator<E>, StopOperator<E>, WidenOperator<E> {
+export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
+   extends AbstractSuccOperator<E>,
+       JoinOperator<E>, TargetOperator<E>, MergeIntoOperator<E, F>,
+       MergeOperator<E>, StopOperator<E, F>, WidenOperator<E>, PartitionOperator<E, F> {
 
     abstractDomain: AbstractDomain<C, E>;
 
     refiner: Refiner<E>;
 
-    abstractSucc(fromState: E): Iterable<E>;
-
-    merge(state1: E, state2: E): boolean;
-
-    mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): StateSet<E>;
-
-    /** Delegates to `join` of the abstract domain */
-    join(state1: E, state2: E): E;
-
-    stop(state: E, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => E): boolean;
-
-    widen(state: E): E;
-
-    target(state: E): Property[];
-
     initialStatesFor(task: App): E[];
 
-    wrapStateSets(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>];
+    createStateSets(): [StateSet<F>, StateSet<F>];
+
+}
+
+export interface PartitionOperator<E extends AbstractElement, F extends AbstractState> {
+
+    partitionOf(ofState: E, reached: StateSet<F>): Iterable<F>;
 
 }
 
@@ -76,21 +68,23 @@ export interface TargetOperator<E extends AbstractElement> {
 
 }
 
-export interface MergeIntoOperator<E extends AbstractElement> {
+export interface MergeIntoOperator<E extends AbstractElement, F extends AbstractState> {
 
-    mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): StateSet<E>;
+    mergeInto(state: E, frontier: StateSet<F>, reached: StateSet<F>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): [StateSet<F>, StateSet<F>];
 
 }
 
 export interface MergeOperator<E extends AbstractElement> {
 
-    merge(state1: E, state2: E): boolean;
+    shouldMerge(state1: E, state2: E): boolean;
+
+    merge(state1: E, state2: E): E;
 
 }
 
-export interface StopOperator<E extends AbstractElement> {
+export interface StopOperator<E extends AbstractElement, F extends AbstractState> {
 
-    stop(state: E, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => E): boolean;
+    stop(state: E, reached: Iterable<F>, unwrapper: (F) => E): boolean;
 
 }
 
@@ -100,7 +94,8 @@ export interface WidenOperator<E extends AbstractElement> {
 
 }
 
-export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends AbstractElement> extends ProgramAnalysis<C, E> {
+export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
+    extends ProgramAnalysis<C, E, F> {
 
     abstractSuccFor(fromState: E, op: ProgramOperation, co: Concern): Iterable<E>;
 
@@ -112,17 +107,17 @@ export interface TransitionLabelProvider<E extends AbstractElement> {
 
 }
 
-export interface ProgramAnalysisWithLabelProducer<C extends ConcreteElement, E extends AbstractElement>
-    extends ProgramAnalysis<C, E>, TransitionLabelProvider<E> {
+export interface ProgramAnalysisWithLabelProducer<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
+    extends ProgramAnalysis<C, E, F>, TransitionLabelProvider<E> {
 
     getTransitionLabel(from: E, to: E): ProgramOperation[];
 
 }
 
-export interface WrappingProgramAnalysis<C extends ConcreteElement, E extends AbstractElement>
-    extends ProgramAnalysis<C, E> {
+export interface WrappingProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
+    extends ProgramAnalysis<C, E, F> {
 
-    wrappedAnalysis: ProgramAnalysis<any, any>;
+    wrappedAnalysis: ProgramAnalysis<any, any, F>;
 
 }
 

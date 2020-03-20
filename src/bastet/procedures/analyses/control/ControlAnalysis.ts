@@ -39,11 +39,12 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
-import {AbstractElement} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Property} from "../../../syntax/Property";
 import {StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {DataAbstractState} from "../data/DataAbstractDomain";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -57,15 +58,15 @@ export class ControlAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<ControlConcreteState, ControlAbstractState>,
-    WrappingProgramAnalysis<ControlConcreteState, ControlAbstractState>,
+export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<ControlConcreteState, ControlAbstractState, AbstractState>,
+    WrappingProgramAnalysis<ControlConcreteState, ControlAbstractState, AbstractState>,
     Unwrapper<ControlAbstractState, AbstractElement> {
 
     private readonly _config: ControlAnalysisConfig;
 
     private readonly _abstractDomain: AbstractDomain<ControlConcreteState, ControlAbstractState>;
 
-    private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any>;
+    private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>;
 
     private readonly _transferRelation: ControlTransferRelation;
 
@@ -75,7 +76,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
 
     private readonly _statistics: AnalysisStatistics;
 
-    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any>, statistics: AnalysisStatistics) {
+    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>, statistics: AnalysisStatistics) {
         this._config = new ControlAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
@@ -88,14 +89,21 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
-        return this._transferRelation.abstractSucc(fromState);
+        const result: ControlAbstractState[] = [];
+        for (const r of this._transferRelation.abstractSucc(fromState)) {
+            if (!this.steppedOnLoophead(r) || this.refiner.checkIsFeasible(r)) {
+                result.push(r);
+            }
+        }
+
+        return result;
     }
 
     join(state1: ControlAbstractState, state2: ControlAbstractState): ControlAbstractState {
         return this._abstractDomain.lattice.join(state1, state2);
     }
 
-    merge(state1: ControlAbstractState, state2: ControlAbstractState): boolean {
+    shouldMerge(state1: ControlAbstractState, state2: ControlAbstractState): boolean {
         if (!state1.getSteppedFor().equals(state2.getSteppedFor())) {
             return false;
         }
@@ -108,18 +116,32 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
             return false;
         }
 
-        return true;
+
+        return this.wrappedAnalysis.shouldMerge(state1.getWrappedState(), state2.getWrappedState());
+    }
+
+    merge(state1: ControlAbstractState, state2: ControlAbstractState): ControlAbstractState {
+        return state1
+            .withWrappedState(this._wrappedAnalysis.merge(state1.getWrappedState(), state2.getWrappedState()))
+            .withIsTargetFor(state1.getIsTargetFor().union(state2.getIsTargetFor()));
+    }
+
+    mergeInto(state: ControlAbstractState, frontier: StateSet<ControlAbstractState>, reached: StateSet<ControlAbstractState>, unwrapper: (AbstractElement) => ControlAbstractState, wrapper: (E) => AbstractElement): [StateSet<ControlAbstractState>, StateSet<ControlAbstractState>] {
+        throw new ImplementMeException();
     }
 
     stop(state: ControlAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => ControlAbstractState): boolean {
-        // for (const r of reached) {
-        //     if (state.getThreadStates().equals(r.getThreadStates())) {
-        //         const w = state.getWrappedState();
-        //         if (this._wrappedAnalysis.stop(w, [r.getWrappedState()])) {
-        //             return true;
-        //         }
-        //     }
-        // }
+        // TODO: Rewrite this?
+        for (const r of reached) {
+            const cs = unwrapper(r);
+            if (state.getThreadStates().equals(cs.getThreadStates())) {
+                const w = state.getWrappedState();
+                if (this._wrappedAnalysis.stop(w, [cs.getWrappedState()], (e) => this.unwrap(e))) {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
@@ -148,7 +170,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         return this._refiner;
     }
 
-    get wrappedAnalysis(): ProgramAnalysis<any, any> {
+    get wrappedAnalysis(): ProgramAnalysis<any, any, AbstractState> {
         return this._wrappedAnalysis;
     }
 
@@ -193,12 +215,26 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         return `${controlLabel} ${innerLabel}`;
     }
 
-    wrapStateSets(frontier: StateSet<ControlAbstractState>, reached: StateSet<ControlAbstractState>): [StateSet<ControlAbstractState>, StateSet<ControlAbstractState>] {
-        return [frontier, reached];
-    }
-
-    mergeInto(state: ControlAbstractState, reached: StateSet<ControlAbstractState>, unwrapper: (AbstractElement) => ControlAbstractState, wrapper: (E) => AbstractElement): StateSet<ControlAbstractState> {
+    createStateSets(): [StateSet<AbstractState>, StateSet<AbstractState>] {
         throw new ImplementMeException();
     }
 
+    partitionOf(ofState: ControlAbstractState, reached: StateSet<AbstractState>): Iterable<AbstractState> {
+        return this.wrappedAnalysis.partitionOf(ofState, reached);
+    }
+
+    private steppedOnLoophead(r: ControlAbstractState) {
+        const steppedThreads = r.getSteppedFor().map((i) => r.getIndexedThreadState(i));
+
+        for (const t of steppedThreads) {
+            const ts = t.threadStatus;
+            const actor = this._task.getActorByName(ts.getActorId());
+            const script = actor.getScript(ts.getScriptId());
+            if (script.transitions.isLoopHead(ts.getRelationLocation().getLocationId())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

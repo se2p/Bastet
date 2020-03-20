@@ -183,6 +183,9 @@ export interface ThreadStateAttributes {
     /** Stack of method call and return locations to enable the inter-procedural analysis */
     callStack: ImmList<MethodCall>;
 
+    /** Stack of loop bodies entered (represented by the loop head location) */
+    loopStack: ImmList<RelationLocation>;
+
     /** Scope to uniquely identify currently declared and references variables (data locations) */
     scopeStack: ImmList<string>;
 
@@ -201,6 +204,7 @@ const ThreadStateRecord = ImmRec({
     waitingForThreads: ImmSet<ThreadId>(),
     failedFor: ImmSet<Property>(),
     callStack: ImmList<MethodCall>(),
+    loopStack: ImmList<RelationLocation>(),
     scopeStack: ImmList<string>(),
     inAtomicMode: 0
 });
@@ -209,11 +213,11 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, operations: ImmList<OperationId>,
                 location: RelationLocation, compState: ThreadComputationState, waitingForThreads: ImmSet<ThreadId>,
-                failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, scopeStack: ImmList<string>,
-                actorScopes: ImmMap<TypedDataLocation, string>,  inAtomicMode: number) {
+                failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, loopStack: ImmList<RelationLocation>,
+                scopeStack: ImmList<string>, actorScopes: ImmMap<TypedDataLocation, string>,  inAtomicMode: number) {
         super({threadId: threadId, actorId: actorId, scriptId: scriptId, operations: operations, location: location,
             computationState: compState, waitingForThreads: waitingForThreads, failedFor: failedFor,
-            callStack: callStack, scopeStack: scopeStack, inAtomicMode: inAtomicMode});
+            callStack: callStack, loopStack: loopStack, scopeStack: scopeStack, inAtomicMode: inAtomicMode});
     }
 
     public getInAtomicMode(): number {
@@ -242,6 +246,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     public getCallStack(): ImmList<MethodCall> {
         return this.get('callStack');
+    }
+
+    public getLoopStack(): ImmList<RelationLocation> {
+        return this.get('loopStack');
     }
 
     public getScopeStack(): ImmList<string> {
@@ -274,6 +282,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     public withOperations(value: ImmList<OperationId>): ThreadState {
         return this.set('operations', value);
+    }
+
+    public withLoopStack(value: ImmList<RelationLocation>): ThreadState {
+        return this.set('loopStack', value);
     }
 
     public withCallStack(value: ImmList<MethodCall>): ThreadState {
@@ -342,7 +354,7 @@ const ControlAbstractStateRecord = ImmRec({
 
     actorScopes: ImmMap<DataLocation, ActorId>(),
 
-    isTargetFor: ImmSet<Property>()
+    isTargetFor: ImmSet<Property>(),
 
 });
 
@@ -481,7 +493,7 @@ export class ScheduleAbstractStateFactory {
                 for (const locId of script.transitions.entryLocationSet) {
                     const loc: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, locId);
                     threads = threads.push(new ThreadState(threadId, actor.ident, script.id, ImmList(),
-                        loc, threadState, ImmSet(), ImmSet(), ImmList(),
+                        loc, threadState, ImmSet(), ImmSet(), ImmList(), ImmList(),
                         ImmList([actor.ident]), ImmMap(), 0));
                 }
             }
@@ -508,7 +520,19 @@ export class ControlLattice implements Lattice<ControlAbstractState> {
     }
 
     join(element1: ControlAbstractState, element2: ControlAbstractState): ControlAbstractState {
-        throw new ImplementMeException();
+        if (!element1.getThreadStates().equals(element2.getThreadStates())) {
+            return this.top();
+        }
+
+        if (!element1.getActorScopes().equals(element2.getActorScopes())) {
+            return this.top();
+        }
+
+        Preconditions.checkArgument(element1.getSteppedFor().equals(element2.getSteppedFor()));
+
+        return element1
+            .withWrappedState(this._wrapped.join(element1.getWrappedState(), element2.getWrappedState()))
+            .withIsTargetFor(element1.getIsTargetFor().union(element2.getIsTargetFor()));
     }
 
     meet(element1: ControlAbstractState, element2: ControlAbstractState): ControlAbstractState {

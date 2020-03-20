@@ -64,6 +64,10 @@ export class BDDLattice implements LatticeWithComplements<BDD> {
     }
 
     join(element1: BDD, element2: BDD): BDD {
+        if (element1 === this._top || element2 === this._top) {
+            return this._top;
+        }
+
         throw new ImplementMeException();
     }
 
