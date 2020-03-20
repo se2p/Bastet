@@ -28,6 +28,8 @@ import {Refiner} from "./Refiner";
 import {Property} from "../../syntax/Property";
 import {StateSet} from "../algorithms/StateSet";
 import {Concern} from "../../syntax/Concern";
+import {LabeledTransition} from "./graph/GraphPath";
+import {LabeledTransferRelation} from "./TransferRelation";
 
 export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
    extends AbstractSuccOperator<E>,
@@ -95,7 +97,7 @@ export interface WidenOperator<E extends AbstractElement> {
 }
 
 export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
-    extends ProgramAnalysis<C, E, F> {
+    extends ProgramAnalysis<C, E, F>, LabeledTransferRelation<E> {
 
     abstractSuccFor(fromState: E, op: ProgramOperation, co: Concern): Iterable<E>;
 

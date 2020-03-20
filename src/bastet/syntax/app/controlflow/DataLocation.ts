@@ -28,6 +28,8 @@ export type DataLocationID = string;
 
 export type DataLocationMap = { [id:string]: TypedDataLocation } ;
 
+export const VAR_SCOPING_SPLITTER = "@";
+
 export interface DataLocation {
 
     type: ScratchTypeID;
@@ -108,7 +110,7 @@ export class TypedDataLocation extends TypedDataLocationRecord implements TypedD
 export class VersionedDataLocation extends VersionedDataLocationRecord implements StaticDataLocationAttributes {
 
     constructor(ident: string, type: ScratchTypeID, version: number) {
-        const qualifiedName = `${ident}@${version}`
+        const qualifiedName = `${ident}${VAR_SCOPING_SPLITTER}${version}`
         super({ident: ident, qualifiedName: qualifiedName, type: type, version: version});
     }
 

@@ -407,7 +407,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         this._typeStorage = Preconditions.checkNotUndefined(typeInformationStorage);
 
         this._typeStack = new Array<ScratchType>();
-        this._activeDeclarationScope = null;
+        this._activeDeclarationScope = typeInformationStorage.getSystemScope();
         this._actorScope = false;
     }
 
@@ -633,6 +633,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         // Identifier and inheritance information
         const ident = ctx.ident().accept(this).nodeOnly() as Identifier;
         const inheritesFrom: InheritsFromList = ctx.inheritsFrom().accept(this).nodeOnly();
+        this._activeDeclarationScope.putTypeInformation(ident, ActorType.instance());
 
         // Role
         const actorMode: ActorMode = ctx.actorMode().accept(this).nodeOnly();
