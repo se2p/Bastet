@@ -138,7 +138,9 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
     }
 
     join(element1: GraphAbstractState, element2: GraphAbstractState): GraphAbstractState {
-        throw new ImplementMeException();
+        return GraphAbstractStateFactory.withFreshID(
+            element1.getPredecessors().union(element2.getPredecessors()),
+            this._wrappedLattice.join(element1.getWrappedState(), element2.getWrappedState()));
     }
 
     meet(element1: GraphAbstractState, element2: GraphAbstractState): GraphAbstractState {
