@@ -52,6 +52,8 @@ export class TransitionRelationBuilder {
 
     private _hasNoLoop: boolean;
 
+    private _name : string;
+
     public constructor() {
         this._entryLocations = new Set();
         this._exitLocations = new Set();
@@ -59,6 +61,12 @@ export class TransitionRelationBuilder {
         this._transitions = new Map();
         this._locations = new Map();
         this._hasNoLoop = false;
+        this._name = null;
+    }
+
+    public setName(name: string): this {
+        this._name = name;
+        return this;
     }
 
     public addEntryLocationWithID(id: LocationId): this {
@@ -166,7 +174,7 @@ export class TransitionRelationBuilder {
             transitions = transitions.set(fromID, fromMap);
         }
 
-        return new TransitionRelation(transitions, locations, entryLocs, exitLocs, loopHeads);
+        return new TransitionRelation(transitions, locations, entryLocs, exitLocs, loopHeads, this._name);
     }
 
     connectLocations(fromLocations: Iterable<LocationId>, toLocations: Iterable<LocationId>): this {
@@ -255,6 +263,8 @@ export class TransitionRelation {
 
     private readonly _ident: TransRelId;
 
+    private readonly _name: string;
+
     private readonly _transitions: TransitionTable;
 
     private readonly _locations: ImmSet<LocationId>;
@@ -281,9 +291,15 @@ export class TransitionRelation {
 
     constructor(transitions: TransitionTable, locations: ImmSet<LocationId>,
                 entryLocs: ImmSet<LocationId>, exitLocs: ImmSet<LocationId>,
-                loopHeads?: ImmSet<LocationId>) {
+                loopHeads?: ImmSet<LocationId>, name?: string) {
         TransitionRelation.TRANS_REL_ID_SEQ = (TransitionRelation.TRANS_REL_ID_SEQ || 0) + 1;
         this._ident = TransitionRelation.TRANS_REL_ID_SEQ;
+
+        if (name) {
+            this._name = name;
+        } else {
+            this._name = this._ident.toString();
+        }
 
         this._transitions = Preconditions.checkNotUndefined(transitions);
         this._locations = Preconditions.checkNotUndefined(locations);
@@ -306,6 +322,10 @@ export class TransitionRelation {
             }
         }
         return lines.join("\n");
+    }
+
+    get name(): string {
+        return this._name;
     }
 
     private buildBackwardsTransitions(): void {
@@ -612,6 +632,12 @@ export class LocationEquivalence {
 }
 
 export class TransitionRelations {
+
+    static named(tr: TransitionRelation, name: string): TransitionRelation {
+        Preconditions.checkNotUndefined(tr);
+        Preconditions.checkNotEmpty(name);
+        return new TransitionRelation(tr.transitionTable, tr.locationSet, tr.entryLocationSet, tr.exitLocationSet, tr.loopHeads, name);
+    }
 
     /**
      * ATTENTION: The transition relation `tr2` is not re-labeled by this method.

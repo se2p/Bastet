@@ -66,7 +66,7 @@ export class AnalysisProcedureFactory {
 
                 const dataAnalysis = new DataAnalysis(config, firstOrderLattice, bddlib.lattice, theories, this._statistics);
                 const ssaAnalysis = new SSAAnalysis(config, task, dataAnalysis, this._statistics);
-                const timeAnalysis = new TimeAnalysis(ssaAnalysis, this._statistics, new StaticTimeProfile());
+                const timeAnalysis = new TimeAnalysis(task, ssaAnalysis, this._statistics, new StaticTimeProfile());
                 const controlAnalysis = new ControlAnalysis(config, task, timeAnalysis, this._statistics);
                 const graphAnalysis = new GraphAnalysis(config, task, controlAnalysis, this._statistics);
                 const outerAnalysis = new StatsAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>(graphAnalysis, this._statistics);

@@ -26,4 +26,9 @@ export class EpsilonStatement extends Statement {
     constructor() {
         super([]);
     }
+
+    toTreeString(): string {
+        return this.constructor.name;
+    }
+
 }

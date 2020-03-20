@@ -27,9 +27,10 @@ import {IllegalArgumentException} from "../core/exceptions/IllegalArgumentExcept
 import {Preconditions} from "../utils/Preconditions";
 import {MethodSignature} from "./ast/core/MethodDefinition";
 import {VariableWithDataLocation} from "./ast/core/Variable";
-import {DataLocation, DataLocations} from "./app/controlflow/DataLocation";
+import {DataLocation, DataLocations, VAR_SCOPING_SPLITTER} from "./app/controlflow/DataLocation";
 import {List as ImmList} from "immutable";
 import {ImplementMeException} from "../core/exceptions/ImplementMeException";
+import {IllegalStateException} from "../core/exceptions/IllegalStateException";
 
 export enum DeclarationScopeType {
     UNDECLARED,
@@ -219,6 +220,19 @@ export class ScopeTypeInformation extends ScopeTreeNode<ScopeTypeInformation> {
         return result;
     }
 
+    dump() {
+        for (const m of Object.keys(this.methods)) {
+            console.log(m);
+        }
+        for (const v of Object.keys(this.variables)) {
+            console.log(v);
+        }
+        for (const c of Object.keys(this.childs)) {
+            console.log(`------ ${c} ----`);
+            this.findChild(c).dump();
+        }
+    }
+
 }
 
 export class TypeInformationStorage implements TypeInformationProvider {
@@ -277,7 +291,7 @@ export class TypeInformationStorage implements TypeInformationProvider {
             actorScopeType = actorScope.findTypeOf(ident);
 
             if (usageScope.size > 1) {
-                const methodScope = actorScope.findChild(usageScope.get(1));
+                const methodScope = actorScope.getChildScope(usageScope.get(1), DeclarationScopeType.METHOD);
                 Preconditions.checkNotUndefined(methodScope, `No scope information for ${usageScope.get(1)}`);
                 methodScopeType = methodScope.findTypeOf(ident);
             }
@@ -297,4 +311,44 @@ export class TypeInformationStorage implements TypeInformationProvider {
         }
     }
 
+    getTypedLocation(key: string): DataLocation {
+        const type = this.lookupTyped(key);
+        return DataLocations.createTypedLocation(Identifier.of(key), type);
+    }
+
+    lookupTyped(key: string): ScratchType {
+        const splitted = key.split(VAR_SCOPING_SPLITTER).reverse();
+        const varId = Identifier.of(splitted[0]);
+        const scopeOf = this.getScopeOf(key);
+        return scopeOf.getTypeOf(varId);
+    }
+
+    getScopeOf(key: string): ScopeTypeInformation {
+        // Example for `key`: var1@Actor1
+        const splitted = key.split(VAR_SCOPING_SPLITTER).reverse();
+
+        if (splitted.length == 1) {
+            // var1
+            return this._systemScope;
+
+        } else if (splitted.length == 2) {
+            // var1@Actor1
+            const actorId = splitted[1];
+            return this._systemScope.getChildScope(actorId, DeclarationScopeType.ACTOR);
+
+        } else if (splitted.length == 3) {
+            // var1@method1@Actor1
+            const methodId = splitted[1];
+            const actorId = splitted[2];
+            const actorScope = this._systemScope.getChildScope(actorId, DeclarationScopeType.ACTOR);
+            return actorScope.getChildScope(methodId, DeclarationScopeType.METHOD);
+
+        } else {
+            throw new IllegalStateException();
+        }
+    }
+
+    dump(): void {
+        this._systemScope.dump();
+    }
 }

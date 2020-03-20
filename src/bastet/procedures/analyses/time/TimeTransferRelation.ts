@@ -55,8 +55,11 @@ import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/Bro
 import {BOOTSTRAP_MESSAGE} from "../../../syntax/ast/core/Message";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
+import {App} from "../../../syntax/app/App";
 
 export class TimeTransferRelation<W extends AbstractElement> implements LabeledTransferRelation<W> {
+
+    private readonly _task: App;
 
     private readonly _wrappedTransfer: LabeledTransferRelation<W>;
 
@@ -68,7 +71,8 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
     private readonly _globalMillisExpr: NumberExpression;
     private readonly _globalSecondsExpr: NumberExpression;
 
-    constructor(timeProfile: ProgramTimeProfile, wrappedTransfer: LabeledTransferRelation<W>) {
+    constructor(task: App, timeProfile: ProgramTimeProfile, wrappedTransfer: LabeledTransferRelation<W>) {
+        this._task = Preconditions.checkNotUndefined(task);
         this._timeProfile = Preconditions.checkNotUndefined(timeProfile);
         this._wrappedTransfer = Preconditions.checkNotUndefined(wrappedTransfer);
 
@@ -76,6 +80,9 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
             DataLocations.createTypedLocation(new Identifier("__global_time_micros"), NumberType.instance()));
         this._globalTimeResetMicrosVariable = new VariableWithDataLocation(
             DataLocations.createTypedLocation(new Identifier("__global_reset_micros"), NumberType.instance()));
+
+        this._task.typeStorage.getScopeOf(this._globalTimeMicrosVariable.qualifiedName).putVariable(this._globalTimeMicrosVariable);
+        this._task.typeStorage.getScopeOf(this._globalTimeResetMicrosVariable.qualifiedName).putVariable(this._globalTimeResetMicrosVariable);
 
         this._globalMicrosExpr = this._globalTimeMicrosVariable;
         this._globalMillisExpr = new DivideExpression(this._globalTimeMicrosVariable, NumberLiteral.of(1000));
@@ -114,6 +121,8 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
                 const opTimeVariable: VariableWithDataLocation = new VariableWithDataLocation(
                     DataLocations.createTypedLocation(Identifier.freshWithPrefix("__op_time_"), NumberType.instance()));
                 const opTimeVariableExpr: NumberVariableExpression = new NumberVariableExpression(opTimeVariable);
+
+                this._task.typeStorage.getScopeOf(opTimeVariable.qualifiedName).putVariable(opTimeVariable);
 
                 const assumeTimeMin = new NumGreaterEqualExpression(opTimeVariableExpr, minTimeMicrosExpr);
                 const assumeTimeMax = new NumLessEqualExpression(opTimeVariableExpr, maxTimeMicrosExpr);

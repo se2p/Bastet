@@ -52,7 +52,7 @@ export class GraphToDot  {
     }
 
     private writeState(e: GraphAbstractState) {
-        const stateLabel = e.accept(new StateLabelVisitor(this._task));
+        const stateLabel = GraphToDot.escapeForDot(e.accept(new StateLabelVisitor(this._task)));
         const stateColor = e.accept(new StateColorVisitor());
         const pensize = e.accept(new PenSizeVisitor());
         this._dot.push(`    ${e.getId()} [label="${stateLabel}" penwidth=${pensize} color="black" fillcolor="${stateColor}"];`);
