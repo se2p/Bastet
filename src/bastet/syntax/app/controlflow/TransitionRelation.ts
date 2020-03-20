@@ -23,8 +23,11 @@ import {OperationId, ProgramOperation, ProgramOperations} from "./ops/ProgramOpe
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ControlLocation, LocationId} from "./ControlLocation";
-import {Map as ImmMap, Set as ImmSet} from "immutable"
+import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
 import {Preconditions} from "../../../utils/Preconditions";
+import {ControlDominance, DominanceMode} from "./Dominators";
+
+const toposort = require('toposort');
 
 export type TargetId = LocationId;
 export type SourceId = LocationId;
@@ -45,11 +48,17 @@ export class TransitionRelationBuilder {
 
     private readonly _exitLocations: Set<LocationId>;
 
+    private readonly _loopHeads: Set<LocationId>;
+
+    private _hasNoLoop: boolean;
+
     public constructor() {
         this._entryLocations = new Set();
         this._exitLocations = new Set();
+        this._loopHeads = new Set();
         this._transitions = new Map();
         this._locations = new Map();
+        this._hasNoLoop = false;
     }
 
     public addEntryLocationWithID(id: LocationId): this {
@@ -69,6 +78,17 @@ export class TransitionRelationBuilder {
 
     public addExitLocation(loc: ControlLocation): this {
         this._exitLocations.add(loc.ident);
+        this.addLocation(loc);
+        return this;
+    }
+
+    public signalHasNoLoop(): this {
+        this._hasNoLoop = true;
+        return this;
+    }
+
+    public addLoopHead(loc: ControlLocation): this {
+        this._loopHeads.add(loc.ident);
         this.addLocation(loc);
         return this;
     }
@@ -124,6 +144,18 @@ export class TransitionRelationBuilder {
         let entryLocs: ImmSet<LocationId> = ImmSet(this._entryLocations);
         let exitLocs: ImmSet<LocationId> = ImmSet(this._exitLocations);
 
+        let loopHeads: ImmSet<LocationId> = null;
+        if (this._hasNoLoop) {
+            Preconditions.checkState(this._loopHeads.size == 0);
+            loopHeads = ImmSet();
+        } else {
+            if (this._loopHeads.size > 0) {
+                loopHeads = ImmSet(this._loopHeads);
+            } else {
+                loopHeads = null;
+            }
+        }
+
         let transitions: TransitionTable = ImmMap();
         for(let [fromID, fwdTargetMap] of this._transitions.entries()) {
             let fromMap: ImmMap<LocationId, ImmSet<OperationId>> = ImmMap();
@@ -134,7 +166,7 @@ export class TransitionRelationBuilder {
             transitions = transitions.set(fromID, fromMap);
         }
 
-        return new TransitionRelation(transitions, locations, entryLocs, exitLocs);
+        return new TransitionRelation(transitions, locations, entryLocs, exitLocs, loopHeads);
     }
 
     connectLocations(fromLocations: Iterable<LocationId>, toLocations: Iterable<LocationId>): this {
@@ -170,7 +202,54 @@ export class TransitionTo {
     }
 }
 
+export class Transition extends TransitionTo {
+
+    private readonly _source: LocationId;
+
+    constructor(from: LocationId, op: OperationId, to: LocationId) {
+        super(op, to);
+        this._source = from;
+    }
+
+    get source(): number {
+        return this._source;
+    }
+}
+
 export type TransRelId = number;
+
+export class TransitionLoop {
+
+    private readonly _loopHead: LocationId;
+
+    private readonly _bodyNodes: ImmSet<LocationId>;
+
+    private readonly _nestedLoops: ImmList<TransitionLoop>;
+
+    constructor(loopHead: LocationId, loopNodes: Iterable<LocationId>, nestedLoops: Iterable<TransitionLoop>) {
+        this._loopHead = loopHead;
+        this._bodyNodes = ImmSet(loopNodes);
+        this._nestedLoops = ImmList(nestedLoops);
+        // ATTENTION: The loop head must not be element of `loopNodes`!
+        Preconditions.checkArgument(!this._bodyNodes.has(loopHead));
+    }
+
+    get loopHead(): number {
+        return this._loopHead;
+    }
+
+    get bodyNodes(): ImmSet<LocationId> {
+        return this._bodyNodes;
+    }
+
+    get nestedLoops(): Iterable<TransitionLoop> {
+        return this._nestedLoops;
+    }
+
+    public toString(): string {
+        return `${this.loopHead} ${this.bodyNodes}, ${this.nestedLoops}`;
+    }
+}
 
 export class TransitionRelation {
 
@@ -184,12 +263,25 @@ export class TransitionRelation {
 
     private readonly _exitLocations: ImmSet<LocationId>;
 
+    private _loopHeads: ImmSet<LocationId>;
+
+    private _loops: ImmList<TransitionLoop>;
+
+    private _inBodyOfLoop: ImmMap<LocationId, TransitionLoop>;
+
+    private _dom: ControlDominance;
+
     private _backwards: TransitionRelation = null;
+
+    private _backEdges: ImmList<Transition>;
+
+    private _flatTransitions: ImmList<[LocationId, OperationId, LocationId]>;
 
     private readonly _closureTerminators: Map<LocationId, ImmSet<LocationId>>;
 
     constructor(transitions: TransitionTable, locations: ImmSet<LocationId>,
-                entryLocs: ImmSet<LocationId>, exitLocs: ImmSet<LocationId>) {
+                entryLocs: ImmSet<LocationId>, exitLocs: ImmSet<LocationId>,
+                loopHeads?: ImmSet<LocationId>) {
         TransitionRelation.TRANS_REL_ID_SEQ = (TransitionRelation.TRANS_REL_ID_SEQ || 0) + 1;
         this._ident = TransitionRelation.TRANS_REL_ID_SEQ;
 
@@ -197,6 +289,8 @@ export class TransitionRelation {
         this._locations = Preconditions.checkNotUndefined(locations);
         this._entryLocations = Preconditions.checkNotUndefined(entryLocs);
         this._exitLocations = Preconditions.checkNotUndefined(exitLocs);
+
+        this._loopHeads = loopHeads;
 
         entryLocs.forEach((l) => Preconditions.checkArgument(this._locations.contains(l)));
         this._closureTerminators = new Map();
@@ -235,6 +329,19 @@ export class TransitionRelation {
         this._backwards = builder.build();
     }
 
+    get transitions(): ImmList<[LocationId, OperationId, LocationId]> {
+        if (!this._flatTransitions) {
+            const flatTransitions = [];
+            for (const from of this._transitions.keys()) {
+                for (const tr of this.transitionsFrom(from)) {
+                    flatTransitions.push([from, tr.opId, tr.target]);
+                }
+            }
+            this._flatTransitions = ImmList(flatTransitions);
+        }
+        return this._flatTransitions;
+    }
+
     get backwards(): TransitionRelation {
         this.buildBackwardsTransitions();
         return this._backwards;
@@ -248,12 +355,108 @@ export class TransitionRelation {
         throw new ImplementMeException();
     }
 
+    get dominance(): ControlDominance {
+        if (!this._dom) {
+            this._dom = new ControlDominance(this, DominanceMode.FORWARDS);
+            this._dom.computeDominators();
+        }
+
+        return this._dom;
+    }
+
+    public getIsInLoopBodyOf(loc: LocationId): TransitionLoop {
+        Preconditions.checkNotUndefined(this.getLoops());
+        Preconditions.checkNotUndefined(this._inBodyOfLoop);
+        return this._inBodyOfLoop.get(loc);
+    }
+
+    public getLoops(): ImmList<TransitionLoop> {
+        if (!this._loops) {
+            const result: TransitionLoop[] = [];
+            const inLoopBodyOf: Map<LocationId, TransitionLoop> = new Map();
+            const loopDominates: [LocationId, LocationId][] = [];
+            for (const l of this.loopHeads) {
+                for (const m of this.loopHeads) {
+                    if (this.dominance.isDominatedBy(l, m)) {
+                        if (l != m) {
+                            loopDominates.push([m, l]);
+                        }
+                    }
+                }
+            }
+
+            // Inner loops first
+            const sorted = toposort(loopDominates).reverse();
+            for (const loopHead of sorted) {
+                const bodyNodes: Set<LocationId> = new Set();
+                const nestedIn: Set<TransitionLoop> = new Set();
+                for (const t of this.getBackEdges()) {
+                    if (t.target == loopHead) {
+                        const toAdd = this.collectNodesBackwardsFromReaching(t.source, t.target);
+                        toAdd.forEach((l) => bodyNodes.add(l));
+                        for (const l of toAdd) {
+                            const nestedBody = inLoopBodyOf.get(l);
+                            if (nestedBody) {
+                                nestedIn.add(nestedBody);
+                            }
+                        }
+                    }
+                }
+
+                const loop = new TransitionLoop(loopHead, bodyNodes, nestedIn);
+                result.push(loop);
+
+                for (const l of loop.bodyNodes) {
+                    inLoopBodyOf.set(l, loop);
+                }
+            }
+
+            this._loops = ImmList(result);
+            this._inBodyOfLoop = ImmMap(inLoopBodyOf);
+        }
+
+        return this._loops;
+    }
+
+    private collectNodesBackwardsFromReaching(source: LocationId, target: LocationId): Set<LocationId> {
+        const result: Set<LocationId> = new Set();
+
+        const worklist: Array<LocationId> = new Array<LocationId>();
+        worklist.push(source);
+
+        while (worklist.length > 0) {
+            const work = worklist.pop();
+            if (!result.has(work)) {
+                if (target != work) {
+                    result.add(work);
+                    const tset = this.transitionsTo(work);
+                    for (const t of tset) {
+                        worklist.push(t.target);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    get loopHeads(): ImmSet<LocationId> {
+        if (!this._loopHeads) {
+            this._loopHeads = this.computeNaturalLoopHeads();
+        }
+        return this._loopHeads;
+    }
+
+    public isLoopHead(loc: LocationId): boolean {
+        return this.loopHeads.contains(loc);
+    }
+
     get locationSet(): ImmSet<LocationId> {
         return this._locations;
     }
 
-    get entryLocations(): IterableIterator<ControlLocation> {
-        throw new ImplementMeException();
+    get entryLocations(): Iterable<ControlLocation> {
+        return this._entryLocations.map((lid) => ControlLocation.for(lid));
     }
 
     get entryLocationSet(): ImmSet<LocationId> {
@@ -340,6 +543,40 @@ export class TransitionRelation {
     get ident(): TransRelId {
         return this._ident;
     }
+
+    private getBackEdges(): ImmList<Transition> {
+        if (!this._backEdges) {
+            const result: Transition[] = [];
+
+            for (const [from, op, to] of this.transitions) {
+                const isBackEdge = this.dominance.getDfsNumber(from) > this.dominance.getDfsNumber(to);
+                if (isBackEdge) {
+                    result.push(new Transition(from, op, to));
+                }
+            }
+
+            this._backEdges = ImmList(result);
+        }
+
+        return this._backEdges;
+    }
+
+    /**
+     * A loop head is the successor node v of a back-edge (u->v)
+     * and dominates the predecessor node (u).
+     */
+    private computeNaturalLoopHeads(): ImmSet<LocationId> {
+        const result = new Set<LocationId>();
+
+        this.getBackEdges().forEach(t => {
+            if (this.dominance.isDominatedBy(t.source, t.target)) {
+                result.add(t.target);
+            }
+        });
+
+        return ImmSet<LocationId>(result);
+    }
+
 }
 
 export class LocationEquivalence {

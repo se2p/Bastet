@@ -19,7 +19,7 @@
  *
  */
 
-import {AbstractElement} from "../../lattices/Lattice";
+import {AbstractElement, AbstractState} from "../../lattices/Lattice";
 import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 import {ChooseOperator, StateSet} from "./StateSet";
 import {Preconditions} from "../../utils/Preconditions";
@@ -53,9 +53,9 @@ export class ReachabilityAlgorithmConfig extends BastetConfiguration {
  * reachability algorithm that can be found in the CPA framework;
  * nevertheless, our implementation has important differences.
  */
-export class ReachabilityAlgorithm<C extends ConcreteElement, E extends AbstractElement> implements AnalysisAlgorithm<C, E> {
+export class ReachabilityAlgorithm<C extends ConcreteElement, E extends AbstractState> implements AnalysisAlgorithm<C, E> {
 
-    private readonly _analysis: ProgramAnalysis<C, E>;
+    private readonly _analysis: ProgramAnalysis<C, E, E>;
     private readonly _chooseOp: ChooseOperator<E>;
     private readonly _statistics: AnalysisStatistics;
     private readonly _config: ReachabilityAlgorithmConfig;
@@ -68,7 +68,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
     private _lastTimeForSucc: number;
     private _lastTimeForWiden: number;
 
-    constructor(config: {}, analysis: ProgramAnalysis<C, E>, chooseOp: ChooseOperator<E>, statistics: AnalysisStatistics) {
+    constructor(config: {}, analysis: ProgramAnalysis<C, E, E>, chooseOp: ChooseOperator<E>, statistics: AnalysisStatistics) {
         this._config = new ReachabilityAlgorithmConfig(config);
         this._analysis = Preconditions.checkNotUndefined(analysis);
         this._chooseOp = Preconditions.checkNotUndefined(chooseOp);
@@ -82,7 +82,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
         this._lastTimeForWiden = 0;
     }
 
-    get analysis(): ProgramAnalysis<C, E> {
+    get analysis(): ProgramAnalysis<C, E, E> {
         return this._analysis;
     }
 
@@ -105,7 +105,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
                 const ePrimePrime: E = this._analysis.widen(ePrime);
 
                 // MERGE: If desired, merge certain states
-                reached = this._analysis.mergeInto(ePrimePrime, reached, (s) => s, (s) => s);
+                [frontier, reached] = this._analysis.mergeInto(ePrimePrime, frontier, reached, (s) => s, (s) => s);
 
                 // STOP: Check for coverage (fixed point iteration)
                 const checkStopFor: E = ePrimePrime; // TODO: How does this interact with the 'merge' above
@@ -132,7 +132,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
         this._statistics.put(STAT_KEY_REACH_REACHED, reached.getSize());
         this._statistics.put(STAT_KEY_REACH_FRONTIER, frontier.getSize());
 
-        const statAnalysis: StatsAnalysis<any, any> = this._analysis as StatsAnalysis<any, any>;
+        const statAnalysis: StatsAnalysis<any, any, E> = this._analysis as StatsAnalysis<any, any, E>;
 
         const elapsed = performance.now() - this._lastOutputTime;
         if (elapsed > 10000) {

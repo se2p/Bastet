@@ -20,7 +20,7 @@
  */
 
 import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
-import {AbstractElement} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ConcreteElement} from "../../domains/ConcreteElements";
@@ -31,10 +31,10 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper} from "../Refiner";
 import {GraphAbstractState} from "../graph/GraphAbstractDomain";
 
-export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
-    implements WrappingProgramAnalysis<C, E>, Unwrapper<E, E> {
+export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F extends AbstractState>
+    implements WrappingProgramAnalysis<C, E, F>, Unwrapper<E, E> {
 
-    private readonly _wrappedAnalysis: ProgramAnalysis<any, any>;
+    private readonly _wrappedAnalysis: ProgramAnalysis<any, any, F>;
 
     private readonly _statistics: AnalysisStatistics;
     private readonly _succStats: AnalysisStatistics;
@@ -46,7 +46,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
     private readonly _otherStats: AnalysisStatistics;
     private readonly _joinStats: AnalysisStatistics;
 
-    constructor(wrappedAnalysis: ProgramAnalysis<any, any>, statistics: AnalysisStatistics) {
+    constructor(wrappedAnalysis: ProgramAnalysis<any, any, F>, statistics: AnalysisStatistics) {
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);
         this._succStats = this._statistics.withContext("abstractSucc");
         this._widenStats = this._statistics.withContext("widening");
@@ -78,21 +78,27 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
         });
     }
 
-    merge(state1: E, state2: E): boolean {
+    merge(state1: E, state2: E): E {
         return this._mergeStats.runWithTimer(() => {
             return this._wrappedAnalysis.merge(state1, state2);
         });
     }
 
-    stop(state: E, reached: Iterable<AbstractElement>, unwrapper: (E) => E): boolean {
+    shouldMerge(state1: E, state2: E): boolean {
+        return this._mergeStats.runWithTimer(() => {
+            return this._wrappedAnalysis.shouldMerge(state1, state2);
+        });
+    }
+
+    stop(state: E, reached: Iterable<F>, unwrapper: (F) => E): boolean {
         return this._stopStats.runWithTimer(() => {
             return this._wrappedAnalysis.stop(state, reached, (e) => this.unwrap(unwrapper(e)));
         });
     }
 
-    mergeInto(state: E, reached: StateSet<E>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): StateSet<E> {
+    mergeInto(state: E, frontier: StateSet<F>, reached: StateSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [StateSet<F>, StateSet<F>] {
         return this._mergeIntoStats.runWithTimer(() => {
-            return this._wrappedAnalysis.mergeInto(state, reached, (e) => this.unwrap(unwrapper(e)), (e) => e);
+            return this._wrappedAnalysis.mergeInto(state, frontier, reached, (e) => this.unwrap(unwrapper(e)), (e) => e);
         });
     }
 
@@ -108,8 +114,8 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
         });
     }
 
-    wrapStateSets(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
-        return this._wrappedAnalysis.wrapStateSets(frontier, reached);
+    createStateSets(): [StateSet<F>, StateSet<F>] {
+        return this._wrappedAnalysis.createStateSets();
     }
 
     get abstractDomain(): AbstractDomain<C, E> {
@@ -120,7 +126,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
         return this._wrappedAnalysis.refiner;
     }
 
-    get wrappedAnalysis(): ProgramAnalysis<any, any> {
+    get wrappedAnalysis(): ProgramAnalysis<any, any, F> {
         return this._wrappedAnalysis;
     }
 
@@ -158,6 +164,10 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractElement>
 
     unwrap(e: E): E {
         return e;
+    }
+
+    partitionOf(ofState: E, reached: StateSet<F>): Iterable<F> {
+        return this.wrappedAnalysis.partitionOf(ofState, reached);
     }
 
 }

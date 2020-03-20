@@ -22,7 +22,7 @@
 
 
 import {ConcreteElement} from "../domains/ConcreteElements";
-import {AbstractElement} from "../../lattices/Lattice";
+import {AbstractElement, AbstractState} from "../../lattices/Lattice";
 import {StateSet} from "./StateSet";
 import {AnalysisAlgorithm} from "./Algorithm";
 import {Refiner} from "../analyses/Refiner";
@@ -32,10 +32,10 @@ import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
 
 export const STAT_KEY_BMC_ITERATIONS = "iterations";
 
-export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
+export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractState>
     implements AnalysisAlgorithm<C, E> {
 
-    private readonly _analysis: ProgramAnalysis<C, E>;
+    private readonly _analysis: ProgramAnalysis<C, E, E>;
 
     private readonly _wrappedAlgorithm: AnalysisAlgorithm<C, E>;
 
@@ -44,7 +44,7 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
     private readonly _statistics: AnalysisStatistics;
     private readonly _feasibilityCheckStats: AnalysisStatistics;
 
-    constructor(wrappedAlgorithm: AnalysisAlgorithm<C, E>, refiner: Refiner<E>, analysis: ProgramAnalysis<C, E>, statistics: AnalysisStatistics) {
+    constructor(wrappedAlgorithm: AnalysisAlgorithm<C, E>, refiner: Refiner<E>, analysis: ProgramAnalysis<C, E, E>, statistics: AnalysisStatistics) {
         this._wrappedAlgorithm = Preconditions.checkNotUndefined(wrappedAlgorithm);
         this._refiner = Preconditions.checkNotUndefined(refiner);
         this._analysis = Preconditions.checkNotUndefined(analysis);
@@ -61,14 +61,14 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractElement>
                 // Target state was found
                 Preconditions.checkState(reached.getAddedLast().length > 0);
                 const targetState = reached.getAddedLast()[0];
-                Preconditions.checkState(this._analysis.target(targetState).length > 0);
+                Preconditions.checkState(this._analysis.target(targetState as E).length > 0);
 
                 // Check the feasibility with the refiner
                 let isFeasible: boolean;
                 console.group("BMC Feasibility Check");
                 this._feasibilityCheckStats.startTimer();
                 try {
-                    isFeasible = this._refiner.checkIsFeasible(targetState);
+                    isFeasible = this._refiner.checkIsFeasible(targetState as E);
                     if (isFeasible) {
                         return [frontier, reached];
                     } else {

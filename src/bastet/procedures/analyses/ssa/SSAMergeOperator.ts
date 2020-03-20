@@ -37,13 +37,16 @@ export class SSAMergeOperator implements MergeOperator<SSAState> {
         this._wrappedAbstractSuccOp = Preconditions.checkNotUndefined(wrappedAbstractSuccOp);
     }
 
-    merge(state1: SSAState, state2: SSAState): boolean {
-        if (this._wrappedMergeOp.merge(state1.getWrappedState(), state2.getWrappedState())) {
-            // Sync the SSA maps
-            throw new ImplementMeException();
-        } else {
-            return false;
-        }
+    merge(state1: SSAState, state2: SSAState): SSAState {
+        // Sync the SSA maps
+        console.log("IMPLEMENT THE SSA MAP MERGE!!!!");
+        const wrappedMergedAndSynced: AbstractState = this._wrappedMergeOp.merge(state1.getWrappedState(), state2.getWrappedState());
+        const syncedSSA = state1.getSSA();
+        return state1.withWrappedState(wrappedMergedAndSynced).withSSA(syncedSSA);
+    }
+
+    shouldMerge(state1: SSAState, state2: SSAState): boolean {
+        return this._wrappedMergeOp.shouldMerge(state1.getWrappedState(), state2.getWrappedState());
     }
 
 }
