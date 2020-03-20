@@ -71,8 +71,6 @@ export class SSAMergeOperator implements MergeOperator<SSAState> {
                 const assignedDataLoc: DataLocation = this._task.typeStorage.getTypedLocation(key);
                 const mergedVersion = Math.max(state1Version, state2Version);
 
-                console.log(`${key} ${state1Version} ${state2Version}`);
-
                 if (assignedDataLoc.type == ActorType.instance().typeId) {
                     return state1Version;
                 }
