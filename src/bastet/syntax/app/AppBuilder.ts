@@ -187,6 +187,9 @@ export class AppBuilder {
             // 4. Eliminate epsilon transitions
             methodTr = TransitionRelations.eliminateEpsilons(methodTr);
 
+            // 5. Assign a name to the transition relation
+            methodTr = TransitionRelations.named(methodTr, m.ident.text);
+
             result.push(new Method(m, methodTr));
         }
 
@@ -200,12 +203,14 @@ export class AppBuilder {
     private buildScripts(scriptList: ScriptDefinitionList): Script[] {
         let result: Script[] = [];
         for (let script of scriptList) {
+            const scriptId = Scripts.freshScriptId();
             const event = script.event;
             const visitor = new RelationBuildingVisitor();
-            const transRelation = TransitionRelations.eliminateEpsilons(
-                script.stmtList.accept(visitor));
+            const transRelation = TransitionRelations.named(
+                TransitionRelations.eliminateEpsilons(
+                    script.stmtList.accept(visitor)), `script_${scriptId}`);
 
-            result.push(new Script(Scripts.freshScriptId(), event,
+            result.push(new Script(scriptId, event,
                 this.shouldRestartOnEvent(script, event), transRelation));
         }
 

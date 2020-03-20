@@ -186,9 +186,6 @@ export interface ThreadStateAttributes {
     /** Stack of loop bodies entered (represented by the loop head location) */
     loopStack: ImmList<RelationLocation>;
 
-    /** Scope to uniquely identify currently declared and references variables (data locations) */
-    scopeStack: ImmList<string>;
-
     /** In atomic group? */
     inAtomicMode: number;
 
@@ -205,7 +202,6 @@ const ThreadStateRecord = ImmRec({
     failedFor: ImmSet<Property>(),
     callStack: ImmList<MethodCall>(),
     loopStack: ImmList<RelationLocation>(),
-    scopeStack: ImmList<string>(),
     inAtomicMode: 0
 });
 
@@ -214,10 +210,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
     constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, operations: ImmList<OperationId>,
                 location: RelationLocation, compState: ThreadComputationState, waitingForThreads: ImmSet<ThreadId>,
                 failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, loopStack: ImmList<RelationLocation>,
-                scopeStack: ImmList<string>, actorScopes: ImmMap<TypedDataLocation, string>,  inAtomicMode: number) {
+                actorScopes: ImmMap<TypedDataLocation, string>,  inAtomicMode: number) {
         super({threadId: threadId, actorId: actorId, scriptId: scriptId, operations: operations, location: location,
             computationState: compState, waitingForThreads: waitingForThreads, failedFor: failedFor,
-            callStack: callStack, loopStack: loopStack, scopeStack: scopeStack, inAtomicMode: inAtomicMode});
+            callStack: callStack, loopStack: loopStack, inAtomicMode: inAtomicMode});
     }
 
     public getInAtomicMode(): number {
@@ -250,10 +246,6 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     public getLoopStack(): ImmList<RelationLocation> {
         return this.get('loopStack');
-    }
-
-    public getScopeStack(): ImmList<string> {
-        return this.get('scopeStack');
     }
 
     public withLocation(value: RelationLocation): ThreadState {
@@ -294,10 +286,6 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     public withFailedFor(value: ImmSet<Property>): ThreadState {
         return this.set('failedFor', value);
-    }
-
-    public withScopeStack(value: ImmList<string>): ThreadState {
-        return this.set('scopeStack', value);
     }
 
     public withIncrementedAtomic(): ThreadState {
@@ -494,7 +482,7 @@ export class ScheduleAbstractStateFactory {
                     const loc: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, locId);
                     threads = threads.push(new ThreadState(threadId, actor.ident, script.id, ImmList(),
                         loc, threadState, ImmSet(), ImmSet(), ImmList(), ImmList(),
-                        ImmList([actor.ident]), ImmMap(), 0));
+                        ImmMap(), 0));
                 }
             }
         }

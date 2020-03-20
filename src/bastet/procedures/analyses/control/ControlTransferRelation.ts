@@ -281,6 +281,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             const statementTarget = new RelationLocation(threadActor.ident, fromRelation.ident, t.target);
             Preconditions.checkNotUndefined(op);
 
+            const scopeStack: ImmList<string> = ImmList([threadActor.ident, ]);
+
             result.push(new StepInformation(thread, statementTarget, isAtomic,
                 this.scopeOperations([op], fromState.getActorScopes(), threadState.getScopeStack(), threadState.getScopeStack()),
                     threadState.getCallStack(), threadState.getScopeStack()));
