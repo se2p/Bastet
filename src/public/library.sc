@@ -83,34 +83,34 @@ role MathActor begin
         define alpha as wrapClamp(alpha, 0, 360)
         declare result as number
 
-        if alpha > (0-1) and alpha < 36 then begin
+        if (alpha > (0-1) and alpha < 36) then begin
             assume result < 1
             assume result > 0-0.127
-        end else if alpha > 35 and alpha < 72 then begin
+        end else if (alpha > 35 and alpha < 72) then begin
             assume result < 0-0.128
             assume result > 0-0.967
-        end else if alpha > 71 and alpha < 108 then begin
+        end else if (alpha > 71 and alpha < 108) then begin
             assume result < 0.376
             assume result > 0-0.967
-        end else if alpha > 107 and alpha < 144 then begin
+        end else if (alpha > 107 and alpha < 144) then begin
             assume result < 0.872
             assume result > 0.375
-        end else if alpha > 143 and alpha < 180 then begin
+        end else if (alpha > 143 and alpha < 180) then begin
             assume result < 0.872
             assume result > 0-0.599
-        end else if alpha > 179 and alpha < 216 then begin
+        end else if (alpha > 179 and alpha < 216) then begin
             assume result < 0-0.598
             assume result > 0-0.717
-        end else if alpha > 215 and alpha < 252 then begin
+        end else if (alpha > 215 and alpha < 252) then begin
             assume result > 0-0.717
             assume result < 0.783
-        end else if alpha > 251 and alpha < 288 then begin
+        end else if (alpha > 251 and alpha < 288) then begin
             assume result < 0.783
             assume result > 0.517
-        end else if alpha > 287 and alpha < 324 then begin
+        end else if (alpha > 287 and alpha < 324) then begin
             assume result < 0.518
             assume result > 0-0.914
-        end else if alpha > 323 and alpha < 361 then begin
+        end else if (alpha > 323 and alpha < 361) then begin
             assume result > 0-0.914
             assume result < 0-0.284
         end else begin
@@ -162,39 +162,52 @@ role MathActor begin
     end returns result: number
 
     define atomic radToDeg(rad: number) begin
+        declare PI as number
+        define PI as 3.14159265359
+
         declare result as number
-        declare negated as boolean
+        define result as ((deg * PI) / 180)
 
-        if rad < 0 then begin
-            define rad as (0-rad)
-            define negated as true
-        end
+        // Todo: isn't this more useful as a simple calculation?
+//        declare negated as boolean
+//        if rad < 0 then begin
+//            define rad as (0-rad)
+//            define negated as true
+//        end
+//
+//        declare lower as number
+//        declare upper as number
+//        declare step as number
+//
+//        define step as 0.628
+//        define lower as 0
+//        define upper as step
+//
+//        define rad as rad - 36
+//        until rad < 0 repeat begin
+//            define lower as lower + step
+//            define upper as upper + step + 0.001
+//            define rad as rad - 36
+//        end
+//
+//        if negated then begin
+//            define lower as (0 - lower)
+//            define upper as (0 - upper)
+//
+//            assume result < lower
+//            assume result > upper
+//        end else begin
+//            assume result > lower
+//            assume result < upper
+//        end
 
-        declare lower as number
-        declare upper as number
-        declare step as number
+    end returns result: number
 
-        define step as 0.628
-        define lower as 0
-        define upper as step
-
-        define rad as rad - 36
-        until rad < 0 repeat begin
-            define lower as lower + step
-            define upper as upper + step + 0.001
-            define rad as rad - 36
-        end
-
-        if negated then begin
-            define lower as (0 - lower)
-            define upper as (0 - upper)
-
-            assume result < lower
-            assume result > upper
-        end else begin
-            assume result > lower
-            assume result < upper
-        end
+    define atomic degToRad(deg: number) begin
+        declare PI as number
+        define PI as 3.14159265359
+        declare result as number
+        define result as (rad * PI) / 180
 
     end returns result: number
 
@@ -246,20 +259,6 @@ role RuntimeEntity is MathActor begin
 
     extern _RUNTIME_integerFromInterval (from_num: number, to_num: number) returns number
 
-    extern _RUNTIME_getImageWidth (ident: string) returns number
-
-    extern _RUNTIME_getImageHeight (ident: string) returns number
-
-//    extern getGraphicIdByIndex (idx: number) returns string
-//
-//    extern getGraphicIndexById (id: string) returns number
-//
-//    extern getGraphicPixels (id: string) returns string
-//
-//    extern getNumGraphics () returns string
-
-
-
     // A random integer in the interval [from, to],
     // that is, both end points are included.
     extern randomIntegerBetween (intervalStart: number, intervalEnd: number) returns number
@@ -290,13 +289,15 @@ role RuntimeEntity is MathActor begin
 
     extern mathPowten(n: number) returns number
 
-    extern degToRad(n: number) returns number
-
     define getGraphicIdByIndex (idx: number) in runtime returns result: string
 
     define getGraphicIndexById (id: string) in runtime returns result: number
 
     define getGraphicPixels (id: string) in runtime returns result: string
+
+    define getImageWidth (ident: string) in runtime returns result: number
+
+    define getImageHeight (ident: string) in runtime returns result: number
 
     define getNumGraphics () in runtime returns result: number
 
@@ -439,8 +440,8 @@ role ScratchEntity is RuntimeEntity begin
     // @Category "Looks"
     define atomic changeActiveGraphicTo (id: string) begin
         define active_graphic_name as id
-        define active_graphic_width as _RUNTIME_getImageWidth(id)
-        define active_graphic_height as _RUNTIME_getImageHeight(id)
+        define active_graphic_width as getImageWidth(id)
+        define active_graphic_height as getImageHeight(id)
         //FIXME Set graphic pixels, this is currently not done as we do not supports lists yet
     end
 

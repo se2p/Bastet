@@ -406,6 +406,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     private indexByIdLookupMethods: Map<Identifier, MethodDefinition> = new Map();
     private idByIndexLookupMethods: Map<Identifier, MethodDefinition> = new Map();
     private numGraphicsMethods: Map<Identifier, MethodDefinition> = new Map();
+    private getImageWidthMethods: Map<Identifier, MethodDefinition> = new Map();
+    private getImageHeightMethods: Map<Identifier, MethodDefinition> = new Map();
 
     constructor(config: TransformerConfig, methodLibrary: App,
                 typeInformationStorage: TypeInformationStorage, filePath: string) {
@@ -685,7 +687,10 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 this.indexByIdLookupMethods.set(ident, indexByIdLookup);
                 let numGraphics = LookupTransformer.buildGetNumGraphics(this._currentActor, resouceDefs, this._filePath)
                 this.numGraphicsMethods.set(ident, numGraphics);
-
+                var imageHeight = LookupTransformer.buildGetImageHeightLookup(this._currentActor, resouceDefs, this._filePath);
+                this.getImageHeightMethods.set(ident, imageHeight);
+                var imageWidth = LookupTransformer.buildGetImageWidthLookup(this._currentActor, resouceDefs, this._filePath);
+                this.getImageWidthMethods.set(ident, imageWidth);
 
                 // Variable declarations and initializations
                 declarations = ctx.actorComponentsDefinition().declarationStmtList().accept(this);
@@ -799,13 +804,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             } else if (methodIdent.text.includes("getGraphicPixels")) {
                 return TransformerResult.withNode(this.graphicLookupMethods.get(this._currentActor))
             } else if (methodIdent.text.includes("getImageHeight")) {
-                throw new ImplementMeException()
+                return TransformerResult.withNode(this.getImageHeightMethods.get(this._currentActor))
             } else if (methodIdent.text.includes("getImageWidth")) {
-                throw new ImplementMeException()
+                return TransformerResult.withNode(this.getImageWidthMethods.get(this._currentActor))
             } else {
                 throw new ImplementMeException()
             }
-
 
             // const resultDeclaration = ctx.methodResultDeclaration().accept(this).nodeOnly() as ResultDeclaration;
             // return TransformerResult.withNode(new MethodDefinition(
