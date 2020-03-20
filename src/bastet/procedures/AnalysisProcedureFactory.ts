@@ -39,6 +39,8 @@ import {AnalysisStatistics} from "./analyses/AnalysisStatistics";
 import {StatsAnalysis} from "./analyses/stats/StatsAnalysis";
 import {TimeAnalysis} from "./analyses/time/TimeAnalysis";
 import {StaticTimeProfile} from "../utils/TimeProfile";
+import {AbstractState} from "../lattices/Lattice";
+import {ConcreteElement} from "./domains/ConcreteElements";
 
 export class AnalysisProcedureFactory {
 
@@ -67,10 +69,9 @@ export class AnalysisProcedureFactory {
                 const timeAnalysis = new TimeAnalysis(ssaAnalysis, this._statistics, new StaticTimeProfile());
                 const controlAnalysis = new ControlAnalysis(config, task, timeAnalysis, this._statistics);
                 const graphAnalysis = new GraphAnalysis(config, task, controlAnalysis, this._statistics);
-                const outerAnalysis = new StatsAnalysis<GraphConcreteState, GraphAbstractState>(graphAnalysis, this._statistics);
+                const outerAnalysis = new StatsAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>(graphAnalysis, this._statistics);
 
-                const frontier: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
-                const reached: StateSet<GraphAbstractState> = StateSetFactory.createStateSet<GraphAbstractState>();
+                const [frontier, reached] = outerAnalysis.createStateSets();
 
                 const chooseOpConfig = new ChooseOpConfig();
                 const chooseOp = frontier.createChooseOp(chooseOpConfig);

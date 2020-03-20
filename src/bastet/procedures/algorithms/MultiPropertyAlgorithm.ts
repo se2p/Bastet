@@ -21,7 +21,7 @@
  */
 
 
-import {AbstractElement} from "../../lattices/Lattice";
+import {AbstractElement, AbstractState} from "../../lattices/Lattice";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {Property} from "../../syntax/Property";
 import {App} from "../../syntax/app/App";
@@ -49,7 +49,7 @@ export class MultiPropertyAlgorithmConfig extends BastetConfiguration {
 
 }
 
-export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends AbstractElement> implements AnalysisAlgorithm<C, E>{
+export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends AbstractState> implements AnalysisAlgorithm<C, E>{
 
     private readonly _task: App;
 
@@ -57,7 +57,7 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
 
     private readonly _wrappedAlgorithm: AnalysisAlgorithm<C, E>;
 
-    private readonly _analysis: ProgramAnalysis<C, E>;
+    private readonly _analysis: ProgramAnalysis<C, E, E>;
 
     private readonly _resultCallback: ResultCallback;
 
@@ -65,7 +65,7 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
 
     private readonly _config: MultiPropertyAlgorithmConfig;
 
-    constructor(config: {}, task: App, algorithm: AnalysisAlgorithm<C, E>, analysis: ProgramAnalysis<C, E>, stats: AnalysisStatistics, resultCallback: ResultCallback) {
+    constructor(config: {}, task: App, algorithm: AnalysisAlgorithm<C, E>, analysis: ProgramAnalysis<C, E, E>, stats: AnalysisStatistics, resultCallback: ResultCallback) {
         this._config = new MultiPropertyAlgorithmConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAlgorithm = Preconditions.checkNotUndefined(algorithm);

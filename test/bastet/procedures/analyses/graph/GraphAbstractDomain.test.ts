@@ -19,19 +19,3 @@
  *
  */
 
-import {GraphAbstractStateBuilder} from "../../../../../src/bastet/procedures/analyses/graph/GraphAbstractDomain";
-
-describe('Functionality of the graph abstract domain', function() {
-
-    it('State creation constructs intended objects', function() {
-        const state = new GraphAbstractStateBuilder()
-            .setId(7)
-            .addPredecessors(5)
-            .addPredecessors(6).build();
-
-        expect(state.id).toEqual(7);
-        expect(state.predecessors).toContain(5);
-    })
-
-});
-

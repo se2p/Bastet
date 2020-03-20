@@ -113,6 +113,72 @@ describe("TransitionRelations", () => {
 
     });
 
+    describe("loops", () => {
+
+        describe("case: no loop", () => {
+            const op = new RawOperation(new StopAllStatement());
+
+            const tr = TransitionRelation.builder()
+                .addTransitionByIDs(0, 1, op)
+                .addTransitionByIDs(1, 2, op)
+                .addEntryLocationWithID(0)
+                .addExitLocationWithID(2)
+                .build();
+
+
+            it("no loop head identified", () => {
+                expect(tr.loopHeads.size).toEqual(0);
+            });
+        });
+
+        describe("case: with one loop", () => {
+            const op = new RawOperation(new StopAllStatement());
+
+            const tr = TransitionRelation.builder()
+                .addTransitionByIDs(0, 1, op)
+                .addTransitionByIDs(1, 2, op)
+                .addTransitionByIDs(2, 3, op)
+                .addTransitionByIDs(2, 1, op)
+                .addEntryLocationWithID(0)
+                .addExitLocationWithID(3)
+                .build();
+
+
+            it("one loop head identified", () => {
+                expect(tr.loopHeads.size).toEqual(1);
+                expect(tr.loopHeads.contains(1)).toBe(true);
+            });
+        });
+
+        describe("case: nested", () => {
+            const op = new RawOperation(new StopAllStatement());
+
+            const tr = TransitionRelation.builder()
+                .addTransitionByIDs(0, 1, op)
+                .addTransitionByIDs(1, 2, op)
+                .addTransitionByIDs(2, 3, op)
+                .addTransitionByIDs(3, 4, op)
+                .addTransitionByIDs(4, 2, op)
+                .addTransitionByIDs(2, 5, op)
+                .addTransitionByIDs(5, 6, op)
+                .addTransitionByIDs(6, 1, op)
+                .addTransitionByIDs(1, 7, op)
+                .addEntryLocationWithID(0)
+                .addExitLocationWithID(7)
+                .build();
+
+
+            it("two loop heads identified", () => {
+                expect(tr.loopHeads.size).toEqual(2);
+                expect(tr.loopHeads.contains(1)).toBe(true);
+                expect(tr.loopHeads.contains(2)).toBe(true);
+
+                console.log(tr.getLoops().map((l) => l.toString()));
+            });
+        });
+
+    });
+
     describe("concatTrOpGoto()", () => {
 
         describe("case:", () => {

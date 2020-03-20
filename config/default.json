@@ -1,9 +1,11 @@
 {
 
     "ReachabilityAlgorithm": {
+        "dump-graph-after-iteration": true
+    },
 
-        "dump-graph-after-iteration": false
-
+    "GraphAnalysis": {
+        "mergeIntoOperator": "StandardMergeIntoOperator"
     }
 
 }

@@ -33,8 +33,6 @@ export interface SSAStateAttribs extends AbstractElement, SingletonStateWrapper 
 
     ssa: ImmMap<string, number>;
 
-    declared: ImmMap<string, ScratchTypeID>;
-
     wrappedState: AbstractState;
 
 }
@@ -42,8 +40,6 @@ export interface SSAStateAttribs extends AbstractElement, SingletonStateWrapper 
 const SSAStateRecord = ImmRec({
 
     ssa: ImmMap<string, number>(),
-
-    declared: ImmMap<string, ScratchTypeID>(),
 
     wrappedState: null
 
@@ -54,8 +50,8 @@ export const INITIALLY_DECLARED_INDEX = NOT_DECLARED_INDEX + 1;
 
 export class SSAState extends SSAStateRecord implements SSAStateAttribs, AbstractState {
 
-    constructor(ssa: ImmMap<string, number>, declared: ImmMap<string, ScratchTypeID>, wrapped: AbstractElement) {
-        super({ssa: ssa, declared: declared, wrappedState: wrapped});
+    constructor(ssa: ImmMap<string, number>, wrapped: AbstractElement) {
+        super({ssa: ssa, wrappedState: wrapped});
     }
 
     public getSSA(): ImmMap<string, number> {
@@ -79,17 +75,8 @@ export class SSAState extends SSAStateRecord implements SSAStateAttribs, Abstrac
         return this.set("ssa", ssa);
     }
 
-    public withDeclarations(declared: ImmMap<string, ScratchTypeID>): SSAState {
-        return this.set("declared", declared);
-    }
-
     public withWrappedState(wrapped: AbstractElement): SSAState {
         return this.set("wrappedState", wrapped);
-    }
-
-    public withDeclaration(declarationOf: string): SSAState {
-        const [newState, newIndex] = this.withAssignment(declarationOf);
-        return newState;
     }
 
     public withAssignment(assignementTo: string): [SSAState, number] {
@@ -119,8 +106,8 @@ export class SSAStateLattice implements Lattice<SSAState> {
 
     constructor(wrappedStateLattice: Lattice<AbstractElement>) {
         this._wrappedStateLattice = Preconditions.checkNotUndefined(wrappedStateLattice);
-        this._bottom = new SSAState(ImmMap({}), ImmMap({}), wrappedStateLattice.bottom());
-        this._top = new SSAState(ImmMap({}), ImmMap({}), wrappedStateLattice.top());
+        this._bottom = new SSAState(ImmMap({}), wrappedStateLattice.bottom());
+        this._top = new SSAState(ImmMap({}), wrappedStateLattice.top());
     }
 
     bottom(): SSAState {
@@ -132,7 +119,12 @@ export class SSAStateLattice implements Lattice<SSAState> {
     }
 
     join(element1: SSAState, element2: SSAState): SSAState {
-        throw new ImplementMeException();
+        if (!element1.getSSA().equals(element2.getSSA())) {
+            return this.top();
+        }
+
+        return element1.withWrappedState(
+            this._wrappedStateLattice.join(element1.getWrappedState(), element2.getWrappedState()));
     }
 
     meet(element1: SSAState, element2: SSAState): SSAState {
