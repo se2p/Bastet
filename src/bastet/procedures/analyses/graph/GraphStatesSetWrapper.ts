@@ -21,14 +21,13 @@
  */
 
 
-import {ChooseOpConfig, OrderedStateSet, StateSet} from "../../algorithms/StateSet";
+import {DefaultAnalysisStateSet, StateSet, StatePartitionOperator} from "../../algorithms/StateSet";
 import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
-import {AbstractElement} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {GraphPath, GraphPathSet} from "./GraphPath";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
-export class GraphReachedSetWrapper<E extends GraphAbstractState> extends OrderedStateSet<GraphAbstractState> {
+export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState> {
 
     private readonly _frontierSet: StateSet<E>;
 
@@ -36,8 +35,8 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Ordere
 
     private readonly _idToStateMap: Map<GraphStateId, E>;
 
-    constructor(frontierSet: StateSet<E>) {
-        super();
+    constructor(frontierSet: StateSet<E>, partitionOp: StatePartitionOperator<E>) {
+        super(partitionOp);
         this._frontierSet = Preconditions.checkNotUndefined(frontierSet);
         this._children = new Map<GraphStateId, GraphStateId[]>();
         this._idToStateMap = new Map<GraphStateId, E>();

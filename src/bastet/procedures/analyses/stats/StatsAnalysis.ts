@@ -25,7 +25,7 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {Property} from "../../../syntax/Property";
-import {StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper} from "../Refiner";
@@ -96,7 +96,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         });
     }
 
-    mergeInto(state: E, frontier: StateSet<F>, reached: StateSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [StateSet<F>, StateSet<F>] {
+    mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
         return this._mergeIntoStats.runWithTimer(() => {
             return this._wrappedAnalysis.mergeInto(state, frontier, reached, (e) => this.unwrap(unwrapper(e)), (e) => e);
         });
@@ -114,7 +114,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         });
     }
 
-    createStateSets(): [StateSet<F>, StateSet<F>] {
+    createStateSets(): [FrontierSet<F>, ReachedSet<F>] {
         return this._wrappedAnalysis.createStateSets();
     }
 
@@ -170,8 +170,12 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         return e;
     }
 
-    partitionOf(ofState: E, reached: StateSet<F>): Iterable<F> {
+    partitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F> {
         return this.wrappedAnalysis.partitionOf(ofState, reached);
+    }
+
+    getPartitionKey(element: E): PartitionKeyElement[] {
+        return this.wrappedAnalysis.getPartitionKey(element);
     }
 
 }

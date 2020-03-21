@@ -25,7 +25,6 @@ import {GraphAnalysis} from "./analyses/graph/GraphAnalysis";
 import {ControlAnalysis} from "./analyses/control/ControlAnalysis";
 import {GraphAbstractState, GraphConcreteState} from "./analyses/graph/GraphAbstractDomain";
 import {ReachabilityAlgorithm} from "./algorithms/ReachabilityAlgorithm";
-import {ChooseOpConfig, StateSet, StateSetFactory} from "./algorithms/StateSet";
 import {SMTFactory} from "../utils/smt/z3/Z3SMT";
 import {DataAnalysis} from "./analyses/data/DataAnalysis";
 import {BDDLibraryFactory} from "../utils/bdd/BDD";
@@ -73,9 +72,7 @@ export class AnalysisProcedureFactory {
 
                 const [frontier, reached] = outerAnalysis.createStateSets();
 
-                const chooseOpConfig = new ChooseOpConfig();
-                const chooseOp = frontier.createChooseOp(chooseOpConfig);
-                const reachabilityAlgorithm = new ReachabilityAlgorithm(config, outerAnalysis, chooseOp, this._statistics);
+                const reachabilityAlgorithm = new ReachabilityAlgorithm(config, outerAnalysis, this._statistics);
                 const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, outerAnalysis.refiner, outerAnalysis, this._statistics);
                 const multiPropertyAlgorithm = new MultiPropertyAlgorithm(config, task, bmcAlgorithm, outerAnalysis, this._statistics,
                     (v, s, u, stats) => this.onAnalysisResult(v, s, u, stats));

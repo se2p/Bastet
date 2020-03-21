@@ -32,7 +32,7 @@ import {Map as ImmMap} from "immutable"
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
-import {StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
 import {GraphAbstractState} from "../graph/GraphAbstractDomain";
@@ -138,16 +138,20 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         } );
     }
 
-    createStateSets(): [StateSet<F>, StateSet<F>] {
+    createStateSets(): [FrontierSet<F>, ReachedSet<F>] {
         return this.wrappedAnalysis.createStateSets();
     }
 
-    mergeInto(state: SSAState, frontier: StateSet<F>, reached: StateSet<F>, unwrapper: (F) => SSAState, wrapper: (E) => F): [StateSet<F>, StateSet<F>] {
+    mergeInto(state: SSAState, frontier: StateSet<F>, reached: ReachedSet<F>, unwrapper: (F) => SSAState, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
         throw new ImplementMeException();
     }
 
-    partitionOf(ofState: SSAState, reached: StateSet<F>): Iterable<F> {
+    partitionOf(ofState: SSAState, reached: ReachedSet<F>): Iterable<F> {
         return this.wrappedAnalysis.partitionOf(ofState.getWrappedState(), reached);
+    }
+
+    getPartitionKey(element: SSAState): PartitionKeyElement[] {
+        return this._wrappedAnalysis.getPartitionKey(element.getWrappedState());
     }
 
 }

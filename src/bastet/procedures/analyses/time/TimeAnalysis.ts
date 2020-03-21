@@ -25,7 +25,7 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {Property} from "../../../syntax/Property";
-import {StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper} from "../Refiner";
@@ -98,7 +98,7 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, 
         return this._wrappedAnalysis.widen(state);
     }
 
-    createStateSets(): [StateSet<F>, StateSet<F>] {
+    createStateSets(): [FrontierSet<F>, ReachedSet<F>] {
         return this._wrappedAnalysis.createStateSets();
     }
 
@@ -118,11 +118,15 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, 
         return e;
     }
 
-    mergeInto(state: E, frontier: StateSet<F>, reached: StateSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [StateSet<F>, StateSet<F>] {
+    mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
         throw new ImplementMeException();
     }
 
-    partitionOf(ofState: E, reached: StateSet<F>): Iterable<F> {
+    partitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F> {
         return this._wrappedAnalysis.partitionOf(ofState, reached);
+    }
+
+    getPartitionKey(element: E): PartitionKeyElement[] {
+        return this._wrappedAnalysis.getPartitionKey(element);
     }
 }

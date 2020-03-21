@@ -19,31 +19,15 @@
  *
  */
 
-import {AbstractElement} from "../../lattices/Lattice";
-
-export class ChooseOpConfig {
-
-}
-
-export interface ChooseOperator<E extends AbstractElement> {
-
-    choose(): E;
-
-}
-
-export class ChooseLastOperator<E extends AbstractElement> implements ChooseOperator<E> {
-
-    choose(): E {
-        return undefined;
-    }
-
-}
+import {AbstractElement, AbstractState} from "../../lattices/Lattice";
+import {AbstractStateVisitor} from "../analyses/AbstractStates";
+import {Preconditions} from "../../utils/Preconditions";
+import {AbstractMockElement} from "../../../../test/bastet/procedures/TransferRelationMock";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
 export interface StateSet<E extends AbstractElement> {
 
     isEmpty(): boolean;
-
-    getStateSet(inPartitionOf: E): StateSet<E>;
 
     [Symbol.iterator](): IterableIterator<E>;
 
@@ -51,13 +35,14 @@ export interface StateSet<E extends AbstractElement> {
 
     add(element: E);
 
-    createChooseOp(config: ChooseOpConfig);
-
-    getAddedLast(): E[];
-
     removeAll(elements: Iterable<E>);
 
     addAll(elements: Iterable<E>);
+
+    getSize(): number;
+}
+
+export interface ReachedSet<E extends AbstractElement> extends StateSet<E> {
 
     isRootState(element: E): boolean;
 
@@ -65,14 +50,23 @@ export interface StateSet<E extends AbstractElement> {
 
     getRootStates(): Set<E>;
 
-    getSize(): number;
+    getStateSet(inPartitionOf: E): Iterable<E>;
+
+    getAddedLast(): E[];
+
 }
 
-export abstract class AbstractStateSet<E extends AbstractElement> {
+export interface FrontierSet<E extends AbstractElement> extends StateSet<E> {
+
+    pop(): E;
+
+}
+
+export abstract class AbstractAnalysisStateSet<E extends AbstractElement> {
 
     abstract isEmpty(): boolean;
 
-    abstract getStateSet(inPartitionOf: E): StateSet<E>;
+    abstract getStateSet(inPartitionOf: E): Iterable<E>;
 
     abstract [Symbol.iterator](): IterableIterator<E>;
 
@@ -98,28 +92,186 @@ export abstract class AbstractStateSet<E extends AbstractElement> {
 
     abstract add(element: E);
 
-    abstract createChooseOp(config: ChooseOpConfig);
-
     abstract getAddedLast(): E[];
 
     abstract getSize(): number;
 
 }
 
+export type PartitionKeyElement = string|number|boolean;
+
+export interface PartitionVisitor extends AbstractStateVisitor<PartitionKeyElement[]> {
+
+}
+
+export interface StatePartitionOperator<E extends AbstractElement> {
+
+    getPartitionKey(element: E): PartitionKeyElement[];
+
+}
+
+export class NoPartitioningOperator<E extends AbstractElement> implements StatePartitionOperator<E> {
+
+    getPartitionKey(element: E): PartitionKeyElement[] {
+        return [];
+    }
+
+}
+
+export class PartitionedOrderedSet<E extends AbstractElement> {
+
+    private _childs: Map<PartitionKeyElement, PartitionedOrderedSet<E>>;
+
+    private _elements: Set<E>;
+
+    private _size: number;
+
+    private _keyOperator: StatePartitionOperator<E>;
+
+    constructor(partitionOperator: StatePartitionOperator<E>) {
+        this._keyOperator = Preconditions.checkNotUndefined(partitionOperator);
+        this._size = 0;
+        this._elements = new Set<E>();
+        this._childs = new Map<PartitionKeyElement, PartitionedOrderedSet<E>>();
+    }
+
+    private getPartitionKey(element: E): PartitionKeyElement[] {
+        return this._keyOperator.getPartitionKey(element);
+    }
+
+    public getPartitionOf(element: E): PartitionedOrderedSet<E> {
+        const key: PartitionKeyElement[] = this.getPartitionKey(element).slice();
+        return this.getPartition(key);
+    }
+
+    private getChildPartition(key: PartitionKeyElement): PartitionedOrderedSet<E> {
+        let result = this._childs.get(key);
+        if (!result) {
+            result = new PartitionedOrderedSet(this._keyOperator);
+            this._childs.set(key, result);
+        }
+
+        return result;
+    }
+
+    public removeFrom(element: E, from: PartitionKeyElement[]) {
+        if (from.length > 0) {
+            this.getChildPartition(from[0]).removeFrom(element, from.slice(1, from.length));
+        }
+
+        if (this._elements.delete(element)) {
+            this._size--;
+        }
+    }
+
+    public remove(element: E) {
+        const partitionKey = this.getPartitionKey(element);
+        this.removeFrom(element, partitionKey);
+    }
+
+    private addElementTo(element: E, to: PartitionKeyElement[]) {
+        if (to.length > 0) {
+            this.getChildPartition(to[0]).addElementTo(element, to.slice(1, to.length));
+        }
+
+        this._elements.add(element);
+        this._size++;
+    }
+
+    public add(element: E) {
+        const partitionKey = this.getPartitionKey(element);
+        this.addElementTo(element, partitionKey);
+    }
+
+    public getPartition(key: PartitionKeyElement[]): PartitionedOrderedSet<E> {
+        if (key.length == 0) {
+            return this;
+        }
+
+        const elementKey = key[0];
+        let elementPartition = this.getChildPartition(elementKey);
+
+        const subpart = key.slice(1, key.length);
+        return elementPartition.getPartition(subpart);
+    }
+
+    public isEmpty(): boolean {
+        return this._size == 0;
+    }
+
+    get size(): number {
+        return this._size;
+    }
+
+    public [Symbol.iterator](): IterableIterator<E> {
+        return this._elements[Symbol.iterator]();
+    }
+}
+
+export class DefaultFrontierSet<E extends AbstractElement> implements FrontierSet<E> {
+
+    private readonly _elements: Set<E>;
+
+    constructor() {
+        this._elements = new Set();
+    }
+
+    public [Symbol.iterator](): IterableIterator<E> {
+        return this._elements[Symbol.iterator]();
+    }
+
+    add(element: E) {
+        return this._elements.add(element);
+    }
+
+    addAll(elements: Iterable<E>) {
+        for (const e of elements) {
+            this.add(e);
+        }
+    }
+
+    getSize(): number {
+        return this._elements.size;
+    }
+
+    isEmpty(): boolean {
+        return this._elements.size == 0;
+    }
+
+    pop(): E {
+        for (const e of this._elements) {
+            return e;
+        }
+
+        return null;
+    }
+
+    remove(element: E) {
+        this._elements.delete(element);
+    }
+
+    removeAll(elements: Iterable<E>) {
+        for (const e of elements) {
+            this.remove(e);
+        }
+    }
+
+}
+
 /**
  * Ordered by insertion time.
  */
-export class OrderedStateSet<E extends AbstractElement> extends AbstractStateSet<E> {
+export class DefaultAnalysisStateSet<E extends AbstractElement> extends AbstractAnalysisStateSet<E> {
 
-    private _states: Set<E>;
+    private _states: PartitionedOrderedSet<E>;
 
     private _root: Set<E>;
 
     private _addedLast: E[];
 
-    constructor() {
+    constructor(partitionOp: StatePartitionOperator<E>) {
         super();
-        this._states = new Set();
+        this._states = new PartitionedOrderedSet(partitionOp);
         this._root = new Set();
         this._addedLast = [];
     }
@@ -146,8 +298,8 @@ export class OrderedStateSet<E extends AbstractElement> extends AbstractStateSet
         this._addedLast = [element];
     }
 
-    public getStateSet(inPartitionOf: E): StateSet<E> {
-        return this;
+    public getStateSet(inPartitionOf: E): Iterable<E> {
+        return this._states.getPartitionOf(inPartitionOf);
     }
 
     public getAddedLast(): E[] {
@@ -160,16 +312,7 @@ export class OrderedStateSet<E extends AbstractElement> extends AbstractStateSet
 
     public remove(element: E) {
         this._addedLast = this._addedLast.filter((e) => e != element);
-        this._states.delete(element);
-    }
-
-    public createChooseOp(config: ChooseOpConfig): ChooseOperator<E> {
-        const outer = this;
-        return new class implements ChooseOperator<E> {
-            choose(): E {
-                return outer._states.values().next().value as E;
-            }
-        }
+        this._states.remove(element);
     }
 
     public getSize(): number {
@@ -177,10 +320,3 @@ export class OrderedStateSet<E extends AbstractElement> extends AbstractStateSet
     }
 }
 
-export class StateSetFactory {
-
-    public static createStateSet<E extends AbstractElement>(): StateSet<E> {
-        return new OrderedStateSet();
-    }
-
-}
