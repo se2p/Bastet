@@ -22,22 +22,28 @@
 import {TransferRelation} from "../TransferRelation";
 import {GraphAbstractState, GraphAbstractStateFactory} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {StateLabelVisitor} from "../StateVisitors";
+import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable"
+import {AbstractSuccOperator, PartitionOperator} from "../ProgramAnalysis";
+import {AbstractElement} from "../../../lattices/Lattice";
+import {StatePartitionOperator} from "../../algorithms/StateSet";
 
 export class GraphTransferRelation implements TransferRelation<GraphAbstractState> {
 
-    private readonly _wrappedAbstractSucc: (GraphAbstractState) => Iterable<GraphAbstractState>;
+    private readonly _wrappedAbstractSucc: AbstractSuccOperator<AbstractElement>;
+    private readonly _wrappedPartitionOp: StatePartitionOperator<AbstractElement>;
 
-    constructor(wrappedAbstractSucc: (GraphAbstractState) => Iterable<GraphAbstractState>) {
+    constructor(wrappedAbstractSucc: AbstractSuccOperator<AbstractElement>, wrappedPartitionOp: StatePartitionOperator<AbstractElement>) {
         this._wrappedAbstractSucc = Preconditions.checkNotUndefined(wrappedAbstractSucc);
+        this._wrappedPartitionOp = Preconditions.checkNotUndefined(wrappedPartitionOp);
     }
 
     abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         const result = [];
-        const wrappedSuccs = this._wrappedAbstractSucc(fromState.getWrappedState());
+        const wrappedSuccs = this._wrappedAbstractSucc.abstractSucc(fromState.getWrappedState());
         for (const w of wrappedSuccs) {
-            const succState = GraphAbstractStateFactory.withFreshID([fromState.getId()], [], w);
+            const wrappedKey = this._wrappedPartitionOp.getPartitionKey(w);
+            const succState = GraphAbstractStateFactory.withFreshID([fromState.getId()], [], w, ImmList(wrappedKey));
             result.push(succState);
         }
 

@@ -25,7 +25,6 @@ import {LabeledTransferRelation} from "../../../src/bastet/procedures/analyses/T
 import {AbstractElement} from "../../../src/bastet/lattices/Lattice";
 import {ProgramOperation} from "../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../src/bastet/syntax/Concern";
-import {from} from "immutable/contrib/cursor";
 import {Preconditions} from "../../../src/bastet/utils/Preconditions";
 
 export interface AbstractMockElementAttributes {

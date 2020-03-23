@@ -21,7 +21,7 @@
  */
 
 import {JoinOperator, MergeIntoOperator, MergeOperator, PartitionOperator} from "./ProgramAnalysis";
-import {StateSet} from "../algorithms/StateSet";
+import {FrontierSet, ReachedSet, StateSet} from "../algorithms/StateSet";
 import {AbstractElement, AbstractState} from "../../lattices/Lattice";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
@@ -31,7 +31,7 @@ import {ConcreteElement} from "../domains/ConcreteElements";
 
 export class NoMergeIntoOperator<E extends AbstractState, F extends AbstractState> implements MergeIntoOperator<E, F> {
 
-    mergeInto(state: E, frontier: StateSet<F>, reached: StateSet<F>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): [StateSet<F>, StateSet<F>] {
+    mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): [FrontierSet<F>, ReachedSet<F>] {
         return [frontier, reached];
     }
 
@@ -101,7 +101,7 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
         this._partOp = Preconditions.checkNotUndefined(partitionOp);
     }
 
-    public mergeInto(state: E, frontier: StateSet<F>, reached: StateSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [StateSet<F>, StateSet<F>] {
+    public mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
         const removeFromReached: Set<F> = new Set<F>();
         const addToReached: Set<F> = new Set<F>();
         const relevantReached: Iterable<F> = this._partOp.partitionOf(state, reached);

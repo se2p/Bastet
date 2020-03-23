@@ -20,13 +20,13 @@
  *
  */
 
-import {StateSet} from "./StateSet";
+import {FrontierSet, ReachedSet, StateSet} from "./StateSet";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {AbstractElement, AbstractState} from "../../lattices/Lattice";
 
 export interface AnalysisAlgorithm<C extends ConcreteElement, F extends AbstractState> {
 
-    run(frontier: StateSet<F>, reached: StateSet<F>): [StateSet<F>, StateSet<F>];
+    run(frontier: FrontierSet<F>, reached: ReachedSet<F>): [FrontierSet<F>, ReachedSet<F>];
 
 }
 

@@ -21,7 +21,7 @@
 
 import {AbstractElement, AbstractState} from "../../lattices/Lattice";
 import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
-import {ChooseOperator, StateSet} from "./StateSet";
+import {FrontierSet, ReachedSet, StateSet} from "./StateSet";
 import {Preconditions} from "../../utils/Preconditions";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
@@ -56,7 +56,6 @@ export class ReachabilityAlgorithmConfig extends BastetConfiguration {
 export class ReachabilityAlgorithm<C extends ConcreteElement, E extends AbstractState> implements AnalysisAlgorithm<C, E> {
 
     private readonly _analysis: ProgramAnalysis<C, E, E>;
-    private readonly _chooseOp: ChooseOperator<E>;
     private readonly _statistics: AnalysisStatistics;
     private readonly _config: ReachabilityAlgorithmConfig;
 
@@ -68,10 +67,9 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
     private _lastTimeForSucc: number;
     private _lastTimeForWiden: number;
 
-    constructor(config: {}, analysis: ProgramAnalysis<C, E, E>, chooseOp: ChooseOperator<E>, statistics: AnalysisStatistics) {
+    constructor(config: {}, analysis: ProgramAnalysis<C, E, E>, statistics: AnalysisStatistics) {
         this._config = new ReachabilityAlgorithmConfig(config);
         this._analysis = Preconditions.checkNotUndefined(analysis);
-        this._chooseOp = Preconditions.checkNotUndefined(chooseOp);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._exportFunction = resolveResultExportFunction(this._analysis);
 
@@ -86,13 +84,13 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
         return this._analysis;
     }
 
-    public run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
+    public run(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {
         while (!frontier.isEmpty()) {
             this._statistics.increment(STAT_KEY_REACH_ITERATIONS);
 
             // CHOOSE: Choose the next state to compute successors for.
             //      This step determines the state-space traversal strategy.
-            const e: E = this._chooseOp.choose();
+            const e: E = frontier.pop();
             frontier.remove(e);
 
             // SUCC: Compute the set of successor states
@@ -109,7 +107,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
 
                 // STOP: Check for coverage (fixed point iteration)
                 const checkStopFor: E = ePrimePrime; // TODO: How does this interact with the 'merge' above
-                if (!this._analysis.stop(checkStopFor, reached, (s) => s)) {
+                if (!this._analysis.stop(checkStopFor, reached.getStateSet(checkStopFor), (s) => s)) {
                     frontier.add(checkStopFor);
                     reached.add(checkStopFor);
 
@@ -128,7 +126,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
         return this.takeNoteOfResult(frontier, reached);
     }
 
-    private takeNoteOfResult(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
+    private takeNoteOfResult(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {
         this._statistics.put(STAT_KEY_REACH_REACHED, reached.getSize());
         this._statistics.put(STAT_KEY_REACH_FRONTIER, frontier.getSize());
 
@@ -153,7 +151,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
         return [frontier, reached];
     }
 
-    private algorithmMonitoringHook(frontier: StateSet<E>, reached: StateSet<E>) {
+    private algorithmMonitoringHook(frontier: FrontierSet<E>, reached: ReachedSet<E>) {
         if (this._config.dumpGraphAfterIteration) {
             if (this._exportFunction) {
                 this._exportFunction(reached, frontier);

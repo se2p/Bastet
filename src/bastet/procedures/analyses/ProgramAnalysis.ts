@@ -26,7 +26,7 @@ import {ConcreteElement} from "../domains/ConcreteElements";
 import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner} from "./Refiner";
 import {Property} from "../../syntax/Property";
-import {StateSet} from "../algorithms/StateSet";
+import {FrontierSet, ReachedSet, StatePartitionOperator, StateSet} from "../algorithms/StateSet";
 import {Concern} from "../../syntax/Concern";
 import {LabeledTransition} from "./graph/GraphPath";
 import {LabeledTransferRelation} from "./TransferRelation";
@@ -42,13 +42,14 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
 
     initialStatesFor(task: App): E[];
 
-    createStateSets(): [StateSet<F>, StateSet<F>];
+    createStateSets(): [FrontierSet<F>, ReachedSet<F>];
 
 }
 
-export interface PartitionOperator<E extends AbstractElement, F extends AbstractState> {
+export interface PartitionOperator<E extends AbstractElement, F extends AbstractState>
+   extends StatePartitionOperator<E> {
 
-    partitionOf(ofState: E, reached: StateSet<F>): Iterable<F>;
+    partitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F>;
 
 }
 
@@ -72,7 +73,7 @@ export interface TargetOperator<E extends AbstractElement> {
 
 export interface MergeIntoOperator<E extends AbstractElement, F extends AbstractState> {
 
-    mergeInto(state: E, frontier: StateSet<F>, reached: StateSet<F>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): [StateSet<F>, StateSet<F>];
+    mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): [FrontierSet<F>, ReachedSet<F>];
 
 }
 

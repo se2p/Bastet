@@ -29,7 +29,7 @@ import {Set as ImmSet} from "immutable";
 import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 import {AnalysisAlgorithm} from "./Algorithm";
 import {Preconditions} from "../../utils/Preconditions";
-import {StateSet} from "./StateSet";
+import {FrontierSet, ReachedSet, StateSet} from "./StateSet";
 import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
 import {BastetConfiguration} from "../../utils/BastetConfiguration";
 
@@ -75,7 +75,7 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
         this._properties = this._task.getProperties();
     }
 
-    run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
+    run(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {
         let violated: ImmSet<Property> = ImmSet();
         let satisfied: ImmSet<Property> = ImmSet();
         let unknown: ImmSet<Property> = this._properties;

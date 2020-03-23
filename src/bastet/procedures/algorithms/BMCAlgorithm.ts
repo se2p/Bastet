@@ -23,7 +23,7 @@
 
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {AbstractElement, AbstractState} from "../../lattices/Lattice";
-import {StateSet} from "./StateSet";
+import {FrontierSet, ReachedSet, StateSet} from "./StateSet";
 import {AnalysisAlgorithm} from "./Algorithm";
 import {Refiner} from "../analyses/Refiner";
 import {Preconditions} from "../../utils/Preconditions";
@@ -53,7 +53,7 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractState>
         this._feasibilityCheckStats = this._statistics.withContext("FeasibilityCheck");
     }
 
-    public run(frontier: StateSet<E>, reached: StateSet<E>): [StateSet<E>, StateSet<E>] {
+    public run(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {
         do {
             this._statistics.increment(STAT_KEY_BMC_ITERATIONS);
             [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);

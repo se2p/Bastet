@@ -41,7 +41,7 @@ import {AbstractElement, AbstractState, LatticeWithComplements} from "../../../l
 import {DataRefiner} from "./DataRefiner";
 import {Refiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
-import {StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
@@ -144,16 +144,20 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return this._refiner;
     }
 
-    createStateSets(): [StateSet<AbstractState>, StateSet<AbstractState>] {
+    createStateSets(): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         throw new ImplementMeException();
     }
 
-    mergeInto(state: DataAbstractState, frontier: StateSet<AbstractState>, reached: StateSet<AbstractState>, unwrapper: (AbstractElement) => DataAbstractState, wrapper: (E) => AbstractElement): [StateSet<AbstractState>, StateSet<AbstractState>] {
+    mergeInto(state: DataAbstractState, frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>, unwrapper: (AbstractElement) => DataAbstractState, wrapper: (E) => AbstractElement): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         throw new ImplementMeException();
     }
 
     partitionOf(ofState: DataAbstractState, reached: StateSet<AbstractState>): Iterable<AbstractState> {
         return reached;
+    }
+
+    getPartitionKey(element: DataAbstractState): PartitionKeyElement[] {
+        return [];
     }
 
 }

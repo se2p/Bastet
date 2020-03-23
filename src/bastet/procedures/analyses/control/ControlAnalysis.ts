@@ -41,7 +41,7 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Property} from "../../../syntax/Property";
-import {StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {DataAbstractState} from "../data/DataAbstractDomain";
@@ -99,6 +99,12 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         return result;
     }
 
+    getPartitionKey(element: ControlAbstractState): PartitionKeyElement[] {
+        const steppedForLocations: PartitionKeyElement[] = element.getSteppedFor()
+            .map((ix) => element.getIndexedThreadState(ix).threadStatus.getRelationLocation().getLocationId()).toArray();
+        return steppedForLocations.concat(this.wrappedAnalysis.getPartitionKey(element.getWrappedState()));
+    }
+
     join(state1: ControlAbstractState, state2: ControlAbstractState): ControlAbstractState {
         return this._abstractDomain.lattice.join(state1, state2);
     }
@@ -126,7 +132,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
             .withIsTargetFor(state1.getIsTargetFor().union(state2.getIsTargetFor()));
     }
 
-    mergeInto(state: ControlAbstractState, frontier: StateSet<ControlAbstractState>, reached: StateSet<ControlAbstractState>, unwrapper: (AbstractElement) => ControlAbstractState, wrapper: (E) => AbstractElement): [StateSet<ControlAbstractState>, StateSet<ControlAbstractState>] {
+    mergeInto(state: ControlAbstractState, frontier: FrontierSet<ControlAbstractState>, reached: ReachedSet<ControlAbstractState>, unwrapper: (AbstractElement) => ControlAbstractState, wrapper: (E) => AbstractElement): [FrontierSet<ControlAbstractState>, ReachedSet<ControlAbstractState>] {
         throw new ImplementMeException();
     }
 
@@ -215,11 +221,11 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         return `${controlLabel} ${innerLabel}`;
     }
 
-    createStateSets(): [StateSet<AbstractState>, StateSet<AbstractState>] {
+    createStateSets(): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         throw new ImplementMeException();
     }
 
-    partitionOf(ofState: ControlAbstractState, reached: StateSet<AbstractState>): Iterable<AbstractState> {
+    partitionOf(ofState: ControlAbstractState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
         return this.wrappedAnalysis.partitionOf(ofState, reached);
     }
 
