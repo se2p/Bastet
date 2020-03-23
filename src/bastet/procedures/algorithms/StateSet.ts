@@ -22,8 +22,6 @@
 import {AbstractElement, AbstractState} from "../../lattices/Lattice";
 import {AbstractStateVisitor} from "../analyses/AbstractStates";
 import {Preconditions} from "../../utils/Preconditions";
-import {AbstractMockElement} from "../../../../test/bastet/procedures/TransferRelationMock";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
 export interface StateSet<E extends AbstractElement> {
 
