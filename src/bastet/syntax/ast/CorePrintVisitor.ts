@@ -75,7 +75,7 @@ import {
     BeginAtomicStatement,
     EndAtomicStatement,
     IfStatement,
-    RepeatForeverStatement,
+    RepeatForeverStatement, ReturnStatement,
     UntilStatement
 } from "./core/statements/ControlStatement";
 import {StatementList} from "./core/statements/Statement";
@@ -120,6 +120,10 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
 
     visit(node: AstNode): string {
         throw new ImplementMeException();
+    }
+
+    visitReturnStatement(node: ReturnStatement): string {
+        return 'RETURN';
     }
 
     visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): string {

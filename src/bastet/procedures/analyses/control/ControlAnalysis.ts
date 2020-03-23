@@ -91,6 +91,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
         const result: ControlAbstractState[] = [];
         for (const r of this._transferRelation.abstractSucc(fromState)) {
+            // if (this.refiner.checkIsFeasible(r)) {
             if (!this.steppedOnLoophead(r) || this.refiner.checkIsFeasible(r)) {
                 result.push(r);
             }

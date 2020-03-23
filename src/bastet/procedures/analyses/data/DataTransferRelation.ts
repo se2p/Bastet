@@ -65,6 +65,8 @@ export class DataTransferRelation implements LabeledTransferRelation<DataAbstrac
             ast = op.ast;
         }
 
+        console.log(ast.accept(new CorePrintVisitor()));
+
         return this.abstractSuccForAst(fromState, ast);
     }
 

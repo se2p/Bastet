@@ -22,6 +22,7 @@
 import {TransitionRelation, TransitionTo} from "./TransitionRelation";
 import {LocationId} from "./ControlLocation";
 import {ProgramOperations} from "./ops/ProgramOperation";
+import {CorePrintVisitor} from "../../ast/CorePrintVisitor";
 
 export class TransitionRelationToDot {
 
@@ -60,8 +61,8 @@ export class TransitionRelationToDot {
                 visited.add(fromlocid);
                 let fromWork: Array<TransitionTo> = tr.transitionsFrom(fromlocid);
                 for (const t of fromWork) {
-                    let op = ProgramOperations.withID(t.opId);
-                    output.push(`    ${fromlocid} -> ${t.target} [label="${this.escapeLabel(op.toString())}"];`);
+                    let op: string = ProgramOperations.withID(t.opId).ast.accept(new CorePrintVisitor());
+                    output.push(`    ${fromlocid} -> ${t.target} [label="${this.escapeLabel(op)}"];`);
                     worklist.push(t.target);
                 }
             }
