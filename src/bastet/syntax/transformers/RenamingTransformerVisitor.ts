@@ -133,6 +133,7 @@ import {
     StartCloneActorExpression, UsherActorExpression
 } from "../ast/core/expressions/ActorExpression";
 import {Identifier} from "../ast/core/Identifier";
+import {InitializeAnalysisStatement} from "../ast/core/statements/InternalStatement";
 
 export enum DataLocationMode {
 
@@ -173,6 +174,10 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     visit(node: AstNode): AstNode {
         throw new ImplementMeException();
+    }
+
+    visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): AstNode {
+        return node;
     }
 
     visitCastExpression(node: CastExpression): AstNode {

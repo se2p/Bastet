@@ -48,7 +48,7 @@ export abstract class DeclareVariableStatement extends DeclarationStatement impl
 
     constructor(variable: VariableWithDataLocation) {
         Preconditions.checkNotUndefined(variable);
-        super([variable.identifier, variable.expressionType]);
+        super([variable]);
         this._variable = variable;
     }
 

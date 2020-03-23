@@ -36,6 +36,7 @@ import {
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {Concern} from "../../../syntax/Concern";
+import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 
 export class DataTransferRelation implements LabeledTransferRelation<DataAbstractState> {
 
@@ -55,6 +56,8 @@ export class DataTransferRelation implements LabeledTransferRelation<DataAbstrac
     public abstractSuccFor(fromState: DataAbstractState, op: ProgramOperation, co: Concern): Iterable<DataAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
+
+        console.log(op.ast.accept(new CorePrintVisitor()));
 
         let ast: AstNode;
         if (op instanceof AssumeOperation) {

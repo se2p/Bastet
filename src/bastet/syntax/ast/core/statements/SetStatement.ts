@@ -87,7 +87,7 @@ export class StoreEvalResultToVariableStatement extends SetStatement {
     private readonly _toValue: Expression;
 
     constructor(variable: VariableWithDataLocation, toValue: Expression) {
-        super([variable.identifier, toValue]);
+        super([variable, toValue]);
         this._variable = Preconditions.checkNotUndefined(variable);
         this._toValue = Preconditions.checkNotUndefined(toValue);
     }

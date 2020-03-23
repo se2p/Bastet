@@ -56,6 +56,7 @@ import {BOOTSTRAP_MESSAGE} from "../../../syntax/ast/core/Message";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
 import {App} from "../../../syntax/app/App";
+import {InitializeAnalysisStatement} from "../../../syntax/ast/core/statements/InternalStatement";
 
 export class TimeTransferRelation<W extends AbstractElement> implements LabeledTransferRelation<W> {
 
@@ -90,11 +91,8 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
     }
 
     private isBootstrapOperation(op: ProgramOperation): boolean {
-        if (op.ast instanceof BroadcastAndWaitStatement) {
-            const bcw = op.ast as BroadcastAndWaitStatement;
-            if (bcw.msg.messageid == BOOTSTRAP_MESSAGE.messageid) {
-                return true;
-            }
+        if (op.ast instanceof InitializeAnalysisStatement) {
+            return true;
         }
         return false;
     }

@@ -71,7 +71,11 @@ import {
 } from "./core/statements/ControlStatement";
 import {CallStatement} from "./core/statements/CallStatement";
 import {StatementList} from "./core/statements/Statement";
-import {DeclareStackVariableStatement} from "./core/statements/DeclarationStatement";
+import {
+    DeclareActorVariableStatement,
+    DeclareStackVariableStatement,
+    DeclareSystemVariableStatement
+} from "./core/statements/DeclarationStatement";
 import {ExpressionStatement} from "./core/statements/ExpressionStatement";
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {CreateCloneOfStatement} from "./core/statements/CreateCloneOfStatement";
@@ -112,6 +116,7 @@ import {
 } from "./core/CoreEvent";
 import {ActorType, BooleanType, ListType, NumberType, ScratchType, StringType} from "./core/ScratchType";
 import {SystemMessage} from "./core/Message";
+import {InitializeAnalysisStatement} from "./core/statements/InternalStatement";
 
 export interface CoreVisitor<R> {
 
@@ -272,11 +277,17 @@ export interface CoreCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
 export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
+    visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): R;
+
     visitBeginAtomicStatement(node: BeginAtomicStatement): R;
 
     visitEndAtomicStatement(node: EndAtomicStatement): R;
 
     visitAssumeStatement(node: AssumeStatement): R;
+
+    visitDeclareSystemVariableStatement(node: DeclareSystemVariableStatement): R;
+
+    visitDeclareActorVariableStatement(node: DeclareActorVariableStatement): R;
 
     visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): R;
 
