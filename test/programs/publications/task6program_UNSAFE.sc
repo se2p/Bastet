@@ -13,7 +13,6 @@ actor strid "Zirkusdirektor-rennend" is ScratchSprite begin
     script on startup do begin
         repeat forever begin
             pointTowards(locate actor "Affe")
-            moveSteps(1)
         end
     end
 
