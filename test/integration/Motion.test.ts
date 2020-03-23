@@ -31,3 +31,13 @@ test("Test pointTowards 1 safe", done => {
         done(error)
     }
 }, utils.timeout);
+
+test("Test pointTowards 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-pointTowards-1_UNSAFE.sc"
+    let bastet = new Bastet();
+    try {
+        utils.execute(bastet, fixtureRelPath, done)
+    } catch (error) {
+        done(error)
+    }
+}, utils.timeout);
