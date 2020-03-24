@@ -25,11 +25,13 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKey, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper} from "../Refiner";
 import {GraphAbstractState} from "../graph/GraphAbstractDomain";
+import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+
 
 export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F extends AbstractState>
     implements WrappingProgramAnalysis<C, E, F>, Unwrapper<E, E> {
@@ -174,8 +176,8 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         return this.wrappedAnalysis.partitionOf(ofState, reached);
     }
 
-    getPartitionKey(element: E): PartitionKeyElement[] {
-        return this.wrappedAnalysis.getPartitionKey(element);
+    getPartitionKeys(element: E): ImmSet<PartitionKey> {
+        return this.wrappedAnalysis.getPartitionKeys(element);
     }
 
 }

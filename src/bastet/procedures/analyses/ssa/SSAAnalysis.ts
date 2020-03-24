@@ -28,11 +28,10 @@ import {ConcreteElement} from "../../domains/ConcreteElements";
 import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferRelation";
 import {SSAAbstractDomain, SSAState} from "./SSAAbstractDomain";
 import {SSATransferRelation} from "./SSATransferRelation";
-import {Map as ImmMap} from "immutable"
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKey, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
 import {GraphAbstractState} from "../graph/GraphAbstractDomain";
@@ -40,6 +39,8 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {StandardMergeOperatorFactory} from "../Operators";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {SSAMergeOperator} from "./SSAMergeOperator";
+import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+
 
 export class SSAAnalysisConfig extends BastetConfiguration {
 
@@ -150,8 +151,8 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return this.wrappedAnalysis.partitionOf(ofState.getWrappedState(), reached);
     }
 
-    getPartitionKey(element: SSAState): PartitionKeyElement[] {
-        return this._wrappedAnalysis.getPartitionKey(element.getWrappedState());
+    getPartitionKeys(element: SSAState): ImmSet<PartitionKey> {
+        return this._wrappedAnalysis.getPartitionKeys(element.getWrappedState());
     }
 
 }

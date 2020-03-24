@@ -42,8 +42,8 @@ export class GraphTransferRelation implements TransferRelation<GraphAbstractStat
         const result = [];
         const wrappedSuccs = this._wrappedAbstractSucc.abstractSucc(fromState.getWrappedState());
         for (const w of wrappedSuccs) {
-            const wrappedKey = this._wrappedPartitionOp.getPartitionKey(w);
-            const succState = GraphAbstractStateFactory.withFreshID([fromState.getId()], [], w, ImmList(wrappedKey));
+            const wrappedKeys = this._wrappedPartitionOp.getPartitionKeys(w);
+            const succState = GraphAbstractStateFactory.withFreshID([fromState.getId()], [], w, wrappedKeys);
             result.push(succState);
         }
 

@@ -25,7 +25,7 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKey, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper} from "../Refiner";
@@ -35,6 +35,8 @@ import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferR
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+
 
 export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
     implements WrappingProgramAnalysis<C, E, F>,
@@ -126,7 +128,7 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, 
         return this._wrappedAnalysis.partitionOf(ofState, reached);
     }
 
-    getPartitionKey(element: E): PartitionKeyElement[] {
-        return this._wrappedAnalysis.getPartitionKey(element);
+    getPartitionKeys(element: E): ImmSet<PartitionKey> {
+        return this._wrappedAnalysis.getPartitionKeys(element);
     }
 }
