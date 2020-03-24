@@ -16,11 +16,6 @@ RUN npm install
 
 FROM node:13-alpine
 
-# Do not run the app as root
-RUN groupadd -r nodejs && useradd -m -r -g -s /bin/bash nodejs nodejs
-
-USER nodejs
-
 # Copy BASTET fully into the image
 COPY . ./
 
