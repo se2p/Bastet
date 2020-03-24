@@ -12,7 +12,7 @@ WORKDIR /bastet
 COPY package.json .
 
 # Build BASTET
-RUN npm install; npm run build
+RUN npm install
 
 FROM node:13-alpine
 
@@ -23,5 +23,7 @@ USER nodejs
 
 # Copy BASTET fully into the image
 COPY . ./
+
+RUN npm run build
 
 CMD ["npm", "start"]
