@@ -42,6 +42,7 @@
     "antlr4ts-cli": "^0.5.0-alpha.3",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.1",
+    "eslint-config-sinon": "^4.0.0",
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-prettier": "^3.1.2",
     "jest": "^25.1.0",
