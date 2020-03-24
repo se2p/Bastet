@@ -1,4 +1,4 @@
-FROM node:8 as build
+FROM node:13 as build
 
 WORKDIR /dist
 COPY . ./
@@ -9,7 +9,7 @@ RUN npm install -g typescript
 # Build bastet
 RUN npm install; npm run build
 
-FROM node:8-alpine
+FROM node:13-alpine
 
 # Do not run the app as root
 RUN groupadd -r nodejs && useradd -m -r -g -s /bin/bash nodejs nodejs
