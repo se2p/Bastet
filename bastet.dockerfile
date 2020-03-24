@@ -5,7 +5,7 @@ FROM node:13-alpine
 WORKDIR /bastet
 
 # First, copy the package dependency definition only (for a better layering)
-COPY package.json .
+COPY package*.json .
 
 # Build BASTET
 RUN npm install --production
