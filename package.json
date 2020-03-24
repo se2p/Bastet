@@ -6,7 +6,8 @@
   "scripts": {
     "antlr4ts": "antlr4ts -visitor src/bastet/syntax/parser/grammar/Scratch.g4",
     "start": "node dist/main.js $*",
-    "build": "npm run build-ts && npm run lint && npm run copy-static-assets",
+    "build": "npm run build-no-lint && npm run lint",
+    "build-no-lint": "npm run build-ts && npm run copy-static-assets",
     "serve": "npm start",
     "watch-node": "nodemon dist/main.js",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",

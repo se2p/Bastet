@@ -19,6 +19,6 @@ RUN npm install -g typescript
 # Copy BASTET fully into the image
 COPY . ./
 
-RUN npm run build
+RUN npm run build-no-lint
 
 CMD ["npm", "start"]
