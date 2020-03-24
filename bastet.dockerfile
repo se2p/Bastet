@@ -1,9 +1,6 @@
 # Use the original nodejs image as parent image
 FROM node:13 as build
 
-# Install the global dependencies
-RUN npm install -g typescript
-
 # Set the working directory
 # All subsequent actions will be taken from here
 WORKDIR /bastet
@@ -15,6 +12,9 @@ COPY package.json .
 RUN npm install
 
 FROM node:13-alpine
+
+# Install the global dependencies
+RUN npm install -g typescript
 
 # Copy BASTET fully into the image
 COPY . ./
