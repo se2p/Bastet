@@ -30,7 +30,7 @@ Upcoming versions will support:
 
 - IDE: JetBrains WebStorm 2019.x
 - NodeJs 13.9 (Current)
-- TypeScript 3.7 (npm install -g typescript)
+- TypeScript 3.8 (npm install -g typescript)
 - UMLet UML Editor 14.3
 
 
