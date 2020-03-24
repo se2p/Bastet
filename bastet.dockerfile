@@ -5,6 +5,7 @@ FROM node:13 as build
 RUN npm install -g typescript
 
 # Set the working directory
+# All subsequent actions will be taken from here
 WORKDIR /bastet
 
 # First, copy the package dependency definition only (for a better layering)
