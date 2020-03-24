@@ -62,6 +62,7 @@
     "commander": "^5.0.0",
     "core-util-is": "^1.0.2",
     "immutable": "^4.0.0-rc.12",
+    "mkdirp": "^1.0.3",
     "toposort": "^2.0.2",
     "typescript-logging": "^0.6.4",
     "wasm-ts": "^0.1.3"
