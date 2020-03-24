@@ -28,7 +28,7 @@ import {
 import {
     ControlAbstractDomain,
     ControlAbstractState,
-    ControlConcreteState,
+    ControlConcreteState, MethodCall,
     ScheduleAbstractStateFactory
 } from "./ControlAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
@@ -41,10 +41,11 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKey, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {DataAbstractState} from "../data/DataAbstractDomain";
+import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -99,10 +100,19 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         return result;
     }
 
-    getPartitionKey(element: ControlAbstractState): PartitionKeyElement[] {
-        const steppedForLocations: PartitionKeyElement[] = element.getSteppedFor()
-            .map((ix) => element.getIndexedThreadState(ix).threadStatus.getRelationLocation().getLocationId()).toArray();
-        return steppedForLocations.concat(this.wrappedAnalysis.getPartitionKey(element.getWrappedState()));
+    getPartitionKeys(element: ControlAbstractState): ImmSet<PartitionKey> {
+        const locations: ImmSet<LocationId> = ImmSet(element.getThreadStates().map((ts) =>
+            ts.getRelationLocation().getLocationId()));
+        const callstacks: ImmSet<ImmList<MethodCall>> = ImmSet(element.getThreadStates().map((ts) =>
+            ts.getCallStack()));
+        const controlPartition = new PartitionKey(ImmList([locations, callstacks]));
+
+        let result: ImmSet<PartitionKey> = ImmSet();
+        for (const wrappedPartition of this.wrappedAnalysis.getPartitionKeys(element.getWrappedState())) {
+            result = result.add(controlPartition.concat(wrappedPartition));
+        }
+
+        return result;
     }
 
     join(state1: ControlAbstractState, state2: ControlAbstractState): ControlAbstractState {

@@ -49,10 +49,10 @@
     "shelljs": "^0.8.3",
     "ts-jest": "^24.2.0",
     "ts-node": "^8.5.4",
-    "typescript": "^3.7.3"
+    "typescript": "^3.8.3"
   },
   "dependencies": {
-    "acorn": "^7.1.0",
+    "acorn": "^7.1.1",
     "antlr4ts": "^0.5.0-alpha.3",
     "commander": "^4.1.0",
     "core-util-is": "^1.0.2",

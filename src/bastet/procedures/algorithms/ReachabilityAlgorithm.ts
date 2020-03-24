@@ -105,6 +105,9 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
                 // MERGE: If desired, merge certain states
                 [frontier, reached] = this._analysis.mergeInto(ePrimePrime, frontier, reached, (s) => s, (s) => s);
 
+                // Statistics
+                [frontier, reached] = this.takeNoteOfResult(frontier, reached);
+
                 // STOP: Check for coverage (fixed point iteration)
                 const checkStopFor: E = ePrimePrime; // TODO: How does this interact with the 'merge' above
                 if (!this._analysis.stop(checkStopFor, reached.getStateSet(checkStopFor), (s) => s)) {

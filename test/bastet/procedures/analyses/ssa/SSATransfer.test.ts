@@ -43,8 +43,8 @@ describe('SSA Transfer Relation', function() {
         const varA = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("a"), NumberType.instance()));
         const ssaState = new SSAState(
             ImmMap([[varA.qualifiedName, 1]]),
-            ImmMap([[varA.qualifiedName, NumberType.instance().typeId]]),
-            new AbstractMockElement(0));
+            new AbstractMockElement(0)
+        );
 
         const result = ssaTr.abstractSuccFor(ssaState, ProgramOperationFactory.createFor(
             new StoreEvalResultToVariableStatement(varA, new PlusExpression(varA, varA))),

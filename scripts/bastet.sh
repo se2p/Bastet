@@ -63,7 +63,7 @@ done
 
 # Script to run Bastet in UNIX environments
 echo "${arguments[*]}"
-exec node --max-old-space-size=10240 dist/main.js ${arguments[*]}
+exec node --max-old-space-size=10240 dist/src/main.js ${arguments[*]}
 
 # Cleanup (is triggered automatically on EXIT---a trap is used)
 exit 0

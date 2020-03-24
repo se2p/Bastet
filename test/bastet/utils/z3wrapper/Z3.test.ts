@@ -140,3 +140,36 @@ test("Lattice Include 5", () => {
     expect(result).toBe(true);
 });
 
+test("Lattice Join 1", () => {
+    const lattice = new Z3FirstOrderLattice(theories.boolTheory, prover);
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), NumberType.instance()));
+    const f1 = theories.boolTheory.and(
+        theories.numTheory.isNumberEqualTo(
+            theories.numTheory.abstractNumberValue(x),
+            theories.numTheory.fromConcreteNumber(new ConcreteNumber(42))),
+        theories.numTheory.isNumberEqualTo(
+            theories.numTheory.abstractNumberValue(x),
+            theories.numTheory.fromConcreteNumber(new ConcreteNumber(42))));
+    const result = lattice.join(f1, lattice.bottom());
+    prover.push();
+    prover.assert(result);
+    const isUnsat = prover.isUnsat();
+    expect(isUnsat).toBe(false);
+});
+
+test("Lattice Meet 1", () => {
+    const lattice = new Z3FirstOrderLattice(theories.boolTheory, prover);
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), NumberType.instance()));
+    const f1 = theories.boolTheory.and(
+        theories.numTheory.isNumberEqualTo(
+            theories.numTheory.abstractNumberValue(x),
+            theories.numTheory.fromConcreteNumber(new ConcreteNumber(42))),
+        theories.numTheory.isNumberEqualTo(
+            theories.numTheory.abstractNumberValue(x),
+            theories.numTheory.fromConcreteNumber(new ConcreteNumber(42))));
+    const result = lattice.meet(f1, lattice.bottom());
+    prover.push();
+    prover.assert(result);
+    const isUnsat = prover.isUnsat();
+    expect(isUnsat).toBe(true);
+});

@@ -57,8 +57,7 @@ export class VariableExpression extends AbstractExpression {
     private readonly _variable: VariableWithDataLocation;
 
     constructor(variable: VariableWithDataLocation) {
-        super(Preconditions.checkNotUndefined(variable.expressionType),
-            [Preconditions.checkNotUndefined(variable.identifier)]);
+        super(Preconditions.checkNotUndefined(variable.expressionType), [variable]);
         this._variable = variable;
     }
 

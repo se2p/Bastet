@@ -67,7 +67,7 @@ export class SSAMergeOperator implements MergeOperator<SSAState> {
         const state2SyncOps: AstNode[] = [];
 
         const syncedSSA = state1.getSSA().mergeWith(
-            (state2Version, state1Version, key) => {
+            (state1Version, state2Version, key) => {
                 const assignedDataLoc: DataLocation = this._task.typeStorage.getTypedLocation(key);
                 const mergedVersion = Math.max(state1Version, state2Version);
 

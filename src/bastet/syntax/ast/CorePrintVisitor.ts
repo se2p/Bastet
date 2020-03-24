@@ -1,4 +1,10 @@
-import {CoreBoolExpressionVisitor, CoreEventVisitor, CoreNumberExpressionVisitor, CoreTypeVisitor} from "./CoreVisitor";
+import {
+    CoreBoolExpressionVisitor,
+    CoreEventVisitor,
+    CoreNonCtrlStatementnVisitor,
+    CoreNumberExpressionVisitor,
+    CoreTypeVisitor
+} from "./CoreVisitor";
 import {AstNode} from "./AstNode";
 import {
     AfterBootstrapMonitoringEvent,
@@ -69,7 +75,7 @@ import {
     BeginAtomicStatement,
     EndAtomicStatement,
     IfStatement,
-    RepeatForeverStatement,
+    RepeatForeverStatement, ReturnStatement,
     UntilStatement
 } from "./core/statements/ControlStatement";
 import {StatementList} from "./core/statements/Statement";
@@ -106,12 +112,22 @@ import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
 import {SystemMessage} from "./core/Message";
+import {InitializeAnalysisStatement} from "./core/statements/InternalStatement";
 
 export class CorePrintVisitor implements CoreEventVisitor<string>,
-    CoreBoolExpressionVisitor<string>, CoreNumberExpressionVisitor<string> {
+    CoreBoolExpressionVisitor<string>, CoreNumberExpressionVisitor<string>,
+    CoreNonCtrlStatementnVisitor<string> {
 
     visit(node: AstNode): string {
         throw new ImplementMeException();
+    }
+
+    visitReturnStatement(node: ReturnStatement): string {
+        return 'RETURN';
+    }
+
+    visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): string {
+        return "initialize analysis";
     }
 
     visitAfterBootstrapMonitoringEvent(node: AfterBootstrapMonitoringEvent): string {

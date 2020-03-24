@@ -52,6 +52,7 @@ import {CallStatement} from "../ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
 import {Properties} from "../Property";
 import {Identifier} from "../ast/core/Identifier";
+import {InitializeAnalysisStatement} from "../ast/core/statements/InternalStatement";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -300,7 +301,7 @@ export class Actors {
     public static defaultBoostraper(): Actor {
         if (!Actors._DEFAULT_BOOTSTRAPPER) {
             const bootstrapStmts = new StatementList([
-                new EpsilonStatement(),
+                new InitializeAnalysisStatement(),
                 new BroadcastAndWaitStatement(BOOTSTRAP_MESSAGE),
                 new BroadcastAndWaitStatement(BOOTSTRAP_FINISHED_MESSAGE),
                 new BroadcastMessageStatement(GREENFLAG_MESSAGE),

@@ -79,7 +79,8 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
 
     visitSSAState(element: SSAState): string {
         const wrappedLabel = element.getWrappedState().accept(this);
-        return `${element.getSSA().toString()} ${wrappedLabel}`;
+        return wrappedLabel;
+        // return `${element.getSSA().toString()} ${wrappedLabel}`;
     }
 
 }

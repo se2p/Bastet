@@ -46,7 +46,6 @@ actor DirectorObserver is Observer begin
 
     declare last_change as number
 
-    define last_change as _RUNTIME_millis()
     define actor_1_moving_towards_2 as true
 
     // TODO: Store attributes as 'normal' variables of the actor?
@@ -95,13 +94,14 @@ actor DirectorObserver is Observer begin
         define actor_1_moving_towards_2 as actor_1_x_move_towards_2 or actor_1_y_move_towards_2
 
         if actor_1_moving_towards_2 then begin
-           define last_change as _RUNTIME_millis()
+           define last_change as _RUNTIME_micros()
         end
 
         // The actual invariant check
-        if _RUNTIME_millis() - last_change > 1000 then begin
+        if _RUNTIME_micros() - last_change > 10 then begin
             define result as false
         end
+
     end returns result: boolean
 
     define atomic storeRelevantStateInfosForNext () begin
@@ -120,6 +120,7 @@ actor DirectorObserver is Observer begin
     script on bootstrap finished do begin
         define actor_1 as locate actor "Zirkusdirektor-rennend"
         define actor_2 as locate actor "Affe"
+        define last_change as _RUNTIME_micros()
 
         // First specification check (base condition)
         assert(isBehaviorSatisfied())

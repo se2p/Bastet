@@ -132,6 +132,7 @@ import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {BeginAtomicStatement, EndAtomicStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpression";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+import {InitializeAnalysisStatement} from "../../../syntax/ast/core/statements/InternalStatement";
 
 export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
     S extends AbstractString, L extends AbstractList>
@@ -518,6 +519,10 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
         return this._mem;
     }
 
+    visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): B {
+        return this._mem;
+    }
+
     visitDeleteFromAllStatement(node: DeleteAllFromStatement): B {
         throw new ImplementMeException();
     }
@@ -623,3 +628,4 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
     }
 
 }
+

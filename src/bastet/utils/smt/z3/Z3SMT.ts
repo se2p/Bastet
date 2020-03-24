@@ -39,7 +39,7 @@ export var PreModule = {
     },
 
     locateFile: function (path, scriptDir) {
-        return "dist/lib/z3/libz3.so.wasm";
+        return "dist/src/lib/z3/libz3.so.wasm";
     },
 
     postRun: function() {
@@ -133,9 +133,9 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
      * @param f
      */
     public assert(f: Z3FirstOrderFormula): void  {
-//        console.log(this._ctx.ast_to_string(
-//            this._ctx.simplify(f.getAST())
-//        ));
+        //console.log(this._ctx.ast_to_string(
+        //    f.getAST()
+        //));
         this._ctx.solver_assert(this._solver, f.getAST());
     }
 

@@ -37,7 +37,7 @@ import {GraphTransferRelation} from "./GraphTransferRelation";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {
     DefaultAnalysisStateSet, DefaultFrontierSet, FrontierSet,
-    NoPartitioningOperator,
+    NoPartitioningOperator, PartitionKey,
     PartitionKeyElement, ReachedSet,
     StatePartitionOperator,
     StateSet
@@ -124,7 +124,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
             state1.getPredecessors().union(state2.getPredecessors()),
             state1.getMergeOf().union(state2.getMergeOf()),
             this._wrappedAnalysis.merge(state1.getWrappedState(), state2.getWrappedState()),
-            state1.getPartitionKey());
+            state1.getPartitionKeys());
     }
 
     mergeInto(state: GraphAbstractState, frontier: FrontierSet<GraphAbstractState>, reached: ReachedSet<GraphAbstractState>, unwrapper: (AbstractElement) => GraphAbstractState, wrapper: (E) => AbstractElement): [FrontierSet<GraphAbstractState>, ReachedSet<GraphAbstractState>] {
@@ -152,8 +152,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     initialStatesFor(task: App): GraphAbstractState[] {
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            const partitionKey = this._wrappedAnalysis.getPartitionKey(w);
-            return GraphAbstractStateFactory.withFreshID([],[],  w, ImmList(partitionKey));
+            const partitionKeys = this._wrappedAnalysis.getPartitionKeys(w);
+            return GraphAbstractStateFactory.withFreshID([],[],  w, partitionKeys);
         } );
     }
 
@@ -195,8 +195,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         return reached.getStateSet(ofState);
     }
 
-    getPartitionKey(element: GraphAbstractState): PartitionKeyElement[] {
-        return element.getPartitionKey().toArray();
+    getPartitionKeys(element: GraphAbstractState): ImmSet<PartitionKey> {
+        return element.getPartitionKeys();
     }
 
 }

@@ -20,10 +20,35 @@
  */
 
 import {AbstractElement, AbstractState} from "../../lattices/Lattice";
-import {AbstractStateVisitor} from "../analyses/AbstractStates";
 import {Preconditions} from "../../utils/Preconditions";
-import {AbstractMockElement} from "../../../../test/bastet/procedures/TransferRelationMock";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {List as ImmList, Record as ImmRec, Set as ImmSet, Map as ImmMap} from "immutable";
+import {getTheOnlyElement} from "../../utils/Collections";
+
+export interface PartitionKeyAttribs extends AbstractElement {
+
+    key: ImmList<any>;
+
+}
+
+const PartitionKeyRecord = ImmRec({
+    key: ImmList()
+});
+
+export class PartitionKey extends PartitionKeyRecord implements PartitionKeyAttribs {
+
+    constructor(partitionKey: ImmList<any>) {
+        super({key: partitionKey});
+    }
+
+    public getKey(): ImmList<any> {
+        return this.get('key');
+    }
+
+    public concat(other: PartitionKey): PartitionKey {
+        return this.set('key', this.getKey().concat(other.getKey()));
+    }
+
+}
 
 export interface StateSet<E extends AbstractElement> {
 
@@ -100,99 +125,71 @@ export abstract class AbstractAnalysisStateSet<E extends AbstractElement> {
 
 export type PartitionKeyElement = string|number|boolean;
 
-export interface PartitionVisitor extends AbstractStateVisitor<PartitionKeyElement[]> {
-
-}
-
 export interface StatePartitionOperator<E extends AbstractElement> {
 
-    getPartitionKey(element: E): PartitionKeyElement[];
+    getPartitionKeys(element: E): ImmSet<PartitionKey>;
 
 }
 
 export class NoPartitioningOperator<E extends AbstractElement> implements StatePartitionOperator<E> {
 
-    getPartitionKey(element: E): PartitionKeyElement[] {
-        return [];
+    getPartitionKeys(element: E): ImmSet<PartitionKey> {
+        return ImmSet([new PartitionKey(ImmList())]);
     }
 
 }
 
 export class PartitionedOrderedSet<E extends AbstractElement> {
 
-    private _childs: Map<PartitionKeyElement, PartitionedOrderedSet<E>>;
-
-    private _elements: Set<E>;
-
     private _size: number;
 
     private _keyOperator: StatePartitionOperator<E>;
+
+    private _elements: Set<E>;
+
+    private _partitions: ImmMap<PartitionKey, Set<E>>;
 
     constructor(partitionOperator: StatePartitionOperator<E>) {
         this._keyOperator = Preconditions.checkNotUndefined(partitionOperator);
         this._size = 0;
         this._elements = new Set<E>();
-        this._childs = new Map<PartitionKeyElement, PartitionedOrderedSet<E>>();
+        this._partitions = ImmMap<PartitionKey, Set<E>>().asMutable();
     }
 
-    private getPartitionKey(element: E): PartitionKeyElement[] {
-        return this._keyOperator.getPartitionKey(element);
+    private getPartitionKey(element: E): PartitionKey {
+        return getTheOnlyElement(this._keyOperator.getPartitionKeys(element));
     }
 
-    public getPartitionOf(element: E): PartitionedOrderedSet<E> {
-        const key: PartitionKeyElement[] = this.getPartitionKey(element).slice();
+    public getPartitionOf(element: E): Set<E> {
+        const key: PartitionKey = this.getPartitionKey(element);
         return this.getPartition(key);
     }
 
-    private getChildPartition(key: PartitionKeyElement): PartitionedOrderedSet<E> {
-        let result = this._childs.get(key);
+    private getPartition(key: PartitionKey): Set<E> {
+        let result = this._partitions.get(key);
         if (!result) {
-            result = new PartitionedOrderedSet(this._keyOperator);
-            this._childs.set(key, result);
+            result = new Set();
+            this._partitions.set(key, result);
         }
 
         return result;
     }
 
-    public removeFrom(element: E, from: PartitionKeyElement[]) {
-        if (from.length > 0) {
-            this.getChildPartition(from[0]).removeFrom(element, from.slice(1, from.length));
-        }
+    public remove(element: E) {
+        const partitionKey = this.getPartitionKey(element);
 
+        this.getPartition(partitionKey).delete(element);
         if (this._elements.delete(element)) {
             this._size--;
         }
     }
 
-    public remove(element: E) {
+    public add(element: E) {
         const partitionKey = this.getPartitionKey(element);
-        this.removeFrom(element, partitionKey);
-    }
-
-    private addElementTo(element: E, to: PartitionKeyElement[]) {
-        if (to.length > 0) {
-            this.getChildPartition(to[0]).addElementTo(element, to.slice(1, to.length));
-        }
+        this.getPartition(partitionKey).add(element);
 
         this._elements.add(element);
         this._size++;
-    }
-
-    public add(element: E) {
-        const partitionKey = this.getPartitionKey(element);
-        this.addElementTo(element, partitionKey);
-    }
-
-    public getPartition(key: PartitionKeyElement[]): PartitionedOrderedSet<E> {
-        if (key.length == 0) {
-            return this;
-        }
-
-        const elementKey = key[0];
-        let elementPartition = this.getChildPartition(elementKey);
-
-        const subpart = key.slice(1, key.length);
-        return elementPartition.getPartition(subpart);
     }
 
     public isEmpty(): boolean {

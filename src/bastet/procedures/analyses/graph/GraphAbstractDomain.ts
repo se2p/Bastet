@@ -26,7 +26,7 @@ import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
 import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
-import {PartitionKeyElement} from "../../algorithms/StateSet";
+import {PartitionKey, PartitionKeyElement} from "../../algorithms/StateSet";
 
 export type GraphStateId = number;
 
@@ -44,7 +44,7 @@ export interface GraphAbstractStateAttribs extends AbstractElement, SingletonSta
 
     wrappedState: ImmRec<any>;
 
-    partitionKey: ImmList<PartitionKeyElement>;
+    partitionKeys: ImmSet<PartitionKey>;
 
 }
 
@@ -53,14 +53,14 @@ const GraphAbstractStateRecord = ImmRec({
     predecessors: ImmSet<GraphStateId>([]),
     wrappedState: null,
     mergeOf: ImmSet<GraphStateId>([]),
-    partitionKey: ImmList()
+    partitionKeys: ImmSet()
 });
 
 export class GraphAbstractState extends GraphAbstractStateRecord implements GraphAbstractStateAttribs, AbstractState {
 
     constructor(id: GraphStateId, preds: ImmSet<GraphStateId>, mergeOf: ImmSet<GraphStateId>, wrapped: ImmRec<any>,
-                partitionKey: ImmList<PartitionKeyElement>) {
-        super({id: id, predecessors: preds, wrappedState: wrapped, mergeOf: mergeOf, partitionKey: partitionKey});
+                partitionKey: ImmSet<PartitionKey>) {
+        super({id: id, predecessors: preds, wrappedState: wrapped, mergeOf: mergeOf, partitionKeys: partitionKey});
     }
 
     public getId(): number {
@@ -79,8 +79,8 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
         return this.get('wrappedState');
     }
 
-    public getPartitionKey(): ImmList<PartitionKeyElement> {
-        return this.get('partitionKey');
+    public getPartitionKeys(): ImmSet<PartitionKey> {
+        return this.get('partitionKeys');
     }
 
     public accept<R>(visitor: AbstractElementVisitor<R>): R {
@@ -98,12 +98,12 @@ export class GraphAbstractStateFactory {
     private static STATE_ID_SEQ: number;
 
     public static withFreshID(preds: Iterable<GraphStateId>, mergeOf: Iterable<GraphStateId>, wrapped: ImmRec<any>,
-                              wrappedKey: ImmList<PartitionKeyElement>): GraphAbstractState {
+                              wrappedKeys: ImmSet<PartitionKey>): GraphAbstractState {
         if (!GraphAbstractStateFactory.STATE_ID_SEQ) {
             GraphAbstractStateFactory.STATE_ID_SEQ = 0;
         }
         const freshId = GraphAbstractStateFactory.STATE_ID_SEQ++;
-        return new GraphAbstractState(freshId, ImmSet(preds), ImmSet(mergeOf).union([freshId]), wrapped, ImmList(wrappedKey));
+        return new GraphAbstractState(freshId, ImmSet(preds), ImmSet(mergeOf).union([freshId]), wrapped, wrappedKeys);
     }
 
 }
@@ -129,7 +129,7 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
             element1.getPredecessors().union(element2.getPredecessors()),
             element1.getMergeOf().union(element2.getMergeOf()),
             this._wrappedLattice.join(element1.getWrappedState(), element2.getWrappedState()),
-            element1.getPartitionKey());
+            element1.getPartitionKeys());
     }
 
     meet(element1: GraphAbstractState, element2: GraphAbstractState): GraphAbstractState {

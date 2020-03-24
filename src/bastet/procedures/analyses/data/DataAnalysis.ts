@@ -41,13 +41,15 @@ import {AbstractElement, AbstractState, LatticeWithComplements} from "../../../l
 import {DataRefiner} from "./DataRefiner";
 import {Refiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKey, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {MergeJoinOperator, MergeSepOperator, StandardMergeOperatorFactory} from "../Operators";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+
 
 export class DataAnalysisConfig extends BastetConfiguration {
 
@@ -156,8 +158,8 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return reached;
     }
 
-    getPartitionKey(element: DataAbstractState): PartitionKeyElement[] {
-        return [];
+    getPartitionKeys(element: DataAbstractState): ImmSet<PartitionKey> {
+        return ImmSet([new PartitionKey(ImmList())]);
     }
 
 }
