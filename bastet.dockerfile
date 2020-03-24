@@ -8,10 +8,10 @@ WORKDIR /bastet
 # First, copy the package dependency definition only (for a better layering)
 COPY package.json .
 
+FROM node:13-alpine
+
 # Build BASTET
 RUN npm install
-
-FROM node:13-alpine
 
 # Install the global dependencies
 RUN npm install -g typescript
