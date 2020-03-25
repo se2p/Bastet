@@ -39,7 +39,7 @@ import {NodeSystemLayer} from "./utils/SystemLayer";
 import {TypeInformationStorage} from "./syntax/DeclarationScopes";
 import {ToIntermediateTransformer} from "./syntax/transformers/ToIntermediateTransformer";
 
-import * as process from 'process'
+const process = require('process');
 
 const commander = require('commander');
 
