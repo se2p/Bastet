@@ -179,7 +179,7 @@ export class LookupTransformer {
     }
 
 
-    public static buildGetImageWidthLookup (actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
+    public static buildGetImageWidthLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
         var sizeof = require('image-size')
 
         //FIXME check if map already exists for actor
@@ -225,7 +225,7 @@ export class LookupTransformer {
             stmtList, resultDecl, true);
     }
 
-    public static buildGetImageHeightLookup (actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
+    public static buildGetImageHeightLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
         var sizeof = require('image-size')
 
         //FIXME check if map already exists for actor
@@ -282,7 +282,7 @@ export class LookupTransformer {
 
         let paramDeclList = new ParameterDeclarationList([]);
 
-        let stackVar= new VariableWithDataLocation(new TypedDataLocation("result", NumberType.instance().typeId));
+        let stackVar = new VariableWithDataLocation(new TypedDataLocation("result", NumberType.instance().typeId));
         let declareStackVar = new DeclareStackVariableStatement(stackVar);
         let stmts = [];
         stmts.push(declareStackVar)
@@ -306,7 +306,7 @@ export class LookupTransformer {
             stmtList, resultDecl, true);
     }
 
-    private static loadImage(uniqueName: string, actorResources: Map<string, Buffer>): Buffer{
+    private static loadImage(uniqueName: string, actorResources: Map<string, Buffer>): Buffer {
         let path = uniqueName;
         if (actorResources.has(uniqueName)) {
             return actorResources.get(uniqueName)
@@ -317,6 +317,25 @@ export class LookupTransformer {
             actorResources.set(uniqueName, f);
 
             return f
+        }
+    }
+
+
+    // TODO do we really want this?
+    resizeWidthAndHeight(width, height) {
+        const inputRatio = width / height;
+        const STAGE_WIDTH = 480;
+        const STAGE_HEIGHT = 360;
+        const RATIO = STAGE_WIDTH / STAGE_HEIGHT;
+
+        if ((width <= STAGE_WIDTH) && (height <= STAGE_HEIGHT)) {
+            return [width * 2, height * 2];
+        } else if ((width <= STAGE_WIDTH * 2) && (height <= STAGE_HEIGHT * 2)) {
+            return [width, height];
+        } else if (inputRatio >= RATIO) {
+            return [STAGE_WIDTH * 2, STAGE_WIDTH * 2 / inputRatio];
+        } else {
+            return [STAGE_HEIGHT * 2 * inputRatio, STAGE_HEIGHT * 2];
         }
     }
 }

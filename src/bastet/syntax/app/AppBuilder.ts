@@ -40,6 +40,7 @@ import {
 } from "../ast/core/CoreEvent";
 import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
+    MethodDefinition,
     MethodDefinitionList,
     MethodDefinitionMap,
     MethodSignatureList,
@@ -62,6 +63,9 @@ import {TypeInformationStorage} from "../DeclarationScopes";
 import {Concern, Concerns} from "../Concern";
 import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {ImmutableMap} from "../../utils/ImmutableMap";
+import {List} from "immutable";
+import {ImmutableList} from "../../utils/ImmutableList";
 
 export class AppBuilder {
 
@@ -330,11 +334,32 @@ export class AppBuilder {
         // The init script must not use stack variables (only global or actor scoped).
         this.ensureNoStackVariables(initScript);
 
-        const methodDefinitions = Maps.mergeImmutableMaps(main.methodMap, secondary.methodMap);
+
+        const methodDefMap: Map<string, MethodDefinition> = new Map()
+        main.methodMap.forEach((v,k) => {
+           methodDefMap.set(k, v)
+        });
+        secondary.methodMap.forEach((v,k) => {
+            if (!methodDefMap.has(k)) {
+                methodDefMap.set(k, v)
+            }
+        });
+        const methodDefinitions: ImmutableMap<string, MethodDefinition> = new ImmutableMap<string, MethodDefinition>(methodDefMap.entries())
+
+        let methodMap: Map<string, Method> = new Map<string, Method>();
+        for (let method of main.methods) {
+            methodMap.set(method.ident.text, method)
+        }
+        for (let method of secondary.methods) {
+            if (!methodMap.has(method.ident.text)) {
+                methodMap.set(method.ident.text,method)
+            }
+        }
+        const methods = new ImmutableList(Array.from(methodMap.values()))
+
         const externalMethods = Maps.mergeImmutableMaps(main.externalMethodMap, secondary.externalMethodMap);
         const datalocs = Maps.mergeImmutableMaps(main.datalocMap, secondary.datalocMap);
         const scripts = Lists.concatImmutableLists(main.scripts, secondary.scripts);
-        const methods = Lists.concatImmutableLists(main.methods, secondary.methods);
 
         // TODO: The way we dedetermine the concern of an actor is somehow hacky.
         //  We could take advantage of the inheritance relation
