@@ -8,4 +8,4 @@ describe('Functionality of immutable maps', function() {
         // let e = new ProductElement(product)
     })
 
-})
+});
