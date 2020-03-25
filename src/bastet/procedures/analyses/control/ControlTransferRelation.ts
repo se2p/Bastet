@@ -92,6 +92,7 @@ import {BooleanExpression, NumGreaterEqualExpression} from "../../../syntax/ast/
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {OptionalAstNode} from "../../../syntax/ast/AstNode";
 import {GLOBAL_TIME_MICROS_VAR} from "../time/TimeTransferRelation";
+import {from} from "immutable/contrib/cursor";
 
 class StepInformation {
 
@@ -788,7 +789,35 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         // 3. Check if threads that wait for certain conditions can continue to run
         //    (assume certain conditions to hold if this accelerates the analysis without being unsound)
 
-        return [result];
+        return this.runStateCheckThreads(result);
+    }
+
+    private runStateCheckThreads(state: ControlAbstractState): ControlAbstractState[] {
+        if (state.getConditionStates().size == 0) {
+            return [state];
+        } else {
+            let result: ControlAbstractState[] = [];
+            for (const [threadIndex, threadState] of state.getConditionStates().entries()) {
+                result = result.concat(this.runConditionThread(state, threadIndex, threadState));
+            }
+
+            return result;
+        }
+    }
+
+    private runConditionThread(state: ControlAbstractState, threadIndex: number, threadState: ThreadState): ControlAbstractState[] {
+        const script: TransitionRelation = this._task.getTransitionRelationById(
+            threadState.getRelationLocation().getRelationId());
+        // Transfers.transferAlongTransitionSystem(this._wrappedTransferRelation, state.getWrappedState(), script,
+        //    getTheOnlyElement(script.entryLocationSet), Concerns.highestPriorityConcern());
+        throw new ImplementMeException();
+    }
+
+    private runFullScript(initialState: ControlAbstractState, fromLocation: RelationLocation) {
+        const actor: Actor = this._task.getActorByName(fromLocation.getActorId());
+        const relation: TransitionRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
+
+
     }
 
     private restartThread(baseState: ControlAbstractState, threadIndex: number): ControlAbstractState {
@@ -979,4 +1008,5 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             return ImmList();
         }
     }
+
 }

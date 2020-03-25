@@ -25,6 +25,9 @@ import {Concern} from "../../syntax/Concern";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {Preconditions} from "../../utils/Preconditions";
 import {Statement} from "../../syntax/ast/core/statements/Statement";
+import {TransitionRelation} from "../../syntax/app/controlflow/TransitionRelation";
+import {LocationId} from "../../syntax/app/controlflow/ControlLocation";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
 export interface TransferRelation<E extends AbstractElement> {
 
@@ -69,6 +72,25 @@ export class Transfers {
         }
 
         return result;
+    }
+
+    public static transferAlongTransitionSystem<W extends AbstractElement>(
+        transferRealtion: LabeledTransferRelation<W>, fromState: W, tr: TransitionRelation,
+        fromLocation: LocationId, co: Concern): W[] {
+
+        let frontier: [LocationId, W][] = [[fromLocation, fromState]];
+        let visited: Set<LocationId> = new Set();
+
+        let hasRemainingSteps: boolean = false;
+        do {
+            let frontierPrime: [LocationId, W][] = [];
+            // for (const succ of transferRealtion.abstractSuccFor(w, toExecute, co)) {
+            throw new ImplementMeException();
+
+            frontier = frontierPrime;
+        } while (hasRemainingSteps)
+
+        return frontier.map(([l,w]) => w);
     }
 
 }
