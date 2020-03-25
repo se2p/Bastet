@@ -1,5 +1,9 @@
 {
 
+    "Transformer": {
+        "use-busy-waiting": false
+    },
+
     "ReachabilityAlgorithm": {
         "dump-graph-after-iteration": false
     },

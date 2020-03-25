@@ -272,6 +272,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
         return this.set('waitingForThreads', value);
     }
 
+    public withAddedWaitingFor(waitFor: ThreadState): ThreadState {
+        return this.withWaitingForThreads(this.getWaitingForThreads().add(waitFor.threadId));
+    }
+
     public withOperations(value: ImmList<OperationId>): ThreadState {
         return this.set('operations', value);
     }
@@ -321,6 +325,9 @@ export interface ControlAbstractStateAttributes extends AbstractElement, Singlet
     /** List of threads and their states */
     threadStates: ImmList<ThreadState>;
 
+    /** List of threads that check reaching a condition */
+    conditionStates: ImmList<ThreadState>;
+
     /** Wrapped abstract state that stores the actual data of heap and stack */
     wrappedState: AbstractState;
 
@@ -335,6 +342,8 @@ export interface ControlAbstractStateAttributes extends AbstractElement, Singlet
 const ControlAbstractStateRecord = ImmRec({
 
     threadStates: ImmList<ThreadState>([]),
+
+    conditionStates: ImmList<ThreadState>([]),
 
     steppedThreadIndices: ImmSet<number>(),
 
@@ -372,9 +381,10 @@ export class IndexedThread {
  */
 export class ControlAbstractState extends ControlAbstractStateRecord implements AbstractState {
 
-    constructor(threadStates: ImmList<ThreadState>, wrappedState: AbstractElement, isTargetFor: ImmSet<Property>,
+    constructor(threadStates: ImmList<ThreadState>, conditionStates: ImmList<ThreadState>,
+                wrappedState: AbstractElement, isTargetFor: ImmSet<Property>,
                 steppedThreadIndices: ImmSet<number>, actorScopes: ImmMap<DataLocation, ActorId>) {
-        super({threadStates: threadStates, wrappedState: wrappedState, isTargetFor: isTargetFor,
+        super({threadStates: threadStates, conditionStates: conditionStates, wrappedState: wrappedState, isTargetFor: isTargetFor,
             steppedThreadIndices: steppedThreadIndices, actorScopes: actorScopes});
     }
 
@@ -382,7 +392,7 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
         return new IndexedThread(this.getThreadStates().get(atIndex), atIndex);
     }
 
-    public getThreadWithId(threadId: ThreadId): IndexedThread {
+    public findThreadWithId(threadId: ThreadId): IndexedThread {
         for (const [index, state] of this.getThreadStates().entries()) {
             if (state.getThreadId() == threadId) {
                 return new IndexedThread(state, index);
@@ -393,6 +403,10 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
 
     public getThreadStates(): ImmList<ThreadState> {
         return this.get("threadStates");
+    }
+
+    public getConditionStates(): ImmList<ThreadState> {
+        return this.get("conditionStates");
     }
 
     public getWrappedState(): AbstractState {
@@ -431,6 +445,14 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
        return this.set('threadStates', this.getThreadStates().set(threadIndex, setStateTo));
     }
 
+    public withAddedConditionState(threadState: ThreadState): ControlAbstractState {
+        return this.set('conditionStates', this.getConditionStates().push(threadState));
+    }
+
+    public withConditionState(threadIndex: number, setStateTo: ThreadState): ControlAbstractState {
+        return this.set('conditionStates', this.getConditionStates().set(threadIndex, setStateTo));
+    }
+
     public withThreadStateUpdate(threadIndex: number, updateFn: (ts: ThreadState) => ThreadState): ControlAbstractState {
         const toUpdate = this.getThreadStates().get(threadIndex);
         return this.withThreadState(threadIndex, updateFn(toUpdate));
@@ -451,6 +473,7 @@ export class ScheduleAbstractStateFactory {
     static createInitialState(task: App, wrappedState: ImmRec<any>, isTarget) {
         let singular = false;
         let threads = ImmList<ThreadState>([]);
+        let conditions = ImmList<ThreadState>([]);
         let actors = ImmMap<DataLocation, ActorId>();
 
         for (const actor of task.actors) {
@@ -487,7 +510,7 @@ export class ScheduleAbstractStateFactory {
             }
         }
 
-        return new ControlAbstractState(threads, wrappedState, isTarget, ImmSet(), actors);
+        return new ControlAbstractState(threads, conditions, wrappedState, isTarget, ImmSet(), actors);
     }
 }
 

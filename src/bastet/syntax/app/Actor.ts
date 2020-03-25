@@ -41,7 +41,7 @@ import {TransitionRelation, TransitionRelations, TransRelId} from "./controlflow
 import {Scripts} from "./controlflow/Scripts";
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
 import {BOOTSTRAP_FINISHED_MESSAGE, GREENFLAG_MESSAGE, BOOTSTRAP_MESSAGE} from "../ast/core/Message";
-import {StatementList} from "../ast/core/statements/Statement";
+import {Statement, StatementList} from "../ast/core/statements/Statement";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
@@ -53,6 +53,11 @@ import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
 import {Properties} from "../Property";
 import {Identifier} from "../ast/core/Identifier";
 import {InitializeAnalysisStatement} from "../ast/core/statements/InternalStatement";
+import {BooleanExpression} from "../ast/core/expressions/BooleanExpression";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {IfStatement} from "../ast/core/statements/ControlStatement";
+import {ExpressionList} from "../ast/core/expressions/ExpressionList";
+import {OptionalAstNode} from "../ast/AstNode";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -265,6 +270,21 @@ export class Actor {
             }
         }
         return false;
+    }
+
+    public getConditionCheckScript(cond: BooleanExpression): Script {
+        Preconditions.checkNotUndefined(cond);
+        const ifConditionReached: StatementList = new StatementList([
+            new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_conditionSat),
+                new ExpressionList([]), OptionalAstNode.absent())]);
+        const ifNotReached: StatementList = new StatementList([
+            new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_conditionUnsat),
+                new ExpressionList([]), OptionalAstNode.absent())]);
+        const statements: StatementList = new StatementList([new IfStatement(cond, ifConditionReached, ifNotReached)]);
+
+        // TODO: Register the script to the actor. Have a cache?
+        const transitions = statements.accept(new RelationBuildingVisitor());
+        return new Script(Identifier.freshWithPrefix("cond"), NeverEvent.instance(), false, transitions);
     }
 
     public transitivelyCalled(from: TransitionRelation): Set<CallStatement> {

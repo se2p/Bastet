@@ -19,7 +19,7 @@
  *
  */
 
-import {Actor, ActorMap} from './Actor'
+import {Actor, ActorId, ActorMap} from './Actor'
 import {Maps} from "../../utils/Maps";
 import {MethodDefinition, MethodDefinitionList} from "../ast/core/MethodDefinition";
 import {Preconditions} from "../../utils/Preconditions";
@@ -108,7 +108,7 @@ export class App {
         return result;
     }
 
-    public getActorByName(name: string): Actor {
+    public getActorByName(name: ActorId): Actor {
         if (!this._actorMap[name]) {
             throw new IllegalArgumentException(`Actor with name "${name}" is unknown!`);
         }

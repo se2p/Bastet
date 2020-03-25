@@ -58,6 +58,10 @@ import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifie
 import {App} from "../../../syntax/app/App";
 import {InitializeAnalysisStatement} from "../../../syntax/ast/core/statements/InternalStatement";
 
+// TODO: Move these variables to the App on SYSTEM level
+export const GLOBAL_TIME_MICROS_VAR: string = "__global_time_micros";
+export const GLOBAL_TIME_RESET_MICROS_VAR: string = "__global_reset_micros";
+
 export class TimeTransferRelation<W extends AbstractElement> implements LabeledTransferRelation<W> {
 
     private readonly _task: App;
@@ -77,10 +81,11 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
         this._timeProfile = Preconditions.checkNotUndefined(timeProfile);
         this._wrappedTransfer = Preconditions.checkNotUndefined(wrappedTransfer);
 
+        // TODO: Move the initialization of these variables to the `AppBuilder`
         this._globalTimeMicrosVariable = new VariableWithDataLocation(
-            DataLocations.createTypedLocation(new Identifier("__global_time_micros"), NumberType.instance()));
+            DataLocations.createTypedLocation(new Identifier(GLOBAL_TIME_MICROS_VAR), NumberType.instance()));
         this._globalTimeResetMicrosVariable = new VariableWithDataLocation(
-            DataLocations.createTypedLocation(new Identifier("__global_reset_micros"), NumberType.instance()));
+            DataLocations.createTypedLocation(new Identifier(GLOBAL_TIME_RESET_MICROS_VAR), NumberType.instance()));
 
         this._task.typeStorage.getScopeOf(this._globalTimeMicrosVariable.qualifiedName).putVariable(this._globalTimeMicrosVariable);
         this._task.typeStorage.getScopeOf(this._globalTimeResetMicrosVariable.qualifiedName).putVariable(this._globalTimeResetMicrosVariable);

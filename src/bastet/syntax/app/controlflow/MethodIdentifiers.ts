@@ -42,4 +42,8 @@ export enum MethodIdentifiers {
 
     _BUSY_WAIT_waitSeconds  = "waitSeconds",
 
+    _RUNTIME_conditionSat = "_RUNTIME_conditionSat",
+
+    _RUNTIME_conditionUnsat = "_RUNTIME_conditionUnsat",
+
 }
