@@ -96,7 +96,7 @@ export class LookupTransformer {
 
         let dirName = path.dirname(filePath);
 
-        let methodIdent = new Identifier("getGraphicIdByIndex");
+        let methodIdent = new Identifier("getGraphicIndexdById");
 
         let paramDecl = new ParameterDeclaration(new Identifier("id"), new StringType());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
