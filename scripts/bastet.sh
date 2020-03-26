@@ -32,7 +32,7 @@ function convert_sb3_to_sc {
     if [ -f $sb3_file ]
     then
         echo "Call litterbox to do convert a file"
-        java -jar $LIB_DIR/litterbox/Litterbox.jar -p $sb3_file -u $target_sc_file
+        java -jar $LIB_DIR/litterbox/Litterbox.jar -p $sb3_file -u -o $target_sc_file
     else
         echo "No existing sb3 file given!"
         exit 1
