@@ -64,3 +64,23 @@ test("Test getImageHeight 1 safe", done => {
     }
 }, utils.timeout);
 
+xtest("Test getGraphicsIndexById 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getGraphicIndexById-1_SAFE.sc"
+    let bastet = new Bastet();
+    try {
+        utils.execute(bastet, fixtureRelPath, done)
+    } catch (error) {
+        done(error)
+    }
+}, utils.timeout);
+
+
+test("Test getGraphicsIndexById 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getGraphicIndexById-1_UNSAFE.sc"
+    let bastet = new Bastet();
+    try {
+        utils.execute(bastet, fixtureRelPath, done)
+    } catch (error) {
+        done(error)
+    }
+}, utils.timeout);

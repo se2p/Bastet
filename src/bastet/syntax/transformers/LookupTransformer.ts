@@ -96,15 +96,15 @@ export class LookupTransformer {
 
         let dirName = path.dirname(filePath);
 
-        let methodIdent = new Identifier("getGraphicIndexdById");
+        let methodIdent = new Identifier("getGraphicIndexById");
 
         let paramDecl = new ParameterDeclaration(new Identifier("id"), new StringType());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
 
-        let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", StringType.instance().typeId));
-        let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
+        const resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", NumberType.instance().typeId));
+        const initStmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(0));
         let stmts = [];
-        stmts.push(declareStackVar)
+        stmts.push(initStmt);
         let idxCount = 0;
         for (let child of resourceDefs.node.children) {
 

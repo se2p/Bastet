@@ -289,17 +289,35 @@ extern mathPowe(n: number) returns number
 
 extern mathPowten(n: number) returns number
 
-define getGraphicIdByIndex (idx: number) begin end returns result: string
+define getGraphicIdByIndex (idx: number) begin
+    declare result as string
+    define result as ""
+end returns result: string
 
-define getGraphicIndexById (id: string) begin end returns result: number
+define getGraphicIndexById (id: string) begin
+    declare result as number
+    define result as (0-1)
+end returns result: number
 
-define getGraphicPixels (id: string) begin end returns result: string
+define getGraphicPixels (id: string) begin
+    declare result as string
+    define result as ""
+end returns result: string
 
-define getImageWidth (ident: string) begin end returns result: number
+define getImageWidth (ident: string) begin
+    declare result as number
+    define result as 0
+end returns result: number
 
-define getImageHeight (ident: string) begin end returns result: number
+define getImageHeight (ident: string) begin
+    declare result as number
+    define result as 0
+end returns result: number
 
-define getNumGraphics () begin end returns result: number
+define getNumGraphics () begin
+    declare result as number
+    define result as 0
+end returns result: number
 
 // @Category "Control"
 // @Block "wait <Num> seconds"
