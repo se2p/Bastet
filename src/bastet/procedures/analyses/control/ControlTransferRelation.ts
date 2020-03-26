@@ -27,7 +27,8 @@ import {
     MethodCall,
     RelationLocation,
     ThreadComputationState,
-    ThreadState
+    ThreadState,
+    ThreadStateFactory
 } from "./ControlAbstractDomain";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {ControlAnalysisConfig} from "./ControlAnalysis";
@@ -80,13 +81,17 @@ import {Script} from "../../../syntax/app/controlflow/Script";
 import {getTheOnlyElement} from "../../../utils/Collections";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {BOOTSTRAP_FINISHED_MESSAGE, SystemMessage} from "../../../syntax/ast/core/Message";
-import {ActorType} from "../../../syntax/ast/core/ScratchType";
+import {ActorType, NumberType} from "../../../syntax/ast/core/ScratchType";
 import {
     LocateActorExpression,
     StartCloneActorExpression,
     UsherActorExpression
 } from "../../../syntax/ast/core/expressions/ActorExpression";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+import {BooleanExpression, NumGreaterEqualExpression} from "../../../syntax/ast/core/expressions/BooleanExpression";
+import {Identifier} from "../../../syntax/ast/core/Identifier";
+import {OptionalAstNode} from "../../../syntax/ast/AstNode";
+import {GLOBAL_TIME_MICROS_VAR} from "../time/TimeTransferRelation";
 
 class StepInformation {
 
@@ -182,10 +187,23 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
     private readonly _task: App;
 
+    private readonly _threadWaitUntilMicrosVariable: VariableWithDataLocation;
+
+    private readonly _globalTimeMicrosVariable: VariableWithDataLocation;
+
     constructor(config: ControlAnalysisConfig, task: App, wrappedTransferRelation: LabeledTransferRelation<AbstractElement>) {
         this._task = Preconditions.checkNotUndefined(task);
         this._config = Preconditions.checkNotUndefined(config);
         this._wrappedTransferRelation = Preconditions.checkNotUndefined(wrappedTransferRelation);
+
+        // TODO: Move the declaration of the following variables to the `App`/`AppBuilder`/`Actor`
+        this._threadWaitUntilMicrosVariable = new VariableWithDataLocation(
+            DataLocations.createTypedLocation(new Identifier("__wait_until_micros"), NumberType.instance()));
+        this._task.typeStorage.getScopeOf(this._threadWaitUntilMicrosVariable.qualifiedName).putVariable(this._threadWaitUntilMicrosVariable);
+
+        // The following var is currently registered by the `TimeAnalysis`
+        this._globalTimeMicrosVariable = new VariableWithDataLocation(
+            DataLocations.createTypedLocation(new Identifier(GLOBAL_TIME_MICROS_VAR), NumberType.instance()));
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
@@ -430,6 +448,16 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
        return resultPrime;
     }
 
+    private createConditionCheckThread(actorId: ActorId, condition: BooleanExpression): ThreadState {
+        const threadId = ThreadStateFactory.freshId();
+        const actor: Actor = this._task.getActorByName(actorId);
+        const script: Script = actor.getConditionCheckScript(condition);
+        const entryLocation: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, getTheOnlyElement(script.transitions.entryLocationSet));
+
+        return new ThreadState(threadId, actorId, script.id, ImmList(), entryLocation, ThreadComputationState.THREAD_STATE_YIELD,
+            ImmSet(), ImmSet(), ImmList(), ImmList(), ImmMap(), 1);
+    }
+
     private getLoopAction(predRelLoc: RelationLocation, succRelLoc: RelationLocation): LoopAction {
         const predRel = this._task.getTransitionRelationById(predRelLoc.getRelationId());
         const succRel = this._task.getTransitionRelationById(succRelLoc.getRelationId());
@@ -517,6 +545,25 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
                         ts.withComputationState(ThreadComputationState.THREAD_STATE_FAILURE)
                             .withFailedFor(properties)), true]];
+
+                } else if (call.calledMethod.text == MethodIdentifiers._RUNTIME_waitSeconds) {
+                    // const timeCond: BooleanExpression = this.createTimeCond(stmt.secs);
+                    // const waitfor: ThreadState = this.createTemporaryCheckThreadFor(timeCond);
+
+                    const ops: ProgramOperation[] = [new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_micros),
+                        new ExpressionList([]), OptionalAstNode.with(this._threadWaitUntilMicrosVariable))]
+                        .map((ast) => ProgramOperationFactory.createFor(ast))
+
+                    const waitUntilCond = new NumGreaterEqualExpression(this._globalTimeMicrosVariable, this._threadWaitUntilMicrosVariable);
+                    const checkThread: ThreadState = this.createConditionCheckThread(steppedActor.ident, waitUntilCond);
+
+                    const currentScopeStack = this.buildScopeStack(steppedActor.ident, fromRelation.name);
+                    return [[result.withAddedConditionState(checkThread)
+                        .withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                        ts.withAddedWaitingFor(checkThread)
+                          .withComputationState(ThreadComputationState.THREAD_STATE_WAIT)
+                          .withOperations(ImmList(this.scopeOperations(ops, fromState.getActorScopes(),
+                            currentScopeStack, currentScopeStack).map(op => op.ident)))), false]];
                 }
 
             } else {
@@ -600,23 +647,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         } else if (stepOp.ast instanceof WaitUntilStatement) {
             const stmt: WaitUntilStatement = stepOp.ast as WaitUntilStatement;
 
-            // ASSUMPTION:
-            //   For each WaitUntilStatement exists a special script that is triggered
-            //   whenever the condition is met. The body of this script is empty.
-
-            // const waitfor: ThreadState = this.getConditionCheckThreadFrom(threadStates, stmt.cond);
-            // Preconditions.checkState(waitfor !== null, "There must be one condition check thread");
-
-            // TODO:
-            //   We might have to introduce an EXIT code of threads that signals
-            //   whether or not a specific control location has been reached while
-            //   processing the body.
-            throw new ImplementMeException();
-
         } else if (stepOp.ast instanceof WaitSecsStatement) {
-            const stmt: WaitSecsStatement = stepOp.ast as WaitSecsStatement;
-            // const timeCond: BooleanExpression = this.createTimeCond(stmt.secs);
-            // const waitfor: ThreadState = this.createTemporaryCheckThreadFor(timeCond);
+            throw new ImplementMeException();
 
             // TODO:
             //   Since (1) the `WaitSecsStatement` can be parameterized with
@@ -732,13 +764,17 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             }
         }
 
+        // 2. Wake-up threads if all threads they have been waiting for are finished now
+        // TODO: What if 'wait for 0 seconds' is used?
         for (const [threadIndex, threadState] of inState.getThreadStates().entries()) {
             let stillWaitingFor = threadState.getWaitingForThreads();
             if (stillWaitingFor.size > 0) {
                 for (const waitingForThreadId of threadState.getWaitingForThreads()) {
-                    const waitingFor = inState.getThreadWithId(waitingForThreadId);
-                    if (waitingFor.threadStatus.computationState == ThreadComputationState.THREAD_STATE_DONE) {
-                        stillWaitingFor = stillWaitingFor.remove(waitingForThreadId);
+                    const waitingFor = inState.findThreadWithId(waitingForThreadId);
+                    if (waitingFor) { // <-- can be NULL, condition-check-threads are in a different list of threads
+                        if (waitingFor.threadStatus.computationState == ThreadComputationState.THREAD_STATE_DONE) {
+                            stillWaitingFor = stillWaitingFor.remove(waitingForThreadId);
+                        }
                     }
                 }
 
@@ -749,9 +785,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             }
         }
 
-            // TODO: Implement this
-        //  2. Check if threads that wait for certain conditions can continue to run
-        //     (assume certain conditions to hold if this accelerates the analysis without being unsound)
+        // 3. Check if threads that wait for certain conditions can continue to run
+        //    (assume certain conditions to hold if this accelerates the analysis without being unsound)
 
         return [result];
     }
