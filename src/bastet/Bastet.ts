@@ -36,7 +36,6 @@ import {AppToDot} from "./syntax/app/AppToDot";
 import {IllegalArgumentException} from "./core/exceptions/IllegalArgumentException";
 import {AnalysisStatistics} from "./procedures/analyses/AnalysisStatistics";
 import {NodeSystemLayer} from "./utils/SystemLayer";
-import {type} from "os";
 import {TypeInformationStorage} from "./syntax/DeclarationScopes";
 import {ToIntermediateTransformer} from "./syntax/transformers/ToIntermediateTransformer";
 import * as fs from "fs";
