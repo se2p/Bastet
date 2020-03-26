@@ -9,7 +9,7 @@ actor MiniActor is RuntimeEntity begin
         declare result as number
         define result as mathAtan(alpha)
 
-        if result < 84.290 or result > 90 then begin
+        if result > 84.290 and result < 90 then begin
         end else begin
             _RUNTIME_signalFailure()
         end
