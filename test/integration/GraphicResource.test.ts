@@ -64,7 +64,7 @@ test("Test getImageHeight 1 safe", done => {
     }
 }, utils.timeout);
 
-xtest("Test getGraphicsIndexById 1 safe", done => {
+test("Test getGraphicsIndexById 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getGraphicIndexById-1_SAFE.sc"
     let bastet = new Bastet();
     try {

@@ -6,7 +6,7 @@ actor MiniActor is RuntimeEntity begin
     image Elefant1 "1.svg"
 
     script on startup do begin
-        if getGraphicIndexById("1.svg") = 1 then begin
+        if getGraphicIndexById("Elefant1") = 1 then begin
             _RUNTIME_signalFailure()
         end
     end

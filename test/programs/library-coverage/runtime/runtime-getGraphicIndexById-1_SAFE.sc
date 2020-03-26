@@ -7,6 +7,7 @@ actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
         if getGraphicIndexById("Elefant1") = 1 then begin
+        end else begin
             _RUNTIME_signalFailure()
         end
     end
