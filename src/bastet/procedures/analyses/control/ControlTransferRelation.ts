@@ -808,8 +808,12 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
     private runConditionThread(state: ControlAbstractState, threadIndex: number, threadState: ThreadState): ControlAbstractState[] {
         const script: TransitionRelation = this._task.getTransitionRelationById(
             threadState.getRelationLocation().getRelationId());
-        // Transfers.transferAlongTransitionSystem(this._wrappedTransferRelation, state.getWrappedState(), script,
-        //    getTheOnlyElement(script.entryLocationSet), Concerns.highestPriorityConcern());
+        const conditionScopeStack = this.buildScopeStack(threadState.actorId, script.name);
+
+        Transfers.transferAlongTransitionSystem(this._wrappedTransferRelation, state.getWrappedState(), script,
+            getTheOnlyElement(script.entryLocationSet), Concerns.highestPriorityConcern(),
+            (op) => {return this.scopeOperations([op], state.getActorScopes(),
+                conditionScopeStack, conditionScopeStack)[0]});
         throw new ImplementMeException();
     }
 

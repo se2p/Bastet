@@ -74,9 +74,12 @@ export class Transfers {
         return result;
     }
 
+    /**
+     * ATTENTION: We assume that the given transition relation `tr` does not have loops!
+     */
     public static transferAlongTransitionSystem<W extends AbstractElement>(
         transferRealtion: LabeledTransferRelation<W>, fromState: W, tr: TransitionRelation,
-        fromLocation: LocationId, co: Concern): W[] {
+        fromLocation: LocationId, co: Concern, opMapper?: (op: ProgramOperation) => ProgramOperation): W[] {
 
         let frontier: [LocationId, W][] = [[fromLocation, fromState]];
         let visited: Set<LocationId> = new Set();
@@ -84,9 +87,22 @@ export class Transfers {
         let hasRemainingSteps: boolean = false;
         do {
             let frontierPrime: [LocationId, W][] = [];
-            // for (const succ of transferRealtion.abstractSuccFor(w, toExecute, co)) {
-            throw new ImplementMeException();
-
+            for (const [loc, e] of frontier) {
+                const transitions = tr.transitionsFrom(loc);
+                if (transitions.length == 0) {
+                    frontierPrime.push([loc, e]);
+                } else {
+                    hasRemainingSteps = true;
+                    for (const t of transitions) {
+                        let op = ProgramOperation.for(t.opId);
+                        if (opMapper) {
+                            op = opMapper(op);
+                        }
+                        const succs = Array.from(transferRealtion.abstractSuccFor(e, op, co));
+                        frontierPrime = frontierPrime.concat(succs.map((s) => [t.target, s]));
+                    }
+                }
+            }
             frontier = frontierPrime;
         } while (hasRemainingSteps)
 
