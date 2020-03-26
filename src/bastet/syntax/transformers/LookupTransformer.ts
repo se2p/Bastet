@@ -37,6 +37,7 @@ import {ResourceDefinition} from "../ast/core/ResourceDefinition";
 import * as path from "path";
 import {NumberLiteral} from "../ast/core/expressions/NumberExpression";
 import {DeclareStackVariableStatement} from "../ast/core/statements/DeclarationStatement";
+import {imageSize} from "image-size";
 
 export class LookupTransformer {
 
@@ -180,7 +181,7 @@ export class LookupTransformer {
 
 
     public static buildGetImageWidthLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
-        var sizeof = require('image-size')
+
 
         //FIXME check if map already exists for actor
         let actorResources: Map<string, Buffer> = new Map();
@@ -208,7 +209,7 @@ export class LookupTransformer {
             let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
 
             // TODO add scaling for svgs
-            let dimensions = sizeof(uri);
+            let dimensions = imageSize(uri);
             let width = dimensions.width;
 
             let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(width));
@@ -226,7 +227,6 @@ export class LookupTransformer {
     }
 
     public static buildGetImageHeightLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
-        var sizeof = require('image-size')
 
         //FIXME check if map already exists for actor
         let actorResources: Map<string, Buffer> = new Map();
@@ -254,7 +254,7 @@ export class LookupTransformer {
             let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
 
             //todo add scaling for svgs
-            let dimensions = sizeof(uri);
+            let dimensions = imageSize(uri);
             let height = dimensions.height;
 
             let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(height));
