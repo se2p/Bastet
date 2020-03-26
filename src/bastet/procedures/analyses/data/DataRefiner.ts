@@ -23,7 +23,7 @@
 
 import {Refiner} from "../Refiner";
 import {DataAbstractState} from "./DataAbstractDomain";
-import {LatticeWithComplements} from "../../../lattices/Lattice";
+import {Lattices, LatticeWithComplements} from "../../../lattices/Lattice";
 
 export class DataRefiner implements Refiner<DataAbstractState> {
 
@@ -34,7 +34,7 @@ export class DataRefiner implements Refiner<DataAbstractState> {
     }
 
     checkIsFeasible(e: DataAbstractState): boolean {
-        return !this._lattice.isIncluded(e, this._lattice.bottom());
+        return Lattices.isFeasible(e, this._lattice);
     }
 
 }

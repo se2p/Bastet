@@ -33,6 +33,8 @@ import {TransitionRelation, TransRelId} from "./controlflow/TransitionRelation";
 import {TypeInformationStorage} from "../DeclarationScopes";
 import {Method} from "./controlflow/Method";
 import {Script} from "./controlflow/Script";
+import {SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
+import {BooleanExpression} from "../ast/core/expressions/BooleanExpression";
 
 export class App {
 
@@ -90,19 +92,18 @@ export class App {
 
     public getProperties(): ImmSet<Property> {
         let result = ImmSet<Property>();
-        const transitivelyCalled = new Set<CallStatement>();
+        const signaled = new Set<SignalTargetReachedStatement>();
 
         for (const a of this.actors) {
             for (const s of a.scripts) {
-                a.transitivelyCalled(s.transitions).forEach((cs) => transitivelyCalled.add(cs));
+                a.transitivelyPresent(s.transitions, (s) => s instanceof SignalTargetReachedStatement)
+                    .forEach((cs) => signaled.add(cs as SignalTargetReachedStatement));
             }
         }
 
-        for (const call of transitivelyCalled) {
-            if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
-                const properties = Properties.fromArguments(call.args);
-                result = result.union(properties);
-            }
+        for (const sig of signaled) {
+            const properties = Properties.fromArguments(sig.targetCharacteristics);
+            result = result.union(properties);
         }
 
         return result;
@@ -117,6 +118,10 @@ export class App {
 
     public getTransitionRelationById(id: TransRelId): TransitionRelation {
         return this._transRelById.get(id);
+    }
+
+    public registerTrasitionRelation(tr: TransitionRelation) {
+        this._transRelById.set(tr.ident, tr);
     }
 
     public getMethodDefinition(methodName: string): MethodDefinitionList {
@@ -139,4 +144,9 @@ export class App {
        return App.EMPTY_APP;
     }
 
+    getConditionCheckScript(actor: Actor, condition: BooleanExpression): Script {
+        const script: Script = actor.getConditionCheckScript(condition);
+        this.registerTrasitionRelation(script.transitions);
+        return script;
+    }
 }

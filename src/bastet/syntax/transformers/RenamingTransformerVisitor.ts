@@ -133,7 +133,7 @@ import {
     StartCloneActorExpression, UsherActorExpression
 } from "../ast/core/expressions/ActorExpression";
 import {Identifier} from "../ast/core/Identifier";
-import {InitializeAnalysisStatement} from "../ast/core/statements/InternalStatement";
+import {InitializeAnalysisStatement, SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
 
 export enum DataLocationMode {
 
@@ -169,11 +169,19 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     private transformBeforeException() {
-        throw new IllegalStateException("Statements on list must have been translated before to assignements of transformed list expressions");
+        throw new IllegalStateException("Statements on list must have been translated before to assignments of transformed list expressions");
     }
 
     visit(node: AstNode): AstNode {
         throw new ImplementMeException();
+    }
+
+    visitExpressionList(node: ExpressionList): AstNode {
+        return new ExpressionList(node.elements.map(e => e.accept(this) as Expression));
+    }
+
+    visitSignalTargetReachedStatement(node: SignalTargetReachedStatement): AstNode {
+        return new SignalTargetReachedStatement(node.targetCharacteristics.accept(this) as ExpressionList);
     }
 
     visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): AstNode {

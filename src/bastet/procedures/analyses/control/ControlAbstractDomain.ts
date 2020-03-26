@@ -302,6 +302,9 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
         return this.set('inAtomicMode', newValue);
     }
 
+    withRemovedWaitingFor(threadId: ThreadId): ThreadState {
+        return undefined;
+    }
 }
 
 export class ThreadStateFactory {
@@ -389,6 +392,7 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
     }
 
     public getIndexedThreadState(atIndex: number): IndexedThread {
+        Preconditions.checkArgument(atIndex < this.getThreadStates().size);
         return new IndexedThread(this.getThreadStates().get(atIndex), atIndex);
     }
 
@@ -445,12 +449,20 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
        return this.set('threadStates', this.getThreadStates().set(threadIndex, setStateTo));
     }
 
+    withThreadStates(threadList: ImmList<ThreadState>): ControlAbstractState {
+        return this.set('threadStates', threadList);
+    }
+
     public withAddedConditionState(threadState: ThreadState): ControlAbstractState {
         return this.set('conditionStates', this.getConditionStates().push(threadState));
     }
 
     public withConditionState(threadIndex: number, setStateTo: ThreadState): ControlAbstractState {
         return this.set('conditionStates', this.getConditionStates().set(threadIndex, setStateTo));
+    }
+
+    withConditionStates(threadStateList: ImmList<ThreadState>): ControlAbstractState {
+        return this.set('conditionStates', threadStateList);
     }
 
     public withThreadStateUpdate(threadIndex: number, updateFn: (ts: ThreadState) => ThreadState): ControlAbstractState {

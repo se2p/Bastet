@@ -112,7 +112,8 @@ import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
 import {SystemMessage} from "./core/Message";
-import {InitializeAnalysisStatement} from "./core/statements/InternalStatement";
+import {InitializeAnalysisStatement, SignalTargetReachedStatement} from "./core/statements/InternalStatement";
+import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
 
 export class CorePrintVisitor implements CoreEventVisitor<string>,
     CoreBoolExpressionVisitor<string>, CoreNumberExpressionVisitor<string>,
@@ -124,6 +125,10 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
 
     visitReturnStatement(node: ReturnStatement): string {
         return 'RETURN';
+    }
+
+    visitSignalTargetReachedStatement(node: SignalTargetReachedStatement): string {
+        return `REACHED (${node.targetCharacteristics.accept(this)})`;
     }
 
     visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): string {

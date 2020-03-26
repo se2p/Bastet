@@ -21,6 +21,8 @@
  */
 
 import {Statement} from "./Statement";
+import {ExpressionList} from "../expressions/ExpressionList";
+import {Preconditions} from "../../../../utils/Preconditions";
 
 export interface InternalStatement {
 
@@ -32,4 +34,18 @@ export class InitializeAnalysisStatement extends Statement implements InternalSt
         super([]);
     }
 
+}
+
+export class SignalTargetReachedStatement extends Statement implements InternalStatement {
+
+    private readonly _targetCharacteristics: ExpressionList;
+
+    constructor(targetCharacteristics: ExpressionList) {
+        super([targetCharacteristics]);
+        this._targetCharacteristics = Preconditions.checkNotUndefined(targetCharacteristics);
+    }
+
+    get targetCharacteristics(): ExpressionList {
+        return this._targetCharacteristics;
+    }
 }

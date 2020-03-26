@@ -28,6 +28,9 @@ import {Statement} from "../../syntax/ast/core/statements/Statement";
 import {TransitionRelation} from "../../syntax/app/controlflow/TransitionRelation";
 import {LocationId} from "../../syntax/app/controlflow/ControlLocation";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {Record as ImmRec, Set as ImmSet} from "immutable";
+import {SignalTargetReachedStatement} from "../../syntax/ast/core/statements/InternalStatement";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 export interface TransferRelation<E extends AbstractElement> {
 
@@ -78,35 +81,42 @@ export class Transfers {
      * ATTENTION: We assume that the given transition relation `tr` does not have loops!
      */
     public static transferAlongTransitionSystem<W extends AbstractElement>(
-        transferRealtion: LabeledTransferRelation<W>, fromState: W, tr: TransitionRelation,
-        fromLocation: LocationId, co: Concern, opMapper?: (op: ProgramOperation) => ProgramOperation): W[] {
+        abstractSucc: LabeledTransferRelation<W>, fromState: W, tr: TransitionRelation,
+        fromLocation: LocationId, co: Concern, opMapper?: (op: ProgramOperation) => ProgramOperation): [W, boolean][] {
 
-        let frontier: [LocationId, W][] = [[fromLocation, fromState]];
-        let visited: Set<LocationId> = new Set();
+        let frontier: [LocationId, ImmSet<LocationId>, W, boolean][] = [[fromLocation, ImmSet([fromLocation]), fromState, false]];
 
-        let hasRemainingSteps: boolean = false;
+        let hasRemainingSteps: boolean;
         do {
-            let frontierPrime: [LocationId, W][] = [];
-            for (const [loc, e] of frontier) {
+            hasRemainingSteps = false;
+            let frontierPrime: [LocationId, ImmSet<LocationId>, W, boolean][] = [];
+            for (const [loc, visited, e, targetReached] of frontier) {
                 const transitions = tr.transitionsFrom(loc);
                 if (transitions.length == 0) {
-                    frontierPrime.push([loc, e]);
+                    frontierPrime.push([loc, visited, e, targetReached]);
                 } else {
                     hasRemainingSteps = true;
                     for (const t of transitions) {
+                        if (visited.contains(t.target)) {
+                            throw new IllegalArgumentException("Loops not allowed for this style of transfers!");
+                        }
+
                         let op = ProgramOperation.for(t.opId);
                         if (opMapper) {
                             op = opMapper(op);
                         }
-                        const succs = Array.from(transferRealtion.abstractSuccFor(e, op, co));
-                        frontierPrime = frontierPrime.concat(succs.map((s) => [t.target, s]));
+                        const succs = Array.from(abstractSucc.abstractSuccFor(e, op, co));
+                        frontierPrime = frontierPrime.concat(succs.map((s) =>
+                            [t.target, visited.union([t.target]), s,
+                                targetReached || op instanceof SignalTargetReachedStatement]));
                     }
                 }
             }
-            frontier = frontierPrime;
-        } while (hasRemainingSteps)
 
-        return frontier.map(([l,w]) => w);
+            frontier = frontierPrime;
+        } while (hasRemainingSteps);
+
+        return frontier.map(([l,v, w, t]) => [w, t]);
     }
 
 }

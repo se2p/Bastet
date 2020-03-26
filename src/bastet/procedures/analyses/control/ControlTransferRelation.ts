@@ -26,11 +26,11 @@ import {
     IndexedThread,
     MethodCall,
     RelationLocation,
-    ThreadComputationState,
+    ThreadComputationState, ThreadId,
     ThreadState,
     ThreadStateFactory
 } from "./ControlAbstractDomain";
-import {AbstractElement} from "../../../lattices/Lattice";
+import {AbstractElement, Lattices} from "../../../lattices/Lattice";
 import {ControlAnalysisConfig} from "./ControlAnalysis";
 import {App} from "../../../syntax/app/App";
 import {Preconditions} from "../../../utils/Preconditions";
@@ -78,7 +78,7 @@ import {AfterStatementMonitoringEvent, MessageReceivedEvent} from "../../../synt
 import {Concern, Concerns} from "../../../syntax/Concern";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {Script} from "../../../syntax/app/controlflow/Script";
-import {getTheOnlyElement} from "../../../utils/Collections";
+import {getTheNextElement, getTheOnlyElement} from "../../../utils/Collections";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {BOOTSTRAP_FINISHED_MESSAGE, SystemMessage} from "../../../syntax/ast/core/Message";
 import {ActorType, NumberType} from "../../../syntax/ast/core/ScratchType";
@@ -91,8 +91,10 @@ import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgument
 import {BooleanExpression, NumGreaterEqualExpression} from "../../../syntax/ast/core/expressions/BooleanExpression";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {OptionalAstNode} from "../../../syntax/ast/AstNode";
+import {SignalTargetReachedStatement} from "../../../syntax/ast/core/statements/InternalStatement";
+import {AbstractDomain} from "../../domains/AbstractDomain";
+import {ConcreteElement} from "../../domains/ConcreteElements";
 import {GLOBAL_TIME_MICROS_VAR} from "../time/TimeTransferRelation";
-import {from} from "immutable/contrib/cursor";
 
 class StepInformation {
 
@@ -182,6 +184,8 @@ class LoopAction {
  */
 export class ControlTransferRelation implements TransferRelation<ControlAbstractState> {
 
+    private readonly _wrappedDomain: AbstractDomain<ConcreteElement, AbstractElement>;
+
     private readonly _wrappedTransferRelation: LabeledTransferRelation<AbstractElement>;
 
     private readonly _config: ControlAnalysisConfig;
@@ -192,10 +196,12 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
     private readonly _globalTimeMicrosVariable: VariableWithDataLocation;
 
-    constructor(config: ControlAnalysisConfig, task: App, wrappedTransferRelation: LabeledTransferRelation<AbstractElement>) {
+    constructor(config: ControlAnalysisConfig, task: App, wrappedTransferRelation: LabeledTransferRelation<AbstractElement>,
+                wrappedDomain: AbstractDomain<ConcreteElement, AbstractElement>) {
         this._task = Preconditions.checkNotUndefined(task);
         this._config = Preconditions.checkNotUndefined(config);
         this._wrappedTransferRelation = Preconditions.checkNotUndefined(wrappedTransferRelation);
+        this._wrappedDomain = Preconditions.checkNotUndefined(wrappedDomain);
 
         // TODO: Move the declaration of the following variables to the `App`/`AppBuilder`/`Actor`
         this._threadWaitUntilMicrosVariable = new VariableWithDataLocation(
@@ -452,7 +458,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
     private createConditionCheckThread(actorId: ActorId, condition: BooleanExpression): ThreadState {
         const threadId = ThreadStateFactory.freshId();
         const actor: Actor = this._task.getActorByName(actorId);
-        const script: Script = actor.getConditionCheckScript(condition);
+        const script: Script = this._task.getConditionCheckScript(actor, condition);
         const entryLocation: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, getTheOnlyElement(script.transitions.entryLocationSet));
 
         return new ThreadState(threadId, actorId, script.id, ImmList(), entryLocation, ThreadComputationState.THREAD_STATE_YIELD,
@@ -527,7 +533,13 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         //
         // Handle different statements that start other threads and wait for them
         //
-        if (stepOp.ast instanceof BeginAtomicStatement) {
+        if (stepOp.ast instanceof SignalTargetReachedStatement) {
+            const properties: ImmSet<Property> = Properties.fromArguments(stepOp.ast.targetCharacteristics);
+            return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                ts.withComputationState(ThreadComputationState.THREAD_STATE_FAILURE)
+                    .withFailedFor(properties)), true]];
+
+        } else if (stepOp.ast instanceof BeginAtomicStatement) {
             return [[result.withThreadStateUpdate(threadToStep.threadIndex,
                 (ts) => ts.withIncrementedAtomic()), true]];
 
@@ -542,10 +554,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             if (steppedActor.isExternalMethod(calledMethodName)) {
                 const call = stepOp.ast as CallStatement;
                 if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
-                    const properties: ImmSet<Property> = Properties.fromArguments(call.args);
-                    return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                        ts.withComputationState(ThreadComputationState.THREAD_STATE_FAILURE)
-                            .withFailedFor(properties)), true]];
+                    throw new IllegalArgumentException("Call should have been transformed to a SignalTargetReachedStatement");
 
                 } else if (call.calledMethod.text == MethodIdentifiers._RUNTIME_waitSeconds) {
                     // const timeCond: BooleanExpression = this.createTimeCond(stmt.secs);
@@ -792,36 +801,121 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return this.runStateCheckThreads(result);
     }
 
+    private hasNonWaitingRunnable(threads: ImmList<ThreadState>): boolean {
+        return threads.filter((ts) => ts.getComputationState() == ThreadComputationState.THREAD_STATE_YIELD
+            || ts.getComputationState() == ThreadComputationState.THREAD_STATE_RUNNING).size > 0;
+    }
+
     private runStateCheckThreads(state: ControlAbstractState): ControlAbstractState[] {
         if (state.getConditionStates().size == 0) {
             return [state];
         } else {
-            let result: ControlAbstractState[] = [];
-            for (const [threadIndex, threadState] of state.getConditionStates().entries()) {
-                result = result.concat(this.runConditionThread(state, threadIndex, threadState));
-            }
+            const waitingThreads = state.getThreadStates().filter((ts) => ts.getComputationState() == ThreadComputationState.THREAD_STATE_WAIT);
 
-            return result;
+            if (this.hasNonWaitingRunnable(state.getThreadStates())) {
+                // No acceleration applicable
+                const conditionCheckThreadIDs = new Set<ThreadId>();
+                const condThreadIdToIndex = new Map<number, number>();
+                const condThreadIdToState = new Map<number, ThreadState>();
+                for (const [index, ts] of state.getConditionStates().entries()) {
+                    conditionCheckThreadIDs.add(ts.getThreadId());
+                    condThreadIdToState.set(ts.getThreadId(), ts);
+                    condThreadIdToIndex.set(ts.getThreadId(), index);
+                }
+
+                let threadSuccStates: ImmMap<number, ImmList<ThreadState>> = ImmMap();
+
+                // For all waiting threads: Check if they are waiting for a condition thread
+                for (const [threadIndex, threadState] of waitingThreads.entries()) {
+                    if (threadState.getComputationState() == ThreadComputationState.THREAD_STATE_WAIT) {
+                        const waitingForCondThreadIDs = threadState.getWaitingForThreads().union(conditionCheckThreadIDs);
+                        Preconditions.checkState(waitingForCondThreadIDs.size == 1);
+                        const waitingForCondThreadID: ThreadId = getTheOnlyElement(waitingForCondThreadIDs);
+
+                        // Check condition
+                        const condThread: ThreadState = condThreadIdToState.get(waitingForCondThreadID);
+                        const wrappedCondStates: [AbstractElement, boolean][] = this.runConditionThread(state, condThread);
+                        //
+
+                        let succStates: ImmList<ThreadState> = ImmList();
+                        for (const [condCheckedState, checkResult] of wrappedCondStates) {
+                            if (checkResult) {
+                                succStates = succStates.push(threadState
+                                    .withComputationState(ThreadComputationState.THREAD_STATE_YIELD)
+                                    .withRemovedWaitingFor(waitingForCondThreadID))
+                            } else {
+                                succStates = succStates.push(threadState);
+                            }
+                        }
+                        threadSuccStates = threadSuccStates.set(threadIndex, succStates);
+                    }
+                }
+
+                const updatedThreadLists: ImmList<ThreadState>[] = this.expandToUpdatedThreadLists(state, threadSuccStates);
+
+                // Create the list of successor states
+                let result: ControlAbstractState[] = [];
+                for (const threadList of updatedThreadLists) {
+                    result.push(state.withThreadStates(threadList));
+                }
+
+                // Remove the cond threads no main thread is waiting for
+                return result.map((cs) => this.removeIrrelevantCondThreads(cs));
+
+            } else {
+                // Acceleration applicable
+                throw new ImplementMeException();
+            }
         }
     }
 
-    private runConditionThread(state: ControlAbstractState, threadIndex: number, threadState: ThreadState): ControlAbstractState[] {
-        const script: TransitionRelation = this._task.getTransitionRelationById(
-            threadState.getRelationLocation().getRelationId());
-        const conditionScopeStack = this.buildScopeStack(threadState.actorId, script.name);
+    private removeIrrelevantCondThreads(cs: ControlAbstractState): ControlAbstractState {
+        const stillWaitingFor: ImmSet<ThreadId> = cs.getThreadStates().map((ts) => ts.getWaitingForThreads())
+            .reduce((acc, value) => value.union(acc), ImmSet<ThreadId>());
 
-        Transfers.transferAlongTransitionSystem(this._wrappedTransferRelation, state.getWrappedState(), script,
-            getTheOnlyElement(script.entryLocationSet), Concerns.highestPriorityConcern(),
-            (op) => {return this.scopeOperations([op], state.getActorScopes(),
-                conditionScopeStack, conditionScopeStack)[0]});
-        throw new ImplementMeException();
+        return cs.withConditionStates(cs.getConditionStates()
+            .filter((cts) => stillWaitingFor.contains(cts.threadId)));
     }
 
-    private runFullScript(initialState: ControlAbstractState, fromLocation: RelationLocation) {
-        const actor: Actor = this._task.getActorByName(fromLocation.getActorId());
-        const relation: TransitionRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
+    private expandToUpdatedThreadLists(state: ControlAbstractState, threadSuccStates: ImmMap<number, ImmList<ThreadState>>): ImmList<ThreadState>[] {
+        const worklist: [ImmList<ThreadState>, ImmMap<number, ImmList<ThreadState>>][] = [];
+        worklist.push([state.getThreadStates(), threadSuccStates]);
 
+        const result: ImmList<ThreadState>[] = [];
+        while (worklist.length > 0) {
+            const [workBaseList, workListUpdates]: [ImmList<ThreadState>, ImmMap<number, ImmList<ThreadState>>] = worklist.pop();
+            if (workListUpdates.size == 0) {
+                Preconditions.checkState(workBaseList.size == state.getThreadStates().size);
+                result.push(workBaseList);
+            } else {
+                const indexToUpdate: number = getTheNextElement(workListUpdates.keys());
+                const workListUpdatesPrime: ImmMap<number, ImmList<ThreadState>> = workListUpdates.delete(indexToUpdate);
+                const alternatives: ImmList<ThreadState> = workListUpdates.get(indexToUpdate);
+                for (const alt of alternatives) {
+                    Preconditions.checkNotUndefined(alt);
+                    worklist.push([workBaseList.set(indexToUpdate, alt), workListUpdatesPrime]);
+                }
+            }
+        }
 
+        return result;
+    }
+
+    private runConditionThread(state: ControlAbstractState, condThreadState: ThreadState): [AbstractElement, boolean][] {
+        Preconditions.checkNotUndefined(state);
+        Preconditions.checkNotUndefined(condThreadState);
+
+        const script: TransitionRelation = this._task.getTransitionRelationById(
+            condThreadState.getRelationLocation().getRelationId());
+        Preconditions.checkArgument(script != null, "Condition script must have been registered!");
+        const conditionScopeStack = this.buildScopeStack(condThreadState.actorId, script.name);
+
+        const checkResult: [AbstractElement, boolean][] = Transfers.transferAlongTransitionSystem(this._wrappedTransferRelation,
+            state.getWrappedState(), script, getTheOnlyElement(script.entryLocationSet), Concerns.highestPriorityConcern(),
+            (op) => {return this.scopeOperations([op], state.getActorScopes(),
+                conditionScopeStack, conditionScopeStack)[0]});
+
+        return checkResult.filter((([e, t]) => Lattices.isFeasible(e, this._wrappedDomain.lattice)));
     }
 
     private restartThread(baseState: ControlAbstractState, threadIndex: number): ControlAbstractState {
