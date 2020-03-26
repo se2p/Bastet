@@ -113,7 +113,7 @@ export class LookupTransformer {
             fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
             let uri = path.join(dirName, fileName);
 
-            let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", StringType.instance().typeId));
+            let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("id", StringType.instance().typeId));
             let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
 
             LookupTransformer.loadImage(uri, actorResources);
@@ -158,7 +158,7 @@ export class LookupTransformer {
             fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
             let uri = path.join(dirName, fileName);
 
-            let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", StringType.instance().typeId));
+            let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("idx", StringType.instance().typeId));
             let cond = new NumEqualsExpression(varWithDataLoc, new NumberLiteral(idxCount));
 
             LookupTransformer.loadImage(uri, actorResources);
@@ -193,7 +193,7 @@ export class LookupTransformer {
         let paramDecl = new ParameterDeclaration(new Identifier("id"), new StringType());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
 
-        let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", StringType.instance().typeId));
+        let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", NumberType.instance().typeId));
         let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
         let stmts = [];
         stmts.push(declareStackVar)
@@ -236,10 +236,10 @@ export class LookupTransformer {
 
         let methodIdent = new Identifier("getImageHeight");
 
-        let paramDecl = new ParameterDeclaration(new Identifier("id"), new StringType());
+        let paramDecl = new ParameterDeclaration(new Identifier("id"), StringType.instance());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
 
-        let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", StringType.instance().typeId));
+        let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", NumberType.instance().typeId));
         let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
         let stmts = [];
         stmts.push(declareStackVar)

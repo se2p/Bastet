@@ -84,3 +84,24 @@ test("Test getGraphicsIndexById 1 unsafe", done => {
         done(error)
     }
 }, utils.timeout);
+
+test("Test changeCostumeTo 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/looks/looks-changeCostumeTo-1_SAFE.sc"
+    let bastet = new Bastet();
+    try {
+        utils.execute(bastet, fixtureRelPath, done)
+    } catch (error) {
+        done(error)
+    }
+}, utils.timeout);
+
+
+test("Test changeCostumeTo 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/looks/looks-changeCostumeTo-1_UNSAFE.sc"
+    let bastet = new Bastet();
+    try {
+        utils.execute(bastet, fixtureRelPath, done)
+    } catch (error) {
+        done(error)
+    }
+}, utils.timeout);
