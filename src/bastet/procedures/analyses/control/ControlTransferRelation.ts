@@ -597,18 +597,17 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     .withFailedFor(properties)), true]];
 
         } else if (stepOp.ast instanceof BeginAtomicStatement) {
-            return [[result.withThreadStateUpdate(threadToStep.threadIndex,
-                (ts) => ts.withIncrementedAtomic()), true]];
+            return [[this.incrementAtomic(result, threadToStep), true]];
 
         } else if (stepOp.ast instanceof EndAtomicStatement) {
-            return [[result.withThreadStateUpdate(threadToStep.threadIndex,
-                (ts) => ts.withDecrementedAtomic()), true]];
+            return [[this.decrementAtomic(result, threadToStep), true]];
 
         } else if (stepOp.ast instanceof CallStatement) {
             // The following lines realize the inter-procedural analysis.
             const calledMethodName = stepOp.ast.calledMethod.text;
 
             if (steppedActor.isExternalMethod(calledMethodName)) {
+                // Separate handling of calls to 'external' methods
                 const call = stepOp.ast as CallStatement;
                 if (call.calledMethod.text == MethodIdentifiers._RUNTIME_signalFailure) {
                     throw new IllegalArgumentException("Call should have been transformed to a SignalTargetReachedStatement");
@@ -665,7 +664,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                             .withCallStack(succCallStack)), false]);
                 }
 
-                return resultList;
+                if (calledMethod.isAtomic) {
+                    return resultList.map(([cs, d]) => [this.incrementAtomic(cs, threadToStep), d]);
+                } else {
+                    return resultList;
+                }
             }
 
         } else if (stepOp.ast instanceof ReturnStatement) {
@@ -679,10 +682,18 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             // Assign the result to the variable that was referenced in the `CallStatement`
             const interProcOps: ProgramOperation[] = this.createStoreCallResultOps(steppedThread, callInformation, stepOp.ast as ReturnStatement);
 
-            return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+            const resultList: [ControlAbstractState, boolean][] = [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
                 ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.actorScopes, predScopeStack, succScopeStack).map(o => o.ident)))
                     .withLocation(callInformation.getReturnTo())
                     .withCallStack(succReturnCallsTo)), false]];
+
+            const returnFrom: Method = steppedActor.getMethod(fromRelation.name);
+
+            if (returnFrom.isAtomic) {
+                return resultList.map(([cs, d]) => [this.decrementAtomic(cs, threadToStep), d]);
+            } else {
+                return resultList;
+            }
 
         } else if (stepOp.ast instanceof BroadcastMessageStatement) {
             const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
@@ -748,6 +759,16 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         // TODO: Produce a state with THREAD_STATE_RUNNING_ATOMIC if isInnerAtomic
 
         return [[result, false]];
+    }
+
+    private incrementAtomic(state: ControlAbstractState, thread: IndexedThread): ControlAbstractState {
+        return state.withThreadStateUpdate(thread.threadIndex,
+            (ts) => ts.withIncrementedAtomic());
+    }
+
+    private decrementAtomic(state: ControlAbstractState, thread: IndexedThread): ControlAbstractState {
+        return state.withThreadStateUpdate(thread.threadIndex,
+            (ts) => ts.withDecrementedAtomic());
     }
 
     private getCallingStatement(callInformation: MethodCall): CallStatement {
