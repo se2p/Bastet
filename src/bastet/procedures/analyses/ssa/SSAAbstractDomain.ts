@@ -115,7 +115,7 @@ export class SSAStateLattice implements Lattice<SSAState> {
     }
 
     isIncluded(element1: SSAState, element2: SSAState): boolean {
-        throw new ImplementMeException();
+        return this._wrappedStateLattice.isIncluded(element1.getWrappedState(), element2.getWrappedState());
     }
 
     join(element1: SSAState, element2: SSAState): SSAState {

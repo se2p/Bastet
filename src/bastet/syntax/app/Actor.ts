@@ -52,12 +52,12 @@ import {CallStatement} from "../ast/core/statements/CallStatement";
 import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
 import {Properties} from "../Property";
 import {Identifier} from "../ast/core/Identifier";
-import {InitializeAnalysisStatement} from "../ast/core/statements/InternalStatement";
+import {InitializeAnalysisStatement, SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
 import {BooleanExpression} from "../ast/core/expressions/BooleanExpression";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {IfStatement} from "../ast/core/statements/ControlStatement";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
-import {OptionalAstNode} from "../ast/AstNode";
+import {AstNode, OptionalAstNode} from "../ast/AstNode";
 
 export type ActorMap = { [id:string]: Actor } ;
 
@@ -275,29 +275,30 @@ export class Actor {
     public getConditionCheckScript(cond: BooleanExpression): Script {
         Preconditions.checkNotUndefined(cond);
         const ifConditionReached: StatementList = new StatementList([
-            new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_conditionSat),
-                new ExpressionList([]), OptionalAstNode.absent())]);
-        const ifNotReached: StatementList = new StatementList([
-            new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_conditionUnsat),
-                new ExpressionList([]), OptionalAstNode.absent())]);
+            new SignalTargetReachedStatement(new ExpressionList([]))]);
+        const ifNotReached: StatementList = new StatementList([]);
         const statements: StatementList = new StatementList([new IfStatement(cond, ifConditionReached, ifNotReached)]);
 
         // TODO: Register the script to the actor. Have a cache?
-        const transitions = statements.accept(new RelationBuildingVisitor());
+        const transitions = TransitionRelations.eliminateEpsilons(statements.accept(new RelationBuildingVisitor()));
         return new Script(Identifier.freshWithPrefix("cond"), NeverEvent.instance(), false, transitions);
     }
 
-    public transitivelyCalled(from: TransitionRelation): Set<CallStatement> {
-        const result = new Set<CallStatement>();
+    public transitivelyPresent(from: TransitionRelation, filter: (s: AstNode) => boolean): Set<AstNode> {
+        const calls = new Set<CallStatement>();
+        const result = new Set<AstNode>();
 
         const addToResult = function(a: Actor, tr: TransitionRelation) {
             for (const l of tr.locationSet) {
                 for (const ts of tr.transitionsFrom(l)) {
-                    const op = ProgramOperation.for(ts.opId);
-                    if (op.ast instanceof CallStatement) {
-                        const call = op.ast as CallStatement;
-                        if (!result.has(call)) {
-                            result.add(call);
+                    const opAst: AstNode = ProgramOperation.for(ts.opId).ast;
+                    if (filter(opAst)) {
+                        result.add(opAst);
+                    }
+                    if (opAst instanceof CallStatement) {
+                        const call = opAst as CallStatement;
+                        if (!calls.has(call)) {
+                            calls.add(call);
                             const calledMethodDef: Method = a.findMethod(call.calledMethod.text);
                             if (calledMethodDef) {
                                 addToResult(a, calledMethodDef.transitions);
