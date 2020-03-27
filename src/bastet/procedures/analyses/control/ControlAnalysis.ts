@@ -46,6 +46,7 @@ import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
+import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -210,8 +211,14 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
             const toLocation = succThread.getRelationLocation();
 
             if (fromLocation.getRelationId() == toLocation.getRelationId()) {
-               const withinRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
-               result.push(withinRelation.transitionBetween(fromLocation.getLocationId(), toLocation.getLocationId()));
+                const withinRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
+                const t = withinRelation.transitionBetween(fromLocation.getLocationId(), toLocation.getLocationId())
+                if (t == null && fromLocation.getLocationId() == toLocation.getLocationId()) {
+                    throw new IllegalStateException("Conducted stuttering transition not known in the transition relation");
+                } else if (t == null) {
+                   throw new IllegalStateException("Something is really wrong here. This seems to be a BUG") ;
+                }
+                result.push(t);
             } else {
                 return steppedThread.getOperations().map(oid => ProgramOperation.for(oid)).toArray();
             }

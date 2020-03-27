@@ -111,7 +111,10 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
             // Initialization: Create a system global variable that stores the current time
             const initStmts: Statement[] = [
                 new DeclareSystemVariableStatement(this._globalTimeMicrosVariable),
-                new StoreEvalResultToVariableStatement(this._globalTimeMicrosVariable, NumberLiteral.of(0)) ];
+                new StoreEvalResultToVariableStatement(this._globalTimeMicrosVariable, NumberLiteral.of(0)),
+                new DeclareSystemVariableStatement(this._globalTimeResetMicrosVariable),
+                new StoreEvalResultToVariableStatement(this._globalTimeResetMicrosVariable, NumberLiteral.of(0)),
+            ];
 
             return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState, initStmts, [op], co);
         }

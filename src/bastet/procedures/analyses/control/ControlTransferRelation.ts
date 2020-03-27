@@ -35,7 +35,12 @@ import {ControlAnalysisConfig} from "./ControlAnalysis";
 import {App} from "../../../syntax/app/App";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {TransitionLoop, TransitionRelation, TransitionTo} from "../../../syntax/app/controlflow/TransitionRelation";
+import {
+    TransitionLoop,
+    TransitionRelation,
+    TransitionRelations,
+    TransitionTo
+} from "../../../syntax/app/controlflow/TransitionRelation";
 import {Actor, ActorId} from "../../../syntax/app/Actor";
 import {
     OperationId,
@@ -62,7 +67,7 @@ import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilS
 import {WaitSecsStatement} from "../../../syntax/ast/core/statements/WaitSecsStatement";
 import {Logger} from "../../../utils/Logger";
 import {ExpressionList} from "../../../syntax/ast/core/expressions/ExpressionList";
-import {Statement} from "../../../syntax/ast/core/statements/Statement";
+import {Statement, StatementList} from "../../../syntax/ast/core/statements/Statement";
 import {ParameterDeclaration} from "../../../syntax/ast/core/ParameterDeclaration";
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
@@ -77,7 +82,7 @@ import {
 import {AfterStatementMonitoringEvent, MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Concern, Concerns} from "../../../syntax/Concern";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {Script} from "../../../syntax/app/controlflow/Script";
+import {Script, ScriptId} from "../../../syntax/app/controlflow/Script";
 import {getTheNextElement, getTheOnlyElement} from "../../../utils/Collections";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {BOOTSTRAP_FINISHED_MESSAGE, SystemMessage} from "../../../syntax/ast/core/Message";
@@ -95,6 +100,14 @@ import {SignalTargetReachedStatement} from "../../../syntax/ast/core/statements/
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {GLOBAL_TIME_MICROS_VAR} from "../time/TimeTransferRelation";
+import {
+    MultiplyExpression,
+    NumberExpression, NumberLiteral,
+    NumberVariableExpression,
+    PlusExpression
+} from "../../../syntax/ast/core/expressions/NumberExpression";
+import {freshId} from "../../../utils/Seq";
+import {RelationBuildingVisitor} from "../../../syntax/app/controlflow/RelationBuildingVisitor";
 
 class StepInformation {
 
@@ -142,6 +155,47 @@ class StepInformation {
 
     get succScopeStack(): ImmList<string> {
         return this._succScopeStack;
+    }
+}
+
+class AccelInfo {
+
+    private readonly _id: number;
+
+    private readonly _actorId: ActorId;
+
+    private readonly _condition: BooleanExpression;
+
+    private readonly _variantVariable: NumberVariableExpression;
+
+    private readonly _accelerateTo: NumberExpression;
+
+    constructor(actor: ActorId, condition: BooleanExpression, variantVariable: NumberVariableExpression, accelerateTo: NumberExpression) {
+        this._actorId = actor;
+        this._condition = Preconditions.checkNotUndefined(condition);
+        this._variantVariable = Preconditions.checkNotUndefined(variantVariable);
+        this._accelerateTo = Preconditions.checkNotUndefined(accelerateTo);
+        this._id = freshId();
+    }
+
+    get id(): number {
+        return this._id;
+    }
+
+    get actorId(): ActorId {
+        return this._actorId;
+    }
+
+    get condition(): BooleanExpression {
+        return this._condition;
+    }
+
+    get variantVariable(): NumberVariableExpression {
+        return this._variantVariable;
+    }
+
+    get accelerateTo(): NumberExpression {
+        return this._accelerateTo;
     }
 }
 
@@ -196,12 +250,15 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
     private readonly _globalTimeMicrosVariable: VariableWithDataLocation;
 
+    private readonly _accelInfoMap: Map<ScriptId, AccelInfo>;
+
     constructor(config: ControlAnalysisConfig, task: App, wrappedTransferRelation: LabeledTransferRelation<AbstractElement>,
                 wrappedDomain: AbstractDomain<ConcreteElement, AbstractElement>) {
         this._task = Preconditions.checkNotUndefined(task);
         this._config = Preconditions.checkNotUndefined(config);
         this._wrappedTransferRelation = Preconditions.checkNotUndefined(wrappedTransferRelation);
         this._wrappedDomain = Preconditions.checkNotUndefined(wrappedDomain);
+        this._accelInfoMap = new Map();
 
         // TODO: Move the declaration of the following variables to the `App`/`AppBuilder`/`Actor`
         this._threadWaitUntilMicrosVariable = new VariableWithDataLocation(
@@ -559,13 +616,23 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 } else if (call.calledMethod.text == MethodIdentifiers._RUNTIME_waitSeconds) {
                     // const timeCond: BooleanExpression = this.createTimeCond(stmt.secs);
                     // const waitfor: ThreadState = this.createTemporaryCheckThreadFor(timeCond);
+                    Preconditions.checkArgument(call.args.elements.length == 1);
+                    const secondsExpression = call.args.getIth(0);
 
-                    const ops: ProgramOperation[] = [new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_micros),
-                        new ExpressionList([]), OptionalAstNode.with(this._threadWaitUntilMicrosVariable))]
-                        .map((ast) => ProgramOperationFactory.createFor(ast))
+                    const ops: ProgramOperation[] = [
+                        new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_micros),
+                            new ExpressionList([]), OptionalAstNode.with(this._threadWaitUntilMicrosVariable)),
+                        new StoreEvalResultToVariableStatement(this._threadWaitUntilMicrosVariable,
+                            new PlusExpression(this._threadWaitUntilMicrosVariable, new MultiplyExpression(secondsExpression, NumberLiteral.of(1000000))))
+                    ].map((ast) => ProgramOperationFactory.createFor(ast));
 
                     const waitUntilCond = new NumGreaterEqualExpression(this._globalTimeMicrosVariable, this._threadWaitUntilMicrosVariable);
+                    const accelInfo = new AccelInfo(threadToStep.threadStatus.getActorId(),
+                        waitUntilCond, new NumberVariableExpression(this._globalTimeMicrosVariable),
+                        new PlusExpression(this._threadWaitUntilMicrosVariable, NumberLiteral.of(1)));
+
                     const checkThread: ThreadState = this.createConditionCheckThread(steppedActor.ident, waitUntilCond);
+                    this._accelInfoMap.set(checkThread.getScriptId(), accelInfo);
 
                     const currentScopeStack = this.buildScopeStack(steppedActor.ident, fromRelation.name);
                     return [[result.withAddedConditionState(checkThread)
@@ -813,60 +880,104 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             const waitingThreads = state.getThreadStates().filter((ts) => ts.getComputationState() == ThreadComputationState.THREAD_STATE_WAIT);
 
             if (this.hasNonWaitingRunnable(state.getThreadStates())) {
-                // No acceleration applicable
-                const conditionCheckThreadIDs = new Set<ThreadId>();
-                const condThreadIdToIndex = new Map<number, number>();
-                const condThreadIdToState = new Map<number, ThreadState>();
-                for (const [index, ts] of state.getConditionStates().entries()) {
-                    conditionCheckThreadIDs.add(ts.getThreadId());
-                    condThreadIdToState.set(ts.getThreadId(), ts);
-                    condThreadIdToIndex.set(ts.getThreadId(), index);
-                }
-
-                let threadSuccStates: ImmMap<number, ImmList<ThreadState>> = ImmMap();
-
-                // For all waiting threads: Check if they are waiting for a condition thread
-                for (const [threadIndex, threadState] of waitingThreads.entries()) {
-                    if (threadState.getComputationState() == ThreadComputationState.THREAD_STATE_WAIT) {
-                        const waitingForCondThreadIDs = threadState.getWaitingForThreads().union(conditionCheckThreadIDs);
-                        Preconditions.checkState(waitingForCondThreadIDs.size == 1);
-                        const waitingForCondThreadID: ThreadId = getTheOnlyElement(waitingForCondThreadIDs);
-
-                        // Check condition
-                        const condThread: ThreadState = condThreadIdToState.get(waitingForCondThreadID);
-                        const wrappedCondStates: [AbstractElement, boolean][] = this.runConditionThread(state, condThread);
-                        //
-
-                        let succStates: ImmList<ThreadState> = ImmList();
-                        for (const [condCheckedState, checkResult] of wrappedCondStates) {
-                            if (checkResult) {
-                                succStates = succStates.push(threadState
-                                    .withComputationState(ThreadComputationState.THREAD_STATE_YIELD)
-                                    .withRemovedWaitingFor(waitingForCondThreadID))
-                            } else {
-                                succStates = succStates.push(threadState);
-                            }
-                        }
-                        threadSuccStates = threadSuccStates.set(threadIndex, succStates);
-                    }
-                }
-
-                const updatedThreadLists: ImmList<ThreadState>[] = this.expandToUpdatedThreadLists(state, threadSuccStates);
-
-                // Create the list of successor states
-                let result: ControlAbstractState[] = [];
-                for (const threadList of updatedThreadLists) {
-                    result.push(state.withThreadStates(threadList));
-                }
-
-                // Remove the cond threads no main thread is waiting for
-                return result.map((cs) => this.removeIrrelevantCondThreads(cs));
+                return this.checkConditionAndWakeUpIfSatisfied(state);
 
             } else {
                 // Acceleration applicable
+
+                // Group the conditions by the variant variable (which should be accelerated)
+                // (assuming that there is no dependency between the variables to accelerate)
+                const acceleratable: AccelInfo[] = this.filterAcceleratableConditionThreads(state.getConditionStates());
+
+                // For now, we only consider an acceleration based on the time variable
+                const timeAccel = acceleratable.filter((ac) => ac.variantVariable.variable == this._globalTimeMicrosVariable);
+                if (timeAccel.length == 1) {
+                    // We can immediately accelerate in this case
+                    const accelInfo = timeAccel[0];
+                    return this.checkConditionAndWakeUpIfSatisfied(getTheOnlyElement(this.accelerateTo(state, accelInfo)));
+                }
+
                 throw new ImplementMeException();
             }
         }
+    }
+
+    private checkConditionAndWakeUpIfSatisfied(state: ControlAbstractState): ControlAbstractState[] {
+        // No acceleration applicable
+        const conditionCheckThreadIDs = new Set<ThreadId>();
+        const condThreadIdToIndex = new Map<number, number>();
+        const condThreadIdToState = new Map<number, ThreadState>();
+        for (const [index, ts] of state.getConditionStates().entries()) {
+            conditionCheckThreadIDs.add(ts.getThreadId());
+            condThreadIdToState.set(ts.getThreadId(), ts);
+            condThreadIdToIndex.set(ts.getThreadId(), index);
+        }
+
+        let threadSuccStates: ImmMap<number, ImmList<ThreadState>> = ImmMap();
+
+        // For all waiting threads: Check if they are waiting for a condition thread
+        for (const [threadIndex, threadState] of state.getThreadStates().entries()) {
+            Preconditions.checkNotUndefined(threadState);
+            if (threadState.getComputationState() == ThreadComputationState.THREAD_STATE_WAIT) {
+                const waitingForCondThreadIDs = threadState.getWaitingForThreads().union(conditionCheckThreadIDs);
+                Preconditions.checkState(waitingForCondThreadIDs.size == 1);
+                const waitingForCondThreadID: ThreadId = getTheOnlyElement(waitingForCondThreadIDs);
+
+                // Check condition
+                const condThread: ThreadState = condThreadIdToState.get(waitingForCondThreadID);
+                const wrappedCondStates: [AbstractElement, boolean][] = this.runConditionThread(state, condThread);
+                //
+
+                let succStates: ImmList<ThreadState> = ImmList();
+                for (const [condCheckedState, checkResult] of wrappedCondStates) {
+                    if (checkResult) {
+                        succStates = succStates.push(threadState
+                            .withComputationState(ThreadComputationState.THREAD_STATE_YIELD)
+                            .withRemovedWaitingFor(waitingForCondThreadID))
+                    } else {
+                        succStates = succStates.push(threadState);
+                    }
+                }
+                threadSuccStates = threadSuccStates.set(threadIndex, succStates);
+            }
+        }
+
+        const updatedThreadLists: ImmList<ThreadState>[] = this.expandToUpdatedThreadLists(state, threadSuccStates);
+
+        // Create the list of successor states
+        let result: ControlAbstractState[] = [];
+        for (const threadList of updatedThreadLists) {
+            result.push(state.withThreadStates(threadList));
+        }
+
+        // Remove the cond threads no main thread is waiting for
+        return result.map((cs) => this.removeIrrelevantCondThreads(cs));
+    }
+
+    private accelerateTo(state: ControlAbstractState, accelInfo: AccelInfo): ControlAbstractState[] {
+        Preconditions.checkNotUndefined(state);
+        Preconditions.checkNotUndefined(accelInfo);
+
+        const accelStmts = new StatementList([
+            new StoreEvalResultToVariableStatement(accelInfo.variantVariable.variable, accelInfo.accelerateTo)]);
+        const accelTr: TransitionRelation = TransitionRelations.eliminateEpsilons(accelStmts.accept(new RelationBuildingVisitor()));
+        this._task.registerTrasitionRelation(accelTr);
+
+        const conditionScopeStack = this.buildScopeStack(accelInfo.actorId, accelTr.name);
+
+        const wrappedResult: [AbstractElement, boolean][] = Transfers.transferAlongTransitionSystem(this._wrappedTransferRelation,
+            state.getWrappedState(), accelTr, getTheOnlyElement(accelTr.entryLocationSet), Concerns.highestPriorityConcern(),
+            (op) => {return this.scopeOperations([op], state.getActorScopes(),
+                conditionScopeStack, conditionScopeStack)[0]});
+
+        return wrappedResult.map(([w,t]) => new ControlAbstractState(state.getThreadStates(),
+            state.getConditionStates(), w, state.getIsTargetFor(), state.getSteppedFor(), state.getActorScopes()));
+    }
+
+    private filterAcceleratableConditionThreads(conditionStates: ImmList<ThreadState>): AccelInfo[] {
+        return Array.from(conditionStates
+            .filter((ts) => this._accelInfoMap.has(ts.getScriptId()))
+            .map((ts) => this._accelInfoMap.get(ts.getScriptId())));
     }
 
     private removeIrrelevantCondThreads(cs: ControlAbstractState): ControlAbstractState {
@@ -889,8 +1000,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 result.push(workBaseList);
             } else {
                 const indexToUpdate: number = getTheNextElement(workListUpdates.keys());
-                const workListUpdatesPrime: ImmMap<number, ImmList<ThreadState>> = workListUpdates.delete(indexToUpdate);
                 const alternatives: ImmList<ThreadState> = workListUpdates.get(indexToUpdate);
+                const workListUpdatesPrime: ImmMap<number, ImmList<ThreadState>> = workListUpdates.delete(indexToUpdate);
                 for (const alt of alternatives) {
                     Preconditions.checkNotUndefined(alt);
                     worklist.push([workBaseList.set(indexToUpdate, alt), workListUpdatesPrime]);

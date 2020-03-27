@@ -105,10 +105,12 @@ export class Transfers {
                         if (opMapper) {
                             op = opMapper(op);
                         }
+
+                        const targetReachedPrime = targetReached || op.ast instanceof SignalTargetReachedStatement;
+
                         const succs = Array.from(abstractSucc.abstractSuccFor(e, op, co));
                         frontierPrime = frontierPrime.concat(succs.map((s) =>
-                            [t.target, visited.union([t.target]), s,
-                                targetReached || op instanceof SignalTargetReachedStatement]));
+                            [t.target, visited.union([t.target]), s, targetReachedPrime]));
                     }
                 }
             }

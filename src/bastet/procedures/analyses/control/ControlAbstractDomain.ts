@@ -303,7 +303,7 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
     }
 
     withRemovedWaitingFor(threadId: ThreadId): ThreadState {
-        return undefined;
+        return this.withWaitingForThreads(this.getWaitingForThreads().remove(threadId));
     }
 }
 
