@@ -26,13 +26,13 @@ program Task7Spec
 
 actor DirectorObserver is Observer begin
 
-    declare actor_1_id as string
+    declare actor_1_id as actor
     declare actor_1_costume as string
     declare actor_1_prev_costume as string
     declare last_change as number
 
     define last_change as _RUNTIME_millis()
-    define actor_1_id as "Elefant1"
+    define actor_1_id as locate actor "Elefant1"
 
     define atomic isBehaviorSatisfied () begin
         // (a) Attributes of the first actor
