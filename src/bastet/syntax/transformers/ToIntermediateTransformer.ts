@@ -166,7 +166,7 @@ import {
     PureElseContext,
     ElseIfCaseContext,
     FullMethodDefinitionContext,
-    RuntimeMethodDefinitionContext, FlatVariableContext, NumAsBoolExpressionContext
+    FlatVariableContext, NumAsBoolExpressionContext
 } from "../parser/grammar/ScratchParser";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {Identifier} from "../ast/core/Identifier";
@@ -317,6 +317,7 @@ import {ActorExpression, ActorVariableExpression, LocateActorExpression} from ".
 import {TransitionRelation} from "../app/controlflow/TransitionRelation";
 import {ScopeTypeInformation, TypeInformationStorage} from "../DeclarationScopes";
 import instantiate = WebAssembly.instantiate;
+import {LookupTransformer} from "./LookupTransformer";
 import {SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
 
 const toposort = require('toposort');
@@ -366,9 +367,10 @@ class TTransformerResult<T extends AstNode> {
 
 }
 
-class TransformerResult extends TTransformerResult<AstNode> {
+export class TransformerResult extends TTransformerResult<AstNode> {
 
 }
+
 const STATEMENT_MATCHER = /(?<method>[A-Za-z0-9_]*)StatementContext/;
 const EXPRESSION_MATCHER = /(?<method>[A-Za-z0-9_]*)ExpressionContext/;
 
@@ -398,11 +400,13 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     private readonly _config: TransformerConfig;
     private readonly _typeStorage: TypeInformationStorage;
 
+    private _currentActor: Identifier;
     private _actorScope : boolean;
     private _activeDeclarationScope: ScopeTypeInformation;
+    private _filePath: string;
 
     constructor(config: TransformerConfig, methodLibrary: App,
-                typeInformationStorage: TypeInformationStorage) {
+                typeInformationStorage: TypeInformationStorage, filePath: string) {
         this._config = Preconditions.checkNotUndefined(config);
         this._methodLibrary = Preconditions.checkNotUndefined(methodLibrary);
         this._typeStorage = Preconditions.checkNotUndefined(typeInformationStorage);
@@ -410,6 +414,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         this._typeStack = new Array<ScratchType>();
         this._activeDeclarationScope = typeInformationStorage.getSystemScope();
         this._actorScope = false;
+        this._filePath = filePath;
     }
 
     get typeStorage(): TypeInformationStorage {
@@ -577,8 +582,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(new ResultDeclaration(resultVar));
     }
 
-    private toMethodDef(ctx: MethodDefinitionContext): FullMethodDefinitionContext|RuntimeMethodDefinitionContext {
-        return ctx as FullMethodDefinitionContext|RuntimeMethodDefinitionContext;
+    private toMethodDef(ctx: MethodDefinitionContext): FullMethodDefinitionContext {
+        return ctx as FullMethodDefinitionContext ;
     }
 
     private precollectMethodSignatures(actorIdent: Identifier, ctx: MethodDefinitionListContext,
@@ -631,10 +636,16 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     public visitActorDefinition(ctx: ActorDefinitionContext): TransformerResult {
         let initStatements: StatementList = StatementList.empty();
 
+        // FIXME add assert that you cannot inherit from anything with resources
+
         // Identifier and inheritance information
         const ident = ctx.ident().accept(this).nodeOnly() as Identifier;
+        this._currentActor = ident;
+
         const inheritesFrom: InheritsFromList = ctx.inheritsFrom().accept(this).nodeOnly();
         this._activeDeclarationScope.putTypeInformation(ident, ActorType.instance());
+
+        const runtimeMethods: MethodDefinition[] = [];
 
         // Role
         const actorMode: ActorMode = ctx.actorMode().accept(this).nodeOnly();
@@ -669,6 +680,20 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 resouceDefs = ctx.actorComponentsDefinition().resourceList().accept(this);
                 initStatements = StatementLists.concat(initStatements, resouceDefs.statementsToPrepend);
 
+                if (resouceDefs.node.children.length > 0) {
+                    const graphicPixelLookup = LookupTransformer.buildGrapicPixelLookup(this._currentActor, resouceDefs, this._filePath);
+                    runtimeMethods.push(graphicPixelLookup);
+                    const idByIndexLookup = LookupTransformer.buildIdByIndexLookup(this._currentActor, resouceDefs, this._filePath);
+                    runtimeMethods.push(idByIndexLookup);
+                    const indexByIdLookup = LookupTransformer.buildIndexByIdLookup(this._currentActor, resouceDefs, this._filePath);
+                    runtimeMethods.push(indexByIdLookup);
+                    const numGraphics = LookupTransformer.buildGetNumGraphics(this._currentActor, resouceDefs, this._filePath);
+                    runtimeMethods.push(numGraphics);
+                    const imageHeight = LookupTransformer.buildGetImageHeightLookup(this._currentActor, resouceDefs, this._filePath);
+                    runtimeMethods.push(imageHeight);
+                    const imageWidth = LookupTransformer.buildGetImageWidthLookup(this._currentActor, resouceDefs, this._filePath);
+                    runtimeMethods.push(imageWidth);
+                }
                 // Variable declarations and initializations
                 declarations = ctx.actorComponentsDefinition().declarationStmtList().accept(this);
                 initStatements = StatementLists.concat(initStatements, declarations.statementsToPrepend);
@@ -693,6 +718,9 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             Preconditions.checkState(inits.statementsToPrepend.elements.length == 0);
             initStatements = StatementLists.concat(initStatements, inits.node as StatementList);
 
+            const updatedMethodDefList :MethodDefinitionList = new MethodDefinitionList(
+                runtimeMethods.concat((methods.node as MethodDefinitionList).elements));
+
             return TransformerResult.withNode(new ActorDefinition(
                 actorMode,
                 ident as Identifier,
@@ -700,7 +728,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 resouceDefs.node as ResourceDefinitionList,
                 declarations.node as StatementList,
                 initStatements,
-                methods.node as MethodDefinitionList,
+                updatedMethodDefList,
                 externalMethods.nodeOnly() as MethodSignatureList,
                 scripts.node as ScriptDefinitionList));
 
@@ -750,7 +778,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return new TransformerResult(defs.statementsToPrepend, new ResourceDefinitionList(defs.nodeList));
     }
 
-    private parseIsAtomic(ctx: RuntimeMethodDefinitionContext|FullMethodDefinitionContext): boolean {
+    private parseIsAtomic(ctx: FullMethodDefinitionContext): boolean {
         for (const attrib of ctx.methodAttributeList().methodAttribute()) {
             if (attrib instanceof AtomicMethodContext) {
                 return true;
@@ -762,25 +790,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     visitMethodDefinition(ctx: MethodDefinitionContext) : TransformerResult {
         return this.visitSingleChild(ctx);
-    }
-
-    public visitRuntimeMethodDefinition(ctx: RuntimeMethodDefinitionContext) : TransformerResult {
-        const methodIdent: Identifier = ctx.ident().accept(this).nodeOnly() as Identifier;
-
-        const isAtomic = this.parseIsAtomic(ctx);
-
-        this._activeDeclarationScope = this._activeDeclarationScope.beginMethodScope(methodIdent.text);
-        try {
-            throw new ImplementMeException();
-            // const resultDeclaration = ctx.methodResultDeclaration().accept(this).nodeOnly() as ResultDeclaration;
-            // return TransformerResult.withNode(new MethodDefinition(
-            //     methodIdent,
-            //     ctx.parameterList().accept(this).nodeOnly() as ParameterDeclarationList,
-            //     ctx.stmtList().accept(this).nodeOnly() as StatementList,
-            //     resultDeclaration, isAtomic));
-        } finally {
-            this._activeDeclarationScope = this._activeDeclarationScope.endScope();
-        }
     }
 
     public visitFullMethodDefinition(ctx: FullMethodDefinitionContext) : TransformerResult {
@@ -2008,9 +2017,9 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 export class ToIntermediateTransformer {
 
     transform(methodLib: App, origin: RuleNode, typeInformationStorage: TypeInformationStorage,
-              config: {}): AstNode {
+              config: {}, filePath: string): AstNode {
         const transformerConfig = new TransformerConfig(config);
-        const visitor = new ToIntermediateVisitor(transformerConfig, methodLib, typeInformationStorage);
+        const visitor = new ToIntermediateVisitor(transformerConfig, methodLib, typeInformationStorage, filePath);
         return origin.accept(visitor).nodeOnly();
     }
 

@@ -34,7 +34,7 @@ export class CodeToApp {
         const rawAST: RuleNode = scratchParser.parseSource("string", code);
         const transformer = new ToIntermediateTransformer();
         const typeStorage = new TypeInformationStorage();
-        const intermAST: AstNode = transformer.transform(library, rawAST, typeStorage, config);
+        const intermAST: AstNode = transformer.transform(library, rawAST, typeStorage, config, "");
         const ab: AppBuilder = new AppBuilder(library);
         return ab.buildFromSyntaxTree("string", intermAST, typeStorage);
     }

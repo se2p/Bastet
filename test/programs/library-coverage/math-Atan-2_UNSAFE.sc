@@ -4,13 +4,12 @@ actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
         declare alpha as number
-        define alpha as 380
+        define alpha as 0
 
         declare result as number
-        define result as mathCos(rad)
+        define result as mathAtan(alpha)
 
-        if result < 0 or result > 0.154 then begin
-        end else begin
+        if result < 0 or result > (0-45) then begin
             _RUNTIME_signalFailure()
         end
     end

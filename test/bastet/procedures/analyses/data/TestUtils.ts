@@ -26,13 +26,13 @@ import {AnalysisResult, MultiPropertyAnalysisResult} from "../../../../../src/ba
 let intermediateRelPath = "../../../../../src/public/library.sc";
 let intermediatePath = path.join(__dirname, intermediateRelPath);
 
-let configRelPath = "../../../../../config/default.json"
+let configRelPath = "../../../../../config/default.json";
 let configFilePath = path.join(__dirname, configRelPath);
 
-let specRelPath = "../../../../specs/empty.sc"
+let specRelPath = "../../../../specs/empty.sc";
 let specFilePath = path.join(__dirname, specRelPath);
 
-let timeout: number = 20000
+let timeout: number = 20000;
 export {timeout, execute, execute_explicit};
 
 
@@ -42,7 +42,7 @@ function execute(bastet: Bastet, fixturePath: string, done) {
     } else if (fixturePath.endsWith("_UNSAFE.sc")) {
         execute_explicit(bastet, fixturePath, false, done)
     } else {
-
+        fail("Fixture file does not fit naming scheme")
     }
 }
 

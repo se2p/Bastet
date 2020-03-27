@@ -7,7 +7,7 @@ actor MiniActor is RuntimeEntity begin
         define alpha as 35
 
         declare result as number
-        define result as mathSin(rad)
+        define result as mathSin(alpha)
 
         if result > 0 or result < (0-0.991)  then begin
         end else begin

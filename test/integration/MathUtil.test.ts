@@ -19,11 +19,12 @@
  *   limitations under the License.
  *
  */
-import {Bastet} from "../../../../../src/bastet/Bastet";
-import * as utils from "./TestUtils";
 
-xtest("Test Cos 1 safe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-1_SAFE.sc"
+import {Bastet} from "../../src/bastet/Bastet";
+import * as utils from "../bastet/procedures/analyses/data/TestUtils";
+
+test("Test WrapClamp 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-WrapClamp-1_SAFE.sc"
     let bastet = new Bastet();
     try {
         utils.execute(bastet, fixtureRelPath, done)
@@ -32,28 +33,8 @@ xtest("Test Cos 1 safe", done => {
     }
 }, utils.timeout);
 
-xtest("Test Cos 2 safe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-2_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
-}, utils.timeout);
-
-xtest("Test Cos 1 unsafe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
-}, utils.timeout);
-
-xtest("Test Cos 2 unsafe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-2_UNSAFE.sc"
+test("Test WrapClamp 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-WrapClamp-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
         utils.execute(bastet, fixtureRelPath, done)
@@ -63,3 +44,22 @@ xtest("Test Cos 2 unsafe", done => {
 }, utils.timeout);
 
 
+test("Test MathFloor 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-MathFloor-1_SAFE.sc"
+    let bastet = new Bastet();
+    try {
+        utils.execute(bastet, fixtureRelPath, done)
+    } catch (error) {
+        done(error)
+    }
+}, utils.timeout);
+
+test("Test MathFloor 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-MathFloor-1_UNSAFE.sc"
+    let bastet = new Bastet();
+    try {
+        utils.execute(bastet, fixtureRelPath, done)
+    } catch (error) {
+        done(error)
+    }
+}, utils.timeout);

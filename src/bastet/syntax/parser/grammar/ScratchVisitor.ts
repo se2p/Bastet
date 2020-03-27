@@ -6,7 +6,6 @@ import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
 import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
 import { FullMethodDefinitionContext } from "./ScratchParser";
-import { RuntimeMethodDefinitionContext } from "./ScratchParser";
 import { RestartScriptContext } from "./ScratchParser";
 import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
@@ -231,14 +230,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitFullMethodDefinition?: (ctx: FullMethodDefinitionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `RuntimeMethodDefinition`
-	 * labeled alternative in `ScratchParser.methodDefinition`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitRuntimeMethodDefinition?: (ctx: RuntimeMethodDefinitionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `RestartScript`

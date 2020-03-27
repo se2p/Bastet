@@ -38,6 +38,7 @@ import {AnalysisStatistics} from "./procedures/analyses/AnalysisStatistics";
 import {NodeSystemLayer} from "./utils/SystemLayer";
 import {TypeInformationStorage} from "./syntax/DeclarationScopes";
 import {ToIntermediateTransformer} from "./syntax/transformers/ToIntermediateTransformer";
+import * as fs from "fs";
 
 const process = require('process');
 
@@ -94,6 +95,11 @@ export class Bastet {
     }
 
     public async runFor(configFilepath: string, libraryFilepath: string, programFilepath: string, specFilepath: string) : Promise<AnalysisResult> {
+        Preconditions.checkArgument(fs.existsSync(configFilepath), "Config File does not exists.")
+        Preconditions.checkArgument(fs.existsSync(libraryFilepath), "Library File does not exists.")
+        Preconditions.checkArgument(fs.existsSync(programFilepath), "Program File does not exists.")
+        Preconditions.checkArgument(fs.existsSync(specFilepath), "Spec File does not exists.")
+
         const sl = new NodeSystemLayer();
         const config: {} = sl.readFileAsJson(configFilepath);
 
@@ -153,7 +159,7 @@ export class Bastet {
         Preconditions.checkState(rawAST instanceof ProgramContext );
 
         const transformer = new ToIntermediateTransformer();
-        const intermediateAST: AstNode = transformer.transform(App.empty(), rawAST, typeStorage, config);
+        const intermediateAST: AstNode = transformer.transform(App.empty(), rawAST, typeStorage, config, filepath);
 
         return this.createControlFlowFrom(filepath, intermediateAST, App.empty(), typeStorage);
     }
@@ -178,7 +184,7 @@ export class Bastet {
         // Transform the AST: Replaces specific statements or expressions
         // by generic constructs.
         const transformer = new ToIntermediateTransformer();
-        const intermediateAST: AstNode = transformer.transform(staticLibraryModel, rawAST, typeStorage, config);
+        const intermediateAST: AstNode = transformer.transform(staticLibraryModel, rawAST, typeStorage, config, filepath);
 
         return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, typeStorage);
     }

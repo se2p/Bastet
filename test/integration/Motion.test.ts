@@ -19,11 +19,11 @@
  *   limitations under the License.
  *
  */
-import {Bastet} from "../../../../../src/bastet/Bastet";
-import * as utils from "./TestUtils";
+import {Bastet} from "../../src/bastet/Bastet";
+import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-xtest("Test Sin 1 safe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/math-Sin-1_SAFE.sc"
+xtest("Test pointTowards 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-pointTowards-1_SAFE.sc"
     let bastet = new Bastet();
     try {
         utils.execute(bastet, fixtureRelPath, done)
@@ -32,8 +32,8 @@ xtest("Test Sin 1 safe", done => {
     }
 }, utils.timeout);
 
-xtest("Test Sin 2 safe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/math-Sin-2_SAFE.sc"
+xtest("Test pointTowards 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-pointTowards-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
         utils.execute(bastet, fixtureRelPath, done)
@@ -41,25 +41,3 @@ xtest("Test Sin 2 safe", done => {
         done(error)
     }
 }, utils.timeout);
-
-xtest("Test Sin 1 unsafe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/math-Sin-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
-}, utils.timeout);
-
-xtest("Test Sin 2 unsafe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/math-Sin-2_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
-}, utils.timeout);
-
-

@@ -133,7 +133,6 @@ externMethodDefinitionList : externMethodDefinition* ;
 
 methodDefinition :
       'define' methodAttributeList ident parameterList stmtList methodResultDeclaration # FullMethodDefinition
-    | 'define' methodAttributeList ident parameterList 'in' 'runtime' methodResultDeclaration # RuntimeMethodDefinition
     ;
 
 methodResultDeclaration :

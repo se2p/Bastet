@@ -3,13 +3,13 @@ program Mini1Program
 actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
-        declare alpha as number
-        define alpha as 35
+        declare num as number
+        define num as 5.5
 
         declare result as number
-        define result as mathSin(alpha)
+        define result as mathFloor(num)
 
-        if result > 0 or result < (0-0.991)  then begin
+        if result = 5 then begin
             _RUNTIME_signalFailure()
         end
     end
