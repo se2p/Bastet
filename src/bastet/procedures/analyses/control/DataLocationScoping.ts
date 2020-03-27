@@ -90,7 +90,7 @@ export class DataLocationScoper implements DataLocationRenamer {
             .reduceToDeclarationScope(readScope, dataLoc)
             .join(SCOPE_SEPARATOR);
 
-        const newIdent: string = readFromScope + SCOPE_SEPARATOR + dataLoc.ident;
+        const newIdent: string = this.addScopePrefix(readFromScope, dataLoc.ident);
         return new TypedDataLocation(newIdent, dataLoc.type);
     }
 
@@ -102,8 +102,16 @@ export class DataLocationScoper implements DataLocationRenamer {
         const writeToScope = this._typeStorage.reduceToDeclarationScope(this._writeToScope, dataLoc)
             .join(SCOPE_SEPARATOR);
 
-        const newIdent: string = writeToScope + SCOPE_SEPARATOR + dataLoc.ident;
+        const newIdent: string = this.addScopePrefix(writeToScope, dataLoc.ident);
         return new TypedDataLocation(newIdent, dataLoc.type);
+    }
+
+    private addScopePrefix(prefix: string, to: string) {
+        if (!prefix || prefix.length == 0) {
+            return to;
+        } else {
+            return prefix + SCOPE_SEPARATOR + to;
+        }
     }
 
 }

@@ -28,7 +28,7 @@ import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataL
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
 import {NumberType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
 import {ConcreteNumber} from "../../../../src/bastet/procedures/domains/ConcreteElements";
-import {Z3FirstOrderLattice} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
+import {Z3FirstOrderLattice, Z3NumberFormula} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
 
 let smt: Z3SMT;
 let ctx;
@@ -138,6 +138,46 @@ test("Lattice Include 5", () => {
             theories.numTheory.fromConcreteNumber(new ConcreteNumber(42))));
     const result = lattice.isIncluded(f, lattice.bottom());
     expect(result).toBe(true);
+});
+
+test("Lattice Include T 1", () => {
+    const lattice = new Z3FirstOrderLattice(theories.boolTheory, prover);
+    const t: Z3NumberFormula = theories.numTheory.abstractNumberValue(new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("t"), NumberType.instance())));
+    const u1: Z3NumberFormula = theories.numTheory.abstractNumberValue(new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("u1"), NumberType.instance())));
+    const u2: Z3NumberFormula = theories.numTheory.abstractNumberValue(new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("u2"), NumberType.instance())));
+
+    const u1_eq_1 = theories.numTheory.isNumberEqualTo(u1, theories.numTheory.fromConcreteNumber(new ConcreteNumber(1)));
+    const u2_eq_3 = theories.numTheory.isNumberEqualTo(u2, theories.numTheory.fromConcreteNumber(new ConcreteNumber(3)));
+
+    const cond1 = theories.boolTheory.and(
+        u1_eq_1,
+        theories.numTheory.isGreaterThan(t, u1));
+    const cond2 = theories.boolTheory.and(
+        u2_eq_3,
+        theories.numTheory.isGreaterThan(t, u2));
+
+    const result = lattice.isIncluded(cond2, cond1);
+    expect(result).toBe(false);
+});
+
+test("Lattice Include T 2", () => {
+    const lattice = new Z3FirstOrderLattice(theories.boolTheory, prover);
+    const t: Z3NumberFormula = theories.numTheory.abstractNumberValue(new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("t"), NumberType.instance())));
+    const u1: Z3NumberFormula = theories.numTheory.abstractNumberValue(new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("u1"), NumberType.instance())));
+    const u2: Z3NumberFormula = theories.numTheory.abstractNumberValue(new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("u2"), NumberType.instance())));
+
+    const u1_eq_1 = theories.numTheory.isNumberEqualTo(u1, theories.numTheory.fromConcreteNumber(new ConcreteNumber(1)));
+    const u2_eq_3 = theories.numTheory.isNumberEqualTo(u2, theories.numTheory.fromConcreteNumber(new ConcreteNumber(3)));
+
+    const cond1 = theories.boolTheory.and(
+        u1_eq_1,
+        theories.numTheory.isGreaterThan(t, u1));
+    const cond2 = theories.boolTheory.and(
+        u2_eq_3,
+        theories.numTheory.isGreaterThan(t, u2));
+
+    const result = lattice.isIncluded(cond1, cond2);
+    expect(result).toBe(false);
 });
 
 test("Lattice Join 1", () => {

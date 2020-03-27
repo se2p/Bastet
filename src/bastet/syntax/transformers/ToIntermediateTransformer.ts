@@ -318,6 +318,7 @@ import {TransitionRelation} from "../app/controlflow/TransitionRelation";
 import {ScopeTypeInformation, TypeInformationStorage} from "../DeclarationScopes";
 import instantiate = WebAssembly.instantiate;
 import {LookupTransformer} from "./LookupTransformer";
+import {SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
 
 const toposort = require('toposort');
 
@@ -1324,12 +1325,19 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitCallStmt(ctx: CallStmtContext) : TransformerResult {
         const exprTr = ctx.expressionList().accept(this);
-        return new TransformerResult(
-            exprTr.statementsToPrepend,
-            new CallStatement(
-                ctx.ident().accept(this).nodeOnly() as Identifier,
-                exprTr.node as ExpressionList,
-                OptionalAstNode.absent<VariableWithDataLocation>()));
+        const calledMethodId = ctx.ident().accept(this).nodeOnly() as Identifier;
+
+        if (calledMethodId.text == MethodIdentifiers._RUNTIME_signalFailure) {
+           return new TransformerResult(exprTr.statementsToPrepend,
+               new SignalTargetReachedStatement(exprTr.node as ExpressionList));
+        } else {
+            return new TransformerResult(
+                exprTr.statementsToPrepend,
+                new CallStatement(
+                    calledMethodId,
+                    exprTr.node as ExpressionList,
+                    OptionalAstNode.absent<VariableWithDataLocation>()));
+        }
     }
 
     public visitCloneStartEvent(ctx: CloneStartEventContext) : TransformerResult {

@@ -132,7 +132,10 @@ import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {BeginAtomicStatement, EndAtomicStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpression";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {InitializeAnalysisStatement} from "../../../syntax/ast/core/statements/InternalStatement";
+import {
+    InitializeAnalysisStatement,
+    SignalTargetReachedStatement
+} from "../../../syntax/ast/core/statements/InternalStatement";
 
 export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
     S extends AbstractString, L extends AbstractList>
@@ -465,6 +468,10 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
         } else if (method.startsWith("_RUNTIME_")) {
             throw new ImplementMeException();
         }
+        return this._mem;
+    }
+
+    visitSignalTargetReachedStatement(node: SignalTargetReachedStatement) {
         return this._mem;
     }
 

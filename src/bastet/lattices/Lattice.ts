@@ -20,6 +20,7 @@
  */
 
 import {Record as ImmRec} from "immutable";
+import {DataAbstractState} from "../procedures/analyses/data/DataAbstractDomain";
 
 export interface AbstractElement extends ImmRec<any> {
 
@@ -75,5 +76,13 @@ export interface Lattice<E extends AbstractElement> {
 export interface LatticeWithComplements<E extends AbstractElement> extends Lattice<E> {
 
     complement(element: E): E;
+
+}
+
+export class Lattices {
+
+    public static isFeasible<E extends AbstractElement>(element: E, inLattice: Lattice<E>) {
+        return !inLattice.isIncluded(element, inLattice.bottom());
+    }
 
 }
