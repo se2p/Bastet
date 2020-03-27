@@ -24,32 +24,28 @@ program Task7Spec
  *
  */
 
-actor DirectorObserver is Observer begin
+actor ElephantObserver is Observer begin
 
     declare actor_1_id as actor
     declare actor_1_costume as string
     declare actor_1_prev_costume as string
     declare last_change as number
 
-    define last_change as _RUNTIME_millis()
-    define actor_1_id as locate actor "Elefant1"
-
     define atomic isBehaviorSatisfied () begin
+        define result as true
+
         // (a) Attributes of the first actor
         define actor_1_costume as attribute "active_graphic_name" of actor_1_id
 
-        declare result as boolean
-        define result as true
-
         if not (actor_1_costume = actor_1_prev_costume) then begin
-           define last_change as _RUNTIME_millis()
+           define last_change as _RUNTIME_micros()
         end
 
        // The actual invariant check
-       if _RUNTIME_millis() - last_change > 2000 then begin
+       if _RUNTIME_micros() - last_change > 1200000 then begin
            define result as false
        end
-    end returns actor_1_switched_costume: boolean
+    end returns result: boolean
 
     define atomic storeRelevantStateInfosForNext () begin
         define actor_1_prev_costume as actor_1_costume
@@ -60,6 +56,9 @@ actor DirectorObserver is Observer begin
     end
 
     script on bootstrap finished do begin
+        define last_change as _RUNTIME_micros()
+        define actor_1_id as locate actor "Elefant1"
+
         // First specification check (base condition)
         assert(isBehaviorSatisfied())
 

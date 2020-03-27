@@ -17,7 +17,7 @@ actor Elefant1 is ScratchSprite begin
     script on startup do begin
         repeat forever begin
             changeCostumeTo("Elefant1")
-            wait 1 seconds
+            wait 3 seconds
             changeCostumeTo("Elefant1")
             wait 1 seconds
             changeCostumeTo("Elefant1")
