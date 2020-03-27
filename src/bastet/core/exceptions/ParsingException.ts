@@ -26,7 +26,7 @@ export class ParsingException extends Error {
     constructor(message: string, node: ParserRuleContext) {
         const start = ParsingException.toPositionString(node.start);
         const end = ParsingException.toPositionString(node.stop);
-        super(`${message}\n Code between ${start} and ${end}`);
+        super(`Parsing failed. Check the syntax of the input program. ${message}\n Code between ${start} and ${end}`);
     }
 
     private static toPositionString(token: Token) {
