@@ -42,9 +42,9 @@ actor Pferd is ScratchSprite begin
 
       script on startup do begin
           repeat forever begin
-              if touchingMousePointer() then begin
+              if touchingMousePointer () then begin
                 // doesn't turn -> unsafe
-              else begin
+              end else begin
                   define color_effect_value as (62.0 + color_effect_value)
               end
               wait 1 seconds

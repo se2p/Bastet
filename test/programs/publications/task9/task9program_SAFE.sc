@@ -42,9 +42,7 @@ actor Pferd is ScratchSprite begin
 
       script on startup do begin
           repeat forever begin
-              declare t as boolean
-              define t as touchingMousePointer()
-              if t then begin
+              if touchingMousePointer() then begin
                   declare i as number
                   define i as 0
                   until i = 10 repeat begin
