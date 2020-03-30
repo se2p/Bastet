@@ -61,4 +61,8 @@ export class Method implements WithTransitionRelation {
         return this._transitions;
     }
 
+    get isAtomic(): boolean {
+        return this._definition.isAtomic;
+    }
+
 }
