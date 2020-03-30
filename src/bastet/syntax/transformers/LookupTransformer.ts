@@ -64,19 +64,22 @@ export class LookupTransformer {
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
-            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
-            fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
-            let uri = path.join(dirName, fileName);
+            if (name.endsWith(".png") || name.endsWith(".svg")) {
 
-            let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", StringType.instance().typeId));
-            let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
+                let fileName = (<ResourceDefinition>child).resourceLocator.uri;
+                fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
+                let uri = path.join(dirName, fileName);
 
-            let f = LookupTransformer.loadImage(uri, actorResources);
-            let resourceData = new StringLiteral(f.toString());
+                let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", StringType.instance().typeId));
+                let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
 
-            let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, resourceData);
-            let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
-            stmts.push(ifStmt)
+                let f = LookupTransformer.loadImage(uri, actorResources);
+                let resourceData = new StringLiteral(f.toString());
+
+                let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, resourceData);
+                let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
+                stmts.push(ifStmt)
+            }
         }
         //todo add default case
 
@@ -110,19 +113,22 @@ export class LookupTransformer {
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
-            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
-            fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
-            let uri = path.join(dirName, fileName);
+            if (name.endsWith(".png") || name.endsWith(".svg")) {
 
-            let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("id", StringType.instance().typeId));
-            let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
+                let fileName = (<ResourceDefinition>child).resourceLocator.uri;
+                fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
+                let uri = path.join(dirName, fileName);
 
-            LookupTransformer.loadImage(uri, actorResources);
+                let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("id", StringType.instance().typeId));
+                let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
 
-            let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(idxCount));
-            let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
-            stmts.push(ifStmt);
-            idxCount++;
+                LookupTransformer.loadImage(uri, actorResources);
+
+                let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(idxCount));
+                let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
+                stmts.push(ifStmt);
+                idxCount++;
+            }
         }
         //TODO add default case
 
@@ -150,24 +156,27 @@ export class LookupTransformer {
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", StringType.instance().typeId));
         let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
         let stmts = [];
-        stmts.push(declareStackVar)
+        stmts.push(declareStackVar);
         let idxCount = 0;
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
-            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
-            fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
-            let uri = path.join(dirName, fileName);
+            if (name.endsWith(".png") || name.endsWith(".svg")) {
 
-            let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("idx", StringType.instance().typeId));
-            let cond = new NumEqualsExpression(varWithDataLoc, new NumberLiteral(idxCount));
+                let fileName = (<ResourceDefinition>child).resourceLocator.uri;
+                fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
+                let uri = path.join(dirName, fileName);
 
-            LookupTransformer.loadImage(uri, actorResources);
+                let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("idx", StringType.instance().typeId));
+                let cond = new NumEqualsExpression(varWithDataLoc, new NumberLiteral(idxCount));
 
-            let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new StringLiteral(name));
-            let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
-            stmts.push(ifStmt);
-            idxCount++;
+                LookupTransformer.loadImage(uri, actorResources);
+
+                let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new StringLiteral(name));
+                let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
+                stmts.push(ifStmt);
+                idxCount++;
+            }
         }
         //TODO add default case
 
@@ -182,7 +191,6 @@ export class LookupTransformer {
 
     public static buildGetImageWidthLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
 
-
         //FIXME check if map already exists for actor
         let actorResources: Map<string, Buffer> = new Map();
         this._data.set(actor, actorResources);
@@ -190,7 +198,6 @@ export class LookupTransformer {
         let dirName = path.dirname(filePath);
 
         let methodIdent = new Identifier("getImageWidth");
-
         let paramDecl = new ParameterDeclaration(new Identifier("id"), new StringType());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
 
@@ -201,20 +208,26 @@ export class LookupTransformer {
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
-            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
-            fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
-            let uri = path.join(dirName, fileName);
+            if (name.endsWith(".png") || name.endsWith(".svg")) {
 
-            let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", StringType.instance().typeId));
-            let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
+                let fileName = (<ResourceDefinition>child).resourceLocator.uri;
+                fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
+                let uri = path.join(dirName, fileName);
 
-            // TODO add scaling for svgs
-            let dimensions = imageSize(uri);
-            let width = dimensions.width;
+                let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", StringType.instance().typeId));
+                let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
 
-            let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(width));
-            let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
-            stmts.push(ifStmt);
+                let dimensions = imageSize(uri);
+                let width = dimensions.width;
+                if (fileName.endsWith(".png")) {
+                    width = this.resizeWidthAndHeight(dimensions.width, dimensions.height)[1]
+                }
+
+                let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(width));
+                let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
+                stmts.push(ifStmt);
+
+            }
         }
         //TODO add default case
 
@@ -246,20 +259,26 @@ export class LookupTransformer {
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
-            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
-            fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
-            let uri = path.join(dirName, fileName);
+            if (name.endsWith(".png") || name.endsWith(".svg")) {
 
-            let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", StringType.instance().typeId));
-            let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
+                let fileName = (<ResourceDefinition>child).resourceLocator.uri;
+                fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
+                let uri = path.join(dirName, fileName);
 
-            //todo add scaling for svgs
-            let dimensions = imageSize(uri);
-            let height = dimensions.height;
+                let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", StringType.instance().typeId));
+                let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
 
-            let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(height));
-            let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
-            stmts.push(ifStmt);
+                let dimensions = imageSize(uri);
+                let height = dimensions.height;
+                if (fileName.endsWith(".png")) {
+                    height = this.resizeWidthAndHeight(dimensions.width, dimensions.height)[0]
+                }
+
+                let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(height));
+                let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
+                stmts.push(ifStmt);
+
+            }
         }
         //TODO add default case
 
@@ -289,10 +308,12 @@ export class LookupTransformer {
         let idxCount = 0;
         for (let child of resourceDefs.node.children) {
             let fileName = (<ResourceDefinition>child).resourceLocator.uri;
-            fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
-            let uri = path.join(dirName, fileName);
-            LookupTransformer.loadImage(uri, actorResources);
-            idxCount++;
+            if (fileName.endsWith(".png") || fileName.endsWith(".svg")) {
+                fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
+                let uri = path.join(dirName, fileName);
+                LookupTransformer.loadImage(uri, actorResources);
+                idxCount++;
+            }
         }
 
         let stmt = new StoreEvalResultToVariableStatement(stackVar, new NumberLiteral(idxCount));
@@ -322,7 +343,7 @@ export class LookupTransformer {
 
 
     // TODO do we really want this?
-    resizeWidthAndHeight(width, height) {
+    private static resizeWidthAndHeight(width, height) {
         const inputRatio = width / height;
         const STAGE_WIDTH = 480;
         const STAGE_HEIGHT = 360;
