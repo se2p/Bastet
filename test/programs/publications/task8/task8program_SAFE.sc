@@ -1,7 +1,6 @@
 program Task8Program
 
 actor Stage is ScratchStage begin
-    // TODO: The URIs must be strings (in quotes)
     image Buhnenbild1 "3.png"
     image HintergrundManegeklein "4.svg"
     image HintergrundAffenjagd "5.svg"
