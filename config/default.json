@@ -8,6 +8,10 @@
         "dump-graph-after-iteration": false
     },
 
+    "DataAnalysis": {
+        "encode-all-numbers-as-floats": true
+    },
+
     "GraphAnalysis": {
         "mergeIntoOperator": "StandardMergeIntoOperator"
     }

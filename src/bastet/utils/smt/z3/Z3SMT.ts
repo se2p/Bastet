@@ -28,6 +28,7 @@ import {FirstOrderSolver} from "../../../procedures/domains/FirstOrderDomain";
 import {Sint32, Uint32} from "./ctypes";
 import {BooleanTheory} from "../../../procedures/domains/MemoryTransformer";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import {BastetConfiguration} from "../../BastetConfiguration";
 
 export var PreModule = {
     print: function(text) {
@@ -163,6 +164,19 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
     public release(): void {
         this.reset();
         this._ctx.solver_dec_ref(this._solver);
+    }
+
+}
+
+
+export class SolverConfig extends BastetConfiguration {
+
+    constructor(dict: {}) {
+        super(dict, ['Solver']);
+    }
+
+    get encodeAllNumbersAsFloats(): boolean {
+        return this.getBoolProperty('encode-all-numbers-as-floats', true);
     }
 
 }

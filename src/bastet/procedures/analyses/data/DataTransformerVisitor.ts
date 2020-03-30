@@ -114,7 +114,7 @@ import {
     AbstractTheories,
     AbstractNumber,
     AbstractString,
-    RationalNumberTheory
+    NumberTheory
 } from "../../domains/MemoryTransformer";
 import {ActorType, BooleanType, NumberType, StringType} from "../../../syntax/ast/core/ScratchType";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
@@ -142,11 +142,11 @@ export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends Abstr
     implements CoreNumberExpressionVisitor<N> {
 
     private readonly _theories: AbstractTheories<B, B, N, S, L>;
-    private readonly _theory: RationalNumberTheory<N, B>;
+    private readonly _theory: NumberTheory<N, B>;
 
     constructor(theories: AbstractTheories<B, B, N, S, L>) {
         this._theories = Preconditions.checkNotUndefined(theories);
-        this._theory = Preconditions.checkNotUndefined(theories.numTheory);
+        this._theory = Preconditions.checkNotUndefined(theories.intTheory);
     }
 
     visit(node: AstNode): N {
@@ -280,35 +280,35 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
         const numVisitor = new DataNumExpressionVisitor(this._theories);
         const op1: N = node.operand1.accept(numVisitor);
         const op2: N = node.operand2.accept(numVisitor);
-        return this._theories.numTheory.isNumberEqualTo(op1, op2);
+        return this._theories.intTheory.isNumberEqualTo(op1, op2);
     }
 
     visitNumGreaterEqualExpression(node: NumGreaterEqualExpression): B {
         const numVisitor = new DataNumExpressionVisitor(this._theories);
         const op1: N = node.operand1.accept(numVisitor);
         const op2: N = node.operand2.accept(numVisitor);
-        return this._theories.numTheory.isGreaterEqual(op1, op2);
+        return this._theories.intTheory.isGreaterEqual(op1, op2);
     }
 
     visitNumGreaterThanExpression(node: NumGreaterThanExpression): B {
         const numVisitor = new DataNumExpressionVisitor(this._theories);
         const op1: N = node.operand1.accept(numVisitor);
         const op2: N = node.operand2.accept(numVisitor);
-        return this._theories.numTheory.isGreaterThan(op1, op2);
+        return this._theories.intTheory.isGreaterThan(op1, op2);
     }
 
     visitNumLessThanExpression(node: NumLessThanExpression): B {
         const numVisitor = new DataNumExpressionVisitor(this._theories);
         const op1: N = node.operand1.accept(numVisitor);
         const op2: N = node.operand2.accept(numVisitor);
-        return this._theories.numTheory.isLessThan(op1, op2);
+        return this._theories.intTheory.isLessThan(op1, op2);
     }
 
     visitNumLessEqualExpression(node: NumLessEqualExpression): B {
         const numVisitor = new DataNumExpressionVisitor(this._theories);
         const op1: N = node.operand1.accept(numVisitor);
         const op2: N = node.operand2.accept(numVisitor);
-        return this._theories.numTheory.isLessEqual(op1, op2);
+        return this._theories.intTheory.isLessEqual(op1, op2);
     }
 
     visitOrExpression(node: OrExpression): B {
@@ -349,7 +349,7 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
             const numVisitor = new DataNumExpressionVisitor(this._theories);
             const numFormula = node.toConvert.accept(numVisitor);
             return this._theories.boolTheory.not(
-                this._theories.numTheory.isNumberEqualTo(numFormula, this._theories.numTheory.zero()));
+                this._theories.intTheory.isNumberEqualTo(numFormula, this._theories.intTheory.zero()));
         }
 
         throw new ImplementMeException();
@@ -593,8 +593,8 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
         if (declaredType instanceof NumberType) {
             const visitor = new DataNumExpressionVisitor(this._theories);
             const value: N = node.toValue.accept(visitor);
-            const assignTo = this._theories.numTheory.abstractNumberValue(node.variable);
-            const assume: B = this._theories.numTheory.isNumberEqualTo(assignTo, value);
+            const assignTo = this._theories.intTheory.abstractNumberValue(node.variable);
+            const assume: B = this._theories.intTheory.isNumberEqualTo(assignTo, value);
             return this._theories.boolTheory.and(this._mem, assume);
 
         } else if (declaredType instanceof BooleanType) {

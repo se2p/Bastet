@@ -31,7 +31,7 @@ import {
     AbstractNumberDomain,
     AbstractString,
     BooleanTheory,
-    RationalNumberTheory
+    NumberTheory
 } from "./MemoryTransformer";
 import {Variable} from "../../syntax/ast/core/Variable";
 
@@ -108,7 +108,7 @@ export class NumIntervalLattice implements Lattice<NumIntervalValue> {
     }
 }
 
-export class NumIntervalTheory implements RationalNumberTheory<NumIntervalValue, AbstractBoolean> {
+export class NumIntervalTheory implements NumberTheory<NumIntervalValue, AbstractBoolean> {
 
     private readonly _dom: NumIntervalValueDomain;
     private readonly _boolTheory: BooleanTheory<AbstractBoolean>;

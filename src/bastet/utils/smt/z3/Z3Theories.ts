@@ -29,14 +29,14 @@ import {
     AbstractString,
     BooleanTheory,
     ListTheory,
-    RationalNumberTheory,
+    NumberTheory,
     StringTheory
 } from "../../../procedures/domains/MemoryTransformer";
 import {Record as ImmRec} from "immutable";
-import {LibZ3InContext, Z3_ast} from "./libz3";
+import {LibZ3InContext, Z3_ast, Z3_sort} from "./libz3";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../../procedures/domains/ConcreteElements";
 import {Preconditions} from "../../Preconditions";
-import {Ptr, Sint32, Uint32} from "./ctypes";
+import {Float, Ptr, Sint32, Uint32} from "./ctypes";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {SMTFirstOrderLattice} from "../../../procedures/domains/FirstOrderDomain";
 import {Z3ProverEnvironment} from "./Z3SMT";
@@ -179,14 +179,16 @@ export class Z3BooleanTheory extends Z3Theory implements BooleanTheory<Z3Boolean
 
 }
 
-export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3NumberFormula, Z3BooleanFormula> {
+export abstract class Z3AbstractNumberTheory extends Z3Theory implements NumberTheory<Z3NumberFormula, Z3BooleanFormula> {
 
-    constructor(ctx: LibZ3InContext) {
-        super(ctx);
-    }
+    protected abstract makeTheorySort(): Z3_sort;
 
     abstractNumberValue(id: Variable): Z3NumberFormula {
-        return new Z3NumberFormula(this._ctx.mk_const(this._ctx.mk_string_symbol(id.qualifiedName), this._ctx.mk_int_sort()));
+        return new Z3NumberFormula(this._ctx.mk_const(this._ctx.mk_string_symbol(id.qualifiedName), this.makeTheorySort()));
+    }
+
+    topNumber(): Z3NumberFormula {
+        throw new ImplementMeException();
     }
 
     bottomNumber(): Z3NumberFormula {
@@ -195,6 +197,203 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
 
     castBoolAsNumber(val: Z3BooleanFormula): Z3NumberFormula {
         return this.ifThenElse(val, this.one(), this.zero());
+    }
+
+    one(): Z3NumberFormula {
+        return this.fromConcreteNumber(new ConcreteNumber(1));
+    }
+
+    zero(): Z3NumberFormula {
+        return this.fromConcreteNumber(new ConcreteNumber(0));
+    }
+
+    ifThenElse(cond: Z3BooleanFormula, thenResult: Z3NumberFormula, elseResult: Z3NumberFormula): Z3NumberFormula {
+        return new Z3NumberFormula(this._ctx.mk_ite(cond.getAST(), thenResult.getAST(), elseResult.getAST()));
+    }
+
+    abstract castStringAsNumber(str: AbstractString): Z3NumberFormula;
+
+    abstract divide(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula;
+
+    abstract fromConcreteNumber(str: ConcreteNumber): Z3NumberFormula;
+
+    abstract isGreaterEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula;
+
+    abstract isGreaterThan(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula;
+
+    abstract isLessEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula;
+
+    abstract isLessThan(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula;
+
+    abstract isNumberEqualTo(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula;
+
+    abstract minus(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula;
+
+    abstract modulo(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula;
+
+    abstract multiply(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula;
+
+    abstract plus(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula;
+
+}
+
+export class Z3RealTheory extends Z3AbstractNumberTheory implements NumberTheory<Z3NumberFormula, Z3BooleanFormula> {
+
+    constructor(ctx: LibZ3InContext) {
+        super(ctx);
+    }
+
+    protected makeTheorySort(): Z3_sort {
+        return this._ctx.mk_real_sort();
+    }
+
+    castStringAsNumber(str: Z3StringFormula): Z3NumberFormula {
+        throw new ImplementMeException();
+    }
+
+    divide(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
+        return new Z3NumberFormula(this._ctx.mk_div(op1.getAST(), op2.getAST()));
+    }
+
+    fromConcreteNumber(str: ConcreteNumber): Z3NumberFormula {
+        return new Z3NumberFormula(
+            this._ctx.mk_fpa_numeral_float(new Float(str.value), this.makeTheorySort()));
+    }
+
+    isGreaterThan(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_gt(s1.getAST(), s2.getAST()));
+    }
+
+    isLessThan(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_lt(s1.getAST(), s2.getAST()));
+    }
+
+    isNumberEqualTo(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_eq(s1.getAST(), s2.getAST()));
+    }
+
+    minus(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
+        const typedArray = new Int32Array([op1.getAST().val(), this._ctx.mk_unary_minus(op2.getAST()).val()]);
+        const arrayOnHeap = this.arrayToHeap(typedArray);
+        try {
+            // 'Minus' adds a negative number
+            return new Z3NumberFormula(this._ctx.mk_add(new Uint32(2), new Ptr(arrayOnHeap.byteOffset)));
+        } finally {
+            this.freeArray(arrayOnHeap);
+        }
+    }
+
+    modulo(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
+        return new Z3NumberFormula(this._ctx.mk_mod(op1.getAST(), op2.getAST()));
+    }
+
+    multiply(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
+        const typedArray = new Int32Array([op1.getAST().val(), op2.getAST().val()]);
+        const arrayOnHeap = this.arrayToHeap(typedArray);
+        try {
+            return new Z3NumberFormula(this._ctx.mk_mul(new Uint32(2), new Ptr(arrayOnHeap.byteOffset)));
+        } finally {
+            this.freeArray(arrayOnHeap);
+        }
+    }
+
+    plus(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
+        const typedArray = new Int32Array([op1.getAST().val(), op2.getAST().val()]);
+        const arrayOnHeap = this.arrayToHeap(typedArray);
+        try {
+            return new Z3NumberFormula(this._ctx.mk_add(new Uint32(2), new Ptr(arrayOnHeap.byteOffset)));
+        } finally {
+            this.freeArray(arrayOnHeap);
+        }
+    }
+
+    isGreaterEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_ge(s1.getAST(), s2.getAST()));
+    }
+
+    isLessEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_le(s1.getAST(), s2.getAST()));
+    }
+
+}
+
+export class Z3FloatTheory extends Z3AbstractNumberTheory implements NumberTheory<Z3NumberFormula, Z3BooleanFormula> {
+
+    constructor(ctx: LibZ3InContext) {
+        super(ctx);
+    }
+
+    protected makeTheorySort(): Z3_sort {
+        return this._ctx.mk_fpa_sort_single();
+    }
+
+    private makeRoundingStrategy(): Z3_ast {
+        return this._ctx.mk_fpa_round_nearest_ties_to_even();
+    }
+
+    fromConcreteNumber(str: ConcreteNumber): Z3NumberFormula {
+        return new Z3NumberFormula(
+            this._ctx.mk_fpa_numeral_float(new Float(str.value), this.makeTheorySort()));
+    }
+
+    castStringAsNumber(str: Z3StringFormula): Z3NumberFormula {
+        // Approach: use castStringAsNumber of the int theory (mk_str_to_int)?
+        throw new ImplementMeException();
+    }
+
+    isGreaterThan(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_fpa_gt(s1.getAST(), s2.getAST()));
+    }
+
+    isLessThan(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_fpa_lt(s1.getAST(), s2.getAST()));
+    }
+
+    isNumberEqualTo(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_fpa_eq(s1.getAST(), s2.getAST()));
+    }
+
+    minus(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
+        const minusAst = this._ctx.mk_unary_minus(op2.getAST());
+        // 'Minus' adds a negative number
+        return new Z3NumberFormula(this._ctx.mk_fpa_add(this.makeRoundingStrategy(), op1.getAST(), minusAst));
+    }
+
+    modulo(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
+        // Only available in the integer theory. Convert the given numbers to ints!
+        throw new ImplementMeException();
+    }
+
+    divide(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
+        return new Z3NumberFormula(this._ctx.mk_fpa_div(this.makeRoundingStrategy(), op1.getAST(), op2.getAST()));
+    }
+
+    multiply(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
+        return new Z3NumberFormula(this._ctx.mk_fpa_mul(this.makeRoundingStrategy(), op1.getAST(), op2.getAST()));
+    }
+
+    plus(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
+        return new Z3NumberFormula(this._ctx.mk_fpa_add(this.makeRoundingStrategy(), op1.getAST(), op2.getAST()));
+    }
+
+    isGreaterEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_fpa_geq(s1.getAST(), s2.getAST()));
+    }
+
+    isLessEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_fpa_leq(s1.getAST(), s2.getAST()));
+    }
+
+}
+
+export class Z3IntegerTheory extends Z3AbstractNumberTheory implements NumberTheory<Z3NumberFormula, Z3BooleanFormula> {
+
+    constructor(ctx: LibZ3InContext) {
+        super(ctx);
+    }
+
+    makeTheorySort(): Z3_sort {
+        return this._ctx.mk_int_sort();
     }
 
     castStringAsNumber(str: Z3StringFormula): Z3NumberFormula {
@@ -247,11 +446,6 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
         }
     }
 
-    one(): Z3NumberFormula {
-        return new Z3NumberFormula(
-            this._ctx.mk_int(new Sint32(1), this._ctx.mk_int_sort()));
-    }
-
     plus(op1: Z3NumberFormula, op2: Z3NumberFormula): Z3NumberFormula {
         const typedArray = new Int32Array([op1.getAST().val(), op2.getAST().val()]);
         const arrayOnHeap = this.arrayToHeap(typedArray);
@@ -262,25 +456,12 @@ export class Z3NumberTheory extends Z3Theory implements RationalNumberTheory<Z3N
         }
     }
 
-    topNumber(): Z3NumberFormula {
-        throw new ImplementMeException();
-    }
-
-    zero(): Z3NumberFormula {
-        return new Z3NumberFormula(
-            this._ctx.mk_int(new Sint32(0), this._ctx.mk_int_sort()));
-    }
-
     isGreaterEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
         return new Z3BooleanFormula(this._ctx.mk_ge(s1.getAST(), s2.getAST()));
     }
 
     isLessEqual(s1: Z3NumberFormula, s2: Z3NumberFormula): Z3BooleanFormula {
         return new Z3BooleanFormula(this._ctx.mk_le(s1.getAST(), s2.getAST()));
-    }
-
-    ifThenElse(cond: Z3BooleanFormula, thenResult: Z3NumberFormula, elseResult: Z3NumberFormula): Z3NumberFormula {
-        return new Z3NumberFormula(this._ctx.mk_ite(cond.getAST(), thenResult.getAST(), elseResult.getAST()));
     }
 
 }
@@ -368,7 +549,11 @@ export class Z3Theories implements AbstractTheories<Z3Formula, Z3BooleanFormula,
 
     private readonly _listTheory: ListTheory<Z3ListFormula>;
 
-    private readonly _numTheory: RationalNumberTheory<Z3NumberFormula, Z3BooleanFormula>;
+    private readonly _intTheory: Z3IntegerTheory;
+
+    private readonly _realTheory: Z3RealTheory;
+
+    private readonly _floatTheory: Z3FloatTheory;
 
     private readonly _stringTheory: StringTheory<Z3StringFormula, Z3BooleanFormula, Z3NumberFormula>;
 
@@ -377,7 +562,9 @@ export class Z3Theories implements AbstractTheories<Z3Formula, Z3BooleanFormula,
     constructor(ctx: LibZ3InContext) {
         this._ctx = Preconditions.checkNotUndefined(ctx);
         this._boolTheory = new Z3BooleanTheory(ctx);
-        this._numTheory = new Z3NumberTheory(ctx);
+        this._intTheory = new Z3IntegerTheory(ctx);
+        this._realTheory = new Z3RealTheory(ctx);
+        this._floatTheory = new Z3FloatTheory(ctx);
         this._stringTheory = new Z3StringTheory(ctx);
         this._listTheory = new Z3ListTheory(ctx);
     }
@@ -390,8 +577,16 @@ export class Z3Theories implements AbstractTheories<Z3Formula, Z3BooleanFormula,
         return this._listTheory;
     }
 
-    get numTheory(): RationalNumberTheory<Z3NumberFormula, Z3BooleanFormula> {
-        return this._numTheory;
+    get intTheory(): NumberTheory<Z3NumberFormula, Z3BooleanFormula> {
+        return this._intTheory;
+    }
+
+    get floatTheory(): NumberTheory<Z3NumberFormula, Z3BooleanFormula> {
+        return this._floatTheory;
+    }
+
+    get realTheory(): NumberTheory<Z3NumberFormula, Z3BooleanFormula> {
+        return this._realTheory;
     }
 
     get stringTheory(): StringTheory<Z3StringFormula, Z3BooleanFormula, Z3NumberFormula> {

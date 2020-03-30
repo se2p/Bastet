@@ -61,6 +61,10 @@ export class DataAnalysisConfig extends BastetConfiguration {
         return this.getStringProperty('merge-operator', 'JOIN');
     }
 
+    get encodeAllNumbersAsFloats(): boolean {
+        return this.getBoolProperty('encode-all-numbers-as-floats', true);
+    }
+
 }
 
 export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState, AbstractState>,

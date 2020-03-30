@@ -166,7 +166,7 @@ export interface StringTheoryQueries {
 
 }
 
-export interface RationalNumberTheory<N extends AbstractNumber, B extends AbstractBoolean> {
+export interface NumberTheory<N extends AbstractNumber, B extends AbstractBoolean> {
 
     fromConcreteNumber(str: ConcreteNumber): N;
 
@@ -439,7 +439,11 @@ export interface AbstractTheories<M extends AbstractMemory, B extends AbstractBo
 
     boolTheory: BooleanTheory<B>;
 
-    numTheory: RationalNumberTheory<N, B>;
+    intTheory: NumberTheory<N, B>;
+
+    realTheory: NumberTheory<N, B>;
+
+    floatTheory: NumberTheory<N, B>;
 
     stringTheory: StringTheory<S, B, N>;
 

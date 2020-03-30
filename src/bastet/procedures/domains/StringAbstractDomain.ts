@@ -28,7 +28,7 @@ import {
     AbstractString,
     AbstractStringDomain,
     BooleanTheory,
-    RationalNumberTheory,
+    NumberTheory,
     StringTheory
 } from "./MemoryTransformer";
 import {Lattice} from "../../lattices/Lattice";
