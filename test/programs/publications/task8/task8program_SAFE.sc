@@ -1,11 +1,9 @@
 program Task8Program
 
 actor Stage is ScratchStage begin
-    // TODO: The URIs must be strings (in quotes)
-    sound Plopp "83a9787d4cb6f3b7632b4ddfebf74367.wav"
-    image Buhnenbild1 "78d212878a6f0a2b3067aa2c8bca28e1.png"
-    image HintergrundManegeklein "d6aca145c741a1b12309267dcecdbd49.svg"
-    image HintergrundAffenjagd "82571467d6b67128680f8d0dd6759285.svg"
+    image Buhnenbild1 "3.png"
+    image HintergrundManegeklein "4.svg"
+    image HintergrundAffenjagd "5.svg"
 
     declare volume as number
     declare layerOrder as number
@@ -21,8 +19,7 @@ actor Stage is ScratchStage begin
 end
 
 actor Katze is ScratchSprite begin
-    sound Plopp "83a9787d4cb6f3b7632b4ddfebf74367.wav"
-    image Katze "3d7f996ef89da170e7ca4f4eca54c2f1.svg"
+    image Katze "2.svg"
 
     declare volume as number
     declare layerOrder as number
@@ -55,8 +52,7 @@ actor Katze is ScratchSprite begin
 end
 
 actor Ball is ScratchSprite begin
-    sound Plopp "83a9787d4cb6f3b7632b4ddfebf74367.wav"
-    image Ball "3d3db5d45e234325c584375f0325123f.svg"
+    image Ball "1.svg"
 
     declare volume as number
     declare layerOrder as number

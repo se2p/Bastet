@@ -29,13 +29,13 @@ program Task6Spec
 
 actor DirectorObserver is Observer begin
 
-    declare actor_1_id as string
-    declare actor_2_id as string
+    declare actor_1_id as actor
+    declare actor_2_id as actor
 
     declare actors_touching as boolean
 
-    define actor_1_id as "Katze"
-    define actor_2_id as "Ball"
+    define actor_1_id as locate actor "Katze"
+    define actor_2_id as locate actor "Ball"
 
     define atomic isBehaviorSatisfied () begin
         define result as false

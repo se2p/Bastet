@@ -454,6 +454,7 @@ declare mosaic_effect_value as number
 declare brightness_effect_value as number
 declare ghost_effect_value as number
 
+define color_effect_value as 0
 
 // @Category "Looks"
 define atomic changeActiveGraphicTo (id: string) begin
