@@ -27,7 +27,7 @@ import {
     CoreStringExpressionVisitor,
     CoreVisitor
 } from "../../../syntax/ast/CoreVisitor";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {
     BoolAsNumberExpression,
@@ -466,7 +466,7 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
         if (method == MethodIdentifiers._RUNTIME_signalFailure) {
             return this._mem;
         } else if (method.startsWith("_RUNTIME_")) {
-            throw new ImplementMeException();
+            throw new ImplementMeForException(method);
         }
         return this._mem;
     }

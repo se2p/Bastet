@@ -39,9 +39,6 @@ actor DirectorObserver is Observer begin
 
     declare last_change as number
 
-    define actor_1_id as locate actor "Pferd"
-    define last_change as _RUNTIME_millis()
-
     define atomic isBehaviorSatisfied () begin
         // (a) Attributes of the first actor
 
@@ -80,6 +77,9 @@ actor DirectorObserver is Observer begin
     end
 
     script on bootstrap finished do begin
+        define actor_1_id as locate actor "Pferd"
+        define last_change as _RUNTIME_millis()
+
         // First specification check (base condition)
         assert(isBehaviorSatisfied())
 

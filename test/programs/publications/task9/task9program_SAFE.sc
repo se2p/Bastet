@@ -42,14 +42,15 @@ actor Pferd is ScratchSprite begin
 
       script on startup do begin
           repeat forever begin
-              if touchingMousePointer() then begin
-                      declare i as number
-                      define i as 0
-                      until i = 10 repeat begin
-                          turnRight(36.0)
-                      end
+              declare t as boolean
+              define t as touchingMousePointer()
+              if t then begin
+                  declare i as number
+                  define i as 0
+                  until i = 10 repeat begin
+                      turnRight(36.0)
                   end
-              else begin
+              end else begin
                   define color_effect_value as (62.0 + color_effect_value)
               end
               wait 1 seconds
