@@ -28,7 +28,7 @@ program Task0Spec
 
 actor DirectorObserver is Observer begin
 
-    declare actor_1_id as string
+    declare actor_1_id as actor
     declare mouseTouched as boolean
 
     declare actor_1_color as string
@@ -39,7 +39,7 @@ actor DirectorObserver is Observer begin
 
     declare last_change as number
 
-    define actor_1_id as "Pferd"
+    define actor_1_id as locate actor "Pferd"
     define last_change as _RUNTIME_millis()
 
     define atomic isBehaviorSatisfied () begin

@@ -1,9 +1,8 @@
 program Task9Program
 
 actor Stage is ScratchStage begin
-      sound  Plopp "83a9787d4cb6f3b7632b4ddfebf74367.wav"
-      image  Buhnenbild1 "78d212878a6f0a2b3067aa2c8bca28e1.png"
-      image  HintergrundManegeklein "d6aca145c741a1b12309267dcecdbd49.svg"
+      image  Buhnenbild1 "2.png"
+      image  HintergrundManegeklein "3.svg"
 
       declare volume as number
       declare layerOrder as number
@@ -19,8 +18,7 @@ actor Stage is ScratchStage begin
   end
 
 actor Pferd is ScratchSprite begin
-      sound  Plopp "83a9787d4cb6f3b7632b4ddfebf74367.wav"
-      image  Pferd "8b75453ccca4324df1d5aebb3b2191ee.svg"
+      image  Pferd "1.svg"
 
       declare volume as number
       declare layerOrder as number
