@@ -54,6 +54,7 @@ do
             argPrime=$sc_file
 
             convert_sb3_to_sc "$arg" "$sc_file"
+            unzip $arg -d $MY_TEMP_DIR
         else
             echo "WARNING: The given sb3-file does not exist!"
             exit 1
