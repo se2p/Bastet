@@ -64,10 +64,10 @@ export class LookupTransformer {
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
-            if (name.endsWith(".png") || name.endsWith(".svg")) {
+            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
+            fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
 
-                let fileName = (<ResourceDefinition>child).resourceLocator.uri;
-                fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
+            if (fileName.endsWith(".png") || fileName.endsWith(".svg")) {
                 let uri = path.join(dirName, fileName);
 
                 let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", StringType.instance().typeId));
@@ -113,10 +113,10 @@ export class LookupTransformer {
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
-            if (name.endsWith(".png") || name.endsWith(".svg")) {
+            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
+            fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
 
-                let fileName = (<ResourceDefinition>child).resourceLocator.uri;
-                fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
+            if (fileName.endsWith(".png") || fileName.endsWith(".svg")) {
                 let uri = path.join(dirName, fileName);
 
                 let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("id", StringType.instance().typeId));
@@ -161,10 +161,10 @@ export class LookupTransformer {
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
-            if (name.endsWith(".png") || name.endsWith(".svg")) {
+            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
+            fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
 
-                let fileName = (<ResourceDefinition>child).resourceLocator.uri;
-                fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
+            if (fileName.endsWith(".png") || fileName.endsWith(".svg")) {
                 let uri = path.join(dirName, fileName);
 
                 let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("idx", StringType.instance().typeId));
@@ -208,10 +208,10 @@ export class LookupTransformer {
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
-            if (name.endsWith(".png") || name.endsWith(".svg")) {
+            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
+            fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
 
-                let fileName = (<ResourceDefinition>child).resourceLocator.uri;
-                fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
+            if (fileName.endsWith(".png") || fileName.endsWith(".svg")) {
                 let uri = path.join(dirName, fileName);
 
                 let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", StringType.instance().typeId));
@@ -259,10 +259,10 @@ export class LookupTransformer {
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
-            if (name.endsWith(".png") || name.endsWith(".svg")) {
+            let fileName = (<ResourceDefinition>child).resourceLocator.uri;
+            fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
 
-                let fileName = (<ResourceDefinition>child).resourceLocator.uri;
-                fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
+            if (fileName.endsWith(".png") || fileName.endsWith(".svg")) {
                 let uri = path.join(dirName, fileName);
 
                 let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", StringType.instance().typeId));
@@ -308,8 +308,9 @@ export class LookupTransformer {
         let idxCount = 0;
         for (let child of resourceDefs.node.children) {
             let fileName = (<ResourceDefinition>child).resourceLocator.uri;
+            fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
+
             if (fileName.endsWith(".png") || fileName.endsWith(".svg")) {
-                fileName = fileName.replace(/^"(.*)"$/, '$1'); // remove quotation marks
                 let uri = path.join(dirName, fileName);
                 LookupTransformer.loadImage(uri, actorResources);
                 idxCount++;
@@ -332,7 +333,7 @@ export class LookupTransformer {
         if (actorResources.has(uniqueName)) {
             return actorResources.get(uniqueName)
         } else {
-            let f = fs.readFileSync(process.cwd() + "/" + path);
+            let f = fs.readFileSync(path);
             this._data[path] = f;
 
             actorResources.set(uniqueName, f);
