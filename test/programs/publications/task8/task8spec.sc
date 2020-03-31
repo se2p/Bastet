@@ -1,4 +1,4 @@
-program Task6Spec
+program Task8Spec
 
 /**
  * ## Task 8 „Cat touching Ball“
@@ -27,24 +27,30 @@ program Task6Spec
  *
  */
 
-actor DirectorObserver is Observer begin
+actor KatzenObserver is Observer begin
 
     declare actor_1_id as actor
     declare actor_2_id as actor
-
     declare actors_touching as boolean
 
-    define actor_1_id as locate actor "Katze"
-    define actor_2_id as locate actor "Ball"
+    declare last_touch as number
+    declare last_msg as number
 
     define atomic isBehaviorSatisfied () begin
-        define result as false
+        define result as true
 
         if touchingObjects(actor_1_id, actor_2_id) then begin
-            if attribute "bubbleText" of actor_1_id = "Hab ich dich!" then begin
-                define result as true
-            end
+            define last_touch as _RUNTIME_micros()
         end
+
+        if length of (attribute "bubbleText" of actor_1_id) > 0 then begin
+            define last_msg as _RUNTIME_micros()
+        end
+
+        if last_msg - last_touch > 200000 then begin
+            define result as false
+        end
+
     end returns result: boolean
 
     define atomic storeRelevantStateInfosForNext () begin
@@ -55,6 +61,12 @@ actor DirectorObserver is Observer begin
     end
 
     script on bootstrap finished do begin
+        define actor_1_id as locate actor "Katze"
+        define actor_2_id as locate actor "Ball"
+
+        define last_touch as 0
+        define last_msg as 0
+
         // First specification check (base condition)
         assert(isBehaviorSatisfied())
 
