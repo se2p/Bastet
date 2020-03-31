@@ -1,4 +1,4 @@
-program Task0Spec
+program Task9Spec
 
 /**
  * ## Task 9 "
@@ -26,7 +26,7 @@ program Task0Spec
  *
  */
 
-actor DirectorObserver is Observer begin
+actor HorseObserver is Observer begin
 
     declare actor_1_id as actor
     declare mouseTouched as boolean
@@ -62,7 +62,7 @@ actor DirectorObserver is Observer begin
             end
         end
 
-       if last_change - _RUNTIME_micros() > 10000000 and mouseTouched then begin
+       if last_change - _RUNTIME_micros() < 10000000 and mouseTouched then begin
            define result as false
        end
     end returns result: boolean
