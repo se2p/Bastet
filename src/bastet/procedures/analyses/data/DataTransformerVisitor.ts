@@ -136,6 +136,7 @@ import {
     InitializeAnalysisStatement,
     SignalTargetReachedStatement
 } from "../../../syntax/ast/core/statements/InternalStatement";
+import {DataLocation} from "../../../syntax/app/controlflow/DataLocation";
 
 export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
     S extends AbstractString, L extends AbstractList>
@@ -461,6 +462,14 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
+    private numberTheoryFor(dl: DataLocation): NumberTheory<N, B> {
+        return this._theories.intTheory;
+    }
+
+    private numberTheoryForExpr(e: N) {
+        return this._theories.intTheory;
+    }
+
     visitCallStatement(node: CallStatement): B {
         const method = node.calledMethod.text;
         if (method == MethodIdentifiers._RUNTIME_signalFailure) {
@@ -593,8 +602,8 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
         if (declaredType instanceof NumberType) {
             const visitor = new DataNumExpressionVisitor(this._theories);
             const value: N = node.toValue.accept(visitor);
-            const assignTo = this._theories.intTheory.abstractNumberValue(node.variable);
-            const assume: B = this._theories.intTheory.isNumberEqualTo(assignTo, value);
+            const assignTo = this.numberTheoryFor(node.variable.dataloc).abstractNumberValue(node.variable);
+            const assume: B = this.numberTheoryFor(node.variable.dataloc).isNumberEqualTo(assignTo, value);
             return this._theories.boolTheory.and(this._mem, assume);
 
         } else if (declaredType instanceof BooleanType) {

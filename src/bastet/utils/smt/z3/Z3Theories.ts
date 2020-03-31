@@ -248,6 +248,8 @@ export class Z3RealTheory extends Z3AbstractNumberTheory implements NumberTheory
     }
 
     castStringAsNumber(str: Z3StringFormula): Z3NumberFormula {
+        // Do you really need this method?
+        //      Does the given string really encode a 'real' or is it an 'int'?
         throw new ImplementMeException();
     }
 
