@@ -48,6 +48,18 @@ export interface AbstractNumber extends AbstractValue {
 
 }
 
+export interface AbstractFloat extends AbstractNumber {
+
+}
+
+export interface AbstractInteger extends AbstractNumber {
+
+}
+
+export interface AbstractReal extends AbstractNumber {
+
+}
+
 export interface AbstractList extends AbstractValue {
 
 }
@@ -110,9 +122,18 @@ export interface ListTheory<L extends AbstractList> {
 
 }
 
-export interface StringTheory<S extends AbstractString, B extends AbstractBoolean, N extends AbstractNumber> {
+export interface StringTheory<S extends AbstractString, B extends AbstractBoolean, I extends AbstractInteger,
+    R extends AbstractReal, F extends AbstractFloat> {
 
-    fromConcreteString(str: ConcreteString): S;
+    fromConcrete(str: ConcreteString): S;
+
+    toFloat(from: S): F;
+
+    toInteger(from: S): I;
+
+    toBoolean(from: S): I;
+
+    toReal(from: S): R;
 
     abstractStringValue(id: Variable): S;
 
@@ -122,21 +143,17 @@ export interface StringTheory<S extends AbstractString, B extends AbstractBoolea
 
     bottomString(): S;
 
-    lengthOf(str: S): N;
-
-    castNumberAsString(num: N): S;
-
-    castBoolAsString(num: B): S;
+    lengthOf(str: S): I;
 
     joinStrings(str1: S, str2: S): S;
 
-    ithLetterOf(index: N, str: S): S;
+    ithLetterOf(index: I, str: S): S;
 
     stringsEqual(str1: S, str2: S): B;
 
     stringContains(str1: S, str2: S): B;
 
-    lengthOf(str: S): N;
+    lengthOf(str: S): I;
 
     ifThenElse(cond: B, thenResult: S, elseResult: S): S;
 
@@ -166,9 +183,20 @@ export interface StringTheoryQueries {
 
 }
 
-export interface NumberTheory<N extends AbstractNumber, B extends AbstractBoolean> {
+export interface NumberTheory<N extends AbstractNumber, I extends AbstractInteger, R extends AbstractReal,
+    F extends AbstractFloat, B extends AbstractBoolean, S extends AbstractString> {
 
     fromConcreteNumber(str: ConcreteNumber): N;
+
+    fromConcreteString(str: ConcreteString): N;
+
+    toFloatFormula(from: N): F;
+
+    toIntegerFormula(from: N): I;
+
+    toRealFormula(from: N): R;
+
+    toStringFormula(from: N): S;
 
     abstractNumberValue(id: Variable): N;
 
@@ -180,15 +208,9 @@ export interface NumberTheory<N extends AbstractNumber, B extends AbstractBoolea
 
     bottomNumber(): N;
 
-    castStringAsNumber(str: AbstractString): N;
-
-    castBoolAsNumber(val: B): N;
-
     multiply(op1: N, op2: N): N;
 
     divide(op1: N, op2: N): N;
-
-    modulo(op1: N, op2: N): N;
 
     plus(op1: N, op2: N): N;
 
@@ -205,6 +227,23 @@ export interface NumberTheory<N extends AbstractNumber, B extends AbstractBoolea
     isNumberEqualTo(s1: N, s2: N): B;
 
     ifThenElse(cond: B, thenResult: N, elseResult: N): N;
+
+}
+
+export interface RealTheory<N extends AbstractReal, I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
+    B extends AbstractBoolean, S extends AbstractString> extends NumberTheory<N, I, R, F, B, S> {
+
+}
+
+export interface FloatTheory<N extends AbstractFloat, I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
+    B extends AbstractBoolean, S extends AbstractString> extends NumberTheory<N, I, R, F, B, S> {
+
+}
+
+export interface IntegerTheory<N extends AbstractInteger, I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
+    B extends AbstractBoolean, S extends AbstractString> extends NumberTheory<N, I, R, F, B, S> {
+
+    modulo(op1: N, op2: N): N;
 
 }
 
@@ -434,19 +473,22 @@ export interface TheoryIndependent<E extends AbstractElement> {
 }
 
 export interface AbstractTheories<M extends AbstractMemory, B extends AbstractBoolean,
-    N extends AbstractNumber, S extends AbstractString, L extends AbstractList> 
+    I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
+    S extends AbstractString, L extends AbstractList>
     extends TheoryIndependent<M> {
 
     boolTheory: BooleanTheory<B>;
 
-    intTheory: NumberTheory<N, B>;
+    intTheory: IntegerTheory<I, I, R, F, B, S>;
 
-    realTheory: NumberTheory<N, B>;
+    realTheory: RealTheory<R, I, R, F, B, S>;
 
-    floatTheory: NumberTheory<N, B>;
+    floatTheory: FloatTheory<F, I, R, F, B, S>;
 
-    stringTheory: StringTheory<S, B, N>;
+    stringTheory: StringTheory<S, B, I, R, F>;
 
     listTheory: ListTheory<L>;
+
+    getNumberTheoryOf(e: AbstractNumber): NumberTheory<AbstractNumber, I, R, F, B, S>;
 
 }

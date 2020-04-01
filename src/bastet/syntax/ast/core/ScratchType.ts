@@ -118,6 +118,40 @@ export class NumberType extends ScratchType {
 
 }
 
+export class IntegerType extends ScratchType {
+
+    private static INSTANCE: IntegerType;
+
+    constructor() {
+        super([], SCRATCH_TYPE_ID_SEQ++);
+    }
+
+    static instance(): IntegerType {
+        if (this.INSTANCE == null) {
+            this.INSTANCE = new IntegerType();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
+export class FloatType extends ScratchType {
+
+    private static INSTANCE: FloatType;
+
+    constructor() {
+        super([], SCRATCH_TYPE_ID_SEQ++);
+    }
+
+    static instance(): FloatType {
+        if (this.INSTANCE == null) {
+            this.INSTANCE = new FloatType();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
 export class BooleanType extends ScratchType {
 
     private static INSTANCE: BooleanType;

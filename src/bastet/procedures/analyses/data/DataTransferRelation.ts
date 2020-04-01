@@ -28,9 +28,9 @@ import {AbstractTheories} from "../../domains/MemoryTransformer";
 import {Preconditions} from "../../../utils/Preconditions";
 import {
     BooleanFormula,
-    FirstOrderFormula,
+    FirstOrderFormula, FloatFormula, IntegerFormula,
     ListFormula,
-    NumberFormula,
+    NumberFormula, RealFormula,
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {AstNode} from "../../../syntax/ast/AstNode";
@@ -42,9 +42,9 @@ export class DataTransferRelation implements LabeledTransferRelation<DataAbstrac
 
     private readonly _abstDomain: DataAbstractDomain;
 
-    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
+    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
 
-    constructor(abstDomain: DataAbstractDomain, theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
+    constructor(abstDomain: DataAbstractDomain, theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
         this._abstDomain = Preconditions.checkNotUndefined(abstDomain);
         this._theories = Preconditions.checkNotUndefined(theories);
     }

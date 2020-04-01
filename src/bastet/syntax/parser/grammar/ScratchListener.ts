@@ -10,6 +10,8 @@ import { RestartScriptContext } from "./ScratchParser";
 import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
 import { ActorTypeContext } from "./ScratchParser";
+import { DecimalLiteralExpressionContext } from "./ScratchParser";
+import { IntegerLiteralExpressionContext } from "./ScratchParser";
 import { ConcreteActorModeContext } from "./ScratchParser";
 import { ActorRoleModeContext } from "./ScratchParser";
 import { ExternFunctionReturnDefinitionContext } from "./ScratchParser";
@@ -87,6 +89,8 @@ import { IthStringItemOfExpressionContext } from "./ScratchParser";
 import { DefaultStringExpressionContext } from "./ScratchParser";
 import { UnspecifiedStringExpressionContext } from "./ScratchParser";
 import { NumberTypeContext } from "./ScratchParser";
+import { IntegerTypeContext } from "./ScratchParser";
+import { FloatTypeContext } from "./ScratchParser";
 import { BooleanTypeContext } from "./ScratchParser";
 import { StringTypeContext } from "./ScratchParser";
 import { EnumTypeContext } from "./ScratchParser";
@@ -294,6 +298,32 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitActorType?: (ctx: ActorTypeContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `DecimalLiteralExpression`
+	 * labeled alternative in `ScratchParser.number`.
+	 * @param ctx the parse tree
+	 */
+	enterDecimalLiteralExpression?: (ctx: DecimalLiteralExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `DecimalLiteralExpression`
+	 * labeled alternative in `ScratchParser.number`.
+	 * @param ctx the parse tree
+	 */
+	exitDecimalLiteralExpression?: (ctx: DecimalLiteralExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `IntegerLiteralExpression`
+	 * labeled alternative in `ScratchParser.number`.
+	 * @param ctx the parse tree
+	 */
+	enterIntegerLiteralExpression?: (ctx: IntegerLiteralExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `IntegerLiteralExpression`
+	 * labeled alternative in `ScratchParser.number`.
+	 * @param ctx the parse tree
+	 */
+	exitIntegerLiteralExpression?: (ctx: IntegerLiteralExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `ConcreteActorMode`
@@ -1295,6 +1325,32 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitNumberType?: (ctx: NumberTypeContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `IntegerType`
+	 * labeled alternative in `ScratchParser.primitiveType`.
+	 * @param ctx the parse tree
+	 */
+	enterIntegerType?: (ctx: IntegerTypeContext) => void;
+	/**
+	 * Exit a parse tree produced by the `IntegerType`
+	 * labeled alternative in `ScratchParser.primitiveType`.
+	 * @param ctx the parse tree
+	 */
+	exitIntegerType?: (ctx: IntegerTypeContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `FloatType`
+	 * labeled alternative in `ScratchParser.primitiveType`.
+	 * @param ctx the parse tree
+	 */
+	enterFloatType?: (ctx: FloatTypeContext) => void;
+	/**
+	 * Exit a parse tree produced by the `FloatType`
+	 * labeled alternative in `ScratchParser.primitiveType`.
+	 * @param ctx the parse tree
+	 */
+	exitFloatType?: (ctx: FloatTypeContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `BooleanType`

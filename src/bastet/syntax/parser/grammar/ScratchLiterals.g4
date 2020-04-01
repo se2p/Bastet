@@ -11,6 +11,8 @@ DecimalLiteral:                 DecimalIntegerLiteral '.' [0-9] [0-9_]* Exponent
               |                 DecimalIntegerLiteral ExponentPart?
               ;
 
+IntegerLiteral: DecimalIntegerLiteral;
+
 fragment DecimalIntegerLiteral
     : '0'
     | [1-9] [0-9_]*

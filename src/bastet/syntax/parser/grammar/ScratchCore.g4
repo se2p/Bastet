@@ -77,7 +77,9 @@ type :
  ;
 
 primitiveType:
-   'number' # NumberType
+   'number' # NumberType // Is an alias for 'int'
+ | 'int' # IntegerType
+ | 'float' # FloatType
  | 'boolean' # BooleanType
  | 'string' # StringType
  | 'enum' '[' expressionListPlain ']' # EnumType
@@ -388,7 +390,10 @@ ident :
     | 'strid' String # StrIdentExpression
     ;
 
-number : DecimalLiteral ;
+number :
+    DecimalLiteral # DecimalLiteralExpression
+ |  IntegerLiteral # IntegerLiteralExpression
+ ;
 
 Boolean : Bool ;
 

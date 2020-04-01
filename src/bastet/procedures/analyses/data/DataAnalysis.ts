@@ -31,9 +31,9 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {AbstractTheories} from "../../domains/MemoryTransformer";
 import {
     BooleanFormula,
-    FirstOrderFormula,
+    FirstOrderFormula, FloatFormula, IntegerFormula,
     ListFormula,
-    NumberFormula,
+    NumberFormula, RealFormula,
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
@@ -70,7 +70,7 @@ export class DataAnalysisConfig extends BastetConfiguration {
 export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState, AbstractState>,
     LabeledTransferRelation<DataAbstractState> {
 
-    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
+    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
 
     private readonly _abstractDomain: DataAbstractDomain;
 
@@ -85,7 +85,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     private readonly _mergeOp: MergeOperator<DataAbstractState>;
 
     constructor(config:{}, folLattice: LatticeWithComplements<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
-                theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>,
+                theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
                 statistics: AnalysisStatistics) {
         Preconditions.checkNotUndefined(folLattice);
         Preconditions.checkNotUndefined(propLattice);
