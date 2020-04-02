@@ -1,5 +1,15 @@
 module ScratchLibrary
 
+actor IOActor begin
+
+    declare mouseX as number
+
+    declare mouseY as number
+
+    declare answer as string
+
+end
+
 role MathActor begin
 
     define atomic wrapClamp(dir: number, min: number, max: number) begin
@@ -168,39 +178,6 @@ define atomic radToDeg(rad: number) begin
     declare result as number
     define result as ((deg * PI) / 180)
 
-    // Todo: isn't this more useful as a simple calculation?
-//        declare negated as boolean
-//        if rad < 0 then begin
-//            define rad as (0-rad)
-//            define negated as true
-//        end
-//
-//        declare lower as number
-//        declare upper as number
-//        declare step as number
-//
-//        define step as 0.628
-//        define lower as 0
-//        define upper as step
-//
-//        define rad as rad - 36
-//        until rad < 0 repeat begin
-//            define lower as lower + step
-//            define upper as upper + step + 0.001
-//            define rad as rad - 36
-//        end
-//
-//        if negated then begin
-//            define lower as (0 - lower)
-//            define upper as (0 - upper)
-//
-//            assume result < lower
-//            assume result > upper
-//        end else begin
-//            assume result > lower
-//            assume result < upper
-//        end
-
 end returns result: number
 
 define atomic degToRad(deg: number) begin
@@ -214,10 +191,6 @@ end returns result: number
 end
 
 role RuntimeEntity is MathActor begin
-
-extern _RUNTIME_getMouseX () returns number
-
-extern _RUNTIME_getMouseY () returns number
 
 extern _RUNTIME_getInitialActors () returns list of string
 
@@ -289,6 +262,22 @@ extern mathPowe(n: number) returns number
 
 extern mathPowten(n: number) returns number
 
+define getMouseX()  begin
+    declare result as number
+    declare io as actor
+
+    define io as locate actor "IOActor"
+    define result as cast (attribute "mouseX" of io) to number
+end returns result: number
+
+define getMouseY()  begin
+    declare result as number
+    declare io as actor
+
+    define io as locate actor "IOActor"
+    define result as cast (attribute "mouseY" of io) to number
+end returns result: number
+
 define getGraphicIdByIndex (idx: number) begin
     declare result as string
     define result as ""
@@ -301,7 +290,7 @@ end returns result: number
 
 define getGraphicPixels (id: string) begin
     declare result as string
-    define result as ""
+    define result as "" // TODO use proper values
 end returns result: string
 
 define getImageWidth (ident: string) begin
@@ -379,19 +368,26 @@ define touchingObjects (fst: actor, snd: actor) begin
 
     declare leg_a_fst as number
     declare leg_b_fst as number
-    define leg_a_fst as cast attribute "active_graphic_width" of fst to number
-    define leg_b_fst as cast attribute "active_graphic_height" of fst to number
+//    define leg_a_fst as cast attribute "active_graphic_width" of fst to number
+//    define leg_b_fst as cast attribute "active_graphic_height" of fst to number
+
+    define leg_a_fst as 100
+    define leg_b_fst as 100
 
     declare radius_fst as number
-    define radius_fst as 0.5 * mathSqrt(leg_a_fst * leg_a_fst + leg_b_fst * leg_b_fst)
+    define radius_fst as 0.5 * mathSqrt((leg_a_fst * leg_a_fst) + (leg_b_fst * leg_b_fst))
 
     declare leg_a_snd as number
     declare leg_b_snd as number
-    define leg_a_snd as cast attribute "active_graphic_width" of snd to number
-    define leg_b_snd as cast attribute "active_graphic_height" of snd to number
+//    define leg_a_snd as cast attribute "active_graphic_width" of snd to number
+//    define leg_b_snd as cast attribute "active_graphic_height" of snd to number
+
+
+    define leg_a_snd as 100
+    define leg_b_snd as 100
 
     declare radius_snd as number
-    define radius_snd as 0.5 * mathSqrt(leg_a_snd * leg_a_snd + leg_b_snd * leg_b_snd)
+    define radius_snd as 0.5 * mathSqrt((leg_a_snd * leg_a_snd) + (leg_b_snd * leg_b_snd))
 
     declare x_fst as number
     define x_fst as cast attribute "x" of fst to number
@@ -404,7 +400,7 @@ define touchingObjects (fst: actor, snd: actor) begin
     define y_snd as cast attribute "y" of snd to number
 
     declare result as boolean
-    define result as not (((mathSqrt((x_fst + x_snd)*(x_fst + x_snd) + (y_fst + y_snd) * (y_fst + y_snd)) - radius_fst - radius_snd) > 0))
+    define result as not (((mathSqrt((x_fst + x_snd)*(x_fst + x_snd) + (y_fst + y_snd) * (y_fst + y_snd)) - (radius_fst + radius_snd)) > 0))
 
 end returns result : boolean
 
@@ -422,10 +418,10 @@ define touchingMousePointer (obj: actor) begin
     define width as cast attribute "active_graphic_width" of obj to number
     define height as cast attribute "active_graphic_height" of obj to number
 
-    if not (_RUNTIME_getMouseX() < x
-            or _RUNTIME_getMouseX() > x + width
-            or _RUNTIME_getMouseY() < y
-            or _RUNTIME_getMouseY() > y + height) then begin
+    if not (getMouseX() < x
+            or getMouseX() > x + width
+            or getMouseY() < y
+            or getMouseY() > y + height) then begin
 
         define result as false
     end
@@ -628,35 +624,35 @@ define layer as 0
 define direction as 90
 define visible as true
 
-define atomic pointTowards (s: actor) begin
-    // Todo what about random?
-    declare targetX as number
-    declare targetY as number
+    define atomic pointTowards (s: actor) begin
+        // Todo what about random?
+        declare targetX as number
+        declare targetY as number
 
-    define targetX as cast (attribute "x" of s) to number
-    define targetY as cast (attribute "y" of s) to number
+        define targetX as cast (attribute "x" of s) to number
+        define targetY as cast (attribute "y" of s) to number
 
-    declare dx as number
-    declare dy as number
-    define dx as targetX - x
-    define dy as targetY - y
+        declare dx as number
+        declare dy as number
+        define dx as targetX - x
+        define dy as targetY - y
 
-    define direction as (90 - radToDeg(mathAtan2(dy, dx)))
-end
+        define direction as (90 - radToDeg(mathAtan2(dy, dx)))
+    end
 
-define atomic moveSteps (n: number) begin
-    declare dx as number
-    declare dy as number
-    declare radians as number
+    define atomic moveSteps (n: number) begin
+        declare dx as number
+        declare dy as number
+        declare radians as number
 
-    define radians as degToRad(90 - direction)
-    define dx as n * mathCos(radians)
-    define dy as n * mathSin(radians)
-    define dy as n * mathSin(radians)
+        define radians as degToRad(90 - direction)
+        define dx as n * mathCos(radians)
+        define dy as n * mathSin(radians)
+        define dy as n * mathSin(radians)
 
-    define x as (x + dx)
-    define y as (y + dy)
-end
+        define x as (x + dx)
+        define y as (y + dy)
+    end
 
 
     define changeXBy (increment: number) begin
@@ -676,10 +672,10 @@ end
     define touchingMousePointer () begin
         declare result as boolean
 
-        if not (_RUNTIME_getMouseX() < x
-                or _RUNTIME_getMouseX() > x + active_graphic_width
-                or _RUNTIME_getMouseY() < y
-                or _RUNTIME_getMouseY() > y + active_graphic_height) then begin
+        if not (getMouseX() < x
+                or getMouseX() > x + active_graphic_width
+                or getMouseY() < y
+                or getMouseY() > y + active_graphic_height) then begin
 
             define result as false
         end
@@ -712,7 +708,7 @@ end
         define y_other as cast attribute "y" of obj to number
 
         declare result as boolean
-        define result as not (((mathSqrt((x + x_other)*(x + x_other) + (y + y_other) * (y + y_other)) - radius - radius_other) > 0))
+        define result as not (((mathSqrt((x + x_other)*(x + x_other) + (y + y_other) * (y + y_other)) - (radius + radius_other)) > 0))
 
     end returns result : boolean
 
