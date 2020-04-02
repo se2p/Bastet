@@ -32,22 +32,18 @@ import {
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {
-    BoolAsNumberExpression,
-    DivideExpression,
-    IndexOfExpression,
+    DivideExpression, FloatLiteral,
+    IndexOfExpression, IntegerLiteral,
     LengthOfListExpression,
     LengthOfStringExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
     NumberExpression,
-    NumberLiteral,
     NumberVariableExpression,
-    NumFunctExpression,
     PickRandomFromExpression,
     PlusExpression,
     RoundExpression,
-    StringAsNumberExpression,
     TimerExpression
 } from "../ast/core/expressions/NumberExpression";
 import {
@@ -189,20 +185,20 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitCastExpression(node: CastExpression): AstNode {
-        const result = new CastExpression(node.toConvert.accept(this) as Expression, node.castToType);
+        const result = new CastExpression(node.toConvertFrom.accept(this) as Expression, node.castToType);
 
         // TODO: Check if the following simplification should be moved to another (new?) visitor
 
         // Remove needless cast (1)
-        if (result.toConvert.expressionType == result.castToType) {
-            return result.toConvert;
+        if (result.toConvertFrom.expressionType == result.castToType) {
+            return result.toConvertFrom;
         }
 
         // Remove needless cast (2)
-        if (result.toConvert instanceof CastExpression) {
-            const innerCast = result.toConvert as CastExpression;
-            if (innerCast.toConvert.expressionType == result.castToType) {
-                return innerCast.toConvert;
+        if (result.toConvertFrom instanceof CastExpression) {
+            const innerCast = result.toConvertFrom as CastExpression;
+            if (innerCast.toConvertFrom.expressionType == result.castToType) {
+                return innerCast.toConvertFrom;
             }
         }
 
@@ -315,10 +311,6 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
         }));
     }
 
-    visitBoolAsNumberExpression(node: BoolAsNumberExpression): AstNode {
-        return new BoolAsNumberExpression(node.toConvert.accept(this) as BooleanExpression);
-    }
-
     visitDivideExpression(node: DivideExpression): AstNode {
         return new DivideExpression(
             node.operand1.accept(this) as NumberExpression,
@@ -358,11 +350,11 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
             node.operand2.accept(this) as NumberExpression);
     }
 
-    visitNumFunctExpression(node: NumFunctExpression): AstNode {
-        throw new IllegalStateException("Assuming that this expression is handled in the IL");
+    visitIntegerLiteral(node: IntegerLiteral): AstNode {
+        return node;
     }
 
-    visitNumberLiteral(node: NumberLiteral): AstNode {
+    visitFloatLiteral(node: FloatLiteral): AstNode {
         return node;
     }
 
@@ -384,10 +376,6 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     visitRoundExpression(node: RoundExpression): AstNode {
         return new RoundExpression(node.num.accept(this) as NumberExpression);
-    }
-
-    visitStringAsNumberExpression(node: StringAsNumberExpression): AstNode {
-        return new StringAsNumberExpression(node.toConvert.accept(this) as StringExpression);
     }
 
     visitTimerExpression(node: TimerExpression): AstNode {
@@ -628,14 +616,6 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
             return new WaitUntilStatement(
                 node.cond.accept(this) as BooleanExpression);
         }));
-    }
-
-    visitChangeAttributeByStatement(node: ChangeAttributeByStatement): AstNode {
-        throw new IllegalArgumentException("Please use variables instead of attributes for actor-local variable changes");
-    }
-
-    visitChangeVarByStatement(node: ChangeVarByStatement): AstNode {
-        throw new IllegalArgumentException("Should be replaced by other statements in a preprocessingt step");
     }
 
     visitDeclareAttributeStatement(node: DeclareAttributeStatement): AstNode {

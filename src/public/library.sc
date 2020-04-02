@@ -2,21 +2,17 @@ module ScratchLibrary
 
 role MathActor begin
 
-    define atomic wrapClamp(dir: number, min: number, max: number) begin
-        declare range as number
-        declare result as number
+    define atomic wrapClamp(dir: int, min: int, max: int) begin
+        declare range as int
         define range as ((max - min) +1)
         define result as (dir - (mathFloor((dir - min) / range) * range))
-    end returns result : number
+    end returns result : int
 
-    define atomic mathFloor (n: number) begin
-        declare result as number
+    define atomic mathFloor (n: int) begin
         define result as (n - (n mod 1))
-    end returns result : number
+    end returns result : int
 
-define atomic mathAtan(n: number) begin
-    declare result as number
-
+define atomic mathAtan(n: int) begin
     if n < 0-9 then begin
         assume result > 0-90
         assume result < 0-84.290
@@ -27,16 +23,16 @@ define atomic mathAtan(n: number) begin
         assume result > 0-80.537
         assume result < 0-63.435
     end else if n > 0-2 and (n < 0-1 or n = 0-1) then begin
-        assume result > 0-63.434
-        assume result < 0-45
+        assume result > 0.0-63.434
+        assume result < 0.0-45.0
     end else if n > 0-1 and (n < 0 or n = 0) then begin
-        assume result > 0-45
-        assume result < 0
+        assume result > 0.0-45.0
+        assume result < 0.0
     end else if n > 0 and (n < 1 or n = 1) then begin
-        assume result < 45
-        assume result > 0
+        assume result < 45.0
+        assume result > 0.0
     end else if n > 1 and (n < 2 or n = 2) then begin
-        assume result > 45
+        assume result > 45.0
         assume result < 63.435
     end else if n > 2 and (n < 6 or n = 6) then begin
         assume result < 80.538
@@ -46,17 +42,16 @@ define atomic mathAtan(n: number) begin
         assume result > 80.537
     end else if n > 10 then begin
         assume result > 84.290
-        assume result < 90
+        assume result < 90.0
     end else begin
         // got invalid input
         _RUNTIME_signalFailure()
     end
 
-end returns result: number
+end returns result: float
 
-define atomic mathAtan2(x: number, y: number) begin
-    declare result as number
-    declare PI as number
+define atomic mathAtan2(x: int, y: int) begin
+    declare PI as int
     define PI as 3.14159265359
     if x > 0 then begin
         define result as mathAtan((y / x))
@@ -77,11 +72,10 @@ define atomic mathAtan2(x: number, y: number) begin
         _RUNTIME_signalFailure()
     end
 
-end returns result: number
+end returns result: float
 
-define atomic mathCos(alpha: number) begin
+define atomic mathCos(alpha: int) begin
     define alpha as wrapClamp(alpha, 0, 360)
-    declare result as number
 
     if (alpha > (0-1) and alpha < 36) then begin
         assume result < 1
@@ -118,11 +112,10 @@ define atomic mathCos(alpha: number) begin
         _RUNTIME_signalFailure()
     end
 
-end returns result: number
+end returns result: float
 
-define atomic mathSin(alpha: number) begin
+define atomic mathSin(alpha: int) begin
     define alpha as wrapClamp(alpha, 0, 360)
-    declare result as number
 
     if alpha > (0-1) and alpha < 36 then begin
         assume result < 0
@@ -159,13 +152,12 @@ define atomic mathSin(alpha: number) begin
         _RUNTIME_signalFailure()
     end
 
-end returns result: number
+end returns result: float
 
-define atomic radToDeg(rad: number) begin
-    declare PI as number
+define atomic radToDeg(rad: int) begin
+    declare PI as int
     define PI as 3.14159265359
 
-    declare result as number
     define result as ((deg * PI) / 180)
 
     // Todo: isn't this more useful as a simple calculation?
@@ -175,9 +167,9 @@ define atomic radToDeg(rad: number) begin
 //            define negated as true
 //        end
 //
-//        declare lower as number
-//        declare upper as number
-//        declare step as number
+//        declare lower as int
+//        declare upper as int
+//        declare step as int
 //
 //        define step as 0.628
 //        define lower as 0
@@ -201,23 +193,22 @@ define atomic radToDeg(rad: number) begin
 //            assume result < upper
 //        end
 
-end returns result: number
+end returns result: int
 
-define atomic degToRad(deg: number) begin
-    declare PI as number
+define atomic degToRad(deg: int) begin
+    declare PI as int
     define PI as 3.14159265359
-    declare result as number
     define result as (rad * PI) / 180
 
-end returns result: number
+end returns result: int
 
 end
 
 role RuntimeEntity is MathActor begin
 
-extern _RUNTIME_getMouseX () returns number
+extern _RUNTIME_getMouseX () returns int
 
-extern _RUNTIME_getMouseY () returns number
+extern _RUNTIME_getMouseY () returns int
 
 extern _RUNTIME_getInitialActors () returns list of string
 
@@ -233,99 +224,93 @@ extern _RUNTIME_restart ()
 //   or: signal a behavior that should be visible to the user.
 extern _RUNTIME_render ()
 
-// Returns the number of milliseconds that
+// Returns the int of milliseconds that
 // elapsed since the VM started.
-extern _RUNTIME_millis () returns number
+extern _RUNTIME_millis () returns int
 
-// Returns the number of seconds that
+// Returns the int of seconds that
 // elapsed since the VM started.
-extern _RUNTIME_seconds () returns number
+extern _RUNTIME_seconds () returns int
 
-extern _RUNTIME_micros () returns number
+extern _RUNTIME_micros () returns int
 
-extern _RUNTIME_waitMillis (ms: number)
+extern _RUNTIME_waitMillis (ms: int)
 
-extern _RUNTIME_waitMicros (micros: number)
+extern _RUNTIME_waitMicros (micros: int)
 
-extern _RUNTIME_waitSeconds (s: number)
+extern _RUNTIME_waitSeconds (s: int)
 
-extern _RUNTIME_timerValue () returns number
+extern _RUNTIME_timerValue () returns int
 
 extern _RUNTIME_resetTimer ()
 
 extern _RUNTIME_signalFailure ()
 
-extern _RUNTIME_numberFromInterval (from_num: number, to_num: number) returns number
+extern _RUNTIME_numberFromInterval (from_num: int, to_num: int) returns int
 
-extern _RUNTIME_integerFromInterval (from_num: number, to_num: number) returns number
+extern _RUNTIME_integerFromInterval (from_num: int, to_num: int) returns int
 
 // A random integer in the interval [from, to],
 // that is, both end points are included.
-extern randomIntegerBetween (intervalStart: number, intervalEnd: number) returns number
+extern randomIntegerBetween (intervalStart: int, intervalEnd: int) returns int
 
 // See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
-extern randomBetween (intervalStart: number, intervalEnd: number) returns number
+extern randomBetween (intervalStart: int, intervalEnd: int) returns int
 
 // TODO: Maybe add an approximation for sqrt
-extern mathSqrt (n: number) returns number
+extern mathSqrt (n: int) returns int
 
-extern mathAbs (n: number) returns number
+extern mathAbs (n: int) returns int
 
-extern mathCeiling (n: number) returns number
+extern mathCeiling (n: int) returns int
 
-extern mathSqrt (n: number) returns number
+extern mathSqrt (n: int) returns int
 
-extern mathTan (n: number) returns number
+extern mathTan (n: int) returns int
 
-extern mathAsin (n: number) returns number
+extern mathAsin (n: int) returns int
 
-extern mathAcos (n: number) returns number
+extern mathAcos (n: int) returns int
 
-extern mathLn(n: number) returns number
+extern mathLn(n: int) returns int
 
-extern mathLog(n: number) returns number
+extern mathLog(n: int) returns int
 
-extern mathPowe(n: number) returns number
+extern mathPowe(n: int) returns int
 
-extern mathPowten(n: number) returns number
+extern mathPowten(n: int) returns int
 
-define getGraphicIdByIndex (idx: number) begin
-    declare result as string
+define getGraphicIdByIndex (idx: int) begin
     define result as ""
 end returns result: string
 
 define getGraphicIndexById (id: string) begin
-    declare result as number
     define result as (0-1)
-end returns result: number
+end returns result: int
 
 define getGraphicPixels (id: string) begin
-    declare result as string
     define result as ""
 end returns result: string
 
 define getImageWidth (ident: string) begin
-    declare result as number
     define result as 0
-end returns result: number
+end returns result: int
 
 define getImageHeight (ident: string) begin
-    declare result as number
     define result as 0
-end returns result: number
+end returns result: int
 
 define getNumGraphics () begin
-    declare result as number
     define result as 0
-end returns result: number
+end returns result: int
 
 // @Category "Control"
 // @Block "wait <Num> seconds"
-define waitSeconds (secs: number) begin
+define waitSeconds (secs: int) begin
     // A busy-waiting implementation.
     // The external methode`_RUNTIME_waitSeconds` is intended to
     // not conduct a busy wait.
-    declare waitUntil as number
+    declare waitUntil as int
     define waitUntil as _RUNTIME_seconds() + secs
     until (_RUNTIME_seconds() > waitUntil) repeat begin
     end
@@ -333,11 +318,11 @@ end
 
 // @Category "Control"
 // @Block "wait <Num> millis"
-define waitMillis (millis: number) begin
+define waitMillis (millis: int) begin
     // A busy-waiting implementation.
     // The external method `_RUNTIME_waitMillis` is intended to
     // not conduct a busy wait.
-    declare waitUntil as number
+    declare waitUntil as int
     define waitUntil as _RUNTIME_millis() + millis
     until (_RUNTIME_millis() > waitUntil) repeat begin
     end
@@ -345,11 +330,11 @@ end
 
 // @Category "Control"
 // @Block "wait <Num> micros"
-define waitMicros (micros: number) begin
+define waitMicros (micros: int) begin
     // A busy-waiting implementation.
     // The external method `_RUNTIME_waitMicros` is intended to
     // not conduct a busy wait.
-    declare waitUntil as number
+    declare waitUntil as int
     define waitUntil as _RUNTIME_micros() + micros
     until (_RUNTIME_micros() > waitUntil) repeat begin
     end
@@ -357,11 +342,11 @@ end
 
 define atomic milliseconds() begin
     define result as _RUNTIME_millis()
-end returns result: number
+end returns result: int
 
 define atomic microseconds() begin
     define result as _RUNTIME_micros()
-end returns result: number
+end returns result: int
 end
 
 role Observer is RuntimeEntity begin
@@ -377,50 +362,47 @@ end
 define touchingObjects (fst: actor, snd: actor) begin
     // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
 
-    declare leg_a_fst as number
-    declare leg_b_fst as number
-    define leg_a_fst as cast attribute "active_graphic_width" of fst to number
-    define leg_b_fst as cast attribute "active_graphic_height" of fst to number
+    declare leg_a_fst as int
+    declare leg_b_fst as int
+    define leg_a_fst as cast attribute "active_graphic_width" of fst to int
+    define leg_b_fst as cast attribute "active_graphic_height" of fst to int
 
-    declare radius_fst as number
+    declare radius_fst as int
     define radius_fst as 0.5 * mathSqrt(leg_a_fst * leg_a_fst + leg_b_fst * leg_b_fst)
 
-    declare leg_a_snd as number
-    declare leg_b_snd as number
-    define leg_a_snd as cast attribute "active_graphic_width" of snd to number
-    define leg_b_snd as cast attribute "active_graphic_height" of snd to number
+    declare leg_a_snd as int
+    declare leg_b_snd as int
+    define leg_a_snd as cast attribute "active_graphic_width" of snd to int
+    define leg_b_snd as cast attribute "active_graphic_height" of snd to int
 
-    declare radius_snd as number
+    declare radius_snd as int
     define radius_snd as 0.5 * mathSqrt(leg_a_snd * leg_a_snd + leg_b_snd * leg_b_snd)
 
-    declare x_fst as number
-    define x_fst as cast attribute "x" of fst to number
-    declare y_fst as number
-    define y_fst as cast attribute "y" of fst to number
+    declare x_fst as int
+    define x_fst as cast attribute "x" of fst to int
+    declare y_fst as int
+    define y_fst as cast attribute "y" of fst to int
 
-    declare x_snd as number
-    define x_snd as cast attribute "x" of snd to number
-    declare y_snd as number
-    define y_snd as cast attribute "y" of snd to number
+    declare x_snd as int
+    define x_snd as cast attribute "x" of snd to int
+    declare y_snd as int
+    define y_snd as cast attribute "y" of snd to int
 
-    declare result as boolean
     define result as not (((mathSqrt((x_fst + x_snd)*(x_fst + x_snd) + (y_fst + y_snd) * (y_fst + y_snd)) - radius_fst - radius_snd) > 0))
 
 end returns result : boolean
 
 // @Category "Specification"
 define touchingMousePointer (obj: actor) begin
-    declare result as boolean
+    declare x as int
+    declare y as int
+    define x as cast attribute "x" of obj to int
+    define y as cast attribute "y" of obj to int
 
-    declare x as number
-    declare y as number
-    define x as cast attribute "x" of obj to number
-    define y as cast attribute "y" of obj to number
-
-    declare width as number
-    declare height as number
-    define width as cast attribute "active_graphic_width" of obj to number
-    define height as cast attribute "active_graphic_height" of obj to number
+    declare width as int
+    declare height as int
+    define width as cast attribute "active_graphic_width" of obj to int
+    define height as cast attribute "active_graphic_height" of obj to int
 
     if not (_RUNTIME_getMouseX() < x
             or _RUNTIME_getMouseX() > x + width
@@ -436,23 +418,23 @@ end
 role ScratchEntity is RuntimeEntity begin
 
 declare sound_effect as enum [ "pitch", "pan_left_right" ]
-declare volume as number
+declare volume as int
 
 // 480 * 360 = 172800 pixels
-declare active_graphic_pixels as list of number
-declare active_graphic_index as number
+declare active_graphic_pixels as list of int
+declare active_graphic_index as int
 declare active_graphic_name as string
-declare active_graphic_width as number
-declare active_graphic_height as number
+declare active_graphic_width as int
+declare active_graphic_height as int
 
 declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
-declare color_effect_value as number
-declare fisheye_effect_value as number
-declare whirl_effect_value as number
-declare pixelate_effect_value as number
-declare mosaic_effect_value as number
-declare brightness_effect_value as number
-declare ghost_effect_value as number
+declare color_effect_value as int
+declare fisheye_effect_value as int
+declare whirl_effect_value as int
+declare pixelate_effect_value as int
+declare mosaic_effect_value as int
+declare brightness_effect_value as int
+declare ghost_effect_value as int
 
 define color_effect_value as 0
 
@@ -465,8 +447,8 @@ define atomic changeActiveGraphicTo (id: string) begin
 end
 
 // @Category "Looks"
-// @Block "change <string as effect> effect by <number as value>
-define atomic changeGraphicEffectBy (eff:string, val:number) begin
+// @Block "change <string as effect> effect by <int as value>
+define atomic changeGraphicEffectBy (eff:string, val:int) begin
 
 end
 
@@ -477,10 +459,10 @@ define atomic clearGraphicEffects () begin
 end
 
 // @Category "Looks"
-// @Block "backdrop number"
+// @Block "backdrop int"
 define backdropNumber () begin
 
-end returns result : number
+end returns result : int
 
 // @Category "Looks"
 // @Block "backdrop name"
@@ -490,13 +472,13 @@ end returns result : string
 
 // @Category "Sound"
 // @Block "play sound <sound as snd> until done"
-define atomic playUntilDone (snd: number) begin
+define atomic playUntilDone (snd: int) begin
 
 end
 
 // @Category "Sound"
 // @Block "start sound <sound as snd>"
-define startSound (snd: number) begin
+define startSound (snd: int) begin
 
 end
 
@@ -507,14 +489,14 @@ define stopAllSounds () begin
 end
 
 // @Category "Sound"
-// @Block "change <string as effect> sound effect by <number as num>"
-define changeSoundEffectBy (eff: string, val: number) begin
+// @Block "change <string as effect> sound effect by <int as num>"
+define changeSoundEffectBy (eff: string, val: int) begin
 
 end
 
 // @Category "Sound"
-// @Block "set <string as effect> sound effect to <number as num>"
-define setSoundEffectTo (eff: string, val: number) begin
+// @Block "set <string as effect> sound effect to <int as num>"
+define setSoundEffectTo (eff: string, val: int) begin
 
 end
 
@@ -525,14 +507,14 @@ define clearSoundEffects () begin
 end
 
 // @Category "Sound"
-// @Block "change volume by <number as delta>"
-define changeVolumeBy (delta: number) begin
+// @Block "change volume by <int as delta>"
+define changeVolumeBy (delta: int) begin
 
 end
 
 // @Category "Sound"
-// @Block "set volume to <number as percent>"
-define setVolumeTo (perc: number) begin
+// @Block "set volume to <int as percent>"
+define setVolumeTo (perc: int) begin
 
 end
 
@@ -540,7 +522,7 @@ end
 // @Block "volume"
 define volume () begin
 
-end returns result : number
+end returns result : int
 
 // data_setvariableto, sensing_setdragmode, motion_setrotationstyle, looks_seteffectto,
 // sound_seteffectto, sound_setvolumeto;
@@ -591,23 +573,23 @@ role ScratchSprite is ScratchEntity begin
 
 // x-coordinate in [-240,+240]
 // See https://en.scratch-wiki.info/wiki/Coordinate_System
-declare x as number
+declare x as int
 
 // y-coordinate in [-180,+180]
 // See https://en.scratch-wiki.info/wiki/Coordinate_System
-declare y as number
+declare y as int
 
 // Percent of the original size in [3,54000]
 // See https://en.scratch-wiki.info/wiki/Size_(value)
-declare size as number
+declare size as int
 
 // The current layer of a sprite
 // See https://en.scratch-wiki.info/wiki/Layer_(value)
-declare layer as number
+declare layer as int
 
 // The rotation of the sprite in [-360,+360]
 // See https://en.scratch-wiki.info/wiki/Direction_(value)
-declare direction as number
+declare direction as int
 
 // Whether or not the sprite is visible (difference to ghost mode!)
 // See https://en.scratch-wiki.info/wiki/Hide_(block)
@@ -617,8 +599,8 @@ declare visible as boolean
 // In Scratch if the bubbleText is empty, the bubble is not visible
 declare bubbleText as string
 declare bubbleType as string
-declare bubbleStart as number
-declare bubbleDuration as number
+declare bubbleStart as int
+declare bubbleDuration as int
 
 // Initialize the variables with their default values
 define x as 0
@@ -630,24 +612,24 @@ define visible as true
 
 define atomic pointTowards (s: actor) begin
     // Todo what about random?
-    declare targetX as number
-    declare targetY as number
+    declare targetX as int
+    declare targetY as int
 
-    define targetX as cast (attribute "x" of s) to number
-    define targetY as cast (attribute "y" of s) to number
+    define targetX as cast (attribute "x" of s) to int
+    define targetY as cast (attribute "y" of s) to int
 
-    declare dx as number
-    declare dy as number
+    declare dx as int
+    declare dy as int
     define dx as targetX - x
     define dy as targetY - y
 
     define direction as (90 - radToDeg(mathAtan2(dy, dx)))
 end
 
-define atomic moveSteps (n: number) begin
-    declare dx as number
-    declare dy as number
-    declare radians as number
+define atomic moveSteps (n: int) begin
+    declare dx as int
+    declare dy as int
+    declare radians as int
 
     define radians as degToRad(90 - direction)
     define dx as n * mathCos(radians)
@@ -659,7 +641,7 @@ define atomic moveSteps (n: number) begin
 end
 
 
-    define changeXBy (increment: number) begin
+    define changeXBy (increment: int) begin
        // set attribute "x" to (attribute "x" + increment)
     end
 
@@ -674,8 +656,6 @@ end
 
     // @Category "Sensing"
     define touchingMousePointer () begin
-        declare result as boolean
-
         if not (_RUNTIME_getMouseX() < x
                 or _RUNTIME_getMouseX() > x + active_graphic_width
                 or _RUNTIME_getMouseY() < y
@@ -689,49 +669,48 @@ end
     define touchingObject (obj: actor) begin
         // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
 
-        declare leg_a as number
-        declare leg_b as number
+        declare leg_a as int
+        declare leg_b as int
         // TODO: Query attributes of myself and the other actor
         define leg_a as active_graphic_width
         define leg_b as active_graphic_height
 
-        declare radius as number
+        declare radius as int
         define radius as 0.5 * mathSqrt(leg_a * leg_a + leg_b * leg_b)
 
-        declare leg_a_other as number
-        declare leg_b_other as number
-        define leg_a_other as cast attribute "active_graphic_width" of obj to number
-        define leg_b_other as cast attribute "active_graphic_height" of obj to number
+        declare leg_a_other as int
+        declare leg_b_other as int
+        define leg_a_other as cast attribute "active_graphic_width" of obj to int
+        define leg_b_other as cast attribute "active_graphic_height" of obj to int
 
-        declare radius_other as number
+        declare radius_other as int
         define radius_other as 0.5 * mathSqrt(leg_a_other * leg_a_other + leg_b_other * leg_b_other)
 
-        declare x_other as number
-        define x_other as cast attribute "x" of obj to number
-        declare y_other as number
-        define y_other as cast attribute "y" of obj to number
+        declare x_other as int
+        define x_other as cast attribute "x" of obj to int
+        declare y_other as int
+        define y_other as cast attribute "y" of obj to int
 
-        declare result as boolean
         define result as not (((mathSqrt((x + x_other)*(x + x_other) + (y + y_other) * (y + y_other)) - radius - radius_other) > 0))
 
     end returns result : boolean
 
     // @Category "Sensing"
-    define touchingColor (clr: number) begin
+    define touchingColor (clr: int) begin
         // ...
     end returns result : boolean
 
     // @Category "Sensing"
-    define colorIsTouchingColor(clr: number, tching: number) begin
+    define colorIsTouchingColor(clr: int, tching: int) begin
         // ...
     end returns result : boolean
 
     // @Category "Sensing"
     define distanceToMousePointer () begin
         // ...
-    end returns result : number
+    end returns result : int
 
-    define sayTextFor (msg: string, scs: number) begin
+    define sayTextFor (msg: string, scs: int) begin
         // msgBounded = substr(msg, 0, 330)
         define bubbleText as msg
         define bubbleStart as _RUNTIME_millis()
@@ -746,16 +725,16 @@ end
     end
 
     // @Category "looks"
-    define turnLeft(degrees: number) begin
+    define turnLeft(degrees: int) begin
         setDirection(direction - degrees)
     end
 
     // @Category "looks"
-    define turnRight(degrees: number) begin
+    define turnRight(degrees: int) begin
         setDirection(direction + degrees)
     end
 
-    define setDirection(dir: number) begin
+    define setDirection(dir: int) begin
         // TODO do we need to check if we are in the stage
         // Make sure direction is between -179 and 180
         define direction as wrapClamp(dir, 0-179, 180)
@@ -793,7 +772,7 @@ end
 
 role ScratchStage is ScratchEntity begin
 
-    declare current_idx as number
+    declare current_idx as int
     define current_idx as 0
 
     define switchBackdropTo (id: string) begin
@@ -805,7 +784,7 @@ role ScratchStage is ScratchEntity begin
     end
 
     define nextBackdrop () begin
-        declare idx as number
+        declare idx as int
         define idx as getGraphicIndexById(active_graphic_name)
         define idx as (current_idx+1) mod getNumGraphics()
 
@@ -816,7 +795,7 @@ role ScratchStage is ScratchEntity begin
     end
 
     define previousBackdrop() begin
-        declare idx as number
+        declare idx as int
         define idx as getGraphicIndexById(active_graphic_name)
         define idx as (current_idx-1) mod getNumGraphics()
 
@@ -827,7 +806,7 @@ role ScratchStage is ScratchEntity begin
     end
 
     define randomBackdrop() begin
-         declare idx as number
+         declare idx as int
          define idx as getGraphicIndexById(active_graphic_name)
          define idx as randomIntegerBetween(0, getNumGraphics()-1)
 

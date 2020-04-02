@@ -86,7 +86,7 @@ import {Script, ScriptId} from "../../../syntax/app/controlflow/Script";
 import {getTheNextElement, getTheOnlyElement} from "../../../utils/Collections";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {BOOTSTRAP_FINISHED_MESSAGE, SystemMessage} from "../../../syntax/ast/core/Message";
-import {ActorType, NumberType} from "../../../syntax/ast/core/ScratchType";
+import {ActorType, IntegerType} from "../../../syntax/ast/core/ScratchType";
 import {
     LocateActorExpression,
     StartCloneActorExpression,
@@ -101,6 +101,7 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {GLOBAL_TIME_MICROS_VAR} from "../time/TimeTransferRelation";
 import {
+    IntegerLiteral,
     MultiplyExpression,
     NumberExpression, NumberLiteral,
     NumberVariableExpression,
@@ -262,12 +263,12 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         // TODO: Move the declaration of the following variables to the `App`/`AppBuilder`/`Actor`
         this._threadWaitUntilMicrosVariable = new VariableWithDataLocation(
-            DataLocations.createTypedLocation(new Identifier("__wait_until_micros"), NumberType.instance()));
+            DataLocations.createTypedLocation(new Identifier("__wait_until_micros"), IntegerType.instance()));
         this._task.typeStorage.getScopeOf(this._threadWaitUntilMicrosVariable.qualifiedName).putVariable(this._threadWaitUntilMicrosVariable);
 
         // The following var is currently registered by the `TimeAnalysis`
         this._globalTimeMicrosVariable = new VariableWithDataLocation(
-            DataLocations.createTypedLocation(new Identifier(GLOBAL_TIME_MICROS_VAR), NumberType.instance()));
+            DataLocations.createTypedLocation(new Identifier(GLOBAL_TIME_MICROS_VAR), IntegerType.instance()));
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
@@ -622,13 +623,13 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                         new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_micros),
                             new ExpressionList([]), OptionalAstNode.with(this._threadWaitUntilMicrosVariable)),
                         new StoreEvalResultToVariableStatement(this._threadWaitUntilMicrosVariable,
-                            new PlusExpression(this._threadWaitUntilMicrosVariable, new MultiplyExpression(secondsExpression, NumberLiteral.of(1000000))))
+                            new PlusExpression(this._threadWaitUntilMicrosVariable, new MultiplyExpression(secondsExpression, IntegerLiteral.of(1000000))))
                     ].map((ast) => ProgramOperationFactory.createFor(ast));
 
                     const waitUntilCond = new NumGreaterEqualExpression(this._globalTimeMicrosVariable, this._threadWaitUntilMicrosVariable);
                     const accelInfo = new AccelInfo(threadToStep.threadStatus.getActorId(),
                         waitUntilCond, new NumberVariableExpression(this._globalTimeMicrosVariable),
-                        new PlusExpression(this._threadWaitUntilMicrosVariable, NumberLiteral.of(1)));
+                        new PlusExpression(this._threadWaitUntilMicrosVariable, IntegerLiteral.of(1)));
 
                     const checkThread: ThreadState = this.createConditionCheckThread(steppedActor.ident, waitUntilCond);
                     this._accelInfoMap.set(checkThread.getScriptId(), accelInfo);
