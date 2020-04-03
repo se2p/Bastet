@@ -141,23 +141,46 @@ import {
     SignalTargetReachedStatement
 } from "../../../syntax/ast/core/statements/InternalStatement";
 import {DataLocation} from "../../../syntax/app/controlflow/DataLocation";
+import {Float} from "../../../utils/smt/z3/ctypes";
 
-export class DataNumExpressionVisitor<B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
-    F extends AbstractFloat, S extends AbstractString, L extends AbstractList>
-    implements CoreNumberExpressionVisitor<AbstractNumber> {
+abstract class TransformingVisitor<RT, B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
+    F extends AbstractFloat, S extends AbstractString, L extends AbstractList> implements CoreVisitor<RT> {
 
-    private readonly _theories: TransformerTheories<B, B, I, R, F, S, L>;
+    protected readonly _theories: TransformerTheories<B, B, I, R, F, S, L>;
 
     constructor(theories: TransformerTheories<B, B, I, R, F, S, L>) {
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
-    visit(node: AstNode): AbstractNumber {
-        throw new ImplementMeException();
+    visit(node: AstNode): RT {
+        throw new ImplementMeForException(node.toTreeString());
     }
+
+    protected createVisitorByType(t: ScratchType): CoreVisitor<any> {
+       if (t == IntegerType.instance()) {
+           return new DataNumExpressionVisitor(this._theories);
+       } else if (t == FloatType.instance()) {
+           return new DataNumExpressionVisitor(this._theories);
+       } else if (t == BooleanType.instance()) {
+           return new DataBoolExpressionVisitor(this._theories);
+       } else if (t == StringType.instance()) {
+           return new DataStringExpressionVisitor(this._theories);
+       } else {
+           throw new ImplementMeForException(t.toTreeString());
+       }
+    }
+
+}
+
+export class DataNumExpressionVisitor<B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
+    F extends AbstractFloat, S extends AbstractString, L extends AbstractList>
+    extends TransformingVisitor<AbstractNumber, B, I, R, F, S, L>
+    implements CoreNumberExpressionVisitor<AbstractNumber> {
 
     visitCastExpression(node: CastExpression): AbstractNumber {
         Preconditions.checkArgument(ScratchType.isNumericType(node.castToType));
+
+        // TODO: Implement purely on `castFrom` of the theories?
 
         if (node.toConvertFrom.expressionType == StringType.instance()) {
             const stringVisitor = new DataStringExpressionVisitor(this._theories);
@@ -176,9 +199,15 @@ export class DataNumExpressionVisitor<B extends AbstractBoolean, I extends Abstr
             } else {
                 throw new IllegalArgumentException();
             }
+        } else if (node.toConvertFrom.expressionType == FloatType.instance()) {
+            const convertFrom = node.toConvertFrom.accept(this.createVisitorByType(node.toConvertFrom.expressionType));
+            return this._theories.getNumberTheoryFor(node.castToType).castFrom(convertFrom);
+        } else if (node.toConvertFrom.expressionType == IntegerType.instance()) {
+            const convertFrom = node.toConvertFrom.accept(this.createVisitorByType(node.toConvertFrom.expressionType));
+            return this._theories.getNumberTheoryFor(node.castToType).castFrom(convertFrom);
         }
 
-        throw new ImplementMeException();
+        throw new ImplementMeForException(node.toTreeString());
     }
 
     visitVariableWithDataLocation(node: VariableWithDataLocation): AbstractNumber {
@@ -269,18 +298,8 @@ export class DataNumExpressionVisitor<B extends AbstractBoolean, I extends Abstr
 
 export class DataBoolExpressionVisitor<B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
     F extends AbstractFloat, S extends AbstractString, L extends AbstractList>
+    extends TransformingVisitor<B, B, I, R, F, S, L>
     implements CoreBoolExpressionVisitor<B> {
-
-    private readonly _base: B;
-    private readonly _theories: TransformerTheories<B, B, I, R, F, S, L>;
-
-    constructor(theories: TransformerTheories<B, B, I, R, F, S, L>) {
-        this._theories = Preconditions.checkNotUndefined(theories);
-    }
-
-    visit(node: AstNode): B {
-        throw new ImplementMeException();
-    }
 
     visitAndExpression(node: AndExpression): B {
         return this._theories.boolTheory.and(node.operand1.accept(this), node.operand2.accept(this));
@@ -385,17 +404,9 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, I extends Abst
 }
 
 export class DataStringExpressionVisitor<B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
-    F extends AbstractFloat, S extends AbstractString, L extends AbstractList> implements CoreStringExpressionVisitor<S> {
-
-    private readonly _theories: TransformerTheories<B, B, I, R, F, S, L>;
-
-    constructor(theories: TransformerTheories<B, B, I, R, F, S, L>) {
-        this._theories = Preconditions.checkNotUndefined(theories);
-    }
-
-    visit(node: AstNode): S {
-        throw new ImplementMeException();
-    }
+    F extends AbstractFloat, S extends AbstractString, L extends AbstractList>
+    extends TransformingVisitor<S, B, I, R, F, S, L>
+    implements CoreStringExpressionVisitor<S> {
 
     visitBoolAsStringExpression(node: BoolAsStringExpression): S {
         throw new ImplementMeException();
@@ -456,17 +467,10 @@ export class DataStringExpressionVisitor<B extends AbstractBoolean, I extends Ab
 
 }
 
-export class DataListExpressionVisitor implements CoreListExpressionVisitor<AbstractList> {
-
-    private readonly _theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
-
-    constructor(theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
-        this._theories = Preconditions.checkNotUndefined(theories);
-    }
-
-    visit(node: AstNode): AbstractList {
-        throw new ImplementMeException();
-    }
+export class DataListExpressionVisitor<B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
+    F extends AbstractFloat, S extends AbstractString, L extends AbstractList>
+    extends TransformingVisitor<S, B, I, R, F, S, L>
+    implements CoreListExpressionVisitor<AbstractList> {
 
     visitExpressionListExpression(node: ExpressionListExpression): AbstractList {
         throw new ImplementMeException();
@@ -481,22 +485,18 @@ export class DataListExpressionVisitor implements CoreListExpressionVisitor<Abst
 export class DataTransformerVisitor<B extends AbstractBoolean,
     I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
     S extends AbstractString, L extends AbstractList>
+    extends TransformingVisitor<B, B, I, R, F, S, L>
     implements CoreVisitor<B>, CoreNonCtrlStatementnVisitor<B> {
 
     private readonly _mem: B;
-    private readonly _theories: TransformerTheories<B, B, I, R, F, S, L>;
 
     constructor(base: B, theories: TransformerTheories<B, B, I, R, F, S, L>) {
+        super(theories);
         this._mem = Preconditions.checkNotUndefined(base);
-        this._theories = Preconditions.checkNotUndefined(theories);
     }
 
     private numberTheoryFor(dl: DataLocation): NumberTheory<AbstractNumber, I, R, F, B, S> {
-        return this._theories.intTheory;
-    }
-
-    private numberTheoryForExpr(e: AbstractNumber) {
-        return this._theories.intTheory;
+        return this._theories.getNumberTheoryFor(ScratchType.fromId(dl.type));
     }
 
     visitCallStatement(node: CallStatement): B {

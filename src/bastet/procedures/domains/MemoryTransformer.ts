@@ -193,6 +193,8 @@ export interface StringTheoryQueries {
 export interface NumberTheory<N extends AbstractNumber, I extends AbstractInteger, R extends AbstractReal,
     F extends AbstractFloat, B extends AbstractBoolean, S extends AbstractString> {
 
+    castFrom(from: AbstractNumber): N;
+
     fromConcreteNumber(str: ConcreteNumber): N;
 
     fromConcreteString(str: ConcreteString): N;

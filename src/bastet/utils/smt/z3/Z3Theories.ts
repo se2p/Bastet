@@ -37,7 +37,7 @@ import {LibZ3InContext, Z3_ast, Z3_sort} from "./libz3";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../../procedures/domains/ConcreteElements";
 import {Preconditions} from "../../Preconditions";
 import {Float, Ptr, Sint32, Uint32} from "./ctypes";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
 import {SMTFirstOrderLattice} from "../../../procedures/domains/FirstOrderDomain";
 import {Z3ProverEnvironment} from "./Z3SMT";
 import {Variable} from "../../../syntax/ast/core/Variable";
@@ -200,6 +200,8 @@ export abstract class Z3AbstractNumberTheory<N extends Z3NumberFormula> extends 
 
     protected abstract createTypedWrapper(ast: Z3_ast): N;
 
+    abstract castFrom(from: AbstractNumber): N;
+
     abstract toFloatFormula(from: N): Z3FloatFormula;
 
     abstract toIntegerFormula(from: N): Z3IntegerFormula;
@@ -259,6 +261,7 @@ export abstract class Z3AbstractNumberTheory<N extends Z3NumberFormula> extends 
 
     abstract plus(op1: N, op2: N): N;
 
+
 }
 
 export class Z3RealTheory extends Z3AbstractNumberTheory<Z3RealFormula>
@@ -270,6 +273,17 @@ export class Z3RealTheory extends Z3AbstractNumberTheory<Z3RealFormula>
 
     private makeFpaRoundingStrategy(): Z3_ast {
         return this._ctx.mk_fpa_round_nearest_ties_to_even();
+    }
+
+    castFrom(from: AbstractNumber): Z3RealFormula {
+        if (from instanceof Z3IntegerFormula) {
+            return new Z3RealFormula(this._ctx.mk_int2real(from.getAST()));
+
+        } else if (from instanceof Z3FloatFormula) {
+            return new Z3RealFormula(this._ctx.mk_fpa_to_real(from.getAST()));
+        }
+
+        throw new ImplementMeForException(from.constructor.name);
     }
 
     fromConcreteString(from: ConcreteString): Z3RealFormula {
@@ -375,8 +389,12 @@ export class Z3FloatTheory extends Z3AbstractNumberTheory<Z3FloatFormula>
         return new Z3FloatFormula(ast);
     }
 
+    castFrom(from: AbstractNumber): Z3FloatFormula {
+        throw new ImplementMeForException(from.constructor.name);
+    }
+
     toFloatFormula(from: Z3FloatFormula): Z3FloatFormula {
-        throw new ImplementMeException();
+        return from;
     }
 
     toIntegerFormula(from: Z3FloatFormula): Z3IntegerFormula {
@@ -462,6 +480,14 @@ export class Z3IntegerTheory extends Z3AbstractNumberTheory<Z3IntegerFormula>
 
     makeTheorySort(): Z3_sort {
         return this._ctx.mk_int_sort();
+    }
+
+    castFrom(from: AbstractNumber): Z3IntegerFormula {
+        if (from instanceof Z3RealFormula) {
+            return new Z3IntegerFormula(this._ctx.mk_real2int(from.getAST()));
+        }
+
+        throw new ImplementMeForException(from.constructor.name);
     }
 
     protected createTypedWrapper(ast: Z3_ast): Z3IntegerFormula {
