@@ -42,6 +42,7 @@ import {SMTFirstOrderLattice} from "../../../procedures/domains/FirstOrderDomain
 import {Z3ProverEnvironment} from "./Z3SMT";
 import {Variable} from "../../../syntax/ast/core/Variable";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;
 
@@ -267,8 +268,14 @@ export class Z3RealTheory extends Z3AbstractNumberTheory<Z3RealFormula>
         super(ctx);
     }
 
+    private makeFpaRoundingStrategy(): Z3_ast {
+        return this._ctx.mk_fpa_round_nearest_ties_to_even();
+    }
+
     fromConcreteString(from: ConcreteString): Z3RealFormula {
-        throw new ImplementMeException();
+        return this.createTypedWrapper(
+            this._ctx.mk_fpa_to_real(
+                this._ctx.mk_numeral(from.value, this.makeTheorySort())));
     }
 
     protected createTypedWrapper(ast: Z3_ast): Z3RealFormula {
@@ -284,11 +291,11 @@ export class Z3RealTheory extends Z3AbstractNumberTheory<Z3RealFormula>
     }
 
     toIntegerFormula(from: Z3RealFormula): Z3IntegerFormula {
-        throw new ImplementMeException();
+        return new Z3IntegerFormula(this._ctx.mk_real2int(from.getAST()));
     }
 
     toRealFormula(from: Z3RealFormula): Z3RealFormula {
-        throw new ImplementMeException();
+        return from;
     }
 
     toStringFormula(from: Z3RealFormula): Z3StringFormula {
@@ -377,7 +384,7 @@ export class Z3FloatTheory extends Z3AbstractNumberTheory<Z3FloatFormula>
     }
 
     toRealFormula(from: Z3FloatFormula): Z3RealFormula {
-        throw new ImplementMeException();
+        return new Z3RealFormula(this._ctx.mk_fpa_to_real(from.getAST()));
     }
 
     toStringFormula(from: Z3FloatFormula): Z3StringFormula {
@@ -385,7 +392,7 @@ export class Z3FloatTheory extends Z3AbstractNumberTheory<Z3FloatFormula>
     }
 
     fromConcreteString(from: ConcreteString): Z3FloatFormula {
-        throw new ImplementMeException();
+        return this.createTypedWrapper(this._ctx.mk_numeral(from.value, this.makeTheorySort()));
     }
 
     protected makeTheorySort(): Z3_sort {
@@ -475,15 +482,15 @@ export class Z3IntegerTheory extends Z3AbstractNumberTheory<Z3IntegerFormula>
     }
 
     toIntegerFormula(from: Z3IntegerFormula): Z3IntegerFormula {
-        throw new ImplementMeException();
+        return from;
     }
 
     toRealFormula(from: Z3IntegerFormula): Z3RealFormula {
-        throw new ImplementMeException();
+        return new Z3RealFormula(this._ctx.mk_int2real(from.getAST()));
     }
 
     toStringFormula(from: Z3IntegerFormula): Z3StringFormula {
-        throw new ImplementMeException();
+        return new Z3StringFormula(this._ctx.mk_int_to_str(from.getAST()));
     }
 
     divide(op1: Z3IntegerFormula, op2: Z3IntegerFormula): Z3IntegerFormula {

@@ -28,7 +28,13 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {DataTransferRelation} from "./DataTransferRelation";
 import {ConcreteMemory} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
-import {AbstractTheories} from "../../domains/MemoryTransformer";
+import {
+    AbstractNumber,
+    AbstractTheories,
+    BooleanTheory, FloatTheory, IntegerTheory, ListTheory,
+    NumberTheory, RealTheory, StringTheory,
+    TransformerTheories
+} from "../../domains/MemoryTransformer";
 import {
     BooleanFormula,
     FirstOrderFormula, FloatFormula, IntegerFormula,
@@ -49,6 +55,7 @@ import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {MergeJoinOperator, MergeSepOperator, StandardMergeOperatorFactory} from "../Operators";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
 
 
 export class DataAnalysisConfig extends BastetConfiguration {
@@ -61,8 +68,69 @@ export class DataAnalysisConfig extends BastetConfiguration {
         return this.getStringProperty('merge-operator', 'JOIN');
     }
 
-    get encodeAllNumbersAsFloats(): boolean {
-        return this.getBoolProperty('encode-all-numbers-as-floats', true);
+    get encodeFloatsAs(): string {
+        return this.getStringProperty('encode-floats-as', "Reals");
+    }
+
+}
+
+export class Theories implements TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula> {
+
+    private readonly _wrapped: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
+
+    private readonly _encodeFloatsAs: RealTheory<AbstractNumber, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula>;
+
+    constructor(encodeFloatsAs: string, wrapped: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
+        this._wrapped = Preconditions.checkNotUndefined(wrapped);
+        if (encodeFloatsAs.toUpperCase() == "REALS") {
+            this._encodeFloatsAs = this._wrapped.realTheory;
+        } else if (encodeFloatsAs.toUpperCase() == "FLOATS") {
+            this._encodeFloatsAs = this._wrapped.floatTheory;
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    get boolTheory(): BooleanTheory<BooleanFormula> {
+        return this._wrapped.boolTheory;
+    }
+
+    get floatTheory(): FloatTheory<FloatFormula, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
+        return this._wrapped.floatTheory;
+    }
+
+    get intTheory(): IntegerTheory<IntegerFormula, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
+        return this._wrapped.intTheory;
+    }
+
+    get listTheory(): ListTheory<ListFormula> {
+        return this._wrapped.listTheory;
+    }
+
+    get realTheory(): RealTheory<RealFormula, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
+        return this._wrapped.realTheory;
+    }
+
+    get stringTheory(): StringTheory<StringFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula> {
+        return this._wrapped.stringTheory;
+    }
+
+    getNumberTheoryFor(t: ScratchType): NumberTheory<AbstractNumber, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
+        if (t == IntegerType.instance()) {
+            return this.intTheory;
+        } else if (t == FloatType.instance()) {
+            return this._encodeFloatsAs;
+        }
+
+        throw new IllegalArgumentException("Unknown number type to map theory to");
+    }
+
+    getNumberTheoryOf(e: AbstractNumber): NumberTheory<AbstractNumber, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
+        return this._wrapped.getNumberTheoryOf(e);
+    }
+
+    simplify(element: FirstOrderFormula): FirstOrderFormula {
+        return this._wrapped.simplify(element);
     }
 
 }
@@ -70,7 +138,7 @@ export class DataAnalysisConfig extends BastetConfiguration {
 export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState, AbstractState>,
     LabeledTransferRelation<DataAbstractState> {
 
-    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
+    private readonly _theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
 
     private readonly _abstractDomain: DataAbstractDomain;
 
@@ -91,7 +159,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         Preconditions.checkNotUndefined(propLattice);
 
         this._config = new DataAnalysisConfig(config);
-        this._theories = Preconditions.checkNotUndefined(theories);
+        this._theories = new Theories(this._config.encodeFloatsAs, Preconditions.checkNotUndefined(theories));
         this._abstractDomain = new DataAbstractDomain(folLattice, propLattice);
         this._transferRelation = new DataTransferRelation(this._abstractDomain, this._theories);
         this._refiner = new DataRefiner(this._abstractDomain.lattice);

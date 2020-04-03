@@ -322,3 +322,11 @@ export interface AbstractTheories<M extends AbstractMemory, B extends AbstractBo
     getNumberTheoryOf(e: AbstractNumber): NumberTheory<AbstractNumber, I, R, F, B, S>;
 
 }
+
+export interface TransformerTheories<M extends AbstractMemory, B extends AbstractBoolean,
+    I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
+    S extends AbstractString, L extends AbstractList>
+    extends AbstractTheories<M, B, I, R, F, S, L> {
+
+    getNumberTheoryFor(t: ScratchType): NumberTheory<AbstractNumber, I, R, F, B, S>;
+}

@@ -111,7 +111,7 @@ import {
     AbstractTheories,
     AbstractNumber,
     AbstractString,
-    NumberTheory, AbstractFloat, AbstractInteger, AbstractReal
+    NumberTheory, AbstractFloat, AbstractInteger, AbstractReal, TransformerTheories
 } from "../../domains/MemoryTransformer";
 import {
     ActorType,
@@ -146,9 +146,9 @@ export class DataNumExpressionVisitor<B extends AbstractBoolean, I extends Abstr
     F extends AbstractFloat, S extends AbstractString, L extends AbstractList>
     implements CoreNumberExpressionVisitor<AbstractNumber> {
 
-    private readonly _theories: AbstractTheories<B, B, I, R, F, S, L>;
+    private readonly _theories: TransformerTheories<B, B, I, R, F, S, L>;
 
-    constructor(theories: AbstractTheories<B, B, I, R, F, S, L>) {
+    constructor(theories: TransformerTheories<B, B, I, R, F, S, L>) {
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
@@ -186,7 +186,7 @@ export class DataNumExpressionVisitor<B extends AbstractBoolean, I extends Abstr
             return this._theories.intTheory.abstractNumberValue(node);
 
         } else if (node.dataloc.type == FloatType.instance().typeId) {
-            return this._theories.floatTheory.abstractNumberValue(node);
+            return this._theories.getNumberTheoryFor(node.expressionType).abstractNumberValue(node);
 
         } else {
             throw new IllegalArgumentException();
@@ -262,7 +262,7 @@ export class DataNumExpressionVisitor<B extends AbstractBoolean, I extends Abstr
     }
 
     visitFloatLiteral(node: FloatLiteral): AbstractNumber {
-        return this._theories.floatTheory.fromConcreteNumber(new ConcreteNumber(node.num));
+        return this._theories.getNumberTheoryFor(node.expressionType).fromConcreteNumber(new ConcreteNumber(node.num));
     }
 
 }
@@ -272,9 +272,9 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, I extends Abst
     implements CoreBoolExpressionVisitor<B> {
 
     private readonly _base: B;
-    private readonly _theories: AbstractTheories<B, B, I, R, F, S, L>;
+    private readonly _theories: TransformerTheories<B, B, I, R, F, S, L>;
 
-    constructor(theories: AbstractTheories<B, B, I, R, F, S, L>) {
+    constructor(theories: TransformerTheories<B, B, I, R, F, S, L>) {
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
@@ -387,9 +387,9 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, I extends Abst
 export class DataStringExpressionVisitor<B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
     F extends AbstractFloat, S extends AbstractString, L extends AbstractList> implements CoreStringExpressionVisitor<S> {
 
-    private readonly _theories: AbstractTheories<B, B, I, R, F, S, L>;
+    private readonly _theories: TransformerTheories<B, B, I, R, F, S, L>;
 
-    constructor(theories: AbstractTheories<B, B, I, R, F, S, L>) {
+    constructor(theories: TransformerTheories<B, B, I, R, F, S, L>) {
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
@@ -458,9 +458,9 @@ export class DataStringExpressionVisitor<B extends AbstractBoolean, I extends Ab
 
 export class DataListExpressionVisitor implements CoreListExpressionVisitor<AbstractList> {
 
-    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
+    private readonly _theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
 
-    constructor(theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
+    constructor(theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
@@ -484,9 +484,9 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
     implements CoreVisitor<B>, CoreNonCtrlStatementnVisitor<B> {
 
     private readonly _mem: B;
-    private readonly _theories: AbstractTheories<B, B, I, R, F, S, L>;
+    private readonly _theories: TransformerTheories<B, B, I, R, F, S, L>;
 
-    constructor(base: B, theories: AbstractTheories<B, B, I, R, F, S, L>) {
+    constructor(base: B, theories: TransformerTheories<B, B, I, R, F, S, L>) {
         this._mem = Preconditions.checkNotUndefined(base);
         this._theories = Preconditions.checkNotUndefined(theories);
     }

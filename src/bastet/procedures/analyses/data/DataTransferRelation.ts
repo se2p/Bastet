@@ -24,27 +24,26 @@ import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {DataTransformerVisitor} from "./DataTransformerVisitor";
-import {AbstractTheories} from "../../domains/MemoryTransformer";
+import {AbstractTheories, TransformerTheories} from "../../domains/MemoryTransformer";
 import {Preconditions} from "../../../utils/Preconditions";
 import {
     BooleanFormula,
     FirstOrderFormula, FloatFormula, IntegerFormula,
     ListFormula,
-    NumberFormula, RealFormula,
+    RealFormula,
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {Concern} from "../../../syntax/Concern";
-import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 
 export class DataTransferRelation implements LabeledTransferRelation<DataAbstractState> {
 
     private readonly _abstDomain: DataAbstractDomain;
 
-    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
+    private readonly _theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
 
-    constructor(abstDomain: DataAbstractDomain, theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
+    constructor(abstDomain: DataAbstractDomain, theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
         this._abstDomain = Preconditions.checkNotUndefined(abstDomain);
         this._theories = Preconditions.checkNotUndefined(theories);
     }
