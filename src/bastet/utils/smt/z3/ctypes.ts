@@ -1,4 +1,5 @@
 import {assert} from "./util"
+import {Preconditions} from "../../Preconditions";
 
 type WasmHeap = DataView;
 
@@ -30,7 +31,7 @@ abstract class NumberCType implements CType {
   abstract max(): number;
 
   constructor(arg: number) {
-    assert (arg >= this.min() && arg <= this.max(),
+    Preconditions.checkArgument(arg >= this.min() && arg <= this.max(),
       "Bad number " + arg + " out of range [" + this.min() + "," + this.max() + "]");
     this._val = arg;
   }
@@ -120,6 +121,7 @@ export class Sint64 extends NumberCType {
 }
 
 export class Float extends NumberCType {
+
   sizeof(): number { return 32 };
   min(): number { return -(1<<31); };
   max(): number { return (1<<31)-1; };
