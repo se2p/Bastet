@@ -113,7 +113,7 @@ export class IntegerLiteral extends AbstractNumberExpression {
         if (num == 0) {
             return this.zero();
         }
-        return new FloatLiteral(num);
+        return new IntegerLiteral(num);
     }
 
     get num() {

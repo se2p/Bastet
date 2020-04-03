@@ -530,9 +530,13 @@ role ScratchSprite is ScratchEntity begin
     // See https://en.scratch-wiki.info/wiki/Direction_(value)
     declare direction as int
 
+    declare rotationStyle as string
+
     // Whether or not the sprite is visible (difference to ghost mode!)
     // See https://en.scratch-wiki.info/wiki/Hide_(block)
     declare visible as boolean
+
+    declare draggable as boolean
 
     // Bubble above a ScratchSprite for saying or thinking text for a given duration
     // In Scratch if the bubbleText is empty, the bubble is not visible
@@ -698,6 +702,13 @@ end
 role ScratchStage is ScratchEntity begin
 
     declare current_idx as int
+
+    declare videoTransparency as int
+
+    declare videoState as string
+
+    declare tempo as int
+
     define current_idx as 0
 
     define switchBackdropTo (id: string) begin
