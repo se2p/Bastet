@@ -2,16 +2,24 @@ module ScratchLibrary
 
 role MathActor begin
 
-    define atomic wrapClamp(dir: float, min: float, max: float) begin
+    // WrampClamp function takes a value and makes sure it is within the given bounds
+    // param value: float - the value that will be wrapped
+    // param min: float - the lower bound
+    // param max: flaot - the upper bound
+    // return result: float - the wrapped value
+    define atomic wrapClamp(value: float, min: float, max: float) begin
         declare range as float
         define range as ((max - min) + 1.0)
-        define result as (dir - (mathFloor((dir - min) / range) * range))
+        define result as (value - (mathFloor((value - min) / range) * range))
     end returns result : float
 
     define atomic mathFloor (n: int) begin
         define result as (n - (n mod 1))
     end returns result : int
 
+    // mathAtan approximates the Atan value in degrees for a given "real" value
+    // param n : float - the real value for which the Atan value is approximated
+    // return result: float - the approximated interval of the Atan value
     define atomic mathAtan(n: float) begin
         if n < 0.0-9.0 then begin
             assume result > 0.0-90.0
@@ -50,6 +58,12 @@ role MathActor begin
 
     end returns result: float
 
+    // mathAtan2 approximates the Atan2 value in degrees for two given "real" numbers.
+    // The result is the angle between the positive x-axis and ray from (0,0) to (x,y)
+    //
+    // param x : float - x-coordinate of the target point
+    // param y : float - y-coordinate of the target point
+    // return result: float - the approximated interval of the Atan2 value
     define atomic mathAtan2(x: float, y: float) begin
         declare PI as float
         define PI as 3.14159265359
@@ -74,6 +88,10 @@ role MathActor begin
 
     end returns result: float
 
+     // mathCos approximates the cos value for a given degree number
+     //
+     // param alpha : float - degree number for which the cos value will be approximated
+     // return result: float - the approximated interval
     define atomic mathCos(alpha: float) begin
         define alpha as wrapClamp(alpha, 0, 360)
 
@@ -114,7 +132,11 @@ role MathActor begin
 
     end returns result: float
 
-    define atomic mathSin(alpha: int) begin
+    // mathSin approximates the sin value for a given degree number
+    //
+    // param alpha : float - degree number for which the sin value will be approximated
+    // return result: float - the approximated interval
+    define atomic mathSin(alpha: int) begin // TODO should be a float
         define alpha as wrapClamp(alpha, 0, 360)
 
         if alpha > (0-1) and alpha < 36 then begin
@@ -154,49 +176,23 @@ role MathActor begin
 
     end returns result: float
 
-    define atomic radToDeg(rad: int) begin
-        declare PI as int
+    // radToDeg calculates the degree value for a given radians valuenumber
+    //
+    // param rad: float - radians number for which the degree value will be calculated
+    // return result: float - the calculated degree value
+    define atomic radToDeg(rad: int) begin // TODO I think this needs to be a float
+        declare PI as int // TODO I think this needs to be a float
         define PI as 3.14159265359
 
         define result as ((deg * PI) / 180)
-
-        // Todo: isn't this more useful as a simple calculation?
-    //        declare negated as boolean
-    //        if rad < 0 then begin
-    //            define rad as (0-rad)
-    //            define negated as true
-    //        end
-    //
-    //        declare lower as int
-    //        declare upper as int
-    //        declare step as int
-    //
-    //        define step as 0.628
-    //        define lower as 0
-    //        define upper as step
-    //
-    //        define rad as rad - 36
-    //        until rad < 0 repeat begin
-    //            define lower as lower + step
-    //            define upper as upper + step + 0.001
-    //            define rad as rad - 36
-    //        end
-    //
-    //        if negated then begin
-    //            define lower as (0 - lower)
-    //            define upper as (0 - upper)
-    //
-    //            assume result < lower
-    //            assume result > upper
-    //        end else begin
-    //            assume result > lower
-    //            assume result < upper
-    //        end
-
     end returns result: int
 
-    define atomic degToRad(deg: int) begin
-        declare PI as int
+    // degToRad calculates the radians value for a given degree value
+    //
+    // param deg: float - degree number for which the radians value will be calculated
+    // return result: float - the calculated radians value
+    define atomic degToRad(deg: int) begin // TODO I think this needs to be a float
+        declare PI as int // TODO I think this needs to be a float
         define PI as 3.14159265359
         define result as (rad * PI) / 180
     end returns result: int
