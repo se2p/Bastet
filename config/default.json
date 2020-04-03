@@ -9,7 +9,7 @@
     },
 
     "DataAnalysis": {
-        "encode-all-numbers-as-floats": true
+        "encode-floats-as": "Reals"
     },
 
     "GraphAnalysis": {

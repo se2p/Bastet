@@ -288,8 +288,7 @@ export class Z3RealTheory extends Z3AbstractNumberTheory<Z3RealFormula>
 
     fromConcreteString(from: ConcreteString): Z3RealFormula {
         return this.createTypedWrapper(
-            this._ctx.mk_fpa_to_real(
-                this._ctx.mk_numeral(from.value, this.makeTheorySort())));
+            this._ctx.mk_numeral(from.value, this.makeTheorySort()));
     }
 
     protected createTypedWrapper(ast: Z3_ast): Z3RealFormula {
@@ -321,8 +320,7 @@ export class Z3RealTheory extends Z3AbstractNumberTheory<Z3RealFormula>
     }
 
     fromConcreteNumber(str: ConcreteNumber): Z3RealFormula {
-        return this.createTypedWrapper(
-            this._ctx.mk_fpa_numeral_float(new Float(str.value), this.makeTheorySort()));
+        return this.fromConcreteString(new ConcreteString(str.value.toString()));
     }
 
     isGreaterThan(op1: Z3RealFormula, op2: Z3RealFormula): Z3BooleanFormula {
