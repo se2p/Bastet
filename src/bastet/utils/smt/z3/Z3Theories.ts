@@ -261,6 +261,9 @@ export abstract class Z3AbstractNumberTheory<N extends Z3NumberFormula> extends 
 
     abstract plus(op1: N, op2: N): N;
 
+    abstract power(op1: N, op2: N): N;
+
+    abstract sqrt(op1: N): N;
 
 }
 
@@ -341,6 +344,14 @@ export class Z3RealTheory extends Z3AbstractNumberTheory<Z3RealFormula>
 
     isNumberEqualTo(op1: Z3RealFormula, op2: Z3RealFormula): Z3BooleanFormula {
         return new Z3BooleanFormula(this._ctx.mk_eq(op1.getAST(), op2.getAST()));
+    }
+
+    power(op1: Z3RealFormula, op2: Z3RealFormula): Z3RealFormula {
+        return this.createTypedWrapper(this._ctx.mk_power(op1.getAST(), op2.getAST()));
+    }
+
+    sqrt(op1: Z3RealFormula): Z3RealFormula {
+        return this.power(op1, this.fromConcreteNumber(new ConcreteNumber(0.5)));
     }
 
     minus(op1: Z3RealFormula, op2: Z3RealFormula): Z3RealFormula {
@@ -441,6 +452,14 @@ export class Z3FloatTheory extends Z3AbstractNumberTheory<Z3FloatFormula>
         return new Z3BooleanFormula(this._ctx.mk_fpa_eq(s1.getAST(), s2.getAST()));
     }
 
+    power(op1: Z3FloatFormula, op2: Z3FloatFormula): Z3FloatFormula {
+        throw new ImplementMeException();
+    }
+
+    sqrt(op1: Z3FloatFormula): Z3FloatFormula {
+        return this.createTypedWrapper(this._ctx.mk_fpa_sqrt(this.makeRoundingStrategy(), op1.getAST()));
+    }
+
     minus(op1: Z3FloatFormula, op2: Z3FloatFormula): Z3FloatFormula {
         const minusAst = this._ctx.mk_unary_minus(op2.getAST());
         // 'Minus' adds a negative number
@@ -531,6 +550,15 @@ export class Z3IntegerTheory extends Z3AbstractNumberTheory<Z3IntegerFormula>
 
     isNumberEqualTo(s1: Z3IntegerFormula, s2: Z3IntegerFormula): Z3BooleanFormula {
         return new Z3BooleanFormula(this._ctx.mk_eq(s1.getAST(), s2.getAST()));
+    }
+
+    power(op1: Z3IntegerFormula, op2: Z3IntegerFormula): Z3IntegerFormula {
+        return this.createTypedWrapper(this._ctx.mk_power(op1.getAST(), op2.getAST()));
+    }
+
+    sqrt(op1: Z3IntegerFormula): Z3IntegerFormula {
+        throw new ImplementMeException();
+        // return this.power(op1, this.fromConcreteNumber(new ConcreteNumber(0.5)));
     }
 
     minus(op1: Z3IntegerFormula, op2: Z3IntegerFormula): Z3NumberFormula {

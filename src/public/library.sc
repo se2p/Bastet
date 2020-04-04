@@ -255,7 +255,7 @@ role RuntimeEntity is MathActor begin
     extern randomBetween (intervalStart: int, intervalEnd: int) returns int
 
     // TODO: Maybe add an approximation for sqrt
-    extern mathSqrt (n: int) returns float
+    extern mathSqrt (n: float) returns float
 
     extern mathAbs (n: int) returns int
 

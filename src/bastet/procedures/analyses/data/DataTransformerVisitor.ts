@@ -142,6 +142,7 @@ import {
 } from "../../../syntax/ast/core/statements/InternalStatement";
 import {DataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {Float} from "../../../utils/smt/z3/ctypes";
+import {getTheOnlyElement} from "../../../utils/Collections";
 
 abstract class TransformingVisitor<RT, B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
     F extends AbstractFloat, S extends AbstractString, L extends AbstractList> implements CoreVisitor<RT> {
@@ -505,7 +506,20 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
             return this._mem;
         } else if (method.startsWith("_RUNTIME_")) {
             throw new ImplementMeForException(method);
+        } else if (method == "mathSqrt") {
+            if (node.assignResultTo.isPresent()) {
+                const dataLoc: DataLocation = node.assignResultTo.value().dataloc;
+                const theory = this.numberTheoryFor(dataLoc);
+                const assignTo = theory.abstractNumberValue(node.assignResultTo.value());
+                const assume: B = theory.isNumberEqualTo(assignTo,
+                    theory.sqrt(getTheOnlyElement(node.args.elements).accept(
+                        this.createVisitorByType(ScratchType.fromId(dataLoc.type)))));
+                return this._theories.boolTheory.and(this._mem, assume);
+            }
+        } else if (method.startsWith("math")) {
+            throw new ImplementMeForException(method);
         }
+
         return this._mem;
     }
 

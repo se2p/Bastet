@@ -217,6 +217,10 @@ export interface NumberTheory<N extends AbstractNumber, I extends AbstractIntege
 
     bottomNumber(): N;
 
+    power(op1: N, op2: N): N;
+
+    sqrt(op1: N): N;
+
     multiply(op1: N, op2: N): N;
 
     divide(op1: N, op2: N): N;
