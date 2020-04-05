@@ -1207,7 +1207,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(IntegerLiteral.fromString(ctx.IntegerLiteral().text));
     }
 
-    private declareFreshBooleanVariable(value: boolean): TTransformerResult<BooleanVariableExpression> {
+    private declareFreshBooleanVariable(value: boolean, addInit: boolean): TTransformerResult<BooleanVariableExpression> {
         const resultVarIdent: Identifier = Identifier.fresh();
         const resultVar = new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, BooleanType.instance()));
         const resultVarExpr = new BooleanVariableExpression(resultVar);
@@ -1217,7 +1217,10 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         this._activeDeclarationScope.putVariable(resultVar);
 
         let prepend: StatementList = StatementList.empty();
-        prepend = StatementLists.concat(prepend, StatementList.from([declareVarStmt, initStmt]));
+        prepend = StatementLists.concat(prepend, StatementList.from([declareVarStmt]));
+        if (addInit) {
+            prepend = StatementLists.concat(prepend, StatementList.from([initStmt]));
+        }
 
         return new TTransformerResult(prepend, resultVarExpr);
     }
@@ -1238,7 +1241,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         // Goal: Evaluate the second argument only if the first evaluates to true
         let prepend = StatementList.empty();
 
-        const varTr = this.declareFreshBooleanVariable(false);
+        const varTr = this.declareFreshBooleanVariable(false, false);
         prepend = StatementLists.concat(prepend, varTr.statementsToPrepend);
 
         const tr1eval = this.evaluateIntoBooleanVariable(varTr.node, this.getOperand1(ctx));
@@ -1277,7 +1280,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         // Goal: Evaluate the second argument only if the first evaluates to FALSE
         let prepend = StatementList.empty();
 
-        const varTr = this.declareFreshBooleanVariable(false);
+        const varTr = this.declareFreshBooleanVariable(false, false);
         prepend = StatementLists.concat(prepend, varTr.statementsToPrepend);
 
         const tr1eval = this.evaluateIntoBooleanVariable(varTr.node, this.getOperand1(ctx));
