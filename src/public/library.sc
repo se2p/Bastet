@@ -55,7 +55,7 @@ role MathActor begin
             assume result < 90.0
         end else begin
             // got invalid input
-            _RUNTIME_signalFailure()
+            _RUNTIME_signalFailure("mathAtan")
         end
 
     end returns result: float
@@ -85,7 +85,7 @@ role MathActor begin
             define result as (0.0 - (PI / 2.0))
         end else begin
             // not defined for (0.0, 0.0)
-            _RUNTIME_signalFailure()
+            _RUNTIME_signalFailure("mathAtan2")
         end
 
     end returns result: float
@@ -129,7 +129,7 @@ role MathActor begin
             assume result < 0.0-0.284
         end else begin
             // got invalid input
-            _RUNTIME_signalFailure()
+            _RUNTIME_signalFailure("mathCos")
         end
 
     end returns result: float
@@ -173,7 +173,7 @@ role MathActor begin
             assume result < 0.959
         end else begin
             // got invalid input
-            _RUNTIME_signalFailure()
+            _RUNTIME_signalFailure("mathSin")
         end
 
     end returns result: float
@@ -348,7 +348,7 @@ role RuntimeEntity is MathActor begin
     // @Category "Specification"
     define atomic assert (condition: boolean) begin
         if not condition then begin
-            _RUNTIME_signalFailure()
+            _RUNTIME_signalFailure("Asserted property must be satisfied!")
         end
     end
 
