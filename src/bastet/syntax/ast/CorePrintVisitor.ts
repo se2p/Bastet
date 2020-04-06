@@ -51,7 +51,7 @@ import {
     TimerExpression
 } from "./core/expressions/NumberExpression";
 import {
-    BoolAsStringExpression,
+    BoolAsStringExpression, extractStringLiteral,
     IthLetterOfStringExpression,
     IthStringItemOfExpression,
     JoinStringsExpression,
@@ -108,7 +108,7 @@ import {
 import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
-import {SystemMessage} from "./core/Message";
+import {SystemMessage, UserMessage} from "./core/Message";
 import {InitializeAnalysisStatement, SignalTargetReachedStatement} from "./core/statements/InternalStatement";
 import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
 
@@ -122,6 +122,10 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
 
     visitReturnStatement(node: ReturnStatement): string {
         return 'RETURN';
+    }
+
+    visitUserMessage(node: UserMessage): string {
+        return node.messageid.accept(this);
     }
 
     visitSignalTargetReachedStatement(node: SignalTargetReachedStatement): string {
