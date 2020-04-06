@@ -744,8 +744,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         for (let e of ctx.actorDefinition()) {
            const adc: ActorDefinitionContext = e as ActorDefinitionContext;
            const actorName = adc.ident().text;
-           for (let id of adc.inheritsFrom().ident()) {
-               result.push([actorName, id.text]);
+           if (adc.inheritsFrom().ident().length == 0) {
+                result.push([actorName, null]);
+           } else {
+               for (let id of adc.inheritsFrom().ident()) {
+                   result.push([actorName, id.text]);
+               }
            }
         }
         return result;
@@ -758,7 +762,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         for (let acd of ctx.actorDefinition()) {
             nameToActorMap[acd.ident().text] = acd;
         }
-        return sorted
+        return sorted.filter((n) => n != null)
             .filter((name) => nameToActorMap[name])
             .map((name) => nameToActorMap[name]);
     }
