@@ -1,5 +1,9 @@
 {
 
+    "MainAnalysis": {
+        "print-statistics": true
+    },
+
     "Transformer": {
         "use-busy-waiting": false
     },

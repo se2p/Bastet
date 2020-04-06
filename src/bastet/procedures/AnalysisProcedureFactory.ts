@@ -40,10 +40,25 @@ import {TimeAnalysis} from "./analyses/time/TimeAnalysis";
 import {StaticTimeProfile} from "../utils/TimeProfile";
 import {AbstractState} from "../lattices/Lattice";
 import {ConcreteElement} from "./domains/ConcreteElements";
+import {BastetConfiguration} from "../utils/BastetConfiguration";
+
+export class MainAnalysisConfig extends BastetConfiguration {
+
+    constructor(dict: {}) {
+        super(dict, ['MainAnalysis']);
+    }
+
+    get printStatistics(): boolean {
+        return this.getBoolProperty('print-statistics', true);
+    }
+
+}
 
 export class AnalysisProcedureFactory {
 
     public static async createAnalysisProcedure(config: {}): Promise<AnalysisProcedure> {
+        const mainConfig = new MainAnalysisConfig(config);
+
         return new class implements AnalysisProcedure {
 
             private _statistics: AnalysisStatistics;
@@ -87,15 +102,18 @@ export class AnalysisProcedureFactory {
                 return this._result;
             }
 
-            private onAnalysisResult(violated: ImmSet<Property>, satisifed: ImmSet<Property>, unknowns: ImmSet<Property>, mpaStatistics: AnalysisStatistics) {
+            private onAnalysisResult(violated: ImmSet<Property>, satisifed: ImmSet<Property>, unknowns: ImmSet<Property>,
+                                     mpaStatistics: AnalysisStatistics) {
                 const analysisDurtionMSec = mpaStatistics.contextTimer.totalDuration.toFixed(3);
 
                 mpaStatistics.put("num_violated", violated.size);
                 mpaStatistics.put("num_unknown", unknowns.size);
                 mpaStatistics.put("num_satisfied", satisifed.size);
 
-                console.log("\n## Statistics #################################################\n");
-                console.log(this._statistics.stringifyToJSON());
+                if (mainConfig.printStatistics) {
+                    console.log("\n## Statistics #################################################\n");
+                    console.log(this._statistics.stringifyToJSON());
+                }
 
                 const printPropertySetAs = function(role: string, set: ImmSet<Property>) {
                     if (!set.isEmpty()) {
