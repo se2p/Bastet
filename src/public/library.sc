@@ -185,8 +185,7 @@ role MathActor begin
     define atomic radToDeg(rad: float) begin
         declare PI as float
         define PI as 3.14159265359
-
-        define result as ((deg * PI) / 180.0)
+        define result as ((rad * 180.0) / PI)
     end returns result: float
 
     // degToRad calculates the radians value for a given degree value
@@ -196,7 +195,7 @@ role MathActor begin
     define atomic degToRad(deg: float) begin
         declare PI as float
         define PI as 3.14159265359
-        define result as (rad * PI) / 180.0
+        define result as (deg * PI) / 180.0
     end returns result: float
 
 end
