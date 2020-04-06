@@ -3,7 +3,7 @@ program Mini1Program
 actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
-        declare x as number
+        declare x as int
         define x as 1
         if x < 2 then begin
             _RUNTIME_signalFailure()

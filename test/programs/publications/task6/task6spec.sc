@@ -98,7 +98,7 @@ actor DirectorObserver is Observer begin
         end
 
         // The actual invariant check
-        if _RUNTIME_micros() - last_change > 10 then begin
+        if _RUNTIME_micros() - last_change > 100000 then begin
             define result as false
         end
 

@@ -4,20 +4,20 @@ actor DirexObserver is Observer begin
 
     declare direx as actor
 
-    declare last_x as number
-    declare last_x_change as number
+    declare last_x as int
+    declare last_x_change as int
 
     define last_x as (0-1)
 
     define atomic storeRelevantStateInfosForNext () begin
-        define last_x as cast attribute "x" of direx to number
+        define last_x as cast attribute "x" of direx to int
     end
 
     define atomic isBehaviorSatisfied () begin
         define result as true
 
-        declare curr as number
-        define curr as cast attribute "x" of direx to number
+        declare curr as int
+        define curr as cast attribute "x" of direx to int
 
         if (not last_x = curr) then begin
             define last_x_change as _RUNTIME_millis()
@@ -45,7 +45,7 @@ end
 
 actor Direx is RuntimeEntity begin
 
-    declare x as number
+    declare x as int
     define x as 0
 
     script on startup do begin

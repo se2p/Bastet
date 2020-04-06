@@ -2,7 +2,7 @@ program Mini1Program
 
 actor Stage is RuntimeEntity begin
 
-    declare x as number
+    declare x as int
 
 end
 

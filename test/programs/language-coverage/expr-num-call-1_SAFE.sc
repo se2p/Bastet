@@ -2,12 +2,12 @@ program Mini1Program
 
 actor MiniActor is RuntimeEntity begin
 
-    define inc (par: number) begin
+    define inc (par: int) begin
         define result as par + 1
-    end returns result: number
+    end returns result: int
 
     script on startup do begin
-        declare x as number
+        declare x as int
         define x as 41
         if inc (x) = 42 then begin
         end else begin

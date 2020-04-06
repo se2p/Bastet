@@ -5,8 +5,8 @@ actor MiniActor is RuntimeEntity begin
     script on startup do begin
         declare s as string
         define s as "41"
-        declare x as number
-        define x as (cast s to number) + 1
+        declare x as int
+        define x as (cast s to int) + 1
         if x = 42 then begin
             _RUNTIME_signalFailure()
         end

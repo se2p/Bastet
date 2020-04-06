@@ -3,8 +3,8 @@ program Mini1Program
 actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
-        declare x as number
-        declare y as number
+        declare x as int
+        declare y as int
 
         define x as 42
         define y as x

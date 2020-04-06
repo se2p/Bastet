@@ -5,9 +5,14 @@ NAME_PREFIX="$1"
 TEST_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 BASTET_ROOT="../../../"
 
+echo "FILTER: $NAME_PREFIX"
+
 cd $BASTET_ROOT
 
-npm run build
+if [ -z $BASTET_NO_BUILD ]
+then
+    npm run build
+fi
 
 grep_statistic () {
     CONTEXT="$1"
@@ -65,7 +70,7 @@ parse_results () {
     fi
 }
 
-for f in $(find $TEST_DIR -name "*${NAME_PREFIX}*.sc" | sort)
+for f in $(find $TEST_DIR -name "*${NAME_PREFIX}*" -and -name "*.sc" | sort)
 do
     RESULT_FILE=$(mktemp)
     printf "`basename $f`"

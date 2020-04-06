@@ -4,7 +4,7 @@ actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
         declare s as string
-        declare n as number
+        declare n as int
 
         define n as 42
         define s as cast n to string

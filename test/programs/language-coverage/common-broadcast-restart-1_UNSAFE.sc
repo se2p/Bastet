@@ -2,8 +2,8 @@ program Mini1Program
 
 actor MiniActor is RuntimeEntity begin
 
-    declare r as number
-    declare x as number
+    declare r as int
+    declare x as int
 
     define x as 0
     define r as 0

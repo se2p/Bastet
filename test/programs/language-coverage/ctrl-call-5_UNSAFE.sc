@@ -3,8 +3,8 @@ program Mini1Program
 actor MiniActor is RuntimeEntity begin
 
     define atomic check () begin
-        declare a as number
-        declare b as number
+        declare a as int
+        declare b as int
 
         define a as 1
         define b as 2
@@ -16,7 +16,7 @@ actor MiniActor is RuntimeEntity begin
         if not cond then begin
             _RUNTIME_signalFailure("This must not happen!")
         end
-    end returns result: number
+    end returns result: int
 
     script on startup do begin
         assert(check())

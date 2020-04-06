@@ -2,7 +2,7 @@ program Mini1Program
 
 actor MiniActor1 is RuntimeEntity begin
 
-    declare x as number
+    declare x as int
     define x as 0
 
     script on startup do begin
