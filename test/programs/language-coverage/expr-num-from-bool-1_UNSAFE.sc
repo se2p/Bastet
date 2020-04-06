@@ -7,7 +7,7 @@ actor MiniActor is RuntimeEntity begin
         define b as true
         declare x as int
         define x as (cast b to int)
-        if x = 0 then begin
+        if not (x = 0) then begin
             _RUNTIME_signalFailure()
         end
     end
