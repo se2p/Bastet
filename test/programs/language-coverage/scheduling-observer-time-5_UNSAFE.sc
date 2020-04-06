@@ -19,11 +19,15 @@ actor DirexObserver is Observer begin
         declare curr as int
         define curr as cast attribute "x" of direx to int
 
-        if (not last_x = curr) then begin
+        if not (last_x = curr) then begin
             define last_x_change as _RUNTIME_millis()
         end
 
         if _RUNTIME_millis() - last_x_change > 100 then begin
+            define result as false
+        end
+
+        if (curr < 2) then begin
             define result as false
         end
     end returns result: boolean
@@ -50,9 +54,7 @@ actor Direx is RuntimeEntity begin
 
     script on startup do begin
         define x as x + 1
-        waitMillis(300)
-        define x as x + 1
-        define x as x + 1
+        wait 1 seconds
         define x as x + 1
     end
 

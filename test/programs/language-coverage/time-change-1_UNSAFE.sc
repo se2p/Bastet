@@ -47,6 +47,7 @@ actor Direx is RuntimeEntity begin
     script on startup do begin
         define x as x + 1
         define x as x + 1
+        define x as x + 1
     end
 
 end
