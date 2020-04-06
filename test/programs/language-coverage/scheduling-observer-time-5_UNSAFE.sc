@@ -19,16 +19,15 @@ actor DirexObserver is Observer begin
         declare curr as int
         define curr as cast attribute "x" of direx to int
 
-        if not (last_x = curr) then begin
-            define last_x_change as _RUNTIME_millis()
-        end
+        declare changed as boolean
+        define changed as not (last_x = curr)
 
         if _RUNTIME_millis() - last_x_change > 100 then begin
             define result as false
         end
 
-        if (curr < 2) then begin
-            define result as false
+        if changed then begin
+            define last_x_change as _RUNTIME_millis()
         end
     end returns result: boolean
 
