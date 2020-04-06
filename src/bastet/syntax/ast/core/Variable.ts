@@ -75,7 +75,8 @@ export class VariableWithDataLocation extends AbstractExpression implements Vari
 
     constructor(dataloc: DataLocation) {
         const ident = Identifier.of(dataloc.ident);
-        super(ScratchType.fromId(dataloc.type), [new QualifiedVariableName(dataloc.qualifiedName)]);
+        const type = ScratchType.fromId(dataloc.type);
+        super(type, [new QualifiedVariableName(dataloc.qualifiedName), type]); // IMPORTANT: Include the type as AST child! Important for using this var as cache key
         this._dataloc = dataloc;
         this._identifier = ident;
     }

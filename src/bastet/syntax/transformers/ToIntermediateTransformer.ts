@@ -594,15 +594,25 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
         for (let md of ctx.methodDefinition().map((m) => this.toMethodDef(m))) {
             const identTr = md.ident().accept(this);
-            const paramsTr = md.parameterList().accept(this);
-            const resultTr = md.methodResultDeclaration().accept(this);
+
+            let paramsTr;
+            let resultTr;
+
+            const methodName = md.ident().text;
+
+            this._activeDeclarationScope = this._activeDeclarationScope.beginMethodScope(methodName);
+            try {
+                paramsTr = md.parameterList().accept(this);
+                resultTr = md.methodResultDeclaration().accept(this);
+            } finally {
+                this._activeDeclarationScope = this._activeDeclarationScope.endScope();
+            }
 
             this._activeDeclarationScope.putMethod(new MethodSignature(
                 identTr.nodeOnly(),
                 paramsTr.node as ParameterDeclarationList,
                 resultTr.nodeOnly(),
-                false
-            ));
+                false));
         }
 
         for (let md of ectx.externMethodDefinition()) {

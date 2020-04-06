@@ -48,7 +48,7 @@ export abstract class DeclareVariableStatement extends DeclarationStatement impl
 
     constructor(variable: VariableWithDataLocation) {
         Preconditions.checkNotUndefined(variable);
-        super([variable]);
+        super([variable, variable.variableType]); // Important: Also add the type. To prevent caching problems.
         this._variable = variable;
     }
 
@@ -57,7 +57,7 @@ export abstract class DeclareVariableStatement extends DeclarationStatement impl
     }
 
     get variableType(): ScratchType {
-        return this._variable.expressionType;
+        return this._variable.variableType;
     }
 
     get variable(): VariableWithDataLocation {

@@ -36,6 +36,7 @@ import {
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {Concern} from "../../../syntax/Concern";
+import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 
 export class DataTransferRelation implements LabeledTransferRelation<DataAbstractState> {
 

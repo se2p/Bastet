@@ -4,6 +4,10 @@ actor MiniActor begin
 
     extern _RUNTIME_signalFailure ()
 
+    define atomic dummy (m: float) begin
+        define result as 42.0
+    end returns result: float
+
     define atomic inc (arg: int) begin
         define result as arg + 1
     end returns result: int
