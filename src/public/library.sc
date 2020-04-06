@@ -57,7 +57,6 @@ role MathActor begin
             // got invalid input
             _RUNTIME_signalFailure("mathAtan")
         end
-
     end returns result: float
 
     // mathAtan2 approximates the Atan2 value in degrees for two given "real" numbers.
@@ -85,9 +84,9 @@ role MathActor begin
             define result as (0.0 - (PI / 2.0))
         end else begin
             // not defined for (0.0, 0.0)
-            _RUNTIME_signalFailure("mathAtan2")
+            // but: the JavaScript implementation returns 0
+            define result as 0.0
         end
-
     end returns result: float
 
      // mathCos approximates the cos value for a given degree number
