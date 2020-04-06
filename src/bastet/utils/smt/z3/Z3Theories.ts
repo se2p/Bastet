@@ -617,7 +617,7 @@ export class Z3StringTheory extends Z3Theory implements StringTheory<Z3StringFor
     }
 
     toInteger(from: Z3StringFormula): Z3IntegerFormula {
-        throw new ImplementMeException();
+        return new Z3IntegerFormula(this._ctx.mk_str_to_int(from.getAST()));
     }
 
     toBoolean(from: Z3StringFormula): Z3IntegerFormula {

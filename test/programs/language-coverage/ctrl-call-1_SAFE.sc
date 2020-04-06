@@ -1,9 +1,11 @@
 program Mini1Program
 
-actor MiniActor is RuntimeEntity begin
+actor MiniActor begin
 
-    define atomic inc (n: int) begin
-        define result as n + 1
+    extern _RUNTIME_signalFailure ()
+
+    define atomic inc (arg: int) begin
+        define result as arg + 1
     end returns result: int
 
     script on startup do begin

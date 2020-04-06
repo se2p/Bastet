@@ -7,9 +7,9 @@ import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
 import { FullMethodDefinitionContext } from "./ScratchParser";
 import { RestartScriptContext } from "./ScratchParser";
-import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
 import { ActorTypeContext } from "./ScratchParser";
+import { PrimitiveContext } from "./ScratchParser";
 import { IntegerLiteralExpressionContext } from "./ScratchParser";
 import { DecimalLiteralExpressionContext } from "./ScratchParser";
 import { ConcreteActorModeContext } from "./ScratchParser";
@@ -88,9 +88,8 @@ import { IthLetterOfStringExpressionContext } from "./ScratchParser";
 import { IthStringItemOfExpressionContext } from "./ScratchParser";
 import { DefaultStringExpressionContext } from "./ScratchParser";
 import { UnspecifiedStringExpressionContext } from "./ScratchParser";
-import { NumberTypeContext } from "./ScratchParser";
 import { IntegerTypeContext } from "./ScratchParser";
-import { FloatTypeContext } from "./ScratchParser";
+import { FloatingPointTypeContext } from "./ScratchParser";
 import { BooleanTypeContext } from "./ScratchParser";
 import { StringTypeContext } from "./ScratchParser";
 import { EnumTypeContext } from "./ScratchParser";
@@ -261,19 +260,6 @@ export interface ScratchListener extends ParseTreeListener {
 	exitRestartScript?: (ctx: RestartScriptContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `Primitive`
-	 * labeled alternative in `ScratchParser.type`.
-	 * @param ctx the parse tree
-	 */
-	enterPrimitive?: (ctx: PrimitiveContext) => void;
-	/**
-	 * Exit a parse tree produced by the `Primitive`
-	 * labeled alternative in `ScratchParser.type`.
-	 * @param ctx the parse tree
-	 */
-	exitPrimitive?: (ctx: PrimitiveContext) => void;
-
-	/**
 	 * Enter a parse tree produced by the `ListType`
 	 * labeled alternative in `ScratchParser.type`.
 	 * @param ctx the parse tree
@@ -298,6 +284,19 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitActorType?: (ctx: ActorTypeContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `Primitive`
+	 * labeled alternative in `ScratchParser.type`.
+	 * @param ctx the parse tree
+	 */
+	enterPrimitive?: (ctx: PrimitiveContext) => void;
+	/**
+	 * Exit a parse tree produced by the `Primitive`
+	 * labeled alternative in `ScratchParser.type`.
+	 * @param ctx the parse tree
+	 */
+	exitPrimitive?: (ctx: PrimitiveContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `IntegerLiteralExpression`
@@ -1314,19 +1313,6 @@ export interface ScratchListener extends ParseTreeListener {
 	exitUnspecifiedStringExpression?: (ctx: UnspecifiedStringExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumberType`
-	 * labeled alternative in `ScratchParser.primitiveType`.
-	 * @param ctx the parse tree
-	 */
-	enterNumberType?: (ctx: NumberTypeContext) => void;
-	/**
-	 * Exit a parse tree produced by the `NumberType`
-	 * labeled alternative in `ScratchParser.primitiveType`.
-	 * @param ctx the parse tree
-	 */
-	exitNumberType?: (ctx: NumberTypeContext) => void;
-
-	/**
 	 * Enter a parse tree produced by the `IntegerType`
 	 * labeled alternative in `ScratchParser.primitiveType`.
 	 * @param ctx the parse tree
@@ -1340,17 +1326,17 @@ export interface ScratchListener extends ParseTreeListener {
 	exitIntegerType?: (ctx: IntegerTypeContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `FloatType`
+	 * Enter a parse tree produced by the `FloatingPointType`
 	 * labeled alternative in `ScratchParser.primitiveType`.
 	 * @param ctx the parse tree
 	 */
-	enterFloatType?: (ctx: FloatTypeContext) => void;
+	enterFloatingPointType?: (ctx: FloatingPointTypeContext) => void;
 	/**
-	 * Exit a parse tree produced by the `FloatType`
+	 * Exit a parse tree produced by the `FloatingPointType`
 	 * labeled alternative in `ScratchParser.primitiveType`.
 	 * @param ctx the parse tree
 	 */
-	exitFloatType?: (ctx: FloatTypeContext) => void;
+	exitFloatingPointType?: (ctx: FloatingPointTypeContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `BooleanType`

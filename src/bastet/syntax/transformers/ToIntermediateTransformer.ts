@@ -99,7 +99,6 @@ import {
     NeverEventContext,
     NumAsStringExpressionContext,
     NumberContext,
-    NumberTypeContext,
     NumBracketsContext,
     NumCallStatementExpressionContext,
     NumDivExpressionContext,
@@ -164,14 +163,16 @@ import {
     FullMethodDefinitionContext,
     FlatVariableContext,
     NumAsBoolExpressionContext,
-    FloatTypeContext,
     IntegerTypeContext,
     StringToIntExpressionContext,
     StringToFloatExpressionContext,
     NumToFloatExpressionContext,
     NumToIntExpressionContext,
     BoolToIntExpressionContext,
-    DecimalLiteralExpressionContext, IntegerLiteralExpressionContext
+    DecimalLiteralExpressionContext,
+    IntegerLiteralExpressionContext,
+    PrimitiveContext,
+    FloatingPointTypeContext
 } from "../parser/grammar/ScratchParser";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {Identifier} from "../ast/core/Identifier";
@@ -830,6 +831,10 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(new ResultDeclaration(resultVar));
     }
 
+    public visitPrimitive(ctx: PrimitiveContext): TransformerResult {
+        return ctx.primitiveType().accept(this);
+    }
+
     public visitVoidReturnDefinition(ctx: VoidReturnDefinitionContext): TransformerResult {
         return TransformerResult.withNode(ResultDeclaration.void());
     }
@@ -940,17 +945,20 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         return TransformerResult.withNode(StringEnumType.withValues(ctx.expressionListPlain().accept(this).nodeOnly() as ExpressionList));
     }
 
+    public visitFloatingPointType(ctx: FloatingPointTypeContext): TransformerResult {
+        return TransformerResult.withNode(FloatType.instance());
+    }
+
+    public visitIntegerType(ctx: IntegerTypeContext): TransformerResult {
+        return TransformerResult.withNode(IntegerType.instance());
+    }
+
     public visitStringType(ctx: StringTypeContext): TransformerResult {
         return TransformerResult.withNode(StringType.instance());
     }
 
     public visitListType(ctx: ListTypeContext): TransformerResult {
         return TransformerResult.withNode(ListType.withElementType(ctx.type().accept(this).nodeOnly() as ScratchType));
-    }
-
-    public visitNumberType (ctx: NumberTypeContext): TransformerResult {
-        // From the syntactical perspective, the type 'number' is an alias for 'integer'
-        return TransformerResult.withNode(IntegerType.instance());
     }
 
     public visitActorType (ctx: ActorTypeContext): TransformerResult {
@@ -1189,14 +1197,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitNumVariableExpression(ctx: NumVariableExpressionContext) : TransformerResult {
         return ctx.variable().accept(this);
-    }
-
-    public visitFloatType(ctx: FloatTypeContext): TransformerResult {
-        return TransformerResult.withNode(FloatType.instance());
-    }
-
-    public visitIntegerType(ctx: IntegerTypeContext): TransformerResult {
-        return TransformerResult.withNode(IntegerType.instance());
     }
 
     public visitNumber(ctx: NumberContext) : TransformerResult {

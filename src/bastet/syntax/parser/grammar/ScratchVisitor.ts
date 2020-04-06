@@ -7,9 +7,9 @@ import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
 import { FullMethodDefinitionContext } from "./ScratchParser";
 import { RestartScriptContext } from "./ScratchParser";
-import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
 import { ActorTypeContext } from "./ScratchParser";
+import { PrimitiveContext } from "./ScratchParser";
 import { IntegerLiteralExpressionContext } from "./ScratchParser";
 import { DecimalLiteralExpressionContext } from "./ScratchParser";
 import { ConcreteActorModeContext } from "./ScratchParser";
@@ -88,9 +88,8 @@ import { IthLetterOfStringExpressionContext } from "./ScratchParser";
 import { IthStringItemOfExpressionContext } from "./ScratchParser";
 import { DefaultStringExpressionContext } from "./ScratchParser";
 import { UnspecifiedStringExpressionContext } from "./ScratchParser";
-import { NumberTypeContext } from "./ScratchParser";
 import { IntegerTypeContext } from "./ScratchParser";
-import { FloatTypeContext } from "./ScratchParser";
+import { FloatingPointTypeContext } from "./ScratchParser";
 import { BooleanTypeContext } from "./ScratchParser";
 import { StringTypeContext } from "./ScratchParser";
 import { EnumTypeContext } from "./ScratchParser";
@@ -244,14 +243,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitRestartScript?: (ctx: RestartScriptContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `Primitive`
-	 * labeled alternative in `ScratchParser.type`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitPrimitive?: (ctx: PrimitiveContext) => Result;
-
-	/**
 	 * Visit a parse tree produced by the `ListType`
 	 * labeled alternative in `ScratchParser.type`.
 	 * @param ctx the parse tree
@@ -266,6 +257,14 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitActorType?: (ctx: ActorTypeContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `Primitive`
+	 * labeled alternative in `ScratchParser.type`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPrimitive?: (ctx: PrimitiveContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `IntegerLiteralExpression`
@@ -892,14 +891,6 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitUnspecifiedStringExpression?: (ctx: UnspecifiedStringExpressionContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `NumberType`
-	 * labeled alternative in `ScratchParser.primitiveType`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitNumberType?: (ctx: NumberTypeContext) => Result;
-
-	/**
 	 * Visit a parse tree produced by the `IntegerType`
 	 * labeled alternative in `ScratchParser.primitiveType`.
 	 * @param ctx the parse tree
@@ -908,12 +899,12 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitIntegerType?: (ctx: IntegerTypeContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `FloatType`
+	 * Visit a parse tree produced by the `FloatingPointType`
 	 * labeled alternative in `ScratchParser.primitiveType`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitFloatType?: (ctx: FloatTypeContext) => Result;
+	visitFloatingPointType?: (ctx: FloatingPointTypeContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `BooleanType`

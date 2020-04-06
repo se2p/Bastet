@@ -132,17 +132,16 @@ export class ScratchParser extends Parser {
 	public static readonly T__101 = 102;
 	public static readonly T__102 = 103;
 	public static readonly T__103 = 104;
-	public static readonly T__104 = 105;
-	public static readonly Boolean = 106;
-	public static readonly Bool = 107;
-	public static readonly String = 108;
-	public static readonly Identifier = 109;
-	public static readonly IntegerLiteral = 110;
-	public static readonly DecimalLiteral = 111;
-	public static readonly Whitespace = 112;
-	public static readonly Newline = 113;
-	public static readonly BlockComment = 114;
-	public static readonly LineComment = 115;
+	public static readonly Boolean = 105;
+	public static readonly Bool = 106;
+	public static readonly String = 107;
+	public static readonly Identifier = 108;
+	public static readonly IntegerLiteral = 109;
+	public static readonly DecimalLiteral = 110;
+	public static readonly Whitespace = 111;
+	public static readonly Newline = 112;
+	public static readonly BlockComment = 113;
+	public static readonly LineComment = 114;
 	public static readonly RULE_program = 0;
 	public static readonly RULE_fileType = 1;
 	public static readonly RULE_importDefinitionList = 2;
@@ -240,12 +239,12 @@ export class ScratchParser extends Parser {
 	private static readonly _LITERAL_NAMES: Array<string | undefined> = [
 		undefined, "'program'", "'module'", "'import'", "'from'", "'*'", "'begin'", 
 		"'end'", "'is'", "','", "'actor'", "'role'", "'image'", "'sound'", "'declare'", 
-		"'as'", "'list'", "'of'", "'number'", "'int'", "'float'", "'boolean'", 
-		"'string'", "'enum'", "'['", "']'", "'script'", "'on'", "'do'", "'restart'", 
-		"'never'", "'bootstrap'", "'finished'", "'startup'", "'started'", "'clone'", 
-		"'received'", "'message'", "'reached condition'", "'rendered'", "'statement'", 
-		"'in'", "'extern'", "'returns'", "'define'", "':'", "'atomic'", "'('", 
-		"')'", "'if'", "'then'", "'else'", "'until'", "'repeat'", "'times'", "'forever'", 
+		"'as'", "'list'", "'of'", "'int'", "'float'", "'boolean'", "'string'", 
+		"'enum'", "'['", "']'", "'script'", "'on'", "'do'", "'restart'", "'never'", 
+		"'bootstrap'", "'finished'", "'startup'", "'started'", "'clone'", "'received'", 
+		"'message'", "'reached condition'", "'rendered'", "'statement'", "'in'", 
+		"'extern'", "'returns'", "'define'", "':'", "'atomic'", "'('", "')'", 
+		"'if'", "'then'", "'else'", "'until'", "'repeat'", "'times'", "'forever'", 
 		"'evaluate'", "'@'", "'wait'", "'seconds'", "'stop'", "'other'", "'scripts'", 
 		"'create'", "'broadcast'", "'and'", "'reset'", "'timer'", "'epsilon'", 
 		"'assume'", "'delete'", "'all'", "'add'", "'to'", "'insert'", "'at'", 
@@ -270,8 +269,8 @@ export class ScratchParser extends Parser {
 		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
 		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
 		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, "Boolean", "Bool", "String", "Identifier", "IntegerLiteral", 
-		"DecimalLiteral", "Whitespace", "Newline", "BlockComment", "LineComment",
+		"Boolean", "Bool", "String", "Identifier", "IntegerLiteral", "DecimalLiteral", 
+		"Whitespace", "Newline", "BlockComment", "LineComment",
 	];
 	public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(ScratchParser._LITERAL_NAMES, ScratchParser._SYMBOLIC_NAMES, []);
 
@@ -441,7 +440,7 @@ export class ScratchParser extends Parser {
 			this.state = 169;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
-			case ScratchParser.T__104:
+			case ScratchParser.T__103:
 			case ScratchParser.Identifier:
 				_localctx = new ImportSelectedActorContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
@@ -871,37 +870,36 @@ export class ScratchParser extends Parser {
 			this.state = 237;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
-			case ScratchParser.T__17:
-			case ScratchParser.T__18:
-			case ScratchParser.T__19:
-			case ScratchParser.T__20:
-			case ScratchParser.T__21:
-			case ScratchParser.T__22:
-				_localctx = new PrimitiveContext(_localctx);
+			case ScratchParser.T__15:
+				_localctx = new ListTypeContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
 				this.state = 232;
-				this.primitiveType();
-				}
-				break;
-			case ScratchParser.T__15:
-				_localctx = new ListTypeContext(_localctx);
-				this.enterOuterAlt(_localctx, 2);
-				{
-				this.state = 233;
 				this.match(ScratchParser.T__15);
-				this.state = 234;
+				this.state = 233;
 				this.match(ScratchParser.T__16);
-				this.state = 235;
+				this.state = 234;
 				this.type();
 				}
 				break;
 			case ScratchParser.T__9:
 				_localctx = new ActorTypeContext(_localctx);
+				this.enterOuterAlt(_localctx, 2);
+				{
+				this.state = 235;
+				this.match(ScratchParser.T__9);
+				}
+				break;
+			case ScratchParser.T__17:
+			case ScratchParser.T__18:
+			case ScratchParser.T__19:
+			case ScratchParser.T__20:
+			case ScratchParser.T__21:
+				_localctx = new PrimitiveContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
 				this.state = 236;
-				this.match(ScratchParser.T__9);
+				this.primitiveType();
 				}
 				break;
 			default:
@@ -927,11 +925,11 @@ export class ScratchParser extends Parser {
 		let _localctx: PrimitiveTypeContext = new PrimitiveTypeContext(this._ctx, this.state);
 		this.enterRule(_localctx, 32, ScratchParser.RULE_primitiveType);
 		try {
-			this.state = 249;
+			this.state = 248;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case ScratchParser.T__17:
-				_localctx = new NumberTypeContext(_localctx);
+				_localctx = new IntegerTypeContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
 				this.state = 239;
@@ -939,7 +937,7 @@ export class ScratchParser extends Parser {
 				}
 				break;
 			case ScratchParser.T__18:
-				_localctx = new IntegerTypeContext(_localctx);
+				_localctx = new FloatingPointTypeContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
 				this.state = 240;
@@ -947,7 +945,7 @@ export class ScratchParser extends Parser {
 				}
 				break;
 			case ScratchParser.T__19:
-				_localctx = new FloatTypeContext(_localctx);
+				_localctx = new BooleanTypeContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
 				this.state = 241;
@@ -955,7 +953,7 @@ export class ScratchParser extends Parser {
 				}
 				break;
 			case ScratchParser.T__20:
-				_localctx = new BooleanTypeContext(_localctx);
+				_localctx = new StringTypeContext(_localctx);
 				this.enterOuterAlt(_localctx, 4);
 				{
 				this.state = 242;
@@ -963,25 +961,17 @@ export class ScratchParser extends Parser {
 				}
 				break;
 			case ScratchParser.T__21:
-				_localctx = new StringTypeContext(_localctx);
+				_localctx = new EnumTypeContext(_localctx);
 				this.enterOuterAlt(_localctx, 5);
 				{
 				this.state = 243;
 				this.match(ScratchParser.T__21);
-				}
-				break;
-			case ScratchParser.T__22:
-				_localctx = new EnumTypeContext(_localctx);
-				this.enterOuterAlt(_localctx, 6);
-				{
 				this.state = 244;
 				this.match(ScratchParser.T__22);
 				this.state = 245;
-				this.match(ScratchParser.T__23);
-				this.state = 246;
 				this.expressionListPlain();
-				this.state = 247;
-				this.match(ScratchParser.T__24);
+				this.state = 246;
+				this.match(ScratchParser.T__23);
 				}
 				break;
 			default:
@@ -1009,17 +999,17 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
+			this.state = 250;
+			this.match(ScratchParser.T__24);
 			this.state = 251;
 			this.match(ScratchParser.T__25);
 			this.state = 252;
-			this.match(ScratchParser.T__26);
-			this.state = 253;
 			this.event();
+			this.state = 253;
+			this.match(ScratchParser.T__26);
 			this.state = 254;
-			this.match(ScratchParser.T__27);
-			this.state = 255;
 			this.scriptAttributeList();
-			this.state = 256;
+			this.state = 255;
 			this.stmtList();
 			}
 		}
@@ -1045,17 +1035,17 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 261;
+			this.state = 260;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
-			while (_la === ScratchParser.T__25) {
+			while (_la === ScratchParser.T__24) {
 				{
 				{
-				this.state = 258;
+				this.state = 257;
 				this.script();
 				}
 				}
-				this.state = 263;
+				this.state = 262;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1083,17 +1073,17 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 267;
+			this.state = 266;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
-			while (_la === ScratchParser.T__28) {
+			while (_la === ScratchParser.T__27) {
 				{
 				{
-				this.state = 264;
+				this.state = 263;
 				this.scriptAttribute();
 				}
 				}
-				this.state = 269;
+				this.state = 268;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1121,8 +1111,8 @@ export class ScratchParser extends Parser {
 			_localctx = new RestartScriptContext(_localctx);
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 270;
-			this.match(ScratchParser.T__28);
+			this.state = 269;
+			this.match(ScratchParser.T__27);
 			}
 		}
 		catch (re) {
@@ -1146,7 +1136,7 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 272;
+			this.state = 271;
 			this.coreEvent();
 			}
 		}
@@ -1169,15 +1159,15 @@ export class ScratchParser extends Parser {
 		let _localctx: CoreEventContext = new CoreEventContext(this._ctx, this.state);
 		this.enterRule(_localctx, 44, ScratchParser.RULE_coreEvent);
 		try {
-			this.state = 292;
+			this.state = 291;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 13, this._ctx) ) {
 			case 1:
 				_localctx = new NeverEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 274;
-				this.match(ScratchParser.T__29);
+				this.state = 273;
+				this.match(ScratchParser.T__28);
 				}
 				break;
 
@@ -1185,8 +1175,8 @@ export class ScratchParser extends Parser {
 				_localctx = new BootstapEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 275;
-				this.match(ScratchParser.T__30);
+				this.state = 274;
+				this.match(ScratchParser.T__29);
 				}
 				break;
 
@@ -1194,10 +1184,10 @@ export class ScratchParser extends Parser {
 				_localctx = new AfterBootstrapMonitoringEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
+				this.state = 275;
+				this.match(ScratchParser.T__29);
 				this.state = 276;
 				this.match(ScratchParser.T__30);
-				this.state = 277;
-				this.match(ScratchParser.T__31);
 				}
 				break;
 
@@ -1205,8 +1195,8 @@ export class ScratchParser extends Parser {
 				_localctx = new StartupEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 278;
-				this.match(ScratchParser.T__32);
+				this.state = 277;
+				this.match(ScratchParser.T__31);
 				}
 				break;
 
@@ -1214,12 +1204,12 @@ export class ScratchParser extends Parser {
 				_localctx = new CloneStartEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 5);
 				{
+				this.state = 278;
+				this.match(ScratchParser.T__32);
 				this.state = 279;
-				this.match(ScratchParser.T__33);
-				this.state = 280;
 				this.match(ScratchParser.T__14);
-				this.state = 281;
-				this.match(ScratchParser.T__34);
+				this.state = 280;
+				this.match(ScratchParser.T__33);
 				}
 				break;
 
@@ -1227,13 +1217,13 @@ export class ScratchParser extends Parser {
 				_localctx = new MessageReceivedEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 6);
 				{
+				this.state = 281;
+				this.match(ScratchParser.T__34);
 				this.state = 282;
 				this.match(ScratchParser.T__35);
 				this.state = 283;
-				this.match(ScratchParser.T__36);
-				this.state = 284;
 				this.stringExpr();
-				this.state = 285;
+				this.state = 284;
 				this.messageNamespace();
 				}
 				break;
@@ -1242,9 +1232,9 @@ export class ScratchParser extends Parser {
 				_localctx = new ConditionReachedEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 7);
 				{
+				this.state = 286;
+				this.match(ScratchParser.T__36);
 				this.state = 287;
-				this.match(ScratchParser.T__37);
-				this.state = 288;
 				this.boolExpr();
 				}
 				break;
@@ -1253,8 +1243,8 @@ export class ScratchParser extends Parser {
 				_localctx = new RenderedMonitoringEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 8);
 				{
-				this.state = 289;
-				this.match(ScratchParser.T__38);
+				this.state = 288;
+				this.match(ScratchParser.T__37);
 				}
 				break;
 
@@ -1262,10 +1252,10 @@ export class ScratchParser extends Parser {
 				_localctx = new AfterStatementMonitoringEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 9);
 				{
+				this.state = 289;
+				this.match(ScratchParser.T__38);
 				this.state = 290;
-				this.match(ScratchParser.T__39);
-				this.state = 291;
-				this.match(ScratchParser.T__31);
+				this.match(ScratchParser.T__30);
 				}
 				break;
 			}
@@ -1289,20 +1279,20 @@ export class ScratchParser extends Parser {
 		let _localctx: MessageNamespaceContext = new MessageNamespaceContext(this._ctx, this.state);
 		this.enterRule(_localctx, 46, ScratchParser.RULE_messageNamespace);
 		try {
-			this.state = 297;
+			this.state = 296;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
-			case ScratchParser.T__40:
+			case ScratchParser.T__39:
 				_localctx = new MessageNameSpaceContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
+				this.state = 293;
+				this.match(ScratchParser.T__39);
 				this.state = 294;
-				this.match(ScratchParser.T__40);
-				this.state = 295;
 				this.match(ScratchParser.String);
 				}
 				break;
-			case ScratchParser.T__27:
+			case ScratchParser.T__26:
 				_localctx = new GlobalNameSpaceContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				// tslint:disable-next-line:no-empty
@@ -1334,13 +1324,13 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
+			this.state = 298;
+			this.match(ScratchParser.T__40);
 			this.state = 299;
-			this.match(ScratchParser.T__41);
-			this.state = 300;
 			this.ident();
-			this.state = 301;
+			this.state = 300;
 			this.parameterList();
-			this.state = 302;
+			this.state = 301;
 			this.externMethodResultDeclaration();
 			}
 		}
@@ -1363,23 +1353,23 @@ export class ScratchParser extends Parser {
 		let _localctx: ExternMethodResultDeclarationContext = new ExternMethodResultDeclarationContext(this._ctx, this.state);
 		this.enterRule(_localctx, 50, ScratchParser.RULE_externMethodResultDeclaration);
 		try {
-			this.state = 307;
+			this.state = 306;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
-			case ScratchParser.T__42:
+			case ScratchParser.T__41:
 				_localctx = new ExternFunctionReturnDefinitionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
+				this.state = 303;
+				this.match(ScratchParser.T__41);
 				this.state = 304;
-				this.match(ScratchParser.T__42);
-				this.state = 305;
 				this.type();
 				}
 				break;
 			case ScratchParser.T__6:
-			case ScratchParser.T__25:
-			case ScratchParser.T__41:
-			case ScratchParser.T__43:
+			case ScratchParser.T__24:
+			case ScratchParser.T__40:
+			case ScratchParser.T__42:
 				_localctx = new ExternVoidReturnDefinitionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				// tslint:disable-next-line:no-empty
@@ -1412,17 +1402,17 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 312;
+			this.state = 311;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
-			while (_la === ScratchParser.T__41) {
+			while (_la === ScratchParser.T__40) {
 				{
 				{
-				this.state = 309;
+				this.state = 308;
 				this.externMethodDefinition();
 				}
 				}
-				this.state = 314;
+				this.state = 313;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1450,17 +1440,17 @@ export class ScratchParser extends Parser {
 			_localctx = new FullMethodDefinitionContext(_localctx);
 			this.enterOuterAlt(_localctx, 1);
 			{
+			this.state = 314;
+			this.match(ScratchParser.T__42);
 			this.state = 315;
-			this.match(ScratchParser.T__43);
-			this.state = 316;
 			this.methodAttributeList();
-			this.state = 317;
+			this.state = 316;
 			this.ident();
-			this.state = 318;
+			this.state = 317;
 			this.parameterList();
-			this.state = 319;
+			this.state = 318;
 			this.stmtList();
-			this.state = 320;
+			this.state = 319;
 			this.methodResultDeclaration();
 			}
 		}
@@ -1483,26 +1473,26 @@ export class ScratchParser extends Parser {
 		let _localctx: MethodResultDeclarationContext = new MethodResultDeclarationContext(this._ctx, this.state);
 		this.enterRule(_localctx, 56, ScratchParser.RULE_methodResultDeclaration);
 		try {
-			this.state = 328;
+			this.state = 327;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
-			case ScratchParser.T__42:
+			case ScratchParser.T__41:
 				_localctx = new FunctionReturnDefinitionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
+				this.state = 321;
+				this.match(ScratchParser.T__41);
 				this.state = 322;
-				this.match(ScratchParser.T__42);
-				this.state = 323;
 				this.ident();
+				this.state = 323;
+				this.match(ScratchParser.T__43);
 				this.state = 324;
-				this.match(ScratchParser.T__44);
-				this.state = 325;
 				this.type();
 				}
 				break;
 			case ScratchParser.T__6:
-			case ScratchParser.T__25:
-			case ScratchParser.T__43:
+			case ScratchParser.T__24:
+			case ScratchParser.T__42:
 				_localctx = new VoidReturnDefinitionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				// tslint:disable-next-line:no-empty
@@ -1535,17 +1525,17 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 333;
+			this.state = 332;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
-			while (_la === ScratchParser.T__43) {
+			while (_la === ScratchParser.T__42) {
 				{
 				{
-				this.state = 330;
+				this.state = 329;
 				this.methodDefinition();
 				}
 				}
-				this.state = 335;
+				this.state = 334;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1573,17 +1563,17 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 339;
+			this.state = 338;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
-			while (_la === ScratchParser.T__45) {
+			while (_la === ScratchParser.T__44) {
 				{
 				{
-				this.state = 336;
+				this.state = 335;
 				this.methodAttribute();
 				}
 				}
-				this.state = 341;
+				this.state = 340;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1611,8 +1601,8 @@ export class ScratchParser extends Parser {
 			_localctx = new AtomicMethodContext(_localctx);
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 342;
-			this.match(ScratchParser.T__45);
+			this.state = 341;
+			this.match(ScratchParser.T__44);
 			}
 		}
 		catch (re) {
@@ -1636,11 +1626,11 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 344;
+			this.state = 343;
 			this.ident();
+			this.state = 344;
+			this.match(ScratchParser.T__43);
 			this.state = 345;
-			this.match(ScratchParser.T__44);
-			this.state = 346;
 			this.type();
 			}
 		}
@@ -1665,12 +1655,12 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
+			this.state = 347;
+			this.match(ScratchParser.T__45);
 			this.state = 348;
-			this.match(ScratchParser.T__46);
-			this.state = 349;
 			this.parameterListPlain();
-			this.state = 350;
-			this.match(ScratchParser.T__47);
+			this.state = 349;
+			this.match(ScratchParser.T__46);
 			}
 		}
 		catch (re) {
@@ -1693,34 +1683,34 @@ export class ScratchParser extends Parser {
 		this.enterRule(_localctx, 68, ScratchParser.RULE_parameterListPlain);
 		let _la: number;
 		try {
-			this.state = 361;
+			this.state = 360;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
-			case ScratchParser.T__104:
+			case ScratchParser.T__103:
 			case ScratchParser.Identifier:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 352;
+				this.state = 351;
 				this.parameter();
-				this.state = 357;
+				this.state = 356;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 				while (_la === ScratchParser.T__8) {
 					{
 					{
-					this.state = 353;
+					this.state = 352;
 					this.match(ScratchParser.T__8);
-					this.state = 354;
+					this.state = 353;
 					this.parameter();
 					}
 					}
-					this.state = 359;
+					this.state = 358;
 					this._errHandler.sync(this);
 					_la = this._input.LA(1);
 				}
 				}
 				break;
-			case ScratchParser.T__47:
+			case ScratchParser.T__46:
 				this.enterOuterAlt(_localctx, 2);
 				// tslint:disable-next-line:no-empty
 				{
@@ -1752,21 +1742,21 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 363;
+			this.state = 362;
 			this.match(ScratchParser.T__5);
-			this.state = 364;
+			this.state = 363;
 			this.stmtListPlain();
-			this.state = 366;
+			this.state = 365;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
-			if (_la === ScratchParser.T__59 || _la === ScratchParser.T__69) {
+			if (_la === ScratchParser.T__58 || _la === ScratchParser.T__68) {
 				{
-				this.state = 365;
+				this.state = 364;
 				this.terminationStmt();
 				}
 			}
 
-			this.state = 368;
+			this.state = 367;
 			this.match(ScratchParser.T__6);
 			}
 		}
@@ -1791,9 +1781,9 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
+			this.state = 369;
+			this.match(ScratchParser.T__44);
 			this.state = 370;
-			this.match(ScratchParser.T__45);
-			this.state = 371;
 			this.stmtList();
 			}
 		}
@@ -1819,19 +1809,19 @@ export class ScratchParser extends Parser {
 			let _alt: number;
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 376;
+			this.state = 375;
 			this._errHandler.sync(this);
 			_alt = this.interpreter.adaptivePredict(this._input, 23, this._ctx);
 			while (_alt !== 2 && _alt !== ATN.INVALID_ALT_NUMBER) {
 				if (_alt === 1) {
 					{
 					{
-					this.state = 373;
+					this.state = 372;
 					this.stmt();
 					}
 					}
 				}
-				this.state = 378;
+				this.state = 377;
 				this._errHandler.sync(this);
 				_alt = this.interpreter.adaptivePredict(this._input, 23, this._ctx);
 			}
@@ -1858,7 +1848,7 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 379;
+			this.state = 378;
 			this.coreControlStmt();
 			}
 		}
@@ -1881,13 +1871,13 @@ export class ScratchParser extends Parser {
 		let _localctx: CoreControlStmtContext = new CoreControlStmtContext(this._ctx, this.state);
 		this.enterRule(_localctx, 78, ScratchParser.RULE_coreControlStmt);
 		try {
-			this.state = 386;
+			this.state = 385;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 24, this._ctx) ) {
 			case 1:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 381;
+				this.state = 380;
 				this.ifStmt();
 				}
 				break;
@@ -1895,7 +1885,7 @@ export class ScratchParser extends Parser {
 			case 2:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 382;
+				this.state = 381;
 				this.untilStmt();
 				}
 				break;
@@ -1903,7 +1893,7 @@ export class ScratchParser extends Parser {
 			case 3:
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 383;
+				this.state = 382;
 				this.repeatTimesStmt();
 				}
 				break;
@@ -1911,7 +1901,7 @@ export class ScratchParser extends Parser {
 			case 4:
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 384;
+				this.state = 383;
 				this.repeatForeverStmt();
 				}
 				break;
@@ -1919,7 +1909,7 @@ export class ScratchParser extends Parser {
 			case 5:
 				this.enterOuterAlt(_localctx, 5);
 				{
-				this.state = 385;
+				this.state = 384;
 				this.callStmt();
 				}
 				break;
@@ -1946,15 +1936,15 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
+			this.state = 387;
+			this.match(ScratchParser.T__47);
 			this.state = 388;
-			this.match(ScratchParser.T__48);
-			this.state = 389;
 			this.boolExpr();
+			this.state = 389;
+			this.match(ScratchParser.T__48);
 			this.state = 390;
-			this.match(ScratchParser.T__49);
-			this.state = 391;
 			this.stmtList();
-			this.state = 392;
+			this.state = 391;
 			this.elseCase();
 			}
 		}
@@ -1977,16 +1967,16 @@ export class ScratchParser extends Parser {
 		let _localctx: ElseCaseContext = new ElseCaseContext(this._ctx, this.state);
 		this.enterRule(_localctx, 82, ScratchParser.RULE_elseCase);
 		try {
-			this.state = 399;
+			this.state = 398;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 25, this._ctx) ) {
 			case 1:
 				_localctx = new PureElseContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
+				this.state = 393;
+				this.match(ScratchParser.T__49);
 				this.state = 394;
-				this.match(ScratchParser.T__50);
-				this.state = 395;
 				this.stmtList();
 				}
 				break;
@@ -1995,9 +1985,9 @@ export class ScratchParser extends Parser {
 				_localctx = new ElseIfCaseContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
+				this.state = 395;
+				this.match(ScratchParser.T__49);
 				this.state = 396;
-				this.match(ScratchParser.T__50);
-				this.state = 397;
 				this.ifStmt();
 				}
 				break;
@@ -2032,13 +2022,13 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
+			this.state = 400;
+			this.match(ScratchParser.T__50);
 			this.state = 401;
-			this.match(ScratchParser.T__51);
-			this.state = 402;
 			this.boolExpr();
+			this.state = 402;
+			this.match(ScratchParser.T__51);
 			this.state = 403;
-			this.match(ScratchParser.T__52);
-			this.state = 404;
 			this.stmtList();
 			}
 		}
@@ -2063,13 +2053,13 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
+			this.state = 405;
+			this.match(ScratchParser.T__51);
 			this.state = 406;
-			this.match(ScratchParser.T__52);
-			this.state = 407;
 			this.numExpr();
+			this.state = 407;
+			this.match(ScratchParser.T__52);
 			this.state = 408;
-			this.match(ScratchParser.T__53);
-			this.state = 409;
 			this.stmtList();
 			}
 		}
@@ -2094,11 +2084,11 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
+			this.state = 410;
+			this.match(ScratchParser.T__51);
 			this.state = 411;
-			this.match(ScratchParser.T__52);
+			this.match(ScratchParser.T__53);
 			this.state = 412;
-			this.match(ScratchParser.T__54);
-			this.state = 413;
 			this.stmtList();
 			}
 		}
@@ -2123,9 +2113,9 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 415;
+			this.state = 414;
 			this.ident();
-			this.state = 416;
+			this.state = 415;
 			this.expressionList();
 			}
 		}
@@ -2150,12 +2140,12 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
+			this.state = 417;
+			this.match(ScratchParser.T__45);
 			this.state = 418;
-			this.match(ScratchParser.T__46);
-			this.state = 419;
 			this.expressionListPlain();
-			this.state = 420;
-			this.match(ScratchParser.T__47);
+			this.state = 419;
+			this.match(ScratchParser.T__46);
 			}
 		}
 		catch (re) {
@@ -2178,28 +2168,28 @@ export class ScratchParser extends Parser {
 		this.enterRule(_localctx, 94, ScratchParser.RULE_expressionListPlain);
 		let _la: number;
 		try {
-			this.state = 431;
+			this.state = 430;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
-			case ScratchParser.T__23:
-			case ScratchParser.T__46:
-			case ScratchParser.T__66:
-			case ScratchParser.T__76:
+			case ScratchParser.T__22:
+			case ScratchParser.T__45:
+			case ScratchParser.T__65:
+			case ScratchParser.T__75:
+			case ScratchParser.T__78:
 			case ScratchParser.T__79:
 			case ScratchParser.T__80:
 			case ScratchParser.T__81:
 			case ScratchParser.T__82:
-			case ScratchParser.T__83:
+			case ScratchParser.T__84:
 			case ScratchParser.T__85:
-			case ScratchParser.T__86:
+			case ScratchParser.T__91:
 			case ScratchParser.T__92:
 			case ScratchParser.T__93:
-			case ScratchParser.T__94:
+			case ScratchParser.T__98:
 			case ScratchParser.T__99:
 			case ScratchParser.T__100:
 			case ScratchParser.T__101:
-			case ScratchParser.T__102:
-			case ScratchParser.T__104:
+			case ScratchParser.T__103:
 			case ScratchParser.Boolean:
 			case ScratchParser.String:
 			case ScratchParser.Identifier:
@@ -2207,28 +2197,28 @@ export class ScratchParser extends Parser {
 			case ScratchParser.DecimalLiteral:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 422;
+				this.state = 421;
 				this.expression();
-				this.state = 427;
+				this.state = 426;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 				while (_la === ScratchParser.T__8) {
 					{
 					{
-					this.state = 423;
+					this.state = 422;
 					this.match(ScratchParser.T__8);
-					this.state = 424;
+					this.state = 423;
 					this.expression();
 					}
 					}
-					this.state = 429;
+					this.state = 428;
 					this._errHandler.sync(this);
 					_la = this._input.LA(1);
 				}
 				}
 				break;
-			case ScratchParser.T__24:
-			case ScratchParser.T__47:
+			case ScratchParser.T__23:
+			case ScratchParser.T__46:
 				this.enterOuterAlt(_localctx, 2);
 				// tslint:disable-next-line:no-empty
 				{
@@ -2259,9 +2249,9 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
+			this.state = 432;
+			this.match(ScratchParser.T__54);
 			this.state = 433;
-			this.match(ScratchParser.T__55);
-			this.state = 434;
 			this.expression();
 			}
 		}
@@ -2284,61 +2274,61 @@ export class ScratchParser extends Parser {
 		let _localctx: StmtContext = new StmtContext(this._ctx, this.state);
 		this.enterRule(_localctx, 98, ScratchParser.RULE_stmt);
 		try {
-			this.state = 444;
+			this.state = 443;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
-			case ScratchParser.T__48:
+			case ScratchParser.T__47:
+			case ScratchParser.T__50:
 			case ScratchParser.T__51:
-			case ScratchParser.T__52:
-			case ScratchParser.T__104:
+			case ScratchParser.T__103:
 			case ScratchParser.Identifier:
 				_localctx = new ControlStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 436;
+				this.state = 435;
 				this.controlStmt();
 				}
 				break;
 			case ScratchParser.T__13:
-			case ScratchParser.T__43:
-			case ScratchParser.T__55:
-			case ScratchParser.T__57:
-			case ScratchParser.T__59:
+			case ScratchParser.T__42:
+			case ScratchParser.T__54:
+			case ScratchParser.T__56:
+			case ScratchParser.T__58:
+			case ScratchParser.T__61:
 			case ScratchParser.T__62:
-			case ScratchParser.T__63:
-			case ScratchParser.T__65:
+			case ScratchParser.T__64:
+			case ScratchParser.T__66:
 			case ScratchParser.T__67:
 			case ScratchParser.T__68:
-			case ScratchParser.T__69:
-			case ScratchParser.T__71:
-			case ScratchParser.T__73:
-			case ScratchParser.T__75:
+			case ScratchParser.T__70:
+			case ScratchParser.T__72:
+			case ScratchParser.T__74:
 				_localctx = new NonControlStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 437;
+				this.state = 436;
 				this.nonCtrlStmt();
 				}
 				break;
-			case ScratchParser.T__45:
+			case ScratchParser.T__44:
 				_localctx = new AtomicBlockStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 438;
+				this.state = 437;
 				this.atomicBlock();
 				}
 				break;
-			case ScratchParser.T__56:
+			case ScratchParser.T__55:
 				_localctx = new AttributedStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 4);
 				{
+				this.state = 438;
+				this.match(ScratchParser.T__55);
 				this.state = 439;
-				this.match(ScratchParser.T__56);
-				this.state = 440;
 				this.match(ScratchParser.Identifier);
-				this.state = 441;
+				this.state = 440;
 				this.expressionList();
-				this.state = 442;
+				this.state = 441;
 				this.stmt();
 				}
 				break;
@@ -2367,7 +2357,7 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 446;
+			this.state = 445;
 			this.coreNonCtrlStmt();
 			}
 		}
@@ -2390,44 +2380,44 @@ export class ScratchParser extends Parser {
 		let _localctx: CoreNonCtrlStmtContext = new CoreNonCtrlStmtContext(this._ctx, this.state);
 		this.enterRule(_localctx, 102, ScratchParser.RULE_coreNonCtrlStmt);
 		try {
-			this.state = 452;
+			this.state = 451;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
-			case ScratchParser.T__55:
+			case ScratchParser.T__54:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 448;
+				this.state = 447;
 				this.expressionStmt();
 				}
 				break;
-			case ScratchParser.T__43:
-			case ScratchParser.T__57:
-			case ScratchParser.T__59:
+			case ScratchParser.T__42:
+			case ScratchParser.T__56:
+			case ScratchParser.T__58:
+			case ScratchParser.T__61:
 			case ScratchParser.T__62:
-			case ScratchParser.T__63:
-			case ScratchParser.T__65:
+			case ScratchParser.T__64:
+			case ScratchParser.T__66:
 			case ScratchParser.T__67:
-			case ScratchParser.T__68:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 449;
+				this.state = 448;
 				this.commonStmt();
 				}
 				break;
-			case ScratchParser.T__69:
-			case ScratchParser.T__71:
-			case ScratchParser.T__73:
-			case ScratchParser.T__75:
+			case ScratchParser.T__68:
+			case ScratchParser.T__70:
+			case ScratchParser.T__72:
+			case ScratchParser.T__74:
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 450;
+				this.state = 449;
 				this.listStmt();
 				}
 				break;
 			case ScratchParser.T__13:
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 451;
+				this.state = 450;
 				this.declarationStmt();
 				}
 				break;
@@ -2454,19 +2444,19 @@ export class ScratchParser extends Parser {
 		let _localctx: CommonStmtContext = new CommonStmtContext(this._ctx, this.state);
 		this.enterRule(_localctx, 104, ScratchParser.RULE_commonStmt);
 		try {
-			this.state = 483;
+			this.state = 482;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 30, this._ctx) ) {
 			case 1:
 				_localctx = new WaitSecsStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
+				this.state = 453;
+				this.match(ScratchParser.T__56);
 				this.state = 454;
-				this.match(ScratchParser.T__57);
-				this.state = 455;
 				this.numExpr();
-				this.state = 456;
-				this.match(ScratchParser.T__58);
+				this.state = 455;
+				this.match(ScratchParser.T__57);
 				}
 				break;
 
@@ -2474,11 +2464,11 @@ export class ScratchParser extends Parser {
 				_localctx = new WaitUntilStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
+				this.state = 457;
+				this.match(ScratchParser.T__56);
 				this.state = 458;
-				this.match(ScratchParser.T__57);
+				this.match(ScratchParser.T__50);
 				this.state = 459;
-				this.match(ScratchParser.T__51);
-				this.state = 460;
 				this.boolExpr();
 				}
 				break;
@@ -2487,15 +2477,15 @@ export class ScratchParser extends Parser {
 				_localctx = new StopOthersInActorStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
+				this.state = 460;
+				this.match(ScratchParser.T__58);
 				this.state = 461;
 				this.match(ScratchParser.T__59);
 				this.state = 462;
 				this.match(ScratchParser.T__60);
 				this.state = 463;
-				this.match(ScratchParser.T__61);
+				this.match(ScratchParser.T__39);
 				this.state = 464;
-				this.match(ScratchParser.T__40);
-				this.state = 465;
 				this.match(ScratchParser.T__9);
 				}
 				break;
@@ -2504,13 +2494,13 @@ export class ScratchParser extends Parser {
 				_localctx = new CreateCloneOfStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 4);
 				{
+				this.state = 465;
+				this.match(ScratchParser.T__61);
 				this.state = 466;
-				this.match(ScratchParser.T__62);
+				this.match(ScratchParser.T__33);
 				this.state = 467;
-				this.match(ScratchParser.T__34);
-				this.state = 468;
 				this.match(ScratchParser.T__16);
-				this.state = 469;
+				this.state = 468;
 				this.stringExpr();
 				}
 				break;
@@ -2519,9 +2509,9 @@ export class ScratchParser extends Parser {
 				_localctx = new BroadcastMessageStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 5);
 				{
+				this.state = 469;
+				this.match(ScratchParser.T__62);
 				this.state = 470;
-				this.match(ScratchParser.T__63);
-				this.state = 471;
 				this.message();
 				}
 				break;
@@ -2530,14 +2520,14 @@ export class ScratchParser extends Parser {
 				_localctx = new BroadcastAndWaitStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 6);
 				{
+				this.state = 471;
+				this.match(ScratchParser.T__62);
 				this.state = 472;
-				this.match(ScratchParser.T__63);
-				this.state = 473;
 				this.message();
+				this.state = 473;
+				this.match(ScratchParser.T__63);
 				this.state = 474;
-				this.match(ScratchParser.T__64);
-				this.state = 475;
-				this.match(ScratchParser.T__57);
+				this.match(ScratchParser.T__56);
 				}
 				break;
 
@@ -2545,10 +2535,10 @@ export class ScratchParser extends Parser {
 				_localctx = new ResetTimerStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 7);
 				{
+				this.state = 476;
+				this.match(ScratchParser.T__64);
 				this.state = 477;
 				this.match(ScratchParser.T__65);
-				this.state = 478;
-				this.match(ScratchParser.T__66);
 				}
 				break;
 
@@ -2556,8 +2546,8 @@ export class ScratchParser extends Parser {
 				_localctx = new EpsilonStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 8);
 				{
-				this.state = 479;
-				this.match(ScratchParser.T__67);
+				this.state = 478;
+				this.match(ScratchParser.T__66);
 				}
 				break;
 
@@ -2565,9 +2555,9 @@ export class ScratchParser extends Parser {
 				_localctx = new AssumeStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 9);
 				{
+				this.state = 479;
+				this.match(ScratchParser.T__67);
 				this.state = 480;
-				this.match(ScratchParser.T__68);
-				this.state = 481;
 				this.boolExpr();
 				}
 				break;
@@ -2576,7 +2566,7 @@ export class ScratchParser extends Parser {
 				_localctx = new SetStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 10);
 				{
-				this.state = 482;
+				this.state = 481;
 				this.setStmt();
 				}
 				break;
@@ -2601,20 +2591,20 @@ export class ScratchParser extends Parser {
 		let _localctx: ListStmtContext = new ListStmtContext(this._ctx, this.state);
 		this.enterRule(_localctx, 106, ScratchParser.RULE_listStmt);
 		try {
-			this.state = 514;
+			this.state = 513;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 31, this._ctx) ) {
 			case 1:
 				_localctx = new DeleteAllFromStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
+				this.state = 484;
+				this.match(ScratchParser.T__68);
 				this.state = 485;
 				this.match(ScratchParser.T__69);
 				this.state = 486;
-				this.match(ScratchParser.T__70);
-				this.state = 487;
 				this.match(ScratchParser.T__3);
-				this.state = 488;
+				this.state = 487;
 				this.variable();
 				}
 				break;
@@ -2623,13 +2613,13 @@ export class ScratchParser extends Parser {
 				_localctx = new DeleteIthFromStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
+				this.state = 488;
+				this.match(ScratchParser.T__68);
 				this.state = 489;
-				this.match(ScratchParser.T__69);
-				this.state = 490;
 				this.numExpr();
-				this.state = 491;
+				this.state = 490;
 				this.match(ScratchParser.T__16);
-				this.state = 492;
+				this.state = 491;
 				this.variable();
 				}
 				break;
@@ -2638,13 +2628,13 @@ export class ScratchParser extends Parser {
 				_localctx = new AddElementToStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
+				this.state = 493;
+				this.match(ScratchParser.T__70);
 				this.state = 494;
-				this.match(ScratchParser.T__71);
-				this.state = 495;
 				this.stringExpr();
+				this.state = 495;
+				this.match(ScratchParser.T__71);
 				this.state = 496;
-				this.match(ScratchParser.T__72);
-				this.state = 497;
 				this.variable();
 				}
 				break;
@@ -2653,17 +2643,17 @@ export class ScratchParser extends Parser {
 				_localctx = new InsertAtStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 4);
 				{
+				this.state = 498;
+				this.match(ScratchParser.T__72);
 				this.state = 499;
-				this.match(ScratchParser.T__73);
-				this.state = 500;
 				this.stringExpr();
+				this.state = 500;
+				this.match(ScratchParser.T__73);
 				this.state = 501;
-				this.match(ScratchParser.T__74);
-				this.state = 502;
 				this.numExpr();
-				this.state = 503;
+				this.state = 502;
 				this.match(ScratchParser.T__16);
-				this.state = 504;
+				this.state = 503;
 				this.variable();
 				}
 				break;
@@ -2672,19 +2662,19 @@ export class ScratchParser extends Parser {
 				_localctx = new ReplaceElementAtStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 5);
 				{
+				this.state = 505;
+				this.match(ScratchParser.T__74);
 				this.state = 506;
 				this.match(ScratchParser.T__75);
 				this.state = 507;
-				this.match(ScratchParser.T__76);
-				this.state = 508;
 				this.numExpr();
-				this.state = 509;
+				this.state = 508;
 				this.match(ScratchParser.T__16);
-				this.state = 510;
+				this.state = 509;
 				this.variable();
+				this.state = 510;
+				this.match(ScratchParser.T__76);
 				this.state = 511;
-				this.match(ScratchParser.T__77);
-				this.state = 512;
 				this.stringExpr();
 				}
 				break;
@@ -2709,20 +2699,20 @@ export class ScratchParser extends Parser {
 		let _localctx: SetStmtContext = new SetStmtContext(this._ctx, this.state);
 		this.enterRule(_localctx, 108, ScratchParser.RULE_setStmt);
 		try {
-			this.state = 526;
+			this.state = 525;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 32, this._ctx) ) {
 			case 1:
 				_localctx = new StoreEvalResultStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
+				this.state = 515;
+				this.match(ScratchParser.T__42);
 				this.state = 516;
-				this.match(ScratchParser.T__43);
-				this.state = 517;
 				this.variable();
-				this.state = 518;
+				this.state = 517;
 				this.match(ScratchParser.T__14);
-				this.state = 519;
+				this.state = 518;
 				this.expression();
 				}
 				break;
@@ -2731,13 +2721,13 @@ export class ScratchParser extends Parser {
 				_localctx = new StoreCallResultStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
+				this.state = 520;
+				this.match(ScratchParser.T__42);
 				this.state = 521;
-				this.match(ScratchParser.T__43);
-				this.state = 522;
 				this.variable();
-				this.state = 523;
+				this.state = 522;
 				this.match(ScratchParser.T__14);
-				this.state = 524;
+				this.state = 523;
 				this.callStmt();
 				}
 				break;
@@ -2765,19 +2755,19 @@ export class ScratchParser extends Parser {
 			let _alt: number;
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 531;
+			this.state = 530;
 			this._errHandler.sync(this);
 			_alt = this.interpreter.adaptivePredict(this._input, 33, this._ctx);
 			while (_alt !== 2 && _alt !== ATN.INVALID_ALT_NUMBER) {
 				if (_alt === 1) {
 					{
 					{
-					this.state = 528;
+					this.state = 527;
 					this.setStmt();
 					}
 					}
 				}
-				this.state = 533;
+				this.state = 532;
 				this._errHandler.sync(this);
 				_alt = this.interpreter.adaptivePredict(this._input, 33, this._ctx);
 			}
@@ -2802,17 +2792,17 @@ export class ScratchParser extends Parser {
 		let _localctx: TerminationStmtContext = new TerminationStmtContext(this._ctx, this.state);
 		this.enterRule(_localctx, 112, ScratchParser.RULE_terminationStmt);
 		try {
-			this.state = 542;
+			this.state = 541;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 34, this._ctx) ) {
 			case 1:
 				_localctx = new StopAllContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
+				this.state = 533;
+				this.match(ScratchParser.T__58);
 				this.state = 534;
-				this.match(ScratchParser.T__59);
-				this.state = 535;
-				this.match(ScratchParser.T__70);
+				this.match(ScratchParser.T__69);
 				}
 				break;
 
@@ -2820,12 +2810,12 @@ export class ScratchParser extends Parser {
 				_localctx = new StopThisContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
+				this.state = 535;
+				this.match(ScratchParser.T__58);
 				this.state = 536;
-				this.match(ScratchParser.T__59);
+				this.match(ScratchParser.T__77);
 				this.state = 537;
-				this.match(ScratchParser.T__78);
-				this.state = 538;
-				this.match(ScratchParser.T__25);
+				this.match(ScratchParser.T__24);
 				}
 				break;
 
@@ -2833,12 +2823,12 @@ export class ScratchParser extends Parser {
 				_localctx = new DeleteThisCloneContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
+				this.state = 538;
+				this.match(ScratchParser.T__68);
 				this.state = 539;
-				this.match(ScratchParser.T__69);
+				this.match(ScratchParser.T__77);
 				this.state = 540;
-				this.match(ScratchParser.T__78);
-				this.state = 541;
-				this.match(ScratchParser.T__34);
+				this.match(ScratchParser.T__33);
 				}
 				break;
 			}
@@ -2864,7 +2854,7 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 544;
+			this.state = 543;
 			this.coreStringExpr();
 			}
 		}
@@ -2887,14 +2877,14 @@ export class ScratchParser extends Parser {
 		let _localctx: CoreStringExprContext = new CoreStringExprContext(this._ctx, this.state);
 		this.enterRule(_localctx, 116, ScratchParser.RULE_coreStringExpr);
 		try {
-			this.state = 587;
+			this.state = 586;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 35, this._ctx) ) {
 			case 1:
 				_localctx = new StringLiteralExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 546;
+				this.state = 545;
 				this.match(ScratchParser.String);
 				}
 				break;
@@ -2903,7 +2893,7 @@ export class ScratchParser extends Parser {
 				_localctx = new StringVariableExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 547;
+				this.state = 546;
 				this.variable();
 				}
 				break;
@@ -2912,12 +2902,12 @@ export class ScratchParser extends Parser {
 				_localctx = new StringParanthExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
+				this.state = 547;
+				this.match(ScratchParser.T__45);
 				this.state = 548;
-				this.match(ScratchParser.T__46);
-				this.state = 549;
 				this.coreStringExpr();
-				this.state = 550;
-				this.match(ScratchParser.T__47);
+				this.state = 549;
+				this.match(ScratchParser.T__46);
 				}
 				break;
 
@@ -2925,7 +2915,7 @@ export class ScratchParser extends Parser {
 				_localctx = new StringCallStatementExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 552;
+				this.state = 551;
 				this.callStmt();
 				}
 				break;
@@ -2934,14 +2924,14 @@ export class ScratchParser extends Parser {
 				_localctx = new NumAsStringExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 5);
 				{
+				this.state = 552;
+				this.match(ScratchParser.T__78);
 				this.state = 553;
-				this.match(ScratchParser.T__79);
-				this.state = 554;
 				this.numExpr();
+				this.state = 554;
+				this.match(ScratchParser.T__71);
 				this.state = 555;
-				this.match(ScratchParser.T__72);
-				this.state = 556;
-				this.match(ScratchParser.T__21);
+				this.match(ScratchParser.T__20);
 				}
 				break;
 
@@ -2949,14 +2939,14 @@ export class ScratchParser extends Parser {
 				_localctx = new BoolAsStringExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 6);
 				{
+				this.state = 557;
+				this.match(ScratchParser.T__78);
 				this.state = 558;
-				this.match(ScratchParser.T__79);
-				this.state = 559;
 				this.boolExpr();
+				this.state = 559;
+				this.match(ScratchParser.T__71);
 				this.state = 560;
-				this.match(ScratchParser.T__72);
-				this.state = 561;
-				this.match(ScratchParser.T__21);
+				this.match(ScratchParser.T__20);
 				}
 				break;
 
@@ -2964,13 +2954,13 @@ export class ScratchParser extends Parser {
 				_localctx = new StringAttributeOfExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 7);
 				{
+				this.state = 562;
+				this.match(ScratchParser.T__79);
 				this.state = 563;
-				this.match(ScratchParser.T__80);
-				this.state = 564;
 				this.stringExpr();
-				this.state = 565;
+				this.state = 564;
 				this.match(ScratchParser.T__16);
-				this.state = 566;
+				this.state = 565;
 				this.actorExpr();
 				}
 				break;
@@ -2979,11 +2969,11 @@ export class ScratchParser extends Parser {
 				_localctx = new JoinStringsExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 8);
 				{
+				this.state = 567;
+				this.match(ScratchParser.T__80);
 				this.state = 568;
-				this.match(ScratchParser.T__81);
-				this.state = 569;
 				this.stringExpr();
-				this.state = 570;
+				this.state = 569;
 				this.stringExpr();
 				}
 				break;
@@ -2992,13 +2982,13 @@ export class ScratchParser extends Parser {
 				_localctx = new IthLetterOfStringExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 9);
 				{
+				this.state = 571;
+				this.match(ScratchParser.T__81);
 				this.state = 572;
-				this.match(ScratchParser.T__82);
-				this.state = 573;
 				this.numExpr();
-				this.state = 574;
+				this.state = 573;
 				this.match(ScratchParser.T__16);
-				this.state = 575;
+				this.state = 574;
 				this.stringExpr();
 				}
 				break;
@@ -3007,13 +2997,13 @@ export class ScratchParser extends Parser {
 				_localctx = new IthStringItemOfExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 10);
 				{
+				this.state = 576;
+				this.match(ScratchParser.T__75);
 				this.state = 577;
-				this.match(ScratchParser.T__76);
-				this.state = 578;
 				this.numExpr();
-				this.state = 579;
+				this.state = 578;
 				this.match(ScratchParser.T__16);
-				this.state = 580;
+				this.state = 579;
 				this.variable();
 				}
 				break;
@@ -3022,13 +3012,13 @@ export class ScratchParser extends Parser {
 				_localctx = new DefaultStringExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 11);
 				{
+				this.state = 581;
+				this.match(ScratchParser.T__82);
 				this.state = 582;
-				this.match(ScratchParser.T__83);
-				this.state = 583;
 				this.match(ScratchParser.String);
+				this.state = 583;
+				this.match(ScratchParser.T__83);
 				this.state = 584;
-				this.match(ScratchParser.T__84);
-				this.state = 585;
 				this.stringExpr();
 				}
 				break;
@@ -3037,8 +3027,8 @@ export class ScratchParser extends Parser {
 				_localctx = new UnspecifiedStringExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 12);
 				{
-				this.state = 586;
-				this.match(ScratchParser.T__85);
+				this.state = 585;
+				this.match(ScratchParser.T__84);
 				}
 				break;
 			}
@@ -3064,7 +3054,7 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 589;
+			this.state = 588;
 			this.coreBoolExpr(0);
 			}
 		}
@@ -3101,7 +3091,7 @@ export class ScratchParser extends Parser {
 			let _alt: number;
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 632;
+			this.state = 631;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 36, this._ctx) ) {
 			case 1:
@@ -3110,7 +3100,7 @@ export class ScratchParser extends Parser {
 				this._ctx = _localctx;
 				_prevctx = _localctx;
 
-				this.state = 592;
+				this.state = 591;
 				this.match(ScratchParser.Boolean);
 				}
 				break;
@@ -3120,7 +3110,7 @@ export class ScratchParser extends Parser {
 				_localctx = new BoolVariableExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 593;
+				this.state = 592;
 				this.variable();
 				}
 				break;
@@ -3130,12 +3120,12 @@ export class ScratchParser extends Parser {
 				_localctx = new BoolParanthExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 593;
+				this.match(ScratchParser.T__45);
 				this.state = 594;
-				this.match(ScratchParser.T__46);
-				this.state = 595;
 				this.coreBoolExpr(0);
-				this.state = 596;
-				this.match(ScratchParser.T__47);
+				this.state = 595;
+				this.match(ScratchParser.T__46);
 				}
 				break;
 
@@ -3144,7 +3134,7 @@ export class ScratchParser extends Parser {
 				_localctx = new BoolCallStatementExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 598;
+				this.state = 597;
 				this.callStmt();
 				}
 				break;
@@ -3154,14 +3144,14 @@ export class ScratchParser extends Parser {
 				_localctx = new NumAsBoolExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 598;
+				this.match(ScratchParser.T__78);
 				this.state = 599;
-				this.match(ScratchParser.T__79);
-				this.state = 600;
 				this.numExpr();
+				this.state = 600;
+				this.match(ScratchParser.T__71);
 				this.state = 601;
-				this.match(ScratchParser.T__72);
-				this.state = 602;
-				this.match(ScratchParser.T__20);
+				this.match(ScratchParser.T__19);
 				}
 				break;
 
@@ -3170,14 +3160,14 @@ export class ScratchParser extends Parser {
 				_localctx = new StringAsBoolExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 603;
+				this.match(ScratchParser.T__78);
 				this.state = 604;
-				this.match(ScratchParser.T__79);
-				this.state = 605;
 				this.stringExpr();
+				this.state = 605;
+				this.match(ScratchParser.T__71);
 				this.state = 606;
-				this.match(ScratchParser.T__72);
-				this.state = 607;
-				this.match(ScratchParser.T__20);
+				this.match(ScratchParser.T__19);
 				}
 				break;
 
@@ -3186,9 +3176,9 @@ export class ScratchParser extends Parser {
 				_localctx = new NegatedBoolExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 608;
+				this.match(ScratchParser.T__85);
 				this.state = 609;
-				this.match(ScratchParser.T__86);
-				this.state = 610;
 				this.coreBoolExpr(9);
 				}
 				break;
@@ -3198,11 +3188,11 @@ export class ScratchParser extends Parser {
 				_localctx = new GreaterThanExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 611;
+				this.state = 610;
 				this.numOrStringExpr();
+				this.state = 611;
+				this.match(ScratchParser.T__87);
 				this.state = 612;
-				this.match(ScratchParser.T__88);
-				this.state = 613;
 				this.numOrStringExpr();
 				}
 				break;
@@ -3212,11 +3202,11 @@ export class ScratchParser extends Parser {
 				_localctx = new LessThanExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 615;
+				this.state = 614;
 				this.numOrStringExpr();
+				this.state = 615;
+				this.match(ScratchParser.T__88);
 				this.state = 616;
-				this.match(ScratchParser.T__89);
-				this.state = 617;
 				this.numOrStringExpr();
 				}
 				break;
@@ -3226,11 +3216,11 @@ export class ScratchParser extends Parser {
 				_localctx = new EqualsExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 619;
+				this.state = 618;
 				this.numOrStringExpr();
+				this.state = 619;
+				this.match(ScratchParser.T__89);
 				this.state = 620;
-				this.match(ScratchParser.T__90);
-				this.state = 621;
 				this.numOrStringExpr();
 				}
 				break;
@@ -3240,11 +3230,11 @@ export class ScratchParser extends Parser {
 				_localctx = new StrContainsExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 623;
+				this.state = 622;
 				this.stringExpr();
+				this.state = 623;
+				this.match(ScratchParser.T__90);
 				this.state = 624;
-				this.match(ScratchParser.T__91);
-				this.state = 625;
 				this.stringExpr();
 				}
 				break;
@@ -3254,13 +3244,13 @@ export class ScratchParser extends Parser {
 				_localctx = new DefaultBoolExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 626;
+				this.match(ScratchParser.T__82);
 				this.state = 627;
-				this.match(ScratchParser.T__83);
-				this.state = 628;
 				this.match(ScratchParser.Boolean);
+				this.state = 628;
+				this.match(ScratchParser.T__83);
 				this.state = 629;
-				this.match(ScratchParser.T__84);
-				this.state = 630;
 				this.coreBoolExpr(2);
 				}
 				break;
@@ -3270,13 +3260,13 @@ export class ScratchParser extends Parser {
 				_localctx = new UnspecifiedBoolExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 631;
-				this.match(ScratchParser.T__92);
+				this.state = 630;
+				this.match(ScratchParser.T__91);
 				}
 				break;
 			}
 			this._ctx._stop = this._input.tryLT(-1);
-			this.state = 642;
+			this.state = 641;
 			this._errHandler.sync(this);
 			_alt = this.interpreter.adaptivePredict(this._input, 38, this._ctx);
 			while (_alt !== 2 && _alt !== ATN.INVALID_ALT_NUMBER) {
@@ -3286,20 +3276,20 @@ export class ScratchParser extends Parser {
 					}
 					_prevctx = _localctx;
 					{
-					this.state = 640;
+					this.state = 639;
 					this._errHandler.sync(this);
 					switch ( this.interpreter.adaptivePredict(this._input, 37, this._ctx) ) {
 					case 1:
 						{
 						_localctx = new BoolAndExpressionContext(new CoreBoolExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, ScratchParser.RULE_coreBoolExpr);
-						this.state = 634;
+						this.state = 633;
 						if (!(this.precpred(this._ctx, 8))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 8)");
 						}
+						this.state = 634;
+						this.match(ScratchParser.T__63);
 						this.state = 635;
-						this.match(ScratchParser.T__64);
-						this.state = 636;
 						this.coreBoolExpr(9);
 						}
 						break;
@@ -3308,20 +3298,20 @@ export class ScratchParser extends Parser {
 						{
 						_localctx = new BoolOrExpressionContext(new CoreBoolExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, ScratchParser.RULE_coreBoolExpr);
-						this.state = 637;
+						this.state = 636;
 						if (!(this.precpred(this._ctx, 7))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 7)");
 						}
+						this.state = 637;
+						this.match(ScratchParser.T__86);
 						this.state = 638;
-						this.match(ScratchParser.T__87);
-						this.state = 639;
 						this.coreBoolExpr(8);
 						}
 						break;
 					}
 					}
 				}
-				this.state = 644;
+				this.state = 643;
 				this._errHandler.sync(this);
 				_alt = this.interpreter.adaptivePredict(this._input, 38, this._ctx);
 			}
@@ -3348,7 +3338,7 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 645;
+			this.state = 644;
 			this.coreNumExpr(0);
 			}
 		}
@@ -3371,14 +3361,14 @@ export class ScratchParser extends Parser {
 		let _localctx: NumOrStringExprContext = new NumOrStringExprContext(this._ctx, this.state);
 		this.enterRule(_localctx, 124, ScratchParser.RULE_numOrStringExpr);
 		try {
-			this.state = 649;
+			this.state = 648;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 39, this._ctx) ) {
 			case 1:
 				_localctx = new NumberExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 647;
+				this.state = 646;
 				this.numExpr();
 				}
 				break;
@@ -3387,7 +3377,7 @@ export class ScratchParser extends Parser {
 				_localctx = new StringExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 648;
+				this.state = 647;
 				this.stringExpr();
 				}
 				break;
@@ -3426,7 +3416,7 @@ export class ScratchParser extends Parser {
 			let _alt: number;
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 704;
+			this.state = 703;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 40, this._ctx) ) {
 			case 1:
@@ -3435,7 +3425,7 @@ export class ScratchParser extends Parser {
 				this._ctx = _localctx;
 				_prevctx = _localctx;
 
-				this.state = 652;
+				this.state = 651;
 				this.number();
 				}
 				break;
@@ -3445,7 +3435,7 @@ export class ScratchParser extends Parser {
 				_localctx = new NumVariableExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 653;
+				this.state = 652;
 				this.variable();
 				}
 				break;
@@ -3455,12 +3445,12 @@ export class ScratchParser extends Parser {
 				_localctx = new NumBracketsContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 653;
+				this.match(ScratchParser.T__45);
 				this.state = 654;
-				this.match(ScratchParser.T__46);
-				this.state = 655;
 				this.coreNumExpr(0);
-				this.state = 656;
-				this.match(ScratchParser.T__47);
+				this.state = 655;
+				this.match(ScratchParser.T__46);
 				}
 				break;
 
@@ -3469,7 +3459,7 @@ export class ScratchParser extends Parser {
 				_localctx = new NumCallStatementExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 658;
+				this.state = 657;
 				this.callStmt();
 				}
 				break;
@@ -3479,14 +3469,14 @@ export class ScratchParser extends Parser {
 				_localctx = new StringToFloatExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 658;
+				this.match(ScratchParser.T__78);
 				this.state = 659;
-				this.match(ScratchParser.T__79);
-				this.state = 660;
 				this.stringExpr();
+				this.state = 660;
+				this.match(ScratchParser.T__71);
 				this.state = 661;
-				this.match(ScratchParser.T__72);
-				this.state = 662;
-				this.match(ScratchParser.T__19);
+				this.match(ScratchParser.T__18);
 				}
 				break;
 
@@ -3495,14 +3485,14 @@ export class ScratchParser extends Parser {
 				_localctx = new StringToIntExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 663;
+				this.match(ScratchParser.T__78);
 				this.state = 664;
-				this.match(ScratchParser.T__79);
-				this.state = 665;
 				this.stringExpr();
+				this.state = 665;
+				this.match(ScratchParser.T__71);
 				this.state = 666;
-				this.match(ScratchParser.T__72);
-				this.state = 667;
-				this.match(ScratchParser.T__18);
+				this.match(ScratchParser.T__17);
 				}
 				break;
 
@@ -3511,14 +3501,14 @@ export class ScratchParser extends Parser {
 				_localctx = new BoolToIntExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 668;
+				this.match(ScratchParser.T__78);
 				this.state = 669;
-				this.match(ScratchParser.T__79);
-				this.state = 670;
 				this.boolExpr();
+				this.state = 670;
+				this.match(ScratchParser.T__71);
 				this.state = 671;
-				this.match(ScratchParser.T__72);
-				this.state = 672;
-				this.match(ScratchParser.T__18);
+				this.match(ScratchParser.T__17);
 				}
 				break;
 
@@ -3527,14 +3517,14 @@ export class ScratchParser extends Parser {
 				_localctx = new NumToFloatExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 673;
+				this.match(ScratchParser.T__78);
 				this.state = 674;
-				this.match(ScratchParser.T__79);
-				this.state = 675;
 				this.coreNumExpr(0);
+				this.state = 675;
+				this.match(ScratchParser.T__71);
 				this.state = 676;
-				this.match(ScratchParser.T__72);
-				this.state = 677;
-				this.match(ScratchParser.T__19);
+				this.match(ScratchParser.T__18);
 				}
 				break;
 
@@ -3543,14 +3533,14 @@ export class ScratchParser extends Parser {
 				_localctx = new NumToIntExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 678;
+				this.match(ScratchParser.T__78);
 				this.state = 679;
-				this.match(ScratchParser.T__79);
-				this.state = 680;
 				this.coreNumExpr(0);
+				this.state = 680;
+				this.match(ScratchParser.T__71);
 				this.state = 681;
-				this.match(ScratchParser.T__72);
-				this.state = 682;
-				this.match(ScratchParser.T__18);
+				this.match(ScratchParser.T__17);
 				}
 				break;
 
@@ -3559,8 +3549,8 @@ export class ScratchParser extends Parser {
 				_localctx = new TimerExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 684;
-				this.match(ScratchParser.T__66);
+				this.state = 683;
+				this.match(ScratchParser.T__65);
 				}
 				break;
 
@@ -3569,11 +3559,11 @@ export class ScratchParser extends Parser {
 				_localctx = new LengthOfStringExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 684;
+				this.match(ScratchParser.T__92);
 				this.state = 685;
-				this.match(ScratchParser.T__93);
-				this.state = 686;
 				this.match(ScratchParser.T__16);
-				this.state = 687;
+				this.state = 686;
 				this.stringExpr();
 				}
 				break;
@@ -3583,13 +3573,13 @@ export class ScratchParser extends Parser {
 				_localctx = new LengthOfListExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 687;
+				this.match(ScratchParser.T__92);
 				this.state = 688;
-				this.match(ScratchParser.T__93);
-				this.state = 689;
 				this.match(ScratchParser.T__16);
-				this.state = 690;
+				this.state = 689;
 				this.match(ScratchParser.T__15);
-				this.state = 691;
+				this.state = 690;
 				this.variable();
 				}
 				break;
@@ -3599,15 +3589,15 @@ export class ScratchParser extends Parser {
 				_localctx = new IndexOfExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 691;
+				this.match(ScratchParser.T__93);
 				this.state = 692;
-				this.match(ScratchParser.T__94);
-				this.state = 693;
 				this.match(ScratchParser.T__16);
-				this.state = 694;
+				this.state = 693;
 				this.expression();
+				this.state = 694;
+				this.match(ScratchParser.T__39);
 				this.state = 695;
-				this.match(ScratchParser.T__40);
-				this.state = 696;
 				this.variable();
 				}
 				break;
@@ -3617,13 +3607,13 @@ export class ScratchParser extends Parser {
 				_localctx = new DefaultNumExprContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
+				this.state = 697;
+				this.match(ScratchParser.T__82);
 				this.state = 698;
-				this.match(ScratchParser.T__83);
-				this.state = 699;
 				this.number();
+				this.state = 699;
+				this.match(ScratchParser.T__83);
 				this.state = 700;
-				this.match(ScratchParser.T__84);
-				this.state = 701;
 				this.coreNumExpr(2);
 				}
 				break;
@@ -3633,13 +3623,13 @@ export class ScratchParser extends Parser {
 				_localctx = new UnspecifiedNumExprContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 703;
-				this.match(ScratchParser.T__99);
+				this.state = 702;
+				this.match(ScratchParser.T__98);
 				}
 				break;
 			}
 			this._ctx._stop = this._input.tryLT(-1);
-			this.state = 723;
+			this.state = 722;
 			this._errHandler.sync(this);
 			_alt = this.interpreter.adaptivePredict(this._input, 42, this._ctx);
 			while (_alt !== 2 && _alt !== ATN.INVALID_ALT_NUMBER) {
@@ -3649,20 +3639,20 @@ export class ScratchParser extends Parser {
 					}
 					_prevctx = _localctx;
 					{
-					this.state = 721;
+					this.state = 720;
 					this._errHandler.sync(this);
 					switch ( this.interpreter.adaptivePredict(this._input, 41, this._ctx) ) {
 					case 1:
 						{
 						_localctx = new NumMulExpressionContext(new CoreNumExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, ScratchParser.RULE_coreNumExpr);
-						this.state = 706;
+						this.state = 705;
 						if (!(this.precpred(this._ctx, 7))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 7)");
 						}
-						this.state = 707;
+						this.state = 706;
 						this.match(ScratchParser.T__4);
-						this.state = 708;
+						this.state = 707;
 						this.coreNumExpr(8);
 						}
 						break;
@@ -3671,13 +3661,13 @@ export class ScratchParser extends Parser {
 						{
 						_localctx = new NumDivExpressionContext(new CoreNumExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, ScratchParser.RULE_coreNumExpr);
-						this.state = 709;
+						this.state = 708;
 						if (!(this.precpred(this._ctx, 6))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 6)");
 						}
+						this.state = 709;
+						this.match(ScratchParser.T__94);
 						this.state = 710;
-						this.match(ScratchParser.T__95);
-						this.state = 711;
 						this.coreNumExpr(7);
 						}
 						break;
@@ -3686,13 +3676,13 @@ export class ScratchParser extends Parser {
 						{
 						_localctx = new NumModExpressionContext(new CoreNumExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, ScratchParser.RULE_coreNumExpr);
-						this.state = 712;
+						this.state = 711;
 						if (!(this.precpred(this._ctx, 5))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 5)");
 						}
+						this.state = 712;
+						this.match(ScratchParser.T__95);
 						this.state = 713;
-						this.match(ScratchParser.T__96);
-						this.state = 714;
 						this.coreNumExpr(6);
 						}
 						break;
@@ -3701,13 +3691,13 @@ export class ScratchParser extends Parser {
 						{
 						_localctx = new NumPlusExpressionContext(new CoreNumExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, ScratchParser.RULE_coreNumExpr);
-						this.state = 715;
+						this.state = 714;
 						if (!(this.precpred(this._ctx, 4))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 4)");
 						}
+						this.state = 715;
+						this.match(ScratchParser.T__96);
 						this.state = 716;
-						this.match(ScratchParser.T__97);
-						this.state = 717;
 						this.coreNumExpr(5);
 						}
 						break;
@@ -3716,20 +3706,20 @@ export class ScratchParser extends Parser {
 						{
 						_localctx = new NumMinusExpressionContext(new CoreNumExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, ScratchParser.RULE_coreNumExpr);
-						this.state = 718;
+						this.state = 717;
 						if (!(this.precpred(this._ctx, 3))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 3)");
 						}
+						this.state = 718;
+						this.match(ScratchParser.T__97);
 						this.state = 719;
-						this.match(ScratchParser.T__98);
-						this.state = 720;
 						this.coreNumExpr(4);
 						}
 						break;
 					}
 					}
 				}
-				this.state = 725;
+				this.state = 724;
 				this._errHandler.sync(this);
 				_alt = this.interpreter.adaptivePredict(this._input, 42, this._ctx);
 			}
@@ -3754,28 +3744,28 @@ export class ScratchParser extends Parser {
 		let _localctx: ListExprContext = new ListExprContext(this._ctx, this.state);
 		this.enterRule(_localctx, 128, ScratchParser.RULE_listExpr);
 		try {
-			this.state = 731;
+			this.state = 730;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
-			case ScratchParser.T__104:
+			case ScratchParser.T__103:
 			case ScratchParser.Identifier:
 				_localctx = new ListVariableExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 726;
+				this.state = 725;
 				this.variable();
 				}
 				break;
-			case ScratchParser.T__23:
+			case ScratchParser.T__22:
 				_localctx = new ListWithElementsExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
+				this.state = 726;
+				this.match(ScratchParser.T__22);
 				this.state = 727;
-				this.match(ScratchParser.T__23);
-				this.state = 728;
 				this.expressionListPlain();
-				this.state = 729;
-				this.match(ScratchParser.T__24);
+				this.state = 728;
+				this.match(ScratchParser.T__23);
 				}
 				break;
 			default:
@@ -3801,14 +3791,14 @@ export class ScratchParser extends Parser {
 		let _localctx: ActorExprContext = new ActorExprContext(this._ctx, this.state);
 		this.enterRule(_localctx, 130, ScratchParser.RULE_actorExpr);
 		try {
-			this.state = 747;
+			this.state = 746;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 44, this._ctx) ) {
 			case 1:
 				_localctx = new ActorVariableExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 733;
+				this.state = 732;
 				this.variable();
 				}
 				break;
@@ -3817,11 +3807,11 @@ export class ScratchParser extends Parser {
 				_localctx = new LocateActorExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
+				this.state = 733;
+				this.match(ScratchParser.T__99);
 				this.state = 734;
-				this.match(ScratchParser.T__100);
-				this.state = 735;
 				this.match(ScratchParser.T__9);
-				this.state = 736;
+				this.state = 735;
 				this.stringExpr();
 				}
 				break;
@@ -3830,13 +3820,13 @@ export class ScratchParser extends Parser {
 				_localctx = new StartCloneActorExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
+				this.state = 736;
+				this.match(ScratchParser.T__100);
 				this.state = 737;
-				this.match(ScratchParser.T__101);
+				this.match(ScratchParser.T__33);
 				this.state = 738;
-				this.match(ScratchParser.T__34);
-				this.state = 739;
 				this.match(ScratchParser.T__16);
-				this.state = 740;
+				this.state = 739;
 				this.actorExpr();
 				}
 				break;
@@ -3845,15 +3835,15 @@ export class ScratchParser extends Parser {
 				_localctx = new UsherActorExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 4);
 				{
+				this.state = 740;
+				this.match(ScratchParser.T__100);
 				this.state = 741;
-				this.match(ScratchParser.T__101);
-				this.state = 742;
 				this.match(ScratchParser.T__9);
-				this.state = 743;
+				this.state = 742;
 				this.stringExpr();
-				this.state = 744;
+				this.state = 743;
 				this.match(ScratchParser.T__14);
-				this.state = 745;
+				this.state = 744;
 				this.ident();
 				}
 				break;
@@ -3880,7 +3870,7 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 749;
+			this.state = 748;
 			this.coreExpression();
 			}
 		}
@@ -3903,13 +3893,13 @@ export class ScratchParser extends Parser {
 		let _localctx: CoreExpressionContext = new CoreExpressionContext(this._ctx, this.state);
 		this.enterRule(_localctx, 134, ScratchParser.RULE_coreExpression);
 		try {
-			this.state = 757;
+			this.state = 756;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 45, this._ctx) ) {
 			case 1:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 751;
+				this.state = 750;
 				this.stringExpr();
 				}
 				break;
@@ -3917,7 +3907,7 @@ export class ScratchParser extends Parser {
 			case 2:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 752;
+				this.state = 751;
 				this.numExpr();
 				}
 				break;
@@ -3925,7 +3915,7 @@ export class ScratchParser extends Parser {
 			case 3:
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 753;
+				this.state = 752;
 				this.boolExpr();
 				}
 				break;
@@ -3933,7 +3923,7 @@ export class ScratchParser extends Parser {
 			case 4:
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 754;
+				this.state = 753;
 				this.listExpr();
 				}
 				break;
@@ -3941,7 +3931,7 @@ export class ScratchParser extends Parser {
 			case 5:
 				this.enterOuterAlt(_localctx, 5);
 				{
-				this.state = 755;
+				this.state = 754;
 				this.actorExpr();
 				}
 				break;
@@ -3949,7 +3939,7 @@ export class ScratchParser extends Parser {
 			case 6:
 				this.enterOuterAlt(_localctx, 6);
 				{
-				this.state = 756;
+				this.state = 755;
 				this.unspecifiedExpr();
 				}
 				break;
@@ -3976,8 +3966,8 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 759;
-			this.match(ScratchParser.T__102);
+			this.state = 758;
+			this.match(ScratchParser.T__101);
 			}
 		}
 		catch (re) {
@@ -3999,14 +3989,14 @@ export class ScratchParser extends Parser {
 		let _localctx: VariableContext = new VariableContext(this._ctx, this.state);
 		this.enterRule(_localctx, 138, ScratchParser.RULE_variable);
 		try {
-			this.state = 766;
+			this.state = 765;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 46, this._ctx) ) {
 			case 1:
 				_localctx = new FlatVariableContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 761;
+				this.state = 760;
 				this.ident();
 				}
 				break;
@@ -4015,11 +4005,11 @@ export class ScratchParser extends Parser {
 				_localctx = new QualifiedVariableContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 762;
+				this.state = 761;
 				this.ident();
+				this.state = 762;
+				this.match(ScratchParser.T__102);
 				this.state = 763;
-				this.match(ScratchParser.T__103);
-				this.state = 764;
 				this.ident();
 				}
 				break;
@@ -4044,24 +4034,24 @@ export class ScratchParser extends Parser {
 		let _localctx: IdentContext = new IdentContext(this._ctx, this.state);
 		this.enterRule(_localctx, 140, ScratchParser.RULE_ident);
 		try {
-			this.state = 771;
+			this.state = 770;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case ScratchParser.Identifier:
 				_localctx = new IdentExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 768;
+				this.state = 767;
 				this.match(ScratchParser.Identifier);
 				}
 				break;
-			case ScratchParser.T__104:
+			case ScratchParser.T__103:
 				_localctx = new StrIdentExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
+				this.state = 768;
+				this.match(ScratchParser.T__103);
 				this.state = 769;
-				this.match(ScratchParser.T__104);
-				this.state = 770;
 				this.match(ScratchParser.String);
 				}
 				break;
@@ -4088,14 +4078,14 @@ export class ScratchParser extends Parser {
 		let _localctx: NumberContext = new NumberContext(this._ctx, this.state);
 		this.enterRule(_localctx, 142, ScratchParser.RULE_number);
 		try {
-			this.state = 775;
+			this.state = 774;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case ScratchParser.IntegerLiteral:
 				_localctx = new IntegerLiteralExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 773;
+				this.state = 772;
 				this.match(ScratchParser.IntegerLiteral);
 				}
 				break;
@@ -4103,7 +4093,7 @@ export class ScratchParser extends Parser {
 				_localctx = new DecimalLiteralExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 774;
+				this.state = 773;
 				this.match(ScratchParser.DecimalLiteral);
 				}
 				break;
@@ -4132,7 +4122,7 @@ export class ScratchParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 777;
+			this.state = 776;
 			this.match(ScratchParser.String);
 			}
 		}
@@ -4155,14 +4145,14 @@ export class ScratchParser extends Parser {
 		let _localctx: MessageContext = new MessageContext(this._ctx, this.state);
 		this.enterRule(_localctx, 146, ScratchParser.RULE_message);
 		try {
-			this.state = 783;
+			this.state = 782;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 49, this._ctx) ) {
 			case 1:
 				_localctx = new UserMessageContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 779;
+				this.state = 778;
 				this.stringExpr();
 				}
 				break;
@@ -4171,11 +4161,11 @@ export class ScratchParser extends Parser {
 				_localctx = new SystemMessageContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 780;
+				this.state = 779;
 				this.match(ScratchParser.String);
+				this.state = 780;
+				this.match(ScratchParser.T__94);
 				this.state = 781;
-				this.match(ScratchParser.T__95);
-				this.state = 782;
 				this.stringExpr();
 				}
 				break;
@@ -4238,7 +4228,7 @@ export class ScratchParser extends Parser {
 
 	private static readonly _serializedATNSegments: number = 2;
 	private static readonly _serializedATNSegment0: string =
-		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03u\u0314\x04\x02" +
+		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03t\u0313\x04\x02" +
 		"\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07" +
 		"\t\x07\x04\b\t\b\x04\t\t\t\x04\n\t\n\x04\v\t\v\x04\f\t\f\x04\r\t\r\x04" +
 		"\x0E\t\x0E\x04\x0F\t\x0F\x04\x10\t\x10\x04\x11\t\x11\x04\x12\t\x12\x04" +
@@ -4260,83 +4250,83 @@ export class ScratchParser extends Parser {
 		"\x0F\x03\x0F\x03\x0F\x03\x0F\x03\x0F\x03\x10\x07\x10\xE6\n\x10\f\x10\x0E" +
 		"\x10\xE9\v\x10\x03\x11\x03\x11\x03\x11\x03\x11\x03\x11\x05\x11\xF0\n\x11" +
 		"\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12" +
-		"\x03\x12\x05\x12\xFC\n\x12\x03\x13\x03\x13\x03\x13\x03\x13\x03\x13\x03" +
-		"\x13\x03\x13\x03\x14\x07\x14\u0106\n\x14\f\x14\x0E\x14\u0109\v\x14\x03" +
-		"\x15\x07\x15\u010C\n\x15\f\x15\x0E\x15\u010F\v\x15\x03\x16\x03\x16\x03" +
-		"\x17\x03\x17\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03" +
+		"\x05\x12\xFB\n\x12\x03\x13\x03\x13\x03\x13\x03\x13\x03\x13\x03\x13\x03" +
+		"\x13\x03\x14\x07\x14\u0105\n\x14\f\x14\x0E\x14\u0108\v\x14\x03\x15\x07" +
+		"\x15\u010B\n\x15\f\x15\x0E\x15\u010E\v\x15\x03\x16\x03\x16\x03\x17\x03" +
+		"\x17\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03" +
 		"\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03" +
-		"\x18\x03\x18\x05\x18\u0127\n\x18\x03\x19\x03\x19\x03\x19\x05\x19\u012C" +
-		"\n\x19\x03\x1A\x03\x1A\x03\x1A\x03\x1A\x03\x1A\x03\x1B\x03\x1B\x03\x1B" +
-		"\x05\x1B\u0136\n\x1B\x03\x1C\x07\x1C\u0139\n\x1C\f\x1C\x0E\x1C\u013C\v" +
-		"\x1C\x03\x1D\x03\x1D\x03\x1D\x03\x1D\x03\x1D\x03\x1D\x03\x1D\x03\x1E\x03" +
-		"\x1E\x03\x1E\x03\x1E\x03\x1E\x03\x1E\x05\x1E\u014B\n\x1E\x03\x1F\x07\x1F" +
-		"\u014E\n\x1F\f\x1F\x0E\x1F\u0151\v\x1F\x03 \x07 \u0154\n \f \x0E \u0157" +
-		"\v \x03!\x03!\x03\"\x03\"\x03\"\x03\"\x03#\x03#\x03#\x03#\x03$\x03$\x03" +
-		"$\x07$\u0166\n$\f$\x0E$\u0169\v$\x03$\x05$\u016C\n$\x03%\x03%\x03%\x05" +
-		"%\u0171\n%\x03%\x03%\x03&\x03&\x03&\x03\'\x07\'\u0179\n\'\f\'\x0E\'\u017C" +
-		"\v\'\x03(\x03(\x03)\x03)\x03)\x03)\x03)\x05)\u0185\n)\x03*\x03*\x03*\x03" +
-		"*\x03*\x03*\x03+\x03+\x03+\x03+\x03+\x05+\u0192\n+\x03,\x03,\x03,\x03" +
-		",\x03,\x03-\x03-\x03-\x03-\x03-\x03.\x03.\x03.\x03.\x03/\x03/\x03/\x03" +
-		"0\x030\x030\x030\x031\x031\x031\x071\u01AC\n1\f1\x0E1\u01AF\v1\x031\x05" +
-		"1\u01B2\n1\x032\x032\x032\x033\x033\x033\x033\x033\x033\x033\x033\x05" +
-		"3\u01BF\n3\x034\x034\x035\x035\x035\x035\x055\u01C7\n5\x036\x036\x036" +
-		"\x036\x036\x036\x036\x036\x036\x036\x036\x036\x036\x036\x036\x036\x03" +
-		"6\x036\x036\x036\x036\x036\x036\x036\x036\x036\x036\x036\x036\x056\u01E6" +
-		"\n6\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x03" +
+		"\x18\x05\x18\u0126\n\x18\x03\x19\x03\x19\x03\x19\x05\x19\u012B\n\x19\x03" +
+		"\x1A\x03\x1A\x03\x1A\x03\x1A\x03\x1A\x03\x1B\x03\x1B\x03\x1B\x05\x1B\u0135" +
+		"\n\x1B\x03\x1C\x07\x1C\u0138\n\x1C\f\x1C\x0E\x1C\u013B\v\x1C\x03\x1D\x03" +
+		"\x1D\x03\x1D\x03\x1D\x03\x1D\x03\x1D\x03\x1D\x03\x1E\x03\x1E\x03\x1E\x03" +
+		"\x1E\x03\x1E\x03\x1E\x05\x1E\u014A\n\x1E\x03\x1F\x07\x1F\u014D\n\x1F\f" +
+		"\x1F\x0E\x1F\u0150\v\x1F\x03 \x07 \u0153\n \f \x0E \u0156\v \x03!\x03" +
+		"!\x03\"\x03\"\x03\"\x03\"\x03#\x03#\x03#\x03#\x03$\x03$\x03$\x07$\u0165" +
+		"\n$\f$\x0E$\u0168\v$\x03$\x05$\u016B\n$\x03%\x03%\x03%\x05%\u0170\n%\x03" +
+		"%\x03%\x03&\x03&\x03&\x03\'\x07\'\u0178\n\'\f\'\x0E\'\u017B\v\'\x03(\x03" +
+		"(\x03)\x03)\x03)\x03)\x03)\x05)\u0184\n)\x03*\x03*\x03*\x03*\x03*\x03" +
+		"*\x03+\x03+\x03+\x03+\x03+\x05+\u0191\n+\x03,\x03,\x03,\x03,\x03,\x03" +
+		"-\x03-\x03-\x03-\x03-\x03.\x03.\x03.\x03.\x03/\x03/\x03/\x030\x030\x03" +
+		"0\x030\x031\x031\x031\x071\u01AB\n1\f1\x0E1\u01AE\v1\x031\x051\u01B1\n" +
+		"1\x032\x032\x032\x033\x033\x033\x033\x033\x033\x033\x033\x053\u01BE\n" +
+		"3\x034\x034\x035\x035\x035\x035\x055\u01C6\n5\x036\x036\x036\x036\x03" +
+		"6\x036\x036\x036\x036\x036\x036\x036\x036\x036\x036\x036\x036\x036\x03" +
+		"6\x036\x036\x036\x036\x036\x036\x036\x036\x036\x036\x056\u01E5\n6\x03" +
 		"7\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x03" +
-		"7\x037\x057\u0205\n7\x038\x038\x038\x038\x038\x038\x038\x038\x038\x03" +
-		"8\x058\u0211\n8\x039\x079\u0214\n9\f9\x0E9\u0217\v9\x03:\x03:\x03:\x03" +
-		":\x03:\x03:\x03:\x03:\x05:\u0221\n:\x03;\x03;\x03<\x03<\x03<\x03<\x03" +
+		"7\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x03" +
+		"7\x057\u0204\n7\x038\x038\x038\x038\x038\x038\x038\x038\x038\x038\x05" +
+		"8\u0210\n8\x039\x079\u0213\n9\f9\x0E9\u0216\v9\x03:\x03:\x03:\x03:\x03" +
+		":\x03:\x03:\x03:\x05:\u0220\n:\x03;\x03;\x03<\x03<\x03<\x03<\x03<\x03" +
 		"<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03" +
 		"<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03" +
-		"<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x05<\u024E\n<\x03=\x03=\x03" +
+		"<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x05<\u024D\n<\x03=\x03=\x03>\x03" +
 		">\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03" +
 		">\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03" +
-		">\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x05>\u027B" +
-		"\n>\x03>\x03>\x03>\x03>\x03>\x03>\x07>\u0283\n>\f>\x0E>\u0286\v>\x03?" +
-		"\x03?\x03@\x03@\x05@\u028C\n@\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A" +
-		"\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03" +
+		">\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x05>\u027A\n" +
+		">\x03>\x03>\x03>\x03>\x03>\x03>\x07>\u0282\n>\f>\x0E>\u0285\v>\x03?\x03" +
+		"?\x03@\x03@\x05@\u028B\n@\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03" +
 		"A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03" +
 		"A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03" +
-		"A\x03A\x03A\x03A\x05A\u02C3\nA\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03" +
-		"A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x07A\u02D4\nA\fA\x0EA\u02D7\vA\x03" +
-		"B\x03B\x03B\x03B\x03B\x05B\u02DE\nB\x03C\x03C\x03C\x03C\x03C\x03C\x03" +
-		"C\x03C\x03C\x03C\x03C\x03C\x03C\x03C\x05C\u02EE\nC\x03D\x03D\x03E\x03" +
-		"E\x03E\x03E\x03E\x03E\x05E\u02F8\nE\x03F\x03F\x03G\x03G\x03G\x03G\x03" +
-		"G\x05G\u0301\nG\x03H\x03H\x03H\x05H\u0306\nH\x03I\x03I\x05I\u030A\nI\x03" +
-		"J\x03J\x03K\x03K\x03K\x03K\x05K\u0312\nK\x03K\x02\x02\x04z\x80L\x02\x02" +
-		"\x04\x02\x06\x02\b\x02\n\x02\f\x02\x0E\x02\x10\x02\x12\x02\x14\x02\x16" +
-		"\x02\x18\x02\x1A\x02\x1C\x02\x1E\x02 \x02\"\x02$\x02&\x02(\x02*\x02,\x02" +
-		".\x020\x022\x024\x026\x028\x02:\x02<\x02>\x02@\x02B\x02D\x02F\x02H\x02" +
+		"A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03" +
+		"A\x03A\x03A\x05A\u02C2\nA\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03A\x03" +
+		"A\x03A\x03A\x03A\x03A\x03A\x03A\x07A\u02D3\nA\fA\x0EA\u02D6\vA\x03B\x03" +
+		"B\x03B\x03B\x03B\x05B\u02DD\nB\x03C\x03C\x03C\x03C\x03C\x03C\x03C\x03" +
+		"C\x03C\x03C\x03C\x03C\x03C\x03C\x05C\u02ED\nC\x03D\x03D\x03E\x03E\x03" +
+		"E\x03E\x03E\x03E\x05E\u02F7\nE\x03F\x03F\x03G\x03G\x03G\x03G\x03G\x05" +
+		"G\u0300\nG\x03H\x03H\x03H\x05H\u0305\nH\x03I\x03I\x05I\u0309\nI\x03J\x03" +
+		"J\x03K\x03K\x03K\x03K\x05K\u0311\nK\x03K\x02\x02\x04z\x80L\x02\x02\x04" +
+		"\x02\x06\x02\b\x02\n\x02\f\x02\x0E\x02\x10\x02\x12\x02\x14\x02\x16\x02" +
+		"\x18\x02\x1A\x02\x1C\x02\x1E\x02 \x02\"\x02$\x02&\x02(\x02*\x02,\x02." +
+		"\x020\x022\x024\x026\x028\x02:\x02<\x02>\x02@\x02B\x02D\x02F\x02H\x02" +
 		"J\x02L\x02N\x02P\x02R\x02T\x02V\x02X\x02Z\x02\\\x02^\x02`\x02b\x02d\x02" +
 		"f\x02h\x02j\x02l\x02n\x02p\x02r\x02t\x02v\x02x\x02z\x02|\x02~\x02\x80" +
 		"\x02\x82\x02\x84\x02\x86\x02\x88\x02\x8A\x02\x8C\x02\x8E\x02\x90\x02\x92" +
-		"\x02\x94\x02\x02\x03\x03\x02\x03\x04\x02\u0346\x02\x96\x03\x02\x02\x02" +
+		"\x02\x94\x02\x02\x03\x03\x02\x03\x04\x02\u0344\x02\x96\x03\x02\x02\x02" +
 		"\x04\x9C\x03\x02\x02\x02\x06\xA1\x03\x02\x02\x02\b\xA4\x03\x02\x02\x02" +
 		"\n\xAB\x03\x02\x02\x02\f\xB0\x03\x02\x02\x02\x0E\xB3\x03\x02\x02\x02\x10" +
 		"\xC4\x03\x02\x02\x02\x12\xC8\x03\x02\x02\x02\x14\xCA\x03\x02\x02\x02\x16" +
 		"\xD1\x03\x02\x02\x02\x18\xD7\x03\x02\x02\x02\x1A\xDC\x03\x02\x02\x02\x1C" +
-		"\xDF\x03\x02\x02\x02\x1E\xE7\x03\x02\x02\x02 \xEF\x03\x02\x02\x02\"\xFB" +
-		"\x03\x02\x02\x02$\xFD\x03\x02\x02\x02&\u0107\x03\x02\x02\x02(\u010D\x03" +
-		"\x02\x02\x02*\u0110\x03\x02\x02\x02,\u0112\x03\x02\x02\x02.\u0126\x03" +
-		"\x02\x02\x020\u012B\x03\x02\x02\x022\u012D\x03\x02\x02\x024\u0135\x03" +
-		"\x02\x02\x026\u013A\x03\x02\x02\x028\u013D\x03\x02\x02\x02:\u014A\x03" +
-		"\x02\x02\x02<\u014F\x03\x02\x02\x02>\u0155\x03\x02\x02\x02@\u0158\x03" +
-		"\x02\x02\x02B\u015A\x03\x02\x02\x02D\u015E\x03\x02\x02\x02F\u016B\x03" +
-		"\x02\x02\x02H\u016D\x03\x02\x02\x02J\u0174\x03\x02\x02\x02L\u017A\x03" +
-		"\x02\x02\x02N\u017D\x03\x02\x02\x02P\u0184\x03\x02\x02\x02R\u0186\x03" +
-		"\x02\x02\x02T\u0191\x03\x02\x02\x02V\u0193\x03\x02\x02\x02X\u0198\x03" +
-		"\x02\x02\x02Z\u019D\x03\x02\x02\x02\\\u01A1\x03\x02\x02\x02^\u01A4\x03" +
-		"\x02\x02\x02`\u01B1\x03\x02\x02\x02b\u01B3\x03\x02\x02\x02d\u01BE\x03" +
-		"\x02\x02\x02f\u01C0\x03\x02\x02\x02h\u01C6\x03\x02\x02\x02j\u01E5\x03" +
-		"\x02\x02\x02l\u0204\x03\x02\x02\x02n\u0210\x03\x02\x02\x02p\u0215\x03" +
-		"\x02\x02\x02r\u0220\x03\x02\x02\x02t\u0222\x03\x02\x02\x02v\u024D\x03" +
-		"\x02\x02\x02x\u024F\x03\x02\x02\x02z\u027A\x03\x02\x02\x02|\u0287\x03" +
-		"\x02\x02\x02~\u028B\x03\x02\x02\x02\x80\u02C2\x03\x02\x02\x02\x82\u02DD" +
-		"\x03\x02\x02\x02\x84\u02ED\x03\x02\x02\x02\x86\u02EF\x03\x02\x02\x02\x88" +
-		"\u02F7\x03\x02\x02\x02\x8A\u02F9\x03\x02\x02\x02\x8C\u0300\x03\x02\x02" +
-		"\x02\x8E\u0305\x03\x02\x02\x02\x90\u0309\x03\x02\x02\x02\x92\u030B\x03" +
-		"\x02\x02\x02\x94\u0311\x03\x02\x02\x02\x96\x97\x05\x04\x03\x02\x97\x98" +
+		"\xDF\x03\x02\x02\x02\x1E\xE7\x03\x02\x02\x02 \xEF\x03\x02\x02\x02\"\xFA" +
+		"\x03\x02\x02\x02$\xFC\x03\x02\x02\x02&\u0106\x03\x02\x02\x02(\u010C\x03" +
+		"\x02\x02\x02*\u010F\x03\x02\x02\x02,\u0111\x03\x02\x02\x02.\u0125\x03" +
+		"\x02\x02\x020\u012A\x03\x02\x02\x022\u012C\x03\x02\x02\x024\u0134\x03" +
+		"\x02\x02\x026\u0139\x03\x02\x02\x028\u013C\x03\x02\x02\x02:\u0149\x03" +
+		"\x02\x02\x02<\u014E\x03\x02\x02\x02>\u0154\x03\x02\x02\x02@\u0157\x03" +
+		"\x02\x02\x02B\u0159\x03\x02\x02\x02D\u015D\x03\x02\x02\x02F\u016A\x03" +
+		"\x02\x02\x02H\u016C\x03\x02\x02\x02J\u0173\x03\x02\x02\x02L\u0179\x03" +
+		"\x02\x02\x02N\u017C\x03\x02\x02\x02P\u0183\x03\x02\x02\x02R\u0185\x03" +
+		"\x02\x02\x02T\u0190\x03\x02\x02\x02V\u0192\x03\x02\x02\x02X\u0197\x03" +
+		"\x02\x02\x02Z\u019C\x03\x02\x02\x02\\\u01A0\x03\x02\x02\x02^\u01A3\x03" +
+		"\x02\x02\x02`\u01B0\x03\x02\x02\x02b\u01B2\x03\x02\x02\x02d\u01BD\x03" +
+		"\x02\x02\x02f\u01BF\x03\x02\x02\x02h\u01C5\x03\x02\x02\x02j\u01E4\x03" +
+		"\x02\x02\x02l\u0203\x03\x02\x02\x02n\u020F\x03\x02\x02\x02p\u0214\x03" +
+		"\x02\x02\x02r\u021F\x03\x02\x02\x02t\u0221\x03\x02\x02\x02v\u024C\x03" +
+		"\x02\x02\x02x\u024E\x03\x02\x02\x02z\u0279\x03\x02\x02\x02|\u0286\x03" +
+		"\x02\x02\x02~\u028A\x03\x02\x02\x02\x80\u02C1\x03\x02\x02\x02\x82\u02DC" +
+		"\x03\x02\x02\x02\x84\u02EC\x03\x02\x02\x02\x86\u02EE\x03\x02\x02\x02\x88" +
+		"\u02F6\x03\x02\x02\x02\x8A\u02F8\x03\x02\x02\x02\x8C\u02FF\x03\x02\x02" +
+		"\x02\x8E\u0304\x03\x02\x02\x02\x90\u0308\x03\x02\x02\x02\x92\u030A\x03" +
+		"\x02\x02\x02\x94\u0310\x03\x02\x02\x02\x96\x97\x05\x04\x03\x02\x97\x98" +
 		"\x05\x8EH\x02\x98\x99\x05\x06\x04\x02\x99\x9A\x05\f\x07\x02\x9A\x9B\x07" +
 		"\x02\x02\x03\x9B\x03\x03\x02\x02\x02\x9C\x9D\t\x02\x02\x02\x9D\x05\x03" +
 		"\x02\x02\x02\x9E\xA0\x05\b\x05\x02\x9F\x9E\x03\x02\x02\x02\xA0\xA3\x03" +
@@ -4366,253 +4356,252 @@ export class ScratchParser extends Parser {
 		"\x07\x10\x02\x02\xE0\xE1\x05\x8EH\x02\xE1\xE2\x07\x11\x02\x02\xE2\xE3" +
 		"\x05 \x11\x02\xE3\x1D\x03\x02\x02\x02\xE4\xE6\x05\x1C\x0F\x02\xE5\xE4" +
 		"\x03\x02\x02\x02\xE6\xE9\x03\x02\x02\x02\xE7\xE5\x03\x02\x02\x02\xE7\xE8" +
-		"\x03\x02\x02\x02\xE8\x1F\x03\x02\x02\x02\xE9\xE7\x03\x02\x02\x02\xEA\xF0" +
-		"\x05\"\x12\x02\xEB\xEC\x07\x12\x02\x02\xEC\xED\x07\x13\x02\x02\xED\xF0" +
-		"\x05 \x11\x02\xEE\xF0\x07\f\x02\x02\xEF\xEA\x03\x02\x02\x02\xEF\xEB\x03" +
-		"\x02\x02\x02\xEF\xEE\x03\x02\x02\x02\xF0!\x03\x02\x02\x02\xF1\xFC\x07" +
-		"\x14\x02\x02\xF2\xFC\x07\x15\x02\x02\xF3\xFC\x07\x16\x02\x02\xF4\xFC\x07" +
-		"\x17\x02\x02\xF5\xFC\x07\x18\x02\x02\xF6\xF7\x07\x19\x02\x02\xF7\xF8\x07" +
-		"\x1A\x02\x02\xF8\xF9\x05`1\x02\xF9\xFA\x07\x1B\x02\x02\xFA\xFC\x03\x02" +
-		"\x02\x02\xFB\xF1\x03\x02\x02\x02\xFB\xF2\x03\x02\x02\x02\xFB\xF3\x03\x02" +
-		"\x02\x02\xFB\xF4\x03\x02\x02\x02\xFB\xF5\x03\x02\x02\x02\xFB\xF6\x03\x02" +
-		"\x02\x02\xFC#\x03\x02\x02\x02\xFD\xFE\x07\x1C\x02\x02\xFE\xFF\x07\x1D" +
-		"\x02\x02\xFF\u0100\x05,\x17\x02\u0100\u0101\x07\x1E\x02\x02\u0101\u0102" +
-		"\x05(\x15\x02\u0102\u0103\x05H%\x02\u0103%\x03\x02\x02\x02\u0104\u0106" +
-		"\x05$\x13\x02\u0105\u0104\x03\x02\x02\x02\u0106\u0109\x03\x02\x02\x02" +
-		"\u0107\u0105\x03\x02\x02\x02\u0107\u0108\x03\x02\x02\x02\u0108\'\x03\x02" +
-		"\x02\x02\u0109\u0107\x03\x02\x02\x02\u010A\u010C\x05*\x16\x02\u010B\u010A" +
-		"\x03\x02\x02\x02\u010C\u010F\x03\x02\x02\x02\u010D\u010B\x03\x02\x02\x02" +
-		"\u010D\u010E\x03\x02\x02\x02\u010E)\x03\x02\x02\x02\u010F\u010D\x03\x02" +
-		"\x02\x02\u0110\u0111\x07\x1F\x02\x02\u0111+\x03\x02\x02\x02\u0112\u0113" +
-		"\x05.\x18\x02\u0113-\x03\x02\x02\x02\u0114\u0127\x07 \x02\x02\u0115\u0127" +
-		"\x07!\x02\x02\u0116\u0117\x07!\x02\x02\u0117\u0127\x07\"\x02\x02\u0118" +
-		"\u0127\x07#\x02\x02\u0119\u011A\x07$\x02\x02\u011A\u011B\x07\x11\x02\x02" +
-		"\u011B\u0127\x07%\x02\x02\u011C\u011D\x07&\x02\x02\u011D\u011E\x07\'\x02" +
-		"\x02\u011E\u011F\x05t;\x02\u011F\u0120\x050\x19\x02\u0120\u0127\x03\x02" +
-		"\x02\x02\u0121\u0122\x07(\x02\x02\u0122\u0127\x05x=\x02\u0123\u0127\x07" +
-		")\x02\x02\u0124\u0125\x07*\x02\x02\u0125\u0127\x07\"\x02\x02\u0126\u0114" +
-		"\x03\x02\x02\x02\u0126\u0115\x03\x02\x02\x02\u0126\u0116\x03\x02\x02\x02" +
-		"\u0126\u0118\x03\x02\x02\x02\u0126\u0119\x03\x02\x02\x02\u0126\u011C\x03" +
-		"\x02\x02\x02\u0126\u0121\x03\x02\x02\x02\u0126\u0123\x03\x02\x02\x02\u0126" +
-		"\u0124\x03\x02\x02\x02\u0127/\x03\x02\x02\x02\u0128\u0129\x07+\x02\x02" +
-		"\u0129\u012C\x07n\x02\x02\u012A\u012C\x03\x02\x02\x02\u012B\u0128\x03" +
-		"\x02\x02\x02\u012B\u012A\x03\x02\x02\x02\u012C1\x03\x02\x02\x02\u012D" +
-		"\u012E\x07,\x02\x02\u012E\u012F\x05\x8EH\x02\u012F\u0130\x05D#\x02\u0130" +
-		"\u0131\x054\x1B\x02\u01313\x03\x02\x02\x02\u0132\u0133\x07-\x02\x02\u0133" +
-		"\u0136\x05 \x11\x02\u0134\u0136\x03\x02\x02\x02\u0135\u0132\x03\x02\x02" +
-		"\x02\u0135\u0134\x03\x02\x02\x02\u01365\x03\x02\x02\x02\u0137\u0139\x05" +
-		"2\x1A\x02\u0138\u0137\x03\x02\x02\x02\u0139\u013C\x03\x02\x02\x02\u013A" +
-		"\u0138\x03\x02\x02\x02\u013A\u013B\x03\x02\x02\x02\u013B7\x03\x02\x02" +
-		"\x02\u013C\u013A\x03\x02\x02\x02\u013D\u013E\x07.\x02\x02\u013E\u013F" +
-		"\x05> \x02\u013F\u0140\x05\x8EH\x02\u0140\u0141\x05D#\x02\u0141\u0142" +
-		"\x05H%\x02\u0142\u0143\x05:\x1E\x02\u01439\x03\x02\x02\x02\u0144\u0145" +
-		"\x07-\x02\x02\u0145\u0146\x05\x8EH\x02\u0146\u0147\x07/\x02\x02\u0147" +
-		"\u0148\x05 \x11\x02\u0148\u014B\x03\x02\x02\x02\u0149\u014B\x03\x02\x02" +
-		"\x02\u014A\u0144\x03\x02\x02\x02\u014A\u0149\x03\x02\x02\x02\u014B;\x03" +
-		"\x02\x02\x02\u014C\u014E\x058\x1D\x02\u014D\u014C\x03\x02\x02\x02\u014E" +
-		"\u0151\x03\x02\x02\x02\u014F\u014D\x03\x02\x02\x02\u014F\u0150\x03\x02" +
-		"\x02\x02\u0150=\x03\x02\x02\x02\u0151\u014F\x03\x02\x02\x02\u0152\u0154" +
-		"\x05@!\x02\u0153\u0152\x03\x02\x02\x02\u0154\u0157\x03\x02\x02\x02\u0155" +
-		"\u0153\x03\x02\x02\x02\u0155\u0156\x03\x02\x02\x02\u0156?\x03\x02\x02" +
-		"\x02\u0157\u0155\x03\x02\x02\x02\u0158\u0159\x070\x02\x02\u0159A\x03\x02" +
-		"\x02\x02\u015A\u015B\x05\x8EH\x02\u015B\u015C\x07/\x02\x02\u015C\u015D" +
-		"\x05 \x11\x02\u015DC\x03\x02\x02\x02\u015E\u015F\x071\x02\x02\u015F\u0160" +
-		"\x05F$\x02\u0160\u0161\x072\x02\x02\u0161E\x03\x02\x02\x02\u0162\u0167" +
-		"\x05B\"\x02\u0163\u0164\x07\v\x02\x02\u0164\u0166\x05B\"\x02\u0165\u0163" +
-		"\x03\x02\x02\x02\u0166\u0169\x03\x02\x02\x02\u0167\u0165\x03\x02\x02\x02" +
-		"\u0167\u0168\x03\x02\x02\x02\u0168\u016C\x03\x02\x02\x02\u0169\u0167\x03" +
-		"\x02\x02\x02\u016A\u016C\x03\x02\x02\x02\u016B\u0162\x03\x02\x02\x02\u016B" +
-		"\u016A\x03\x02\x02\x02\u016CG\x03\x02\x02\x02\u016D\u016E\x07\b\x02\x02" +
-		"\u016E\u0170\x05L\'\x02\u016F\u0171\x05r:\x02\u0170\u016F\x03\x02\x02" +
-		"\x02\u0170\u0171\x03\x02\x02\x02\u0171\u0172\x03\x02\x02\x02\u0172\u0173" +
-		"\x07\t\x02\x02\u0173I\x03\x02\x02\x02\u0174\u0175\x070\x02\x02\u0175\u0176" +
-		"\x05H%\x02\u0176K\x03\x02\x02\x02\u0177\u0179\x05d3\x02\u0178\u0177\x03" +
-		"\x02\x02\x02\u0179\u017C\x03\x02\x02\x02\u017A\u0178\x03\x02\x02\x02\u017A" +
-		"\u017B\x03\x02\x02\x02\u017BM\x03\x02\x02\x02\u017C\u017A\x03\x02\x02" +
-		"\x02\u017D\u017E\x05P)\x02\u017EO\x03\x02\x02\x02\u017F\u0185\x05R*\x02" +
-		"\u0180\u0185\x05V,\x02\u0181\u0185\x05X-\x02\u0182\u0185\x05Z.\x02\u0183" +
-		"\u0185\x05\\/\x02\u0184\u017F\x03\x02\x02\x02\u0184\u0180\x03\x02\x02" +
-		"\x02\u0184\u0181\x03\x02\x02\x02\u0184\u0182\x03\x02\x02\x02\u0184\u0183" +
-		"\x03\x02\x02\x02\u0185Q\x03\x02\x02\x02\u0186\u0187\x073\x02\x02\u0187" +
-		"\u0188\x05x=\x02\u0188\u0189\x074\x02\x02\u0189\u018A\x05H%\x02\u018A" +
-		"\u018B\x05T+\x02\u018BS\x03\x02\x02\x02\u018C\u018D\x075\x02\x02\u018D" +
-		"\u0192\x05H%\x02\u018E\u018F\x075\x02\x02\u018F\u0192\x05R*\x02\u0190" +
-		"\u0192\x03\x02\x02\x02\u0191\u018C\x03\x02\x02\x02\u0191\u018E\x03\x02" +
-		"\x02\x02\u0191\u0190\x03\x02\x02\x02\u0192U\x03\x02\x02\x02\u0193\u0194" +
-		"\x076\x02\x02\u0194\u0195\x05x=\x02\u0195\u0196\x077\x02\x02\u0196\u0197" +
-		"\x05H%\x02\u0197W\x03\x02\x02\x02\u0198\u0199\x077\x02\x02\u0199\u019A" +
-		"\x05|?\x02\u019A\u019B\x078\x02\x02\u019B\u019C\x05H%\x02\u019CY\x03\x02" +
-		"\x02\x02\u019D\u019E\x077\x02\x02\u019E\u019F\x079\x02\x02\u019F\u01A0" +
-		"\x05H%\x02\u01A0[\x03\x02\x02\x02\u01A1\u01A2\x05\x8EH\x02\u01A2\u01A3" +
-		"\x05^0\x02\u01A3]\x03\x02\x02\x02\u01A4\u01A5\x071\x02\x02\u01A5\u01A6" +
-		"\x05`1\x02\u01A6\u01A7\x072\x02\x02\u01A7_\x03\x02\x02\x02\u01A8\u01AD" +
-		"\x05\x86D\x02\u01A9\u01AA\x07\v\x02\x02\u01AA\u01AC\x05\x86D\x02\u01AB" +
-		"\u01A9\x03\x02\x02\x02\u01AC\u01AF\x03\x02\x02\x02\u01AD\u01AB\x03\x02" +
-		"\x02\x02\u01AD\u01AE\x03\x02\x02\x02\u01AE\u01B2\x03\x02\x02\x02\u01AF" +
-		"\u01AD\x03\x02\x02\x02\u01B0\u01B2\x03\x02\x02\x02\u01B1\u01A8\x03\x02" +
-		"\x02\x02\u01B1\u01B0\x03\x02\x02\x02\u01B2a\x03\x02\x02\x02\u01B3\u01B4" +
-		"\x07:\x02\x02\u01B4\u01B5\x05\x86D\x02\u01B5c\x03\x02\x02\x02\u01B6\u01BF" +
-		"\x05N(\x02\u01B7\u01BF\x05f4\x02\u01B8\u01BF\x05J&\x02\u01B9\u01BA\x07" +
-		";\x02\x02\u01BA\u01BB\x07o\x02\x02\u01BB\u01BC\x05^0\x02\u01BC\u01BD\x05" +
-		"d3\x02\u01BD\u01BF\x03\x02\x02\x02\u01BE\u01B6\x03\x02\x02\x02\u01BE\u01B7" +
-		"\x03\x02\x02\x02\u01BE\u01B8\x03\x02\x02\x02\u01BE\u01B9\x03\x02\x02\x02" +
-		"\u01BFe\x03\x02\x02\x02\u01C0\u01C1\x05h5\x02\u01C1g\x03\x02\x02\x02\u01C2" +
-		"\u01C7\x05b2\x02\u01C3\u01C7\x05j6\x02\u01C4\u01C7\x05l7\x02\u01C5\u01C7" +
-		"\x05\x1C\x0F\x02\u01C6\u01C2\x03\x02\x02\x02\u01C6\u01C3\x03\x02\x02\x02" +
-		"\u01C6\u01C4\x03\x02\x02\x02\u01C6\u01C5\x03\x02\x02\x02\u01C7i\x03\x02" +
-		"\x02\x02\u01C8\u01C9\x07<\x02\x02\u01C9\u01CA\x05|?\x02\u01CA\u01CB\x07" +
-		"=\x02\x02\u01CB\u01E6\x03\x02\x02\x02\u01CC\u01CD\x07<\x02\x02\u01CD\u01CE" +
-		"\x076\x02\x02\u01CE\u01E6\x05x=\x02\u01CF\u01D0\x07>\x02\x02\u01D0\u01D1" +
-		"\x07?\x02\x02\u01D1\u01D2\x07@\x02\x02\u01D2\u01D3\x07+\x02\x02\u01D3" +
-		"\u01E6\x07\f\x02\x02\u01D4\u01D5\x07A\x02\x02\u01D5\u01D6\x07%\x02\x02" +
-		"\u01D6\u01D7\x07\x13\x02\x02\u01D7\u01E6\x05t;\x02\u01D8\u01D9\x07B\x02" +
-		"\x02\u01D9\u01E6\x05\x94K\x02\u01DA\u01DB\x07B\x02\x02\u01DB\u01DC\x05" +
-		"\x94K\x02\u01DC\u01DD\x07C\x02\x02\u01DD\u01DE\x07<\x02\x02\u01DE\u01E6" +
-		"\x03\x02\x02\x02\u01DF\u01E0\x07D\x02\x02\u01E0\u01E6\x07E\x02\x02\u01E1" +
-		"\u01E6\x07F\x02\x02\u01E2\u01E3\x07G\x02\x02\u01E3\u01E6\x05x=\x02\u01E4" +
-		"\u01E6\x05n8\x02\u01E5\u01C8\x03\x02\x02\x02\u01E5\u01CC\x03\x02\x02\x02" +
-		"\u01E5\u01CF\x03\x02\x02\x02\u01E5\u01D4\x03\x02\x02\x02\u01E5\u01D8\x03" +
-		"\x02\x02\x02\u01E5\u01DA\x03\x02\x02\x02\u01E5\u01DF\x03\x02\x02\x02\u01E5" +
-		"\u01E1\x03\x02\x02\x02\u01E5\u01E2\x03\x02\x02\x02\u01E5\u01E4\x03\x02" +
-		"\x02\x02\u01E6k\x03\x02\x02\x02\u01E7\u01E8\x07H\x02\x02\u01E8\u01E9\x07" +
-		"I\x02\x02\u01E9\u01EA\x07\x06\x02\x02\u01EA\u0205\x05\x8CG\x02\u01EB\u01EC" +
-		"\x07H\x02\x02\u01EC\u01ED\x05|?\x02\u01ED\u01EE\x07\x13\x02\x02\u01EE" +
-		"\u01EF\x05\x8CG\x02\u01EF\u0205\x03\x02\x02\x02\u01F0\u01F1\x07J\x02\x02" +
-		"\u01F1\u01F2\x05t;\x02\u01F2\u01F3\x07K\x02\x02\u01F3\u01F4\x05\x8CG\x02" +
-		"\u01F4\u0205\x03\x02\x02\x02\u01F5\u01F6\x07L\x02\x02\u01F6\u01F7\x05" +
-		"t;\x02\u01F7\u01F8\x07M\x02\x02\u01F8\u01F9\x05|?\x02\u01F9\u01FA\x07" +
-		"\x13\x02\x02\u01FA\u01FB\x05\x8CG\x02\u01FB\u0205\x03\x02\x02\x02\u01FC" +
-		"\u01FD\x07N\x02\x02\u01FD\u01FE\x07O\x02\x02\u01FE\u01FF\x05|?\x02\u01FF" +
-		"\u0200\x07\x13\x02\x02\u0200\u0201\x05\x8CG\x02\u0201\u0202\x07P\x02\x02" +
-		"\u0202\u0203\x05t;\x02\u0203\u0205\x03\x02\x02\x02\u0204\u01E7\x03\x02" +
-		"\x02\x02\u0204\u01EB\x03\x02\x02\x02\u0204\u01F0\x03\x02\x02\x02\u0204" +
-		"\u01F5\x03\x02\x02\x02\u0204\u01FC\x03\x02\x02\x02\u0205m\x03\x02\x02" +
-		"\x02\u0206\u0207\x07.\x02\x02\u0207\u0208\x05\x8CG\x02\u0208\u0209\x07" +
-		"\x11\x02\x02\u0209\u020A\x05\x86D\x02\u020A\u0211\x03\x02\x02\x02\u020B" +
-		"\u020C\x07.\x02\x02\u020C\u020D\x05\x8CG\x02\u020D\u020E\x07\x11\x02\x02" +
-		"\u020E\u020F\x05\\/\x02\u020F\u0211\x03\x02\x02\x02\u0210\u0206\x03\x02" +
-		"\x02\x02\u0210\u020B\x03\x02\x02\x02\u0211o\x03\x02\x02\x02\u0212\u0214" +
-		"\x05n8\x02\u0213\u0212\x03\x02\x02\x02\u0214\u0217\x03\x02\x02\x02\u0215" +
-		"\u0213\x03\x02\x02\x02\u0215\u0216\x03\x02\x02\x02\u0216q\x03\x02\x02" +
-		"\x02\u0217\u0215\x03\x02\x02\x02\u0218\u0219\x07>\x02\x02\u0219\u0221" +
-		"\x07I\x02\x02\u021A\u021B\x07>\x02\x02\u021B\u021C\x07Q\x02\x02\u021C" +
-		"\u0221\x07\x1C\x02\x02\u021D\u021E\x07H\x02\x02\u021E\u021F\x07Q";
+		"\x03\x02\x02\x02\xE8\x1F\x03\x02\x02\x02\xE9\xE7\x03\x02\x02\x02\xEA\xEB" +
+		"\x07\x12\x02\x02\xEB\xEC\x07\x13\x02\x02\xEC\xF0\x05 \x11\x02\xED\xF0" +
+		"\x07\f\x02\x02\xEE\xF0\x05\"\x12\x02\xEF\xEA\x03\x02\x02\x02\xEF\xED\x03" +
+		"\x02\x02\x02\xEF\xEE\x03\x02\x02\x02\xF0!\x03\x02\x02\x02\xF1\xFB\x07" +
+		"\x14\x02\x02\xF2\xFB\x07\x15\x02\x02\xF3\xFB\x07\x16\x02\x02\xF4\xFB\x07" +
+		"\x17\x02\x02\xF5\xF6\x07\x18\x02\x02\xF6\xF7\x07\x19\x02\x02\xF7\xF8\x05" +
+		"`1\x02\xF8\xF9\x07\x1A\x02\x02\xF9\xFB\x03\x02\x02\x02\xFA\xF1\x03\x02" +
+		"\x02\x02\xFA\xF2\x03\x02\x02\x02\xFA\xF3\x03\x02\x02\x02\xFA\xF4\x03\x02" +
+		"\x02\x02\xFA\xF5\x03\x02\x02\x02\xFB#\x03\x02\x02\x02\xFC\xFD\x07\x1B" +
+		"\x02\x02\xFD\xFE\x07\x1C\x02\x02\xFE\xFF\x05,\x17\x02\xFF\u0100\x07\x1D" +
+		"\x02\x02\u0100\u0101\x05(\x15\x02\u0101\u0102\x05H%\x02\u0102%\x03\x02" +
+		"\x02\x02\u0103\u0105\x05$\x13\x02\u0104\u0103\x03\x02\x02\x02\u0105\u0108" +
+		"\x03\x02\x02\x02\u0106\u0104\x03\x02\x02\x02\u0106\u0107\x03\x02\x02\x02" +
+		"\u0107\'\x03\x02\x02\x02\u0108\u0106\x03\x02\x02\x02\u0109\u010B\x05*" +
+		"\x16\x02\u010A\u0109\x03\x02\x02\x02\u010B\u010E\x03\x02\x02\x02\u010C" +
+		"\u010A\x03\x02\x02\x02\u010C\u010D\x03\x02\x02\x02\u010D)\x03\x02\x02" +
+		"\x02\u010E\u010C\x03\x02\x02\x02\u010F\u0110\x07\x1E\x02\x02\u0110+\x03" +
+		"\x02\x02\x02\u0111\u0112\x05.\x18\x02\u0112-\x03\x02\x02\x02\u0113\u0126" +
+		"\x07\x1F\x02\x02\u0114\u0126\x07 \x02\x02\u0115\u0116\x07 \x02\x02\u0116" +
+		"\u0126\x07!\x02\x02\u0117\u0126\x07\"\x02\x02\u0118\u0119\x07#\x02\x02" +
+		"\u0119\u011A\x07\x11\x02\x02\u011A\u0126\x07$\x02\x02\u011B\u011C\x07" +
+		"%\x02\x02\u011C\u011D\x07&\x02\x02\u011D\u011E\x05t;\x02\u011E\u011F\x05" +
+		"0\x19\x02\u011F\u0126\x03\x02\x02\x02\u0120\u0121\x07\'\x02\x02\u0121" +
+		"\u0126\x05x=\x02\u0122\u0126\x07(\x02\x02\u0123\u0124\x07)\x02\x02\u0124" +
+		"\u0126\x07!\x02\x02\u0125\u0113\x03\x02\x02\x02\u0125\u0114\x03\x02\x02" +
+		"\x02\u0125\u0115\x03\x02\x02\x02\u0125\u0117\x03\x02\x02\x02\u0125\u0118" +
+		"\x03\x02\x02\x02\u0125\u011B\x03\x02\x02\x02\u0125\u0120\x03\x02\x02\x02" +
+		"\u0125\u0122\x03\x02\x02\x02\u0125\u0123\x03\x02\x02\x02\u0126/\x03\x02" +
+		"\x02\x02\u0127\u0128\x07*\x02\x02\u0128\u012B\x07m\x02\x02\u0129\u012B" +
+		"\x03\x02\x02\x02\u012A\u0127\x03\x02\x02\x02\u012A\u0129\x03\x02\x02\x02" +
+		"\u012B1\x03\x02\x02\x02\u012C\u012D\x07+\x02\x02\u012D\u012E\x05\x8EH" +
+		"\x02\u012E\u012F\x05D#\x02\u012F\u0130\x054\x1B\x02\u01303\x03\x02\x02" +
+		"\x02\u0131\u0132\x07,\x02\x02\u0132\u0135\x05 \x11\x02\u0133\u0135\x03" +
+		"\x02\x02\x02\u0134\u0131\x03\x02\x02\x02\u0134\u0133\x03\x02\x02\x02\u0135" +
+		"5\x03\x02\x02\x02\u0136\u0138\x052\x1A\x02\u0137\u0136\x03\x02\x02\x02" +
+		"\u0138\u013B\x03\x02\x02\x02\u0139\u0137\x03\x02\x02\x02\u0139\u013A\x03" +
+		"\x02\x02\x02\u013A7\x03\x02\x02\x02\u013B\u0139\x03\x02\x02\x02\u013C" +
+		"\u013D\x07-\x02\x02\u013D\u013E\x05> \x02\u013E\u013F\x05\x8EH\x02\u013F" +
+		"\u0140\x05D#\x02\u0140\u0141\x05H%\x02\u0141\u0142\x05:\x1E\x02\u0142" +
+		"9\x03\x02\x02\x02\u0143\u0144\x07,\x02\x02\u0144\u0145\x05\x8EH\x02\u0145" +
+		"\u0146\x07.\x02\x02\u0146\u0147\x05 \x11\x02\u0147\u014A\x03\x02\x02\x02" +
+		"\u0148\u014A\x03\x02\x02\x02\u0149\u0143\x03\x02\x02\x02\u0149\u0148\x03" +
+		"\x02\x02\x02\u014A;\x03\x02\x02\x02\u014B\u014D\x058\x1D\x02\u014C\u014B" +
+		"\x03\x02\x02\x02\u014D\u0150\x03\x02\x02\x02\u014E\u014C\x03\x02\x02\x02" +
+		"\u014E\u014F\x03\x02\x02\x02\u014F=\x03\x02\x02\x02\u0150\u014E\x03\x02" +
+		"\x02\x02\u0151\u0153\x05@!\x02\u0152\u0151\x03\x02\x02\x02\u0153\u0156" +
+		"\x03\x02\x02\x02\u0154\u0152\x03\x02\x02\x02\u0154\u0155\x03\x02\x02\x02" +
+		"\u0155?\x03\x02\x02\x02\u0156\u0154\x03\x02\x02\x02\u0157\u0158\x07/\x02" +
+		"\x02\u0158A\x03\x02\x02\x02\u0159\u015A\x05\x8EH\x02\u015A\u015B\x07." +
+		"\x02\x02\u015B\u015C\x05 \x11\x02\u015CC\x03\x02\x02\x02\u015D\u015E\x07" +
+		"0\x02\x02\u015E\u015F\x05F$\x02\u015F\u0160\x071\x02\x02\u0160E\x03\x02" +
+		"\x02\x02\u0161\u0166\x05B\"\x02\u0162\u0163\x07\v\x02\x02\u0163\u0165" +
+		"\x05B\"\x02\u0164\u0162\x03\x02\x02\x02\u0165\u0168\x03\x02\x02\x02\u0166" +
+		"\u0164\x03\x02\x02\x02\u0166\u0167\x03\x02\x02\x02\u0167\u016B\x03\x02" +
+		"\x02\x02\u0168\u0166\x03\x02\x02\x02\u0169\u016B\x03\x02\x02\x02\u016A" +
+		"\u0161\x03\x02\x02\x02\u016A\u0169\x03\x02\x02\x02\u016BG\x03\x02\x02" +
+		"\x02\u016C\u016D\x07\b\x02\x02\u016D\u016F\x05L\'\x02\u016E\u0170\x05" +
+		"r:\x02\u016F\u016E\x03\x02\x02\x02\u016F\u0170\x03\x02\x02\x02\u0170\u0171" +
+		"\x03\x02\x02\x02\u0171\u0172\x07\t\x02\x02\u0172I\x03\x02\x02\x02\u0173" +
+		"\u0174\x07/\x02\x02\u0174\u0175\x05H%\x02\u0175K\x03\x02\x02\x02\u0176" +
+		"\u0178\x05d3\x02\u0177\u0176\x03\x02\x02\x02\u0178\u017B\x03\x02\x02\x02" +
+		"\u0179\u0177\x03\x02\x02\x02\u0179\u017A\x03\x02\x02\x02\u017AM\x03\x02" +
+		"\x02\x02\u017B\u0179\x03\x02\x02\x02\u017C\u017D\x05P)\x02\u017DO\x03" +
+		"\x02\x02\x02\u017E\u0184\x05R*\x02\u017F\u0184\x05V,\x02\u0180\u0184\x05" +
+		"X-\x02\u0181\u0184\x05Z.\x02\u0182\u0184\x05\\/\x02\u0183\u017E\x03\x02" +
+		"\x02\x02\u0183\u017F\x03\x02\x02\x02\u0183\u0180\x03\x02\x02\x02\u0183" +
+		"\u0181\x03\x02\x02\x02\u0183\u0182\x03\x02\x02\x02\u0184Q\x03\x02\x02" +
+		"\x02\u0185\u0186\x072\x02\x02\u0186\u0187\x05x=\x02\u0187\u0188\x073\x02" +
+		"\x02\u0188\u0189\x05H%\x02\u0189\u018A\x05T+\x02\u018AS\x03\x02\x02\x02" +
+		"\u018B\u018C\x074\x02\x02\u018C\u0191\x05H%\x02\u018D\u018E\x074\x02\x02" +
+		"\u018E\u0191\x05R*\x02\u018F\u0191\x03\x02\x02\x02\u0190\u018B\x03\x02" +
+		"\x02\x02\u0190\u018D\x03\x02\x02\x02\u0190\u018F\x03\x02\x02\x02\u0191" +
+		"U\x03\x02\x02\x02\u0192\u0193\x075\x02\x02\u0193\u0194\x05x=\x02\u0194" +
+		"\u0195\x076\x02\x02\u0195\u0196\x05H%\x02\u0196W\x03\x02\x02\x02\u0197" +
+		"\u0198\x076\x02\x02\u0198\u0199\x05|?\x02\u0199\u019A\x077\x02\x02\u019A" +
+		"\u019B\x05H%\x02\u019BY\x03\x02\x02\x02\u019C\u019D\x076\x02\x02\u019D" +
+		"\u019E\x078\x02\x02\u019E\u019F\x05H%\x02\u019F[\x03\x02\x02\x02\u01A0" +
+		"\u01A1\x05\x8EH\x02\u01A1\u01A2\x05^0\x02\u01A2]\x03\x02\x02\x02\u01A3" +
+		"\u01A4\x070\x02\x02\u01A4\u01A5\x05`1\x02\u01A5\u01A6\x071\x02\x02\u01A6" +
+		"_\x03\x02\x02\x02\u01A7\u01AC\x05\x86D\x02\u01A8\u01A9\x07\v\x02\x02\u01A9" +
+		"\u01AB\x05\x86D\x02\u01AA\u01A8\x03\x02\x02\x02\u01AB\u01AE\x03\x02\x02" +
+		"\x02\u01AC\u01AA\x03\x02\x02\x02\u01AC\u01AD\x03\x02\x02\x02\u01AD\u01B1" +
+		"\x03\x02\x02\x02\u01AE\u01AC\x03\x02\x02\x02\u01AF\u01B1\x03\x02\x02\x02" +
+		"\u01B0\u01A7\x03\x02\x02\x02\u01B0\u01AF\x03\x02\x02\x02\u01B1a\x03\x02" +
+		"\x02\x02\u01B2\u01B3\x079\x02\x02\u01B3\u01B4\x05\x86D\x02\u01B4c\x03" +
+		"\x02\x02\x02\u01B5\u01BE\x05N(\x02\u01B6\u01BE\x05f4\x02\u01B7\u01BE\x05" +
+		"J&\x02\u01B8\u01B9\x07:\x02\x02\u01B9\u01BA\x07n\x02\x02\u01BA\u01BB\x05" +
+		"^0\x02\u01BB\u01BC\x05d3\x02\u01BC\u01BE\x03\x02\x02\x02\u01BD\u01B5\x03" +
+		"\x02\x02\x02\u01BD\u01B6\x03\x02\x02\x02\u01BD\u01B7\x03\x02\x02\x02\u01BD" +
+		"\u01B8\x03\x02\x02\x02\u01BEe\x03\x02\x02\x02\u01BF\u01C0\x05h5\x02\u01C0" +
+		"g\x03\x02\x02\x02\u01C1\u01C6\x05b2\x02\u01C2\u01C6\x05j6\x02\u01C3\u01C6" +
+		"\x05l7\x02\u01C4\u01C6\x05\x1C\x0F\x02\u01C5\u01C1\x03\x02\x02\x02\u01C5" +
+		"\u01C2\x03\x02\x02\x02\u01C5\u01C3\x03\x02\x02\x02\u01C5\u01C4\x03\x02" +
+		"\x02\x02\u01C6i\x03\x02\x02\x02\u01C7\u01C8\x07;\x02\x02\u01C8\u01C9\x05" +
+		"|?\x02\u01C9\u01CA\x07<\x02\x02\u01CA\u01E5\x03\x02\x02\x02\u01CB\u01CC" +
+		"\x07;\x02\x02\u01CC\u01CD\x075\x02\x02\u01CD\u01E5\x05x=\x02\u01CE\u01CF" +
+		"\x07=\x02\x02\u01CF\u01D0\x07>\x02\x02\u01D0\u01D1\x07?\x02\x02\u01D1" +
+		"\u01D2\x07*\x02\x02\u01D2\u01E5\x07\f\x02\x02\u01D3\u01D4\x07@\x02\x02" +
+		"\u01D4\u01D5\x07$\x02\x02\u01D5\u01D6\x07\x13\x02\x02\u01D6\u01E5\x05" +
+		"t;\x02\u01D7\u01D8\x07A\x02\x02\u01D8\u01E5\x05\x94K\x02\u01D9\u01DA\x07" +
+		"A\x02\x02\u01DA\u01DB\x05\x94K\x02\u01DB\u01DC\x07B\x02\x02\u01DC\u01DD" +
+		"\x07;\x02\x02\u01DD\u01E5\x03\x02\x02\x02\u01DE\u01DF\x07C\x02\x02\u01DF" +
+		"\u01E5\x07D\x02\x02\u01E0\u01E5\x07E\x02\x02\u01E1\u01E2\x07F\x02\x02" +
+		"\u01E2\u01E5\x05x=\x02\u01E3\u01E5\x05n8\x02\u01E4\u01C7\x03\x02\x02\x02" +
+		"\u01E4\u01CB\x03\x02\x02\x02\u01E4\u01CE\x03\x02\x02\x02\u01E4\u01D3\x03" +
+		"\x02\x02\x02\u01E4\u01D7\x03\x02\x02\x02\u01E4\u01D9\x03\x02\x02\x02\u01E4" +
+		"\u01DE\x03\x02\x02\x02\u01E4\u01E0\x03\x02\x02\x02\u01E4\u01E1\x03\x02" +
+		"\x02\x02\u01E4\u01E3\x03\x02\x02\x02\u01E5k\x03\x02\x02\x02\u01E6\u01E7" +
+		"\x07G\x02\x02\u01E7\u01E8\x07H\x02\x02\u01E8\u01E9\x07\x06\x02\x02\u01E9" +
+		"\u0204\x05\x8CG\x02\u01EA\u01EB\x07G\x02\x02\u01EB\u01EC\x05|?\x02\u01EC" +
+		"\u01ED\x07\x13\x02\x02\u01ED\u01EE\x05\x8CG\x02\u01EE\u0204\x03\x02\x02" +
+		"\x02\u01EF\u01F0\x07I\x02\x02\u01F0\u01F1\x05t;\x02\u01F1\u01F2\x07J\x02" +
+		"\x02\u01F2\u01F3\x05\x8CG\x02\u01F3\u0204\x03\x02\x02\x02\u01F4\u01F5" +
+		"\x07K\x02\x02\u01F5\u01F6\x05t;\x02\u01F6\u01F7\x07L\x02\x02\u01F7\u01F8" +
+		"\x05|?\x02\u01F8\u01F9\x07\x13\x02\x02\u01F9\u01FA\x05\x8CG\x02\u01FA" +
+		"\u0204\x03\x02\x02\x02\u01FB\u01FC\x07M\x02\x02\u01FC\u01FD\x07N\x02\x02" +
+		"\u01FD\u01FE\x05|?\x02\u01FE\u01FF\x07\x13\x02\x02\u01FF\u0200\x05\x8C" +
+		"G\x02\u0200\u0201\x07O\x02\x02\u0201\u0202\x05t;\x02\u0202\u0204\x03\x02" +
+		"\x02\x02\u0203\u01E6\x03\x02\x02\x02\u0203\u01EA\x03\x02\x02\x02\u0203" +
+		"\u01EF\x03\x02\x02\x02\u0203\u01F4\x03\x02\x02\x02\u0203\u01FB\x03\x02" +
+		"\x02\x02\u0204m\x03\x02\x02\x02\u0205\u0206\x07-\x02\x02\u0206\u0207\x05" +
+		"\x8CG\x02\u0207\u0208\x07\x11\x02\x02\u0208\u0209\x05\x86D\x02\u0209\u0210" +
+		"\x03\x02\x02\x02\u020A\u020B\x07-\x02\x02\u020B\u020C\x05\x8CG\x02\u020C" +
+		"\u020D\x07\x11\x02\x02\u020D\u020E\x05\\/\x02\u020E\u0210\x03\x02\x02" +
+		"\x02\u020F\u0205\x03\x02\x02\x02\u020F\u020A\x03\x02\x02\x02\u0210o\x03" +
+		"\x02\x02\x02\u0211\u0213\x05n8\x02\u0212\u0211\x03\x02\x02\x02\u0213\u0216" +
+		"\x03\x02\x02\x02\u0214\u0212\x03\x02\x02\x02\u0214\u0215\x03\x02\x02\x02" +
+		"\u0215q\x03\x02\x02\x02\u0216\u0214\x03\x02\x02\x02\u0217\u0218\x07=\x02" +
+		"\x02\u0218\u0220\x07H\x02\x02\u0219\u021A\x07=\x02\x02\u021A\u021B\x07" +
+		"P\x02\x02\u021B\u0220\x07\x1B\x02\x02\u021C\u021D\x07G\x02\x02\u021D\u021E" +
+		"\x07P\x02\x02\u021E\u0220\x07$\x02\x02\u021F\u0217\x03\x02\x02\x02";
 	private static readonly _serializedATNSegment1: string =
-		"\x02\x02\u021F\u0221\x07%\x02\x02\u0220\u0218\x03\x02\x02\x02\u0220\u021A" +
-		"\x03\x02\x02\x02\u0220\u021D\x03\x02\x02\x02\u0221s\x03\x02\x02\x02\u0222" +
-		"\u0223\x05v<\x02\u0223u\x03\x02\x02\x02\u0224\u024E\x07n\x02\x02\u0225" +
-		"\u024E\x05\x8CG\x02\u0226\u0227\x071\x02\x02\u0227\u0228\x05v<\x02\u0228" +
-		"\u0229\x072\x02\x02\u0229\u024E\x03\x02\x02\x02\u022A\u024E\x05\\/\x02" +
-		"\u022B\u022C\x07R\x02\x02\u022C\u022D\x05|?\x02\u022D\u022E\x07K\x02\x02" +
-		"\u022E\u022F\x07\x18\x02\x02\u022F\u024E\x03\x02\x02\x02\u0230\u0231\x07" +
-		"R\x02\x02\u0231\u0232\x05x=\x02\u0232\u0233\x07K\x02\x02\u0233\u0234\x07" +
-		"\x18\x02\x02\u0234\u024E\x03\x02\x02\x02\u0235\u0236\x07S\x02\x02\u0236" +
-		"\u0237\x05t;\x02\u0237\u0238\x07\x13\x02\x02\u0238\u0239\x05\x84C\x02" +
-		"\u0239\u024E\x03\x02\x02\x02\u023A\u023B\x07T\x02\x02\u023B\u023C\x05" +
-		"t;\x02\u023C\u023D\x05t;\x02\u023D\u024E\x03\x02\x02\x02\u023E\u023F\x07" +
-		"U\x02\x02\u023F\u0240\x05|?\x02\u0240\u0241\x07\x13\x02\x02\u0241\u0242" +
-		"\x05t;\x02\u0242\u024E\x03\x02\x02\x02\u0243\u0244\x07O\x02\x02\u0244" +
-		"\u0245\x05|?\x02\u0245\u0246\x07\x13\x02\x02\u0246\u0247\x05\x8CG\x02" +
-		"\u0247\u024E\x03\x02\x02\x02\u0248\u0249\x07V\x02\x02\u0249\u024A\x07" +
-		"n\x02\x02\u024A\u024B\x07W\x02\x02\u024B\u024E\x05t;\x02\u024C\u024E\x07" +
-		"X\x02\x02\u024D\u0224\x03\x02\x02\x02\u024D\u0225\x03\x02\x02\x02\u024D" +
-		"\u0226\x03\x02\x02\x02\u024D\u022A\x03\x02\x02\x02\u024D\u022B\x03\x02" +
-		"\x02\x02\u024D\u0230\x03\x02\x02\x02\u024D\u0235\x03\x02\x02\x02\u024D" +
-		"\u023A\x03\x02\x02\x02\u024D\u023E\x03\x02\x02\x02\u024D\u0243\x03\x02" +
-		"\x02\x02\u024D\u0248\x03\x02\x02\x02\u024D\u024C\x03\x02\x02\x02\u024E" +
-		"w\x03\x02\x02\x02\u024F\u0250\x05z>\x02\u0250y\x03\x02\x02\x02\u0251\u0252" +
-		"\b>\x01\x02\u0252\u027B\x07l\x02\x02\u0253\u027B\x05\x8CG\x02\u0254\u0255" +
-		"\x071\x02\x02\u0255\u0256\x05z>\x02\u0256\u0257\x072\x02\x02\u0257\u027B" +
-		"\x03\x02\x02\x02\u0258\u027B\x05\\/\x02\u0259\u025A\x07R\x02\x02\u025A" +
-		"\u025B\x05|?\x02\u025B\u025C\x07K\x02\x02\u025C\u025D\x07\x17\x02\x02" +
-		"\u025D\u027B\x03\x02\x02\x02\u025E\u025F\x07R\x02\x02\u025F\u0260\x05" +
-		"t;\x02\u0260\u0261\x07K\x02\x02\u0261\u0262\x07\x17\x02\x02\u0262\u027B" +
-		"\x03\x02\x02\x02\u0263\u0264\x07Y\x02\x02\u0264\u027B\x05z>\v\u0265\u0266" +
-		"\x05~@\x02\u0266\u0267\x07[\x02\x02\u0267\u0268\x05~@\x02\u0268\u027B" +
-		"\x03\x02\x02\x02\u0269\u026A\x05~@\x02\u026A\u026B\x07\\\x02\x02\u026B" +
-		"\u026C\x05~@\x02\u026C\u027B\x03\x02\x02\x02\u026D\u026E\x05~@\x02\u026E" +
-		"\u026F\x07]\x02\x02\u026F\u0270\x05~@\x02\u0270\u027B\x03\x02\x02\x02" +
-		"\u0271\u0272\x05t;\x02\u0272\u0273\x07^\x02\x02\u0273\u0274\x05t;\x02" +
-		"\u0274\u027B\x03\x02\x02\x02\u0275\u0276\x07V\x02\x02\u0276\u0277\x07" +
-		"l\x02\x02\u0277\u0278\x07W\x02\x02\u0278\u027B\x05z>\x04\u0279\u027B\x07" +
-		"_\x02\x02\u027A\u0251\x03\x02\x02\x02\u027A\u0253\x03\x02\x02\x02\u027A" +
-		"\u0254\x03\x02\x02\x02\u027A\u0258\x03\x02\x02\x02\u027A\u0259\x03\x02" +
-		"\x02\x02\u027A\u025E\x03\x02\x02\x02\u027A\u0263\x03\x02\x02\x02\u027A" +
-		"\u0265\x03\x02\x02\x02\u027A\u0269\x03\x02\x02\x02\u027A\u026D\x03\x02" +
-		"\x02\x02\u027A\u0271\x03\x02\x02\x02\u027A\u0275\x03\x02\x02\x02\u027A" +
-		"\u0279\x03\x02\x02\x02\u027B\u0284\x03\x02\x02\x02\u027C\u027D\f\n\x02" +
-		"\x02\u027D\u027E\x07C\x02\x02\u027E\u0283\x05z>\v\u027F\u0280\f\t\x02" +
-		"\x02\u0280\u0281\x07Z\x02\x02\u0281\u0283\x05z>\n\u0282\u027C\x03\x02" +
-		"\x02\x02\u0282\u027F\x03\x02\x02\x02\u0283\u0286\x03\x02\x02\x02\u0284" +
-		"\u0282\x03\x02\x02\x02\u0284\u0285\x03\x02\x02\x02\u0285{\x03\x02\x02" +
-		"\x02\u0286\u0284\x03\x02\x02\x02\u0287\u0288\x05\x80A\x02\u0288}\x03\x02" +
-		"\x02\x02\u0289\u028C\x05|?\x02\u028A\u028C\x05t;\x02\u028B\u0289\x03\x02" +
-		"\x02\x02\u028B\u028A\x03\x02\x02\x02\u028C\x7F\x03\x02\x02\x02\u028D\u028E" +
-		"\bA\x01\x02\u028E\u02C3\x05\x90I\x02\u028F\u02C3\x05\x8CG\x02\u0290\u0291" +
-		"\x071\x02\x02\u0291\u0292\x05\x80A\x02\u0292\u0293\x072\x02\x02\u0293" +
-		"\u02C3\x03\x02\x02\x02\u0294\u02C3\x05\\/\x02\u0295\u0296\x07R\x02\x02" +
-		"\u0296\u0297\x05t;\x02\u0297\u0298\x07K\x02\x02\u0298\u0299\x07\x16\x02" +
-		"\x02\u0299\u02C3\x03\x02\x02\x02\u029A\u029B\x07R\x02\x02\u029B\u029C" +
-		"\x05t;\x02\u029C\u029D\x07K\x02\x02\u029D\u029E\x07\x15\x02\x02\u029E" +
-		"\u02C3\x03\x02\x02\x02\u029F\u02A0\x07R\x02\x02\u02A0\u02A1\x05x=\x02" +
-		"\u02A1\u02A2\x07K\x02\x02\u02A2\u02A3\x07\x15\x02\x02\u02A3\u02C3\x03" +
-		"\x02\x02\x02\u02A4\u02A5\x07R\x02\x02\u02A5\u02A6\x05\x80A\x02\u02A6\u02A7" +
-		"\x07K\x02\x02\u02A7\u02A8\x07\x16\x02\x02\u02A8\u02C3\x03\x02\x02\x02" +
-		"\u02A9\u02AA\x07R\x02\x02\u02AA\u02AB\x05\x80A\x02\u02AB\u02AC\x07K\x02" +
-		"\x02\u02AC\u02AD\x07\x15\x02\x02\u02AD\u02C3\x03\x02\x02\x02\u02AE\u02C3" +
-		"\x07E\x02\x02\u02AF\u02B0\x07`\x02\x02\u02B0\u02B1\x07\x13\x02\x02\u02B1" +
-		"\u02C3\x05t;\x02\u02B2\u02B3\x07`\x02\x02\u02B3\u02B4\x07\x13\x02\x02" +
-		"\u02B4\u02B5\x07\x12\x02\x02\u02B5\u02C3\x05\x8CG\x02\u02B6\u02B7\x07" +
-		"a\x02\x02\u02B7\u02B8\x07\x13\x02\x02\u02B8\u02B9\x05\x86D\x02\u02B9\u02BA" +
-		"\x07+\x02\x02\u02BA\u02BB\x05\x8CG\x02\u02BB\u02C3\x03\x02\x02\x02\u02BC" +
-		"\u02BD\x07V\x02\x02\u02BD\u02BE\x05\x90I\x02\u02BE\u02BF\x07W\x02\x02" +
-		"\u02BF\u02C0\x05\x80A\x04\u02C0\u02C3\x03\x02\x02\x02\u02C1\u02C3\x07" +
-		"f\x02\x02\u02C2\u028D\x03\x02\x02\x02\u02C2\u028F\x03\x02\x02\x02\u02C2" +
-		"\u0290\x03\x02\x02\x02\u02C2\u0294\x03\x02\x02\x02\u02C2\u0295\x03\x02" +
-		"\x02\x02\u02C2\u029A\x03\x02\x02\x02\u02C2\u029F\x03\x02\x02\x02\u02C2" +
-		"\u02A4\x03\x02\x02\x02\u02C2\u02A9\x03\x02\x02\x02\u02C2\u02AE\x03\x02" +
-		"\x02\x02\u02C2\u02AF\x03\x02\x02\x02\u02C2\u02B2\x03\x02\x02\x02\u02C2" +
-		"\u02B6\x03\x02\x02\x02\u02C2\u02BC\x03\x02\x02\x02\u02C2\u02C1\x03\x02" +
-		"\x02\x02\u02C3\u02D5\x03\x02\x02\x02\u02C4\u02C5\f\t\x02\x02\u02C5\u02C6" +
-		"\x07\x07\x02\x02\u02C6\u02D4\x05\x80A\n\u02C7\u02C8\f\b\x02\x02\u02C8" +
-		"\u02C9\x07b\x02\x02\u02C9\u02D4\x05\x80A\t\u02CA\u02CB\f\x07\x02\x02\u02CB" +
-		"\u02CC\x07c\x02\x02\u02CC\u02D4\x05\x80A\b\u02CD\u02CE\f\x06\x02\x02\u02CE" +
-		"\u02CF\x07d\x02\x02\u02CF\u02D4\x05\x80A\x07\u02D0\u02D1\f\x05\x02\x02" +
-		"\u02D1\u02D2\x07e\x02\x02\u02D2\u02D4\x05\x80A\x06\u02D3\u02C4\x03\x02" +
-		"\x02\x02\u02D3\u02C7\x03\x02\x02\x02\u02D3\u02CA\x03\x02\x02\x02\u02D3" +
-		"\u02CD\x03\x02\x02\x02\u02D3\u02D0\x03\x02\x02\x02\u02D4\u02D7\x03\x02" +
-		"\x02\x02\u02D5\u02D3\x03\x02\x02\x02\u02D5\u02D6\x03\x02\x02\x02\u02D6" +
-		"\x81\x03\x02\x02\x02\u02D7\u02D5\x03\x02\x02\x02\u02D8\u02DE\x05\x8CG" +
-		"\x02\u02D9\u02DA\x07\x1A\x02\x02\u02DA\u02DB\x05`1\x02\u02DB\u02DC\x07" +
-		"\x1B\x02\x02\u02DC\u02DE\x03\x02\x02\x02\u02DD\u02D8\x03\x02\x02\x02\u02DD" +
-		"\u02D9\x03\x02\x02\x02\u02DE\x83\x03\x02\x02\x02\u02DF\u02EE\x05\x8CG" +
-		"\x02\u02E0\u02E1\x07g\x02\x02\u02E1\u02E2\x07\f\x02\x02\u02E2\u02EE\x05" +
-		"t;\x02\u02E3\u02E4\x07h\x02\x02\u02E4\u02E5\x07%\x02\x02\u02E5\u02E6\x07" +
-		"\x13\x02\x02\u02E6\u02EE\x05\x84C\x02\u02E7\u02E8\x07h\x02\x02\u02E8\u02E9" +
-		"\x07\f\x02\x02\u02E9\u02EA\x05t;\x02\u02EA\u02EB\x07\x11\x02\x02\u02EB" +
-		"\u02EC\x05\x8EH\x02\u02EC\u02EE\x03\x02\x02\x02\u02ED\u02DF\x03\x02\x02" +
-		"\x02\u02ED\u02E0\x03\x02\x02\x02\u02ED\u02E3\x03\x02\x02\x02\u02ED\u02E7" +
-		"\x03\x02\x02\x02\u02EE\x85\x03\x02\x02\x02\u02EF\u02F0\x05\x88E\x02\u02F0" +
-		"\x87\x03\x02\x02\x02\u02F1\u02F8\x05t;\x02\u02F2\u02F8\x05|?\x02\u02F3" +
-		"\u02F8\x05x=\x02\u02F4\u02F8\x05\x82B\x02\u02F5\u02F8\x05\x84C\x02\u02F6" +
-		"\u02F8\x05\x8AF\x02\u02F7\u02F1\x03\x02\x02\x02\u02F7\u02F2\x03\x02\x02" +
-		"\x02\u02F7\u02F3\x03\x02\x02\x02\u02F7\u02F4\x03\x02\x02\x02\u02F7\u02F5" +
-		"\x03\x02\x02\x02\u02F7\u02F6\x03\x02\x02\x02\u02F8\x89\x03\x02\x02\x02" +
-		"\u02F9\u02FA\x07i\x02\x02\u02FA\x8B\x03\x02\x02\x02\u02FB\u0301\x05\x8E" +
-		"H\x02\u02FC\u02FD\x05\x8EH\x02\u02FD\u02FE\x07j\x02\x02\u02FE\u02FF\x05" +
-		"\x8EH\x02\u02FF\u0301\x03\x02\x02\x02\u0300\u02FB\x03\x02\x02\x02\u0300" +
-		"\u02FC\x03\x02\x02\x02\u0301\x8D\x03\x02\x02\x02\u0302\u0306\x07o\x02" +
-		"\x02\u0303\u0304\x07k\x02\x02\u0304\u0306\x07n\x02\x02\u0305\u0302\x03" +
-		"\x02\x02\x02\u0305\u0303\x03\x02\x02\x02\u0306\x8F\x03\x02\x02\x02\u0307" +
-		"\u030A\x07p\x02\x02\u0308\u030A\x07q\x02\x02\u0309\u0307\x03\x02\x02\x02" +
-		"\u0309\u0308\x03\x02\x02\x02\u030A\x91\x03\x02\x02\x02\u030B\u030C\x07" +
-		"n\x02\x02\u030C\x93\x03\x02\x02\x02\u030D\u0312\x05t;\x02\u030E\u030F" +
-		"\x07n\x02\x02\u030F\u0310\x07b\x02\x02\u0310\u0312\x05t;\x02\u0311\u030D" +
-		"\x03\x02\x02\x02\u0311\u030E\x03\x02\x02\x02\u0312\x95\x03\x02\x02\x02" +
-		"4\xA1\xAB\xB0\xC0\xC4\xC8\xD7\xDC\xE7\xEF\xFB\u0107\u010D\u0126\u012B" +
-		"\u0135\u013A\u014A\u014F\u0155\u0167\u016B\u0170\u017A\u0184\u0191\u01AD" +
-		"\u01B1\u01BE\u01C6\u01E5\u0204\u0210\u0215\u0220\u024D\u027A\u0282\u0284" +
-		"\u028B\u02C2\u02D3\u02D5\u02DD\u02ED\u02F7\u0300\u0305\u0309\u0311";
+		"\u021F\u0219\x03\x02\x02\x02\u021F\u021C\x03\x02\x02\x02\u0220s\x03\x02" +
+		"\x02\x02\u0221\u0222\x05v<\x02\u0222u\x03\x02\x02\x02\u0223\u024D\x07" +
+		"m\x02\x02\u0224\u024D\x05\x8CG\x02\u0225\u0226\x070\x02\x02\u0226\u0227" +
+		"\x05v<\x02\u0227\u0228\x071\x02\x02\u0228\u024D\x03\x02\x02\x02\u0229" +
+		"\u024D\x05\\/\x02\u022A\u022B\x07Q\x02\x02\u022B\u022C\x05|?\x02\u022C" +
+		"\u022D\x07J\x02\x02\u022D\u022E\x07\x17\x02\x02\u022E\u024D\x03\x02\x02" +
+		"\x02\u022F\u0230\x07Q\x02\x02\u0230\u0231\x05x=\x02\u0231\u0232\x07J\x02" +
+		"\x02\u0232\u0233\x07\x17\x02\x02\u0233\u024D\x03\x02\x02\x02\u0234\u0235" +
+		"\x07R\x02\x02\u0235\u0236\x05t;\x02\u0236\u0237\x07\x13\x02\x02\u0237" +
+		"\u0238\x05\x84C\x02\u0238\u024D\x03\x02\x02\x02\u0239\u023A\x07S\x02\x02" +
+		"\u023A\u023B\x05t;\x02\u023B\u023C\x05t;\x02\u023C\u024D\x03\x02\x02\x02" +
+		"\u023D\u023E\x07T\x02\x02\u023E\u023F\x05|?\x02\u023F\u0240\x07\x13\x02" +
+		"\x02\u0240\u0241\x05t;\x02\u0241\u024D\x03\x02\x02\x02\u0242\u0243\x07" +
+		"N\x02\x02\u0243\u0244\x05|?\x02\u0244\u0245\x07\x13\x02\x02\u0245\u0246" +
+		"\x05\x8CG\x02\u0246\u024D\x03\x02\x02\x02\u0247\u0248\x07U\x02\x02\u0248" +
+		"\u0249\x07m\x02\x02\u0249\u024A\x07V\x02\x02\u024A\u024D\x05t;\x02\u024B" +
+		"\u024D\x07W\x02\x02\u024C\u0223\x03\x02\x02\x02\u024C\u0224\x03\x02\x02" +
+		"\x02\u024C\u0225\x03\x02\x02\x02\u024C\u0229\x03\x02\x02\x02\u024C\u022A" +
+		"\x03\x02\x02\x02\u024C\u022F\x03\x02\x02\x02\u024C\u0234\x03\x02\x02\x02" +
+		"\u024C\u0239\x03\x02\x02\x02\u024C\u023D\x03\x02\x02\x02\u024C\u0242\x03" +
+		"\x02\x02\x02\u024C\u0247\x03\x02\x02\x02\u024C\u024B\x03\x02\x02\x02\u024D" +
+		"w\x03\x02\x02\x02\u024E\u024F\x05z>\x02\u024Fy\x03\x02\x02\x02\u0250\u0251" +
+		"\b>\x01\x02\u0251\u027A\x07k\x02\x02\u0252\u027A\x05\x8CG\x02\u0253\u0254" +
+		"\x070\x02\x02\u0254\u0255\x05z>\x02\u0255\u0256\x071\x02\x02\u0256\u027A" +
+		"\x03\x02\x02\x02\u0257\u027A\x05\\/\x02\u0258\u0259\x07Q\x02\x02\u0259" +
+		"\u025A\x05|?\x02\u025A\u025B\x07J\x02\x02\u025B\u025C\x07\x16\x02\x02" +
+		"\u025C\u027A\x03\x02\x02\x02\u025D\u025E\x07Q\x02\x02\u025E\u025F\x05" +
+		"t;\x02\u025F\u0260\x07J\x02\x02\u0260\u0261\x07\x16\x02\x02\u0261\u027A" +
+		"\x03\x02\x02\x02\u0262\u0263\x07X\x02\x02\u0263\u027A\x05z>\v\u0264\u0265" +
+		"\x05~@\x02\u0265\u0266\x07Z\x02\x02\u0266\u0267\x05~@\x02\u0267\u027A" +
+		"\x03\x02\x02\x02\u0268\u0269\x05~@\x02\u0269\u026A\x07[\x02\x02\u026A" +
+		"\u026B\x05~@\x02\u026B\u027A\x03\x02\x02\x02\u026C\u026D\x05~@\x02\u026D" +
+		"\u026E\x07\\\x02\x02\u026E\u026F\x05~@\x02\u026F\u027A\x03\x02\x02\x02" +
+		"\u0270\u0271\x05t;\x02\u0271\u0272\x07]\x02\x02\u0272\u0273\x05t;\x02" +
+		"\u0273\u027A\x03\x02\x02\x02\u0274\u0275\x07U\x02\x02\u0275\u0276\x07" +
+		"k\x02\x02\u0276\u0277\x07V\x02\x02\u0277\u027A\x05z>\x04\u0278\u027A\x07" +
+		"^\x02\x02\u0279\u0250\x03\x02\x02\x02\u0279\u0252\x03\x02\x02\x02\u0279" +
+		"\u0253\x03\x02\x02\x02\u0279\u0257\x03\x02\x02\x02\u0279\u0258\x03\x02" +
+		"\x02\x02\u0279\u025D\x03\x02\x02\x02\u0279\u0262\x03\x02\x02\x02\u0279" +
+		"\u0264\x03\x02\x02\x02\u0279\u0268\x03\x02\x02\x02\u0279\u026C\x03\x02" +
+		"\x02\x02\u0279\u0270\x03\x02\x02\x02\u0279\u0274\x03\x02\x02\x02\u0279" +
+		"\u0278\x03\x02\x02\x02\u027A\u0283\x03\x02\x02\x02\u027B\u027C\f\n\x02" +
+		"\x02\u027C\u027D\x07B\x02\x02\u027D\u0282\x05z>\v\u027E\u027F\f\t\x02" +
+		"\x02\u027F\u0280\x07Y\x02\x02\u0280\u0282\x05z>\n\u0281\u027B\x03\x02" +
+		"\x02\x02\u0281\u027E\x03\x02\x02\x02\u0282\u0285\x03\x02\x02\x02\u0283" +
+		"\u0281\x03\x02\x02\x02\u0283\u0284\x03\x02\x02\x02\u0284{\x03\x02\x02" +
+		"\x02\u0285\u0283\x03\x02\x02\x02\u0286\u0287\x05\x80A\x02\u0287}\x03\x02" +
+		"\x02\x02\u0288\u028B\x05|?\x02\u0289\u028B\x05t;\x02\u028A\u0288\x03\x02" +
+		"\x02\x02\u028A\u0289\x03\x02\x02\x02\u028B\x7F\x03\x02\x02\x02\u028C\u028D" +
+		"\bA\x01\x02\u028D\u02C2\x05\x90I\x02\u028E\u02C2\x05\x8CG\x02\u028F\u0290" +
+		"\x070\x02\x02\u0290\u0291\x05\x80A\x02\u0291\u0292\x071\x02\x02\u0292" +
+		"\u02C2\x03\x02\x02\x02\u0293\u02C2\x05\\/\x02\u0294\u0295\x07Q\x02\x02" +
+		"\u0295\u0296\x05t;\x02\u0296\u0297\x07J\x02\x02\u0297\u0298\x07\x15\x02" +
+		"\x02\u0298\u02C2\x03\x02\x02\x02\u0299\u029A\x07Q\x02\x02\u029A\u029B" +
+		"\x05t;\x02\u029B\u029C\x07J\x02\x02\u029C\u029D\x07\x14\x02\x02\u029D" +
+		"\u02C2\x03\x02\x02\x02\u029E\u029F\x07Q\x02\x02\u029F\u02A0\x05x=\x02" +
+		"\u02A0\u02A1\x07J\x02\x02\u02A1\u02A2\x07\x14\x02\x02\u02A2\u02C2\x03" +
+		"\x02\x02\x02\u02A3\u02A4\x07Q\x02\x02\u02A4\u02A5\x05\x80A\x02\u02A5\u02A6" +
+		"\x07J\x02\x02\u02A6\u02A7\x07\x15\x02\x02\u02A7\u02C2\x03\x02\x02\x02" +
+		"\u02A8\u02A9\x07Q\x02\x02\u02A9\u02AA\x05\x80A\x02\u02AA\u02AB\x07J\x02" +
+		"\x02\u02AB\u02AC\x07\x14\x02\x02\u02AC\u02C2\x03\x02\x02\x02\u02AD\u02C2" +
+		"\x07D\x02\x02\u02AE\u02AF\x07_\x02\x02\u02AF\u02B0\x07\x13\x02\x02\u02B0" +
+		"\u02C2\x05t;\x02\u02B1\u02B2\x07_\x02\x02\u02B2\u02B3\x07\x13\x02\x02" +
+		"\u02B3\u02B4\x07\x12\x02\x02\u02B4\u02C2\x05\x8CG\x02\u02B5\u02B6\x07" +
+		"`\x02\x02\u02B6\u02B7\x07\x13\x02\x02\u02B7\u02B8\x05\x86D\x02\u02B8\u02B9" +
+		"\x07*\x02\x02\u02B9\u02BA\x05\x8CG\x02\u02BA\u02C2\x03\x02\x02\x02\u02BB" +
+		"\u02BC\x07U\x02\x02\u02BC\u02BD\x05\x90I\x02\u02BD\u02BE\x07V\x02\x02" +
+		"\u02BE\u02BF\x05\x80A\x04\u02BF\u02C2\x03\x02\x02\x02\u02C0\u02C2\x07" +
+		"e\x02\x02\u02C1\u028C\x03\x02\x02\x02\u02C1\u028E\x03\x02\x02\x02\u02C1" +
+		"\u028F\x03\x02\x02\x02\u02C1\u0293\x03\x02\x02\x02\u02C1\u0294\x03\x02" +
+		"\x02\x02\u02C1\u0299\x03\x02\x02\x02\u02C1\u029E\x03\x02\x02\x02\u02C1" +
+		"\u02A3\x03\x02\x02\x02\u02C1\u02A8\x03\x02\x02\x02\u02C1\u02AD\x03\x02" +
+		"\x02\x02\u02C1\u02AE\x03\x02\x02\x02\u02C1\u02B1\x03\x02\x02\x02\u02C1" +
+		"\u02B5\x03\x02\x02\x02\u02C1\u02BB\x03\x02\x02\x02\u02C1\u02C0\x03\x02" +
+		"\x02\x02\u02C2\u02D4\x03\x02\x02\x02\u02C3\u02C4\f\t\x02\x02\u02C4\u02C5" +
+		"\x07\x07\x02\x02\u02C5\u02D3\x05\x80A\n\u02C6\u02C7\f\b\x02\x02\u02C7" +
+		"\u02C8\x07a\x02\x02\u02C8\u02D3\x05\x80A\t\u02C9\u02CA\f\x07\x02\x02\u02CA" +
+		"\u02CB\x07b\x02\x02\u02CB\u02D3\x05\x80A\b\u02CC\u02CD\f\x06\x02\x02\u02CD" +
+		"\u02CE\x07c\x02\x02\u02CE\u02D3\x05\x80A\x07\u02CF\u02D0\f\x05\x02\x02" +
+		"\u02D0\u02D1\x07d\x02\x02\u02D1\u02D3\x05\x80A\x06\u02D2\u02C3\x03\x02" +
+		"\x02\x02\u02D2\u02C6\x03\x02\x02\x02\u02D2\u02C9\x03\x02\x02\x02\u02D2" +
+		"\u02CC\x03\x02\x02\x02\u02D2\u02CF\x03\x02\x02\x02\u02D3\u02D6\x03\x02" +
+		"\x02\x02\u02D4\u02D2\x03\x02\x02\x02\u02D4\u02D5\x03\x02\x02\x02\u02D5" +
+		"\x81\x03\x02\x02\x02\u02D6\u02D4\x03\x02\x02\x02\u02D7\u02DD\x05\x8CG" +
+		"\x02\u02D8\u02D9\x07\x19\x02\x02\u02D9\u02DA\x05`1\x02\u02DA\u02DB\x07" +
+		"\x1A\x02\x02\u02DB\u02DD\x03\x02\x02\x02\u02DC\u02D7\x03\x02\x02\x02\u02DC" +
+		"\u02D8\x03\x02\x02\x02\u02DD\x83\x03\x02\x02\x02\u02DE\u02ED\x05\x8CG" +
+		"\x02\u02DF\u02E0\x07f\x02\x02\u02E0\u02E1\x07\f\x02\x02\u02E1\u02ED\x05" +
+		"t;\x02\u02E2\u02E3\x07g\x02\x02\u02E3\u02E4\x07$\x02\x02\u02E4\u02E5\x07" +
+		"\x13\x02\x02\u02E5\u02ED\x05\x84C\x02\u02E6\u02E7\x07g\x02\x02\u02E7\u02E8" +
+		"\x07\f\x02\x02\u02E8\u02E9\x05t;\x02\u02E9\u02EA\x07\x11\x02\x02\u02EA" +
+		"\u02EB\x05\x8EH\x02\u02EB\u02ED\x03\x02\x02\x02\u02EC\u02DE\x03\x02\x02" +
+		"\x02\u02EC\u02DF\x03\x02\x02\x02\u02EC\u02E2\x03\x02\x02\x02\u02EC\u02E6" +
+		"\x03\x02\x02\x02\u02ED\x85\x03\x02\x02\x02\u02EE\u02EF\x05\x88E\x02\u02EF" +
+		"\x87\x03\x02\x02\x02\u02F0\u02F7\x05t;\x02\u02F1\u02F7\x05|?\x02\u02F2" +
+		"\u02F7\x05x=\x02\u02F3\u02F7\x05\x82B\x02\u02F4\u02F7\x05\x84C\x02\u02F5" +
+		"\u02F7\x05\x8AF\x02\u02F6\u02F0\x03\x02\x02\x02\u02F6\u02F1\x03\x02\x02" +
+		"\x02\u02F6\u02F2\x03\x02\x02\x02\u02F6\u02F3\x03\x02\x02\x02\u02F6\u02F4" +
+		"\x03\x02\x02\x02\u02F6\u02F5\x03\x02\x02\x02\u02F7\x89\x03\x02\x02\x02" +
+		"\u02F8\u02F9\x07h\x02\x02\u02F9\x8B\x03\x02\x02\x02\u02FA\u0300\x05\x8E" +
+		"H\x02\u02FB\u02FC\x05\x8EH\x02\u02FC\u02FD\x07i\x02\x02\u02FD\u02FE\x05" +
+		"\x8EH\x02\u02FE\u0300\x03\x02\x02\x02\u02FF\u02FA\x03\x02\x02\x02\u02FF" +
+		"\u02FB\x03\x02\x02\x02\u0300\x8D\x03\x02\x02\x02\u0301\u0305\x07n\x02" +
+		"\x02\u0302\u0303\x07j\x02\x02\u0303\u0305\x07m\x02\x02\u0304\u0301\x03" +
+		"\x02\x02\x02\u0304\u0302\x03\x02\x02\x02\u0305\x8F\x03\x02\x02\x02\u0306" +
+		"\u0309\x07o\x02\x02\u0307\u0309\x07p\x02\x02\u0308\u0306\x03\x02\x02\x02" +
+		"\u0308\u0307\x03\x02\x02\x02\u0309\x91\x03\x02\x02\x02\u030A\u030B\x07" +
+		"m\x02\x02\u030B\x93\x03\x02\x02\x02\u030C\u0311\x05t;\x02\u030D\u030E" +
+		"\x07m\x02\x02\u030E\u030F\x07a\x02\x02\u030F\u0311\x05t;\x02\u0310\u030C" +
+		"\x03\x02\x02\x02\u0310\u030D\x03\x02\x02\x02\u0311\x95\x03\x02\x02\x02" +
+		"4\xA1\xAB\xB0\xC0\xC4\xC8\xD7\xDC\xE7\xEF\xFA\u0106\u010C\u0125\u012A" +
+		"\u0134\u0139\u0149\u014E\u0154\u0166\u016A\u016F\u0179\u0183\u0190\u01AC" +
+		"\u01B0\u01BD\u01C5\u01E4\u0203\u020F\u0214\u021F\u024C\u0279\u0281\u0283" +
+		"\u028A\u02C1\u02D2\u02D4\u02DC\u02EC\u02F6\u02FF\u0304\u0308\u0310";
 	public static readonly _serializedATN: string = Utils.join(
 		[
 			ScratchParser._serializedATNSegment0,
@@ -5302,35 +5291,6 @@ export class TypeContext extends ParserRuleContext {
 		super.copyFrom(ctx);
 	}
 }
-export class PrimitiveContext extends TypeContext {
-	public primitiveType(): PrimitiveTypeContext {
-		return this.getRuleContext(0, PrimitiveTypeContext);
-	}
-	constructor(ctx: TypeContext) {
-		super(ctx.parent, ctx.invokingState);
-		this.copyFrom(ctx);
-	}
-	// @Override
-	public enterRule(listener: ScratchListener): void {
-		if (listener.enterPrimitive) {
-			listener.enterPrimitive(this);
-		}
-	}
-	// @Override
-	public exitRule(listener: ScratchListener): void {
-		if (listener.exitPrimitive) {
-			listener.exitPrimitive(this);
-		}
-	}
-	// @Override
-	public accept<Result>(visitor: ScratchVisitor<Result>): Result {
-		if (visitor.visitPrimitive) {
-			return visitor.visitPrimitive(this);
-		} else {
-			return visitor.visitChildren(this);
-		}
-	}
-}
 export class ListTypeContext extends TypeContext {
 	public type(): TypeContext {
 		return this.getRuleContext(0, TypeContext);
@@ -5386,6 +5346,35 @@ export class ActorTypeContext extends TypeContext {
 		}
 	}
 }
+export class PrimitiveContext extends TypeContext {
+	public primitiveType(): PrimitiveTypeContext {
+		return this.getRuleContext(0, PrimitiveTypeContext);
+	}
+	constructor(ctx: TypeContext) {
+		super(ctx.parent, ctx.invokingState);
+		this.copyFrom(ctx);
+	}
+	// @Override
+	public enterRule(listener: ScratchListener): void {
+		if (listener.enterPrimitive) {
+			listener.enterPrimitive(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: ScratchListener): void {
+		if (listener.exitPrimitive) {
+			listener.exitPrimitive(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: ScratchVisitor<Result>): Result {
+		if (visitor.visitPrimitive) {
+			return visitor.visitPrimitive(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
 
 
 export class PrimitiveTypeContext extends ParserRuleContext {
@@ -5396,32 +5385,6 @@ export class PrimitiveTypeContext extends ParserRuleContext {
 	public get ruleIndex(): number { return ScratchParser.RULE_primitiveType; }
 	public copyFrom(ctx: PrimitiveTypeContext): void {
 		super.copyFrom(ctx);
-	}
-}
-export class NumberTypeContext extends PrimitiveTypeContext {
-	constructor(ctx: PrimitiveTypeContext) {
-		super(ctx.parent, ctx.invokingState);
-		this.copyFrom(ctx);
-	}
-	// @Override
-	public enterRule(listener: ScratchListener): void {
-		if (listener.enterNumberType) {
-			listener.enterNumberType(this);
-		}
-	}
-	// @Override
-	public exitRule(listener: ScratchListener): void {
-		if (listener.exitNumberType) {
-			listener.exitNumberType(this);
-		}
-	}
-	// @Override
-	public accept<Result>(visitor: ScratchVisitor<Result>): Result {
-		if (visitor.visitNumberType) {
-			return visitor.visitNumberType(this);
-		} else {
-			return visitor.visitChildren(this);
-		}
 	}
 }
 export class IntegerTypeContext extends PrimitiveTypeContext {
@@ -5450,27 +5413,27 @@ export class IntegerTypeContext extends PrimitiveTypeContext {
 		}
 	}
 }
-export class FloatTypeContext extends PrimitiveTypeContext {
+export class FloatingPointTypeContext extends PrimitiveTypeContext {
 	constructor(ctx: PrimitiveTypeContext) {
 		super(ctx.parent, ctx.invokingState);
 		this.copyFrom(ctx);
 	}
 	// @Override
 	public enterRule(listener: ScratchListener): void {
-		if (listener.enterFloatType) {
-			listener.enterFloatType(this);
+		if (listener.enterFloatingPointType) {
+			listener.enterFloatingPointType(this);
 		}
 	}
 	// @Override
 	public exitRule(listener: ScratchListener): void {
-		if (listener.exitFloatType) {
-			listener.exitFloatType(this);
+		if (listener.exitFloatingPointType) {
+			listener.exitFloatingPointType(this);
 		}
 	}
 	// @Override
 	public accept<Result>(visitor: ScratchVisitor<Result>): Result {
-		if (visitor.visitFloatType) {
-			return visitor.visitFloatType(this);
+		if (visitor.visitFloatingPointType) {
+			return visitor.visitFloatingPointType(this);
 		} else {
 			return visitor.visitChildren(this);
 		}

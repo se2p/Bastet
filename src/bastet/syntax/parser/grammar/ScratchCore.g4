@@ -71,15 +71,14 @@ declarationStmtList : declarationStmt* ;
 // The list of datatypes that are allowed for the declaration
 // of variables and attributes.
 type :
-    primitiveType # Primitive
- | 'list' 'of' type # ListType
+ 'list' 'of' type # ListType
  | 'actor' # ActorType
+ | primitiveType # Primitive
  ;
 
 primitiveType:
-   'number' # NumberType // Is an alias for 'int'
- | 'int' # IntegerType
- | 'float' # FloatType
+ 'int' # IntegerType
+ | 'float' # FloatingPointType
  | 'boolean' # BooleanType
  | 'string' # StringType
  | 'enum' '[' expressionListPlain ']' # EnumType
