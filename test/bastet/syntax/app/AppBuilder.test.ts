@@ -31,7 +31,7 @@ describe("AppBuilder", () => {
             program Test
             
             role A begin
-                extern _RUN_foo () returns number
+                extern _RUN_foo () returns int
             end
             
             role B is A begin
