@@ -78,7 +78,7 @@ export class Z3BooleanFormula extends Z3Formula implements AbstractBoolean {
 
 }
 
-export class Z3NumberFormula extends Z3Formula implements AbstractNumber {
+export abstract class Z3NumberFormula extends Z3Formula implements AbstractNumber {
 
 }
 
@@ -661,14 +661,14 @@ export class Z3StringTheory extends Z3Theory implements StringTheory<Z3StringFor
         const typedArray = new Int32Array([str1.getAST().val(), str2.getAST().val()]);
         const arrayOnHeap = this.arrayToHeap(typedArray);
         try {
-            return new Z3NumberFormula(this._ctx.mk_seq_concat(new Uint32(2), new Ptr(arrayOnHeap.byteOffset)));
+            return new Z3StringFormula(this._ctx.mk_seq_concat(new Uint32(2), new Ptr(arrayOnHeap.byteOffset)));
         } finally {
             this.freeArray(arrayOnHeap);
         }
     }
 
     lengthOf(str: Z3StringFormula): Z3NumberFormula {
-        return new Z3NumberFormula(this._ctx.mk_seq_length(str.getAST()));
+        return new Z3IntegerFormula(this._ctx.mk_seq_length(str.getAST()));
     }
 
     topString(): Z3StringFormula {

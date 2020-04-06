@@ -7,7 +7,7 @@ actor MiniActor is RuntimeEntity begin
         define x as 42
         repeat forever begin
             define x as x - 1
-            if (x < 0) begin
+            if (x < 0) then begin
                 _RUNTIME_signalFailure()
             end
         end
