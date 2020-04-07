@@ -46,7 +46,7 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
         // A `GraphAbstractState` has only references to the parents.
         // This wrapper has to keep track of the children, too.
         for (const parentId of element.getPredecessors()) {
-            Preconditions.checkState(this._idToStateMap.has(parentId));
+            Preconditions.checkState(this._idToStateMap.has(parentId), `Parent state with id ${parentId} must exit!`);
 
             const parentChilds = this._children.get(parentId) || [];
             parentChilds.push(element.getId());
