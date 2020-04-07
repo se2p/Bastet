@@ -21,6 +21,7 @@
  */
 
 import fs from "fs";
+import {Preconditions} from "./Preconditions";
 
 export interface SystemLayer {
 
@@ -31,6 +32,7 @@ export interface SystemLayer {
 export class NodeSystemLayer implements SystemLayer {
 
     readFileAsJson(filePath: string): {} {
+        Preconditions.checkArgument(fs.existsSync(filePath), "File does not exists.")
         const data: string = fs.readFileSync(filePath, 'utf8');
         return JSON.parse(data);
     }

@@ -35,10 +35,10 @@ import {AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
 import {AppToDot} from "./syntax/app/AppToDot";
 import {IllegalArgumentException} from "./core/exceptions/IllegalArgumentException";
 import {AnalysisStatistics} from "./procedures/analyses/AnalysisStatistics";
-import {NodeSystemLayer} from "./utils/SystemLayer";
 import {TypeInformationStorage} from "./syntax/DeclarationScopes";
 import {ToIntermediateTransformer} from "./syntax/transformers/ToIntermediateTransformer";
 import * as fs from "fs";
+import {mergeConfigFilesToJson} from "./utils/BastetConfiguration";
 
 const process = require('process');
 
@@ -50,11 +50,15 @@ const commander = require('commander');
 export class Bastet {
 
     private parseProgramArguments() : any {
+        function commaSeparatedList(value, dummy) {
+            return value.split(',');
+        }
+
         const program = new commander.Command();
         return program
             .version('0.0.1')
             .option('-d, --debug', 'Debugging mode')
-            .option('-c, --configuration <required>', 'Configuration file')
+            .option('-c, --configuration <required>', 'Configuration files, separated by comma', commaSeparatedList)
             .requiredOption('-I, --intermediateLibrary <required>', 'Program file that defines the intermediate functions')
             .requiredOption('-P, --program <required>', 'Program file')
             .requiredOption('-S, --specification <required>', 'Specification file')
@@ -78,9 +82,9 @@ export class Bastet {
         const intermLibFilepath: string = cmdlineArguments.intermediateLibrary;
         const programFilepath: string = cmdlineArguments.program;
         const specFilepath: string = cmdlineArguments.specification;
-        const configFilepath: string = cmdlineArguments['configuration'] || "./config/default.json";
+        const configFilepaths: string[] = cmdlineArguments['configuration'] || [ "./config/default.json" ];
 
-        return this.runFor(configFilepath, intermLibFilepath, programFilepath, specFilepath);
+        return this.runFor(configFilepaths, intermLibFilepath, programFilepath, specFilepath);
     }
 
     public registerOnExitNotifiers() {
@@ -94,14 +98,12 @@ export class Bastet {
         });
     }
 
-    public async runFor(configFilepath: string, libraryFilepath: string, programFilepath: string, specFilepath: string) : Promise<AnalysisResult> {
-        Preconditions.checkArgument(fs.existsSync(configFilepath), "Config File does not exists.")
+    public async runFor(configFilepath: string[], libraryFilepath: string, programFilepath: string, specFilepath: string) : Promise<AnalysisResult> {
         Preconditions.checkArgument(fs.existsSync(libraryFilepath), "Library File does not exists.")
         Preconditions.checkArgument(fs.existsSync(programFilepath), "Program File does not exists.")
         Preconditions.checkArgument(fs.existsSync(specFilepath), "Spec File does not exists.")
 
-        const sl = new NodeSystemLayer();
-        const config: {} = sl.readFileAsJson(configFilepath);
+        const config: {} = mergeConfigFilesToJson(configFilepath);
 
         // Build the static task model
         const staticTaskModel: App = this.buildTaskModel(libraryFilepath, programFilepath, specFilepath, config);

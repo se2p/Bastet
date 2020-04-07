@@ -22,6 +22,19 @@
 import {ImplementMeException} from "../core/exceptions/ImplementMeException";
 import {Preconditions} from "./Preconditions";
 
+import {NodeSystemLayer} from "./SystemLayer";
+import * as _ from "lodash";
+
+export function mergeConfigFilesToJson(files: string[]): {} {
+    let result: {} = {};
+    for (const f of files) {
+        const sl = new NodeSystemLayer();
+        const j: {} = sl.readFileAsJson(f);
+        result = _.merge(result, j);
+    }
+    return result;
+}
+
 export class BastetConfiguration {
 
     private readonly dict: {};
