@@ -53,6 +53,7 @@ import {NoMergeIntoOperator, StandardMergeIntoOperator} from "../Operators";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable"
+import {GraphContextToDot} from "./GraphContextToDot";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 
@@ -181,9 +182,14 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         return this._wrappedAnalysis;
     }
 
+    private onStateError(reached: GraphReachedSetWrapper<GraphAbstractState>, e: GraphAbstractState): void {
+        const toDot = new GraphContextToDot(this._task, this, reached);
+        toDot.writeContextToFile(`output/state-${e.getId()}-context.dot`, e.getId());
+    }
+
     createStateSets(): [FrontierSet<GraphAbstractState>, ReachedSet<GraphAbstractState>] {
         const frontierSet = new DefaultFrontierSet<GraphAbstractState>();
-        const reachedSet = new GraphReachedSetWrapper(frontierSet, this);
+        const reachedSet = new GraphReachedSetWrapper(frontierSet, this, (r, e) => {this.onStateError(r,e)});
         return [frontierSet, reachedSet];
     }
 

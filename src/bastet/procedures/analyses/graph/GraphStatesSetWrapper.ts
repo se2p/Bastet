@@ -21,25 +21,37 @@
  */
 
 
-import {DefaultAnalysisStateSet, StateSet, StatePartitionOperator} from "../../algorithms/StateSet";
+import {
+    DefaultAnalysisStateSet,
+    StateSet,
+    StatePartitionOperator,
+    DefaultFrontierSet,
+    FrontierSet
+} from "../../algorithms/StateSet";
 import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {GraphPath, GraphPathSet} from "./GraphPath";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {GraphContextToDot} from "./GraphContextToDot";
+import {GraphAnalysis} from "./GraphAnalysis";
+import {App} from "../../../syntax/app/App";
 
 export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState> {
 
-    private readonly _frontierSet: StateSet<E>;
+    private readonly _frontierSet: FrontierSet<E>;
 
     private readonly _children: Map<GraphStateId, GraphStateId[]>;
 
     private readonly _idToStateMap: Map<GraphStateId, E>;
 
-    constructor(frontierSet: StateSet<E>, partitionOp: StatePartitionOperator<E>) {
+    private readonly _onStateToInspect: (r: GraphReachedSetWrapper<E>, e: E) => void;
+
+    constructor(frontierSet: FrontierSet<E>, partitionOp: StatePartitionOperator<E>, onStateToInspect: (r: GraphReachedSetWrapper<E>, e: E) => void) {
         super(partitionOp);
         this._frontierSet = Preconditions.checkNotUndefined(frontierSet);
         this._children = new Map<GraphStateId, GraphStateId[]>();
         this._idToStateMap = new Map<GraphStateId, E>();
+        this._onStateToInspect = Preconditions.checkNotUndefined(onStateToInspect);
     }
 
     public add(element: E): any {
@@ -75,6 +87,16 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
             // Also remove the child from the set of frontier states
             this._frontierSet.remove(childState);
         }
+    }
+
+    public getChildrenOf(of: GraphStateId): Set<GraphStateId> {
+        const childIDs: GraphStateId[] = this._children.get(of) || [];
+        return new Set(childIDs);
+    }
+
+    public getChildStatesOf(of: GraphStateId): E[] {
+        const childIDs: GraphStateId[] = this._children.get(of) || [];
+        return childIDs.map((id) => this._idToStateMap.get(id));
     }
 
     public remove(element: E): any {

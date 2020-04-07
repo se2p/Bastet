@@ -21,38 +21,34 @@
  */
 
 import {StateSet} from "../../algorithms/StateSet";
-import {GraphAbstractState} from "./GraphAbstractDomain";
+import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {TransitionLabelProvider} from "../ProgramAnalysis";
 import {PenSizeVisitor, StateColorVisitor, StateLabelVisitor} from "../StateVisitors";
 import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 import {App} from "../../../syntax/app/App";
+import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
 
-export class GraphToDot  {
+export class GraphContextToDot  {
 
     private _headerdot: any[];
     private _dot: string[];
-    private _idseq: number;
-    private _reached: StateSet<GraphAbstractState>;
-    private _frontier: StateSet<GraphAbstractState>;
+    private _reached: GraphReachedSetWrapper<GraphAbstractState>;
     private _transLabProvider: TransitionLabelProvider<GraphAbstractState>;
     private _task: App;
 
     constructor(task: App,
                 transLabProvider: TransitionLabelProvider<GraphAbstractState>,
-                reached: StateSet<GraphAbstractState>,
-                frontier: StateSet<GraphAbstractState>) {
+                reached: GraphReachedSetWrapper<GraphAbstractState>) {
         this._task = Preconditions.checkNotUndefined(task);
         this._transLabProvider = Preconditions.checkNotUndefined(transLabProvider);
         this._reached = Preconditions.checkNotUndefined(reached);
-        this._frontier = Preconditions.checkNotUndefined(frontier);
         this._headerdot = [];
         this._dot = [];
-        this._idseq = 0;
     }
 
     private writeState(e: GraphAbstractState) {
-        const stateLabel = GraphToDot.escapeForDot(e.accept(new StateLabelVisitor(this._task)));
+        const stateLabel = GraphContextToDot.escapeForDot(e.accept(new StateLabelVisitor(this._task)));
         const stateColor = e.accept(new StateColorVisitor());
         const pensize = e.accept(new PenSizeVisitor());
         this._dot.push(`    ${e.getId()} [label="${stateLabel}" penwidth=${pensize} color="black" fillcolor="${stateColor}"];`);
@@ -60,32 +56,41 @@ export class GraphToDot  {
 
     private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
         const visitor = new CorePrintVisitor();
-        const transLabels = GraphToDot.escapeForDot(this._transLabProvider.getTransitionLabel(from, to)
+        const transLabels = GraphContextToDot.escapeForDot(this._transLabProvider.getTransitionLabel(from, to)
             .map(o => o.ast.accept(visitor)).join(";"));
         this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabels}"];`);
     }
 
-    private export() {
+    private export(contextOf: GraphStateId) {
         this._headerdot.push(`    node [shape=box, style=filled];`);
 
         const idToStateMap = new Map<number, GraphAbstractState>();
+        const contextStateIDs: Set<GraphStateId> = new Set<GraphStateId>();
 
         for (const e of this._reached) {
+            const inContext: boolean = e.getId() == contextOf
+                || e.getPredecessors().contains(contextOf)
+                || this._reached.getChildrenOf(contextOf).has(contextOf);
             idToStateMap.set(e.getId(), e);
-            this.writeState(e);
+            if (inContext) {
+                contextStateIDs.add(e.getId());
+                this.writeState(e);
+            }
         }
 
         for (const e of this._reached) {
             for (const ePredId of e.getPredecessors()) {
-                const ePred = idToStateMap.get(ePredId);
-                Preconditions.checkNotUndefined(ePred);
-                this.writeTransition(ePred, e);
+                if (contextStateIDs.has(ePredId)) {
+                    const ePred = idToStateMap.get(ePredId);
+                    Preconditions.checkNotUndefined(ePred);
+                    this.writeTransition(ePred, e);
+                }
             }
         }
     }
 
-    public writeToFile(filepath: string): void {
-        this.export();
+    public writeContextToFile(filepath: string, contextOf: GraphStateId): void {
+        this.export(contextOf);
         let fs = require('fs');
         fs.writeFileSync(filepath, `digraph ReachabilityGraph {\n`
             + this._headerdot.join("\n")
