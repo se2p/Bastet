@@ -21,7 +21,7 @@
  */
 
 import {Preconditions} from "../../utils/Preconditions";
-import {BooleanType, NumberType, ScratchType, StringType} from "../../syntax/ast/core/ScratchType";
+import {BooleanType, FloatType, IntegerType, ScratchType, StringType} from "../../syntax/ast/core/ScratchType";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString, ConcreteStringList} from "./ConcreteElements";
 import {AbstractElement} from "../../lattices/Lattice";
 import {AbstractDomain} from "./AbstractDomain";
@@ -45,6 +45,18 @@ export interface AbstractBoolean extends AbstractValue {
 }
 
 export interface AbstractNumber extends AbstractValue {
+
+}
+
+export interface AbstractFloat extends AbstractNumber {
+
+}
+
+export interface AbstractInteger extends AbstractNumber {
+
+}
+
+export interface AbstractReal extends AbstractNumber {
 
 }
 
@@ -91,10 +103,17 @@ export class StringVariable extends IdentifiableMemoryCell {
     }
 }
 
-export class NumberVariable extends IdentifiableMemoryCell {
+export class IntegerVariable extends IdentifiableMemoryCell {
 
     constructor(name: string) {
-        super(NumberType.instance(), name);
+        super(IntegerType.instance(), name);
+    }
+}
+
+export class FloatVariable extends IdentifiableMemoryCell {
+
+    constructor(name: string) {
+        super(FloatType.instance(), name);
     }
 }
 
@@ -110,9 +129,18 @@ export interface ListTheory<L extends AbstractList> {
 
 }
 
-export interface StringTheory<S extends AbstractString, B extends AbstractBoolean, N extends AbstractNumber> {
+export interface StringTheory<S extends AbstractString, B extends AbstractBoolean, I extends AbstractInteger,
+    R extends AbstractReal, F extends AbstractFloat> {
 
-    fromConcreteString(str: ConcreteString): S;
+    fromConcrete(str: ConcreteString): S;
+
+    toFloat(from: S): F;
+
+    toInteger(from: S): I;
+
+    toBoolean(from: S): I;
+
+    toReal(from: S): R;
 
     abstractStringValue(id: Variable): S;
 
@@ -122,21 +150,17 @@ export interface StringTheory<S extends AbstractString, B extends AbstractBoolea
 
     bottomString(): S;
 
-    lengthOf(str: S): N;
-
-    castNumberAsString(num: N): S;
-
-    castBoolAsString(num: B): S;
+    lengthOf(str: S): I;
 
     joinStrings(str1: S, str2: S): S;
 
-    ithLetterOf(index: N, str: S): S;
+    ithLetterOf(index: I, str: S): S;
 
     stringsEqual(str1: S, str2: S): B;
 
     stringContains(str1: S, str2: S): B;
 
-    lengthOf(str: S): N;
+    lengthOf(str: S): I;
 
     ifThenElse(cond: B, thenResult: S, elseResult: S): S;
 
@@ -166,9 +190,22 @@ export interface StringTheoryQueries {
 
 }
 
-export interface NumberTheory<N extends AbstractNumber, B extends AbstractBoolean> {
+export interface NumberTheory<N extends AbstractNumber, I extends AbstractInteger, R extends AbstractReal,
+    F extends AbstractFloat, B extends AbstractBoolean, S extends AbstractString> {
+
+    castFrom(from: AbstractNumber): N;
 
     fromConcreteNumber(str: ConcreteNumber): N;
+
+    fromConcreteString(str: ConcreteString): N;
+
+    toFloatFormula(from: N): F;
+
+    toIntegerFormula(from: N): I;
+
+    toRealFormula(from: N): R;
+
+    toStringFormula(from: N): S;
 
     abstractNumberValue(id: Variable): N;
 
@@ -180,15 +217,13 @@ export interface NumberTheory<N extends AbstractNumber, B extends AbstractBoolea
 
     bottomNumber(): N;
 
-    castStringAsNumber(str: AbstractString): N;
+    power(op1: N, op2: N): N;
 
-    castBoolAsNumber(val: B): N;
+    sqrt(op1: N): N;
 
     multiply(op1: N, op2: N): N;
 
     divide(op1: N, op2: N): N;
-
-    modulo(op1: N, op2: N): N;
 
     plus(op1: N, op2: N): N;
 
@@ -205,6 +240,23 @@ export interface NumberTheory<N extends AbstractNumber, B extends AbstractBoolea
     isNumberEqualTo(s1: N, s2: N): B;
 
     ifThenElse(cond: B, thenResult: N, elseResult: N): N;
+
+}
+
+export interface RealTheory<N extends AbstractReal, I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
+    B extends AbstractBoolean, S extends AbstractString> extends NumberTheory<N, I, R, F, B, S> {
+
+}
+
+export interface FloatTheory<N extends AbstractFloat, I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
+    B extends AbstractBoolean, S extends AbstractString> extends NumberTheory<N, I, R, F, B, S> {
+
+}
+
+export interface IntegerTheory<N extends AbstractInteger, I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
+    B extends AbstractBoolean, S extends AbstractString> extends NumberTheory<N, I, R, F, B, S> {
+
+    modulo(op1: N, op2: N): N;
 
 }
 
@@ -250,183 +302,6 @@ export interface BooleanTheory<B extends AbstractBoolean> {
 
 }
 
-export interface MemoryTheory {
-
-    /** Variable Declarations */
-
-    declareVariable(id: Variable, type: ScratchType): AbstractMemory;
-
-    freeVariable(id: Variable): AbstractMemory;
-
-    getStringVariable(id: Variable): StringVariable;
-
-    getNumberVariable(id: Variable): NumberVariable;
-
-    getBooleanVariable(id: Variable): BooleanVariable;
-
-    getListVariable(id: Variable): ListVariable;
-
-    getMapVariable(id: Variable): MapVariable;
-
-
-    /** Querying Variable Values */
-
-    queryAbstractString(id: StringVariable): AbstractString;
-
-    queryAbstractNumber(id: NumberVariable): AbstractNumber;
-
-    queryAbstractBoolean(id: BooleanVariable): AbstractBoolean;
-
-    queryAbstractMap(id: MapVariable): AbstractMap;
-
-    queryAbstractList(id: ListVariable): AbstractList;
-
-
-    /** Booleans */
-
-    assignBoolean(assignTo: BooleanVariable, b: AbstractBoolean): AbstractMemory;
-
-    assignAnd(assignTo: BooleanVariable, b1: AbstractBoolean, b2: AbstractBoolean): AbstractMemory;
-
-    assignOr(assignTo: BooleanVariable, b1: AbstractBoolean, b2: AbstractBoolean): AbstractMemory;
-
-    assignNot(assignTo: BooleanVariable, b1: AbstractBoolean): AbstractMemory;
-
-
-    /** Boolean Assumes */
-
-    assumeTrue(boolVar: BooleanVariable): AbstractMemory;
-
-    assumeFalse(boolVar: BooleanVariable): AbstractMemory;
-
-    assumeTruth(boolVal: AbstractBoolean): AbstractMemory;
-
-
-    /** Strings */
-
-    assignString(assignTo: StringVariable, b: AbstractString): AbstractMemory;
-
-    assignJoinedStrings(assignTo: StringVariable, s1: AbstractString, s2: AbstractString): AbstractMemory;
-
-    assignIthLetterOf(assignTo: StringVariable, index: AbstractNumber, str: AbstractString): AbstractMemory;
-
-
-    /** Strings --> Boolean */
-
-    assignStringGreaterThan(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): AbstractMemory;
-
-    assignIsStringLessThan(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): AbstractMemory;
-
-    assignIsStringEqualTo(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): AbstractMemory;
-
-    assignIsStringContained(assignTo: BooleanVariable, s: AbstractString, containedIn: AbstractString): AbstractMemory;
-
-
-    /** Numbers */
-
-    assignNumber(assignTo: NumberVariable, b: AbstractNumber): AbstractMemory;
-
-    assignMultiply(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
-
-    assignDivide(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
-
-    assignModulo(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
-
-    assignPlus(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
-
-    assignMinus(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
-
-
-    /** Numbers --> Boolean */
-
-    assignNumberGreaterThan(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): AbstractMemory;
-
-    assignIsNumberLessThan(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): AbstractMemory;
-
-    assignIsNumberEqualTo(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): AbstractMemory;
-
-}
-
-export abstract class MemoryTransformer<M extends AbstractMemory> implements MemoryTheory {
-
-    protected readonly _state: M;
-
-    constructor(state: M) {
-        this._state = Preconditions.checkNotUndefined(state);
-    }
-
-    abstract assignAnd(assignTo: BooleanVariable, b1: AbstractBoolean, b2: AbstractBoolean): AbstractMemory;
-
-    abstract assignBoolean(assignTo: BooleanVariable, b: AbstractBoolean): AbstractMemory;
-
-    abstract assignDivide(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
-
-    abstract assignIsNumberEqualTo(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): AbstractMemory;
-
-    abstract assignIsNumberLessThan(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): AbstractMemory;
-
-    abstract assignIsStringContained(assignTo: BooleanVariable, s: AbstractString, containedIn: AbstractString): AbstractMemory;
-
-    abstract assignIsStringEqualTo(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): AbstractMemory;
-
-    abstract assignIsStringLessThan(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): AbstractMemory;
-
-    abstract assignIthLetterOf(assignTo: StringVariable, index: AbstractNumber, str: AbstractString): AbstractMemory;
-
-    abstract assignJoinedStrings(assignTo: StringVariable, s1: AbstractString, s2: AbstractString): AbstractMemory;
-
-    abstract assignMinus(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
-
-    abstract assignModulo(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
-
-    abstract assignMultiply(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
-
-    abstract assignNot(assignTo: BooleanVariable, b1: AbstractBoolean): AbstractMemory;
-
-    abstract assignNumber(assignTo: NumberVariable, b: AbstractNumber): AbstractMemory;
-
-    abstract assignNumberGreaterThan(assignTo: BooleanVariable, s1: AbstractNumber, s2: AbstractNumber): AbstractMemory;
-
-    abstract assignOr(assignTo: BooleanVariable, b1: AbstractBoolean, b2: AbstractBoolean): AbstractMemory;
-
-    abstract assignPlus(assignTo: NumberVariable, op1: AbstractNumber, op2: AbstractNumber): AbstractMemory;
-
-    abstract assignString(assignTo: StringVariable, b: AbstractString): AbstractMemory;
-
-    abstract assignStringGreaterThan(assignTo: BooleanVariable, s1: AbstractString, s2: AbstractString): AbstractMemory;
-
-    abstract assumeFalse(boolVar: BooleanVariable): AbstractMemory;
-
-    abstract assumeTrue(boolVar: BooleanVariable): AbstractMemory;
-
-    abstract assumeTruth(boolVal: AbstractBoolean): AbstractMemory;
-
-    abstract declareVariable(id: Variable, type: ScratchType): AbstractMemory;
-
-    abstract freeVariable(id: Variable): AbstractMemory;
-
-    abstract getBooleanVariable(id: Variable): BooleanVariable;
-
-    abstract getListVariable(id: Variable): ListVariable;
-
-    abstract getMapVariable(id: Variable): MapVariable;
-
-    abstract getNumberVariable(id: Variable): NumberVariable;
-
-    abstract getStringVariable(id: Variable): StringVariable;
-
-    abstract queryAbstractBoolean(id: BooleanVariable): AbstractBoolean;
-
-    abstract queryAbstractList(id: ListVariable): AbstractList;
-
-    abstract queryAbstractMap(id: MapVariable): AbstractMap;
-
-    abstract queryAbstractNumber(id: NumberVariable): AbstractNumber;
-
-    abstract queryAbstractString(id: StringVariable): AbstractString;
-
-}
-
 export interface TheoryIndependent<E extends AbstractElement> {
 
     simplify(element: E): E;
@@ -434,19 +309,30 @@ export interface TheoryIndependent<E extends AbstractElement> {
 }
 
 export interface AbstractTheories<M extends AbstractMemory, B extends AbstractBoolean,
-    N extends AbstractNumber, S extends AbstractString, L extends AbstractList> 
+    I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
+    S extends AbstractString, L extends AbstractList>
     extends TheoryIndependent<M> {
 
     boolTheory: BooleanTheory<B>;
 
-    intTheory: NumberTheory<N, B>;
+    intTheory: IntegerTheory<I, I, R, F, B, S>;
 
-    realTheory: NumberTheory<N, B>;
+    realTheory: RealTheory<R, I, R, F, B, S>;
 
-    floatTheory: NumberTheory<N, B>;
+    floatTheory: FloatTheory<F, I, R, F, B, S>;
 
-    stringTheory: StringTheory<S, B, N>;
+    stringTheory: StringTheory<S, B, I, R, F>;
 
     listTheory: ListTheory<L>;
 
+    getNumberTheoryOf(e: AbstractNumber): NumberTheory<AbstractNumber, I, R, F, B, S>;
+
+}
+
+export interface TransformerTheories<M extends AbstractMemory, B extends AbstractBoolean,
+    I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
+    S extends AbstractString, L extends AbstractList>
+    extends AbstractTheories<M, B, I, R, F, S, L> {
+
+    getNumberTheoryFor(t: ScratchType): NumberTheory<AbstractNumber, I, R, F, B, S>;
 }

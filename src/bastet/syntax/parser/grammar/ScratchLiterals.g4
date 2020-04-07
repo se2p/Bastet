@@ -6,9 +6,11 @@ String : '"' ~('"')* '"' ;
 
 Identifier  :   ('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')* ;
 
+IntegerLiteral: DecimalIntegerLiteral;
+
 DecimalLiteral:                 DecimalIntegerLiteral '.' [0-9] [0-9_]* ExponentPart?
               |                 '.' [0-9] [0-9_]* ExponentPart?
-              |                 DecimalIntegerLiteral ExponentPart?
+              |                 DecimalIntegerLiteral ExponentPart
               ;
 
 fragment DecimalIntegerLiteral

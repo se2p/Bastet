@@ -42,6 +42,18 @@ export interface NumberFormula extends AbstractNumber {
 
 }
 
+export interface IntegerFormula extends NumberFormula {
+
+}
+
+export interface FloatFormula extends NumberFormula {
+
+}
+
+export interface RealFormula extends NumberFormula {
+
+}
+
 export interface ListFormula extends AbstractList {
 
 }

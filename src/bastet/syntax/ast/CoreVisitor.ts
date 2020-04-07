@@ -21,9 +21,8 @@
 
 import {AstNode} from "./AstNode";
 import {
-    BoolAsNumberExpression,
-    DivideExpression,
-    IndexOfExpression,
+    DivideExpression, FloatLiteral,
+    IndexOfExpression, IntegerLiteral,
     LengthOfListExpression,
     LengthOfStringExpression,
     MinusExpression,
@@ -32,7 +31,6 @@ import {
     NumberLiteral,
     NumberVariableExpression,
     PlusExpression,
-    StringAsNumberExpression,
     TimerExpression
 } from "./core/expressions/NumberExpression";
 import {
@@ -114,7 +112,7 @@ import {
     SingularityEvent,
     StartupEvent
 } from "./core/CoreEvent";
-import {ActorType, BooleanType, ListType, NumberType, ScratchType, StringType} from "./core/ScratchType";
+import {ActorType, BooleanType, FloatType, IntegerType, ListType, ScratchType, StringType} from "./core/ScratchType";
 import {SystemMessage} from "./core/Message";
 import {InitializeAnalysisStatement, SignalTargetReachedStatement} from "./core/statements/InternalStatement";
 
@@ -151,15 +149,13 @@ export interface CoreNumberExpressionVisitor<R> extends CoreVisitor<R>{
 
     visitCastExpression(node: CastExpression): R;
 
-    visitNumberLiteral(node: NumberLiteral): R;
+    visitIntegerLiteral(node: IntegerLiteral): R;
+
+    visitFloatLiteral(node: FloatLiteral): R;
 
     visitNumberVariableExpression(node: NumberVariableExpression): R;
 
     visitVariableWithDataLocation(node: VariableWithDataLocation): R;
-
-    visitStringAsNumberExpression(node: StringAsNumberExpression): R;
-
-    visitBoolAsNumberExpression(node: BoolAsNumberExpression): R;
 
     visitTimerExpression(node: TimerExpression): R;
 
@@ -331,7 +327,9 @@ export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
 export interface CoreTypeVisitor<R> extends CoreVisitor<R> {
 
-    visitNumberType(type: NumberType): R;
+    visitIntegerType(type: IntegerType): R;
+
+    visitFloatType(type: FloatType): R;
 
     visitStringType(type: StringType): R;
 

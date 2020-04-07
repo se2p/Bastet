@@ -1,0 +1,11 @@
+{
+
+    "MainAnalysis": {
+        "print-statistics": true
+    },
+
+    "ReachabilityAlgorithm": {
+        "dump-graph-after-iteration": true
+    }
+
+}

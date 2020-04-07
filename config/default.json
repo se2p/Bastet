@@ -1,5 +1,9 @@
 {
 
+    "MainAnalysis": {
+        "print-statistics": true
+    },
+
     "Transformer": {
         "use-busy-waiting": false
     },
@@ -9,7 +13,7 @@
     },
 
     "DataAnalysis": {
-        "encode-all-numbers-as-floats": true
+        "encode-floats-as": "Reals"
     },
 
     "GraphAnalysis": {

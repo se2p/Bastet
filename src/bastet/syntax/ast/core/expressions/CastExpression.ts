@@ -28,18 +28,18 @@ import {Preconditions} from "../../../../utils/Preconditions";
 
 export class CastExpression extends AbstractExpression implements Expression {
 
-    private _toConvert: Expression;
+    private _toConvertFrom: Expression;
 
     constructor(inputExpression: Expression, castToType: ScratchType) {
         super(castToType, [inputExpression, castToType]);
-        this._toConvert = Preconditions.checkNotUndefined(inputExpression);
+        this._toConvertFrom = Preconditions.checkNotUndefined(inputExpression);
     }
 
     get castToType(): ScratchType {
        return this.expressionType;
     }
 
-    get toConvert(): Expression {
-        return this._toConvert;
+    get toConvertFrom(): Expression {
+        return this._toConvertFrom;
     }
 }

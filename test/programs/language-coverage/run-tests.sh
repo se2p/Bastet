@@ -5,14 +5,23 @@ NAME_PREFIX="$1"
 TEST_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 BASTET_ROOT="../../../"
 
+echo "FILTER: $NAME_PREFIX"
+
 cd $BASTET_ROOT
 
-npm run build
+if [ -z $BASTET_NO_BUILD ]
+then
+    npm run build
+fi
 
 grep_statistic () {
     CONTEXT="$1"
     IDENT="$2"
     cat $RESULT_FILE | grep $CONTEXT -A 5 | grep "$IDENT" | cut -d":" -f2 | cut -d"," -f1
+}
+
+grep_error () {
+    cat $RESULT_FILE | grep "Running BASTET failed with:" | cut -d":" -f2
 }
 
 num_or_zero () {
@@ -32,6 +41,7 @@ parse_results () {
     VIOLATED=$(num_or_zero `grep_statistic "MultiPropertyAlgorithm" "num_violated"`)
     DURATION=$(grep_statistic "MultiPropertyAlgorithm" "duration")
     REACHED=$(grep_statistic "ReachabilityAlgorithm" "reached states")
+    ERROR=$(grep_error)
     DURATION=$(printf '%.*f\n' 2 $DURATION)
 
     if [[ $INPUT_FILE == *_SAFE.sc ]]
@@ -49,23 +59,28 @@ parse_results () {
         OK=0
     fi
 
-    if [ ! $EXPECTED_SATISFIED -eq "$SATISFIED" ]
+    if [ ! "$SATISFIED" -ge $EXPECTED_SATISFIED ]
     then
         OK=0
     fi
 
     printf "\t$DURATION\t$REACHED\t$VIOLATED\t$SATISFIED"
 
-    if [ $OK -eq 1 ]
+    if [ ! -z "$ERROR" ]
     then
-        printf "\tOK"
+            printf "\tERROR\t$ERROR"
     else
-        printf "\tBUG"
-        cp $RESULT_FILE "output/test-results/$(basename $INPUT_FILE).bug.log"
+        if [ $OK -eq 1 ]
+        then
+            printf "\tOK"
+        else
+            printf "\tBUG"
+            cp $RESULT_FILE "output/test-results/$(basename $INPUT_FILE).bug.log"
+        fi
     fi
 }
 
-for f in $(find $TEST_DIR -name "*${NAME_PREFIX}*.sc" | sort)
+for f in $(find $TEST_DIR -name "*${NAME_PREFIX}*" -and -name "*.sc" | sort)
 do
     RESULT_FILE=$(mktemp)
     printf "`basename $f`"

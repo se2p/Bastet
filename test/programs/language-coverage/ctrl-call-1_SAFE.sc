@@ -1,16 +1,22 @@
 program Mini1Program
 
-actor MiniActor is RuntimeEntity begin
+actor MiniActor begin
 
-    define atomic inc (n: number) begin
-        define result as n + 1
-    end returns result: number
+    extern _RUNTIME_signalFailure ()
+
+    define atomic dummy (m: float) begin
+        define result as 42.0
+    end returns result: float
+
+    define atomic inc (arg: int) begin
+        define result as arg + 1
+    end returns result: int
 
     script on startup do begin
-        declare x as number
+        declare x as int
         define x as 41
 
-        declare y as number
+        declare y as int
         define y as inc(x)
 
         if not (y = 42) then begin

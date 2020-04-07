@@ -71,24 +71,18 @@ declarationStmtList : declarationStmt* ;
 // The list of datatypes that are allowed for the declaration
 // of variables and attributes.
 type :
-    primitiveType # Primitive
- | 'list' 'of' type # ListType
+ 'list' 'of' type # ListType
  | 'actor' # ActorType
+ | primitiveType # Primitive
  ;
 
 primitiveType:
-   'number' # NumberType
+ 'int' # IntegerType
+ | 'float' # FloatingPointType
  | 'boolean' # BooleanType
  | 'string' # StringType
  | 'enum' '[' expressionListPlain ']' # EnumType
  ;
-
-// Maps can be indexed either by numbers or strings.
-// Values can have different types (a map is simular
-// to an actor with its attributes).
-indexType : 'number' # NumberIndexType
-    | 'string' # StringIndexType
-    ;
 
 // A script is the central unit that of a Scratch program that
 // defines the behavior (and with it the control and data flow).
@@ -332,8 +326,11 @@ coreNumExpr  :
  |  '(' coreNumExpr ')' # NumBrackets
  |  callStmt # NumCallStatementExpression
 
- |  'cast' stringExpr 'to' 'number' # StringAsNumExpression
- |  'cast' boolExpr 'to' 'number' # BoolAsNumExpression
+ |  'cast' stringExpr 'to' 'float' # StringToFloatExpression
+ |  'cast' stringExpr 'to' 'int' # StringToIntExpression
+ |  'cast' boolExpr 'to' 'int' # BoolToIntExpression
+ |  'cast' coreNumExpr 'to' 'float' # NumToFloatExpression
+ |  'cast' coreNumExpr 'to' 'int' # NumToIntExpression
 
  |  'timer' # TimerExpression
 
@@ -388,7 +385,10 @@ ident :
     | 'strid' String # StrIdentExpression
     ;
 
-number : DecimalLiteral ;
+number :
+    IntegerLiteral # IntegerLiteralExpression
+    | DecimalLiteral # DecimalLiteralExpression
+ ;
 
 Boolean : Bool ;
 

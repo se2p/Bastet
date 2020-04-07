@@ -4,7 +4,7 @@ actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
         declare b as boolean
-        declare n as number
+        declare n as int
 
         define n as 0
         define b as cast n to boolean

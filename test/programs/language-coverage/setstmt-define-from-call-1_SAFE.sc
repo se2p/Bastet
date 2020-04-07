@@ -2,11 +2,11 @@ program Mini1Program
 
 actor MiniActor is RuntimeEntity begin
 
-    declare x as number
+    declare x as int
 
-    define increment (par: number) begin
+    define increment (par: int) begin
         define result as par + 1
-    end returns result: number
+    end returns result: int
 
     script on startup do begin
         define x as 1

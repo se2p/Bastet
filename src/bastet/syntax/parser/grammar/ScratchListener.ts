@@ -7,9 +7,11 @@ import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
 import { FullMethodDefinitionContext } from "./ScratchParser";
 import { RestartScriptContext } from "./ScratchParser";
-import { PrimitiveContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
 import { ActorTypeContext } from "./ScratchParser";
+import { PrimitiveContext } from "./ScratchParser";
+import { IntegerLiteralExpressionContext } from "./ScratchParser";
+import { DecimalLiteralExpressionContext } from "./ScratchParser";
 import { ConcreteActorModeContext } from "./ScratchParser";
 import { ActorRoleModeContext } from "./ScratchParser";
 import { ExternFunctionReturnDefinitionContext } from "./ScratchParser";
@@ -86,7 +88,8 @@ import { IthLetterOfStringExpressionContext } from "./ScratchParser";
 import { IthStringItemOfExpressionContext } from "./ScratchParser";
 import { DefaultStringExpressionContext } from "./ScratchParser";
 import { UnspecifiedStringExpressionContext } from "./ScratchParser";
-import { NumberTypeContext } from "./ScratchParser";
+import { IntegerTypeContext } from "./ScratchParser";
+import { FloatingPointTypeContext } from "./ScratchParser";
 import { BooleanTypeContext } from "./ScratchParser";
 import { StringTypeContext } from "./ScratchParser";
 import { EnumTypeContext } from "./ScratchParser";
@@ -95,16 +98,17 @@ import { SystemMessageContext } from "./ScratchParser";
 import { PureElseContext } from "./ScratchParser";
 import { ElseIfCaseContext } from "./ScratchParser";
 import { EmptyElseCaseContext } from "./ScratchParser";
-import { NumberIndexTypeContext } from "./ScratchParser";
-import { StringIndexTypeContext } from "./ScratchParser";
 import { FlatVariableContext } from "./ScratchParser";
 import { QualifiedVariableContext } from "./ScratchParser";
 import { NumLiteralExpressionContext } from "./ScratchParser";
 import { NumVariableExpressionContext } from "./ScratchParser";
 import { NumBracketsContext } from "./ScratchParser";
 import { NumCallStatementExpressionContext } from "./ScratchParser";
-import { StringAsNumExpressionContext } from "./ScratchParser";
-import { BoolAsNumExpressionContext } from "./ScratchParser";
+import { StringToFloatExpressionContext } from "./ScratchParser";
+import { StringToIntExpressionContext } from "./ScratchParser";
+import { BoolToIntExpressionContext } from "./ScratchParser";
+import { NumToFloatExpressionContext } from "./ScratchParser";
+import { NumToIntExpressionContext } from "./ScratchParser";
 import { TimerExpressionContext } from "./ScratchParser";
 import { LengthOfStringExpressionContext } from "./ScratchParser";
 import { LengthOfListExpressionContext } from "./ScratchParser";
@@ -139,7 +143,6 @@ import { DeclarationStmtContext } from "./ScratchParser";
 import { DeclarationStmtListContext } from "./ScratchParser";
 import { TypeContext } from "./ScratchParser";
 import { PrimitiveTypeContext } from "./ScratchParser";
-import { IndexTypeContext } from "./ScratchParser";
 import { ScriptContext } from "./ScratchParser";
 import { ScriptListContext } from "./ScratchParser";
 import { ScriptAttributeListContext } from "./ScratchParser";
@@ -257,19 +260,6 @@ export interface ScratchListener extends ParseTreeListener {
 	exitRestartScript?: (ctx: RestartScriptContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `Primitive`
-	 * labeled alternative in `ScratchParser.type`.
-	 * @param ctx the parse tree
-	 */
-	enterPrimitive?: (ctx: PrimitiveContext) => void;
-	/**
-	 * Exit a parse tree produced by the `Primitive`
-	 * labeled alternative in `ScratchParser.type`.
-	 * @param ctx the parse tree
-	 */
-	exitPrimitive?: (ctx: PrimitiveContext) => void;
-
-	/**
 	 * Enter a parse tree produced by the `ListType`
 	 * labeled alternative in `ScratchParser.type`.
 	 * @param ctx the parse tree
@@ -294,6 +284,45 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitActorType?: (ctx: ActorTypeContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `Primitive`
+	 * labeled alternative in `ScratchParser.type`.
+	 * @param ctx the parse tree
+	 */
+	enterPrimitive?: (ctx: PrimitiveContext) => void;
+	/**
+	 * Exit a parse tree produced by the `Primitive`
+	 * labeled alternative in `ScratchParser.type`.
+	 * @param ctx the parse tree
+	 */
+	exitPrimitive?: (ctx: PrimitiveContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `IntegerLiteralExpression`
+	 * labeled alternative in `ScratchParser.number`.
+	 * @param ctx the parse tree
+	 */
+	enterIntegerLiteralExpression?: (ctx: IntegerLiteralExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `IntegerLiteralExpression`
+	 * labeled alternative in `ScratchParser.number`.
+	 * @param ctx the parse tree
+	 */
+	exitIntegerLiteralExpression?: (ctx: IntegerLiteralExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `DecimalLiteralExpression`
+	 * labeled alternative in `ScratchParser.number`.
+	 * @param ctx the parse tree
+	 */
+	enterDecimalLiteralExpression?: (ctx: DecimalLiteralExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `DecimalLiteralExpression`
+	 * labeled alternative in `ScratchParser.number`.
+	 * @param ctx the parse tree
+	 */
+	exitDecimalLiteralExpression?: (ctx: DecimalLiteralExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `ConcreteActorMode`
@@ -1284,17 +1313,30 @@ export interface ScratchListener extends ParseTreeListener {
 	exitUnspecifiedStringExpression?: (ctx: UnspecifiedStringExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumberType`
+	 * Enter a parse tree produced by the `IntegerType`
 	 * labeled alternative in `ScratchParser.primitiveType`.
 	 * @param ctx the parse tree
 	 */
-	enterNumberType?: (ctx: NumberTypeContext) => void;
+	enterIntegerType?: (ctx: IntegerTypeContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumberType`
+	 * Exit a parse tree produced by the `IntegerType`
 	 * labeled alternative in `ScratchParser.primitiveType`.
 	 * @param ctx the parse tree
 	 */
-	exitNumberType?: (ctx: NumberTypeContext) => void;
+	exitIntegerType?: (ctx: IntegerTypeContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `FloatingPointType`
+	 * labeled alternative in `ScratchParser.primitiveType`.
+	 * @param ctx the parse tree
+	 */
+	enterFloatingPointType?: (ctx: FloatingPointTypeContext) => void;
+	/**
+	 * Exit a parse tree produced by the `FloatingPointType`
+	 * labeled alternative in `ScratchParser.primitiveType`.
+	 * @param ctx the parse tree
+	 */
+	exitFloatingPointType?: (ctx: FloatingPointTypeContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `BooleanType`
@@ -1401,32 +1443,6 @@ export interface ScratchListener extends ParseTreeListener {
 	exitEmptyElseCase?: (ctx: EmptyElseCaseContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumberIndexType`
-	 * labeled alternative in `ScratchParser.indexType`.
-	 * @param ctx the parse tree
-	 */
-	enterNumberIndexType?: (ctx: NumberIndexTypeContext) => void;
-	/**
-	 * Exit a parse tree produced by the `NumberIndexType`
-	 * labeled alternative in `ScratchParser.indexType`.
-	 * @param ctx the parse tree
-	 */
-	exitNumberIndexType?: (ctx: NumberIndexTypeContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `StringIndexType`
-	 * labeled alternative in `ScratchParser.indexType`.
-	 * @param ctx the parse tree
-	 */
-	enterStringIndexType?: (ctx: StringIndexTypeContext) => void;
-	/**
-	 * Exit a parse tree produced by the `StringIndexType`
-	 * labeled alternative in `ScratchParser.indexType`.
-	 * @param ctx the parse tree
-	 */
-	exitStringIndexType?: (ctx: StringIndexTypeContext) => void;
-
-	/**
 	 * Enter a parse tree produced by the `FlatVariable`
 	 * labeled alternative in `ScratchParser.variable`.
 	 * @param ctx the parse tree
@@ -1505,30 +1521,69 @@ export interface ScratchListener extends ParseTreeListener {
 	exitNumCallStatementExpression?: (ctx: NumCallStatementExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `StringAsNumExpression`
+	 * Enter a parse tree produced by the `StringToFloatExpression`
 	 * labeled alternative in `ScratchParser.coreNumExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterStringAsNumExpression?: (ctx: StringAsNumExpressionContext) => void;
+	enterStringToFloatExpression?: (ctx: StringToFloatExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `StringAsNumExpression`
+	 * Exit a parse tree produced by the `StringToFloatExpression`
 	 * labeled alternative in `ScratchParser.coreNumExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitStringAsNumExpression?: (ctx: StringAsNumExpressionContext) => void;
+	exitStringToFloatExpression?: (ctx: StringToFloatExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `BoolAsNumExpression`
+	 * Enter a parse tree produced by the `StringToIntExpression`
 	 * labeled alternative in `ScratchParser.coreNumExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterBoolAsNumExpression?: (ctx: BoolAsNumExpressionContext) => void;
+	enterStringToIntExpression?: (ctx: StringToIntExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `BoolAsNumExpression`
+	 * Exit a parse tree produced by the `StringToIntExpression`
 	 * labeled alternative in `ScratchParser.coreNumExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitBoolAsNumExpression?: (ctx: BoolAsNumExpressionContext) => void;
+	exitStringToIntExpression?: (ctx: StringToIntExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `BoolToIntExpression`
+	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterBoolToIntExpression?: (ctx: BoolToIntExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `BoolToIntExpression`
+	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitBoolToIntExpression?: (ctx: BoolToIntExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumToFloatExpression`
+	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumToFloatExpression?: (ctx: NumToFloatExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumToFloatExpression`
+	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumToFloatExpression?: (ctx: NumToFloatExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumToIntExpression`
+	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumToIntExpression?: (ctx: NumToIntExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumToIntExpression`
+	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumToIntExpression?: (ctx: NumToIntExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `TimerExpression`
@@ -1937,17 +1992,6 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitPrimitiveType?: (ctx: PrimitiveTypeContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `ScratchParser.indexType`.
-	 * @param ctx the parse tree
-	 */
-	enterIndexType?: (ctx: IndexTypeContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.indexType`.
-	 * @param ctx the parse tree
-	 */
-	exitIndexType?: (ctx: IndexTypeContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.script`.

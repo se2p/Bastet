@@ -3,13 +3,13 @@ program Mini1Program
 actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
-        declare x as number
-        declare y as number
-        declare z as number
+        declare x as int
+        declare y as int
+        declare z as int
 
-        declare a as number
-        declare b as number
-        declare c as number
+        declare a as int
+        declare b as int
+        declare c as int
 
         if (x > y) then begin
             define a as 1

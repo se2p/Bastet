@@ -3,7 +3,7 @@ program Mini1Program
 actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
-        declare rad as number
+        declare rad as int
 
         define rad as 360
 

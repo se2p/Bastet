@@ -24,7 +24,7 @@ import {MethodDefinition, ResultDeclaration} from "../ast/core/MethodDefinition"
 import {TransformerResult} from "./ToIntermediateTransformer";
 import {Identifier} from "../ast/core/Identifier";
 import {ParameterDeclaration, ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
-import {NumberType, StringType} from "../ast/core/ScratchType";
+import {IntegerType, StringType} from "../ast/core/ScratchType";
 import {Statement, StatementList} from "../ast/core/statements/Statement";
 import {IfStatement} from "../ast/core/statements/ControlStatement";
 import {NumEqualsExpression, StrEqualsExpression} from "../ast/core/expressions/BooleanExpression";
@@ -35,7 +35,7 @@ import {StoreEvalResultToVariableStatement} from "../ast/core/statements/SetStat
 import * as fs from "fs";
 import {ResourceDefinition} from "../ast/core/ResourceDefinition";
 import * as path from "path";
-import {NumberLiteral} from "../ast/core/expressions/NumberExpression";
+import {IntegerLiteral, NumberLiteral} from "../ast/core/expressions/NumberExpression";
 import {DeclareStackVariableStatement} from "../ast/core/statements/DeclarationStatement";
 import {imageSize} from "image-size";
 
@@ -54,7 +54,7 @@ export class LookupTransformer {
 
         let methodIdent = new Identifier("ResourceLookup");
 
-        let paramDecl = new ParameterDeclaration(new Identifier("ident"), new StringType());
+        let paramDecl = new ParameterDeclaration(new Identifier("ident"), StringType.instance());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", StringType.instance().typeId));
@@ -102,11 +102,11 @@ export class LookupTransformer {
 
         let methodIdent = new Identifier("getGraphicIndexById");
 
-        let paramDecl = new ParameterDeclaration(new Identifier("id"), new StringType());
+        let paramDecl = new ParameterDeclaration(new Identifier("id"), StringType.instance());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
 
-        const resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", NumberType.instance().typeId));
-        const initStmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(0));
+        const resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", IntegerType.instance().typeId));
+        const initStmt = new StoreEvalResultToVariableStatement(resultVarDecl, new IntegerLiteral(0));
         let stmts = [];
         stmts.push(initStmt);
         let idxCount = 0;
@@ -124,7 +124,7 @@ export class LookupTransformer {
 
                 LookupTransformer.loadImage(uri, actorResources);
 
-                let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(idxCount));
+                let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new IntegerLiteral(idxCount));
                 let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
                 stmts.push(ifStmt);
                 idxCount++;
@@ -150,7 +150,7 @@ export class LookupTransformer {
 
         let methodIdent = new Identifier("getGraphicIdByIndex");
 
-        let paramDecl = new ParameterDeclaration(new Identifier("idx"), new NumberType());
+        let paramDecl = new ParameterDeclaration(new Identifier("idx"), IntegerType.instance());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", StringType.instance().typeId));
@@ -168,7 +168,7 @@ export class LookupTransformer {
                 let uri = path.join(dirName, fileName);
 
                 let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("idx", StringType.instance().typeId));
-                let cond = new NumEqualsExpression(varWithDataLoc, new NumberLiteral(idxCount));
+                let cond = new NumEqualsExpression(varWithDataLoc, new IntegerLiteral(idxCount));
 
                 LookupTransformer.loadImage(uri, actorResources);
 
@@ -198,10 +198,10 @@ export class LookupTransformer {
         let dirName = path.dirname(filePath);
 
         let methodIdent = new Identifier("getImageWidth");
-        let paramDecl = new ParameterDeclaration(new Identifier("id"), new StringType());
+        let paramDecl = new ParameterDeclaration(new Identifier("id"), StringType.instance());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
 
-        let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", NumberType.instance().typeId));
+        let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", IntegerType.instance().typeId));
         let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
         let stmts = [];
         stmts.push(declareStackVar)
@@ -223,7 +223,7 @@ export class LookupTransformer {
                     width = this.resizeWidthAndHeight(dimensions.width, dimensions.height)[1]
                 }
 
-                let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(width));
+                let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new IntegerLiteral(width));
                 let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
                 stmts.push(ifStmt);
 
@@ -252,7 +252,7 @@ export class LookupTransformer {
         let paramDecl = new ParameterDeclaration(new Identifier("id"), StringType.instance());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
 
-        let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", NumberType.instance().typeId));
+        let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", IntegerType.instance().typeId));
         let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
         let stmts = [];
         stmts.push(declareStackVar)
@@ -274,7 +274,7 @@ export class LookupTransformer {
                     height = this.resizeWidthAndHeight(dimensions.width, dimensions.height)[0]
                 }
 
-                let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new NumberLiteral(height));
+                let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new IntegerLiteral(height));
                 let ifStmt = new IfStatement(cond, new StatementList([stmt], true), StatementList.empty());
                 stmts.push(ifStmt);
 
@@ -301,7 +301,7 @@ export class LookupTransformer {
 
         let paramDeclList = new ParameterDeclarationList([]);
 
-        let stackVar = new VariableWithDataLocation(new TypedDataLocation("result", NumberType.instance().typeId));
+        let stackVar = new VariableWithDataLocation(new TypedDataLocation("result", IntegerType.instance().typeId));
         let declareStackVar = new DeclareStackVariableStatement(stackVar);
         let stmts = [];
         stmts.push(declareStackVar)
@@ -317,11 +317,11 @@ export class LookupTransformer {
             }
         }
 
-        let stmt = new StoreEvalResultToVariableStatement(stackVar, new NumberLiteral(idxCount));
+        let stmt = new StoreEvalResultToVariableStatement(stackVar, new IntegerLiteral(idxCount));
         stmts.push(stmt);
         let stmtList = new StatementList(stmts);
 
-        let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", NumberType.instance().typeId));
+        let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", IntegerType.instance().typeId));
         let resultDecl = new ResultDeclaration(resultVarDecl);
         return new MethodDefinition(
             methodIdent, paramDeclList,

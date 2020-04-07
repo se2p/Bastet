@@ -25,7 +25,7 @@ import {Map as ImmMap, Record as ImmRec} from "immutable"
 import {SSATransferRelation} from "../../../../../src/bastet/procedures/analyses/ssa/SSATransferRelation";
 import {AbstractMockElement, TransferRelationMock} from "../../TransferRelationMock";
 import {SSAState} from "../../../../../src/bastet/procedures/analyses/ssa/SSAAbstractDomain";
-import {NumberType, ScratchType} from "../../../../../src/bastet/syntax/ast/core/ScratchType";
+import {IntegerType, ScratchType} from "../../../../../src/bastet/syntax/ast/core/ScratchType";
 import {ProgramOperationFactory} from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
 import {StoreEvalResultToVariableStatement} from "../../../../../src/bastet/syntax/ast/core/statements/SetStatement";
 import {VariableWithDataLocation} from "../../../../../src/bastet/syntax/ast/core/Variable";
@@ -40,7 +40,7 @@ describe('SSA Transfer Relation', function() {
     const ssaTr = new SSATransferRelation(mockTr);
 
     test('LHS and RHS', function() {
-        const varA = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("a"), NumberType.instance()));
+        const varA = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("a"), IntegerType.instance()));
         const ssaState = new SSAState(
             ImmMap([[varA.qualifiedName, 1]]),
             new AbstractMockElement(0)

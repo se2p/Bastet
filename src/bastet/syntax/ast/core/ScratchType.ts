@@ -31,9 +31,22 @@
 import {AbstractNode} from "../AstNode";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ExpressionList} from "./expressions/ExpressionList";
+import {Preconditions} from "../../../utils/Preconditions";
+import {Expression} from "./expressions/Expression";
 
 export type ScratchTypeID = number;
 let SCRATCH_TYPE_ID_SEQ: ScratchTypeID = 0;
+
+export function ensureEqualTypes(t1: ScratchType, t2: ScratchType): ScratchType {
+    Preconditions.checkArgument(t1 == t2, `Types do not match: ${t1.toTreeString()} and ${t2.toTreeString()}`);
+    return t1;
+}
+
+export function ensureEqualExpressionTypes(t1: Expression, t2: Expression): ScratchType {
+    Preconditions.checkArgument(t1.expressionType == t2.expressionType,
+        `Types do not match: \n\t${t1.expressionType.toTreeString()}: ${t1.toTreeString()} and \n\t${t2.expressionType.toTreeString()}: ${t2.toTreeString()}`);
+    return t1.expressionType;
+}
 
 export abstract class ScratchType extends AbstractNode {
 
@@ -65,13 +78,18 @@ export abstract class ScratchType extends AbstractNode {
     get typeId(): number {
         return this._typeId;
     }
+
+    static isNumericType(type: ScratchType) {
+        return type == IntegerType.instance()
+            || type == FloatType.instance();
+    }
 }
 
 export class VoidType extends ScratchType {
 
     private static INSTANCE: VoidType;
 
-    constructor() {
+    private constructor() {
         super([], SCRATCH_TYPE_ID_SEQ++);
     }
 
@@ -88,7 +106,7 @@ export class ActorType extends ScratchType {
 
     private static INSTANCE: ActorType;
 
-    constructor() {
+    private constructor() {
         super([], SCRATCH_TYPE_ID_SEQ++);
     }
 
@@ -101,17 +119,34 @@ export class ActorType extends ScratchType {
 
 }
 
-export class NumberType extends ScratchType {
+export class IntegerType extends ScratchType {
 
-    private static INSTANCE: NumberType;
+    private static INSTANCE: IntegerType;
 
-    constructor() {
+    private constructor() {
         super([], SCRATCH_TYPE_ID_SEQ++);
     }
 
-    static instance(): NumberType {
+    static instance(): IntegerType {
         if (this.INSTANCE == null) {
-            this.INSTANCE = new NumberType();
+            this.INSTANCE = new IntegerType();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
+export class FloatType extends ScratchType {
+
+    private static INSTANCE: FloatType;
+
+    private constructor() {
+        super([], SCRATCH_TYPE_ID_SEQ++);
+    }
+
+    static instance(): FloatType {
+        if (this.INSTANCE == null) {
+            this.INSTANCE = new FloatType();
         }
         return this.INSTANCE;
     }
@@ -122,7 +157,7 @@ export class BooleanType extends ScratchType {
 
     private static INSTANCE: BooleanType;
 
-    constructor() {
+    private constructor() {
         super([], SCRATCH_TYPE_ID_SEQ++);
     }
 
@@ -139,7 +174,7 @@ export class StringType extends ScratchType {
 
     private static INSTANCE: StringType;
 
-    constructor() {
+    private constructor() {
         super([], SCRATCH_TYPE_ID_SEQ++);
     }
 
@@ -202,11 +237,4 @@ export class ListType extends ScratchType {
     }
 }
 
-export class MapType extends ScratchType {
-
-    static withIndexType(indexType: ScratchType): ScratchType {
-        throw new ImplementMeException();
-    }
-
-}
 

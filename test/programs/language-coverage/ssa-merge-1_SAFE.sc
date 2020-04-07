@@ -3,10 +3,10 @@ program Mini1Program
 actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
-        declare r as number
+        declare r as int
         define r as 0
 
-        declare a1 as number
+        declare a1 as int
         define a1 as 1
 
         if (a1 > 0) then begin

@@ -38,9 +38,8 @@ import {
 import {CastExpression} from "./core/expressions/CastExpression";
 import {VariableWithDataLocation} from "./core/Variable";
 import {
-    BoolAsNumberExpression,
-    DivideExpression,
-    IndexOfExpression,
+    DivideExpression, FloatLiteral,
+    IndexOfExpression, IntegerLiteral,
     LengthOfListExpression,
     LengthOfStringExpression,
     MinusExpression,
@@ -49,11 +48,10 @@ import {
     NumberLiteral,
     NumberVariableExpression,
     PlusExpression,
-    StringAsNumberExpression,
     TimerExpression
 } from "./core/expressions/NumberExpression";
 import {
-    BoolAsStringExpression,
+    BoolAsStringExpression, extractStringLiteral,
     IthLetterOfStringExpression,
     IthStringItemOfExpression,
     JoinStringsExpression,
@@ -101,9 +99,8 @@ import {ExpressionStatement} from "./core/statements/ExpressionStatement";
 import {ResetTimerStatement} from "./core/statements/ResetTimerStatement";
 import {
     ActorType,
-    BooleanType,
+    BooleanType, FloatType, IntegerType,
     ListType,
-    NumberType,
     ScratchType,
     StringEnumType,
     StringType
@@ -111,7 +108,7 @@ import {
 import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
-import {SystemMessage} from "./core/Message";
+import {SystemMessage, UserMessage} from "./core/Message";
 import {InitializeAnalysisStatement, SignalTargetReachedStatement} from "./core/statements/InternalStatement";
 import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
 
@@ -125,6 +122,10 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
 
     visitReturnStatement(node: ReturnStatement): string {
         return 'RETURN';
+    }
+
+    visitUserMessage(node: UserMessage): string {
+        return node.messageid.accept(this);
     }
 
     visitSignalTargetReachedStatement(node: SignalTargetReachedStatement): string {
@@ -192,7 +193,7 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitCastExpression(node: CastExpression): string {
-        return `cast ${node.toConvert.accept(this)} as ${node.castToType.accept(this)}`;
+        return `cast ${node.toConvertFrom.accept(this)} as ${node.castToType.accept(this)}`;
     }
 
     visitNegationExpression(node: NegationExpression): string {
@@ -243,10 +244,6 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
         return node.qualifiedName;
     }
 
-    visitBoolAsNumberExpression(node: BoolAsNumberExpression): string {
-        return `cast ${node.toConvert.accept(this)} to number`;
-    }
-
     visitDivideExpression(node: DivideExpression): string {
         return `${node.operand1.accept(this)} / ${node.operand2.accept(this)}`;
     }
@@ -275,7 +272,11 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
         return `${node.operand1.accept(this)} * ${node.operand2.accept(this)}`;
     }
 
-    visitNumberLiteral(node: NumberLiteral): string {
+    visitIntegerLiteral(node: IntegerLiteral): string {
+        return node.num.toString();
+    }
+
+    visitFloatLiteral(node: FloatLiteral): string {
         return node.num.toString();
     }
 
@@ -284,19 +285,11 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitPlusExpression(node: PlusExpression): string {
-        return `${node.operand1.accept(this)} + ${node.operand2.accept(this)}`;
-    }
-
-    visitStringAsNumberExpression(node: StringAsNumberExpression): string {
-        return `cast ${node.toConvert.accept(this)} to number`;
+        return `(${node.operand1.accept(this)} + ${node.operand2.accept(this)})`;
     }
 
     visitTimerExpression(node: TimerExpression): string {
         return `timer`;
-    }
-
-    visitBoolAsStringExpression(node: BoolAsStringExpression): string {
-        return `cast ${node.bool.accept(this)} as string`;
     }
 
     visitIthLetterOfStringExpression(node: IthLetterOfStringExpression): string {
@@ -309,10 +302,6 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
 
     visitJoinStringsExpression(node: JoinStringsExpression): string {
         return `join ${node.operand1.accept(this)} ${node.operand2.accept(this)}`;
-    }
-
-    visitNumAsStringExpression(node: NumAsStringExpression): string {
-        return `cast ${node.num.accept(this)} as string`;
     }
 
     visitStringAttributeOfExpression(node: StringAttributeOfExpression): string {
@@ -479,8 +468,12 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
         return `list of ${type.elementType.accept(this)}`;
     }
 
-    visitNumberType(type: NumberType): string {
-        return `number`;
+    visitIntegerType(type: IntegerType): string {
+        return `integer`;
+    }
+
+    visitFloatType(type: FloatType): string {
+        return `float`;
     }
 
     visitStringType(type: StringType): string {

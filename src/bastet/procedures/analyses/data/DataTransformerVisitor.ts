@@ -30,20 +30,17 @@ import {
 import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {
-    BoolAsNumberExpression,
-    DivideExpression,
-    IndexOfExpression,
+    DivideExpression, FloatLiteral,
+    IndexOfExpression, IntegerLiteral,
     LengthOfListExpression,
     LengthOfStringExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
-    NumberLiteral,
     NumberVariableExpression,
-    NumFunctExpression,
     PickRandomFromExpression,
     PlusExpression,
-    RoundExpression, StringAsNumberExpression,
+    RoundExpression,
     TimerExpression
 } from "../../../syntax/ast/core/expressions/NumberExpression";
 import {
@@ -114,15 +111,22 @@ import {
     AbstractTheories,
     AbstractNumber,
     AbstractString,
-    NumberTheory
+    NumberTheory, AbstractFloat, AbstractInteger, AbstractReal, TransformerTheories
 } from "../../domains/MemoryTransformer";
-import {ActorType, BooleanType, NumberType, StringType} from "../../../syntax/ast/core/ScratchType";
+import {
+    ActorType,
+    BooleanType,
+    FloatType,
+    IntegerType,
+    ScratchType,
+    StringType
+} from "../../../syntax/ast/core/ScratchType";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {
     BooleanFormula,
-    FirstOrderFormula,
+    FirstOrderFormula, FloatFormula, IntegerFormula,
     ListFormula,
-    NumberFormula,
+    RealFormula,
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../domains/ConcreteElements";
@@ -136,124 +140,167 @@ import {
     InitializeAnalysisStatement,
     SignalTargetReachedStatement
 } from "../../../syntax/ast/core/statements/InternalStatement";
+import {DataLocation} from "../../../syntax/app/controlflow/DataLocation";
+import {Float} from "../../../utils/smt/z3/ctypes";
+import {getTheOnlyElement} from "../../../utils/Collections";
 
-export class DataNumExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
-    S extends AbstractString, L extends AbstractList>
-    implements CoreNumberExpressionVisitor<N> {
+abstract class TransformingVisitor<RT, B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
+    F extends AbstractFloat, S extends AbstractString, L extends AbstractList> implements CoreVisitor<RT> {
 
-    private readonly _theories: AbstractTheories<B, B, N, S, L>;
-    private readonly _theory: NumberTheory<N, B>;
+    protected readonly _theories: TransformerTheories<B, B, I, R, F, S, L>;
 
-    constructor(theories: AbstractTheories<B, B, N, S, L>) {
+    constructor(theories: TransformerTheories<B, B, I, R, F, S, L>) {
         this._theories = Preconditions.checkNotUndefined(theories);
-        this._theory = Preconditions.checkNotUndefined(theories.intTheory);
     }
 
-    visit(node: AstNode): N {
-        throw new ImplementMeException();
+    visit(node: AstNode): RT {
+        throw new ImplementMeForException(node.toTreeString());
     }
 
-    visitCastExpression(node: CastExpression): N {
-        Preconditions.checkArgument(node.castToType == NumberType.instance());
-
-        if (node.toConvert.expressionType == StringType.instance()) {
-            const stringVisitor = new DataStringExpressionVisitor(this._theories);
-            return this._theory.castStringAsNumber(node.toConvert.accept(stringVisitor));
-
-        } else if (node.toConvert.expressionType == BooleanType.instance()) {
-            const boolVisitor = new DataBoolExpressionVisitor(this._theories);
-            return this._theory.castBoolAsNumber(node.toConvert.accept(boolVisitor));
-        }
-
-        throw new ImplementMeException();
-    }
-
-    visitVariableWithDataLocation(node: VariableWithDataLocation): N {
-        return this._theory.abstractNumberValue(node);
-    }
-
-    visitNumberVariableExpression(node: NumberVariableExpression): N {
-        return this.visitVariableWithDataLocation(node.variable);
-    }
-
-    visitBoolAsNumberExpression(node: BoolAsNumberExpression): N {
-        throw new ImplementMeException();
-    }
-
-    visitDivideExpression(node: DivideExpression): N {
-        return this._theory.divide(node.operand1.accept(this), node.operand2.accept(this));
-    }
-
-    visitIndexOfExpression(node: IndexOfExpression): N {
-        throw new ImplementMeException();
-    }
-
-    visitLengthOListExpression(node: LengthOfListExpression): N {
-        throw new ImplementMeException();
-    }
-
-    visitLengthOfStringExpression(node: LengthOfStringExpression): N {
-        const stringVisitor = new DataStringExpressionVisitor(this._theories);
-        return this._theories.stringTheory.lengthOf(node.str.accept(stringVisitor) as S);
-    }
-
-    visitMinusExpression(node: MinusExpression): N {
-        return this._theory.minus(node.operand1.accept(this), node.operand2.accept(this));
-    }
-
-    visitModuloExpression(node: ModuloExpression): N {
-        return this._theory.modulo(node.operand1.accept(this), node.operand2.accept(this));
-    }
-
-    visitMultiplyExpression(node: MultiplyExpression): N {
-        return this._theory.multiply(node.operand1.accept(this), node.operand2.accept(this));
-    }
-
-    visitNumFunctExpression(node: NumFunctExpression): N {
-        throw new ImplementMeException();
-    }
-
-    visitPickRandomFromExpression(node: PickRandomFromExpression): N {
-        throw new ImplementMeException();
-    }
-
-    visitPlusExpression(node: PlusExpression): N {
-        return this._theory.plus(node.operand1.accept(this), node.operand2.accept(this));
-    }
-
-    visitRoundExpression(node: RoundExpression): N {
-        throw new ImplementMeException();
-    }
-
-    visitStringAsNumberExpression(node: StringAsNumberExpression): N {
-        const stringVisitor = new DataStringExpressionVisitor(this._theories);
-        return this._theory.castStringAsNumber(node.toConvert.accept(stringVisitor))
-    }
-
-    visitTimerExpression(node: TimerExpression): N {
-        throw new ImplementMeException();
-    }
-
-    visitNumberLiteral(node: NumberLiteral): N {
-        return this._theory.fromConcreteNumber(new ConcreteNumber(node.num));
+    protected createVisitorByType(t: ScratchType): CoreVisitor<any> {
+       if (t == IntegerType.instance()) {
+           return new DataNumExpressionVisitor(this._theories);
+       } else if (t == FloatType.instance()) {
+           return new DataNumExpressionVisitor(this._theories);
+       } else if (t == BooleanType.instance()) {
+           return new DataBoolExpressionVisitor(this._theories);
+       } else if (t == StringType.instance()) {
+           return new DataStringExpressionVisitor(this._theories);
+       } else {
+           throw new ImplementMeForException(t.toTreeString());
+       }
     }
 
 }
 
-export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
-    S extends AbstractString, L extends AbstractList>
-    implements CoreBoolExpressionVisitor<B> {
+export class DataNumExpressionVisitor<B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
+    F extends AbstractFloat, S extends AbstractString, L extends AbstractList>
+    extends TransformingVisitor<AbstractNumber, B, I, R, F, S, L>
+    implements CoreNumberExpressionVisitor<AbstractNumber> {
 
-    private readonly _base: B;
-    private readonly _theories: AbstractTheories<B, B, N, S, L>;
+    visitCastExpression(node: CastExpression): AbstractNumber {
+        Preconditions.checkArgument(ScratchType.isNumericType(node.castToType));
 
-    constructor(theories: AbstractTheories<B, B, N, S, L>) {
-        this._theories = Preconditions.checkNotUndefined(theories);
+        // TODO: Implement purely on `castFrom` of the theories?
+
+        if (node.toConvertFrom.expressionType == StringType.instance()) {
+            const stringVisitor = new DataStringExpressionVisitor(this._theories);
+            if (node.castToType == IntegerType.instance()) {
+                return this._theories.stringTheory.toInteger(node.toConvertFrom.accept(stringVisitor));
+            } else if (node.castToType == FloatType.instance()) {
+                return this._theories.stringTheory.toFloat(node.toConvertFrom.accept(stringVisitor));
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else if (node.toConvertFrom.expressionType == BooleanType.instance()) {
+            const boolVisitor = new DataBoolExpressionVisitor(this._theories);
+            if (node.castToType == IntegerType.instance()) {
+                return this._theories.intTheory.ifThenElse(node.toConvertFrom.accept(boolVisitor),
+                    this._theories.intTheory.one(), this._theories.intTheory.zero());
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else if (node.toConvertFrom.expressionType == FloatType.instance()) {
+            const convertFrom = node.toConvertFrom.accept(this.createVisitorByType(node.toConvertFrom.expressionType));
+            return this._theories.getNumberTheoryFor(node.castToType).castFrom(convertFrom);
+        } else if (node.toConvertFrom.expressionType == IntegerType.instance()) {
+            const convertFrom = node.toConvertFrom.accept(this.createVisitorByType(node.toConvertFrom.expressionType));
+            return this._theories.getNumberTheoryFor(node.castToType).castFrom(convertFrom);
+        }
+
+        throw new ImplementMeForException(node.toTreeString());
     }
 
-    visit(node: AstNode): B {
+    visitVariableWithDataLocation(node: VariableWithDataLocation): AbstractNumber {
+        if (node.dataloc.type == IntegerType.instance().typeId) {
+            return this._theories.intTheory.abstractNumberValue(node);
+
+        } else if (node.dataloc.type == FloatType.instance().typeId) {
+            return this._theories.getNumberTheoryFor(node.expressionType).abstractNumberValue(node);
+
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    visitNumberVariableExpression(node: NumberVariableExpression): AbstractNumber {
+        return this.visitVariableWithDataLocation(node.variable);
+    }
+
+    visitDivideExpression(node: DivideExpression): AbstractNumber {
+        const op1: AbstractNumber = node.operand1.accept(this);
+        const op2: AbstractNumber = node.operand2.accept(this);
+        const t = this._theories.getNumberTheoryOf(op1);
+        return t.divide(op1, op2);
+    }
+
+    visitIndexOfExpression(node: IndexOfExpression): AbstractNumber {
         throw new ImplementMeException();
     }
+
+    visitLengthOListExpression(node: LengthOfListExpression): AbstractNumber {
+        throw new ImplementMeException();
+    }
+
+    visitLengthOfStringExpression(node: LengthOfStringExpression): AbstractNumber {
+        const stringVisitor = new DataStringExpressionVisitor(this._theories);
+        return this._theories.stringTheory.lengthOf(node.str.accept(stringVisitor) as S);
+    }
+
+    visitMinusExpression(node: MinusExpression): AbstractNumber {
+        const op1: AbstractNumber = node.operand1.accept(this);
+        const op2: AbstractNumber = node.operand2.accept(this);
+        const t = this._theories.getNumberTheoryOf(op1);
+        return t.minus(op1, op2);
+    }
+
+    visitModuloExpression(node: ModuloExpression): AbstractNumber {
+        const op1: AbstractNumber = node.operand1.accept(this);
+        const op2: AbstractNumber = node.operand2.accept(this);
+        const t = this._theories.intTheory;
+        return t.modulo(op1 as I, op2 as I);
+    }
+
+    visitMultiplyExpression(node: MultiplyExpression): AbstractNumber {
+        const op1: AbstractNumber = node.operand1.accept(this);
+        const op2: AbstractNumber = node.operand2.accept(this);
+        const t = this._theories.getNumberTheoryOf(op1);
+        return t.multiply(op1, op2);
+    }
+
+    visitPickRandomFromExpression(node: PickRandomFromExpression): AbstractNumber {
+        throw new ImplementMeException();
+    }
+
+    visitPlusExpression(node: PlusExpression): AbstractNumber {
+        const op1: AbstractNumber = node.operand1.accept(this);
+        const op2: AbstractNumber = node.operand2.accept(this);
+        const t = this._theories.getNumberTheoryOf(op1);
+        return t.plus(op1, op2);
+    }
+
+    visitRoundExpression(node: RoundExpression): AbstractNumber {
+        throw new ImplementMeException();
+    }
+
+    visitTimerExpression(node: TimerExpression): AbstractNumber {
+        throw new ImplementMeException();
+    }
+
+    visitIntegerLiteral(node: IntegerLiteral): AbstractNumber {
+        return this._theories.intTheory.fromConcreteNumber(new ConcreteNumber(node.num));
+    }
+
+    visitFloatLiteral(node: FloatLiteral): AbstractNumber {
+        return this._theories.getNumberTheoryFor(node.expressionType).fromConcreteNumber(new ConcreteNumber(node.num));
+    }
+
+}
+
+export class DataBoolExpressionVisitor<B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
+    F extends AbstractFloat, S extends AbstractString, L extends AbstractList>
+    extends TransformingVisitor<B, B, I, R, F, S, L>
+    implements CoreBoolExpressionVisitor<B> {
 
     visitAndExpression(node: AndExpression): B {
         return this._theories.boolTheory.and(node.operand1.accept(this), node.operand2.accept(this));
@@ -278,37 +325,37 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
 
     visitNumEqualsExpression(node: NumEqualsExpression): B {
         const numVisitor = new DataNumExpressionVisitor(this._theories);
-        const op1: N = node.operand1.accept(numVisitor);
-        const op2: N = node.operand2.accept(numVisitor);
-        return this._theories.intTheory.isNumberEqualTo(op1, op2);
+        const op1: AbstractNumber = node.operand1.accept(numVisitor);
+        const op2: AbstractNumber = node.operand2.accept(numVisitor);
+        return this._theories.getNumberTheoryOf(op1).isNumberEqualTo(op1, op2);
     }
 
     visitNumGreaterEqualExpression(node: NumGreaterEqualExpression): B {
         const numVisitor = new DataNumExpressionVisitor(this._theories);
-        const op1: N = node.operand1.accept(numVisitor);
-        const op2: N = node.operand2.accept(numVisitor);
-        return this._theories.intTheory.isGreaterEqual(op1, op2);
+        const op1: AbstractNumber = node.operand1.accept(numVisitor);
+        const op2: AbstractNumber = node.operand2.accept(numVisitor);
+        return this._theories.getNumberTheoryOf(op1).isGreaterEqual(op1, op2);
     }
 
     visitNumGreaterThanExpression(node: NumGreaterThanExpression): B {
         const numVisitor = new DataNumExpressionVisitor(this._theories);
-        const op1: N = node.operand1.accept(numVisitor);
-        const op2: N = node.operand2.accept(numVisitor);
-        return this._theories.intTheory.isGreaterThan(op1, op2);
+        const op1: AbstractNumber = node.operand1.accept(numVisitor);
+        const op2: AbstractNumber = node.operand2.accept(numVisitor);
+        return this._theories.getNumberTheoryOf(op1).isGreaterThan(op1, op2);
     }
 
     visitNumLessThanExpression(node: NumLessThanExpression): B {
         const numVisitor = new DataNumExpressionVisitor(this._theories);
-        const op1: N = node.operand1.accept(numVisitor);
-        const op2: N = node.operand2.accept(numVisitor);
-        return this._theories.intTheory.isLessThan(op1, op2);
+        const op1: AbstractNumber = node.operand1.accept(numVisitor);
+        const op2: AbstractNumber = node.operand2.accept(numVisitor);
+        return this._theories.getNumberTheoryOf(op1).isLessThan(op1, op2);
     }
 
     visitNumLessEqualExpression(node: NumLessEqualExpression): B {
         const numVisitor = new DataNumExpressionVisitor(this._theories);
-        const op1: N = node.operand1.accept(numVisitor);
-        const op2: N = node.operand2.accept(numVisitor);
-        return this._theories.intTheory.isLessEqual(op1, op2);
+        const op1: AbstractNumber = node.operand1.accept(numVisitor);
+        const op2: AbstractNumber = node.operand2.accept(numVisitor);
+        return this._theories.getNumberTheoryOf(op1).isLessEqual(op1, op2);
     }
 
     visitOrExpression(node: OrExpression): B {
@@ -341,15 +388,15 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
     visitCastExpression(node: CastExpression): B {
         Preconditions.checkArgument(node.castToType == BooleanType.instance());
 
-        if (node.toConvert.expressionType == StringType.instance()) {
+        if (node.toConvertFrom.expressionType == StringType.instance()) {
             const stringVisitor = new DataStringExpressionVisitor(this._theories);
             throw new ImplementMeException();
 
-        } else if (node.toConvert.expressionType == NumberType.instance()) {
+        } else if (ScratchType.isNumericType(node.toConvertFrom.expressionType)) {
             const numVisitor = new DataNumExpressionVisitor(this._theories);
-            const numFormula = node.toConvert.accept(numVisitor);
-            return this._theories.boolTheory.not(
-                this._theories.intTheory.isNumberEqualTo(numFormula, this._theories.intTheory.zero()));
+            const numFormula: AbstractNumber = node.toConvertFrom.accept(numVisitor);
+            const numTheory = this._theories.getNumberTheoryOf(numFormula);
+            return this._theories.boolTheory.not(numTheory.isNumberEqualTo(numFormula, numTheory.zero()));
         }
 
         throw new ImplementMeException();
@@ -357,18 +404,10 @@ export class DataBoolExpressionVisitor<B extends AbstractBoolean, N extends Abst
 
 }
 
-export class DataStringExpressionVisitor<B extends AbstractBoolean, N extends AbstractNumber,
-    S extends AbstractString, L extends AbstractList> implements CoreStringExpressionVisitor<S> {
-
-    private readonly _theories: AbstractTheories<B, B, N, S, L>;
-
-    constructor(theories: AbstractTheories<B, B, N, S, L>) {
-        this._theories = Preconditions.checkNotUndefined(theories);
-    }
-
-    visit(node: AstNode): S {
-        throw new ImplementMeException();
-    }
+export class DataStringExpressionVisitor<B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
+    F extends AbstractFloat, S extends AbstractString, L extends AbstractList>
+    extends TransformingVisitor<S, B, I, R, F, S, L>
+    implements CoreStringExpressionVisitor<S> {
 
     visitBoolAsStringExpression(node: BoolAsStringExpression): S {
         throw new ImplementMeException();
@@ -388,7 +427,8 @@ export class DataStringExpressionVisitor<B extends AbstractBoolean, N extends Ab
 
     visitNumAsStringExpression(node: NumAsStringExpression): S {
         const numVisitor = new DataNumExpressionVisitor(this._theories);
-        return this._theories.stringTheory.castNumberAsString(node.accept(numVisitor));
+        const num = node.accept(numVisitor)
+        return this._theories.getNumberTheoryOf(num).toStringFormula(num);
     }
 
     visitResourceAttributeOfExpression(node: ResourceAttributeOfExpression): S {
@@ -400,7 +440,7 @@ export class DataStringExpressionVisitor<B extends AbstractBoolean, N extends Ab
     }
 
     visitStringLiteral(node: StringLiteral): S {
-        return this._theories.stringTheory.fromConcreteString(new ConcreteString(node.text));
+        return this._theories.stringTheory.fromConcrete(new ConcreteString(node.text));
     }
 
     visitStringVariableExpression(node: StringVariableExpression): S {
@@ -414,12 +454,13 @@ export class DataStringExpressionVisitor<B extends AbstractBoolean, N extends Ab
     visitCastExpression(node: CastExpression): S {
         Preconditions.checkArgument(node.castToType == StringType.instance());
 
-        if (node.toConvert.expressionType == NumberType.instance()) {
+        if (ScratchType.isNumericType(node.toConvertFrom.expressionType)) {
             const numVisitor = new DataNumExpressionVisitor(this._theories);
-            return this._theories.stringTheory.castNumberAsString(node.toConvert.accept(numVisitor));
+            const num = node.toConvertFrom.accept(numVisitor);
+            return this._theories.getNumberTheoryOf(num).toStringFormula(num);
 
-        } else if (node.toConvert.expressionType == StringType.instance()) {
-            return node.toConvert.accept(this);
+        } else if (node.toConvertFrom.expressionType == StringType.instance()) {
+            return node.toConvertFrom.accept(this);
         }
 
         throw new ImplementMeException();
@@ -427,17 +468,10 @@ export class DataStringExpressionVisitor<B extends AbstractBoolean, N extends Ab
 
 }
 
-export class DataListExpressionVisitor implements CoreListExpressionVisitor<AbstractList> {
-
-    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>;
-
-    constructor(theories: AbstractTheories<FirstOrderFormula, BooleanFormula, NumberFormula, StringFormula, ListFormula>) {
-        this._theories = Preconditions.checkNotUndefined(theories);
-    }
-
-    visit(node: AstNode): AbstractList {
-        throw new ImplementMeException();
-    }
+export class DataListExpressionVisitor<B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
+    F extends AbstractFloat, S extends AbstractString, L extends AbstractList>
+    extends TransformingVisitor<S, B, I, R, F, S, L>
+    implements CoreListExpressionVisitor<AbstractList> {
 
     visitExpressionListExpression(node: ExpressionListExpression): AbstractList {
         throw new ImplementMeException();
@@ -450,15 +484,20 @@ export class DataListExpressionVisitor implements CoreListExpressionVisitor<Abst
 }
 
 export class DataTransformerVisitor<B extends AbstractBoolean,
-    N extends AbstractNumber, S extends AbstractString, L extends AbstractList>
+    I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
+    S extends AbstractString, L extends AbstractList>
+    extends TransformingVisitor<B, B, I, R, F, S, L>
     implements CoreVisitor<B>, CoreNonCtrlStatementnVisitor<B> {
 
     private readonly _mem: B;
-    private readonly _theories: AbstractTheories<B, B, N, S, L>;
 
-    constructor(base: B, theories: AbstractTheories<B, B, N, S, L>) {
+    constructor(base: B, theories: TransformerTheories<B, B, I, R, F, S, L>) {
+        super(theories);
         this._mem = Preconditions.checkNotUndefined(base);
-        this._theories = Preconditions.checkNotUndefined(theories);
+    }
+
+    private numberTheoryFor(dl: DataLocation): NumberTheory<AbstractNumber, I, R, F, B, S> {
+        return this._theories.getNumberTheoryFor(ScratchType.fromId(dl.type));
     }
 
     visitCallStatement(node: CallStatement): B {
@@ -467,7 +506,20 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
             return this._mem;
         } else if (method.startsWith("_RUNTIME_")) {
             throw new ImplementMeForException(method);
+        } else if (method == "mathSqrt") {
+            if (node.assignResultTo.isPresent()) {
+                const dataLoc: DataLocation = node.assignResultTo.value().dataloc;
+                const theory = this.numberTheoryFor(dataLoc);
+                const assignTo = theory.abstractNumberValue(node.assignResultTo.value());
+                const assume: B = theory.isNumberEqualTo(assignTo,
+                    theory.sqrt(getTheOnlyElement(node.args.elements).accept(
+                        this.createVisitorByType(ScratchType.fromId(dataLoc.type)))));
+                return this._theories.boolTheory.and(this._mem, assume);
+            }
+        } else if (method.startsWith("math")) {
+            throw new ImplementMeForException(method);
         }
+
         return this._mem;
     }
 
@@ -590,11 +642,11 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
     visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): B {
         // We assume that a wrapping analysis step takes care of ssa.
         const declaredType = node.variable.expressionType;
-        if (declaredType instanceof NumberType) {
+        if (declaredType instanceof IntegerType || declaredType instanceof FloatType) {
             const visitor = new DataNumExpressionVisitor(this._theories);
-            const value: N = node.toValue.accept(visitor);
-            const assignTo = this._theories.intTheory.abstractNumberValue(node.variable);
-            const assume: B = this._theories.intTheory.isNumberEqualTo(assignTo, value);
+            const value: AbstractNumber = node.toValue.accept(visitor);
+            const assignTo = this.numberTheoryFor(node.variable.dataloc).abstractNumberValue(node.variable);
+            const assume: B = this.numberTheoryFor(node.variable.dataloc).isNumberEqualTo(assignTo, value);
             return this._theories.boolTheory.and(this._mem, assume);
 
         } else if (declaredType instanceof BooleanType) {

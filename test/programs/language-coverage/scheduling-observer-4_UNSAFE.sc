@@ -3,16 +3,16 @@ program Mini1Program
 actor DirexObserver is Observer begin
 
     declare direx as actor
-    declare last_x as number
+    declare last_x as int
 
     define atomic storeRelevantStateInfosForNext () begin
-        define last_x as cast attribute "x" of direx to number
+        define last_x as cast attribute "x" of direx to int
     end
 
     define atomic isBehaviorSatisfied () begin
         define result as true
-        declare curr as number
-        define curr as cast attribute "x" of direx to number
+        declare curr as int
+        define curr as cast attribute "x" of direx to int
 
         if not last_x < curr then begin
             define result as false
@@ -46,7 +46,7 @@ end
 
 actor Direx is RuntimeEntity begin
 
-    declare x as number
+    declare x as int
     define x as 0
 
     script on startup do begin
