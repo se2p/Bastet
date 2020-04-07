@@ -1,14 +1,14 @@
 module ScratchLibrary
 
-actor IOActor begin
+//actor IOActor begin
 
-    declare mouseX as number
+//    declare mouseX as number
 
-    declare mouseY as number
+//    declare mouseY as number
 
-    declare answer as string
+//    declare answer as string
 
-end
+//end
 
 role MathActor begin
 
@@ -284,7 +284,7 @@ extern _RUNTIME_getInitialActors () returns list of string
 
         define io as locate actor "IOActor"
         define result as cast (attribute "mouseX" of io) to int
-    end returns result: number
+    end returns result: int
 
     define getMouseY()  begin
         declare io as actor
