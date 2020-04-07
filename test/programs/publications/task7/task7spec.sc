@@ -29,7 +29,7 @@ actor ElephantObserver is Observer begin
     declare actor_1_id as actor
     declare actor_1_costume as string
     declare actor_1_prev_costume as string
-    declare last_change as number
+    declare last_change as int
 
     define atomic isBehaviorSatisfied () begin
         define result as true
