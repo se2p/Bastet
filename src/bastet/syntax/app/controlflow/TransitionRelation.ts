@@ -569,7 +569,7 @@ export class TransitionRelation {
             const result: Transition[] = [];
 
             for (const [from, op, to] of this.transitions) {
-                const isBackEdge = this.dominance.getDfsNumber(from) > this.dominance.getDfsNumber(to);
+                const isBackEdge = this.dominance.getDfsNumber(from) >= this.dominance.getDfsNumber(to);
                 if (isBackEdge) {
                     result.push(new Transition(from, op, to));
                 }

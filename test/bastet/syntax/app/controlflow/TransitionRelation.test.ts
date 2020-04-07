@@ -27,6 +27,19 @@ import {ControlLocation} from "../../../../../src/bastet/syntax/app/controlflow/
 import {ProgramOperations, RawOperation} from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
 import {StopAllStatement} from "../../../../../src/bastet/syntax/ast/core/statements/TerminationStatement";
 
+test("case: minimal loop", () => {
+    const op = new RawOperation(new StopAllStatement());
+
+    const tr = TransitionRelation.builder()
+        .addTransitionByIDs(1, 1, op)
+        .addEntryLocationWithID(1)
+        .addExitLocationWithID(1)
+        .build();
+
+    expect(tr.loopHeads.size).toEqual(1);
+});
+
+
 describe("TransitionRelation", () => {
 
     describe("constructor", () => {
@@ -114,6 +127,20 @@ describe("TransitionRelations", () => {
     });
 
     describe("loops", () => {
+
+        describe("case: minimal loop", () => {
+            const op = new RawOperation(new StopAllStatement());
+
+            const tr = TransitionRelation.builder()
+                .addTransitionByIDs(1, 1, op)
+                .addEntryLocationWithID(1)
+                .addExitLocationWithID(1)
+                .build();
+
+            it("loop head identified", () => {
+                expect(tr.loopHeads.size).toEqual(1);
+            });
+        });
 
         describe("case: no loop", () => {
             const op = new RawOperation(new StopAllStatement());
