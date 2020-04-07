@@ -1,5 +1,7 @@
 FROM node:13-alpine AS base
 
+RUN apk add --no-cache bash
+
 # Set the working directory
 # All subsequent actions will be taken from here
 WORKDIR /bastet
