@@ -24,6 +24,7 @@
 import {Refiner} from "../Refiner";
 import {DataAbstractState} from "./DataAbstractDomain";
 import {Lattices, LatticeWithComplements} from "../../../lattices/Lattice";
+import {PerfTimer} from "../AnalysisStatistics";
 
 export class DataRefiner implements Refiner<DataAbstractState> {
 
@@ -34,7 +35,18 @@ export class DataRefiner implements Refiner<DataAbstractState> {
     }
 
     checkIsFeasible(e: DataAbstractState): boolean {
-        return Lattices.isFeasible(e, this._lattice);
+        let isFeasible: boolean;
+        console.group("Feasibility Check...");
+        const timer = new PerfTimer(null);
+        timer.start();
+        try {
+            isFeasible = Lattices.isFeasible(e, this._lattice);
+            return isFeasible;
+        } finally {
+            timer.stop();
+            console.log(`${isFeasible ? "Feasible" : "Infeasible"} ${timer.lastIntervalDuration}`)
+            console.groupEnd();
+        }
     }
 
 }

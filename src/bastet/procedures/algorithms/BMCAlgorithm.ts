@@ -76,7 +76,7 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractState>
                     }
                 } finally {
                     this._feasibilityCheckStats.stopTimer();
-                    console.log(`${isFeasible ? "Feasible" : "Infeasible"} ${this._feasibilityCheckStats.contextTimer.lastIntervalDuration}`)
+                    console.log(`${isFeasible ? "Feasible" : "Infeasible"}`)
                     console.groupEnd();
                 }
             }

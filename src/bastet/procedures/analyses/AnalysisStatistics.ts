@@ -58,7 +58,9 @@ export class PerfTimer {
         this._lastIntervalDuration = this._stopTime - this._startTime;
         this._totalDuartion = this._totalDuartion + this._lastIntervalDuration;
 
-        this._onStopCallback(this);
+        if (this._onStopCallback) {
+            this._onStopCallback(this);
+        }
         return this.totalDuration;
     }
 
