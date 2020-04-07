@@ -192,6 +192,10 @@ export class Z3SMT extends LibZ3NonContext {
 
     public createContext(): LibZ3InContext {
         const cfg = this.mk_config();
+        // this.set_param_value(cfg, "timeout", "60000"); // Timeout in milliseconds (the Z3 WASM must be recompiled with PTHREADS enabled)
+        this.set_param_value(cfg, "proof", "false"); // No proof generation (sufficient for BMC)
+        this.set_param_value(cfg, "unsat_core", "false"); // No unsat-core generation (sufficient for BMC)
+
         const ctx = this.mk_context(cfg);
         return new LibZ3InContext(this._wasmInstance, ctx);
     }
