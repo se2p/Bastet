@@ -52,6 +52,10 @@ export class MainAnalysisConfig extends BastetConfiguration {
         return this.getBoolProperty('print-statistics', true);
     }
 
+    get exportArtifacts(): boolean {
+        return this.getBoolProperty('export-artifacts', true);
+    }
+
 }
 
 export class AnalysisProcedureFactory {
@@ -97,7 +101,9 @@ export class AnalysisProcedureFactory {
                 reached.addRootSates(initialStates);
 
                 const [frontierPrime, reachedPrime] = multiPropertyAlgorithm.run(frontier, reached);
-                graphAnalysis.exportAnalysisResult(reachedPrime, frontierPrime);
+                if (mainConfig.exportArtifacts) {
+                    graphAnalysis.exportAnalysisResult(reachedPrime, frontierPrime);
+                }
 
                 return this._result;
             }

@@ -5,6 +5,12 @@ NAME_PREFIX="$1"
 TEST_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 BASTET_ROOT="../../../"
 
+ctrl_c () {
+    exit 1
+}
+
+trap ctrl_c INT
+
 echo "FILTER: $NAME_PREFIX"
 
 cd $BASTET_ROOT
@@ -85,6 +91,7 @@ do
     RESULT_FILE=$(mktemp)
     printf "`basename $f`"
      timeout 360 ./scripts/bastet.sh \
+        -c config/default.json,config/benchmarking.delta.json \
         -P $f \
         -S test/programs/empty.sc \
         -I src/public/library.sc \
