@@ -48,7 +48,7 @@ function execute(bastet: Bastet, fixturePath: string, done) {
 
 function execute_explicit(bastet: Bastet, fixturePath: string, expectSuccess: boolean, done) {
     async function asyncAwaitFunction(): Promise<AnalysisResult> {
-        return await bastet.runFor(configFilePath, intermediatePath, fixturePath, specFilePath);
+        return await bastet.runFor([configFilePath], intermediatePath, fixturePath, specFilePath);
     }
 
     asyncAwaitFunction().then(result => {
