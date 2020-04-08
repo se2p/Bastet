@@ -157,34 +157,34 @@ role MathActor begin
     define atomic mathSin(alpha: float) begin
         define alpha as wrapClamp(alpha, 0.0, 360.0)
 
-        if alpha > (0.0-1.0) and alpha < 36.0 then begin
+        if (alpha > 0.0 or alpha = 0.0) and alpha < 36.0 then begin
             assume result < 0.0
             assume result > 0.0-0.991
-        end else if alpha > 35.0 and alpha < 72.0 then begin
+        end else if (alpha > 36.0 or alpha = 36.0) and alpha < 72.0 then begin
             assume result > 0.0-0.991
             assume result < 0.254
-        end else if alpha > 71.0 and alpha < 108.0 then begin
+        end else if (alpha > 72.0 or alpha = 72.0) and alpha < 108.0 then begin
             assume result > 0.253
             assume result < 0.927
-        end else if alpha > 107.0 and alpha < 144.0 then begin
+        end else if (alpha > 108.0 or alpha = 108.0) and alpha < 144.0 then begin
             assume result < 0.927
             assume result > 0.0-0.491
-        end else if alpha > 143.0 and alpha < 180.0 then begin
+        end else if (alpha > 144.0 or alpha = 144.0) and alpha < 180.0 then begin
             assume result < 0.0-0.492
             assume result > 0.0-0.801
-        end else if alpha > 179.0 and alpha < 216.0 then begin
+        end else if (alpha > 180.0 or alpha = 180.0) and alpha < 216.0 then begin
             assume result > 0.0-0.801
             assume result < 0.697
-        end else if alpha > 215.0 and alpha < 252.0 then begin
+        end else if (alpha > 216.0 or alpha = 216.0) and alpha < 252.0 then begin
             assume result > 0.623
             assume result < 0.697
-        end else if alpha > 251.0 and alpha < 288.0 then begin
+        end else if (alpha > 252.0 or alpha = 216.0) and alpha < 288.0 then begin
             assume result < 0.624
             assume result > 0.0-0.855
-        end else if alpha > 287.0 and alpha < 324.0 then begin
+        end else if (alpha > 288.0 or alpha = 288.0) and alpha < 324.0 then begin
             assume result > 0.0-0.854
             assume result < 0.0-0.405
-        end else if alpha > 323.0 and alpha < 361.0 then begin
+        end else if (alpha > 324.0 or alpha = 324.0) and alpha < 360.0 then begin
             assume result > 0.0-0.404
             assume result < 0.959
         end else begin

@@ -9,7 +9,7 @@ actor MiniActor is RuntimeEntity begin
         declare result as float
         define result as mathCos(alpha)
 
-        if result > 1.0 or result < (0.0-0.128)  then begin
+        if result > 1.0 and result < (0.0-0.128)  then begin
             _RUNTIME_signalFailure()
         end
     end
