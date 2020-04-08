@@ -1,14 +1,18 @@
 module ScratchLibrary
 
-//actor IOActor begin
+actor IOActor begin
 
-//    declare mouseX as number
+    declare mouseX as int
 
-//    declare mouseY as number
+    declare mouseY as int
 
-//    declare answer as string
+    declare answer as string
 
-//end
+    // Key code of the currently pressed key
+    declare key_pressed as int
+
+end
+
 
 role MathActor begin
 
@@ -24,9 +28,13 @@ role MathActor begin
     end returns result : float
 
     define atomic mathFloor (n: float) begin
-        declare d as float
-        define d as cast (cast n to int mod 1) to float
-        define result as n - d
+        declare num as int
+        define num as cast n to int
+        define result as cast num to float
+        if result > n then begin
+            define result as result - 1.0
+        end
+
     end returns result : float
 
     // mathAtan approximates the Atan value in degrees for a given "real" value
@@ -106,41 +114,40 @@ role MathActor begin
     define atomic mathCos(alpha: float) begin
         define alpha as wrapClamp(alpha, 0.0, 360.0)
 
-        if (alpha > (0.0-1.0) and alpha < 36.0) then begin
+        if ((alpha > 0.0 or alpha = 0.0) and alpha < 36.0) then begin
             assume result < 1.0
             assume result > 0.0-0.127
-        end else if (alpha > 35.0 and alpha < 72.0) then begin
+        end else if ((alpha > 36.0 or alpha = 36.0) and alpha < 72.0) then begin
             assume result < 0.0-0.128
             assume result > 0.0-0.967
-        end else if (alpha > 71.0 and alpha < 108.0) then begin
+        end else if ((alpha > 72.0 or alpha = 72.0) and alpha < 108.0) then begin
             assume result < 0.376
             assume result > 0.0-0.967
-        end else if (alpha > 107.0 and alpha < 144.0) then begin
+        end else if ((alpha > 107.0 or alpha = 107.0) and alpha < 143.0) then begin
             assume result < 0.872
             assume result > 0.375
-        end else if (alpha > 143.0 and alpha < 180.0) then begin
+        end else if ((alpha = 143.0 or alpha > 143.0) and alpha < 180.0) then begin
             assume result < 0.872
             assume result > 0.0-0.599
-        end else if (alpha > 179.0 and alpha < 216.0) then begin
+        end else if ((alpha > 180.0 or alpha = 180.0) and alpha < 216.0) then begin
             assume result < 0.0-0.598
             assume result > 0.0-0.717
-        end else if (alpha > 215.0 and alpha < 252.0) then begin
+        end else if ((alpha > 216.0 or alpha = 216.0) and alpha < 252.0) then begin
             assume result > 0.0-0.717
             assume result < 0.783
-        end else if (alpha > 251.0 and alpha < 288.0) then begin
+        end else if ((alpha > 252.0 or alpha = 252.0) and alpha < 288.0) then begin
             assume result < 0.783
             assume result > 0.517
-        end else if (alpha > 287.0 and alpha < 324.0) then begin
+        end else if ((alpha > 288.0 or alpha = 288.0) and alpha < 324.0) then begin
             assume result < 0.518
             assume result > 0.0-0.914
-        end else if (alpha > 323.0 and alpha < 361.0) then begin
+        end else if ((alpha = 324.0 or alpha > 324.0) and alpha < 360.0) then begin
             assume result > 0.0-0.914
             assume result < 0.0-0.284
         end else begin
             // got invalid input
             _RUNTIME_signalFailure("mathCos")
         end
-
     end returns result: float
 
     // mathSin approximates the sin value for a given degree number
@@ -377,18 +384,28 @@ extern _RUNTIME_getInitialActors () returns list of string
     define touchingObjects (fst: actor, snd: actor) begin
         // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
 
+        declare size_fst as float
         declare leg_a_fst as float
         declare leg_b_fst as float
         define leg_a_fst as cast attribute "active_graphic_width" of fst to float
         define leg_b_fst as cast attribute "active_graphic_height" of fst to float
 
+        define size_fst as cast attribute "size" of fst to float
+        define leg_a_fst as leg_a_fst * (size_fst / 100.0)
+        define leg_b_fst as leg_b_fst * (size_fst / 100.0)
+
         declare radius_fst as float
         define radius_fst as 0.5 * mathSqrt(leg_a_fst * leg_a_fst + leg_b_fst * leg_b_fst)
 
+        declare size_snd as float
         declare leg_a_snd as float
         declare leg_b_snd as float
         define leg_a_snd as cast attribute "active_graphic_width" of snd to float
         define leg_b_snd as cast attribute "active_graphic_height" of snd to float
+
+        define size_snd as cast attribute "size" of snd to float
+        define leg_a_snd as leg_a_snd * (size_snd / 100.0)
+        define leg_b_snd as leg_b_snd * (size_snd / 100.0)
 
         declare radius_snd as float
         define radius_snd as 0.5 * mathSqrt(leg_a_snd * leg_a_snd + leg_b_snd * leg_b_snd)
@@ -638,20 +655,31 @@ role ScratchSprite is ScratchEntity begin
     define atomic touchingObject (obj: actor) begin
         // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
 
+        declare size_fst as float
         declare leg_a as float
         declare leg_b as float
 
         // TODO: Query attributes of myself and the other actor
         define leg_a as cast active_graphic_width to float
         define leg_b as cast active_graphic_height to float
+        define size_fst as cast size to float
+        define leg_a as leg_a * (size_fst / 100.0)
+        define leg_b as leg_b * (size_fst / 100.0)
+
 
         declare radius as float
         define radius as 0.5 * mathSqrt(leg_a * leg_a + leg_b * leg_b)
 
+        declare size_snd as float
         declare leg_a_other as float
         declare leg_b_other as float
         define leg_a_other as cast attribute "active_graphic_width" of obj to float
         define leg_b_other as cast attribute "active_graphic_height" of obj to float
+
+        define size_snd as cast attribute "size" of obj to float
+        define leg_a_other as leg_a_other * (size_snd / 100.0)
+        define leg_b_other as leg_b_other * (size_snd / 100.0)
+
 
         declare radius_other as float
         define radius_other as 0.5 * mathSqrt(leg_a_other * leg_a_other + leg_b_other * leg_b_other)
@@ -772,4 +800,6 @@ role ScratchStage is ScratchEntity begin
          changeActiveGraphicTo(id)
     end
 end
+
+
 
