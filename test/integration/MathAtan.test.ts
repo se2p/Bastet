@@ -32,7 +32,7 @@ test("Test Atan 1 safe", done => {
     }
 }, utils.timeout);
 
-xtest("Test Atan 2 safe", done => {
+test("Test Atan 2 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-2_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -42,7 +42,7 @@ xtest("Test Atan 2 safe", done => {
     }
 }, utils.timeout);
 
-xtest("Test Atan 1 unsafe", done => {
+test("Test Atan 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
@@ -52,7 +52,7 @@ xtest("Test Atan 1 unsafe", done => {
     }
 }, utils.timeout);
 
-xtest("Test Atan 2 unsafe", done => {
+test("Test Atan 2 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-2_UNSAFE.sc"
     let bastet = new Bastet();
     try {
