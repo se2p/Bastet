@@ -20,10 +20,10 @@
  */
 
 import {AbstractNode} from "../AstNode";
-import {StringExpression, StringLiteral} from "./expressions/StringExpression";
+import {StringExpression} from "./expressions/StringExpression";
 import {BooleanExpression} from "./expressions/BooleanExpression";
 import {StatementList} from "./statements/Statement";
-import {BOOTSTRAP_FINISHED_MESSAGE, GREENFLAG_MESSAGE, BOOTSTRAP_MESSAGE, Message, SYSTEM_NAMESPACE} from "./Message";
+import {BOOTSTRAP_FINISHED_MESSAGE, BOOTSTRAP_MESSAGE, GREENFLAG_MESSAGE, SYSTEM_NAMESPACE} from "./Message";
 
 export abstract class CoreEvent extends AbstractNode {
 

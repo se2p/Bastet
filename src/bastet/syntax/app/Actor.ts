@@ -31,33 +31,28 @@ import {ActorMode} from "../ast/core/ActorDefinition";
 import {Preconditions} from "../../utils/Preconditions";
 import {Method} from "./controlflow/Method";
 import {
-    AfterBootstrapMonitoringEvent,
     AfterStatementMonitoringEvent,
     BootstrapEvent,
     NeverEvent,
-    RenderedMonitoringEvent, SingularityEvent
+    RenderedMonitoringEvent,
+    SingularityEvent
 } from "../ast/core/CoreEvent";
 import {TransitionRelation, TransitionRelations, TransRelId} from "./controlflow/TransitionRelation";
-import {Scripts} from "./controlflow/Scripts";
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
-import {BOOTSTRAP_FINISHED_MESSAGE, GREENFLAG_MESSAGE, BOOTSTRAP_MESSAGE} from "../ast/core/Message";
-import {Statement, StatementList} from "../ast/core/statements/Statement";
+import {BOOTSTRAP_FINISHED_MESSAGE, BOOTSTRAP_MESSAGE, GREENFLAG_MESSAGE} from "../ast/core/Message";
+import {StatementList} from "../ast/core/statements/Statement";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
 import {Concern, Concerns} from "../Concern";
 import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
 import {CallStatement} from "../ast/core/statements/CallStatement";
-import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
-import {Properties} from "../Property";
 import {Identifier} from "../ast/core/Identifier";
 import {InitializeAnalysisStatement, SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
 import {BooleanExpression} from "../ast/core/expressions/BooleanExpression";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {IfStatement} from "../ast/core/statements/ControlStatement";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
-import {AstNode, OptionalAstNode} from "../ast/AstNode";
+import {AstNode} from "../ast/AstNode";
 
 export type ActorMap = { [id:string]: Actor } ;
 

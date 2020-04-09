@@ -20,7 +20,6 @@
  */
 
 import {Statement} from "./Statement";
-import {StringExpression} from "../expressions/StringExpression";
 import {SystemMessage} from "../Message";
 
 export class BroadcastMessageStatement extends Statement {

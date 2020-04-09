@@ -24,7 +24,7 @@ import {LocationId} from "./ControlLocation";
 import {TransitionRelation, TransitionTo} from "./TransitionRelation";
 import {Preconditions} from "../../../utils/Preconditions";
 import {getTheOnlyElement} from "../../../utils/Collections";
-import {Map as ImmMap, Set as ImmSet} from "immutable"
+import {Set as ImmSet} from "immutable"
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export class NodeInfo {

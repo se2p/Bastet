@@ -21,14 +21,15 @@
 
 import {AstNode} from "./AstNode";
 import {
-    DivideExpression, FloatLiteral,
-    IndexOfExpression, IntegerLiteral,
+    DivideExpression,
+    FloatLiteral,
+    IndexOfExpression,
+    IntegerLiteral,
     LengthOfListExpression,
     LengthOfStringExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
-    NumberLiteral,
     NumberVariableExpression,
     PlusExpression,
     TimerExpression

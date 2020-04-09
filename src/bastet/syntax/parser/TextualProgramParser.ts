@@ -26,7 +26,6 @@ import fs from "fs";
 import path from "path";
 import {ProgramParser} from "./ProgramParser";
 import {Preconditions} from "../../utils/Preconditions";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {ParsingException} from "../../core/exceptions/ParsingException";
 
 class MyScratchCoreParser extends ScratchParser {

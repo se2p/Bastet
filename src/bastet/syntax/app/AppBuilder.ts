@@ -35,8 +35,7 @@ import {
     AfterBootstrapMonitoringEvent,
     AfterStatementMonitoringEvent,
     BootstrapEvent,
-    CoreEvent,
-    NeverEvent
+    CoreEvent
 } from "../ast/core/CoreEvent";
 import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
 import {
@@ -58,13 +57,11 @@ import {Identifier} from "../ast/core/Identifier";
 import {VariableWithDataLocation} from "../ast/core/Variable";
 import {Logger} from "../../utils/Logger";
 import {ReturnStatement} from "../ast/core/statements/ControlStatement";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {TypeInformationStorage} from "../DeclarationScopes";
 import {Concern, Concerns} from "../Concern";
 import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {ImmutableMap} from "../../utils/ImmutableMap";
-import {List} from "immutable";
 import {ImmutableList} from "../../utils/ImmutableList";
 
 export class AppBuilder {

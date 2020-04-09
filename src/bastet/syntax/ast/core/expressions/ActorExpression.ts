@@ -21,7 +21,7 @@
  */
 
 import {Expression} from "./Expression";
-import {VariableExpression, VariableWithDataLocation} from "../Variable";
+import {VariableWithDataLocation} from "../Variable";
 import {AbstractExpression} from "./AbstractExpression";
 import {AstNode} from "../../AstNode";
 import {ActorType} from "../ScratchType";

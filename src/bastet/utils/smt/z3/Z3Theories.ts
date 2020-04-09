@@ -24,25 +24,27 @@ import {FirstOrderFormula} from "../../ConjunctiveNormalForm";
 import {
     AbstractBoolean,
     AbstractList,
-    AbstractTheories,
     AbstractNumber,
     AbstractString,
+    AbstractTheories,
     BooleanTheory,
+    FloatTheory,
+    IntegerTheory,
     ListTheory,
     NumberTheory,
-    StringTheory, IntegerTheory, RealTheory, FloatTheory
+    RealTheory,
+    StringTheory
 } from "../../../procedures/domains/MemoryTransformer";
 import {Record as ImmRec} from "immutable";
 import {LibZ3InContext, Z3_ast, Z3_sort} from "./libz3";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../../procedures/domains/ConcreteElements";
 import {Preconditions} from "../../Preconditions";
-import {Float, Ptr, Sint32, Uint32} from "./ctypes";
+import {Ptr, Sint32, Uint32} from "./ctypes";
 import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
 import {SMTFirstOrderLattice} from "../../../procedures/domains/FirstOrderDomain";
 import {Z3ProverEnvironment} from "./Z3SMT";
 import {Variable} from "../../../syntax/ast/core/Variable";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;
 

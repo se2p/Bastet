@@ -32,8 +32,10 @@ import {
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {
-    DivideExpression, FloatLiteral,
-    IndexOfExpression, IntegerLiteral,
+    DivideExpression,
+    FloatLiteral,
+    IndexOfExpression,
+    IntegerLiteral,
     LengthOfListExpression,
     LengthOfStringExpression,
     MinusExpression,
@@ -104,8 +106,6 @@ import {
     DeclareSystemVariableStatement
 } from "../ast/core/statements/DeclarationStatement";
 import {CreateCloneOfStatement} from "../ast/core/statements/CreateCloneOfStatement";
-import {ChangeVarByStatement} from "../ast/core/statements/ChangeVarByStatement";
-import {ChangeAttributeByStatement} from "../ast/core/statements/ChangeAttributeByStatement";
 import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
 import {AbsentAstNode, AstNode, OptionalAstNode, PresentAstNode} from "../ast/AstNode";
@@ -118,7 +118,6 @@ import {AssumeStatement} from "../ast/core/statements/AssumeStatement";
 import {CallStatement} from "../ast/core/statements/CallStatement";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {Statement} from "../ast/core/statements/Statement";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {BeginAtomicStatement, EndAtomicStatement, ReturnStatement} from "../ast/core/statements/ControlStatement";
 import {SystemMessage, UserMessage} from "../ast/core/Message";
 import {CastExpression} from "../ast/core/expressions/CastExpression";
@@ -126,7 +125,8 @@ import {
     ActorExpression,
     ActorVariableExpression,
     LocateActorExpression,
-    StartCloneActorExpression, UsherActorExpression
+    StartCloneActorExpression,
+    UsherActorExpression
 } from "../ast/core/expressions/ActorExpression";
 import {Identifier} from "../ast/core/Identifier";
 import {InitializeAnalysisStatement, SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";

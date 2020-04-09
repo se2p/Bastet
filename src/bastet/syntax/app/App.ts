@@ -25,13 +25,9 @@ import {MethodDefinition, MethodDefinitionList} from "../ast/core/MethodDefiniti
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {Set as ImmSet} from "immutable";
-import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
-import {CallStatement} from "../ast/core/statements/CallStatement";
-import {MethodIdentifiers} from "./controlflow/MethodIdentifiers";
 import {Properties, Property} from "../Property";
 import {TransitionRelation, TransRelId} from "./controlflow/TransitionRelation";
 import {TypeInformationStorage} from "../DeclarationScopes";
-import {Method} from "./controlflow/Method";
 import {Script} from "./controlflow/Script";
 import {SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
 import {BooleanExpression} from "../ast/core/expressions/BooleanExpression";
