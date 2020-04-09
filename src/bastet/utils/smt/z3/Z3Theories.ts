@@ -399,6 +399,14 @@ export class Z3FloatTheory extends Z3AbstractNumberTheory<Z3FloatFormula>
     }
 
     castFrom(from: AbstractNumber): Z3FloatFormula {
+        if (from instanceof Z3IntegerFormula) {
+            return new Z3FloatFormula(this._ctx.mk_fpa_to_fp_real(
+                this.makeRoundingStrategy(), this._ctx.mk_int2real(from.getAST()), this.makeTheorySort()));
+        } else if (from instanceof Z3RealFormula) {
+            return new Z3FloatFormula(this._ctx.mk_fpa_to_fp_real(
+                this.makeRoundingStrategy(), from.getAST(), this.makeTheorySort()));
+        }
+
         throw new ImplementMeForException(from.constructor.name);
     }
 
@@ -430,9 +438,8 @@ export class Z3FloatTheory extends Z3AbstractNumberTheory<Z3FloatFormula>
         return this._ctx.mk_fpa_round_nearest_ties_to_even();
     }
 
-    fromConcreteNumber(str: ConcreteNumber): Z3FloatFormula {
-        return this.createTypedWrapper(
-            this._ctx.mk_fpa_numeral_float(new Float(str.value), this.makeTheorySort()));
+    fromConcreteNumber(number: ConcreteNumber): Z3FloatFormula {
+        return this.fromConcreteString(new ConcreteString(number.value.toString()));
     }
 
     castStringAsNumber(str: Z3StringFormula): Z3NumberFormula {
@@ -461,9 +468,9 @@ export class Z3FloatTheory extends Z3AbstractNumberTheory<Z3FloatFormula>
     }
 
     minus(op1: Z3FloatFormula, op2: Z3FloatFormula): Z3FloatFormula {
-        const minusAst = this._ctx.mk_unary_minus(op2.getAST());
+        const minusAst = this.multiply(op2, this.fromConcreteNumber(new ConcreteNumber(-1)));
         // 'Minus' adds a negative number
-        return this.createTypedWrapper(this._ctx.mk_fpa_add(this.makeRoundingStrategy(), op1.getAST(), minusAst));
+        return this.createTypedWrapper(this._ctx.mk_fpa_add(this.makeRoundingStrategy(), op1.getAST(), minusAst.getAST()));
     }
 
     divide(op1: Z3FloatFormula, op2: Z3FloatFormula): Z3FloatFormula {

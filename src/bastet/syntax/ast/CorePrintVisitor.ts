@@ -205,7 +205,7 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitNumGreaterEqualExpression(node: NumGreaterEqualExpression): string {
-        return `${node.operand1.accept(this)} > ${node.operand2.accept(this)} or ${node.operand1.accept(this)} = ${node.operand2.accept(this)}`;
+        return `${node.operand1.accept(this)} >= ${node.operand2.accept(this)}`;
     }
 
     visitNumGreaterThanExpression(node: NumGreaterThanExpression): string {
@@ -213,7 +213,7 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitNumLessEqualExpression(node: NumLessEqualExpression): string {
-        return `${node.operand1.accept(this)} < ${node.operand2.accept(this)} or ${node.operand1.accept(this)} = ${node.operand2.accept(this)}`;
+        return `${node.operand1.accept(this)} <= ${node.operand2.accept(this)}`;
     }
 
     visitNumLessThanExpression(node: NumLessThanExpression): string {

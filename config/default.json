@@ -14,7 +14,7 @@
     },
 
     "DataAnalysis": {
-        "encode-floats-as": "Reals"
+        "encode-floats-as": "Floats"
     },
 
     "GraphAnalysis": {

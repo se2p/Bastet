@@ -11,7 +11,7 @@ actor MiniActor is RuntimeEntity begin
         define b as 2.2
         define c as 3.3
 
-        if c - b - a > 0.0 then begin
+        if c - b - a = 0.0 then begin
             _RUNTIME_signalFailure()
         end
     end
