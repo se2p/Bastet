@@ -38,13 +38,14 @@ import * as path from "path";
 import {IntegerLiteral, NumberLiteral} from "../ast/core/expressions/NumberExpression";
 import {DeclareStackVariableStatement} from "../ast/core/statements/DeclarationStatement";
 import {imageSize} from "image-size";
+import {ScopeTypeInformation} from "../DeclarationScopes";
 
 export class LookupTransformer {
 
     // Todo using strings is probably not correct here
     private static _data: Map<Identifier, Map<string, Buffer>> = new Map();
 
-    public static buildGrapicPixelLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
+    public static buildGrapicPixelLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string, activeDeclarationScope: ScopeTypeInformation): MethodDefinition {
 
         //FIXME check if map already exists for actor
         let actorResources: Map<string, Buffer> = new Map();
@@ -53,9 +54,11 @@ export class LookupTransformer {
         let dirName = path.dirname(filePath);
 
         let methodIdent = new Identifier("ResourceLookup");
-
-        let paramDecl = new ParameterDeclaration(new Identifier("ident"), StringType.instance());
+        const ident = new Identifier("ident");
+        let paramDecl = new ParameterDeclaration(ident , StringType.instance());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
+
+        activeDeclarationScope.putTypeInformation(ident, StringType.instance())
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", StringType.instance().typeId));
         let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
@@ -92,7 +95,7 @@ export class LookupTransformer {
             stmtList, resultDecl, true);
     }
 
-    public static buildIndexByIdLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
+    public static buildIndexByIdLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string, _activeDeclarationScope: ScopeTypeInformation): MethodDefinition {
 
         //FIXME check if map already exists for actor
         let actorResources: Map<string, Buffer> = new Map();
@@ -102,8 +105,11 @@ export class LookupTransformer {
 
         let methodIdent = new Identifier("getGraphicIndexById");
 
-        let paramDecl = new ParameterDeclaration(new Identifier("id"), StringType.instance());
+        const ident = new Identifier("id");
+        let paramDecl = new ParameterDeclaration(ident, StringType.instance());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
+
+        _activeDeclarationScope.putTypeInformation(ident, StringType.instance())
 
         const resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", IntegerType.instance().typeId));
         const initStmt = new StoreEvalResultToVariableStatement(resultVarDecl, new IntegerLiteral(0));
@@ -140,7 +146,7 @@ export class LookupTransformer {
             stmtList, resultDecl, true);
     }
 
-    public static buildIdByIndexLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
+    public static buildIdByIndexLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string, activeDeclarationScope: ScopeTypeInformation): MethodDefinition {
 
         //FIXME check if map already exists for actor
         let actorResources: Map<string, Buffer> = new Map();
@@ -149,9 +155,11 @@ export class LookupTransformer {
         let dirName = path.dirname(filePath);
 
         let methodIdent = new Identifier("getGraphicIdByIndex");
-
-        let paramDecl = new ParameterDeclaration(new Identifier("idx"), IntegerType.instance());
+        const ident = new Identifier("idx")
+        let paramDecl = new ParameterDeclaration(ident , IntegerType.instance());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
+
+        activeDeclarationScope.putTypeInformation(ident, StringType.instance())
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", StringType.instance().typeId));
         let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
@@ -189,7 +197,7 @@ export class LookupTransformer {
     }
 
 
-    public static buildGetImageWidthLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
+    public static buildGetImageWidthLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string, _activeDeclarationScope: ScopeTypeInformation): MethodDefinition {
 
         //FIXME check if map already exists for actor
         let actorResources: Map<string, Buffer> = new Map();
@@ -198,13 +206,17 @@ export class LookupTransformer {
         let dirName = path.dirname(filePath);
 
         let methodIdent = new Identifier("getImageWidth");
-        let paramDecl = new ParameterDeclaration(new Identifier("id"), StringType.instance());
+        const ident = new Identifier("id");
+        let paramDecl = new ParameterDeclaration(ident, StringType.instance());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
+
+        _activeDeclarationScope.putTypeInformation(ident, StringType.instance())
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", IntegerType.instance().typeId));
         let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
         let stmts = [];
-        stmts.push(declareStackVar)
+        stmts.push(declareStackVar);
+
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
@@ -214,7 +226,7 @@ export class LookupTransformer {
             if (fileName.endsWith(".png") || fileName.endsWith(".svg")) {
                 let uri = path.join(dirName, fileName);
 
-                let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", StringType.instance().typeId));
+                let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("id", StringType.instance().typeId));
                 let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
 
                 let dimensions = imageSize(uri);
@@ -239,7 +251,7 @@ export class LookupTransformer {
             stmtList, resultDecl, true);
     }
 
-    public static buildGetImageHeightLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string): MethodDefinition {
+    public static buildGetImageHeightLookup(actor: Identifier, resourceDefs: TransformerResult, filePath: string, activeDeclarationScope: ScopeTypeInformation): MethodDefinition {
 
         //FIXME check if map already exists for actor
         let actorResources: Map<string, Buffer> = new Map();
@@ -248,9 +260,10 @@ export class LookupTransformer {
         let dirName = path.dirname(filePath);
 
         let methodIdent = new Identifier("getImageHeight");
-
-        let paramDecl = new ParameterDeclaration(new Identifier("id"), StringType.instance());
+        const ident = new Identifier("id");
+        let paramDecl = new ParameterDeclaration(ident, StringType.instance());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
+        activeDeclarationScope.putTypeInformation(ident, StringType.instance())
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", IntegerType.instance().typeId));
         let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);

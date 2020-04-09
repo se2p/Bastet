@@ -694,17 +694,17 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 initStatements = StatementLists.concat(initStatements, resouceDefs.statementsToPrepend);
 
                 if (resouceDefs.node.children.length > 0) {
-                    const graphicPixelLookup = LookupTransformer.buildGrapicPixelLookup(this._currentActor, resouceDefs, this._filePath);
+                    const graphicPixelLookup = LookupTransformer.buildGrapicPixelLookup(this._currentActor, resouceDefs, this._filePath, this._activeDeclarationScope);
                     runtimeMethods.push(graphicPixelLookup);
-                    const idByIndexLookup = LookupTransformer.buildIdByIndexLookup(this._currentActor, resouceDefs, this._filePath);
+                    const idByIndexLookup = LookupTransformer.buildIdByIndexLookup(this._currentActor, resouceDefs, this._filePath, this._activeDeclarationScope);
                     runtimeMethods.push(idByIndexLookup);
-                    const indexByIdLookup = LookupTransformer.buildIndexByIdLookup(this._currentActor, resouceDefs, this._filePath);
+                    const indexByIdLookup = LookupTransformer.buildIndexByIdLookup(this._currentActor, resouceDefs, this._filePath, this._activeDeclarationScope);
                     runtimeMethods.push(indexByIdLookup);
                     const numGraphics = LookupTransformer.buildGetNumGraphics(this._currentActor, resouceDefs, this._filePath);
                     runtimeMethods.push(numGraphics);
-                    const imageHeight = LookupTransformer.buildGetImageHeightLookup(this._currentActor, resouceDefs, this._filePath);
+                    const imageHeight = LookupTransformer.buildGetImageHeightLookup(this._currentActor, resouceDefs, this._filePath, this._activeDeclarationScope);
                     runtimeMethods.push(imageHeight);
-                    const imageWidth = LookupTransformer.buildGetImageWidthLookup(this._currentActor, resouceDefs, this._filePath);
+                    const imageWidth = LookupTransformer.buildGetImageWidthLookup(this._currentActor, resouceDefs, this._filePath, this._activeDeclarationScope);
                     runtimeMethods.push(imageWidth);
                 }
                 // Variable declarations and initializations
