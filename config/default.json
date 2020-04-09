@@ -18,7 +18,7 @@
     },
 
     "GraphAnalysis": {
-        "mergeIntoOperator": "NoMergeIntoOperator",
+        "mergeIntoOperator": "StandardMergeIntoOperator",
         "stopOperator": "CheckCoverage"
     }
 
