@@ -170,6 +170,9 @@ export class Z3BooleanTheory extends Z3Theory implements BooleanTheory<Z3Boolean
     }
 
     or(op1: Z3BooleanFormula, op2: Z3BooleanFormula): Z3BooleanFormula {
+        // console.log("OP1", this._ctx.ast_to_string(op1.getAST()));
+        // console.log("OP2", this._ctx.ast_to_string(op2.getAST()));
+
         const typedArray = new Int32Array([op1.getAST().val(), op2.getAST().val()]);
         const arrayOnHeap = this.arrayToHeap(typedArray);
         try {
@@ -789,6 +792,10 @@ export class Z3FirstOrderLattice extends SMTFirstOrderLattice<Z3FirstOrderFormul
 
     constructor(theory: BooleanTheory<Z3FirstOrderFormula>, prover: Z3ProverEnvironment) {
         super(theory, prover);
+    }
+
+    join(element1: Z3FirstOrderFormula, element2: Z3FirstOrderFormula): Z3FirstOrderFormula {
+        return super.join(element1, element2);
     }
 
 }

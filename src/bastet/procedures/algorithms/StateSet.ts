@@ -65,6 +65,8 @@ export interface StateSet<E extends AbstractElement> {
     addAll(elements: Iterable<E>);
 
     getSize(): number;
+
+    has(element: E): boolean
 }
 
 export interface ReachedSet<E extends AbstractElement> extends StateSet<E> {
@@ -192,6 +194,10 @@ export class PartitionedOrderedSet<E extends AbstractElement> {
         this._size++;
     }
 
+    public has(element: E): boolean {
+        return this._elements.has(element);
+    }
+
     public isEmpty(): boolean {
         return this._size == 0;
     }
@@ -203,6 +209,7 @@ export class PartitionedOrderedSet<E extends AbstractElement> {
     public [Symbol.iterator](): IterableIterator<E> {
         return this._elements[Symbol.iterator]();
     }
+
 }
 
 export class DefaultFrontierSet<E extends AbstractElement> implements FrontierSet<E> {
@@ -225,6 +232,10 @@ export class DefaultFrontierSet<E extends AbstractElement> implements FrontierSe
         for (const e of elements) {
             this.add(e);
         }
+    }
+
+    has(element: E): boolean {
+        return this._elements.has(element);
     }
 
     getSize(): number {
@@ -288,6 +299,10 @@ export class DefaultAnalysisStateSet<E extends AbstractElement> extends Abstract
 
     public getRootStates(): Set<E> {
         return this._root;
+    }
+
+    public has(element: E) {
+        return this._states.has(element);
     }
 
     public add(element: E) {
