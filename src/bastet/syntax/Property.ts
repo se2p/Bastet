@@ -101,7 +101,7 @@ export class Properties {
         }
 
         if (result.isEmpty()) {
-            result = result.add(new Property("Violating program location reachable!"));
+            result = result.add(new Property("Violating program location must NOT be reachable!"));
         }
 
         return result;
