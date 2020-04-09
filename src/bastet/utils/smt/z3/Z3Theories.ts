@@ -509,6 +509,8 @@ export class Z3IntegerTheory extends Z3AbstractNumberTheory<Z3IntegerFormula>
     castFrom(from: AbstractNumber): Z3IntegerFormula {
         if (from instanceof Z3RealFormula) {
             return new Z3IntegerFormula(this._ctx.mk_real2int(from.getAST()));
+        } else if (from instanceof Z3FloatFormula) {
+            return new Z3IntegerFormula(this._ctx.mk_real2int(this._ctx.mk_fpa_to_real(from.getAST())));
         }
 
         throw new ImplementMeForException(from.constructor.name);
