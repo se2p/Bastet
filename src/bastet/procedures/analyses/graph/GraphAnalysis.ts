@@ -21,7 +21,7 @@
 
 import {
     MergeIntoOperator,
-    ProgramAnalysis,
+    ProgramAnalysis, StopOperator,
     TransitionLabelProvider,
     WrappingProgramAnalysis
 } from "../ProgramAnalysis";
@@ -49,11 +49,12 @@ import {Property} from "../../../syntax/Property";
 import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {NoMergeIntoOperator, StandardMergeIntoOperator} from "../Operators";
+import {NoMergeIntoOperator, NoStopOperator, StandardMergeIntoOperator} from "../Operators";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable"
 import {GraphContextToDot} from "./GraphContextToDot";
+import {GraphCoverCheckStopOperator} from "./GraphCoverCheckStopOperator";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 
@@ -63,6 +64,10 @@ export class GraphAnalysisConfig extends BastetConfiguration {
 
     get mergeIntoOperator(): string {
         return this.getStringProperty('mergeIntoOperator', 'NoMergeIntoOperator');
+    }
+
+    get stopOperator(): string {
+        return this.getStringProperty('stopOperator', 'CheckCoverage');
     }
 
 }
@@ -85,6 +90,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
 
     private readonly _mergeIntoOp: MergeIntoOperator<GraphAbstractState, GraphAbstractState>;
 
+    private readonly _stopOp: StopOperator<GraphAbstractState, GraphAbstractState>;
+
     private readonly _config: GraphAnalysisConfig;
 
     constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysis<any, any, any>, statistics: AnalysisStatistics) {
@@ -99,12 +106,18 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
 
         if (this._config.mergeIntoOperator == 'NoMergeIntoOperator') {
             this._mergeIntoOp = new NoMergeIntoOperator<GraphAbstractState, GraphAbstractState>();
-
         } else if (this._config.mergeIntoOperator == 'StandardMergeIntoOperator') {
             this._mergeIntoOp = new StandardMergeIntoOperator(this, this, this);
-
         } else {
-            throw new IllegalArgumentException("Illegal configuration value");
+            throw new IllegalArgumentException("Illegal merge operator configuration");
+        }
+
+        if (this._config.stopOperator == 'CheckCoverage') {
+            this._stopOp = new GraphCoverCheckStopOperator(this.wrappedAnalysis, (e) => {return this.unwrap(e)});
+        } else if (this._config.stopOperator == 'NoStop') {
+            this._stopOp = new NoStopOperator();
+        } else {
+            throw new IllegalArgumentException("Illegal stop operator configuration");
         }
     }
 
@@ -133,12 +146,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     stop(state: GraphAbstractState, reached: Iterable<GraphAbstractState>, unwrapper: (GraphAbstractState) => GraphAbstractState): boolean {
-        for (const r of reached) {
-            if (r.getMergeOf().contains(state.getId())) {
-                return true;
-            }
-        }
-        return this._wrappedAnalysis.stop(state.getWrappedState(), reached, (e) => this.unwrap(unwrapper(e)));
+        return this._stopOp.stop(state, reached, unwrapper);
     }
 
     target(state: GraphAbstractState): Property[] {

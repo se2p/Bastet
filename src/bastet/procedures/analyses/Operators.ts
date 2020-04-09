@@ -20,7 +20,7 @@
  *
  */
 
-import {JoinOperator, MergeIntoOperator, MergeOperator, PartitionOperator} from "./ProgramAnalysis";
+import {JoinOperator, MergeIntoOperator, MergeOperator, PartitionOperator, StopOperator} from "./ProgramAnalysis";
 import {FrontierSet, ReachedSet, StateSet} from "../algorithms/StateSet";
 import {AbstractElement, AbstractState} from "../../lattices/Lattice";
 import {Preconditions} from "../../utils/Preconditions";
@@ -28,6 +28,14 @@ import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentExc
 import {Unwrapper, Wrapper} from "./Refiner";
 import {AbstractDomain} from "../domains/AbstractDomain";
 import {ConcreteElement} from "../domains/ConcreteElements";
+
+export class NoStopOperator<E extends AbstractElement, F extends AbstractState> implements StopOperator<E, F> {
+
+    stop(state: E, reached: Iterable<F>, unwrapper: (F) => E): boolean {
+        return false;
+    }
+
+}
 
 export class NoMergeIntoOperator<E extends AbstractState, F extends AbstractState> implements MergeIntoOperator<E, F> {
 
