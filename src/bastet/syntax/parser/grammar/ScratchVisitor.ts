@@ -69,8 +69,10 @@ import { StringAsBoolExpressionContext } from "./ScratchParser";
 import { NegatedBoolExpressionContext } from "./ScratchParser";
 import { BoolAndExpressionContext } from "./ScratchParser";
 import { BoolOrExpressionContext } from "./ScratchParser";
+import { GreaterEqualExpressionContext } from "./ScratchParser";
 import { GreaterThanExpressionContext } from "./ScratchParser";
 import { LessThanExpressionContext } from "./ScratchParser";
+import { LessEqualExpressionContext } from "./ScratchParser";
 import { EqualsExpressionContext } from "./ScratchParser";
 import { StrContainsExpressionContext } from "./ScratchParser";
 import { DefaultBoolExpressionContext } from "./ScratchParser";
@@ -739,6 +741,14 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitBoolOrExpression?: (ctx: BoolOrExpressionContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by the `GreaterEqualExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitGreaterEqualExpression?: (ctx: GreaterEqualExpressionContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by the `GreaterThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
@@ -753,6 +763,14 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitLessThanExpression?: (ctx: LessThanExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `LessEqualExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitLessEqualExpression?: (ctx: LessEqualExpressionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `EqualsExpression`

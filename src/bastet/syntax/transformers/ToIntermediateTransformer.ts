@@ -172,7 +172,7 @@ import {
     DecimalLiteralExpressionContext,
     IntegerLiteralExpressionContext,
     PrimitiveContext,
-    FloatingPointTypeContext
+    FloatingPointTypeContext, GreaterEqualExpressionContext
 } from "../parser/grammar/ScratchParser";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {Identifier} from "../ast/core/Identifier";
@@ -262,8 +262,8 @@ import {
     BooleanLiteral,
     BooleanVariableExpression,
     NegationExpression,
-    NumEqualsExpression,
-    NumGreaterThanExpression,
+    NumEqualsExpression, NumGreaterEqualExpression,
+    NumGreaterThanExpression, NumLessEqualExpression,
     NumLessThanExpression,
     StrContainsExpression,
     StrEqualsExpression,
@@ -1133,6 +1133,45 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                     tr1.node as StringExpression,
                     tr2.node as StringExpression));
 
+        } else {
+            throw new ImplementMeException();
+        }
+    }
+
+    public visitGreaterEqualExpression(ctx: GreaterEqualExpressionContext) : TransformerResult {
+        const tr1 = this.parseOperand1(ctx);
+        const tr2 = this.parseOperand2(ctx);
+        this.assertEqualOperandTypes(ctx, tr1, tr2);
+
+        if (ScratchType.isNumericType((tr1.node as Expression).expressionType)) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new NumGreaterEqualExpression(
+                    tr1.node as NumberExpression,
+                    tr2.node as NumberExpression));
+
+        } else if ((tr1.node as Expression).expressionType == StringType.instance()) {
+            throw new ImplementMeException()
+
+        } else {
+            throw new ImplementMeException();
+        }
+    }
+
+    public visitLessEqualExpression(ctx: LessThanExpressionContext) : TransformerResult {
+        const tr1 = this.parseOperand1(ctx);
+        const tr2 = this.parseOperand2(ctx);
+        this.assertEqualOperandTypes(ctx, tr1, tr2);
+
+        if (ScratchType.isNumericType((tr1.node as Expression).expressionType)) {
+            return new TransformerResult(
+                StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
+                new NumLessEqualExpression(
+                    tr1.node as NumberExpression,
+                    tr2.node as NumberExpression));
+
+        } else if ((tr1.node as Expression).expressionType == StringType.instance()) {
+            throw new ImplementMeException()
         } else {
             throw new ImplementMeException();
         }

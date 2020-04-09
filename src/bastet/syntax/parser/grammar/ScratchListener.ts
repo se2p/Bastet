@@ -69,8 +69,10 @@ import { StringAsBoolExpressionContext } from "./ScratchParser";
 import { NegatedBoolExpressionContext } from "./ScratchParser";
 import { BoolAndExpressionContext } from "./ScratchParser";
 import { BoolOrExpressionContext } from "./ScratchParser";
+import { GreaterEqualExpressionContext } from "./ScratchParser";
 import { GreaterThanExpressionContext } from "./ScratchParser";
 import { LessThanExpressionContext } from "./ScratchParser";
+import { LessEqualExpressionContext } from "./ScratchParser";
 import { EqualsExpressionContext } from "./ScratchParser";
 import { StrContainsExpressionContext } from "./ScratchParser";
 import { DefaultBoolExpressionContext } from "./ScratchParser";
@@ -1066,6 +1068,19 @@ export interface ScratchListener extends ParseTreeListener {
 	exitBoolOrExpression?: (ctx: BoolOrExpressionContext) => void;
 
 	/**
+	 * Enter a parse tree produced by the `GreaterEqualExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterGreaterEqualExpression?: (ctx: GreaterEqualExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `GreaterEqualExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitGreaterEqualExpression?: (ctx: GreaterEqualExpressionContext) => void;
+
+	/**
 	 * Enter a parse tree produced by the `GreaterThanExpression`
 	 * labeled alternative in `ScratchParser.coreBoolExpr`.
 	 * @param ctx the parse tree
@@ -1090,6 +1105,19 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitLessThanExpression?: (ctx: LessThanExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `LessEqualExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterLessEqualExpression?: (ctx: LessEqualExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `LessEqualExpression`
+	 * labeled alternative in `ScratchParser.coreBoolExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitLessEqualExpression?: (ctx: LessEqualExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `EqualsExpression`

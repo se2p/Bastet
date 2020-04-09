@@ -304,8 +304,10 @@ coreBoolExpr  :
  |  coreBoolExpr  'and'  coreBoolExpr # BoolAndExpression
  |  coreBoolExpr  'or'  coreBoolExpr # BoolOrExpression
 
+ |  numOrStringExpr  '>='  numOrStringExpr # GreaterEqualExpression
  |  numOrStringExpr  '>'  numOrStringExpr # GreaterThanExpression
  |  numOrStringExpr  '<'  numOrStringExpr # LessThanExpression
+ |  numOrStringExpr  '<='  numOrStringExpr # LessEqualExpression
  |  numOrStringExpr  '='  numOrStringExpr # EqualsExpression
 
  |  stringExpr  'contains'  stringExpr # StrContainsExpression
