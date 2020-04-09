@@ -22,8 +22,8 @@
 import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-test("Test Atan 1 safe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-1_SAFE.sc"
+test("Test touchingObject 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObject-1_SAFE.sc"
     let bastet = new Bastet();
     try {
         utils.execute(bastet, fixtureRelPath, done)
@@ -32,8 +32,8 @@ test("Test Atan 1 safe", done => {
     }
 }, utils.timeout);
 
-test("Test Atan 2 safe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-2_SAFE.sc"
+test("Test touchingObject 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObject-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
         utils.execute(bastet, fixtureRelPath, done)
@@ -42,8 +42,8 @@ test("Test Atan 2 safe", done => {
     }
 }, utils.timeout);
 
-test("Test Atan 1 unsafe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-1_UNSAFE.sc"
+test("Test touchingObjects 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObjects-1_SAFE.sc"
     let bastet = new Bastet();
     try {
         utils.execute(bastet, fixtureRelPath, done)
@@ -52,8 +52,8 @@ test("Test Atan 1 unsafe", done => {
     }
 }, utils.timeout);
 
-test("Test Atan 2 unsafe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-2_UNSAFE.sc"
+test("Test touchingObjects 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObjects-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
         utils.execute(bastet, fixtureRelPath, done)
@@ -61,5 +61,3 @@ test("Test Atan 2 unsafe", done => {
         done(error)
     }
 }, utils.timeout);
-
-
