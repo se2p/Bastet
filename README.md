@@ -64,6 +64,9 @@ BASTET can also be executed from within a Docker container:
 where `bastet:9a9e226` is the identifier of the Docker image 
 that was loaded to Docker.
 
+See the files [docker-build.sh](./docker-build.sh) and
+[docker-load-run.sh](./docker-load-run.sh) for more details.
+
 ## Publications and Citing
 
 The foundations for this work were developed in our FSE'19 paper on "Testing
