@@ -19,32 +19,27 @@
  *
  */
 
-import {
-    ProgramAnalysis,
-    ProgramAnalysisWithLabelProducer,
-    ProgramAnalysisWithLabels,
-    WrappingProgramAnalysis
-} from "../ProgramAnalysis";
+import {ProgramAnalysisWithLabelProducer, ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
 import {
     ControlAbstractDomain,
     ControlAbstractState,
-    ControlConcreteState, MethodCall,
+    ControlConcreteState,
+    MethodCall,
     ScheduleAbstractStateFactory
 } from "./ControlAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {ControlTransferRelation} from "./ControlTransferRelation";
-import {LabeledTransferRelationImpl} from "../TransferRelation";
 import {Preconditions} from "../../../utils/Preconditions";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+import {List as ImmList, Set as ImmSet} from "immutable";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 

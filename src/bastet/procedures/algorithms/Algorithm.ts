@@ -20,9 +20,9 @@
  *
  */
 
-import {FrontierSet, ReachedSet, StateSet} from "./StateSet";
+import {FrontierSet, ReachedSet} from "./StateSet";
 import {ConcreteElement} from "../domains/ConcreteElements";
-import {AbstractElement, AbstractState} from "../../lattices/Lattice";
+import {AbstractState} from "../../lattices/Lattice";
 
 export interface AnalysisAlgorithm<C extends ConcreteElement, F extends AbstractState> {
 

@@ -21,7 +21,7 @@
  */
 
 import {GraphAbstractState} from "./GraphAbstractDomain";
-import {Record as ImmRec, Set as ImmSet, List as ImmList} from "immutable"
+import {List as ImmList, Set as ImmSet} from "immutable"
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
 import {Preconditions} from "../../../utils/Preconditions";

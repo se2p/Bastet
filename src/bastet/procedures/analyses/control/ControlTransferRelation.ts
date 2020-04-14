@@ -26,7 +26,8 @@ import {
     IndexedThread,
     MethodCall,
     RelationLocation,
-    ThreadComputationState, ThreadId,
+    ThreadComputationState,
+    ThreadId,
     ThreadState,
     ThreadStateFactory
 } from "./ControlAbstractDomain";
@@ -103,7 +104,7 @@ import {GLOBAL_TIME_MICROS_VAR} from "../time/TimeTransferRelation";
 import {
     IntegerLiteral,
     MultiplyExpression,
-    NumberExpression, NumberLiteral,
+    NumberExpression,
     NumberVariableExpression,
     PlusExpression
 } from "../../../syntax/ast/core/expressions/NumberExpression";

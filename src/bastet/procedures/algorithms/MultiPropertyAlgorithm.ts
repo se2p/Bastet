@@ -21,7 +21,7 @@
  */
 
 
-import {AbstractElement, AbstractState} from "../../lattices/Lattice";
+import {AbstractState} from "../../lattices/Lattice";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {Property} from "../../syntax/Property";
 import {App} from "../../syntax/app/App";
@@ -29,7 +29,7 @@ import {Set as ImmSet} from "immutable";
 import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 import {AnalysisAlgorithm} from "./Algorithm";
 import {Preconditions} from "../../utils/Preconditions";
-import {FrontierSet, ReachedSet, StateSet} from "./StateSet";
+import {FrontierSet, ReachedSet} from "./StateSet";
 import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
 import {BastetConfiguration} from "../../utils/BastetConfiguration";
 

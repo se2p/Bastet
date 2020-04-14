@@ -21,20 +21,11 @@
  */
 
 
-import {
-    DefaultAnalysisStateSet,
-    StateSet,
-    StatePartitionOperator,
-    DefaultFrontierSet,
-    FrontierSet
-} from "../../algorithms/StateSet";
+import {DefaultAnalysisStateSet, FrontierSet, StatePartitionOperator} from "../../algorithms/StateSet";
 import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {GraphPath, GraphPathSet} from "./GraphPath";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {GraphContextToDot} from "./GraphContextToDot";
-import {GraphAnalysis} from "./GraphAnalysis";
-import {App} from "../../../syntax/app/App";
 
 export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState> {
 

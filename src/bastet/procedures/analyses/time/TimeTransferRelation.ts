@@ -37,10 +37,10 @@ import {Statement} from "../../../syntax/ast/core/statements/Statement";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
 import {
-    DivideExpression, IntegerLiteral,
+    DivideExpression,
+    IntegerLiteral,
     MinusExpression,
     NumberExpression,
-    NumberLiteral,
     NumberVariableExpression,
     PlusExpression
 } from "../../../syntax/ast/core/expressions/NumberExpression";

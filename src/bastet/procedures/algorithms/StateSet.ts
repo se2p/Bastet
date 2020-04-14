@@ -19,9 +19,9 @@
  *
  */
 
-import {AbstractElement, AbstractState} from "../../lattices/Lattice";
+import {AbstractElement} from "../../lattices/Lattice";
 import {Preconditions} from "../../utils/Preconditions";
-import {List as ImmList, Record as ImmRec, Set as ImmSet, Map as ImmMap} from "immutable";
+import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {getTheOnlyElement} from "../../utils/Collections";
 
 export interface PartitionKeyAttribs extends AbstractElement {

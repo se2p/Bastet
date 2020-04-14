@@ -24,11 +24,13 @@ import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {DataTransformerVisitor} from "./DataTransformerVisitor";
-import {AbstractTheories, TransformerTheories} from "../../domains/MemoryTransformer";
+import {TransformerTheories} from "../../domains/MemoryTransformer";
 import {Preconditions} from "../../../utils/Preconditions";
 import {
     BooleanFormula,
-    FirstOrderFormula, FloatFormula, IntegerFormula,
+    FirstOrderFormula,
+    FloatFormula,
+    IntegerFormula,
     ListFormula,
     RealFormula,
     StringFormula
@@ -36,7 +38,6 @@ import {
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {Concern} from "../../../syntax/Concern";
-import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 
 export class DataTransferRelation implements LabeledTransferRelation<DataAbstractState> {
 

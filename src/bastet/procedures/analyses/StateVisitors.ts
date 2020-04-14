@@ -21,15 +21,12 @@
  */
 
 
-
 import {AbstractStateVisitor} from "./AbstractStates";
 import {AbstractElement} from "../../lattices/Lattice";
 import {ControlAbstractState, ThreadState} from "./control/ControlAbstractDomain";
 import {DataAbstractState} from "./data/DataAbstractDomain";
 import {GraphAbstractState} from "./graph/GraphAbstractDomain";
 import {SSAState} from "./ssa/SSAAbstractDomain";
-import {Actor} from "../../syntax/app/Actor";
-import {Script} from "../../syntax/app/controlflow/Script";
 import {App} from "../../syntax/app/App";
 import {Preconditions} from "../../utils/Preconditions";
 import {CorePrintVisitor} from "../../syntax/ast/CorePrintVisitor";

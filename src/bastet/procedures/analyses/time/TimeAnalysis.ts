@@ -25,7 +25,7 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper} from "../Refiner";
@@ -35,7 +35,7 @@ import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferR
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+import {Set as ImmSet} from "immutable";
 
 
 export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>

@@ -22,8 +22,7 @@
 
 import {ProgramAnalysis} from "./ProgramAnalysis";
 import {StateSet} from "../algorithms/StateSet";
-import {AbstractElement, AbstractState} from "../../lattices/Lattice";
-import {ConcreteElement} from "../domains/ConcreteElements";
+import {AbstractElement} from "../../lattices/Lattice";
 
 export type ExportFunction = (reachedPrime: StateSet<AbstractElement>, frontierPrime: StateSet<AbstractElement>) => void;
 

@@ -25,7 +25,6 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {Map as ImmMap, Record as ImmRec} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
 import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
-import {ScratchTypeID} from "../../../syntax/ast/core/ScratchType";
 import {Preconditions} from "../../../utils/Preconditions";
 
 
