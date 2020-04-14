@@ -28,10 +28,11 @@ import {
     ActorDefinitionListContext,
     ActorModeContext,
     ActorRoleModeContext,
+    ActorTypeContext,
+    ActorVariableExpressionContext,
     AddElementToStatementContext,
     AfterBootstrapMonitoringEventContext,
     AfterStatementMonitoringEventContext,
-    UserMessageContext,
     AssumeStatementContext,
     AtomicMethodContext,
     BoolAndExpressionContext,
@@ -41,6 +42,7 @@ import {
     BoolLiteralExpressionContext,
     BoolOrExpressionContext,
     BoolParanthExpressionContext,
+    BoolToIntExpressionContext,
     BoolVariableExpressionContext,
     BootstapEventContext,
     BroadcastAndWaitStatementContext,
@@ -52,6 +54,7 @@ import {
     CoreBoolExprContext,
     CoreStringExprContext,
     CreateCloneOfStatementContext,
+    DecimalLiteralExpressionContext,
     DeclarationStmtListContext,
     DeclareVariableContext,
     DefaultBoolExpressionContext,
@@ -60,6 +63,8 @@ import {
     DeleteAllFromStatementContext,
     DeleteIthFromStatementContext,
     DeleteThisCloneContext,
+    ElseIfCaseContext,
+    EmptyElseCaseContext,
     EnumTypeContext,
     EpsilonStatementContext,
     EqualsExpressionContext,
@@ -71,7 +76,11 @@ import {
     ExternMethodDefinitionListContext,
     ExternMethodResultDeclarationContext,
     ExternVoidReturnDefinitionContext,
+    FlatVariableContext,
+    FloatingPointTypeContext,
+    FullMethodDefinitionContext,
     FunctionReturnDefinitionContext,
+    GreaterEqualExpressionContext,
     GreaterThanExpressionContext,
     IdentContext,
     IdentExpressionContext,
@@ -83,6 +92,8 @@ import {
     IndexOfExpressionContext,
     InheritsFromContext,
     InsertAtStatementContext,
+    IntegerLiteralExpressionContext,
+    IntegerTypeContext,
     IthLetterOfStringExpressionContext,
     IthStringItemOfExpressionContext,
     JoinStringsExpressionContext,
@@ -92,11 +103,13 @@ import {
     ListTypeContext,
     ListVariableExpressionContext,
     ListWithElementsExpressionContext,
+    LocateActorExpressionContext,
     MessageReceivedEventContext,
     MethodDefinitionContext,
     MethodDefinitionListContext,
     NegatedBoolExpressionContext,
     NeverEventContext,
+    NumAsBoolExpressionContext,
     NumAsStringExpressionContext,
     NumberContext,
     NumBracketsContext,
@@ -107,11 +120,15 @@ import {
     NumModExpressionContext,
     NumMulExpressionContext,
     NumPlusExpressionContext,
+    NumToFloatExpressionContext,
+    NumToIntExpressionContext,
     NumVariableExpressionContext,
     ParameterContext,
     ParameterListContext,
     ParameterListPlainContext,
+    PrimitiveContext,
     ProgramContext,
+    PureElseContext,
     QualifiedVariableContext,
     RenderedMonitoringEventContext,
     RepeatForeverStmtContext,
@@ -141,6 +158,8 @@ import {
     StringCallStatementExpressionContext,
     StringLiteralExpressionContext,
     StringParanthExpressionContext,
+    StringToFloatExpressionContext,
+    StringToIntExpressionContext,
     StringTypeContext,
     StringVariableExpressionContext,
     SystemMessageContext,
@@ -150,29 +169,11 @@ import {
     UnspecifiedNumExprContext,
     UnspecifiedStringExpressionContext,
     UntilStmtContext,
+    UserMessageContext,
     VariableContext,
     VoidReturnDefinitionContext,
     WaitSecsStatementContext,
-    WaitUntilStatementContext,
-    LocateActorExpressionContext,
-    ActorVariableExpressionContext,
-    ActorTypeContext,
-    EmptyElseCaseContext,
-    PureElseContext,
-    ElseIfCaseContext,
-    FullMethodDefinitionContext,
-    FlatVariableContext,
-    NumAsBoolExpressionContext,
-    IntegerTypeContext,
-    StringToIntExpressionContext,
-    StringToFloatExpressionContext,
-    NumToFloatExpressionContext,
-    NumToIntExpressionContext,
-    BoolToIntExpressionContext,
-    DecimalLiteralExpressionContext,
-    IntegerLiteralExpressionContext,
-    PrimitiveContext,
-    FloatingPointTypeContext, GreaterEqualExpressionContext
+    WaitUntilStatementContext
 } from "../parser/grammar/ScratchParser";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {Identifier} from "../ast/core/Identifier";
@@ -193,11 +194,9 @@ import {
 } from "../ast/core/ActorDefinition";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {
-    BoolAsStringExpression,
     IthLetterOfStringExpression,
     IthStringItemOfExpression,
     JoinStringsExpression,
-    NumAsStringExpression,
     StringAttributeOfExpression,
     StringExpression,
     StringLiteral,
@@ -231,7 +230,9 @@ import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {ParameterDeclaration, ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {
     ActorType,
-    BooleanType, FloatType, IntegerType,
+    BooleanType,
+    FloatType,
+    IntegerType,
     ListType,
     ScratchType,
     StringEnumType,
@@ -262,8 +263,10 @@ import {
     BooleanLiteral,
     BooleanVariableExpression,
     NegationExpression,
-    NumEqualsExpression, NumGreaterEqualExpression,
-    NumGreaterThanExpression, NumLessEqualExpression,
+    NumEqualsExpression,
+    NumGreaterEqualExpression,
+    NumGreaterThanExpression,
+    NumLessEqualExpression,
     NumLessThanExpression,
     StrContainsExpression,
     StrEqualsExpression,
@@ -271,15 +274,16 @@ import {
     StrLessThanExpression
 } from "../ast/core/expressions/BooleanExpression";
 import {
-    DivideExpression, FloatLiteral,
-    IndexOfExpression, IntegerLiteral,
+    DivideExpression,
+    FloatLiteral,
+    IndexOfExpression,
+    IntegerLiteral,
     LengthOfListExpression,
     LengthOfStringExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
     NumberExpression,
-    NumberLiteral,
     NumberVariableExpression,
     PlusExpression
 } from "../ast/core/expressions/NumberExpression";
@@ -308,20 +312,17 @@ import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {App} from "../app/App";
 import {VariableWithDataLocation} from "../ast/core/Variable";
-import {DataLocation, DataLocations} from "../app/controlflow/DataLocation";
+import {DataLocations} from "../app/controlflow/DataLocation";
 import {AssumeStatement} from "../ast/core/statements/AssumeStatement";
 import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
 import {BastetConfiguration} from "../../utils/BastetConfiguration";
 import {ParsingException} from "../../core/exceptions/ParsingException";
 import {ParserRuleContext} from "antlr4ts";
 import {CastExpression} from "../ast/core/expressions/CastExpression";
-import {ActorExpression, ActorVariableExpression, LocateActorExpression} from "../ast/core/expressions/ActorExpression";
-import {TransitionRelation} from "../app/controlflow/TransitionRelation";
+import {ActorExpression, LocateActorExpression} from "../ast/core/expressions/ActorExpression";
 import {ScopeTypeInformation, TypeInformationStorage} from "../DeclarationScopes";
-import instantiate = WebAssembly.instantiate;
 import {LookupTransformer} from "./LookupTransformer";
 import {SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
-import {Literal} from "../../utils/ConjunctiveNormalForm";
 
 const toposort = require('toposort');
 

@@ -52,6 +52,18 @@ We recommend to use the `bastet.sh` wrapper script (can be started from an Unix 
     --intermediateLibrary src/public/library.sc
 ```
 
+BASTET can also be executed from within a Docker container:
+
+```
+  docker run \
+    --mount type=bind,source=${INPUT_DIR},target=/input \
+    --mount type=bind,source=${OUTPUT_DIR},target=/output \
+    bastet:9a9e226 \
+    /bin/bash ./scripts/bastet.sh
+```
+where `bastet:9a9e226` is the identifier of the Docker image 
+that was loaded to Docker.
+
 ## Publications and Citing
 
 The foundations for this work were developed in our FSE'19 paper on "Testing

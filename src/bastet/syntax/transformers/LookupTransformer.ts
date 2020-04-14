@@ -25,7 +25,7 @@ import {TransformerResult} from "./ToIntermediateTransformer";
 import {Identifier} from "../ast/core/Identifier";
 import {ParameterDeclaration, ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
 import {IntegerType, StringType} from "../ast/core/ScratchType";
-import {Statement, StatementList} from "../ast/core/statements/Statement";
+import {StatementList} from "../ast/core/statements/Statement";
 import {IfStatement} from "../ast/core/statements/ControlStatement";
 import {NumEqualsExpression, StrEqualsExpression} from "../ast/core/expressions/BooleanExpression";
 import {VariableWithDataLocation} from "../ast/core/Variable";
@@ -35,7 +35,7 @@ import {StoreEvalResultToVariableStatement} from "../ast/core/statements/SetStat
 import * as fs from "fs";
 import {ResourceDefinition} from "../ast/core/ResourceDefinition";
 import * as path from "path";
-import {IntegerLiteral, NumberLiteral} from "../ast/core/expressions/NumberExpression";
+import {IntegerLiteral} from "../ast/core/expressions/NumberExpression";
 import {DeclareStackVariableStatement} from "../ast/core/statements/DeclarationStatement";
 import {imageSize} from "image-size";
 import {ScopeTypeInformation} from "../DeclarationScopes";

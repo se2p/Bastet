@@ -20,7 +20,6 @@
  */
 
 import {Record as ImmRec} from "immutable";
-import {DataAbstractState} from "../procedures/analyses/data/DataAbstractDomain";
 
 export interface AbstractElement extends ImmRec<any> {
 

@@ -71,12 +71,14 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
         return super.add(element);
     }
 
-    private removeChildren(element: E) {
-        Preconditions.checkNotUndefined(element);
+    private removeChildrenOf(parent: E) {
+        // ATTENTION: The graph does NOT have cycles!
+        Preconditions.checkNotUndefined(parent);
+        // TODO: Rewrite to a non-recursive algorithm (rewrite to a worklist alg)
 
         // Set the list of children to the empty list before recurring. Avoids an infinite loop.
-        const toRemove: GraphStateId[] = this._children.get(element.getId()) || [];
-        this._children.set(element.getId(), []);
+        const toRemove: GraphStateId[] = this._children.get(parent.getId()) || [];
+        this._children.set(parent.getId(), []);
 
         // Remove the children recursively
         for (const childId of toRemove) {
@@ -84,8 +86,24 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
             Preconditions.checkNotUndefined(childState);
             this.remove(childState);
 
-            // Also remove the child from the set of frontier states
-            this._frontierSet.remove(childState);
+            // GOAL: Never loose frontier states to ensure that we
+            //  cover the full state space!
+            //
+            // Re-add all parents of the child
+            // to the set of frontier states if they are not
+            // equal to the state `parent` (from which the childs
+            // must be deleted) if the child is in the set of frontier states
+            if (this._frontierSet.has(childState)) {
+                for (const childParentId of childState.getPredecessors()) {
+                    const childParent = this._idToStateMap.get(childParentId);
+                    if (childParent != parent) {
+                        this._frontierSet.add(childParent);
+                    }
+                }
+
+                // Remove the child from the set of frontier states
+                this._frontierSet.remove(childState);
+            }
         }
     }
 
@@ -101,7 +119,7 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
 
     public remove(element: E): any {
         // Remove all children
-        this.removeChildren(element);
+        this.removeChildrenOf(element);
 
         // Remove child from parent
         for (const parent of element.getPredecessors()) {

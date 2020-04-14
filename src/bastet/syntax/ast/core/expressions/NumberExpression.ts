@@ -21,9 +21,9 @@
 
 import {Expression} from "./Expression";
 import {AbstractExpression} from "./AbstractExpression";
-import {ensureEqualExpressionTypes, ensureEqualTypes, FloatType, IntegerType, ScratchType} from "../ScratchType";
+import {ensureEqualExpressionTypes, FloatType, IntegerType} from "../ScratchType";
 import {AstNode} from "../../AstNode";
-import {StringExpression, StringLiteral} from "./StringExpression";
+import {StringExpression} from "./StringExpression";
 import {BinaryExpression} from "./BinaryExpression";
 import {VariableExpression, VariableWithDataLocation} from "../Variable";
 

@@ -22,7 +22,7 @@
 import {Statement} from "./Statement";
 import {NumberExpression} from "../expressions/NumberExpression";
 import {StringExpression} from "../expressions/StringExpression";
-import {Variable, VariableWithDataLocation} from "../Variable";
+import {VariableWithDataLocation} from "../Variable";
 
 export interface ListStatement {
 

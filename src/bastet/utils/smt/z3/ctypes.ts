@@ -1,4 +1,3 @@
-import {assert} from "./util"
 import {Preconditions} from "../../Preconditions";
 
 type WasmHeap = DataView;

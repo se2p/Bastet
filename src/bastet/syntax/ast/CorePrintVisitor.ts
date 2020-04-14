@@ -2,8 +2,7 @@ import {
     CoreBoolExpressionVisitor,
     CoreEventVisitor,
     CoreNonCtrlStatementnVisitor,
-    CoreNumberExpressionVisitor,
-    CoreTypeVisitor
+    CoreNumberExpressionVisitor
 } from "./CoreVisitor";
 import {AstNode} from "./AstNode";
 import {
@@ -38,24 +37,23 @@ import {
 import {CastExpression} from "./core/expressions/CastExpression";
 import {VariableWithDataLocation} from "./core/Variable";
 import {
-    DivideExpression, FloatLiteral,
-    IndexOfExpression, IntegerLiteral,
+    DivideExpression,
+    FloatLiteral,
+    IndexOfExpression,
+    IntegerLiteral,
     LengthOfListExpression,
     LengthOfStringExpression,
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
-    NumberLiteral,
     NumberVariableExpression,
     PlusExpression,
     TimerExpression
 } from "./core/expressions/NumberExpression";
 import {
-    BoolAsStringExpression, extractStringLiteral,
     IthLetterOfStringExpression,
     IthStringItemOfExpression,
     JoinStringsExpression,
-    NumAsStringExpression,
     StringAttributeOfExpression,
     StringLiteral,
     StringVariableExpression
@@ -73,7 +71,8 @@ import {
     BeginAtomicStatement,
     EndAtomicStatement,
     IfStatement,
-    RepeatForeverStatement, ReturnStatement,
+    RepeatForeverStatement,
+    ReturnStatement,
     UntilStatement
 } from "./core/statements/ControlStatement";
 import {StatementList} from "./core/statements/Statement";
@@ -97,20 +96,12 @@ import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./c
 import {EpsilonStatement} from "./core/statements/EpsilonStatement";
 import {ExpressionStatement} from "./core/statements/ExpressionStatement";
 import {ResetTimerStatement} from "./core/statements/ResetTimerStatement";
-import {
-    ActorType,
-    BooleanType, FloatType, IntegerType,
-    ListType,
-    ScratchType,
-    StringEnumType,
-    StringType
-} from "./core/ScratchType";
+import {ActorType, BooleanType, FloatType, IntegerType, ListType, StringEnumType, StringType} from "./core/ScratchType";
 import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
 import {SystemMessage, UserMessage} from "./core/Message";
 import {InitializeAnalysisStatement, SignalTargetReachedStatement} from "./core/statements/InternalStatement";
-import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
 
 export class CorePrintVisitor implements CoreEventVisitor<string>,
     CoreBoolExpressionVisitor<string>, CoreNumberExpressionVisitor<string>,

@@ -24,25 +24,27 @@ import {FirstOrderFormula} from "../../ConjunctiveNormalForm";
 import {
     AbstractBoolean,
     AbstractList,
-    AbstractTheories,
     AbstractNumber,
     AbstractString,
+    AbstractTheories,
     BooleanTheory,
+    FloatTheory,
+    IntegerTheory,
     ListTheory,
     NumberTheory,
-    StringTheory, IntegerTheory, RealTheory, FloatTheory
+    RealTheory,
+    StringTheory
 } from "../../../procedures/domains/MemoryTransformer";
 import {Record as ImmRec} from "immutable";
 import {LibZ3InContext, Z3_ast, Z3_sort} from "./libz3";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../../procedures/domains/ConcreteElements";
 import {Preconditions} from "../../Preconditions";
-import {Float, Ptr, Sint32, Uint32} from "./ctypes";
+import {Ptr, Sint32, Uint32} from "./ctypes";
 import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
 import {SMTFirstOrderLattice} from "../../../procedures/domains/FirstOrderDomain";
 import {Z3ProverEnvironment} from "./Z3SMT";
 import {Variable} from "../../../syntax/ast/core/Variable";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;
 
@@ -170,6 +172,9 @@ export class Z3BooleanTheory extends Z3Theory implements BooleanTheory<Z3Boolean
     }
 
     or(op1: Z3BooleanFormula, op2: Z3BooleanFormula): Z3BooleanFormula {
+        // console.log("OP1", this._ctx.ast_to_string(op1.getAST()));
+        // console.log("OP2", this._ctx.ast_to_string(op2.getAST()));
+
         const typedArray = new Int32Array([op1.getAST().val(), op2.getAST().val()]);
         const arrayOnHeap = this.arrayToHeap(typedArray);
         try {
@@ -789,6 +794,10 @@ export class Z3FirstOrderLattice extends SMTFirstOrderLattice<Z3FirstOrderFormul
 
     constructor(theory: BooleanTheory<Z3FirstOrderFormula>, prover: Z3ProverEnvironment) {
         super(theory, prover);
+    }
+
+    join(element1: Z3FirstOrderFormula, element2: Z3FirstOrderFormula): Z3FirstOrderFormula {
+        return super.join(element1, element2);
     }
 
 }
