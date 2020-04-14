@@ -9,4 +9,4 @@ dockerd-rootless-infosun --data-root /local/$USER/docker -- \
 
 # Export the docker image to a tar.bz2 file
 dockerd-rootless-infosun --data-root /local/$USER/docker -- \
-    docker save $TAG > bastet-docker-$BASTET_VERSION.tar
+    docker save $TAG -o bastet-docker-$BASTET_VERSION.tar
