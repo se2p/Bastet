@@ -3,22 +3,44 @@ program Mini1Program
 actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
-        declare num as float
-        declare input as float
+        declare f as float
+        declare foo as float
         declare result as float
         declare range as float
-        declare numi as int
+        declare i as int
 
-        define num as 395.0
-        define input as num
+        define f as 395.0
+        define foo as f
         define range as 360.0
 
-        define num as (num / range)
-        define numi as cast num to int
-        define result as cast numi to float
+        if not f = 395.0 then begin
+            _RUNTIME_signalFailure("Value of f")
+        end
+
+        if not foo = 395.0 then begin
+            _RUNTIME_signalFailure("Value of foo")
+        end
+
+        if not range = 360.0 then begin
+            _RUNTIME_signalFailure("Value of range")
+        end
+
+        define f as (f / range)
+
+        if not (f > 1.0 and f < 1.1) then begin
+            _RUNTIME_signalFailure("Division")
+        end
+
+        define i as cast f to int
+
+        if not i = 1 then begin
+            _RUNTIME_signalFailure("Cast 1")
+        end
+
+        define result as cast i to float
         define result as result * range
 
-        define result as (input - result)
+        define result as (foo - result)
 
         if result = 35.0 then begin
         end else begin
