@@ -106,7 +106,7 @@ coreEvent :
  |  'bootstrap' 'finished' # AfterBootstrapMonitoringEvent
  |  'startup' # StartupEvent
  |  'started' 'as' 'clone' # CloneStartEvent
- |  'received' 'message' stringExpr messageNamespace # MessageReceivedEvent
+ |  'received' 'message' stringExpr messageNamespace parameterList # MessageReceivedEvent
  |  'reached condition' boolExpr # ConditionReachedEvent
  |  'rendered' # RenderedMonitoringEvent
  |  'statement' 'finished' # AfterStatementMonitoringEvent
@@ -397,5 +397,5 @@ Boolean : Bool ;
 resourceLocator : String ;
 
 message : stringExpr # UserMessage
-    | String '/' stringExpr # SystemMessage
+    | String '/' stringExpr expressionList # SystemMessage
     ;

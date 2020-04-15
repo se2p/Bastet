@@ -28,4 +28,13 @@ export class ExpressionList extends AstNodeList<Expression> {
         super(elements);
     }
 
+    private static EMPTY: ExpressionList;
+
+    static empty(): ExpressionList {
+        if (!ExpressionList.EMPTY) {
+            ExpressionList.EMPTY = new ExpressionList([]);
+        }
+        return ExpressionList.EMPTY;
+    }
+
 }

@@ -544,7 +544,7 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     visitSystemMessage(node: SystemMessage): AstNode {
        return new SystemMessage(node.namespace,
            node.messageid.accept(this) as StringExpression,
-           node.payload.accept(this) as OptionalAstNode<Expression>) ;
+           node.payload.accept(this) as ExpressionList) ;
     }
 
     visitBroadcastMessageStatement(node: BroadcastMessageStatement): AstNode {

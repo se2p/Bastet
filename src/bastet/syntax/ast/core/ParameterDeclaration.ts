@@ -49,4 +49,13 @@ export class ParameterDeclarationList extends AstNodeList<ParameterDeclaration> 
     constructor(elements: ParameterDeclaration[]) {
         super(elements);
     }
+
+    private static EMPTY: ParameterDeclarationList;
+
+    public static empty(): ParameterDeclarationList {
+        if (!ParameterDeclarationList.EMPTY) {
+            ParameterDeclarationList.EMPTY = new ParameterDeclarationList([]);
+        }
+        return ParameterDeclarationList.EMPTY;
+    }
 }

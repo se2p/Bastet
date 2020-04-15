@@ -1554,11 +1554,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitSystemMessage(ctx: SystemMessageContext) : TransformerResult {
         const strTr = ctx.stringExpr().accept(this);
+        const payloadTr = ctx.payload.accept(this);
         return new TransformerResult(
-            strTr.statementsToPrepend,
+            StatementLists.concat(strTr.statementsToPrepend, payloadTr.statementsToPrepend),
             new SystemMessage(StringLiteral.from(ctx.String().text),
                 strTr.node as StringExpression,
-                OptionalAstNode.absent()));
+                payloadTr.node as ExpressionList));
     }
 
     public visitLengthOfListExpression(ctx: LengthOfListExpressionContext) : TransformerResult {
@@ -1586,8 +1587,10 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const tr = ctx.stringExpr().accept(this);
         return new TransformerResult(
             tr.statementsToPrepend,
-            new MessageReceivedEvent(StringLiteral.from(ctx.stringExpr().text),
-            tr.node as StringExpression));
+            new MessageReceivedEvent(
+                StringLiteral.from(ctx.stringExpr().text),
+                tr.node as StringExpression,
+                ctx.parameterList().accept(this).nodeOnly() as ParameterDeclarationList));
     }
 
     public visitNegatedBoolExpression(ctx: NegatedBoolExpressionContext) : TransformerResult {
