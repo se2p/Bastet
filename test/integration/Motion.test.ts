@@ -22,7 +22,7 @@
 import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-test("Test pointTowards 1 safe", done => {
+xtest("Test pointTowards 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-pointTowards-1_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -32,7 +32,7 @@ test("Test pointTowards 1 safe", done => {
     }
 }, utils.timeout);
 
-test("Test pointTowards 1 unsafe", done => {
+xtest("Test pointTowards 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-pointTowards-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
@@ -42,7 +42,7 @@ test("Test pointTowards 1 unsafe", done => {
     }
 }, utils.timeout);
 
-test("Test moveSteps 1 safe", done => {
+xtest("Test moveSteps 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-moveSteps-1_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -52,7 +52,7 @@ test("Test moveSteps 1 safe", done => {
     }
 }, utils.timeout);
 
-test("Test moveSteps 2 safe", done => {
+xtest("Test moveSteps 2 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-moveSteps-2_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -63,7 +63,7 @@ test("Test moveSteps 2 safe", done => {
 }, utils.timeout);
 
 
-test("Test moveSteps 1 unsafe", done => {
+xtest("Test moveSteps 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-moveSteps-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {

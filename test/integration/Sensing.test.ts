@@ -22,7 +22,7 @@
 import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-test("Test touchingObject 1 safe", done => {
+xtest("Test touchingObject 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObject-1_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -32,7 +32,7 @@ test("Test touchingObject 1 safe", done => {
     }
 }, utils.timeout);
 
-test("Test touchingObject 1 unsafe", done => {
+xtest("Test touchingObject 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObject-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
@@ -42,7 +42,7 @@ test("Test touchingObject 1 unsafe", done => {
     }
 }, utils.timeout);
 
-test("Test touchingObjects 1 safe", done => {
+xtest("Test touchingObjects 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObjects-1_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -52,7 +52,7 @@ test("Test touchingObjects 1 safe", done => {
     }
 }, utils.timeout);
 
-test("Test touchingObjects 1 unsafe", done => {
+xtest("Test touchingObjects 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObjects-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
