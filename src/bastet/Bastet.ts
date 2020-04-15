@@ -38,11 +38,22 @@ import {AnalysisStatistics} from "./procedures/analyses/AnalysisStatistics";
 import {TypeInformationStorage} from "./syntax/DeclarationScopes";
 import {ToIntermediateTransformer} from "./syntax/transformers/ToIntermediateTransformer";
 import * as fs from "fs";
-import {mergeConfigFilesToJson} from "./utils/BastetConfiguration";
+import {BastetConfiguration, mergeConfigFilesToJson} from "./utils/BastetConfiguration";
 
 const process = require('process');
 
 const commander = require('commander');
+
+class BastetRootConfig extends BastetConfiguration {
+
+    constructor(dict: {}) {
+        super(dict, []);
+    }
+
+    get outputDir(): string {
+        return this.getStringProperty('output-dir', "./output/");
+    }
+}
 
 /**
  * The main class of the Main program analyses framework.
@@ -99,9 +110,9 @@ export class Bastet {
     }
 
     public async runFor(configFilepath: string[], libraryFilepath: string, programFilepath: string, specFilepath: string) : Promise<AnalysisResult> {
-        Preconditions.checkArgument(fs.existsSync(libraryFilepath), "Library File does not exists.")
-        Preconditions.checkArgument(fs.existsSync(programFilepath), "Program File does not exists.")
-        Preconditions.checkArgument(fs.existsSync(specFilepath), "Spec File does not exists.")
+        Preconditions.checkArgument(fs.existsSync(libraryFilepath), "Library File does not exists.");
+        Preconditions.checkArgument(fs.existsSync(programFilepath), "Program File does not exists.");
+        Preconditions.checkArgument(fs.existsSync(specFilepath), "Spec File does not exists.");
 
         const config: {} = mergeConfigFilesToJson(configFilepath);
 
