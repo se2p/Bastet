@@ -134,7 +134,7 @@ export class AppBuilder {
         for (let aid of actorDefinition.inheritsFrom.elements) {
             const a: Actor = this._knownActors[aid.text];
             if (!a) {
-                throw new IllegalStateException(`The actor "${aid.text}" is not known. Correct library specified?`)
+                throw new IllegalStateException(`The actor "${aid.text}" is not known. Correct library specified?`);
             }
             inheritsFromActors.push(a);
         }
