@@ -1,5 +1,7 @@
 {
 
+    "output-dir": "./output/",
+
     "MainAnalysis": {
         "print-statistics": true,
         "export-artifacts": true
