@@ -33,8 +33,8 @@ actor KatzenObserver is Observer begin
     declare actor_2_id as actor
     declare actors_touching as boolean
 
-    declare last_touch as number
-    declare last_msg as number
+    declare last_touch as int
+    declare last_msg as int
 
     define atomic isBehaviorSatisfied () begin
         define result as true
