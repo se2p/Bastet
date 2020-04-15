@@ -20,31 +20,18 @@
  *
  */
 
-import {AbstractSuccOperator, MergeOperator} from "../ProgramAnalysis";
+import {MergeOperator} from "../ProgramAnalysis";
 import {SSAState} from "./SSAAbstractDomain";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
+import {AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
 import {App} from "../../../syntax/app/App";
-import {
-    DataLocationMode,
-    DataLocationRenamer,
-    RenamingTransformerVisitor
-} from "../../../syntax/transformers/RenamingTransformerVisitor";
 import {DataLocation, VersionedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
-import {Statement} from "../../../syntax/ast/core/statements/Statement";
-import {SSAssigner} from "./SSATransformerVisitor";
-import {Map as ImmMap} from "immutable";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {Concerns} from "../../../syntax/Concern";
 import {LabeledTransferRelation, Transfers} from "../TransferRelation";
 import {AstNode} from "../../../syntax/ast/AstNode";
-import {
-    ProgramOperation,
-    ProgramOperationFactory,
-    ProgramOperations
-} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperationFactory} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
 
 export class SSAMergeOperator implements MergeOperator<SSAState> {

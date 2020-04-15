@@ -26,9 +26,8 @@ import {ConcreteElement} from "../domains/ConcreteElements";
 import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner} from "./Refiner";
 import {Property} from "../../syntax/Property";
-import {FrontierSet, ReachedSet, StatePartitionOperator, StateSet} from "../algorithms/StateSet";
+import {FrontierSet, ReachedSet, StatePartitionOperator} from "../algorithms/StateSet";
 import {Concern} from "../../syntax/Concern";
-import {LabeledTransition} from "./graph/GraphPath";
 import {LabeledTransferRelation} from "./TransferRelation";
 
 export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>

@@ -27,7 +27,7 @@ grep_statistic () {
 }
 
 grep_error () {
-    cat $RESULT_FILE | grep "Running BASTET failed with:" | cut -d":" -f2
+    cat $RESULT_FILE | egrep "Failed to verify:|Running BASTET failed with:" | cut -d":" -f2
 }
 
 num_or_zero () {

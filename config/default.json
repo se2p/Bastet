@@ -1,5 +1,7 @@
 {
 
+    "output-dir": "./output/",
+
     "MainAnalysis": {
         "print-statistics": true,
         "export-artifacts": true
@@ -14,7 +16,7 @@
     },
 
     "DataAnalysis": {
-        "encode-floats-as": "Floats"
+        "encode-floats-as": "Reals"
     },
 
     "GraphAnalysis": {

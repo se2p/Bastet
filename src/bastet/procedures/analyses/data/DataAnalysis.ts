@@ -31,15 +31,22 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {
     AbstractNumber,
     AbstractTheories,
-    BooleanTheory, FloatTheory, IntegerTheory, ListTheory,
-    NumberTheory, RealTheory, StringTheory,
+    BooleanTheory,
+    FloatTheory,
+    IntegerTheory,
+    ListTheory,
+    NumberTheory,
+    RealTheory,
+    StringTheory,
     TransformerTheories
 } from "../../domains/MemoryTransformer";
 import {
     BooleanFormula,
-    FirstOrderFormula, FloatFormula, IntegerFormula,
+    FirstOrderFormula,
+    FloatFormula,
+    IntegerFormula,
     ListFormula,
-    NumberFormula, RealFormula,
+    RealFormula,
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
@@ -47,14 +54,14 @@ import {AbstractElement, AbstractState, LatticeWithComplements} from "../../../l
 import {DataRefiner} from "./DataRefiner";
 import {Refiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKey, ReachedSet, StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
-import {MergeJoinOperator, MergeSepOperator, StandardMergeOperatorFactory} from "../Operators";
+import {StandardMergeOperatorFactory} from "../Operators";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+import {List as ImmList, Set as ImmSet} from "immutable";
 import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
 
 

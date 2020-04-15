@@ -30,8 +30,10 @@ import {
 import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {
-    DivideExpression, FloatLiteral,
-    IndexOfExpression, IntegerLiteral,
+    DivideExpression,
+    FloatLiteral,
+    IndexOfExpression,
+    IntegerLiteral,
     LengthOfListExpression,
     LengthOfStringExpression,
     MinusExpression,
@@ -47,7 +49,8 @@ import {
     BoolAsStringExpression,
     IthLetterOfStringExpression,
     IthStringItemOfExpression,
-    JoinStringsExpression, NumAsStringExpression,
+    JoinStringsExpression,
+    NumAsStringExpression,
     ResourceAttributeOfExpression,
     StringAttributeOfExpression,
     StringLiteral,
@@ -107,11 +110,14 @@ import {AstNode} from "../../../syntax/ast/AstNode";
 import {Preconditions} from "../../../utils/Preconditions";
 import {
     AbstractBoolean,
+    AbstractFloat,
+    AbstractInteger,
     AbstractList,
-    AbstractTheories,
     AbstractNumber,
+    AbstractReal,
     AbstractString,
-    NumberTheory, AbstractFloat, AbstractInteger, AbstractReal, TransformerTheories
+    NumberTheory,
+    TransformerTheories
 } from "../../domains/MemoryTransformer";
 import {
     ActorType,
@@ -122,13 +128,6 @@ import {
     StringType
 } from "../../../syntax/ast/core/ScratchType";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
-import {
-    BooleanFormula,
-    FirstOrderFormula, FloatFormula, IntegerFormula,
-    ListFormula,
-    RealFormula,
-    StringFormula
-} from "../../../utils/ConjunctiveNormalForm";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../domains/ConcreteElements";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
@@ -141,7 +140,6 @@ import {
     SignalTargetReachedStatement
 } from "../../../syntax/ast/core/statements/InternalStatement";
 import {DataLocation} from "../../../syntax/app/controlflow/DataLocation";
-import {Float} from "../../../utils/smt/z3/ctypes";
 import {getTheOnlyElement} from "../../../utils/Collections";
 
 abstract class TransformingVisitor<RT, B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,

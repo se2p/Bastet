@@ -20,21 +20,9 @@
  *
  */
 
-import {AbstractionPrecision} from "./AbstractDomain";
-import {ConcreteDomain, ConcreteString} from "./ConcreteElements";
-import {
-    AbstractBoolean,
-    AbstractNumber,
-    AbstractString,
-    AbstractStringDomain,
-    BooleanTheory,
-    NumberTheory,
-    StringTheory
-} from "./MemoryTransformer";
+import {AbstractString} from "./MemoryTransformer";
 import {Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {Preconditions} from "../../utils/Preconditions";
-import {Variable} from "../../syntax/ast/core/Variable";
 
 export class AbstractStringLattice implements Lattice<AbstractString> {
 

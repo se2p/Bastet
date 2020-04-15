@@ -23,7 +23,7 @@ import {AnalysisProcedure, MultiPropertyAnalysisResult} from "./AnalysisProcedur
 import {App} from "../syntax/app/App";
 import {GraphAnalysis} from "./analyses/graph/GraphAnalysis";
 import {ControlAnalysis} from "./analyses/control/ControlAnalysis";
-import {GraphAbstractState, GraphConcreteState} from "./analyses/graph/GraphAbstractDomain";
+import {GraphAbstractState} from "./analyses/graph/GraphAbstractDomain";
 import {ReachabilityAlgorithm} from "./algorithms/ReachabilityAlgorithm";
 import {SMTFactory} from "../utils/smt/z3/Z3SMT";
 import {DataAnalysis} from "./analyses/data/DataAnalysis";
@@ -38,7 +38,6 @@ import {AnalysisStatistics} from "./analyses/AnalysisStatistics";
 import {StatsAnalysis} from "./analyses/stats/StatsAnalysis";
 import {TimeAnalysis} from "./analyses/time/TimeAnalysis";
 import {StaticTimeProfile} from "../utils/TimeProfile";
-import {AbstractState} from "../lattices/Lattice";
 import {ConcreteElement} from "./domains/ConcreteElements";
 import {BastetConfiguration} from "../utils/BastetConfiguration";
 

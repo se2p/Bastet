@@ -5,3 +5,5 @@ output
 diagrams
 coverage
 test
+*-docker-*.tar
+*-docker-*.tar.*

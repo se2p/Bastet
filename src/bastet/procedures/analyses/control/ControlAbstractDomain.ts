@@ -23,12 +23,12 @@ import {SingletonStateWrapper} from "../AbstractStates";
 import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
 import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
-import {Actor, ActorId} from "../../../syntax/app/Actor";
+import {ActorId} from "../../../syntax/app/Actor";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 import {App} from "../../../syntax/app/App";
-import {AfterStatementMonitoringEvent, BootstrapEvent, SingularityEvent} from "../../../syntax/ast/core/CoreEvent";
+import {AfterStatementMonitoringEvent, SingularityEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Property} from "../../../syntax/Property";
 import {TransRelId} from "../../../syntax/app/controlflow/TransitionRelation";
 import {ScriptId} from "../../../syntax/app/controlflow/Script";
@@ -36,9 +36,7 @@ import {OperationId} from "../../../syntax/app/controlflow/ops/ProgramOperation"
 import {Preconditions} from "../../../utils/Preconditions";
 import {DataLocation, DataLocations, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
-import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
-import {GraphAbstractStateLattice} from "../graph/GraphAbstractDomain";
 
 /**
  * Current thread state that is active or becomes active if...

@@ -21,7 +21,8 @@
 
 import {
     MergeIntoOperator,
-    ProgramAnalysis, StopOperator,
+    ProgramAnalysis,
+    StopOperator,
     TransitionLabelProvider,
     WrappingProgramAnalysis
 } from "../ProgramAnalysis";
@@ -36,15 +37,16 @@ import {App} from "../../../syntax/app/App";
 import {GraphTransferRelation} from "./GraphTransferRelation";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {
-    DefaultAnalysisStateSet, DefaultFrontierSet, FrontierSet,
-    NoPartitioningOperator, PartitionKey,
-    PartitionKeyElement, ReachedSet,
+    DefaultFrontierSet,
+    FrontierSet,
+    PartitionKey,
+    ReachedSet,
     StatePartitionOperator,
     StateSet
 } from "../../algorithms/StateSet";
 import {Preconditions} from "../../../utils/Preconditions";
 import {GraphToDot} from "./GraphToDot";
-import {Refiner, Unwrapper, Wrapper, WrappingRefiner} from "../Refiner";
+import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
 import {AnalysisStatistics} from "../AnalysisStatistics";
@@ -52,7 +54,7 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {NoMergeIntoOperator, NoStopOperator, StandardMergeIntoOperator} from "../Operators";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable"
+import {Set as ImmSet} from "immutable"
 import {GraphContextToDot} from "./GraphContextToDot";
 import {GraphCoverCheckStopOperator} from "./GraphCoverCheckStopOperator";
 

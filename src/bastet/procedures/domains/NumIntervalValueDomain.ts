@@ -26,14 +26,7 @@ import {Record as ImmRec} from "immutable";
 import {ConcreteDomain, ConcreteElementFactory, ConcreteNumber, ConcreteNumberOrderLattice} from "./ConcreteElements";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
-import {
-    AbstractBoolean,
-    AbstractNumberDomain,
-    AbstractString,
-    BooleanTheory,
-    NumberTheory
-} from "./MemoryTransformer";
-import {Variable} from "../../syntax/ast/core/Variable";
+import {AbstractNumberDomain} from "./MemoryTransformer";
 
 export interface NumIntervalValueAttribs extends AbstractElement {
 

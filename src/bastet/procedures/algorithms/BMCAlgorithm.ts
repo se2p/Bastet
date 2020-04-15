@@ -22,8 +22,8 @@
 
 
 import {ConcreteElement} from "../domains/ConcreteElements";
-import {AbstractElement, AbstractState} from "../../lattices/Lattice";
-import {FrontierSet, ReachedSet, StateSet} from "./StateSet";
+import {AbstractState} from "../../lattices/Lattice";
+import {FrontierSet, ReachedSet} from "./StateSet";
 import {AnalysisAlgorithm} from "./Algorithm";
 import {Refiner} from "../analyses/Refiner";
 import {Preconditions} from "../../utils/Preconditions";

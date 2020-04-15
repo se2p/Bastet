@@ -31,15 +31,13 @@ import {SSATransferRelation} from "./SSATransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKey, ReachedSet, StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
-import {GraphAbstractState} from "../graph/GraphAbstractDomain";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {StandardMergeOperatorFactory} from "../Operators";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {SSAMergeOperator} from "./SSAMergeOperator";
-import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+import {Map as ImmMap, Set as ImmSet} from "immutable";
 
 
 export class SSAAnalysisConfig extends BastetConfiguration {

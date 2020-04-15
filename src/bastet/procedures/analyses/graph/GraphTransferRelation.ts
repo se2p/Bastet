@@ -22,8 +22,7 @@
 import {TransferRelation} from "../TransferRelation";
 import {GraphAbstractState, GraphAbstractStateFactory} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable"
-import {AbstractSuccOperator, PartitionOperator} from "../ProgramAnalysis";
+import {AbstractSuccOperator} from "../ProgramAnalysis";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {StatePartitionOperator} from "../../algorithms/StateSet";
 

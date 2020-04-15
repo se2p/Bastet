@@ -19,9 +19,9 @@
  *
  */
 
-import {AbstractElement, AbstractState} from "../../lattices/Lattice";
+import {AbstractState} from "../../lattices/Lattice";
 import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
-import {FrontierSet, ReachedSet, StateSet} from "./StateSet";
+import {FrontierSet, ReachedSet} from "./StateSet";
 import {Preconditions} from "../../utils/Preconditions";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {AnalysisStatistics} from "../analyses/AnalysisStatistics";

@@ -27,8 +27,7 @@ import {Preconditions} from "../../utils/Preconditions";
 import {Statement} from "../../syntax/ast/core/statements/Statement";
 import {TransitionRelation} from "../../syntax/app/controlflow/TransitionRelation";
 import {LocationId} from "../../syntax/app/controlflow/ControlLocation";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {Record as ImmRec, Set as ImmSet} from "immutable";
+import {Set as ImmSet} from "immutable";
 import {SignalTargetReachedStatement} from "../../syntax/ast/core/statements/InternalStatement";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 

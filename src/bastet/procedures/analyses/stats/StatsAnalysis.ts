@@ -20,17 +20,16 @@
  */
 
 import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
+import {AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, PartitionKeyElement, ReachedSet, StateSet} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper} from "../Refiner";
-import {GraphAbstractState} from "../graph/GraphAbstractDomain";
-import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+import {Set as ImmSet} from "immutable";
 
 
 export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F extends AbstractState>
