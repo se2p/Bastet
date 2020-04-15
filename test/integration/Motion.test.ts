@@ -41,3 +41,34 @@ xtest("Test pointTowards 1 unsafe", done => {
         done(error)
     }
 }, utils.timeout);
+
+xtest("Test moveSteps 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-moveSteps-1_SAFE.sc"
+    let bastet = new Bastet();
+    try {
+        utils.execute(bastet, fixtureRelPath, done)
+    } catch (error) {
+        done(error)
+    }
+}, utils.timeout);
+
+xtest("Test moveSteps 2 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-moveSteps-2_SAFE.sc"
+    let bastet = new Bastet();
+    try {
+        utils.execute(bastet, fixtureRelPath, done)
+    } catch (error) {
+        done(error)
+    }
+}, utils.timeout);
+
+
+xtest("Test moveSteps 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-moveSteps-1_UNSAFE.sc"
+    let bastet = new Bastet();
+    try {
+        utils.execute(bastet, fixtureRelPath, done)
+    } catch (error) {
+        done(error)
+    }
+}, utils.timeout);

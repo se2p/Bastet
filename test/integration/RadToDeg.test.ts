@@ -22,7 +22,7 @@
 import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-xtest("Test radToDeg 1 safe", done => {
+test("Test radToDeg 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-radToDeg-1_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -32,7 +32,7 @@ xtest("Test radToDeg 1 safe", done => {
     }
 }, utils.timeout);
 
-xtest("Test radToDeg 2 safe", done => {
+test("Test radToDeg 2 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-radToDeg-2_SAFE.sc"
     let bastet = new Bastet();
     try {
@@ -42,7 +42,7 @@ xtest("Test radToDeg 2 safe", done => {
     }
 }, utils.timeout);
 
-xtest("Test radToDeg 1 unsafe", done => {
+test("Test radToDeg 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-radToDeg-1_UNSAFE.sc"
     let bastet = new Bastet();
     try {
@@ -51,15 +51,4 @@ xtest("Test radToDeg 1 unsafe", done => {
         done(error)
     }
 }, utils.timeout);
-
-xtest("Test radToDeg 2 unsafe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/math-radToDeg-2_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
-}, utils.timeout);
-
 

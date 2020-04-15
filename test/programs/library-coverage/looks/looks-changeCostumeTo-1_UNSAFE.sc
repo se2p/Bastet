@@ -8,7 +8,6 @@ actor MiniActor is ScratchSprite begin
     script on startup do begin
         changeCostumeTo("Elefant1")
 
-        declare active_id as string
         if active_graphic_name = "Elefant1" then begin
             _RUNTIME_signalFailure()
         end

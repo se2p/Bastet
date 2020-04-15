@@ -41,31 +41,31 @@ role MathActor begin
     // param n : float - the real value for which the Atan value is approximated
     // return result: float - the approximated interval of the Atan value
     define atomic mathAtan(n: float) begin
-        if n < 0.0-9.0 then begin
+        if n < 0.0-9.0 or n = 0.0-9.0 then begin
             assume result > 0.0-90.0
             assume result < 0.0-84.290
-        end else if n < 0.0-5.0 and (n > 0.0-9.0 or n = 0.0-9.0) then begin
+        end else if (n < 0.0-5.0 or n = 0.0-5.0) and n > 0.0-9.0 then begin
             assume result > 0.0-84.289
             assume result < 0.0-80.537
-        end else if n > 0.0-6.0 and (n < 0.0-2.0 or n = 0.0-2.0) then begin
+        end else if (n < 0.0-2.0 or n = 0.0-2.0) and n > 0.0-5.0 then begin
             assume result > 0.0-80.537
             assume result < 0.0-63.435
-        end else if n > 0.0-2.0 and (n < 0.0-1.0 or n = 0.0-1.0) then begin
+        end else if (n < 0.0-1.0 or n = 0.0-1.0) and n > 0.0-2.0 then begin
             assume result > 0.0-63.434
             assume result < 0.0-45.0
-        end else if n > 0.0-1.0 and (n < 0.0 or n = 0.0) then begin
+        end else if (n < 0.0 or n = 0.0) and n > 0.0-1.0 then begin
             assume result > 0.0-45.0
             assume result < 0.0
-        end else if n > 0.0 and (n < 1.0 or n = 1.0) then begin
+        end else if (n < 1.0 or n = 1.0) and n > 0.0 then begin
             assume result < 45.0
             assume result > 0.0
-        end else if n > 1.0 and (n < 2.0 or n = 2.0) then begin
+        end else if (n < 2.0 or n = 2.0) and n > 1.0  then begin
             assume result > 45.0
             assume result < 63.435
-        end else if n > 2.0 and (n < 6.0 or n = 6.0) then begin
+        end else if (n < 6.0 or n = 6.0) and n > 2.0 then begin
             assume result < 80.538
             assume result > 63.434
-        end else if n > 6.0 and (n < 10.0 or n = 10.0) then begin
+        end else if (n < 10.0 or n = 10.0) and n > 6.0 then begin
             assume result < 84.289
             assume result > 80.537
         end else if n > 10.0 then begin
@@ -115,7 +115,7 @@ role MathActor begin
         define alpha as wrapClamp(alpha, 0.0, 360.0)
 
         if ((alpha > 0.0 or alpha = 0.0) and alpha < 36.0) then begin
-            assume result < 1.0
+            assume (result < 1.0 or result = 1.0)
             assume result > 0.0-0.127
         end else if ((alpha > 36.0 or alpha = 36.0) and alpha < 72.0) then begin
             assume result < 0.0-0.128
@@ -158,7 +158,7 @@ role MathActor begin
         define alpha as wrapClamp(alpha, 0.0, 360.0)
 
         if (alpha > 0.0 or alpha = 0.0) and alpha < 36.0 then begin
-            assume result < 0.0
+            assume (result < 0.0 or result = 0.0)
             assume result > 0.0-0.991
         end else if (alpha > 36.0 or alpha = 36.0) and alpha < 72.0 then begin
             assume result > 0.0-0.991
@@ -470,6 +470,11 @@ role ScratchEntity is RuntimeEntity begin
 
     define color_effect_value as 0
 
+        define atomic simpleReturn(n:float) begin
+            define result as n
+        end returns result: float
+
+
     // @Category "Looks"
     define atomic changeActiveGraphicTo (id: string) begin
         define active_graphic_name as id
@@ -607,24 +612,33 @@ role ScratchSprite is ScratchEntity begin
         define dx as cast (targetX - x) to float
         define dy as cast (targetY - y) to float
 
-        define direction as cast (90.0 - radToDeg(mathAtan2(dy, dx))) to int
+        if dx = 0.0 and dy = 0.0 then begin
+            define direction as 90
+         end else begin
+            define direction as cast (90.0 - radToDeg(mathAtan2(dy, dx))) to int
+         end
     end
 
     define atomic moveSteps (n: int) begin
         declare nf as float
         declare dx as float
         declare dy as float
-        declare radians as float
+        declare ndir as float
 
         define nf as cast n to float
 
-        define radians as degToRad(90.0 - cast direction to float)
-        define dx as nf * mathCos(radians)
-        define dy as nf * mathSin(radians)
-        define dy as nf * mathSin(radians)
+//        define radians as degToRad(90.0 - cast direction to float)
+        define ndir as cast direction to float
+        define dx as nf * mathCos(90.0 - ndir)
+        define dy as nf * mathSin(90.0 - ndir)
 
-        define x as x + cast dx to int
-        define y as y + cast dy to int
+        declare tmpx as int
+        declare tmpy as int
+        define tmpx as cast dx to int
+        define tmpy as cast dy to int
+
+        define x as x + tmpx
+        define y as y + tmpy
     end
 
     define changeXBy (increment: int) begin
