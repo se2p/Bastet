@@ -186,7 +186,8 @@ export class DataNumExpressionVisitor<B extends AbstractBoolean, I extends Abstr
             if (node.castToType == IntegerType.instance()) {
                 return this._theories.stringTheory.toInteger(node.toConvertFrom.accept(stringVisitor));
             } else if (node.castToType == FloatType.instance()) {
-                return this._theories.stringTheory.toFloat(node.toConvertFrom.accept(stringVisitor));
+                const convertFrom = node.toConvertFrom.accept(stringVisitor);
+                return this._theories.getNumberTheoryFor(node.castToType).castFrom(convertFrom);
             } else {
                 throw new IllegalArgumentException();
             }

@@ -289,6 +289,11 @@ export class Z3RealTheory extends Z3AbstractNumberTheory<Z3RealFormula>
 
         } else if (from instanceof Z3FloatFormula) {
             return new Z3RealFormula(this._ctx.mk_fpa_to_real(from.getAST()));
+
+        } else if (from instanceof Z3StringFormula) {
+            // ATTENTION: This is unsound
+            // TODO: Sound solution that also allows to convert from floats?
+            return new Z3RealFormula(this._ctx.mk_int2real(this._ctx.mk_str_to_int(from.getAST())));
         }
 
         throw new ImplementMeForException(from.constructor.name);
