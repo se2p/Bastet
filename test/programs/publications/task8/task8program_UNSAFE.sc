@@ -4,9 +4,6 @@ actor Stage is ScratchStage begin
     image Buhnenbild1 "3.png"
     image HintergrundManegeklein "4.svg"
     image HintergrundAffenjagd "5.svg"
-
-    define videoTransparency as 50
-    define videoState as "off"
 end
 
 actor Katze is ScratchSprite begin
