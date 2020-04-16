@@ -655,7 +655,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         // Identifier and inheritance information
         const ident = ctx.ident().accept(this).nodeOnly() as Identifier;
         this._currentActor = ident;
-
         const inheritesFrom: InheritsFromList = ctx.inheritsFrom().accept(this).nodeOnly();
         this._activeDeclarationScope.putTypeInformation(ident, ActorType.instance());
 
@@ -1813,8 +1812,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitFlatVariable(ctx: FlatVariableContext): TransformerResult {
-        const varIdent = new Identifier(ctx.ident().text);
-        return this.produceVariableFromIdentifier(varIdent);
+        const varIdent = ctx.ident().accept(this).nodeOnly() as Identifier;
+        try {
+            return this.produceVariableFromIdentifier(varIdent);
+        } catch (e) {
+            throw new ParsingException(e.message, ctx);
+        }
     }
 
     public visitQualifiedVariable(ctx: QualifiedVariableContext): TransformerResult {
