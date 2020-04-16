@@ -24,42 +24,22 @@ import * as utils from './TestUtils'
 
 xtest("Test common wait 1 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/common-wait-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test common wait 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/common-wait-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test common wait 2 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/common-wait-2_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test common wait 2 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/common-wait-2_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 

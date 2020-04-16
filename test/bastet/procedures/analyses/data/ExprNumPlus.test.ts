@@ -24,32 +24,17 @@ import * as utils from './TestUtils'
 
 xtest("Test num plus 1 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test num plus 2 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-2_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test num plus 3 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-3_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test num plus 4 safe", done => {
@@ -64,22 +49,12 @@ xtest("Test num plus 4 safe", done => {
 
 xtest("Test num plus 4 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-4_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test num plus 5 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-5_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test num plus 5 unsafe", done => {
