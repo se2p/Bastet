@@ -25,41 +25,52 @@ import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
 test("Test WrapClamp 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-WrapClamp-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test WrapClamp 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-WrapClamp-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 
 test("Test MathFloor 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-MathFloor-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test MathFloor 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-MathFloor-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
+test("Test MathSqrt 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-Sqrt-1_SAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
+test("Test MathSqrt 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-Sqrt-1_UNSAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
+test("Test MathSqrt 2 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-Sqrt-2_SAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
+test("Test MathSqrt 2 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-Sqrt-2_UNSAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
+test("Test Nearest Perfect Sqrt 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-NearestPerfectSqrt-1_SAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
+test("Test Nearest Perfect Sqrt 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-NearestPerfectSqrt-1_UNSAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);

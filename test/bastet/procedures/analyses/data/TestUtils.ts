@@ -33,8 +33,16 @@ let specRelPath = "../../../../specs/empty.sc";
 let specFilePath = path.join(__dirname, specRelPath);
 
 let timeout: number = 20000;
-export {timeout, execute, execute_explicit};
+export {timeout, execFixture, execute, execute_explicit};
 
+function execFixture(fixturePath: string, done) {
+    let bastet = new Bastet();
+    try {
+        execute(bastet, fixturePath, done)
+    } catch (error) {
+        done(error)
+    }
+}
 
 function execute(bastet: Bastet, fixturePath: string, done) {
     if (fixturePath.endsWith("_SAFE.sc")) {

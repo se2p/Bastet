@@ -214,6 +214,73 @@ role MathActor begin
         define result as (deg * PI) / 180.0
     end returns result: float
 
+    define atomic nearestPerfectSqrt(num: float) begin
+          if num < 0.0 then begin
+            _RUNTIME_signalFailure("Sqrt of negative number not allowed")
+          end else if num = 0.0 then begin
+			 define result as 0.0
+          end else if num <= 1.0 then begin
+			 define result as 1.0
+          end else if num <= 4.0 then begin
+			 define result as 2.0
+          end else if num <= 9.0 then begin
+			 define result as 3.0
+          end else if num <= 16.0 then begin
+			 define result as 4.0
+          end else if num <= 25.0 then begin
+			 define result as 5.0
+          end else if num <= 36.0 then begin
+			 define result as 6.0
+          end else if num <= 49.0 then begin
+			 define result as 7.0
+          end else if num <= 64.0 then begin
+			 define result as 8.0
+          end else if num <= 81.0 then begin
+			 define result as 9.0
+          end else if num <= 100.0 then begin
+			 define result as 10.0
+          end else if num <= 121.0 then begin
+			 define result as 11.0
+          end else if num <= 144.0 then begin
+			 define result as 12.0
+          end else if num <= 169.0 then begin
+			 define result as 13.0
+          end else if num <= 196.0 then begin
+			 define result as 14.0
+          end else if num <= 225.0 then begin
+			 define result as 15.0
+          end else if num <= 256.0 then begin
+			 define result as 16.0
+          end else if num <= 289.0 then begin
+			 define result as 17.0
+          end else if num <= 324.0 then begin
+			 define result as 18.0
+          end else if num <= 361.0 then begin
+			 define result as 19.0
+          end else if num <= 400.0 then begin
+			 define result as 20.0
+          end else if num <= 441.0 then begin
+			 define result as 21.0
+          end else if num <= 484.0 then begin
+			 define result as 22.0
+          end else if num <= 529.0 then begin
+			 define result as 23.0
+          end else if num <= 576.0 then begin
+			 define result as 24.0
+          end else if num <= 625.0 then begin
+			 define result as 25.0
+          end
+    end returns result: float
+
+    define mathSqrt(num: float) begin
+        declare result as float
+        define result as nearestPerfectSqrt(num)
+
+        // Three iterations of newton
+        define result as (result + (num /result)) / 2.0
+        define result as (result + (num /result)) / 2.0
+        define result as (result + (num /result)) / 2.0
+    end returns result: float
 end
 
 role RuntimeEntity is MathActor begin
@@ -265,9 +332,6 @@ extern _RUNTIME_getInitialActors () returns list of string
     // See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
     extern randomBetween (intervalStart: int, intervalEnd: int) returns int
 
-    // TODO: Maybe add an approximation for sqrt
-    extern mathSqrt (n: float) returns float
-
     extern mathAbs (n: int) returns int
 
     extern mathCeiling (n: int) returns int
@@ -299,8 +363,6 @@ extern _RUNTIME_getInitialActors () returns list of string
         define io as locate actor "IOActor"
         define result as cast (attribute "mouseY" of io) to int
     end returns result: int
-
-
 
     define getGraphicIdByIndex (idx: int) begin
         define result as ""
@@ -615,7 +677,7 @@ role ScratchSprite is ScratchEntity begin
         if dx = 0.0 and dy = 0.0 then begin
             define direction as 90
          end else begin
-            define direction as cast (90.0 - radToDeg(mathAtan2(dy, dx))) to int
+            define direction as cast radToDeg(mathAtan2(dx, dy)) to int
          end
     end
 
