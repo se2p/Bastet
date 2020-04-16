@@ -522,20 +522,19 @@ role ScratchEntity is RuntimeEntity begin
     declare active_graphic_height as int
 
     declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
-    declare color_effect_value as int
-    declare fisheye_effect_value as int
-    declare whirl_effect_value as int
-    declare pixelate_effect_value as int
-    declare mosaic_effect_value as int
-    declare brightness_effect_value as int
-    declare ghost_effect_value as int
+    declare color_effect_value as float
+    declare fisheye_effect_value as float
+    declare whirl_effect_value as float
+    declare pixelate_effect_value as float
+    declare mosaic_effect_value as float
+    declare brightness_effect_value as float
+    declare ghost_effect_value as float
 
-    define color_effect_value as 0
+    define color_effect_value as 0.0
 
-        define atomic simpleReturn(n:float) begin
-            define result as n
-        end returns result: float
-
+    define atomic simpleReturn(n:float) begin
+        define result as n
+    end returns result: float
 
     // @Category "Looks"
     define atomic changeActiveGraphicTo (id: string) begin

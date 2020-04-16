@@ -31,8 +31,8 @@ actor HorseObserver is Observer begin
     declare actor_1_id as actor
     declare mouseTouched as boolean
 
-    declare actor_1_color as int
-    declare actor_1_prev_color as int
+    declare actor_1_color as float
+    declare actor_1_prev_color as float
 
     declare actor_1_direction as int
     declare actor_1_prev_direction as int
@@ -42,7 +42,7 @@ actor HorseObserver is Observer begin
     define atomic isBehaviorSatisfied () begin
         // (a) Attributes of the first actor
 
-        define actor_1_color as cast (attribute "color_effect_value" of actor_1_id) to int
+        define actor_1_color as cast (attribute "color_effect_value" of actor_1_id) to float
         define actor_1_direction as cast (attribute "direction" of actor_1_id) to int
 
         // The actual invariant check
