@@ -504,16 +504,18 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
             return this._mem;
         } else if (method.startsWith("_RUNTIME_")) {
             throw new ImplementMeForException(method);
-        } else if (method == "mathSqrt") {
-            if (node.assignResultTo.isPresent()) {
-                const dataLoc: DataLocation = node.assignResultTo.value().dataloc;
-                const theory = this.numberTheoryFor(dataLoc);
-                const assignTo = theory.abstractNumberValue(node.assignResultTo.value());
-                const assume: B = theory.isNumberEqualTo(assignTo,
-                    theory.sqrt(getTheOnlyElement(node.args.elements).accept(
-                        this.createVisitorByType(ScratchType.fromId(dataLoc.type)))));
-                return this._theories.boolTheory.and(this._mem, assume);
-            }
+        // We use our own approximation of matSqrt for now
+        //
+        // } else if (method == "mathSqrt") {
+        //     if (node.assignResultTo.isPresent()) {
+        //         const dataLoc: DataLocation = node.assignResultTo.value().dataloc;
+        //         const theory = this.numberTheoryFor(dataLoc);
+        //         const assignTo = theory.abstractNumberValue(node.assignResultTo.value());
+        //         const assume: B = theory.isNumberEqualTo(assignTo,
+        //             theory.sqrt(getTheOnlyElement(node.args.elements).accept(
+        //                 this.createVisitorByType(ScratchType.fromId(dataLoc.type)))));
+        //         return this._theories.boolTheory.and(this._mem, assume);
+        //     }
         } else if (method.startsWith("math")) {
             throw new ImplementMeForException(method);
         }
