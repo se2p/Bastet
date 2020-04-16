@@ -24,42 +24,22 @@ import * as utils from './TestUtils'
 
 xtest("Test bool num equals 1 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-equals-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test bool num equals 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-equals-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test bool num equals 2 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-equals-2_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test bool num equals 2 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-equals-2_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 

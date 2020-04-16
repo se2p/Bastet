@@ -24,42 +24,22 @@ import * as utils from './TestUtils'
 
 xtest("Test bool not 1 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-not-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test bool not 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-not-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test bool not 2 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-not-2_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test bool not 2 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-not-2_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 

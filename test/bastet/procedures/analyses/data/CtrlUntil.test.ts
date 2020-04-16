@@ -24,20 +24,10 @@ import * as utils from './TestUtils'
 
 xtest("Test ctrl until 1 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-until-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test ctrl until 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-until-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);

@@ -24,63 +24,33 @@ import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
 test("Test Cos 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test Cos 2 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-2_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test Cos 3 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-3_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 
 test("Test Cos 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test Cos 2 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-2_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test Cos 3 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-3_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 

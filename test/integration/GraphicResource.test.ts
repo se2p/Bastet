@@ -24,84 +24,44 @@ import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
 test("Test getNumGraphics 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getNumGraphics-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test getNumGraphics 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getNumGraphics-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 
 test("Test getNumGraphics 2 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getNumGraphics-2_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 
 test("Test getImageHeight 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getImageHeight-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test getGraphicsIndexById 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getGraphicIndexById-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 
 test("Test getGraphicsIndexById 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getGraphicIndexById-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test changeCostumeTo 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/looks/looks-changeCostumeTo-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 
 test("Test changeCostumeTo 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/looks/looks-changeCostumeTo-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);

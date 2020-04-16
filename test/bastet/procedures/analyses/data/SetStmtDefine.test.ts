@@ -24,42 +24,22 @@ import * as utils from './TestUtils'
 
 xtest("Test setstmt define-from-call 1 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-call-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test setstmt define-from-call 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-call-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test setstmt define-from-expr 2 safe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-expr-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 xtest("Test setstmt define-from-expr 2 unsafe", done => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-expr-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 

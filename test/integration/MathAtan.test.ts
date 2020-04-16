@@ -24,42 +24,22 @@ import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
 test("Test Atan 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-1_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test Atan 2 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-2_SAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test Atan 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-1_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 test("Test Atan 2 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-2_UNSAFE.sc"
-    let bastet = new Bastet();
-    try {
-        utils.execute(bastet, fixtureRelPath, done)
-    } catch (error) {
-        done(error)
-    }
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 
