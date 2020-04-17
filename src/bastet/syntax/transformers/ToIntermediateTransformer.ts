@@ -1716,9 +1716,9 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         Preconditions.checkArgument(!(tr.node instanceof Identifier));
         const cast = new CastExpression(tr.node as Expression, FloatType.instance());
 
-        if (cast.toConvertFrom.expressionType == StringType.instance() && cast.castToType == FloatType.instance()) {
-            throw new ParsingException("Casting from 'string' to 'float' is currently not supported. Cast from string to int to float if possible.", ctx);
-        }
+        // if (cast.toConvertFrom.expressionType == StringType.instance() && cast.castToType == FloatType.instance()) {
+        //     throw new ParsingException("Casting from 'string' to 'float' is currently not supported. Cast from string to int to float if possible.", ctx);
+        // } DO NOT THROW the exception here because we might remove the cast in a later step
 
         return new TransformerResult(tr.statementsToPrepend, cast);
     }
