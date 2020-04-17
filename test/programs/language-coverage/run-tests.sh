@@ -90,7 +90,7 @@ for f in $(find $TEST_DIR -name "*${NAME_PREFIX}*" -and -name "*.sc" | sort)
 do
     RESULT_FILE=$(mktemp)
     printf "`basename $f`"
-     timeout 360 ./scripts/bastet.sh \
+     timeout 120 ./scripts/bastet.sh \
         -c config/default.json,config/benchmarking.delta.json \
         -P $f \
         -S test/programs/empty.sc \
