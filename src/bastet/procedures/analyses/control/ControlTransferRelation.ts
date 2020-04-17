@@ -534,14 +534,18 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         if (predRel.isLoopHead(predRelLoc.location)) {
             const predIsLoopHeadOf: TransitionLoop = predRel.getIsLoopHeadOf(predRelLoc.getLocationId());
+            const succIsLoopHeadOf: TransitionLoop = succRel.getIsLoopHeadOf(succRelLoc.getLocationId());
             const predInBodyOf: TransitionLoop = predRel.getIsInLoopBodyOf(predRelLoc.getLocationId());
             const succInBodyOf: TransitionLoop = succRel.getIsInLoopBodyOf(succRelLoc.getLocationId());
 
             if (succInBodyOf) {
-                if (predIsLoopHeadOf == succInBodyOf) {
+                if (predIsLoopHeadOf == succInBodyOf ) {
                     // case 1: succ is in the same loop --> entering or re-entering the loop
                     return new LoopAction(LoopActionType.ENTERING, succInBodyOf, succRelLoc.withLocationId(succInBodyOf.loopHead));
                 }
+            } else if (predIsLoopHeadOf == succIsLoopHeadOf) {
+                // Self-Loop the the loop header
+                return new LoopAction(LoopActionType.ENTERING, succIsLoopHeadOf, succRelLoc.withLocationId(succIsLoopHeadOf.loopHead));
             }
 
             if (predIsLoopHeadOf != succInBodyOf) {
