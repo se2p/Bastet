@@ -66,14 +66,12 @@ actor HorseObserver is Observer begin
         end
 
         if mouse_touched then begin
-            declare dir_change_sat as boolean
-            define dir_change_sat as now - last_direction_change < 1000000
-
-            declare color_change_sat as boolean
-            define color_change_sat as now - last_color_change < 1000000
-
-            if not dir_change_sat and not color_change_sat then begin
-                _RUNTIME_signalFailure("If the mouse is touched, either the direction or the color must change within every second")
+            if now - last_direction_change > 1000000 then begin
+                _RUNTIME_signalFailure("If the mouse is NOT touched, the color must change within every second")
+            end
+        end else begin
+            if now - last_color_change > 1000000 then begin
+                _RUNTIME_signalFailure("If the mouse IS touched, either the direction must change within every second")
             end
         end
     end
