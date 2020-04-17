@@ -1067,7 +1067,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         let result: ControlAbstractState = succState;
         const steppedThread: IndexedThread = succState.getIndexedThreadState(steppedThreadIndex);
 
-        const nextOps = this.resolveLeavingOps(predState, steppedThread);
+        const nextOps = this.resolveLeavingOps(succState, steppedThread); // Use 'succState' to solve issues with new 'actorScopes' information
         if (nextOps.length > 0 && steppedThread.threadStatus.getInAtomicMode() > 0) {
             // Finish the atomic operations without interruptions by another thread
             return [result.withThreadStateUpdate(steppedThread.threadIndex, (ts) =>
