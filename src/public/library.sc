@@ -449,10 +449,10 @@ extern _RUNTIME_getInitialActors () returns list of string
         declare size_fst as float
         declare leg_a_fst as float
         declare leg_b_fst as float
-        define leg_a_fst as cast attribute "active_graphic_width" of fst to float
-        define leg_b_fst as cast attribute "active_graphic_height" of fst to float
+        define leg_a_fst as cast (cast attribute "active_graphic_width" of fst to int) to float
+        define leg_b_fst as cast (cast attribute "active_graphic_height" of fst to int) to float
 
-        define size_fst as cast attribute "size" of fst to float
+        define size_fst as cast (cast attribute "size" of fst to int) to float
         define leg_a_fst as leg_a_fst * (size_fst / 100.0)
         define leg_b_fst as leg_b_fst * (size_fst / 100.0)
 
@@ -462,10 +462,10 @@ extern _RUNTIME_getInitialActors () returns list of string
         declare size_snd as float
         declare leg_a_snd as float
         declare leg_b_snd as float
-        define leg_a_snd as cast attribute "active_graphic_width" of snd to float
-        define leg_b_snd as cast attribute "active_graphic_height" of snd to float
+        define leg_a_snd as cast (cast attribute "active_graphic_width" of snd to int) to float
+        define leg_b_snd as cast (cast attribute "active_graphic_height" of snd to int) to float
 
-        define size_snd as cast attribute "size" of snd to float
+        define size_snd as cast (cast attribute "size" of snd to int) to float
         define leg_a_snd as leg_a_snd * (size_snd / 100.0)
         define leg_b_snd as leg_b_snd * (size_snd / 100.0)
 
@@ -473,14 +473,14 @@ extern _RUNTIME_getInitialActors () returns list of string
         define radius_snd as 0.5 * mathSqrt(leg_a_snd * leg_a_snd + leg_b_snd * leg_b_snd)
 
         declare x_fst as float
-        define x_fst as cast attribute "x" of fst to float
+        define x_fst as cast (cast attribute "x" of fst to int) to float
         declare y_fst as float
-        define y_fst as cast attribute "y" of fst to float
+        define y_fst as cast (cast attribute "y" of fst to int) to float
 
         declare x_snd as float
-        define x_snd as cast attribute "x" of snd to float
+        define x_snd as cast (cast attribute "x" of snd to int) to float
         declare y_snd as float
-        define y_snd as cast attribute "y" of snd to float
+        define y_snd as cast (cast attribute "y" of snd to int) to float
 
         define result as not (((mathSqrt((x_fst + x_snd)*(x_fst + x_snd) + (y_fst + y_snd) * (y_fst + y_snd)) - radius_fst - radius_snd) > 0.0))
 
@@ -747,10 +747,10 @@ role ScratchSprite is ScratchEntity begin
         declare size_snd as float
         declare leg_a_other as float
         declare leg_b_other as float
-        define leg_a_other as cast attribute "active_graphic_width" of obj to float
-        define leg_b_other as cast attribute "active_graphic_height" of obj to float
+        define leg_a_other as cast (cast attribute "active_graphic_width" of obj to int) to float
+        define leg_b_other as cast (cast attribute "active_graphic_height" of obj to int) to float
 
-        define size_snd as cast attribute "size" of obj to float
+        define size_snd as cast (cast attribute "size" of obj to int) to float
         define leg_a_other as leg_a_other * (size_snd / 100.0)
         define leg_b_other as leg_b_other * (size_snd / 100.0)
 
@@ -759,9 +759,9 @@ role ScratchSprite is ScratchEntity begin
         define radius_other as 0.5 * mathSqrt(leg_a_other * leg_a_other + leg_b_other * leg_b_other)
 
         declare x_other as float
-        define x_other as cast attribute "x" of obj to float
+        define x_other as cast (cast attribute "x" of obj to int) to float
         declare y_other as float
-        define y_other as cast attribute "y" of obj to float
+        define y_other as cast (cast attribute "y" of obj to int) to float
 
         declare x_this as float
         define x_this as cast x to float
