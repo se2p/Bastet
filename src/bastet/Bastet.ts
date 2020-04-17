@@ -54,6 +54,7 @@ class BastetRootConfig extends BastetConfiguration {
     get outputDir(): string {
         return this.getStringProperty('output-dir', "./output/");
     }
+
 }
 
 /**

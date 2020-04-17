@@ -21,57 +21,7 @@
  */
 
 import {Preconditions} from "../../utils/Preconditions";
-
-const { performance } = require('perf_hooks');
-
-export class PerfTimer {
-
-    private _lastIntervalDuration: number;
-
-    private _totalDuartion: number;
-
-    private _startTime: number;
-
-    private _stopTime: number;
-
-    private readonly _onStopCallback: (timer: PerfTimer) => void;
-
-    constructor(onStopCallback: (timer: PerfTimer) => void) {
-        this._onStopCallback = onStopCallback;
-        this._totalDuartion = 0;
-        this._lastIntervalDuration = 0;
-    }
-
-    public start() {
-        this._startTime = performance.now();
-        this._stopTime = 0;
-    }
-
-    public stop(): number {
-        this._stopTime = performance.now();
-        return this.stopWith(this._stopTime);
-    }
-
-    public stopWith(commonTimeMsec: number): number {
-        this._stopTime = commonTimeMsec;
-
-        this._lastIntervalDuration = this._stopTime - this._startTime;
-        this._totalDuartion = this._totalDuartion + this._lastIntervalDuration;
-
-        if (this._onStopCallback) {
-            this._onStopCallback(this);
-        }
-        return this.totalDuration;
-    }
-
-    get lastIntervalDuration(): number {
-        return this._lastIntervalDuration;
-    }
-
-    get totalDuration() : number {
-        return this._totalDuartion;
-    }
-}
+import {PerfTimer} from "../../utils/PerfTimer";
 
 export class AnalysisStatistics {
 

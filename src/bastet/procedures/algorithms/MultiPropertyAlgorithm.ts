@@ -32,6 +32,14 @@ import {Preconditions} from "../../utils/Preconditions";
 import {FrontierSet, ReachedSet} from "./StateSet";
 import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
 import {BastetConfiguration} from "../../utils/BastetConfiguration";
+import {
+    Budget,
+    BudgetExhaustedException,
+    InfiniteBudget,
+    popActiveBudget,
+    pushActiveBudget,
+    WallTimeDurationBudget
+} from "../../utils/Budgets";
 
 export type ResultCallback = (violated: ImmSet<Property>, satisfied: ImmSet<Property>, unknown: ImmSet<Property>, stats: AnalysisStatistics) => void;
 
@@ -45,6 +53,10 @@ export class MultiPropertyAlgorithmConfig extends BastetConfiguration {
 
     get shouldTerminateAfterViolation(): boolean {
         return this.getBoolProperty('should-terminate-after-violation', true);
+    }
+
+    get totalWallTimeLimitSecs(): number {
+       return this.getNumberProperty("budget-total-walltime-secs", -1);
     }
 
 }
@@ -65,6 +77,8 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
 
     private readonly _config: MultiPropertyAlgorithmConfig;
 
+    private readonly _algorithmBudget: Budget;
+
     constructor(config: {}, task: App, algorithm: AnalysisAlgorithm<C, E>, analysis: ProgramAnalysis<C, E, E>, stats: AnalysisStatistics, resultCallback: ResultCallback) {
         this._config = new MultiPropertyAlgorithmConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
@@ -73,6 +87,12 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
         this._resultCallback = Preconditions.checkNotUndefined(resultCallback);
         this._statistics = Preconditions.checkNotUndefined(stats).withContext(this.constructor.name);
         this._properties = this._task.getProperties();
+
+        if (this._config.totalWallTimeLimitSecs > 0) {
+            this._algorithmBudget = new WallTimeDurationBudget(this._config.totalWallTimeLimitSecs * 1000);
+        } else {
+            this._algorithmBudget = new InfiniteBudget();
+        }
     }
 
     run(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {
@@ -81,33 +101,47 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
         let unknown: ImmSet<Property> = this._properties;
         Preconditions.checkArgument(unknown.size > 0, "There must be at least one property to check.");
 
+        this._algorithmBudget.beginBudget();
+        pushActiveBudget(this._algorithmBudget);
         this._statistics.contextTimer.start();
         try {
-            do {
-                this._statistics.increment(STAT_KEY_MPA_ITERATIONS);
-                [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);
+            try {
+                do {
+                    this._statistics.increment(STAT_KEY_MPA_ITERATIONS);
+                    [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);
 
-                // Handle property violations
-                if (reached.getAddedLast().length > 0) {
-                    Preconditions.checkState(reached.getAddedLast().length > 0);
-                    const lastState = reached.getAddedLast()[0];
-                    const targetProperties = ImmSet<Property>(this._analysis.target(lastState));
-                    violated = violated.union(targetProperties);
-                    unknown = unknown.subtract(violated);
+                    // Handle property violations
+                    if (reached.getAddedLast().length > 0) {
+                        Preconditions.checkState(reached.getAddedLast().length > 0);
+                        const lastState = reached.getAddedLast()[0];
+                        const targetProperties = ImmSet<Property>(this._analysis.target(lastState));
+                        violated = violated.union(targetProperties);
+                        unknown = unknown.subtract(violated);
 
-                    if (this._config.shouldTerminateAfterViolation) {
-                        if (targetProperties.size > 0) {
-                            return [frontier, reached];
+                        if (this._config.shouldTerminateAfterViolation) {
+                            if (targetProperties.size > 0) {
+                                return [frontier, reached];
+                            }
                         }
                     }
-                }
-            } while (!frontier.isEmpty());
+                } while (!frontier.isEmpty());
 
-            satisfied = unknown.subtract(violated);
-            unknown = unknown.subtract(satisfied);
+                // Termination without resource exhaustion (reached a fixed point)
+                satisfied = unknown.subtract(violated);
+                unknown = unknown.subtract(satisfied);
+
+            } catch (e) {
+                if (e instanceof BudgetExhaustedException) {
+                    // Do not stop the flow of the analysis in case the budget was exhausted
+                    console.log("The analysis terminated because of budget exhaustion!");
+                } else {
+                    throw e;
+                }
+            }
 
         } finally {
             this._statistics.contextTimer.stop();
+            popActiveBudget(this._algorithmBudget);
             this._resultCallback(violated, satisfied, unknown, this._statistics);
         }
 

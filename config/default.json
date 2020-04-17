@@ -22,6 +22,10 @@
     "GraphAnalysis": {
         "mergeIntoOperator": "StandardMergeIntoOperator",
         "stopOperator": "CheckCoverage"
+    },
+
+    "MultiPropertyAlgorithm" : {
+        "budget-total-walltime-secs": -1
     }
 
 }

@@ -29,6 +29,7 @@ import {BastetConfiguration} from "../../utils/BastetConfiguration";
 import {ExportFunction, resolveResultExportFunction} from "../analyses/Analyses";
 import {AnalysisAlgorithm} from "./Algorithm";
 import {StatsAnalysis} from "../analyses/stats/StatsAnalysis";
+import {getActiveBudget} from "../../utils/Budgets";
 
 const { performance } = require('perf_hooks');
 
@@ -121,6 +122,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
                 }
 
                 this.algorithmMonitoringHook(frontier, reached);
+                getActiveBudget().raiseIfExhausted();
             }
         }
 

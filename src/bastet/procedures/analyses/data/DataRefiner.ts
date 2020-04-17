@@ -24,7 +24,7 @@
 import {Refiner} from "../Refiner";
 import {DataAbstractState} from "./DataAbstractDomain";
 import {Lattices, LatticeWithComplements} from "../../../lattices/Lattice";
-import {PerfTimer} from "../AnalysisStatistics";
+import {PerfTimer} from "../../../utils/PerfTimer";
 
 export class DataRefiner implements Refiner<DataAbstractState> {
 
