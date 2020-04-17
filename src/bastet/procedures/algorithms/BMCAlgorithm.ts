@@ -29,6 +29,7 @@ import {Refiner} from "../analyses/Refiner";
 import {Preconditions} from "../../utils/Preconditions";
 import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
+import {getActiveBudget} from "../../utils/Budgets";
 
 export const STAT_KEY_BMC_ITERATIONS = "iterations";
 
@@ -56,6 +57,7 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractState>
     public run(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {
         do {
             this._statistics.increment(STAT_KEY_BMC_ITERATIONS);
+            getActiveBudget().raiseIfExhausted();
             [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);
             if (!frontier.isEmpty()) {
                 // Target state was found
