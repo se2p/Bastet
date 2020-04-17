@@ -1714,12 +1714,13 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     public visitStringToFloatExpression(ctx: StringToFloatExpressionContext) : TransformerResult {
         const tr = ctx.stringExpr().accept(this);
         Preconditions.checkArgument(!(tr.node instanceof Identifier));
+        const cast = new CastExpression(tr.node as Expression, FloatType.instance());
 
-        throw new ParsingException("Casting from 'string' to 'float' is currently not supported. Cast from string to int to float if possible.", ctx);
+        if (cast.toConvertFrom.expressionType == StringType.instance() && cast.castToType == FloatType.instance()) {
+            throw new ParsingException("Casting from 'string' to 'float' is currently not supported. Cast from string to int to float if possible.", ctx);
+        }
 
-        // return new TransformerResult(
-        //    tr.statementsToPrepend,
-        //    new CastExpression(tr.node as Expression, FloatType.instance()));
+        return new TransformerResult(tr.statementsToPrepend, cast);
     }
 
     public visitNumToFloatExpression(ctx: NumToFloatExpressionContext) : TransformerResult {
