@@ -27,10 +27,10 @@ program Task8Spec
  *
  */
 
-actor KatzenObserver is Observer begin
+actor CatObserver is Observer begin
 
-    declare actor_1_id as actor
-    declare actor_2_id as actor
+    declare cat_id as actor
+    declare ball_id as actor
     declare actors_touching as boolean
 
     declare last_touch as int
@@ -39,11 +39,11 @@ actor KatzenObserver is Observer begin
     define atomic isBehaviorSatisfied () begin
         define result as true
 
-        if touchingObjects(actor_1_id, actor_2_id) then begin
+        if touchingObjects(cat_id, ball_id) then begin
             define last_touch as _RUNTIME_micros()
         end
 
-        if length of (attribute "bubbleText" of actor_1_id) > 0 then begin
+        if length of (attribute "bubbleText" of cat_id) > 0 then begin
             define last_msg as _RUNTIME_micros()
         end
 
@@ -61,8 +61,8 @@ actor KatzenObserver is Observer begin
     end
 
     script on bootstrap finished do begin
-        define actor_1_id as locate actor "Katze"
-        define actor_2_id as locate actor "Ball"
+        define cat_id as locate actor "Katze"
+        define ball_id as locate actor "Ball"
 
         define last_touch as 0
         define last_msg as 0
