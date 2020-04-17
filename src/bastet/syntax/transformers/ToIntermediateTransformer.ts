@@ -1621,9 +1621,8 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     public visitNumAsStringExpression(ctx: NumAsStringExpressionContext) : TransformerResult {
         const tr = ctx.numExpr().accept(this);
-        return new TransformerResult(
-            tr.statementsToPrepend,
-            new CastExpression(tr.node as NumberExpression, StringType.instance()));
+        const cast = new CastExpression(tr.node as NumberExpression, StringType.instance());
+        return new TransformerResult(tr.statementsToPrepend, cast);
     }
 
     public visitParameter(ctx: ParameterContext) : TransformerResult {
@@ -1716,9 +1715,11 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
         const tr = ctx.stringExpr().accept(this);
         Preconditions.checkArgument(!(tr.node instanceof Identifier));
 
-        return new TransformerResult(
-            tr.statementsToPrepend,
-            new CastExpression(tr.node as Expression, FloatType.instance()));
+        throw new ParsingException("Casting from 'string' to 'float' is currently not supported. Cast from string to int to float if possible.", ctx);
+
+        // return new TransformerResult(
+        //    tr.statementsToPrepend,
+        //    new CastExpression(tr.node as Expression, FloatType.instance()));
     }
 
     public visitNumToFloatExpression(ctx: NumToFloatExpressionContext) : TransformerResult {
