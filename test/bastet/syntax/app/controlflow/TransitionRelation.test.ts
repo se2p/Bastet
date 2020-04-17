@@ -39,7 +39,6 @@ test("case: minimal loop", () => {
     expect(tr.loopHeads.size).toEqual(1);
 });
 
-
 describe("TransitionRelation", () => {
 
     describe("constructor", () => {
@@ -177,6 +176,28 @@ describe("TransitionRelations", () => {
             });
         });
 
+        describe("case: forever 1", () => {
+            const op = new RawOperation(new StopAllStatement());
+
+            const tr = TransitionRelation.builder()
+                .addTransitionByIDs(0, 1, op)
+                .addTransitionByIDs(1, 6, op)
+                .addTransitionByIDs(6, 3, op)
+                .addTransitionByIDs(3, 6, op)
+                .addTransitionByIDs(3, 4, op)
+                .addTransitionByIDs(4, 6, op)
+                .addEntryLocationWithID(0)
+                .build();
+
+            it("one loop head identified", () => {
+                expect(tr.loopHeads.size).toEqual(1);
+                expect(tr.loopHeads.contains(6)).toBe(true);
+                expect(tr.getIsInLoopBodyOf(3).loopHead).toEqual(6);
+
+                console.log(tr.getLoops().map((l) => l.toString()));
+            });
+        });
+
         describe("case: nested", () => {
             const op = new RawOperation(new StopAllStatement());
 
@@ -199,6 +220,43 @@ describe("TransitionRelations", () => {
                 expect(tr.loopHeads.size).toEqual(2);
                 expect(tr.loopHeads.contains(1)).toBe(true);
                 expect(tr.loopHeads.contains(2)).toBe(true);
+
+                console.log(tr.getLoops().map((l) => l.toString()));
+            });
+        });
+
+        describe("case: nested 2", () => {
+            const op = new RawOperation(new StopAllStatement());
+
+            const tr = TransitionRelation.builder()
+                .addTransitionByIDs(3, 4, op)
+                .addTransitionByIDs(4, 6, op)
+                .addTransitionByIDs(6, 1, op)
+                .addTransitionByIDs(1, 7, op)
+                .addTransitionByIDs(7, 6, op)
+                .addTransitionByIDs(7, 8, op)
+                .addTransitionByIDs(8, 6, op)
+                .addTransitionByIDs(6, 3, op)
+                .addEntryLocationWithID(3)
+                .build();
+
+            it("two loop heads identified", () => {
+                expect(tr.loopHeads.size).toEqual(2);
+                expect(tr.loopHeads.contains(3)).toBe(true);
+                expect(tr.loopHeads.contains(6)).toBe(true);
+
+                expect(tr.isLoopHead(3)).toBe(true);
+                expect(tr.isLoopHead(6)).toBe(true);
+
+                const loopAt3 = tr.getIsLoopHeadOf(3);
+                expect(loopAt3).toBeDefined();
+                const loopAt6 = tr.getIsLoopHeadOf(6);
+                expect(loopAt6).toBeDefined();
+
+                expect(loopAt3).not.toEqual(loopAt6);
+
+                const body = tr.getIsInLoopBodyOf(1)
+                expect(body).toEqual(tr.getIsLoopHeadOf(6));
 
                 console.log(tr.getLoops().map((l) => l.toString()));
             });

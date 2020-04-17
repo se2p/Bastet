@@ -232,6 +232,10 @@ class LoopAction {
     get loop(): TransitionLoop {
         return this._loop;
     }
+
+    toString(): string {
+        return `${this._type.toString()} ${this._loop.toString()} ${this._loopHead.toString()}`;
+    }
 }
 
 /**
@@ -524,25 +528,34 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             ImmSet(), ImmSet(), ImmList(), ImmList(), ImmMap(), 1);
     }
 
-    private getLoopAction(predRelLoc: RelationLocation, succRelLoc: RelationLocation): LoopAction {
+    private getLoopAction(predLoopStack: ImmList<RelationLocation>, predRelLoc: RelationLocation, succRelLoc: RelationLocation): LoopAction {
         const predRel = this._task.getTransitionRelationById(predRelLoc.getRelationId());
         const succRel = this._task.getTransitionRelationById(succRelLoc.getRelationId());
 
         if (predRel.isLoopHead(predRelLoc.location)) {
-            const predIsLoopHeadOf: TransitionLoop = predRel.getIsInLoopBodyOf(predRelLoc.getLocationId());
-            const predLoop: TransitionLoop = predRel.getIsInLoopBodyOf(predRelLoc.getLocationId());
-            const succLoop: TransitionLoop = succRel.getIsInLoopBodyOf(succRelLoc.getLocationId());
+            const predIsLoopHeadOf: TransitionLoop = predRel.getIsLoopHeadOf(predRelLoc.getLocationId());
+            const predInBodyOf: TransitionLoop = predRel.getIsInLoopBodyOf(predRelLoc.getLocationId());
+            const succInBodyOf: TransitionLoop = succRel.getIsInLoopBodyOf(succRelLoc.getLocationId());
 
-            if (predIsLoopHeadOf == succLoop) {
-                // case 1: succ is in the same loop --> entering or re-entering the loop
-                return new LoopAction(LoopActionType.ENTERING, succLoop, predRelLoc);
-            } else {
-                // case 2: succ is not the same loop --> leaving the loop
-                return new LoopAction(LoopActionType.LEAVING, predIsLoopHeadOf, predRelLoc);
+            if (succInBodyOf) {
+                if (predIsLoopHeadOf == succInBodyOf) {
+                    // case 1: succ is in the same loop --> entering or re-entering the loop
+                    return new LoopAction(LoopActionType.ENTERING, succInBodyOf, succRelLoc.withLocationId(succInBodyOf.loopHead));
+                }
             }
-        } else {
-            return new LoopAction(LoopActionType.NONE, null, null);
+
+            if (predIsLoopHeadOf != succInBodyOf) {
+                if (!predLoopStack.isEmpty()) {
+                    const topElement: RelationLocation = predLoopStack.get(predLoopStack.size-1);
+                    // case 2: succ is not the same loop --> leaving the loop
+                    if (topElement.equals(predRelLoc)) {
+                        return new LoopAction(LoopActionType.LEAVING, predIsLoopHeadOf, predRelLoc.withLocationId(predIsLoopHeadOf.loopHead));
+                    }
+                }
+            }
         }
+
+        return new LoopAction(LoopActionType.NONE, null, null);
     }
 
     private interpreteLocal0(fromState: ControlAbstractState, threadToStep: IndexedThread,
@@ -569,7 +582,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         const succRelLoc = step.succLoc;
         const predLoopStack = step.steppedThread.threadStatus.getLoopStack();
 
-        const loopAction = this.getLoopAction(predRelLoc, succRelLoc);
+        const loopAction = this.getLoopAction(predLoopStack, predRelLoc, succRelLoc);
         switch (loopAction.type) {
             case LoopActionType.ENTERING: {
                 const newLoopStack: ImmList<RelationLocation> = predLoopStack.push(loopAction.loopHead);
@@ -579,7 +592,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 break;
             }
             case LoopActionType.LEAVING: {
-                const newLoopStack = this.popLoop(predLoopStack);
+                const newLoopStack = this.popLoop(predLoopStack, loopAction.loopHead);
                 result = result.withThreadStateUpdate(threadToStep.threadIndex,
                     (ts) =>
                         ts.withLoopStack(newLoopStack));
@@ -1222,23 +1235,24 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result;
     }
 
-    private popLoop(predLoopStack: ImmList<RelationLocation>): ImmList<RelationLocation> {
-        // TODO: Write tests for this method
-        if (predLoopStack.size > 1) {
-            let i = predLoopStack.size-1;
-            const topElement = predLoopStack.get(i);
-
-            while (i > 0) {
-                if (!predLoopStack.get(i).equals(topElement)) {
-                    break;
-                }
-                i--;
-            }
-            return predLoopStack.slice(0, i);
-
-        } else {
+    private popLoop(predLoopStack: ImmList<RelationLocation>, loopHead: RelationLocation): ImmList<RelationLocation> {
+        if (predLoopStack.isEmpty()) {
             return ImmList();
         }
+
+        let i = predLoopStack.size-1;
+        const topElement = predLoopStack.get(i);
+        Preconditions.checkState(topElement.equals(loopHead));
+
+        let toSkip = 0;
+        while (i > 0) {
+            if (!predLoopStack.get(i).equals(topElement)) {
+                break;
+            }
+            toSkip++;
+            i--;
+        }
+        return predLoopStack.skipLast(toSkip);
     }
 
 }

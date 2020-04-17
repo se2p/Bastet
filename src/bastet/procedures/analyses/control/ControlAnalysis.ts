@@ -135,6 +135,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
             return false;
         }
 
+        if (this.steppedOnLoophead(state1) || this.steppedOnLoophead(state2)) {
+            return false;
+        }
+
         return this.wrappedAnalysis.shouldMerge(state1.getWrappedState(), state2.getWrappedState());
     }
 
@@ -252,9 +256,8 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
 
         for (const t of steppedThreads) {
             const ts = t.threadStatus;
-            const actor = this._task.getActorByName(ts.getActorId());
-            const script = actor.getScript(ts.getScriptId());
-            if (script.transitions.isLoopHead(ts.getRelationLocation().getLocationId())) {
+            const relation = this._task.getTransitionRelationById(ts.getRelationLocation().getRelationId());
+            if (relation.isLoopHead(ts.getRelationLocation().getLocationId())) {
                 return true;
             }
         }

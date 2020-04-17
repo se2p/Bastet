@@ -238,7 +238,7 @@ export class TransitionLoop {
         this._loopHead = loopHead;
         this._bodyNodes = ImmSet(loopNodes);
         this._nestedLoops = ImmList(nestedLoops);
-        // ATTENTION: The loop head must not be element of `loopNodes`!
+        // ATTENTION: The loop head must NOT be element of `loopNodes`!
         Preconditions.checkArgument(!this._bodyNodes.has(loopHead));
     }
 
@@ -384,6 +384,17 @@ export class TransitionRelation {
         return this._dom;
     }
 
+    public getIsLoopHeadOf(loc: LocationId): TransitionLoop {
+        if (this.isLoopHead(loc)) {
+            for (const l of this.getLoops()) {
+                if (l.loopHead == loc) {
+                    return l;
+                }
+            }
+        }
+        return null;
+    }
+
     public getIsInLoopBodyOf(loc: LocationId): TransitionLoop {
         Preconditions.checkNotUndefined(this.getLoops());
         Preconditions.checkNotUndefined(this._inBodyOfLoop);
@@ -396,6 +407,7 @@ export class TransitionRelation {
             const inLoopBodyOf: Map<LocationId, TransitionLoop> = new Map();
             const loopDominates: [LocationId, LocationId][] = [];
             for (const l of this.loopHeads) {
+                loopDominates.push([l, null]);
                 for (const m of this.loopHeads) {
                     if (this.dominance.isDominatedBy(l, m)) {
                         if (l != m) {
@@ -406,7 +418,7 @@ export class TransitionRelation {
             }
 
             // Inner loops first
-            const sorted = toposort(loopDominates).reverse();
+            const sorted = toposort(loopDominates).reverse().filter(l => {return l != null} );
             for (const loopHead of sorted) {
                 const bodyNodes: Set<LocationId> = new Set();
                 const nestedIn: Set<TransitionLoop> = new Set();
@@ -427,7 +439,10 @@ export class TransitionRelation {
                 result.push(loop);
 
                 for (const l of loop.bodyNodes) {
-                    inLoopBodyOf.set(l, loop);
+                    // Map the location to the inner loop it belongs to
+                    if (!inLoopBodyOf.get(l)) {
+                        inLoopBodyOf.set(l, loop);
+                    }
                 }
             }
 
