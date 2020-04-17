@@ -123,10 +123,17 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
             return false;
         }
 
-        if (!state1.getIsTargetFor().equals(state2.getIsTargetFor())) {
+        if (!state1.getConditionStates().equals(state2.getConditionStates())) {
             return false;
         }
 
+        if (!state1.getActorScopes().equals(state2.getActorScopes())) {
+            return false;
+        }
+
+        if (!state1.getIsTargetFor().equals(state2.getIsTargetFor())) {
+            return false;
+        }
 
         return this.wrappedAnalysis.shouldMerge(state1.getWrappedState(), state2.getWrappedState());
     }
