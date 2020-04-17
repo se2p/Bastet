@@ -66,11 +66,11 @@ actor HorseObserver is Observer begin
         end
 
         if mouse_touched then begin
-            if now - last_direction_change > 1000000 then begin
+            if now - last_direction_change > 1100000 then begin
                 _RUNTIME_signalFailure("If the mouse is NOT touched, the color must change within every second")
             end
         end else begin
-            if now - last_color_change > 1000000 then begin
+            if now - last_color_change > 1100000 then begin
                 _RUNTIME_signalFailure("If the mouse IS touched, either the direction must change within every second")
             end
         end
