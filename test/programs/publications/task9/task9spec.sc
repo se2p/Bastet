@@ -28,48 +28,60 @@ program Task9Spec
 
 actor HorseObserver is Observer begin
 
-    declare actor_1_id as actor
-    declare mouseTouched as boolean
+    declare horse_id as actor
 
-    declare actor_1_color as float
-    declare actor_1_prev_color as float
+    declare horse_color as float
+    declare horse_prev_color as float
 
-    declare actor_1_direction as int
-    declare actor_1_prev_direction as int
+    declare horse_direction as int
+    declare horse_prev_direction as int
 
-    declare last_change as int
+    declare mouse_touched as boolean
+    declare prev_mouse_touched as boolean
 
-    define atomic isBehaviorSatisfied () begin
-        // (a) Attributes of the first actor
+    declare last_direction_change as int
+    declare last_color_change as int
+    declare last_touching_change as int
 
-        define actor_1_color as cast (attribute "color_effect_value" of actor_1_id) to float
-        define actor_1_direction as cast (attribute "direction" of actor_1_id) to int
+    define atomic checkBehaviorSatisfied () begin
+        define horse_color as cast (attribute "color_effect_value" of horse_id) to float
+        define horse_direction as cast (attribute "direction" of horse_id) to int
+        define mouse_touched as touchingMousePointer(horse_id)
 
-        // The actual invariant check
-        if not actor_1_color = actor_1_prev_color then begin
-           define mouseTouched as true
+        declare now as int
+        define now as _RUNTIME_micros()
+
+        if not (mouse_touched and prev_mouse_touched) then begin
+            define last_touching_change as now
+            define last_direction_change as now
+            define last_color_change as now
         end
 
-        if touchingMousePointer(actor_1_id) then begin
-            if not actor_1_direction = actor_1_prev_direction then begin
-                define mouseTouched as true
-                define last_change as _RUNTIME_millis()
-            end
-        end else begin
-            // Only turn if we are touching the mouse, if we turn and do not touch the mouse, this is wrong
-            if not actor_1_direction = actor_1_prev_direction then begin
-                define mouseTouched as false
-            end
+        if not horse_color = horse_prev_color then begin
+            define last_color_change as now
         end
 
-       if last_change - _RUNTIME_micros() < 10000000 and mouseTouched then begin
-           define result as false
-       end
-    end returns result: boolean
+        if not horse_direction = horse_prev_direction then begin
+            define last_direction_change as now
+        end
+
+        if mouse_touched then begin
+            declare dir_change_sat as boolean
+            define dir_change_sat as now - last_direction_change < 1000000
+
+            declare color_change_sat as boolean
+            define color_change_sat as now - last_color_change < 1000000
+
+            if not dir_change_sat and not color_change_sat then begin
+                _RUNTIME_signalFailure("If the mouse is touched, either the direction or the color must change within every second")
+            end
+        end
+    end
 
     define atomic storeRelevantStateInfosForNext () begin
-        define actor_1_prev_color as actor_1_color
-        define actor_1_prev_direction as actor_1_direction
+        define horse_prev_color as horse_color
+        define horse_prev_direction as horse_direction
+        define prev_mouse_touched as mouse_touched
     end
 
     script on startup do begin
@@ -77,11 +89,11 @@ actor HorseObserver is Observer begin
     end
 
     script on bootstrap finished do begin
-        define actor_1_id as locate actor "Pferd"
-        define last_change as _RUNTIME_millis()
+        define horse_id as locate actor "Pferd"
+        define prev_mouse_touched as false
 
         // First specification check (base condition)
-        assert(isBehaviorSatisfied())
+        checkBehaviorSatisfied()
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
@@ -89,7 +101,7 @@ actor HorseObserver is Observer begin
 
     script on statement finished do begin
         // The actual specification check
-        assert(isBehaviorSatisfied())
+        checkBehaviorSatisfied()
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
