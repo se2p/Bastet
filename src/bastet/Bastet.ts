@@ -39,6 +39,7 @@ import {TypeInformationStorage} from "./syntax/DeclarationScopes";
 import {ToIntermediateTransformer} from "./syntax/transformers/ToIntermediateTransformer";
 import * as fs from "fs";
 import {BastetConfiguration, mergeConfigFilesToJson} from "./utils/BastetConfiguration";
+import {ParsingException} from "./core/exceptions/ParsingException";
 
 const process = require('process');
 
@@ -163,18 +164,7 @@ export class Bastet {
     }
 
     private parseFromIntermediateCode(ident: string, filepath: string, typeStorage: TypeInformationStorage, config: {}): App {
-        Preconditions.checkNotEmpty(filepath);
-
-        const scratchParser : ProgramParser = ProgramParserFactory.createParserFor(filepath);
-
-        // Create the RAW AST
-        const rawAST: RuleNode = scratchParser.parseFile(filepath);
-        Preconditions.checkState(rawAST instanceof ProgramContext );
-
-        const transformer = new ToIntermediateTransformer();
-        const intermediateAST: AstNode = transformer.transform(App.empty(), rawAST, typeStorage, config, filepath);
-
-        return this.createControlFlowFrom(filepath, intermediateAST, App.empty(), typeStorage);
+        return this.parseFromRawCode(ident, filepath, App.empty(), typeStorage, config);
     }
 
     /**
@@ -188,18 +178,26 @@ export class Bastet {
                              config: {}): App {
         Preconditions.checkNotEmpty(filepath);
 
-        // Create the parser for the file format
-        const scratchParser : ProgramParser = ProgramParserFactory.createParserFor(filepath);
+        try {
+            // Create the parser for the file format
+            const scratchParser: ProgramParser = ProgramParserFactory.createParserFor(filepath);
 
-        // Create the RAW AST (no simplifications or generalizations were applied)
-        const rawAST: RuleNode = scratchParser.parseFile(filepath);
+            // Create the RAW AST (no simplifications or generalizations were applied)
+            const rawAST: RuleNode = scratchParser.parseFile(filepath);
 
-        // Transform the AST: Replaces specific statements or expressions
-        // by generic constructs.
-        const transformer = new ToIntermediateTransformer();
-        const intermediateAST: AstNode = transformer.transform(staticLibraryModel, rawAST, typeStorage, config, filepath);
+            // Transform the AST: Replaces specific statements or expressions
+            // by generic constructs.
+            const transformer = new ToIntermediateTransformer();
+            const intermediateAST: AstNode = transformer.transform(staticLibraryModel, rawAST, typeStorage, config, filepath);
 
-        return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, typeStorage);
+            return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, typeStorage);
+        } catch (e) {
+            if (e instanceof ParsingException) {
+                throw new ParsingException(`Parsing '${filepath}' failed: ${e.cause}`, e.node);
+            } else {
+                throw e;
+            }
+        }
     }
 
     private createControlFlowFrom(programOrigin: string, intermediateSpecAST: AstNode, libraryModule: App,

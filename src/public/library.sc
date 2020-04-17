@@ -741,7 +741,6 @@ role ScratchSprite is ScratchEntity begin
         define leg_a as leg_a * (size_fst / 100.0)
         define leg_b as leg_b * (size_fst / 100.0)
 
-
         declare radius as float
         define radius as 0.5 * mathSqrt(leg_a * leg_a + leg_b * leg_b)
 

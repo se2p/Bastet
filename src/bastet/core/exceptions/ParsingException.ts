@@ -23,10 +23,24 @@ import {ParserRuleContext, Token} from "antlr4ts";
 
 export class ParsingException extends Error {
 
-    constructor(message: string, node: ParserRuleContext) {
+    private readonly _node: ParserRuleContext;
+
+    private readonly _cause: string;
+
+    constructor(cause: string, node: ParserRuleContext) {
         const start = ParsingException.toPositionString(node.start);
         const end = ParsingException.toPositionString(node.stop);
-        super(`Parsing failed. Check the syntax of the input program. ${message}\n Code between ${start} and ${end}`);
+        super(`Check the syntax of the input program. ${cause}\n Code between ${start} and ${end}`);
+        this._node = node;
+        this._cause = cause;
+    }
+
+    get cause(): string {
+        return this._cause;
+    }
+
+    get node(): ParserRuleContext {
+        return this._node;
     }
 
     private static toPositionString(token: Token) {
