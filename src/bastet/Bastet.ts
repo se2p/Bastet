@@ -40,6 +40,7 @@ import {ToIntermediateTransformer} from "./syntax/transformers/ToIntermediateTra
 import * as fs from "fs";
 import {BastetConfiguration, mergeConfigFilesToJson} from "./utils/BastetConfiguration";
 import {ParsingException} from "./core/exceptions/ParsingException";
+import {NodeSystemLayer} from "./utils/SystemLayer";
 
 const process = require('process');
 
@@ -194,7 +195,8 @@ export class Bastet {
             return this.createControlFlowFrom(filepath, intermediateAST, staticLibraryModel, typeStorage);
         } catch (e) {
             if (e instanceof ParsingException) {
-                throw new ParsingException(`Parsing '${filepath}' failed: ${e.cause}`, e.node);
+                const bn = new NodeSystemLayer().basename(filepath);
+                throw new ParsingException(`Parsing '${bn}' failed: ${e.cause}`, e.node);
             } else {
                 throw e;
             }

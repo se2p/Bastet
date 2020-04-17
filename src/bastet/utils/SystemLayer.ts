@@ -27,6 +27,8 @@ export interface SystemLayer {
 
     readFileAsJson(filePath: string): {};
 
+    basename(filePath: string): string;
+
 }
 
 export class NodeSystemLayer implements SystemLayer {
@@ -37,4 +39,10 @@ export class NodeSystemLayer implements SystemLayer {
         return JSON.parse(data);
     }
 
+    basename(filePath: string): string {
+        const sp = filePath.split("/");
+        return sp[sp.length-1];
+    }
+
 }
+
