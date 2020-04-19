@@ -20,13 +20,13 @@
  *
  */
 
-import {SMTFactory, Z3SMT} from "../../../../src/bastet/utils/smt/z3/Z3SMT";
+import {SMTFactory, Z3Const, Z3Model, Z3SMT} from "../../../../src/bastet/utils/smt/z3/Z3SMT";
 import {VariableWithDataLocation} from "../../../../src/bastet/syntax/ast/core/Variable";
 import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataLocation";
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
-import {ConcreteNumber} from "../../../../src/bastet/procedures/domains/ConcreteElements";
+import {ConcreteNumber, ConcreteString} from "../../../../src/bastet/procedures/domains/ConcreteElements";
 import {Z3FirstOrderLattice, Z3NumberFormula} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
-import {IntegerType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
+import {BooleanType, IntegerType, StringType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
 
 let smt: Z3SMT;
 let ctx;
@@ -210,4 +210,76 @@ test("Lattice Meet 1", () => {
     prover.assert(result);
     const isUnsat = prover.isUnsat();
     expect(isUnsat).toBe(true);
+});
+
+test("Get model for unsat formula", () => {
+   const oneGreaterZero = theories.intTheory.isGreaterThan(theories.intTheory.one(), theories.intTheory.zero());
+
+   prover.push();
+   prover.assert(oneGreaterZero);
+   const isUnsat = prover.isUnsat();
+   expect(isUnsat).toBe(false);
+
+   const model = prover.getModel();
+   expect(model.getNumConst()).toBe(0);
+   expect(model.getConstValues()).toStrictEqual([]);
+});
+
+test("Get model for int formula", () => {
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
+    const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), IntegerType.instance()));
+
+    const xLessThan3 = theories.intTheory.isLessThan(theories.intTheory.abstractNumberValue(x), theories.intTheory.fromConcreteNumber(new ConcreteNumber(3)));
+
+    const xGreater1 = theories.intTheory.isGreaterThan(theories.intTheory.abstractNumberValue(x), theories.intTheory.fromConcreteNumber(new ConcreteNumber(1)));
+
+    const xPlus2 = theories.intTheory.plus(theories.intTheory.abstractNumberValue(x), theories.intTheory.fromConcreteNumber(new ConcreteNumber(2)));
+    const yEqualsXPlus2 = theories.intTheory.isNumberEqualTo(theories.intTheory.abstractNumberValue(y), xPlus2);
+
+    prover.push();
+    prover.assert(theories.boolTheory.and(xGreater1, theories.boolTheory.and(xLessThan3, yEqualsXPlus2)));
+    const isUnsat = prover.isUnsat();
+    expect(isUnsat).toBe(false);
+
+    const model: Z3Model = prover.getModel();
+    expect(model.getNumConst()).toBe(2);
+    expect(model.getConstValues()).toStrictEqual([new Z3Const("y", 4), new Z3Const("x", 2)]);
+});
+
+test('Get model for string formula', () => {
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), StringType.instance()));
+
+    const xContainsB = theories.stringTheory.stringContains(theories.stringTheory.abstractStringValue(x), theories.stringTheory.fromConcrete(new ConcreteString("B")));
+
+    const xJoinedOther = theories.stringTheory.joinStrings(theories.stringTheory.abstractStringValue(x), theories.stringTheory.fromConcrete(new ConcreteString("b")));
+    const xJoinedOtherEqualsBob = theories.stringTheory.stringsEqual(xJoinedOther, theories.stringTheory.fromConcrete(new ConcreteString("Bob")));
+
+    prover.push();
+    prover.assert(theories.boolTheory.and(xContainsB, xJoinedOtherEqualsBob));
+    const isUnsat = prover.isUnsat();
+    expect(isUnsat).toBe(false);
+
+    const model: Z3Model = prover.getModel();
+    expect(model.getNumConst()).toBe(1);
+    expect(model.getConstValues()).toStrictEqual([new Z3Const("x", "Bo")]);
+});
+
+test('Get model for boolean formula (x && !z)', () => {
+    const x = theories.boolTheory.abstractBooleanValue(new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance())));
+    const z = theories.boolTheory.abstractBooleanValue(new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("z"), BooleanType.instance())));
+    const notZ = theories.boolTheory.not(z);
+
+    prover.push();
+    prover.assert(theories.boolTheory.and(x, notZ));
+    const isUnsat = prover.isUnsat();
+    expect(isUnsat).toBe(false);
+
+    const model: Z3Model = prover.getModel();
+    expect(model.getNumConst()).toBe(2);
+
+    const constValues = model.getConstValues();
+    const constZ = constValues.find(constV => constV.getName() === "z");
+    expect(constZ.getValue()).toBe(false);
+    const constX = constValues.find(constV => constV.getName() === "x");
+    expect(constX.getValue()).toBe(true);
 });
