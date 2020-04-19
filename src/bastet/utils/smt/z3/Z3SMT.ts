@@ -20,7 +20,15 @@
  *
  */
 
-import {LibZ3InContext, LibZ3NonContext, Z3_solver} from "./libz3";
+import {
+    LibZ3InContext,
+    LibZ3NonContext,
+    Z3_ast,
+    Z3_func_decl,
+    Z3_model,
+    Z3_solver, Z3_sort,
+    Z3_symbol,
+} from './libz3';
 import {Preconditions} from "../../Preconditions";
 import {WasmJSInstance} from "./WasmInstance";
 import {Z3FirstOrderFormula, Z3FirstOrderLattice, Z3Theories} from "./Z3Theories";
@@ -112,6 +120,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
 
     private _ctx: LibZ3InContext;
     private _solver: Z3_solver;
+    private _model: Z3Model;
 
     constructor(ctx: LibZ3InContext) {
         super();
@@ -164,8 +173,110 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
     public release(): void {
         this.reset();
         this._ctx.solver_dec_ref(this._solver);
+        this._model.release();
     }
 
+    public getModel(): Z3Model {
+        if (!this._model) {
+            this._model = new Z3Model(this._ctx, this._ctx.solver_get_model(this._solver));
+        }
+
+        return this._model;
+    }
+}
+
+export class Z3Model {
+    private readonly _ctx: LibZ3InContext;
+    private readonly _model: Z3_model;
+
+    constructor(ctx: LibZ3InContext, model: Z3_model) {
+        this._ctx = Preconditions.checkNotUndefined(ctx);
+        this._model = Preconditions.checkNotUndefined(model);
+
+        this._ctx.model_inc_ref(model);
+    }
+
+    public release(): void {
+        this._ctx.model_dec_ref(this._model);
+    }
+
+    public getConstValues(): Z3Const[] {
+        const constValues: Z3Const[] = [];
+
+        for (let index = 0; index < this.getNumConst(); index++) {
+            const constDecl: Z3_func_decl = this._ctx.model_get_const_decl(this._model, new Uint32(index));
+
+            constValues.push(Z3Const.of(constDecl, this._ctx, this._model));
+        }
+
+        return constValues;
+    }
+
+    public getNumConst(): number {
+        return this._ctx.model_get_num_consts(this._model).val();
+    }
+}
+
+type Z3ConstType = string|number|boolean;
+
+export class Z3Const {
+    private readonly _name: string;
+    private readonly _value: Z3ConstType;
+
+    constructor(name: string, value: Z3ConstType) {
+        Preconditions.checkNotUndefined(name);
+
+        this._name = name;
+        this._value = value;
+    }
+
+    public getName(): string {
+        return this._name;
+    }
+
+    public getValue(): Z3ConstType {
+        return this._value;
+    }
+
+    public static of(constDecl: Z3_func_decl, ctx: LibZ3InContext, model: Z3_model): Z3Const {
+        Preconditions.checkNotUndefined(constDecl);
+        Preconditions.checkNotUndefined(ctx);
+        Preconditions.checkNotUndefined(model);
+
+        return new Z3Const(Z3Const.getConstName(ctx, constDecl), this.getConstValue(ctx, constDecl, model));
+    }
+
+    private static getConstName(ctx: LibZ3InContext, constDecl: Z3_func_decl): string {
+        const symbol: Z3_symbol = ctx.get_decl_name(constDecl);
+        return ctx.get_symbol_string(symbol);
+    }
+
+    private static getConstValue(ctx: LibZ3InContext, constDecl: Z3_func_decl, model: Z3_model): Z3ConstType {
+        const constInterp: Z3_ast = ctx.model_get_const_interp(model, constDecl);
+        ctx.inc_ref(constInterp);
+
+        const value = this.mapInterpToValue(constInterp, ctx);
+
+        ctx.dec_ref(constInterp);
+
+        return value;
+    }
+
+    private static mapInterpToValue(constInterp: Z3_ast, ctx: LibZ3InContext): Z3ConstType {
+        const sort: Z3_sort = ctx.get_sort(constInterp);
+        const sortString: string = ctx.sort_to_string(sort);
+
+        switch (sortString) {
+            case "String":
+                return ctx.get_string(constInterp);
+            case "Int":
+                return parseInt(ctx.get_numeral_string(constInterp));
+            case "Bool":
+                return Z3_L_TRUE == ctx.get_bool_value(constInterp).val();
+            default:
+                throw new IllegalStateException(`Unknown const type '${sortString}'`)
+        }
+    }
 }
 
 
