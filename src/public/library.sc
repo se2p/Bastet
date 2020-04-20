@@ -364,6 +364,8 @@ extern _RUNTIME_getInitialActors () returns list of string
 
     extern mathPowten(n: int) returns int
 
+    extern label (str: string)
+
     define getMouseX()  begin
         declare io as actor
 

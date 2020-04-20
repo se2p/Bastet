@@ -413,6 +413,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 const properties = this.extractFailedForProperties(r.getThreadStates());
                 result.push(r.withWrappedState(w)
                     .withSteppedFor([step.steppedThread.threadIndex])
+                    .withThreadStateUpdate(step.steppedThread.threadIndex, (ts) => ts.withOperations(ImmList()))
                     .withIsTargetFor(properties));
             }
         }
