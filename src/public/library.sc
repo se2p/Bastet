@@ -92,8 +92,13 @@ role MathActor begin
             // TODO use constant for pi
             define result as mathAtan((y/x)) +  PI
         end else if x < 0.0 and y = 0.0 then begin
-            // TODO by definition this is +- PI, can we do this with assumes?
-            define result as PI
+            declare nondet as int
+            if nondet = 1 then begin
+                define result as PI
+            end else begin
+                define result as 0.0 - PI
+            end
+            _RUNTIME_signalFailure("3")
         end else if x < 0.0 and y < 0.0 then begin
             define result as mathAtan((y/x)) -  PI
         end else if x = 0.0 and y > 0.0 then begin
@@ -281,6 +286,15 @@ role MathActor begin
         define result as (result + (num /result)) / 2.0
         define result as (result + (num /result)) / 2.0
     end returns result: float
+
+    define mathAbsF(n: float) begin
+        if n < 0.0 then begin
+            define result as n * (0.0-1.0)
+        end else begin
+            define result as n
+        end
+
+    end returns result: float
 end
 
 role RuntimeEntity is MathActor begin
@@ -459,7 +473,7 @@ extern _RUNTIME_getInitialActors () returns list of string
         define leg_b_fst as leg_b_fst * (size_fst / 100.0)
 
         declare radius_fst as float
-        define radius_fst as 0.5 * mathSqrt(leg_a_fst * leg_a_fst + leg_b_fst * leg_b_fst)
+        define radius_fst as 0.5 * mathSqrt(mathAbsF(leg_a_fst * leg_a_fst + leg_b_fst * leg_b_fst))
 
         declare size_snd as float
         declare leg_a_snd as float
@@ -472,7 +486,7 @@ extern _RUNTIME_getInitialActors () returns list of string
         define leg_b_snd as leg_b_snd * (size_snd / 100.0)
 
         declare radius_snd as float
-        define radius_snd as 0.5 * mathSqrt(leg_a_snd * leg_a_snd + leg_b_snd * leg_b_snd)
+        define radius_snd as 0.5 * mathSqrt(mathAbsF(leg_a_snd * leg_a_snd + leg_b_snd * leg_b_snd))
 
         declare x_fst as float
         define x_fst as cast (cast attribute "x" of fst to int) to float
@@ -484,7 +498,7 @@ extern _RUNTIME_getInitialActors () returns list of string
         declare y_snd as float
         define y_snd as cast (cast attribute "y" of snd to int) to float
 
-        define result as not (((mathSqrt((x_fst + x_snd)*(x_fst + x_snd) + (y_fst + y_snd) * (y_fst + y_snd)) - radius_fst - radius_snd) > 0.0))
+        define result as not (((mathSqrt(mathAbsF((x_fst + x_snd)*(x_fst + x_snd) + (y_fst + y_snd) * (y_fst + y_snd))) - radius_fst - radius_snd) > 0.0))
 
     end returns result : boolean
 
@@ -744,7 +758,7 @@ role ScratchSprite is ScratchEntity begin
         define leg_b as leg_b * (size_fst / 100.0)
 
         declare radius as float
-        define radius as 0.5 * mathSqrt(leg_a * leg_a + leg_b * leg_b)
+        define radius as 0.5 * mathSqrt(mathAbsF(leg_a * leg_a + leg_b * leg_b))
 
         declare size_snd as float
         declare leg_a_other as float
@@ -758,7 +772,7 @@ role ScratchSprite is ScratchEntity begin
 
 
         declare radius_other as float
-        define radius_other as 0.5 * mathSqrt(leg_a_other * leg_a_other + leg_b_other * leg_b_other)
+        define radius_other as 0.5 * mathSqrt(mathAbsF(leg_a_other * leg_a_other + leg_b_other * leg_b_other))
 
         declare x_other as float
         define x_other as cast (cast attribute "x" of obj to int) to float
@@ -770,7 +784,10 @@ role ScratchSprite is ScratchEntity begin
         declare y_this as float
         define y_this as cast y to float
 
-        define result as not (((mathSqrt((x_this + x_other)*(x_this + x_other) + (y_this + y_other) * (y_this + y_other)) - radius - radius_other) > 0.0))
+        declare intermedRes as float
+        define intermedRes as mathAbsF((x_this + x_other)*(x_this + x_other) + (y_this + y_other) * (y_this + y_other))
+
+        define result as not (((mathSqrt(intermedRes) - radius - radius_other) > 0.0))
 
     end returns result : boolean
 

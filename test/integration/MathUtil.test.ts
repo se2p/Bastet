@@ -74,3 +74,14 @@ test("Test Nearest Perfect Sqrt 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-NearestPerfectSqrt-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
+
+test("Test MathAbsF 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-AbsF-1_UNSAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
+test("Test MathAbsF 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-AbsF-1_SAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
