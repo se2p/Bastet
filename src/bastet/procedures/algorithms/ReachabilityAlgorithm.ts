@@ -106,6 +106,8 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
                 // MERGE: If desired, merge certain states
                 [frontier, reached] = this._analysis.mergeInto(ePrimePrime, frontier, reached, (s) => s, (s) => s);
 
+                this.algorithmMonitoringHook(frontier, reached);
+
                 // Statistics
                 [frontier, reached] = this.takeNoteOfResult(frontier, reached);
 
