@@ -98,7 +98,6 @@ role MathActor begin
             end else begin
                 define result as 0.0 - PI
             end
-            _RUNTIME_signalFailure("3")
         end else if x < 0.0 and y < 0.0 then begin
             define result as mathAtan((y/x)) -  PI
         end else if x = 0.0 and y > 0.0 then begin
