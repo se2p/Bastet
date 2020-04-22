@@ -125,6 +125,24 @@ describe("TransitionRelations", () => {
 
     });
 
+    describe("fork-merge-invariant", () => {
+        const op = new RawOperation(new StopAllStatement());
+        const tr = TransitionRelation.builder()
+            .addTransitionByIDs(11, 61, op)
+            .addTransitionByIDs(61, 10, op)
+            .addTransitionByIDs(11, 10, op)
+            .addEntryLocationWithID(11)
+            .addExitLocationWithID(10)
+            .build();
+
+        const trPrime = TransitionRelations.introduceEpsilonToMergeTransitions(tr);
+        it ("added intermediate transitions", () => {
+           expect(trPrime.transitions.size).toEqual(4);
+           const irrTrans = trPrime.transitionsTo(10).filter((t) => t.opId == ProgramOperations.irreducibleEpsilon().ident);
+           expect(irrTrans.length).toEqual(1);
+        });
+    });
+
     describe("loops", () => {
 
         describe("case: minimal loop", () => {

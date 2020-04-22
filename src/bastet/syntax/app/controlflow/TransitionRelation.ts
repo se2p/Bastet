@@ -111,6 +111,19 @@ export class TransitionRelationBuilder {
         return this.addTransition(ControlLocation.for(from), ControlLocation.for(to), op);
     }
 
+    public removeTransition(from: LocationId, to: LocationId, op: OperationId): this {
+        const transitionsFrom = new Map(this._transitions.get(from));
+        const transitionOps = new Set(transitionsFrom.get(to));
+        transitionOps.delete(op);
+        if (transitionOps.size > 0) {
+            transitionsFrom.set(to, transitionOps);
+        } else {
+            transitionsFrom.delete(to);
+        }
+        this._transitions.set(from, transitionsFrom);
+        return this;
+    }
+
     public addTransition(from: ControlLocation, to: ControlLocation, op: ProgramOperation): this {
         // Add the transition
         let fromMap: Map<LocationId, Set<OperationId>> = this._transitions.get(from.ident);
@@ -186,6 +199,16 @@ export class TransitionRelationBuilder {
         return this;
     }
 
+    addRelation(tr: TransitionRelation): this {
+        this.addAllTransitionsOf(tr);
+        for (const l of tr.entryLocations) {
+            this.addEntryLocation(l);
+        }
+        for (const l of tr.exitLocations) {
+            this.addExitLocation(l);
+        }
+        return this;
+    }
 }
 
 export type TransitionTable = ImmMap<LocationId, ImmMap<LocationId, ImmSet<OperationId>>>;
@@ -498,8 +521,8 @@ export class TransitionRelation {
         return this._entryLocations;
     }
 
-    get exitLocations(): IterableIterator<ControlLocation> {
-        throw new ImplementMeException();
+    get exitLocations(): Iterable<ControlLocation> {
+        return this._exitLocations.map((lid) => ControlLocation.for(lid));
     }
 
     get exitLocationSet(): ImmSet<LocationId> {
@@ -834,6 +857,42 @@ export class TransitionRelations {
             .build();
     }
 
+    /**
+     * Add dummy transitions to nodes on that the control flow merges
+     * if a branch consists of one transition only. This step establishes an important
+     * invariant on that other analyses, for example, the graph analysis, rely on.
+     *
+     * @param tr
+     */
+    public static introduceEpsilonToMergeTransitions(tr: TransitionRelation): TransitionRelation {
+        const builder = TransitionRelation.builder();
+        builder.addRelation(tr);
+
+        // For all nodes that are entered by more than one transition
+        for (const loc of tr.locationSet) {
+            // If `loc` is a merge location
+            const transTo = tr.transitionsTo(loc);
+            if (transTo.length > 1) {
+                for (const trans of transTo) {
+                    // If the predecessor is a fork
+                    const predLoc: LocationId = trans.target;
+                    if (tr.transitionsFrom(predLoc).length > 1) {
+                        // Add a dummy transition between `predLoc` and `loc`
+                        // - Introduce an intermediate location and add a corresponding transition
+                        const intermediateLoc = ControlLocation.fresh();
+                        builder.addTransitionByIDs(intermediateLoc.ident, loc, ProgramOperations.irreducibleEpsilon());
+                        // - Remove the original transition
+                        builder.removeTransition(predLoc, loc, trans.opId);
+                        // - Re-add a transition with the originals operation (semantics)
+                        builder.addTransitionByIDs(predLoc, intermediateLoc.ident, ProgramOperation.for(trans.opId));
+                    }
+                }
+            }
+        }
+
+        return builder.build();
+    }
+
     private static buildEquivalenceClasses(tr: TransitionRelation): Map<LocationId, LocationEquivalence> {
         const result: Map<LocationId, LocationEquivalence> = new Map();
 
@@ -902,6 +961,11 @@ export class TransitionRelations {
         Preconditions.checkState(backwardsClosure.size > 0);
 
         return new Set([...forwardsClosure, ...backwardsClosure]);
+    }
+
+    static establishAnalysisInvariants(tr: TransitionRelation): TransitionRelation {
+        return TransitionRelations.introduceEpsilonToMergeTransitions(
+            TransitionRelations.eliminateEpsilons(tr));
     }
 
     static eliminateEpsilons(tr: TransitionRelation): TransitionRelation {

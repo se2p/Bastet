@@ -166,6 +166,15 @@ export class ProgramOperations {
         return ProgramOperations.EPSILON_OP;
     }
 
+    private static IRREDUCIBLE_EPSILON_OP: ProgramOperation;
+
+    public static irreducibleEpsilon(): ProgramOperation {
+        if (!ProgramOperations.IRREDUCIBLE_EPSILON_OP) {
+            ProgramOperations.IRREDUCIBLE_EPSILON_OP = new RawOperation(new EpsilonStatement());
+        }
+        return ProgramOperations.IRREDUCIBLE_EPSILON_OP;
+    }
+
 }
 
 export class ProgramOperationFactory {
