@@ -44,6 +44,21 @@ test("Test getImageHeight 1 safe", done => {
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
+test("Test getImageHeight 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getImageHeight-1_UNSAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
+test("Test getImageWidth 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getImageWidth-1_SAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
+test("Test getImageWidth 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getImageWidth-1_UNSAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
 test("Test getGraphicsIndexById 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/runtime/runtime-getGraphicIndexById-1_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);

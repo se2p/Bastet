@@ -6,8 +6,7 @@ actor MiniActor is ScratchSprite begin
     image Elefant2 "0.png"
 
     script on startup do begin
-        if getImageHeight("Elefant1") = 360 then begin
-        end else begin
+        if getImageHeight("Elefant1") = 480 then begin
             _RUNTIME_signalFailure("Wrong Image Height")
         end
     end
