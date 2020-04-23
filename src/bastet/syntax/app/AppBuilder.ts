@@ -190,7 +190,7 @@ export class AppBuilder {
             methodTr = TransitionRelations.concat(methodTr, returnStmtInList.accept(visitor));
 
             // 4. Eliminate epsilon transitions
-            methodTr = TransitionRelations.eliminateEpsilons(methodTr);
+            methodTr = TransitionRelations.establishAnalysisInvariants(methodTr);
 
             // 5. Assign a name to the transition relation
             methodTr = TransitionRelations.named(methodTr, m.ident.text);
@@ -212,7 +212,7 @@ export class AppBuilder {
             const event = script.event;
             const visitor = new RelationBuildingVisitor();
             const transRelation = TransitionRelations.named(
-                TransitionRelations.eliminateEpsilons(
+                TransitionRelations.establishAnalysisInvariants(
                     script.stmtList.accept(visitor)), scriptId.text);
 
             result.push(new Script(scriptId, event,
@@ -258,7 +258,7 @@ export class AppBuilder {
 
         const transrelLocs: TransitionRelation = declarationStmtList.accept(visitor);
         const transrelSet: TransitionRelation = stmtList.accept(visitor);
-        const compundTransRel = TransitionRelations.eliminateEpsilons(
+        const compundTransRel = TransitionRelations.establishAnalysisInvariants(
             TransitionRelations.concat(transrelRes,
                 TransitionRelations.concat(transrelLocs, transrelSet)));
 
