@@ -554,10 +554,12 @@ role MathActor begin
         declare result as float
         define result as nearestPerfectSqrt(num)
 
-        // Three iterations of newton
-        define result as (result + (num /result)) / 2.0
-        define result as (result + (num /result)) / 2.0
-        define result as (result + (num /result)) / 2.0
+        if not (num = result) then begin
+            // Three iterations of newton
+            define result as (result + (num /result)) / 2.0
+            define result as (result + (num /result)) / 2.0
+            define result as (result + (num /result)) / 2.0
+        end
     end returns result: float
 
     define mathAbsF(n: float) begin
