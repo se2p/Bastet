@@ -113,8 +113,14 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
                     // Handle property violations
                     if (reached.getAddedLast().length > 0) {
                         Preconditions.checkState(reached.getAddedLast().length > 0);
-                        const lastState = reached.getAddedLast()[0];
-                        const targetProperties = ImmSet<Property>(this._analysis.target(lastState));
+                        // Determine the target state and the violated properties
+                        const targetState = reached.getAddedLast()[0];
+                        const targetProperties = ImmSet<Property>(this._analysis.target(targetState));
+
+                        // Call the witness handler
+                        this._analysis.handleViolatingState(reached, targetState);
+
+                        // Adjust the property sets
                         violated = violated.union(targetProperties);
                         unknown = unknown.subtract(violated);
 

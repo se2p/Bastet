@@ -241,4 +241,8 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return ImmSet([new PartitionKey(ImmList())]);
     }
 
+    handleViolatingState(reached: ReachedSet<AbstractState>, violating: AbstractState) {
+        throw new ImplementMeException();
+    }
+
 }

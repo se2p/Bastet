@@ -21,14 +21,16 @@
  */
 
 
-import {DefaultAnalysisStateSet, FrontierSet, StatePartitionOperator} from "../../algorithms/StateSet";
+import {DefaultAnalysisStateSet, FrontierSet, ReachedSet, StatePartitionOperator} from "../../algorithms/StateSet";
 import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {GraphPath, GraphPathSet} from "./GraphPath";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
 
-export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState> {
+export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState>
+    implements ReachedSet<GraphAbstractState>
+{
 
     private readonly _frontierSet: FrontierSet<E>;
 

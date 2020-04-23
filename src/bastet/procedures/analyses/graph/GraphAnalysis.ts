@@ -57,6 +57,8 @@ import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgument
 import {Set as ImmSet} from "immutable"
 import {GraphContextToDot} from "./GraphContextToDot";
 import {GraphCoverCheckStopOperator} from "./GraphCoverCheckStopOperator";
+import {DummyHandler, WitnessHandler} from "../WitnessHandlers";
+import {WitnessExporter} from "./witnesses/WitnessExporter";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 
@@ -70,6 +72,10 @@ export class GraphAnalysisConfig extends BastetConfiguration {
 
     get stopOperator(): string {
         return this.getStringProperty('stopOperator', 'CheckCoverage');
+    }
+
+    get witnessHandler(): string {
+        return this.getStringProperty('witnessHandler', 'DoNothing');
     }
 
 }
@@ -93,6 +99,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     private readonly _mergeIntoOp: MergeIntoOperator<GraphAbstractState, GraphAbstractState>;
 
     private readonly _stopOp: StopOperator<GraphAbstractState, GraphAbstractState>;
+
+    private readonly _witnessHandler: WitnessHandler<GraphAbstractState>;
 
     private readonly _config: GraphAnalysisConfig;
 
@@ -120,6 +128,14 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
             this._stopOp = new NoStopOperator();
         } else {
             throw new IllegalArgumentException("Illegal stop operator configuration");
+        }
+
+        if (this._config.witnessHandler == 'DoNothing') {
+            this._witnessHandler = DummyHandler.create();
+        } else if (this._config.witnessHandler == 'ExportWitness') {
+            this._witnessHandler = new WitnessExporter();
+        } else {
+            throw new IllegalArgumentException("Illegal witness handler configuration");
         }
     }
 
@@ -213,6 +229,10 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
 
     getPartitionKeys(element: GraphAbstractState): ImmSet<PartitionKey> {
         return element.getPartitionKeys();
+    }
+
+    handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
+        return this._witnessHandler.handleViolatingState(reached, violating);
     }
 
 }

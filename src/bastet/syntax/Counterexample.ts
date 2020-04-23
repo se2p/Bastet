@@ -20,6 +20,11 @@
  *
  */
 
-export class Counterexample {
+import {Set as ImmSet} from "immutable";
+import {Property} from "./Property";
+
+export interface Counterexample {
+
+    violatedProperties: ImmSet<Property>;
 
 }
