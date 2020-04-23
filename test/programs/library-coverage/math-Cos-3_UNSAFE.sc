@@ -4,7 +4,7 @@ actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
         declare alpha as float
-        define alpha as 324.0
+        define alpha as 8.9
 
         declare result as float
         define result as mathCos(alpha)
