@@ -22,22 +22,24 @@
 import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-test("Test pointTowards 1 safe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-pointTowards-1_SAFE.sc"
+xtest("Test Atan2 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-Atan2-1_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test pointTowards 1 unsafe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-pointTowards-1_UNSAFE.sc"
+test("Test Atan2 2 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-Atan2-2_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test moveSteps 1 safe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-moveSteps-1_SAFE.sc"
+xtest("Test Atan2 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-Atan2-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test moveSteps 1 unsafe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-moveSteps-1_UNSAFE.sc"
+test("Test Atan2 2 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-Atan2-2_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
+
+

@@ -4,7 +4,7 @@ actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
         declare x as float
-        define x as 0.0-35.0
+        define x as 0.0-0.61
 
         declare y as float
         define y as 0.0
