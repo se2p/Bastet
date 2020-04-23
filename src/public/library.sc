@@ -969,6 +969,9 @@ role ScratchSprite is ScratchEntity begin
          end
     end
 
+    define atomic pointTowardsSelf() begin
+    end
+
     define atomic moveSteps (n: int) begin
         declare nf as float
         declare dx as float
