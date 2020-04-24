@@ -64,11 +64,21 @@ test("Test MathSqrt 2 unsafe", done => {
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
+test("Test MathSqrt 3 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-Sqrt-3_SAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
 test("Test Nearest Perfect Sqrt 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-NearestPerfectSqrt-1_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
+test("Test Nearest Perfect Sqrt 2 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/math-NearestPerfectSqrt-2_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
+
 
 test("Test Nearest Perfect Sqrt 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-NearestPerfectSqrt-1_UNSAFE.sc"

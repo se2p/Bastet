@@ -493,7 +493,7 @@ role MathActor begin
     end returns result: float
 
     define atomic nearestPerfectSqrt(num: float) begin
-          if num < 0.0 then begin
+        if num < 0.0 then begin
             _RUNTIME_signalFailure("Sqrt of negative number not allowed")
           end else if num = 0.0 then begin
 			 define result as 0.0
@@ -550,14 +550,17 @@ role MathActor begin
           end
     end returns result: float
 
+
     define mathSqrt(num: float) begin
         declare result as float
         define result as nearestPerfectSqrt(num)
 
-        // Three iterations of newton
-        define result as (result + (num /result)) / 2.0
-        define result as (result + (num /result)) / 2.0
-        define result as (result + (num /result)) / 2.0
+        if not (num = result) then begin
+            // Three iterations of newton
+            define result as (result + (num /result)) / 2.0
+            define result as (result + (num /result)) / 2.0
+            define result as (result + (num /result)) / 2.0
+        end
     end returns result: float
 
     define mathAbsF(n: float) begin
@@ -733,45 +736,55 @@ extern _RUNTIME_getInitialActors () returns list of string
 
     // @Category "Specification"
     define touchingObjects (fst: actor, snd: actor) begin
-        // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
+            declare size_fst as float
+            declare width as float
+            declare height as float
 
-        declare size_fst as float
-        declare leg_a_fst as float
-        declare leg_b_fst as float
-        define leg_a_fst as cast (cast attribute "active_graphic_width" of fst to int) to float
-        define leg_b_fst as cast (cast attribute "active_graphic_height" of fst to int) to float
+            // TODO: Query attributes of myself and the other actor
+            define width as cast (cast attribute "active_graphic_width" of fst to int) to float
+            define height as cast (cast attribute "active_graphic_height" of fst to int) to float
+            define size_fst as cast (cast attribute "size" of fst to int) to float
 
-        define size_fst as cast (cast attribute "size" of fst to int) to float
-        define leg_a_fst as leg_a_fst * (size_fst / 100.0)
-        define leg_b_fst as leg_b_fst * (size_fst / 100.0)
+            define width as width * (size_fst / 100.0)
+            define height as height * (size_fst / 100.0)
 
-        declare radius_fst as float
-        define radius_fst as 0.5 * mathSqrt(mathAbsF(leg_a_fst * leg_a_fst + leg_b_fst * leg_b_fst))
+            declare size_snd as float
+            declare width_snd as float
+            declare height_snd as float
+            define width_snd as cast (cast attribute "active_graphic_width" of snd to int) to float
+            define height_snd as cast (cast attribute "active_graphic_height" of snd to int) to float
 
-        declare size_snd as float
-        declare leg_a_snd as float
-        declare leg_b_snd as float
-        define leg_a_snd as cast (cast attribute "active_graphic_width" of snd to int) to float
-        define leg_b_snd as cast (cast attribute "active_graphic_height" of snd to int) to float
+            define size_snd as cast (cast attribute "size" of snd to int) to float
+            define width_snd as width_snd * (size_snd / 100.0)
+            define height_snd as height_snd * (size_snd / 100.0)
 
-        define size_snd as cast (cast attribute "size" of snd to int) to float
-        define leg_a_snd as leg_a_snd * (size_snd / 100.0)
-        define leg_b_snd as leg_b_snd * (size_snd / 100.0)
+            declare x_snd as float
+            define x_snd as cast (cast attribute "x" of snd to int) to float
+            declare y_snd as float
+            define y_snd as cast (cast attribute "y" of snd to int) to float
 
-        declare radius_snd as float
-        define radius_snd as 0.5 * mathSqrt(mathAbsF(leg_a_snd * leg_a_snd + leg_b_snd * leg_b_snd))
+            declare x_fst as float
+            define x_fst as cast (cast attribute "x" of fst to int) to float
+            declare y_fst as float
+            define y_fst as cast (cast attribute "y" of fst to int) to float
 
-        declare x_fst as float
-        define x_fst as cast (cast attribute "x" of fst to int) to float
-        declare y_fst as float
-        define y_fst as cast (cast attribute "y" of fst to int) to float
+            define result as false
 
-        declare x_snd as float
-        define x_snd as cast (cast attribute "x" of snd to int) to float
-        declare y_snd as float
-        define y_snd as cast (cast attribute "y" of snd to int) to float
+            declare condOne as boolean
+            declare condTwo as boolean
+            declare condThree as boolean
+            declare condFour as boolean
+            declare condFive as boolean
 
-        define result as not (((mathSqrt(mathAbsF((x_fst + x_snd)*(x_fst + x_snd) + (y_fst + y_snd) * (y_fst + y_snd))) - radius_fst - radius_snd) > 0.0))
+            define condOne as (x_fst + width / 2.0 > x_snd - width_snd / 2.0 and y_fst + height / 2.0 > y_snd - height_snd / 2.0)
+            define condTwo as (x_fst - width / 2.0 < x_snd + width_snd / 2.0 and  y_fst + height / 2.0 > y_snd - height_snd / 2.0)
+            define condThree as (x_snd + width_snd / 2.0 > x_fst - width / 2.0 and y_snd + height_snd / 2.0 > y_fst - height / 2.0)
+            define condFour as (x_snd - width_snd / 2.0 < x_fst + width / 2.0 and  y_snd + height_snd / 2.0 > y_fst - height / 2.0)
+            define condFive as (x_fst = x_snd and y_fst = y_snd)
+
+            if (condOne or condTwo or condThree or condFour or condFive) then begin
+                define result as true
+            end
 
     end returns result : boolean
 
@@ -787,10 +800,11 @@ extern _RUNTIME_getInitialActors () returns list of string
         define width as cast attribute "active_graphic_width" of obj to int
         define height as cast attribute "active_graphic_height" of obj to int
 
-    if not (getMouseX() < x
-            or getMouseX() > x + width
-            or getMouseY() < y
-            or getMouseY() > y + height) then begin
+        define result as true
+        if not (getMouseX() < x + width / 2
+            or getMouseX() > x - width / 2
+            or getMouseY() < y + height / 2
+            or getMouseY() > y - height / 2) then begin
 
             define result as false
         end
@@ -1020,35 +1034,27 @@ role ScratchSprite is ScratchEntity begin
 
     // @Category "Sensing"
     define atomic touchingObject (obj: actor) begin
-        // Over-approximation of the sprites be calculating a circle around each sprite and testing if the circles touch
-
         declare size_fst as float
-        declare leg_a as float
-        declare leg_b as float
+        declare width as float
+        declare height as float
 
         // TODO: Query attributes of myself and the other actor
-        define leg_a as cast active_graphic_width to float
-        define leg_b as cast active_graphic_height to float
+        define width as cast active_graphic_width to float
+        define height as cast active_graphic_height to float
         define size_fst as cast size to float
-        define leg_a as leg_a * (size_fst / 100.0)
-        define leg_b as leg_b * (size_fst / 100.0)
 
-        declare radius as float
-        define radius as 0.5 * mathSqrt(mathAbsF(leg_a * leg_a + leg_b * leg_b))
+        define width as width * (size_fst / 100.0)
+        define height as height * (size_fst / 100.0)
 
         declare size_snd as float
-        declare leg_a_other as float
-        declare leg_b_other as float
-        define leg_a_other as cast (cast attribute "active_graphic_width" of obj to int) to float
-        define leg_b_other as cast (cast attribute "active_graphic_height" of obj to int) to float
+        declare width_other as float
+        declare height_other as float
+        define width_other as cast (cast attribute "active_graphic_width" of obj to int) to float
+        define height_other as cast (cast attribute "active_graphic_height" of obj to int) to float
 
         define size_snd as cast (cast attribute "size" of obj to int) to float
-        define leg_a_other as leg_a_other * (size_snd / 100.0)
-        define leg_b_other as leg_b_other * (size_snd / 100.0)
-
-
-        declare radius_other as float
-        define radius_other as 0.5 * mathSqrt(mathAbsF(leg_a_other * leg_a_other + leg_b_other * leg_b_other))
+        define width_other as width_other * (size_snd / 100.0)
+        define height_other as height_other * (size_snd / 100.0)
 
         declare x_other as float
         define x_other as cast (cast attribute "x" of obj to int) to float
@@ -1060,10 +1066,23 @@ role ScratchSprite is ScratchEntity begin
         declare y_this as float
         define y_this as cast y to float
 
-        declare intermedRes as float
-        define intermedRes as mathAbsF((x_this + x_other)*(x_this + x_other) + (y_this + y_other) * (y_this + y_other))
+        define result as false
 
-        define result as not (((mathSqrt(intermedRes) - radius - radius_other) > 0.0))
+        declare condOne as boolean
+        declare condTwo as boolean
+        declare condThree as boolean
+        declare condFour as boolean
+        declare condFive as boolean
+
+        define condOne as (x_this + width / 2.0 > x_other - width_other / 2.0 and y_this + height / 2.0 > y_other - height_other / 2.0)
+        define condTwo as (x_this - width / 2.0 < x_other + width_other / 2.0 and  y_this + height / 2.0 > y_other - height_other / 2.0)
+        define condThree as (x_other + width_other / 2.0 > x_this - width / 2.0 and y_other + height_other / 2.0 > y_this - height / 2.0)
+        define condFour as (x_other - width_other / 2.0 < x_this + width / 2.0 and  y_other + height_other / 2.0 > y_this - height / 2.0)
+        define condFive as (x_this = x_other and y_this = y_other)
+
+        if (condOne or condTwo or condThree or condFour or condFive) then begin
+            define result as true
+        end
 
     end returns result : boolean
 

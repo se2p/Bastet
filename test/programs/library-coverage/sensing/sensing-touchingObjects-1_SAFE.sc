@@ -15,8 +15,8 @@ actor ActorB is ScratchSprite begin
     image Elefant "1.svg"
 
     script on bootstrap do begin
-        define x as 0
-        define y as 0
+        define x as 1
+        define y as 1
         changeActiveGraphicTo("Elefant")
     end
 end
