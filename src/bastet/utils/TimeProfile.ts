@@ -62,7 +62,7 @@ export class StaticTimeProfile implements ProgramTimeProfile {
         this._avgOpProfile = new OperationTimeProfile(
             new NumIntervalValue(
                 new ConcreteNumber(ONE_MICSEC_IN_NSECS * 50),
-                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 150)));
+                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 500)));
     }
 
     public widen(op: ProgramOperation, minNanos: number, maxNanos: number) {

@@ -251,7 +251,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     }
 
     getLexiOrderKey(ofState: DataAbstractState): LexiKey {
-        throw new ImplementMeException();
+        return new LexiKey([]);
     }
 
 }

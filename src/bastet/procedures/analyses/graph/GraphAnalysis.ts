@@ -37,6 +37,8 @@ import {App} from "../../../syntax/app/App";
 import {GraphTransferRelation} from "./GraphTransferRelation";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {
+    CHOOSE_EITHER,
+    CHOOSE_FIRST, CHOOSE_SECOND,
     DefaultFrontierSet,
     FrontierSet,
     PartitionKey, PriorityFrontierSet,
@@ -191,7 +193,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     exportAnalysisResult(reachedPrime: StateSet<AbstractState>, frontierPrime: StateSet<AbstractState>) {
-        const exporter = new GraphToDot(this._task, this,
+        const exporter = new GraphToDot(this._task, this, this,
             reachedPrime as StateSet<GraphAbstractState>,
             frontierPrime as StateSet<GraphAbstractState>);
 
@@ -251,9 +253,19 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
 
     compareStateOrder(a: GraphAbstractState, b: GraphAbstractState): number {
         if (!a || !b) {
-            return 0;
+            return CHOOSE_EITHER;
         }
-        return this.wrappedAnalysis.compareStateOrder(a.getWrappedState(), b.getWrappedState());
+
+        const wrappedResult = this.wrappedAnalysis.compareStateOrder(a.getWrappedState(), b.getWrappedState());
+        if (wrappedResult == CHOOSE_EITHER) {
+            if (a.getId() < b.getId()) {
+                return CHOOSE_FIRST;
+            } else {
+                return CHOOSE_SECOND;
+            }
+        } else {
+            return wrappedResult;
+        }
     }
 
     getLexiOrderKey(ofState: GraphAbstractState): LexiKey {

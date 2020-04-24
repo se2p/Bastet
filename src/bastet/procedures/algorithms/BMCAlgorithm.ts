@@ -65,9 +65,11 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractState>
                 const targetState = reached.getAddedLast()[0];
                 Preconditions.checkState(this._analysis.target(targetState as E).length > 0);
 
+                const properties = this._analysis.target(targetState);
+
                 // Check the feasibility with the refiner
                 let isFeasible: boolean;
-                console.group("BMC Feasibility Check");
+                console.group("BMC Feasibility Check for " + properties.toString());
                 this._feasibilityCheckStats.startTimer();
                 try {
                     isFeasible = this._refiner.checkIsFeasible(targetState as E);

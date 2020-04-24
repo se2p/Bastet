@@ -213,6 +213,10 @@ export class PartitionedOrderedSet<E extends AbstractElement> {
 
 }
 
+export const CHOOSE_EITHER: number = 0;
+export const CHOOSE_SECOND: number = +1;
+export const CHOOSE_FIRST: number = -1;
+
 export interface StateOrderComparator<E extends AbstractElement> {
 
     compareStateOrder(a: E, b: E): number;

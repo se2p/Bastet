@@ -36,7 +36,14 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
+import {
+    CHOOSE_EITHER,
+    CHOOSE_FIRST,
+    CHOOSE_SECOND,
+    FrontierSet,
+    PartitionKey,
+    ReachedSet
+} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {List as ImmList, Set as ImmSet} from "immutable";
@@ -285,23 +292,34 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
                 const relA: TransitionRelation = this._task.getTransitionRelationById(relLocA.getRelationId());
                 const relB: TransitionRelation = this._task.getTransitionRelationById(relLocB.getRelationId());
 
-                const rpoA = relA.getReversePostOrderOf(relLocA.getLocationId());
-                const rpoB = relB.getReversePostOrderOf(relLocB.getLocationId());
+                const rpoA = relA.getWaitAtMeetOrderOf(relLocA.getLocationId());
+                const rpoB = relB.getWaitAtMeetOrderOf(relLocB.getLocationId());
 
                 if (rpoA == rpoB) {
-                    return 0;
+                    return CHOOSE_EITHER;
                 } else if (rpoA > rpoB) {
-                    return +1;
+                    return CHOOSE_SECOND;
                 } else {
-                    return -1;
+                    return CHOOSE_FIRST;
                 }
             }
         }
 
-        return 0;
+        return CHOOSE_EITHER;
     }
 
     getLexiOrderKey(ofState: ControlAbstractState): LexiKey {
-        throw new ImplementMeException();
+        const steppedThreadsA = ofState.getSteppedFor().map((i) => ofState.getIndexedThreadState(i));
+
+        if (steppedThreadsA.size == 1) {
+            const steppedA: IndexedThread = getTheOnlyElement(steppedThreadsA);
+            const relLocA: RelationLocation = steppedA.threadStatus.getRelationLocation();
+            const relA: TransitionRelation = this._task.getTransitionRelationById(relLocA.getRelationId());
+            const rpoA: number = relA.getWaitAtMeetOrderOf(relLocA.getLocationId());
+
+            return new LexiKey([rpoA]);
+        }
+
+        return new LexiKey([]);
     }
 }

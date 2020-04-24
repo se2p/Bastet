@@ -314,6 +314,8 @@ export class TransitionRelation {
 
     private _dfsNums: Map<LocationId, number>;
 
+    private _wamNums: Map<LocationId, number>;
+
     constructor(transitions: TransitionTable, locations: ImmSet<LocationId>,
                 entryLocs: ImmSet<LocationId>, exitLocs: ImmSet<LocationId>,
                 loopHeads?: ImmSet<LocationId>, name?: string) {
@@ -637,6 +639,8 @@ export class TransitionRelation {
         return ImmSet<LocationId>(result);
     }
 
+    private maxAssignedDfsNum: number;
+
     private computeDfsNumbering() {
         this._dfsNums = new Map();
 
@@ -664,6 +668,9 @@ export class TransitionRelation {
                 dfsVisit(u);
             }
         }
+
+        // Needed to assign other, non-conflicting numberings
+        this.maxAssignedDfsNum = time;
     }
 
     getDfsNumberOf(loc: LocationId) {
@@ -678,13 +685,50 @@ export class TransitionRelation {
         return this.getDfsNumberOf(loc);
     }
 
-    /**
-     * Reverse post order is a 'wait-at-meet order'
-     *
-     * @param loc
-     */
     getReversePostOrderOf(loc: LocationId) {
         return this.backwards.getPostOrderOf(loc);
+    }
+
+    getWaitAtMeetOrderOf(loc: LocationId) {
+        if (!this._wamNums) {
+            this.computeWaitAtMeetNumbering();
+        }
+
+        return this._wamNums.get(loc);
+    }
+
+    private computeWaitAtMeetNumbering() {
+        // The reverse post ordering is the foundation
+        // for this wait-at-meet ordering.
+        if (!this.backwards._dfsNums) {
+            this.backwards.computeDfsNumbering();
+        }
+        this._wamNums = new Map<LocationId, number>(this.backwards._dfsNums);
+
+        // Order all loop heads by the max. reverse-post order
+        // from that they are entered.
+        const sortedHeads = this.loopHeads.sort((headA, headB) => {
+            const enteringAmax = this.transitionsTo(headA)
+                .map((v) => this.getReversePostOrderOf(v.target))
+                .reduce((prev, curr) => {return Math.max(prev, curr)}, 0);
+            const enteringBmax = this.transitionsTo(headB)
+                .map((v) => this.getReversePostOrderOf(v.target))
+                .reduce((prev, curr) => {return Math.max(prev, curr)}, 0);
+
+            if (enteringAmax > enteringBmax) {
+                return +1;
+            } else if (enteringBmax > enteringAmax) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+
+        let maxWamNumber = this.backwards.maxAssignedDfsNum;
+        for (const l of sortedHeads) {
+            maxWamNumber = maxWamNumber + 1;
+            this._wamNums.set(l, maxWamNumber);
+        }
     }
 }
 

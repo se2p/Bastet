@@ -142,6 +142,6 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, 
     }
 
     getLexiOrderKey(ofState: E): LexiKey {
-        throw new ImplementMeException();
+        return this._wrappedAnalysis.getLexiOrderKey(ofState);
     }
 }

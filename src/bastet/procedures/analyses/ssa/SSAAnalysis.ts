@@ -163,7 +163,7 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
     }
 
     getLexiOrderKey(ofState: SSAState): LexiKey {
-        throw new ImplementMeException();
+        return this._wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
     }
 
 }

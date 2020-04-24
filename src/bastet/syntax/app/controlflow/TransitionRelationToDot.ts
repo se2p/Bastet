@@ -53,7 +53,7 @@ export class TransitionRelationToDot {
             }
 
             const dfsNumber: number = tr.getDfsNumberOf(loc);
-            const label: string = this.escapeLabel(`${loc}\n${dfsNumber}\n${tr.getReversePostOrderOf(loc)}`);
+            const label: string = this.escapeLabel(`${loc}\n${dfsNumber}\n${tr.getWaitAtMeetOrderOf(loc)}`);
             output.push(`    ${loc} [label="${label}" shape=${shape} penwidth=${penwidth}]`);
         }
 
