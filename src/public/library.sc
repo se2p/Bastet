@@ -800,10 +800,11 @@ extern _RUNTIME_getInitialActors () returns list of string
         define width as cast attribute "active_graphic_width" of obj to int
         define height as cast attribute "active_graphic_height" of obj to int
 
-    if not (getMouseX() < x
-            or getMouseX() > x + width
-            or getMouseY() < y
-            or getMouseY() > y + height) then begin
+        define result as true
+        if not (getMouseX() < x + width / 2
+            or getMouseX() > x - width / 2
+            or getMouseY() < y + height / 2
+            or getMouseY() > y - height / 2) then begin
 
             define result as false
         end
