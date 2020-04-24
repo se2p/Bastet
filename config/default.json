@@ -22,7 +22,8 @@
     "GraphAnalysis": {
         "mergeIntoOperator": "StandardMergeIntoOperator",
         "stopOperator": "CheckCoverage",
-        "witnessHandler": "DoNothing"
+        "witnessHandler": "DoNothing",
+        "graphConstructionOrder": "WaitAtMeet"
     },
 
     "MultiPropertyAlgorithm" : {
