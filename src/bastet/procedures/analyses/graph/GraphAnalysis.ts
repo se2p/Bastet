@@ -59,6 +59,8 @@ import {GraphContextToDot} from "./GraphContextToDot";
 import {GraphCoverCheckStopOperator} from "./GraphCoverCheckStopOperator";
 import {DummyHandler, WitnessHandler} from "../WitnessHandlers";
 import {WitnessExporter} from "./witnesses/WitnessExporter";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {LexiKey} from "../../../utils/Lexicographic";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 
@@ -76,6 +78,10 @@ export class GraphAnalysisConfig extends BastetConfiguration {
 
     get witnessHandler(): string {
         return this.getStringProperty('witnessHandler', 'DoNothing');
+    }
+
+    get graphConstructionOrder(): string {
+        return this.getStringProperty('graphConstructionOrder', 'WaitAtMeet');
     }
 
 }
@@ -214,7 +220,15 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     createStateSets(): [FrontierSet<GraphAbstractState>, ReachedSet<GraphAbstractState>] {
-        const frontierSet = new PriorityFrontierSet<GraphAbstractState>();
+        let frontierSet;
+        if (this._config.graphConstructionOrder == "DepthFirst") {
+            frontierSet = new DefaultFrontierSet();
+        } else if (this._config.graphConstructionOrder == "WaitAtMeet") {
+            frontierSet = new PriorityFrontierSet<GraphAbstractState>(this);
+        } else {
+            throw new IllegalArgumentException("Invalid custruction order: " + this._config.graphConstructionOrder);
+        }
+
         const reachedSet = new GraphReachedSetWrapper(frontierSet, this, (r, e) => {this.onStateError(r,e)});
         return [frontierSet, reachedSet];
     }
@@ -234,5 +248,17 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
         return this._witnessHandler.handleViolatingState(reached, violating);
     }
+
+    compareStateOrder(a: GraphAbstractState, b: GraphAbstractState): number {
+        if (!a || !b) {
+            return 0;
+        }
+        return this.wrappedAnalysis.compareStateOrder(a.getWrappedState(), b.getWrappedState());
+    }
+
+    getLexiOrderKey(ofState: GraphAbstractState): LexiKey {
+        return this.wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
+    }
+
 
 }

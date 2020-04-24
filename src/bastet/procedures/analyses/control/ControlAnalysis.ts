@@ -23,8 +23,8 @@ import {ProgramAnalysisWithLabelProducer, ProgramAnalysisWithLabels, WrappingPro
 import {
     ControlAbstractDomain,
     ControlAbstractState,
-    ControlConcreteState,
-    MethodCall,
+    ControlConcreteState, IndexedThread,
+    MethodCall, RelationLocation,
     ScheduleAbstractStateFactory
 } from "./ControlAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
@@ -42,6 +42,9 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {List as ImmList, Set as ImmSet} from "immutable";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import {LexiKey} from "../../../utils/Lexicographic";
+import {getTheOnlyElement} from "../../../utils/Collections";
+import {TransitionRelation} from "../../../syntax/app/controlflow/TransitionRelation";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -252,9 +255,9 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     }
 
     private steppedOnLoophead(r: ControlAbstractState) {
-        const steppedThreads = r.getSteppedFor().map((i) => r.getIndexedThreadState(i));
+        const steppedthreads = r.getSteppedFor().map((i) => r.getIndexedThreadState(i));
 
-        for (const t of steppedThreads) {
+        for (const t of steppedthreads) {
             const ts = t.threadStatus;
             const relation = this._task.getTransitionRelationById(ts.getRelationLocation().getRelationId());
             if (relation.isLoopHead(ts.getRelationLocation().getLocationId())) {
@@ -266,6 +269,39 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     }
 
     handleViolatingState(reached: ReachedSet<AbstractState>, violating: AbstractState) {
+        throw new ImplementMeException();
+    }
+
+    compareStateOrder(a: ControlAbstractState, b: ControlAbstractState): number {
+        const steppedThreadsA = a.getSteppedFor().map((i) => a.getIndexedThreadState(i));
+        const steppedThreadsB = b.getSteppedFor().map((i) => b.getIndexedThreadState(i));
+
+        if (steppedThreadsA.size == steppedThreadsB.size) {
+            if (steppedThreadsA.size == 1) {
+                const steppedA: IndexedThread = getTheOnlyElement(steppedThreadsA);
+                const steppedB: IndexedThread = getTheOnlyElement(steppedThreadsB);
+                const relLocA: RelationLocation = steppedA.threadStatus.getRelationLocation();
+                const relLocB: RelationLocation = steppedB.threadStatus.getRelationLocation();
+                const relA: TransitionRelation = this._task.getTransitionRelationById(relLocA.getRelationId());
+                const relB: TransitionRelation = this._task.getTransitionRelationById(relLocB.getRelationId());
+
+                const rpoA = relA.getReversePostOrderOf(relLocA.getLocationId());
+                const rpoB = relB.getReversePostOrderOf(relLocB.getLocationId());
+
+                if (rpoA == rpoB) {
+                    return 0;
+                } else if (rpoA > rpoB) {
+                    return +1;
+                } else {
+                    return -1;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    getLexiOrderKey(ofState: ControlAbstractState): LexiKey {
         throw new ImplementMeException();
     }
 }

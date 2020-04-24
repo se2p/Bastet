@@ -36,6 +36,7 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Set as ImmSet} from "immutable";
+import {LexiKey} from "../../../utils/Lexicographic";
 
 
 export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
@@ -133,6 +134,14 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, 
     }
 
     handleViolatingState(reached: ReachedSet<F>, violating: F) {
+        throw new ImplementMeException();
+    }
+
+    compareStateOrder(a: E, b: E): number {
+        throw new ImplementMeException();
+    }
+
+    getLexiOrderKey(ofState: E): LexiKey {
         throw new ImplementMeException();
     }
 }

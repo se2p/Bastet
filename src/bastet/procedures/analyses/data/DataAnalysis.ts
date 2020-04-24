@@ -63,6 +63,7 @@ import {StandardMergeOperatorFactory} from "../Operators";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {List as ImmList, Set as ImmSet} from "immutable";
 import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
+import {LexiKey} from "../../../utils/Lexicographic";
 
 
 export class DataAnalysisConfig extends BastetConfiguration {
@@ -242,6 +243,14 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     }
 
     handleViolatingState(reached: ReachedSet<AbstractState>, violating: AbstractState) {
+        throw new ImplementMeException();
+    }
+
+    compareStateOrder(a: DataAbstractState, b: DataAbstractState): number {
+        throw new ImplementMeException();
+    }
+
+    getLexiOrderKey(ofState: DataAbstractState): LexiKey {
         throw new ImplementMeException();
     }
 

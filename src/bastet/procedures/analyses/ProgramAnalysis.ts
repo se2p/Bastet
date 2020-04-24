@@ -26,16 +26,17 @@ import {ConcreteElement} from "../domains/ConcreteElements";
 import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner} from "./Refiner";
 import {Property} from "../../syntax/Property";
-import {FrontierSet, ReachedSet, StatePartitionOperator} from "../algorithms/StateSet";
+import {FrontierSet, ReachedSet, StateOrderComparator, StatePartitionOperator} from "../algorithms/StateSet";
 import {Concern} from "../../syntax/Concern";
 import {LabeledTransferRelation} from "./TransferRelation";
 import {WitnessHandler} from "./WitnessHandlers";
+import {LexiKey} from "../../utils/Lexicographic";
 
 export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
    extends AbstractSuccOperator<E>,
        JoinOperator<E>, TargetOperator<E>, MergeIntoOperator<E, F>,
        MergeOperator<E>, StopOperator<E, F>, WidenOperator<E>, PartitionOperator<E, F>,
-       WitnessHandler<F> {
+       WitnessHandler<F>, TraversalOrderOperator<E, F> {
 
     abstractDomain: AbstractDomain<C, E>;
 
@@ -51,6 +52,12 @@ export interface PartitionOperator<E extends AbstractElement, F extends Abstract
    extends StatePartitionOperator<E> {
 
     partitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F>;
+
+}
+
+export interface TraversalOrderOperator<E extends AbstractElement, F extends AbstractState> extends StateOrderComparator<E> {
+
+    getLexiOrderKey(ofState: E): LexiKey;
 
 }
 

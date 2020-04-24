@@ -23,7 +23,7 @@ import {AbstractElement} from "../../lattices/Lattice";
 import {Preconditions} from "../../utils/Preconditions";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {getTheOnlyElement} from "../../utils/Collections";
-import {Heap} from 'heap-js';
+import {Comparator, Heap} from 'heap-js';
 
 export interface PartitionKeyAttribs extends AbstractElement {
 
@@ -86,7 +86,7 @@ export interface ReachedSet<E extends AbstractElement> extends StateSet<E> {
 
 export interface FrontierSet<E extends AbstractElement> extends StateSet<E> {
 
-    pop(): E;
+    peek(): E;
 
 }
 
@@ -213,12 +213,18 @@ export class PartitionedOrderedSet<E extends AbstractElement> {
 
 }
 
+export interface StateOrderComparator<E extends AbstractElement> {
+
+    compareStateOrder(a: E, b: E): number;
+
+}
+
 export class PriorityFrontierSet<E extends AbstractElement> implements FrontierSet<E> {
 
     private readonly _elements: Heap<E>;
 
-    constructor() {
-        this._elements = new Heap();
+    constructor(comparator: StateOrderComparator<E>) {
+        this._elements = new Heap((a, b) => {return comparator.compareStateOrder(a, b)});
     }
 
     public [Symbol.iterator](): IterableIterator<E> {
@@ -247,12 +253,8 @@ export class PriorityFrontierSet<E extends AbstractElement> implements FrontierS
         return this._elements.length == 0;
     }
 
-    pop(): E {
-        for (const e of this._elements) {
-            return e;
-        }
-
-        return null;
+    peek(): E {
+        return this._elements.peek();
     }
 
     remove(element: E) {
@@ -301,7 +303,7 @@ export class DefaultFrontierSet<E extends AbstractElement> implements FrontierSe
         return this._elements.size == 0;
     }
 
-    pop(): E {
+    peek(): E {
         for (const e of this._elements) {
             return e;
         }
