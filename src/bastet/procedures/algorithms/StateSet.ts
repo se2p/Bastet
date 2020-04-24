@@ -23,6 +23,7 @@ import {AbstractElement} from "../../lattices/Lattice";
 import {Preconditions} from "../../utils/Preconditions";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {getTheOnlyElement} from "../../utils/Collections";
+import {Heap} from 'heap-js';
 
 export interface PartitionKeyAttribs extends AbstractElement {
 
@@ -208,6 +209,60 @@ export class PartitionedOrderedSet<E extends AbstractElement> {
 
     public [Symbol.iterator](): IterableIterator<E> {
         return this._elements[Symbol.iterator]();
+    }
+
+}
+
+export class PriorityFrontierSet<E extends AbstractElement> implements FrontierSet<E> {
+
+    private readonly _elements: Heap<E>;
+
+    constructor() {
+        this._elements = new Heap();
+    }
+
+    public [Symbol.iterator](): IterableIterator<E> {
+        return this._elements[Symbol.iterator]();
+    }
+
+    add(element: E) {
+        return this._elements.add(element);
+    }
+
+    addAll(elements: Iterable<E>) {
+        for (const e of elements) {
+            this.add(e);
+        }
+    }
+
+    has(element: E): boolean {
+        return this._elements.contains(element);
+    }
+
+    getSize(): number {
+        return this._elements.length
+    }
+
+    isEmpty(): boolean {
+        return this._elements.length == 0;
+    }
+
+    pop(): E {
+        for (const e of this._elements) {
+            return e;
+        }
+
+        return null;
+    }
+
+    remove(element: E) {
+        this._elements.remove(element);
+    }
+
+    removeAll(elements: Iterable<E>) {
+        for (const e of elements) {
+            this.remove(e);
+        }
     }
 
 }

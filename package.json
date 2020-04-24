@@ -62,6 +62,7 @@
     "antlr4ts": "^0.5.0-alpha.3",
     "commander": "^5.0.0",
     "core-util-is": "^1.0.2",
+    "heap-js": "^1.5.2",
     "image-size": "^0.8.3",
     "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.15",

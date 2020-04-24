@@ -39,7 +39,7 @@ import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {
     DefaultFrontierSet,
     FrontierSet,
-    PartitionKey,
+    PartitionKey, PriorityFrontierSet,
     ReachedSet,
     StatePartitionOperator,
     StateSet
@@ -214,7 +214,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     createStateSets(): [FrontierSet<GraphAbstractState>, ReachedSet<GraphAbstractState>] {
-        const frontierSet = new DefaultFrontierSet<GraphAbstractState>();
+        const frontierSet = new PriorityFrontierSet<GraphAbstractState>();
         const reachedSet = new GraphReachedSetWrapper(frontierSet, this, (r, e) => {this.onStateError(r,e)});
         return [frontierSet, reachedSet];
     }
