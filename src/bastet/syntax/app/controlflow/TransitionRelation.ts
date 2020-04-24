@@ -312,6 +312,8 @@ export class TransitionRelation {
 
     private readonly _closureTerminators: Map<LocationId, ImmSet<LocationId>>;
 
+    private _dfsNums: Map<LocationId, number>;
+
     constructor(transitions: TransitionTable, locations: ImmSet<LocationId>,
                 entryLocs: ImmSet<LocationId>, exitLocs: ImmSet<LocationId>,
                 loopHeads?: ImmSet<LocationId>, name?: string) {
@@ -635,6 +637,55 @@ export class TransitionRelation {
         return ImmSet<LocationId>(result);
     }
 
+    private computeDfsNumbering() {
+        this._dfsNums = new Map();
+
+        let time = 0;
+        const colors: Map<LocationId, number> = new Map();
+        const WHITE: number = 0;
+        const BLACK: number = 1;
+        const GRAY: number = 2;
+
+        const dfsVisit = (u: LocationId) => {
+            time = time + 1;
+            colors.set(u, GRAY);
+            for (const trans of this.transitionsFrom(u)) {
+                if ((colors.get(trans.target) || WHITE) == WHITE) {
+                    dfsVisit(trans.target);
+                }
+            }
+            colors.set(u, BLACK);
+            time = time + 1;
+            this._dfsNums.set(u, time);
+        };
+
+        for (const u of this.locationSet) {
+            if ((colors.get(u) || WHITE) == WHITE) {
+                dfsVisit(u);
+            }
+        }
+    }
+
+    getDfsNumberOf(loc: LocationId) {
+        if (!this._dfsNums) {
+            this.computeDfsNumbering();
+        }
+
+        return this._dfsNums.get(loc);
+    }
+
+    getPostOrderOf(loc: LocationId) {
+        return this.getDfsNumberOf(loc);
+    }
+
+    /**
+     * Reverse post order is a 'wait-at-meet order'
+     *
+     * @param loc
+     */
+    getReversePostOrderOf(loc: LocationId) {
+        return this.backwards.getPostOrderOf(loc);
+    }
 }
 
 export class LocationEquivalence {

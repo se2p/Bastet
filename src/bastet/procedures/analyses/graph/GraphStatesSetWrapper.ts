@@ -21,14 +21,17 @@
  */
 
 
-import {DefaultAnalysisStateSet, FrontierSet, StatePartitionOperator} from "../../algorithms/StateSet";
+import {DefaultAnalysisStateSet, FrontierSet, ReachedSet, StatePartitionOperator} from "../../algorithms/StateSet";
 import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {GraphPath, GraphPathSet} from "./GraphPath";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
+import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 
-export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState> {
+export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState>
+    implements ReachedSet<GraphAbstractState>
+{
 
     private readonly _frontierSet: FrontierSet<E>;
 
@@ -93,6 +96,7 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
 
         let hasFrontierChilds = false;
 
+        const visited: ImmSet<E> = ImmSet().asMutable();
         const worklist: E[] = [element];
         while (worklist.length > 0) {
             const p = worklist.pop();
@@ -100,14 +104,19 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
 
             for (const childId of childs) {
                 const c = this._idToStateMap.get(childId);
-                toRemove.add(c);
+                if (!visited.contains(c)) {
+                    visited.add(c);
 
-                if (this._frontierSet.has(c)) {
-                    hasFrontierChilds = true;
+                    // Schedule for removal
+                    toRemove.add(c);
+
+                    if (this._frontierSet.has(c)) {
+                        hasFrontierChilds = true;
+                    }
+
+                    // ATTENTION: The graph does NOT have cycles!
+                    worklist.push(c);
                 }
-
-                // ATTENTION: The graph does NOT have cycles!
-                worklist.push(c);
             }
         }
 

@@ -131,4 +131,8 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, 
     getPartitionKeys(element: E): ImmSet<PartitionKey> {
         return this._wrappedAnalysis.getPartitionKeys(element);
     }
+
+    handleViolatingState(reached: ReachedSet<F>, violating: F) {
+        throw new ImplementMeException();
+    }
 }

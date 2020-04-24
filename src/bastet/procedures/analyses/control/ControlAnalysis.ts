@@ -264,4 +264,8 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
 
         return false;
     }
+
+    handleViolatingState(reached: ReachedSet<AbstractState>, violating: AbstractState) {
+        throw new ImplementMeException();
+    }
 }

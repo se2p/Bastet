@@ -153,4 +153,8 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return this._wrappedAnalysis.getPartitionKeys(element.getWrappedState());
     }
 
+    handleViolatingState(reached: ReachedSet<F>, violating: F) {
+        throw new ImplementMeException();
+    }
+
 }

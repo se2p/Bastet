@@ -29,11 +29,13 @@ import {Property} from "../../syntax/Property";
 import {FrontierSet, ReachedSet, StatePartitionOperator} from "../algorithms/StateSet";
 import {Concern} from "../../syntax/Concern";
 import {LabeledTransferRelation} from "./TransferRelation";
+import {WitnessHandler} from "./WitnessHandlers";
 
 export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
    extends AbstractSuccOperator<E>,
        JoinOperator<E>, TargetOperator<E>, MergeIntoOperator<E, F>,
-       MergeOperator<E>, StopOperator<E, F>, WidenOperator<E>, PartitionOperator<E, F> {
+       MergeOperator<E>, StopOperator<E, F>, WidenOperator<E>, PartitionOperator<E, F>,
+       WitnessHandler<F> {
 
     abstractDomain: AbstractDomain<C, E>;
 

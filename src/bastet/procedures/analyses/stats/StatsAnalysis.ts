@@ -179,5 +179,8 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         return this.wrappedAnalysis.getPartitionKeys(element);
     }
 
+    handleViolatingState(reached: ReachedSet<F>, violating: F) {
+        return this.wrappedAnalysis.handleViolatingState(reached, violating);
+    }
 }
 
