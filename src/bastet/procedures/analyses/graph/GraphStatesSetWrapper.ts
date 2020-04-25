@@ -25,8 +25,8 @@ import {DefaultAnalysisStateSet, FrontierSet, ReachedSet, StatePartitionOperator
 import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {GraphPath, GraphPathSet} from "./GraphPath";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
+import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
+import {Set as ImmSet, Stack as ImmStack} from "immutable";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 
 export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState>
@@ -174,7 +174,36 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
     }
 
     public chooseRandomPathTo(element: E): GraphPath {
-        throw new ImplementMeException();
+        Preconditions.checkNotUndefined(element);
+        const pathToElement: ImmStack<E> = ImmStack();
+        let currentNode = element;
+
+        // In every iteration the currentNode is updated to its predecessor until root is reached.
+        // Its assumed that every node has at most one predecessor.
+        while (currentNode) {
+            pathToElement.push(currentNode);
+
+            const predecessorSet: ImmSet<number> = element.getPredecessors();
+
+            if (predecessorSet.size == 0) {
+                // Root reached
+                currentNode = undefined;
+            } else if (predecessorSet.size > 1) {
+                throw new ImplementMeForException("graph with multiple predecessors");
+            } else {
+                const parentId = predecessorSet.toArray().pop();
+                if (pathToElement.some(node => node.getId() === parentId)) {
+                    throw new ImplementMeForException("cyclic graph");
+                }
+
+                currentNode = this._idToStateMap.get(parentId);
+                if (currentNode === undefined) {
+                    throw new IllegalStateException();
+                }
+            }
+        }
+
+        return new GraphPath(pathToElement);
     }
 
     public queryAllPathsTo(element: E): GraphPathSet {
