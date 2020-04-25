@@ -55,16 +55,19 @@ import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifie
 import {App} from "../../../syntax/app/App";
 import {InitializeAnalysisStatement} from "../../../syntax/ast/core/statements/InternalStatement";
 import {IntegerType} from "../../../syntax/ast/core/ScratchType";
+import {TimeState} from "./TimeAbstractDomain";
+import {from} from "immutable/contrib/cursor";
+import {BeginAtomicStatement, EndAtomicStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 
 // TODO: Move these variables to the App on SYSTEM level
 export const GLOBAL_TIME_MICROS_VAR: string = "__global_time_micros";
 export const GLOBAL_TIME_RESET_MICROS_VAR: string = "__global_reset_micros";
 
-export class TimeTransferRelation<W extends AbstractElement> implements LabeledTransferRelation<W> {
+export class TimeTransferRelation implements LabeledTransferRelation<TimeState> {
 
     private readonly _task: App;
 
-    private readonly _wrappedTransfer: LabeledTransferRelation<W>;
+    private readonly _wrappedTransfer: LabeledTransferRelation<AbstractElement>;
 
     private readonly _timeProfile: ProgramTimeProfile;
 
@@ -74,7 +77,7 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
     private readonly _globalMillisExpr: NumberExpression;
     private readonly _globalSecondsExpr: NumberExpression;
 
-    constructor(task: App, timeProfile: ProgramTimeProfile, wrappedTransfer: LabeledTransferRelation<W>) {
+    constructor(task: App, timeProfile: ProgramTimeProfile, wrappedTransfer: LabeledTransferRelation<AbstractElement>) {
         this._task = Preconditions.checkNotUndefined(task);
         this._timeProfile = Preconditions.checkNotUndefined(timeProfile);
         this._wrappedTransfer = Preconditions.checkNotUndefined(wrappedTransfer);
@@ -100,11 +103,11 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
         return false;
     }
 
-    abstractSucc(fromState: W): Iterable<W> {
+    abstractSucc(fromState: TimeState): Iterable<TimeState> {
         throw new IllegalStateException("Not intended to be used.");
     }
 
-    abstractSuccFor(fromState: W, op: ProgramOperation, co: Concern): Iterable<W> {
+    abstractSuccFor(fromState: TimeState, op: ProgramOperation, co: Concern): Iterable<TimeState> {
         if (this.isBootstrapOperation(op)) {
             // Initialization: Create a system global variable that stores the current time
             const initStmts: Statement[] = [
@@ -114,33 +117,44 @@ export class TimeTransferRelation<W extends AbstractElement> implements LabeledT
                 new StoreEvalResultToVariableStatement(this._globalTimeResetMicrosVariable, IntegerLiteral.of(0)),
             ];
 
-            return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState, initStmts, [op], co);
+            return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(), initStmts, [op], co)
+                .map((w) => fromState.withWrappedState(w));
+        }
+
+        let timeStatePrime = fromState;
+        if (op.ast instanceof BeginAtomicStatement) {
+            timeStatePrime = timeStatePrime.withPushedBlock("block");
+        } else if (op.ast instanceof EndAtomicStatement) {
+            timeStatePrime = timeStatePrime.withPopBlock();
         }
 
         const [minTimeMicrosExpr, maxTimeMicrosExpr, ops] = this.reinterprete(op);
         let intermediateStatements: Statement[] = [];
 
         if (!this.isObserverConcern(co)) {
-            if (!this.isEmptyInterval(minTimeMicrosExpr, maxTimeMicrosExpr)) {
-                const opTimeVariable: VariableWithDataLocation = new VariableWithDataLocation(
-                    DataLocations.createTypedLocation(Identifier.freshWithPrefix("__op_time_"), IntegerType.instance()));
-                const opTimeVariableExpr: NumberVariableExpression = new NumberVariableExpression(opTimeVariable);
+            if (timeStatePrime.getTimedBlockStack().isEmpty()) {
+                if (!this.isEmptyInterval(minTimeMicrosExpr, maxTimeMicrosExpr)) {
+                    const opTimeVariable: VariableWithDataLocation = new VariableWithDataLocation(
+                        DataLocations.createTypedLocation(Identifier.freshWithPrefix("__op_time_"), IntegerType.instance()));
+                    const opTimeVariableExpr: NumberVariableExpression = new NumberVariableExpression(opTimeVariable);
 
-                this._task.typeStorage.getScopeOf(opTimeVariable.qualifiedName).putVariable(opTimeVariable);
+                    this._task.typeStorage.getScopeOf(opTimeVariable.qualifiedName).putVariable(opTimeVariable);
 
-                const assumeTimeMin = new NumGreaterEqualExpression(opTimeVariableExpr, minTimeMicrosExpr);
-                const assumeTimeMax = new NumLessEqualExpression(opTimeVariableExpr, maxTimeMicrosExpr);
+                    const assumeTimeMin = new NumGreaterEqualExpression(opTimeVariableExpr, minTimeMicrosExpr);
+                    const assumeTimeMax = new NumLessEqualExpression(opTimeVariableExpr, maxTimeMicrosExpr);
 
-                intermediateStatements = [
-                    new DeclareStackVariableStatement(opTimeVariable),
-                    new AssumeStatement(assumeTimeMin),
-                    new AssumeStatement(assumeTimeMax),
-                    new StoreEvalResultToVariableStatement(this._globalTimeMicrosVariable,
-                        new PlusExpression(this._globalTimeMicrosVariable, opTimeVariableExpr))];
+                    intermediateStatements = [
+                        new DeclareStackVariableStatement(opTimeVariable),
+                        new AssumeStatement(assumeTimeMin),
+                        new AssumeStatement(assumeTimeMax),
+                        new StoreEvalResultToVariableStatement(this._globalTimeMicrosVariable,
+                            new PlusExpression(this._globalTimeMicrosVariable, opTimeVariableExpr))];
+                }
             }
         }
 
-        return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState, intermediateStatements, ops, co);
+        return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(), intermediateStatements, ops, co)
+            .map((w) => timeStatePrime.withWrappedState(w));
     }
 
     private reinterprete(op: ProgramOperation): [NumberExpression, NumberExpression, ProgramOperation[]] {

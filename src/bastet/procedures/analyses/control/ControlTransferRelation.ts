@@ -617,10 +617,10 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     .withFailedFor(properties)), true]];
 
         } else if (stepOp.ast instanceof BeginAtomicStatement) {
-            return [[this.incrementAtomic(result, threadToStep), true]];
+            return [[this.incrementAtomic(result, threadToStep), false]];
 
         } else if (stepOp.ast instanceof EndAtomicStatement) {
-            return [[this.decrementAtomic(result, threadToStep), true]];
+            return [[this.decrementAtomic(result, threadToStep), false]];
 
         } else if (stepOp.ast instanceof CallStatement) {
             // The following lines realize the inter-procedural analysis.
@@ -783,12 +783,16 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
     private incrementAtomic(state: ControlAbstractState, thread: IndexedThread): ControlAbstractState {
         return state.withThreadStateUpdate(thread.threadIndex,
-            (ts) => ts.withIncrementedAtomic());
+            (ts) => ts
+                .withIncrementedAtomic()
+                .withOperations(ts.getOperations().concat([ProgramOperations.constructOp(new BeginAtomicStatement())])));
     }
 
     private decrementAtomic(state: ControlAbstractState, thread: IndexedThread): ControlAbstractState {
         return state.withThreadStateUpdate(thread.threadIndex,
-            (ts) => ts.withDecrementedAtomic());
+            (ts) => ts
+                .withDecrementedAtomic()
+                .withOperations(ts.getOperations().concat([ProgramOperations.constructOp(new EndAtomicStatement())])));
     }
 
     private getCallingStatement(callInformation: MethodCall): CallStatement {
