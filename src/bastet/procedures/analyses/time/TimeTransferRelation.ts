@@ -56,7 +56,6 @@ import {App} from "../../../syntax/app/App";
 import {InitializeAnalysisStatement} from "../../../syntax/ast/core/statements/InternalStatement";
 import {IntegerType} from "../../../syntax/ast/core/ScratchType";
 import {TimeState} from "./TimeAbstractDomain";
-import {from} from "immutable/contrib/cursor";
 import {BeginAtomicStatement, EndAtomicStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 
 // TODO: Move these variables to the App on SYSTEM level
