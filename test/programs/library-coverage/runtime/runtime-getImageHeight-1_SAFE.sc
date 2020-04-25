@@ -1,14 +1,14 @@
 program Mini1Program
 
-actor MiniActor is RuntimeEntity begin
+actor MiniActor is ScratchSprite begin
 
     image Elefant1 "1.svg"
     image Elefant2 "0.png"
 
     script on startup do begin
-        if getNumGraphics() = 2 then begin
+        if getImageHeight("Elefant1") = 360 then begin
         end else begin
-            _RUNTIME_signalFailure()
+            _RUNTIME_signalFailure("Wrong Image Height")
         end
     end
 

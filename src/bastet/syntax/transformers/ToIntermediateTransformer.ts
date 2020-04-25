@@ -1029,7 +1029,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     /**
-     * Replaces a `RepeatTimesStatement` by an `UntilStatement`
+     * Replaces a `RepeatTimesStatement` by an `UntilQueriedConditionStatement`
      */
     public visitRepeatTimesStmt (ctx: RepeatTimesStmtContext): TransformerResult {
         // Semantics: Evaluate the expression once, and use the
@@ -1046,6 +1046,9 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
         this._activeDeclarationScope.putVariable(counterVar);
 
+        // Statement to increase the loop counter
+        const counterIncStmt = new StoreEvalResultToVariableStatement(counterVar, new PlusExpression(counterVar, new IntegerLiteral(1)));
+
         // Determine the number of iterations
         const timesTr: TransformerResult = ctx.numExpr().accept(this);
         const times: NumberExpression = timesTr.node as NumberExpression;
@@ -1053,8 +1056,9 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
         // Build the loop
         const untilCond = new NegationExpression(new NumLessThanExpression(counterVarExpr, times));
-        const loopBody = ctx.stmtList().accept(this).nodeOnly<StatementList>();
-        const untilStatement = new UntilStatement(untilCond, loopBody);
+        const loopBody = StatementLists.concat(ctx.stmtList().accept(this).nodeOnly<StatementList>(),
+                    StatementList.from([counterIncStmt]));
+        const untilStatement = new UntilQueriedConditionStatement(untilCond, StatementList.empty(), loopBody);
 
         return new TransformerResult(prepend, untilStatement);
     }

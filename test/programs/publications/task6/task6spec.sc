@@ -10,7 +10,7 @@ program Task6Spec
  *
  * Precondition:
  *      There exists two actors, one with the role of
- *      the monkey (id is "Affe") and one in the role of the circus director (id is "Zirkusdirektor").
+ *      the monkey (id is "monkey") and one in the role of the circus director (id is "Zirkusdirektor").
  *
  * Interpretations and considerations:
  *  - Also the monkey could move on its own, in arbitrary
@@ -33,97 +33,88 @@ program Task6Spec
 
 actor DirectorObserver is Observer begin
 
-    declare actor_1 as actor
-    declare actor_1_last_y as int
-    declare actor_1_last_x as int
+    declare director as actor
+    declare director_last_y as int
+    declare director_last_x as int
 
-    declare actor_2 as actor
-    declare actor_2_last_y as int
-    declare actor_2_last_x as int
+    declare monkey as actor
+    declare monkey_last_y as int
+    declare monkey_last_x as int
 
-    declare actor_1_moving_towards_2 as boolean
-    declare actor_2_moving_towards_1 as boolean
+    declare last_move_towards as int
 
-    declare last_change as int
-
-    define actor_1_moving_towards_2 as true
-
-    // TODO: Store attributes as 'normal' variables of the actor?
-    // TODO: Is the map datatype really needed?
-
-    define atomic isBehaviorSatisfied () begin
-        define result as true
-
+    define atomic checkBehaviorSatisfied () begin
         // (a) Attributes of the first actor
-        declare actor_1_x as int
-        declare actor_1_y as int
-        define actor_1_x as cast attribute "x" of actor_1 to int
-        define actor_1_y as cast attribute "y" of actor_1 to int
+        declare director_x as int
+        declare director_y as int
+        define director_x as cast attribute "x" of director to int
+        define director_y as cast attribute "y" of director to int
 
         // (b) Attributes of the second actor
-        declare actor_2_x as int
-        declare actor_2_y as int
-        define actor_2_x as cast attribute "x" of actor_2 to int
-        define actor_2_y as cast attribute "y" of actor_2 to int
-
-        // TODO: Parameterize the code / move to a method.
-        //      Map data type needed for this.
+        declare monkey_x as int
+        declare monkey_y as int
+        define monkey_x as cast attribute "x" of monkey to int
+        define monkey_y as cast attribute "y" of monkey to int
 
         // If actor 2 is left of actor 1:
-        //   actor1.x' <= actor1.x (left move)
+        //   actor1.x' < actor1.x (left move)
         // If actor 2 is right of actor 1:
-        //   actor1.x' >= actor1.x (right move)
-        declare actor_1_x_move_towards_2 as boolean
-        define actor_1_x_move_towards_2 as (actor_1_last_x = actor_2_last_x)
-        if actor_2_last_x < actor_1_last_x then begin
-           define actor_1_x_move_towards_2 as (actor_1_x < actor_1_last_x) or (actor_1_x = actor_1_last_x)
+        //   actor1.x' > actor1.x (right move)
+        declare director_x_towards_monkey as boolean
+        define director_x_towards_monkey as false
+        if monkey_last_x < director_last_x then begin
+           define director_x_towards_monkey as (director_x < director_last_x)
         end
-        if actor_2_last_x > actor_1_last_x then begin
-           define actor_1_x_move_towards_2 as (actor_1_x > actor_1_last_x) or (actor_1_x = actor_1_last_x)
-        end
-
-        declare actor_1_y_move_towards_2 as boolean
-        define actor_1_y_move_towards_2 as (actor_1_last_y = actor_2_last_y)
-        if actor_2_last_y < actor_1_last_y then begin
-           define actor_1_y_move_towards_2  as (actor_1_y < actor_1_last_y) or (actor_1_y = actor_1_last_y)
-        end
-        if actor_2_last_y > actor_1_last_y then begin
-           define actor_1_y_move_towards_2  as (actor_1_y > actor_1_last_y) or (actor_1_y = actor_1_last_y)
+        if monkey_last_x > director_last_x then begin
+           define director_x_towards_monkey as (director_x > director_last_x)
         end
 
-        define actor_1_moving_towards_2 as actor_1_x_move_towards_2 or actor_1_y_move_towards_2
+        declare director_y_towards_monkey as boolean
+        define director_y_towards_monkey as false
+        if monkey_last_y < director_last_y then begin
+           define director_y_towards_monkey  as (director_y < director_last_y)
+        end
+        if monkey_last_y > director_last_y then begin
+           define director_y_towards_monkey  as (director_y > director_last_y)
+        end
 
-        if actor_1_moving_towards_2 then begin
-           define last_change as _RUNTIME_micros()
+        declare director_towards_monkey as boolean
+        define director_towards_monkey as director_x_towards_monkey or director_y_towards_monkey
+
+        declare director_at_monkey as boolean
+        define director_at_monkey as touchingObjects(director, monkey)
+
+        if director_towards_monkey or director_at_monkey then begin
+           define last_move_towards as _RUNTIME_micros()
         end
 
         // The actual invariant check
-        if _RUNTIME_micros() - last_change > 100000 then begin
-            define result as false
+        if _RUNTIME_micros() - last_move_towards > 100000 then begin
+           _RUNTIME_signalFailure("The director must move towards the monkey.")
         end
 
-    end returns result: boolean
+    end
 
     define atomic storeRelevantStateInfosForNext () begin
         // Actor 1
-        define actor_1_last_x as cast attribute "x" of actor_1 to int
-        define actor_1_last_y as cast attribute "y" of actor_1 to int
+        define director_last_x as cast attribute "x" of director to int
+        define director_last_y as cast attribute "y" of director to int
 
         // Actor 2
-        define actor_2_last_x as cast attribute "x" of actor_2 to int
-        define actor_2_last_y as cast attribute "y" of actor_2 to int
+        define monkey_last_x as cast attribute "x" of monkey to int
+        define monkey_last_y as cast attribute "y" of monkey to int
     end
 
     script on bootstrap do begin
     end
 
     script on bootstrap finished do begin
-        define actor_1 as locate actor "Zirkusdirektor-rennend"
-        define actor_2 as locate actor "Affe"
-        define last_change as _RUNTIME_micros()
+        define director as locate actor "Zirkusdirektor-rennend"
+        define monkey as locate actor "Affe"
+        define last_move_towards as _RUNTIME_micros()
 
         // First specification check (base condition)
-        assert(isBehaviorSatisfied())
+        checkBehaviorSatisfied()
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
@@ -131,7 +122,7 @@ actor DirectorObserver is Observer begin
 
     script on statement finished do begin
         // The actual specification check
-        assert(isBehaviorSatisfied())
+        checkBehaviorSatisfied()
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()

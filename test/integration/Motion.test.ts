@@ -22,28 +22,22 @@
 import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-xtest("Test pointTowards 1 safe", done => {
+test("Test pointTowards 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-pointTowards-1_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test pointTowards 1 unsafe", done => {
+test("Test pointTowards 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-pointTowards-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test moveSteps 1 safe", done => {
+test("Test moveSteps 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-moveSteps-1_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test moveSteps 2 safe", done => {
-    const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-moveSteps-2_SAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
-}, utils.timeout);
-
-
-xtest("Test moveSteps 1 unsafe", done => {
+test("Test moveSteps 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-moveSteps-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);

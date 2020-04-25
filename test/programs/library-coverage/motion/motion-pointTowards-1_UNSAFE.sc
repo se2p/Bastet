@@ -13,7 +13,7 @@ actor ActorB is ScratchSprite begin
 
     script on bootstrap do begin
         define x as 0
-        define y as 10
+        define y as 100
     end
 
     script on startup do begin
@@ -21,7 +21,7 @@ actor ActorB is ScratchSprite begin
         define actorA as locate actor "ActorA"
         pointTowards(actorA)
 
-        if not (direction = 0) then begin
+        if (direction < 185 or direction > 175)  then begin
             _RUNTIME_signalFailure()
         end
     end

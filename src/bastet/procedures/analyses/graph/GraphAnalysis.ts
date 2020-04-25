@@ -37,9 +37,11 @@ import {App} from "../../../syntax/app/App";
 import {GraphTransferRelation} from "./GraphTransferRelation";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {
+    CHOOSE_EITHER,
+    CHOOSE_FIRST, CHOOSE_SECOND,
     DefaultFrontierSet,
     FrontierSet,
-    PartitionKey,
+    PartitionKey, PriorityFrontierSet,
     ReachedSet,
     StatePartitionOperator,
     StateSet
@@ -57,6 +59,10 @@ import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgument
 import {Set as ImmSet} from "immutable"
 import {GraphContextToDot} from "./GraphContextToDot";
 import {GraphCoverCheckStopOperator} from "./GraphCoverCheckStopOperator";
+import {DummyHandler, WitnessHandler} from "../WitnessHandlers";
+import {WitnessExporter} from "./witnesses/WitnessExporter";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {LexiKey} from "../../../utils/Lexicographic";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 
@@ -70,6 +76,14 @@ export class GraphAnalysisConfig extends BastetConfiguration {
 
     get stopOperator(): string {
         return this.getStringProperty('stopOperator', 'CheckCoverage');
+    }
+
+    get witnessHandler(): string {
+        return this.getStringProperty('witnessHandler', 'DoNothing');
+    }
+
+    get graphConstructionOrder(): string {
+        return this.getStringProperty('graphConstructionOrder', 'WaitAtMeet');
     }
 
 }
@@ -93,6 +107,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     private readonly _mergeIntoOp: MergeIntoOperator<GraphAbstractState, GraphAbstractState>;
 
     private readonly _stopOp: StopOperator<GraphAbstractState, GraphAbstractState>;
+
+    private readonly _witnessHandler: WitnessHandler<GraphAbstractState>;
 
     private readonly _config: GraphAnalysisConfig;
 
@@ -120,6 +136,14 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
             this._stopOp = new NoStopOperator();
         } else {
             throw new IllegalArgumentException("Illegal stop operator configuration");
+        }
+
+        if (this._config.witnessHandler == 'DoNothing') {
+            this._witnessHandler = DummyHandler.create();
+        } else if (this._config.witnessHandler == 'ExportWitness') {
+            this._witnessHandler = new WitnessExporter();
+        } else {
+            throw new IllegalArgumentException("Illegal witness handler configuration");
         }
     }
 
@@ -169,7 +193,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     exportAnalysisResult(reachedPrime: StateSet<AbstractState>, frontierPrime: StateSet<AbstractState>) {
-        const exporter = new GraphToDot(this._task, this,
+        const exporter = new GraphToDot(this._task, this, this,
             reachedPrime as StateSet<GraphAbstractState>,
             frontierPrime as StateSet<GraphAbstractState>);
 
@@ -198,7 +222,15 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     createStateSets(): [FrontierSet<GraphAbstractState>, ReachedSet<GraphAbstractState>] {
-        const frontierSet = new DefaultFrontierSet<GraphAbstractState>();
+        let frontierSet;
+        if (this._config.graphConstructionOrder == "DepthFirst") {
+            frontierSet = new DefaultFrontierSet();
+        } else if (this._config.graphConstructionOrder == "WaitAtMeet") {
+            frontierSet = new PriorityFrontierSet<GraphAbstractState>(this);
+        } else {
+            throw new IllegalArgumentException("Invalid custruction order: " + this._config.graphConstructionOrder);
+        }
+
         const reachedSet = new GraphReachedSetWrapper(frontierSet, this, (r, e) => {this.onStateError(r,e)});
         return [frontierSet, reachedSet];
     }
@@ -214,5 +246,31 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     getPartitionKeys(element: GraphAbstractState): ImmSet<PartitionKey> {
         return element.getPartitionKeys();
     }
+
+    handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
+        return this._witnessHandler.handleViolatingState(reached, violating);
+    }
+
+    compareStateOrder(a: GraphAbstractState, b: GraphAbstractState): number {
+        if (!a || !b) {
+            return CHOOSE_EITHER;
+        }
+
+        const wrappedResult = this.wrappedAnalysis.compareStateOrder(a.getWrappedState(), b.getWrappedState());
+        if (wrappedResult == CHOOSE_EITHER) {
+            if (a.getId() < b.getId()) {
+                return CHOOSE_FIRST;
+            } else {
+                return CHOOSE_SECOND;
+            }
+        } else {
+            return wrappedResult;
+        }
+    }
+
+    getLexiOrderKey(ofState: GraphAbstractState): LexiKey {
+        return this.wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
+    }
+
 
 }

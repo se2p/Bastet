@@ -38,6 +38,7 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {SSAMergeOperator} from "./SSAMergeOperator";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
+import {LexiKey} from "../../../utils/Lexicographic";
 
 
 export class SSAAnalysisConfig extends BastetConfiguration {
@@ -151,6 +152,18 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
 
     getPartitionKeys(element: SSAState): ImmSet<PartitionKey> {
         return this._wrappedAnalysis.getPartitionKeys(element.getWrappedState());
+    }
+
+    handleViolatingState(reached: ReachedSet<F>, violating: F) {
+        throw new ImplementMeException();
+    }
+
+    compareStateOrder(a: SSAState, b: SSAState): number {
+        throw new ImplementMeException();
+    }
+
+    getLexiOrderKey(ofState: SSAState): LexiKey {
+        return this._wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
     }
 
 }

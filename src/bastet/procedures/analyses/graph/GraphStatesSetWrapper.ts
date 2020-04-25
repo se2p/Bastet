@@ -21,13 +21,17 @@
  */
 
 
-import {DefaultAnalysisStateSet, FrontierSet, StatePartitionOperator} from "../../algorithms/StateSet";
+import {DefaultAnalysisStateSet, FrontierSet, ReachedSet, StatePartitionOperator} from "../../algorithms/StateSet";
 import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {GraphPath, GraphPathSet} from "./GraphPath";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
+import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 
-export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState> {
+export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState>
+    implements ReachedSet<GraphAbstractState>
+{
 
     private readonly _frontierSet: FrontierSet<E>;
 
@@ -62,42 +66,6 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
         return super.add(element);
     }
 
-    private removeChildrenOf(parent: E) {
-        // ATTENTION: The graph does NOT have cycles!
-        Preconditions.checkNotUndefined(parent);
-        // TODO: Rewrite to a non-recursive algorithm (rewrite to a worklist alg)
-
-        // Set the list of children to the empty list before recurring. Avoids an infinite loop.
-        const toRemove: GraphStateId[] = this._children.get(parent.getId()) || [];
-        this._children.set(parent.getId(), []);
-
-        // Remove the children recursively
-        for (const childId of toRemove) {
-            const childState = this._idToStateMap.get(childId);
-            Preconditions.checkNotUndefined(childState);
-            this.remove(childState);
-
-            // GOAL: Never loose frontier states to ensure that we
-            //  cover the full state space!
-            //
-            // Re-add all parents of the child
-            // to the set of frontier states if they are not
-            // equal to the state `parent` (from which the childs
-            // must be deleted) if the child is in the set of frontier states
-            if (this._frontierSet.has(childState)) {
-                for (const childParentId of childState.getPredecessors()) {
-                    const childParent = this._idToStateMap.get(childParentId);
-                    if (childParent != parent) {
-                        this._frontierSet.add(childParent);
-                    }
-                }
-
-                // Remove the child from the set of frontier states
-                this._frontierSet.remove(childState);
-            }
-        }
-    }
-
     public getChildrenOf(of: GraphStateId): Set<GraphStateId> {
         const childIDs: GraphStateId[] = this._children.get(of) || [];
         return new Set(childIDs);
@@ -108,24 +76,101 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
         return childIDs.map((id) => this._idToStateMap.get(id));
     }
 
-    public remove(element: E): any {
-        // Remove all children
-        this.removeChildrenOf(element);
+    /**
+     * Remove the element `element` from the set of reached states.
+     * In case `element` was a frontier state, the parents of
+     * `element` become frontier states.
+     *
+     * @param element
+     */
+    public remove(element: E) {
+        this.removeState(element, true);
+    }
 
-        // Remove child from parent
-        for (const parent of element.getPredecessors()) {
-            const newParentChilds: GraphStateId[] = [];
-            for (const c of this._children.get(parent) || []) {
-                if (c != element.getId()) {
-                    newParentChilds.push(c);
+    public removeState(element: E, reAddToWaitlist: boolean) {
+        Preconditions.checkNotUndefined(element);
+
+        // 1. Determine the childs to remove
+        const toRemove: ImmSet<E> = ImmSet().asMutable();
+        toRemove.add(element);
+
+        let hasFrontierChilds = false;
+
+        const visited: ImmSet<E> = ImmSet().asMutable();
+        const worklist: E[] = [element];
+        while (worklist.length > 0) {
+            const p = worklist.pop();
+            const childs: GraphStateId[] = this._children.get(p.getId()) || [];
+
+            for (const childId of childs) {
+                const c = this._idToStateMap.get(childId);
+                if (!visited.contains(c)) {
+                    visited.add(c);
+
+                    // Schedule for removal
+                    toRemove.add(c);
+
+                    if (this._frontierSet.has(c)) {
+                        hasFrontierChilds = true;
+                    }
+
+                    // ATTENTION: The graph does NOT have cycles!
+                    worklist.push(c);
                 }
             }
-            this._children.set(parent, newParentChilds);
         }
 
-        // Remove the state itself
-        this._idToStateMap.delete(element.getId());
-        return super.remove(element);
+        // 2. Make all parent states that will not get removed frontier states
+        const removeChildsOf: ImmSet<E> = ImmSet().asMutable();
+
+        // - Only if they had childs that were in the set of frontier states
+        //      (it must be possible to remove infeasible parts of the ARG without causing a re-computation)
+        if (reAddToWaitlist && hasFrontierChilds) {
+            for (const e of toRemove) {
+                if (e != element) {
+                    // Only if not the state to remove (operators like 'merge' will re-add a
+                    // state that overapproximates 'element')
+                    for (const p of e.getPredecessors().map((id) => this._idToStateMap.get(id))) {
+                        if (toRemove.has(p)) {
+                            // Also the parent will be removed --> Do not add this parent to the frontier set
+                        } else {
+                            this._frontierSet.add(p);
+
+                            // Also remove the childs of all nodes that get re-added to the wait-list (LATER)
+                            const frontierChildsIds: GraphStateId[] = this._children.get(p.getId()) || [];
+                            frontierChildsIds.map((id) => this._idToStateMap.get(id)).forEach((e) => removeChildsOf.add(e));
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. Actually remove the states
+        for (const e of toRemove) {
+            // Remove the reference to the element from its parent
+            for (const parent of e.getPredecessors()) {
+                const newParentChilds: GraphStateId[] = [];
+                for (const c of this._children.get(parent) || []) {
+                    if (c != e.getId()) {
+                        newParentChilds.push(c);
+                    }
+                }
+                this._children.set(parent, newParentChilds);
+            }
+
+            // Remove the state itself
+            this._idToStateMap.delete(e.getId());
+            super.remove(e);
+
+            // Also remove it from the set of frontier states
+            this._frontierSet.remove(e);
+        }
+
+        // 4. Actually remove all childs of the new frontier states
+        for (const e of removeChildsOf) {
+            const childs: GraphStateId[] = this._children.get(e.getId()) || [];
+            childs.map((id) => this._idToStateMap.get(id)).forEach((e) => this.removeState(e, false));
+        }
     }
 
     public chooseRandomPathTo(element: E): GraphPath {

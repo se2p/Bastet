@@ -52,7 +52,9 @@ export class TransitionRelationToDot {
                 penwidth = 3;
             }
 
-            output.push(`    ${loc} [shape=${shape} penwidth=${penwidth}]`);
+            const dfsNumber: number = tr.getDfsNumberOf(loc);
+            const label: string = this.escapeLabel(`${loc}\n${dfsNumber}\n${tr.getWaitAtMeetOrderOf(loc)}`);
+            output.push(`    ${loc} [label="${label}" shape=${shape} penwidth=${penwidth}]`);
         }
 
         while (worklist.length > 0) {

@@ -13,14 +13,15 @@ actor ActorB is ScratchSprite begin
 
     script on startup do begin
         define x as 0
-        define y as 10
+        define y as 100
 
         declare actorA as actor
         define actorA as locate actor "ActorA"
         pointTowards(actorA)
 
-        if (direction = 0) then begin
-            _RUNTIME_signalFailure()
+        if (direction < 185 or direction > 175)  then begin
+        end else begin
+            _RUNTIME_signalFailure("pointTowardsTest")
         end
     end
 

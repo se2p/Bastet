@@ -28,20 +28,25 @@ import {Property} from "../../../syntax/Property";
 import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
-import {Refiner, Unwrapper} from "../Refiner";
+import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {ProgramTimeProfile} from "../../../utils/TimeProfile";
 import {TimeTransferRelation} from "./TimeTransferRelation";
 import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {Set as ImmSet} from "immutable";
+import {Map as ImmMap, List as ImmList, Set as ImmSet} from "immutable";
+import {LexiKey} from "../../../utils/Lexicographic";
+import {TimeAbstractDomain, TimeState} from "./TimeAbstractDomain";
+import {TimeMergeOperator} from "./TimeMergeOperator";
 
 
-export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
-    implements WrappingProgramAnalysis<C, E, F>,
-        Unwrapper<E, E>,
-        LabeledTransferRelation<E>{
+export class TimeAnalysis<F extends AbstractState>
+    implements WrappingProgramAnalysis<ConcreteElement, TimeState, F>,
+        Unwrapper<TimeState, AbstractElement>,
+        LabeledTransferRelation<TimeState>{
+
+    private readonly _abstractDomain: TimeAbstractDomain;
 
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any, F>;
 
@@ -49,7 +54,11 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, 
 
     private readonly _timeProfile: ProgramTimeProfile;
 
-    private readonly _transfer: TimeTransferRelation<any>;
+    private readonly _transfer: TimeTransferRelation;
+
+    private readonly _mergeOperator: TimeMergeOperator;
+
+    private readonly _refiner: WrappingRefiner<TimeState, any>;
 
     private readonly _task: App;
 
@@ -59,76 +68,94 @@ export class TimeAnalysis<C extends ConcreteElement, E extends AbstractElement, 
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._timeProfile = Preconditions.checkNotUndefined(timeProfile);
+        this._abstractDomain = new TimeAbstractDomain(wrappedAnalysis.abstractDomain);
+        this._mergeOperator = new TimeMergeOperator(wrappedAnalysis);
+        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._transfer = new TimeTransferRelation(task, timeProfile,
             new LabeledTransferRelationImpl(null,
             (from, op, co) => wrappedAnalysis.abstractSuccFor(from, op, co)));
     }
 
-    abstractSucc(fromState: E): Iterable<E> {
+    abstractSucc(fromState: TimeState): Iterable<TimeState> {
         return this._transfer.abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: E, op: ProgramOperation, co: Concern): Iterable<E> {
+    abstractSuccFor(fromState: TimeState, op: ProgramOperation, co: Concern): Iterable<TimeState> {
         return this._transfer.abstractSuccFor(fromState, op, co);
     }
 
-    initialStatesFor(task: App): E[] {
-        return this._wrappedAnalysis.initialStatesFor(task);
+    initialStatesFor(task: App): TimeState[] {
+        Preconditions.checkArgument(task === this._task);
+        return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
+            return new TimeState(ImmList([]), w);
+        } );
     }
 
-    join(state1: E, state2: E): E {
-        return this._wrappedAnalysis.join(state1, state2);
+    join(state1: TimeState, state2: TimeState): TimeState {
+        return this._abstractDomain.lattice.join(state1, state2);
     }
 
-    merge(state1: E, state2: E): E {
-        return this._wrappedAnalysis.merge(state1, state2);
+    merge(state1: TimeState, state2: TimeState): TimeState {
+        return this._mergeOperator.merge(state1, state2);
     }
 
-    shouldMerge(state1: E, state2: E): boolean {
-        return this._wrappedAnalysis.shouldMerge(state1, state2);
+    shouldMerge(state1: TimeState, state2: TimeState): boolean {
+        return this._mergeOperator.shouldMerge(state1, state2);
     }
 
-    stop(state: E, reached: Iterable<F>, unwrapper: (e: F) => E): boolean {
+    stop(state: TimeState, reached: Iterable<F>, unwrapper: (e: F) => TimeState): boolean {
         return this._wrappedAnalysis.stop(state, reached, unwrapper);
     }
 
-    target(state: E): Property[] {
-        return this._wrappedAnalysis.target(state);
+    target(state: TimeState): Property[] {
+        return this._wrappedAnalysis.target(state.getWrappedState());
     }
 
-    widen(state: E): E {
-        return this._wrappedAnalysis.widen(state);
+    widen(state: TimeState): TimeState {
+        return this._wrappedAnalysis.widen(state.getWrappedState());
     }
 
     createStateSets(): [FrontierSet<F>, ReachedSet<F>] {
         return this._wrappedAnalysis.createStateSets();
     }
 
-    get abstractDomain(): AbstractDomain<C, E> {
-        return this._wrappedAnalysis.abstractDomain;
+    get abstractDomain(): AbstractDomain<ConcreteElement, TimeState> {
+        return this._abstractDomain;
     }
 
-    get refiner(): Refiner<E> {
-        return this._wrappedAnalysis.refiner;
+    get refiner(): Refiner<TimeState> {
+        return this._refiner;
     }
 
     get wrappedAnalysis(): ProgramAnalysis<any, any, F> {
         return this._wrappedAnalysis;
     }
 
-    unwrap(e: E): E {
-        return e;
+    unwrap(e: TimeState): AbstractElement {
+        return e.getWrappedState();
     }
 
-    mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
+    mergeInto(state: TimeState, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => TimeState, wrapper: (TimeState) => F): [FrontierSet<F>, ReachedSet<F>] {
         throw new ImplementMeException();
     }
 
-    partitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F> {
-        return this._wrappedAnalysis.partitionOf(ofState, reached);
+    partitionOf(ofState: TimeState, reached: ReachedSet<F>): Iterable<F> {
+        return this._wrappedAnalysis.partitionOf(ofState.getWrappedState(), reached);
     }
 
-    getPartitionKeys(element: E): ImmSet<PartitionKey> {
-        return this._wrappedAnalysis.getPartitionKeys(element);
+    getPartitionKeys(element: TimeState): ImmSet<PartitionKey> {
+        return this._wrappedAnalysis.getPartitionKeys(element.getWrappedState());
+    }
+
+    handleViolatingState(reached: ReachedSet<F>, violating: F) {
+        throw new ImplementMeException();
+    }
+
+    compareStateOrder(a: TimeState, b: TimeState): number {
+        throw new ImplementMeException();
+    }
+
+    getLexiOrderKey(ofState: TimeState): LexiKey {
+        return this._wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
     }
 }

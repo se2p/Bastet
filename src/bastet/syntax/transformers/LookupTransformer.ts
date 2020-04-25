@@ -61,9 +61,9 @@ export class LookupTransformer {
         activeDeclarationScope.putTypeInformation(ident, StringType.instance())
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", StringType.instance().typeId));
-        let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
+   //     let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
         let stmts = [];
-        stmts.push(declareStackVar)
+  //      stmts.push(declareStackVar)
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
@@ -162,9 +162,9 @@ export class LookupTransformer {
         activeDeclarationScope.putTypeInformation(ident, StringType.instance())
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", StringType.instance().typeId));
-        let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
+       // let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
         let stmts = [];
-        stmts.push(declareStackVar);
+        //stmts.push(declareStackVar);
         let idxCount = 0;
         for (let child of resourceDefs.node.children) {
 
@@ -206,17 +206,15 @@ export class LookupTransformer {
         let dirName = path.dirname(filePath);
 
         let methodIdent = new Identifier("getImageWidth");
-        const ident = new Identifier("id");
+        const ident = new Identifier("ident");
         let paramDecl = new ParameterDeclaration(ident, StringType.instance());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
-
         _activeDeclarationScope.putTypeInformation(ident, StringType.instance())
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", IntegerType.instance().typeId));
-        let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
+        //   let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
         let stmts = [];
-        stmts.push(declareStackVar);
-
+        //   stmts.push(declareStackVar)
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
@@ -226,13 +224,13 @@ export class LookupTransformer {
             if (fileName.endsWith(".png") || fileName.endsWith(".svg")) {
                 let uri = path.join(dirName, fileName);
 
-                let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("id", StringType.instance().typeId));
+                let varWithDataLoc = new VariableWithDataLocation(new TypedDataLocation("ident", StringType.instance().typeId));
                 let cond = new StrEqualsExpression(varWithDataLoc, new StringLiteral(name));
 
                 let dimensions = imageSize(uri);
                 let width = dimensions.width;
                 if (fileName.endsWith(".png")) {
-                    width = this.resizeWidthAndHeight(dimensions.width, dimensions.height)[1]
+                    width = this.resizeWidthAndHeight(dimensions.width, dimensions.height)[0]
                 }
 
                 let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new IntegerLiteral(width));
@@ -260,15 +258,15 @@ export class LookupTransformer {
         let dirName = path.dirname(filePath);
 
         let methodIdent = new Identifier("getImageHeight");
-        const ident = new Identifier("id");
+        const ident = new Identifier("ident");
         let paramDecl = new ParameterDeclaration(ident, StringType.instance());
         let paramDeclList = new ParameterDeclarationList([paramDecl]);
         activeDeclarationScope.putTypeInformation(ident, StringType.instance())
 
         let resultVarDecl = new VariableWithDataLocation(new TypedDataLocation("result", IntegerType.instance().typeId));
-        let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
+     //   let declareStackVar = new DeclareStackVariableStatement(resultVarDecl);
         let stmts = [];
-        stmts.push(declareStackVar)
+     //   stmts.push(declareStackVar)
         for (let child of resourceDefs.node.children) {
 
             let name = (<ResourceDefinition>child).ident.text;
@@ -284,7 +282,7 @@ export class LookupTransformer {
                 let dimensions = imageSize(uri);
                 let height = dimensions.height;
                 if (fileName.endsWith(".png")) {
-                    height = this.resizeWidthAndHeight(dimensions.width, dimensions.height)[0]
+                    height = this.resizeWidthAndHeight(dimensions.width, dimensions.height)[1]
                 }
 
                 let stmt = new StoreEvalResultToVariableStatement(resultVarDecl, new IntegerLiteral(height));
@@ -315,9 +313,9 @@ export class LookupTransformer {
         let paramDeclList = new ParameterDeclarationList([]);
 
         let stackVar = new VariableWithDataLocation(new TypedDataLocation("result", IntegerType.instance().typeId));
-        let declareStackVar = new DeclareStackVariableStatement(stackVar);
+    //    let declareStackVar = new DeclareStackVariableStatement(stackVar);
         let stmts = [];
-        stmts.push(declareStackVar)
+    //    stmts.push(declareStackVar)
         let idxCount = 0;
         for (let child of resourceDefs.node.children) {
             let fileName = (<ResourceDefinition>child).resourceLocator.uri;
@@ -368,9 +366,9 @@ export class LookupTransformer {
         } else if ((width <= STAGE_WIDTH * 2) && (height <= STAGE_HEIGHT * 2)) {
             return [width, height];
         } else if (inputRatio >= RATIO) {
-            return [STAGE_WIDTH * 2, STAGE_WIDTH * 2 / inputRatio];
+            return [STAGE_WIDTH * 2, STAGE_HEIGHT* 2 / inputRatio];
         } else {
-            return [STAGE_HEIGHT * 2 * inputRatio, STAGE_HEIGHT * 2];
+            return [STAGE_WIDTH * 2 * inputRatio, STAGE_HEIGHT * 2];
         }
     }
 }

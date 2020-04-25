@@ -25,6 +25,9 @@ import {BooleanExpression} from "../expressions/BooleanExpression";
 import {NumberExpression} from "../expressions/NumberExpression";
 import {VariableWithDataLocation} from "../Variable";
 import {Preconditions} from "../../../../utils/Preconditions";
+import {StringLiteral} from "../expressions/StringExpression";
+
+export type BlockId = string;
 
 export interface ControlStatement extends AbstractNode {
 
