@@ -280,32 +280,9 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     }
 
     compareStateOrder(a: ControlAbstractState, b: ControlAbstractState): number {
-        const steppedThreadsA = a.getSteppedFor().map((i) => a.getIndexedThreadState(i));
-        const steppedThreadsB = b.getSteppedFor().map((i) => b.getIndexedThreadState(i));
-
-        if (steppedThreadsA.size == steppedThreadsB.size) {
-            if (steppedThreadsA.size == 1) {
-                const steppedA: IndexedThread = getTheOnlyElement(steppedThreadsA);
-                const steppedB: IndexedThread = getTheOnlyElement(steppedThreadsB);
-                const relLocA: RelationLocation = steppedA.threadStatus.getRelationLocation();
-                const relLocB: RelationLocation = steppedB.threadStatus.getRelationLocation();
-                const relA: TransitionRelation = this._task.getTransitionRelationById(relLocA.getRelationId());
-                const relB: TransitionRelation = this._task.getTransitionRelationById(relLocB.getRelationId());
-
-                const rpoA = relA.getWaitAtMeetOrderOf(relLocA.getLocationId());
-                const rpoB = relB.getWaitAtMeetOrderOf(relLocB.getLocationId());
-
-                if (rpoA == rpoB) {
-                    return CHOOSE_EITHER;
-                } else if (rpoA > rpoB) {
-                    return CHOOSE_SECOND;
-                } else {
-                    return CHOOSE_FIRST;
-                }
-            }
-        }
-
-        return CHOOSE_EITHER;
+        const keyA = this.getLexiOrderKey(a);
+        const keyB = this.getLexiOrderKey(b);
+        return keyA.compareTo(keyB);
     }
 
     getLexiOrderKey(ofState: ControlAbstractState): LexiKey {
@@ -317,7 +294,8 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
             const relA: TransitionRelation = this._task.getTransitionRelationById(relLocA.getRelationId());
             const rpoA: number = relA.getWaitAtMeetOrderOf(relLocA.getLocationId());
 
-            return new LexiKey([rpoA]);
+            return new LexiKey([rpoA * -1]); // We use a Max-Priority-Queue. Larger elements are prefered but we
+            // what to process elements with the smaller wait-at-meet order first
         }
 
         return new LexiKey([]);
