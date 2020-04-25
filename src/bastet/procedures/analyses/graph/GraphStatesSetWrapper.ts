@@ -175,7 +175,7 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
 
     public chooseRandomPathTo(element: E): GraphPath {
         Preconditions.checkNotUndefined(element);
-        const pathToElement: ImmStack<E> = ImmStack();
+        const pathToElement: ImmStack<E> = ImmStack().asMutable();
         let currentNode = element;
 
         // In every iteration the currentNode is updated to its predecessor until root is reached.
@@ -183,7 +183,7 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
         while (currentNode) {
             pathToElement.push(currentNode);
 
-            const predecessorSet: ImmSet<number> = element.getPredecessors();
+            const predecessorSet: ImmSet<number> = currentNode.getPredecessors();
 
             if (predecessorSet.size == 0) {
                 // Root reached
