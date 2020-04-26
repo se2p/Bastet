@@ -46,7 +46,7 @@ parse_results () {
     SATISFIED=$(num_or_zero `grep_statistic "MultiPropertyAlgorithm" "num_satisfied"`)
     VIOLATED=$(num_or_zero `grep_statistic "MultiPropertyAlgorithm" "num_violated"`)
     DURATION=$(grep_statistic "MultiPropertyAlgorithm" "duration")
-    REACHED=$(grep_statistic "ReachabilityAlgorithm" "reached states")
+    REACHED=$(grep_statistic "ReachabilityAlgorithm" "reachedStates")
     ERROR=$(grep_error)
     DURATION=$(printf '%.*f\n' 2 $DURATION)
 
