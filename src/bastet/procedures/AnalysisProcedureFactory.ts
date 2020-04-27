@@ -93,7 +93,10 @@ export class AnalysisProcedureFactory {
                 const reachabilityAlgorithm = new ReachabilityAlgorithm(config, outerAnalysis, this._statistics);
                 const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, outerAnalysis.refiner, outerAnalysis, this._statistics);
                 const multiPropertyAlgorithm = new MultiPropertyAlgorithm(config, task, bmcAlgorithm, outerAnalysis, this._statistics,
-                    (v, s, u, stats) => this.onAnalysisResult(v, s, u, stats));
+                    (v, s, u, stats) => {
+                    outerAnalysis.finalizeResults(frontier, reached);
+                    this.onAnalysisResult(v, s, u, stats);
+                });
 
                 const initialStates: GraphAbstractState[] = outerAnalysis.initialStatesFor(task);
                 frontier.addAll(initialStates);
@@ -109,6 +112,7 @@ export class AnalysisProcedureFactory {
 
             private onAnalysisResult(violated: ImmSet<Property>, satisifed: ImmSet<Property>, unknowns: ImmSet<Property>,
                                      mpaStatistics: AnalysisStatistics) {
+
                 const analysisDurtionMSec = mpaStatistics.contextTimer.totalDuration.toFixed(3);
 
                 mpaStatistics.put("num_violated", violated.size);

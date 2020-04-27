@@ -36,7 +36,7 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
    extends AbstractSuccOperator<E>,
        JoinOperator<E>, TargetOperator<E>, MergeIntoOperator<E, F>,
        MergeOperator<E>, StopOperator<E, F>, WidenOperator<E>, PartitionOperator<E, F>,
-       WitnessHandler<F>, TraversalOrderOperator<E, F> {
+       WitnessHandler<F>, TraversalOrderOperator<E, F>, ResultFinalization<F> {
 
     abstractDomain: AbstractDomain<C, E>;
 
@@ -45,6 +45,12 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
     initialStatesFor(task: App): E[];
 
     createStateSets(): [FrontierSet<F>, ReachedSet<F>];
+
+}
+
+export interface ResultFinalization<F extends AbstractState> {
+
+    finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>);
 
 }
 

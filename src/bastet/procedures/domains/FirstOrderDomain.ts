@@ -144,4 +144,11 @@ export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
         return this._boolTheory.not(element);
     }
 
+    get boolTheory(): BooleanTheory<F> {
+        return this._boolTheory;
+    }
+
+    get prover(): FirstOrderSolver<F> {
+        return this._prover;
+    }
 }

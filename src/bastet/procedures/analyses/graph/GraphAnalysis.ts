@@ -272,5 +272,9 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         return this.wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
     }
 
+    finalizeResults(frontier: FrontierSet<GraphAbstractState>, reached: ReachedSet<GraphAbstractState>) {
+        this.wrappedAnalysis.finalizeResults(frontier, reached);
+    }
+
 
 }

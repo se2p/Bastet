@@ -52,6 +52,7 @@ import {IllegalStateException} from "../../../core/exceptions/IllegalStateExcept
 import {LexiKey} from "../../../utils/Lexicographic";
 import {getTheOnlyElement} from "../../../utils/Collections";
 import {TransitionRelation} from "../../../syntax/app/controlflow/TransitionRelation";
+import {ControlCoverageExaminer} from "./coverage/ControlCoverage";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -97,7 +98,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
         const result: ControlAbstractState[] = [];
         for (const r of this._transferRelation.abstractSucc(fromState)) {
-            if (!this.steppedOnLoophead(r) || this.refiner.checkIsFeasible(r)) {
+            if (!this.steppedOnLoophead(r) || this.refiner.checkIsFeasible(r, "Loop unrolling")) {
                 result.push(r);
             }
         }
@@ -299,5 +300,17 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         }
 
         return new LexiKey([]);
+    }
+
+    finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
+        this.wrappedAnalysis.finalizeResults(frontier, reached);
+
+        const examiner = new ControlCoverageExaminer();
+        const coverage = examiner.determineCoverageOf(this._task, reached);
+        const covStats = this._statistics.withContext("Coverage");
+        covStats.put("coveredLocationsPercent", coverage.controlCoveragePercent);
+        covStats.put("coveredLocationsAbs", coverage.coveredControlLocationsAbs);
+        covStats.put("uncoveredLocationsAbs", coverage.uncoveredControlLocationsAbs);
+        covStats.put("uncoveredPerLocationAbs", coverage.numberOfUncoveredPerRelation);
     }
 }

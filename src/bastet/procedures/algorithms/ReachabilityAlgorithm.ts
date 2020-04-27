@@ -34,8 +34,8 @@ import {getActiveBudget} from "../../utils/Budgets";
 const { performance } = require('perf_hooks');
 
 export const STAT_KEY_REACH_ITERATIONS = "iterations";
-export const STAT_KEY_REACH_REACHED = "reached states";
-export const STAT_KEY_REACH_FRONTIER = "frontier states";
+export const STAT_KEY_REACH_REACHED = "reachedStates";
+export const STAT_KEY_REACH_FRONTIER = "frontierStates";
 
 export class ReachabilityAlgorithmConfig extends BastetConfiguration {
 

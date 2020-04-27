@@ -69,10 +69,9 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractState>
 
                 // Check the feasibility with the refiner
                 let isFeasible: boolean;
-                console.group("BMC Feasibility Check for " + properties.toString());
                 this._feasibilityCheckStats.startTimer();
                 try {
-                    isFeasible = this._refiner.checkIsFeasible(targetState as E);
+                    isFeasible = this._refiner.checkIsFeasible(targetState as E, `BMC target state feasibility for ${properties.toString()}`);
                     if (isFeasible) {
                         return [frontier, reached];
                     } else {
@@ -80,8 +79,6 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractState>
                     }
                 } finally {
                     this._feasibilityCheckStats.stopTimer();
-                    console.log(`${isFeasible ? "Feasible" : "Infeasible"}`)
-                    console.groupEnd();
                 }
             }
         } while (!frontier.isEmpty());

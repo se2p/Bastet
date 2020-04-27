@@ -192,5 +192,9 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
     getLexiOrderKey(ofState: E): LexiKey {
         return this.wrappedAnalysis.getLexiOrderKey(ofState);
     }
+
+    finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
+        return this.wrappedAnalysis.finalizeResults(frontier, reached);
+    }
 }
 

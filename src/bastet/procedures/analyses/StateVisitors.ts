@@ -21,7 +21,7 @@
  */
 
 
-import {AbstractStateVisitor} from "./AbstractStates";
+import {AbstractStateVisitor, DelegatingStateVisitor} from "./AbstractStates";
 import {AbstractElement} from "../../lattices/Lattice";
 import {ControlAbstractState, ThreadState} from "./control/ControlAbstractDomain";
 import {DataAbstractState} from "./data/DataAbstractDomain";
@@ -30,6 +30,7 @@ import {SSAState} from "./ssa/SSAAbstractDomain";
 import {App} from "../../syntax/app/App";
 import {Preconditions} from "../../utils/Preconditions";
 import {CorePrintVisitor} from "../../syntax/ast/CorePrintVisitor";
+import {TimeState} from "./time/TimeAbstractDomain";
 
 export class StateLabelVisitor implements AbstractStateVisitor<string> {
 
@@ -80,11 +81,15 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
         // return `${element.getSSA().toString()} ${wrappedLabel}`;
     }
 
+    visitTimeState(element: TimeState): string {
+        return element.getWrappedState().accept(this);
+    }
+
 }
 
-export class StateColorVisitor implements AbstractStateVisitor<string> {
+export class StateColorVisitor extends DelegatingStateVisitor<string> {
 
-    visit(element: AbstractElement): string {
+    protected defaultResultFor(element: AbstractElement): string {
         return "white";
     }
 
@@ -96,40 +101,12 @@ export class StateColorVisitor implements AbstractStateVisitor<string> {
         }
     }
 
-    visitDataAbstractState(element: DataAbstractState): string {
-        return undefined;
-    }
-
-    visitGraphAbstractState(element: GraphAbstractState): string {
-        return element.getWrappedState().accept(this);
-    }
-
-    visitSSAState(element: SSAState): string {
-        return element.getWrappedState().accept(this);
-    }
-
 }
 
-export class PenSizeVisitor implements AbstractStateVisitor<number> {
+export class PenSizeVisitor extends DelegatingStateVisitor<number> {
 
-    visit(element: AbstractElement): number {
+    protected defaultResultFor(element: AbstractElement): number {
         return 1;
-    }
-
-    visitControlAbstractState(element: ControlAbstractState): number {
-        return element.getWrappedState().accept(this);
-    }
-
-    visitGraphAbstractState(element: GraphAbstractState): number {
-        return element.getWrappedState().accept(this);
-    }
-
-    visitDataAbstractState(element: DataAbstractState): number {
-        return 1;
-    }
-
-    visitSSAState(element: SSAState): number {
-        return element.getWrappedState().accept(this);
     }
 
 }

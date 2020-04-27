@@ -26,7 +26,7 @@ import {Preconditions} from "../../utils/Preconditions";
 
 export interface Refiner<E extends AbstractElement> {
 
-    checkIsFeasible(e: E): boolean;
+    checkIsFeasible(e: E, purpose?: string): boolean;
 
 }
 
@@ -52,9 +52,9 @@ export class WrappingRefiner<E extends AbstractElement, W extends AbstractElemen
         this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
     }
 
-    checkIsFeasible(e: E): boolean {
+    checkIsFeasible(e: E, purpose?: string): boolean {
         const w = this._unwrapper.unwrap(e);
-        return this._wrapped.checkIsFeasible(w);
+        return this._wrapped.checkIsFeasible(w, purpose);
     }
 
 }
