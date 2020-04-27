@@ -22,19 +22,35 @@
 
 
 import {WitnessHandler} from "../../WitnessHandlers";
-import {GraphAbstractState} from "../GraphAbstractDomain";
+import {GraphAbstractState, GraphConcreteState} from "../GraphAbstractDomain";
 import {ReachedSet} from "../../../algorithms/StateSet";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {GraphReachedSetWrapper} from "../GraphStatesSetWrapper";
+import {GraphPath} from "../GraphPath";
+import {GraphSafetyCounterexample} from "./GraphCounterexample";
+import {ProgramAnalysis} from "../../ProgramAnalysis";
 import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
-    handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
-        Preconditions.checkArgument(reached instanceof GraphReachedSetWrapper);
-        throw new ImplementMeException();
-        // Make use of the class `GraphSafetyCounterexample`
+    private readonly _analysis: ProgramAnalysis<GraphConcreteState, GraphAbstractState, GraphAbstractState>;
+
+    constructor(analysis: ProgramAnalysis<GraphConcreteState, GraphAbstractState, GraphAbstractState>) {
+        this._analysis = analysis;
     }
 
+    handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
+        const counterExample = this.extractCounterExample(reached, violating);
+        throw new ImplementMeException();
+    }
 
+    public extractCounterExample(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState): GraphSafetyCounterexample {
+        Preconditions.checkArgument(reached instanceof GraphReachedSetWrapper);
+        const reachedSetWrapper = reached as GraphReachedSetWrapper<GraphAbstractState>;
+
+        const errorWitness: GraphPath = reachedSetWrapper.chooseRandomPathTo(violating);
+
+        const violatedProperties = this._analysis.target(violating);
+        return new GraphSafetyCounterexample(errorWitness, violatedProperties);
+    }
 }

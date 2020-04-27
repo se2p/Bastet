@@ -141,7 +141,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         if (this._config.witnessHandler == 'DoNothing') {
             this._witnessHandler = DummyHandler.create();
         } else if (this._config.witnessHandler == 'ExportWitness') {
-            this._witnessHandler = new WitnessExporter();
+            this._witnessHandler = new WitnessExporter(this);
         } else {
             throw new IllegalArgumentException("Illegal witness handler configuration");
         }
