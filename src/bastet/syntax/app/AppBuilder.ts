@@ -64,7 +64,6 @@ import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentExc
 import {ImmutableMap} from "../../utils/ImmutableMap";
 import {ImmutableList} from "../../utils/ImmutableList";
 import {CallStatement} from "../ast/core/statements/CallStatement";
-import {from} from "immutable/contrib/cursor";
 
 export class AppBuilder {
 
