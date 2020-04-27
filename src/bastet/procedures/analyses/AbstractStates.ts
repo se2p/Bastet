@@ -24,10 +24,28 @@ import {GraphAbstractState} from "./graph/GraphAbstractDomain";
 import {ControlAbstractState} from "./control/ControlAbstractDomain";
 import {SSAState} from "./ssa/SSAAbstractDomain";
 import {DataAbstractState} from "./data/DataAbstractDomain";
+import {TimeState} from "./time/TimeAbstractDomain";
+import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 
 export interface SingletonStateWrapper {
 
     wrappedState: AbstractElement;
+
+}
+
+export class DelegatingStateVisitor<T> implements AbstractElementVisitor<T> {
+
+    visit(element: AbstractElement): T {
+        if (element['wrappedState']) {
+            return element['wrappedState'].accept(this);
+        }
+
+        return this.defaultResultFor(element);
+    }
+
+    protected defaultResultFor(element: AbstractElement): T {
+        throw new ImplementMeForException(element.constructor.name);
+    }
 
 }
 
@@ -42,6 +60,8 @@ export interface AbstractStateVisitor<T> extends AbstractElementVisitor<T> {
     visitSSAState(element: SSAState): T;
 
     visitDataAbstractState(element: DataAbstractState): T;
+
+    visitTimeState(element: TimeState): T;
 
 }
 

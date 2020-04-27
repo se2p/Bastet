@@ -52,6 +52,7 @@ import {IllegalStateException} from "../../../core/exceptions/IllegalStateExcept
 import {LexiKey} from "../../../utils/Lexicographic";
 import {getTheOnlyElement} from "../../../utils/Collections";
 import {TransitionRelation} from "../../../syntax/app/controlflow/TransitionRelation";
+import {ControlCoverageExaminer} from "./coverage/ControlCoverage";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -299,5 +300,16 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         }
 
         return new LexiKey([]);
+    }
+
+    finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
+        this.wrappedAnalysis.finalizeResults(frontier, reached);
+
+        const examiner = new ControlCoverageExaminer();
+        const coverage = examiner.determineCoverageOf(this._task, reached);
+        const covStats = this._statistics.withContext("Coverage");
+        covStats.put("coveredLocationsPercent", coverage.controlCoveragePercent);
+        covStats.put("coveredLocationsAbs", coverage.coveredControlLocationsAbs);
+        covStats.put("uncoveredLocationsAbs", coverage.uncoveredControlLocationsAbs);
     }
 }

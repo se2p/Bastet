@@ -158,4 +158,8 @@ export class TimeAnalysis<F extends AbstractState>
     getLexiOrderKey(ofState: TimeState): LexiKey {
         return this._wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
     }
+
+    finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
+        return this.wrappedAnalysis.finalizeResults(frontier, reached);
+    }
 }
