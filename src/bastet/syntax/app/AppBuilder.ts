@@ -63,6 +63,8 @@ import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {ImmutableMap} from "../../utils/ImmutableMap";
 import {ImmutableList} from "../../utils/ImmutableList";
+import {CallStatement} from "../ast/core/statements/CallStatement";
+import {from} from "immutable/contrib/cursor";
 
 export class AppBuilder {
 
@@ -386,6 +388,74 @@ export class AppBuilder {
         }
 
         return new App(taskModel.origin, taskModel.ident, flatActors, taskModel.typeStorage);
+    }
+
+    /**
+     * Remove all method definitions for that no call exists
+     * from the task model.
+     *
+     * @param taskModel
+     */
+    public static removeIrrelevantMethods(taskModel: App): App {
+        Preconditions.checkNotUndefined(taskModel);
+
+        const actorMap: ActorMap = {};
+
+        for (const actor of taskModel.actors) {
+            // Collect all called methods
+            const calledMethods = new Set<string>();
+
+            const collectFromTransitions = (tr: TransitionRelation) => {
+                for (const [from, opId, to] of tr.transitions) {
+                    const op = ProgramOperation.for(opId);
+                    if (op.ast instanceof CallStatement) {
+                        const call = op.ast as CallStatement;
+                        const calledMethod = actor.findMethod(call.calledMethod.text);
+                        if (calledMethod != null) {
+                            if (!calledMethods.has(call.calledMethod.text)) {
+                                calledMethods.add(call.calledMethod.text);
+                                collectFromTransitions(calledMethod.transitions);
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Add all externally called methods (does not harm and some of them
+            // are called from within BASTET).
+            for (const ext of actor.externalMethodMap.keys()) {
+                calledMethods.add(ext);
+            }
+
+            Preconditions.checkNotUndefined(actor.inheritFrom.length == 0, "Please dissolve the inheritance relation before!");
+            for (const script of actor.scripts) {
+                collectFromTransitions(script.transitions);
+            }
+
+            const methodDefsPrime: MethodDefinitionMap = {};
+            for (const [mid, m] of actor.methodMap.entries()) {
+                if (calledMethods.has(mid)) {
+                    methodDefsPrime[mid] = m;
+                }
+            }
+
+            // `methodsPrime` must include both internal and external methods
+            const methodsPrime: Method[] = [];
+            for (const m of actor.methods) {
+                if (calledMethods.has(m.ident.text)) {
+                    methodsPrime.push(m);
+                }
+            }
+
+            const actorPrime = new Actor(actor.actorMode, actor.ident, actor.inheritFrom.createMutable(),
+                actor.dissolvedFrom.createMutable(), actor.concern, actor.resourceMap.createMutable(),
+                actor.datalocMap.createMutable(), actor.initScript,
+                methodDefsPrime, actor.externalMethodMap.createMutable(), actor.scripts.createMutable(), methodsPrime);
+
+            actorMap[actorPrime.ident] = actorPrime;
+        }
+
+        return new App(taskModel.origin, taskModel.ident, actorMap, taskModel.typeStorage);
     }
 
     private ensureNoStackVariables(initScript: Script) {

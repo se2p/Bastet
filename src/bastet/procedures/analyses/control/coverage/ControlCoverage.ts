@@ -129,7 +129,6 @@ export class ControlCoverageExaminer {
         };
 
         for (const actor of task.actors) {
-            collectLocsFromRelation(actor.ident, actor.initScript.transitions);
             for (const script of actor.scripts) {
                 collectLocsFromRelation(actor.ident, script.transitions);
             }
