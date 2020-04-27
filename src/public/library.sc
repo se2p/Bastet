@@ -1008,6 +1008,26 @@ role ScratchSprite is ScratchEntity begin
         define y as y + tmpy
     end
 
+    // @Category "Motion"
+    define atomic goTo (newX: int, newY: int) begin
+        define x as newX
+        define y as newY
+    end
+
+    define atomic hide () begin
+        define visible as false
+    end
+
+    define atomic show () begin
+        define visible as true
+    end
+
+    // @Category "Motion"
+    define atomic goToRandomPosition () begin
+        define x as randomIntegerBetween(0-240, 240)
+        define y as randomIntegerBetween(0-180, 180)
+    end
+
     define atomic changeXBy (increment: int) begin
        // set attribute "x" to (attribute "x" + increment)
     end
