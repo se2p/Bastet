@@ -17,7 +17,7 @@ tmp
 public/css/main.css
 
 # Coverage reports
-coverage
+./coverage/
 
 # API keys and secrets
 .env
