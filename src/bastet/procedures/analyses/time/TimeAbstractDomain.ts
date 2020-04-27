@@ -24,9 +24,10 @@ import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from ".
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Map as ImmMap, List as ImmList, Record as ImmRec} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
-import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
+import { ConcreteDomain, ConcreteElement, ConcreteStringList } from '../../domains/ConcreteElements'
 import {Preconditions} from "../../../utils/Preconditions";
 import {BlockId} from "../../../syntax/ast/core/statements/ControlStatement";
+import { AbstractStringList } from '../../domains/StringListAbstractDomain'
 
 
 export interface TimeStateAttribs extends AbstractElement, SingletonStateWrapper {
@@ -146,6 +147,10 @@ export class TimeAbstractDomain implements AbstractDomain<ConcreteElement, TimeS
     }
 
     concretize(element: TimeState): Iterable<ConcreteElement> {
+        throw new ImplementMeException();
+    }
+
+    concretizeOne(element: TimeState): ConcreteElement {
         throw new ImplementMeException();
     }
 

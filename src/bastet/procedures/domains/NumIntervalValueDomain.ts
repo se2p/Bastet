@@ -23,10 +23,17 @@
 import {AbstractionPrecision} from "./AbstractDomain";
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {Record as ImmRec} from "immutable";
-import {ConcreteDomain, ConcreteElementFactory, ConcreteNumber, ConcreteNumberOrderLattice} from "./ConcreteElements";
+import {
+    ConcreteDomain,
+    ConcreteElementFactory,
+    ConcreteMemory,
+    ConcreteNumber,
+    ConcreteNumberOrderLattice,
+} from './ConcreteElements'
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
-import {AbstractNumberDomain} from "./MemoryTransformer";
+import { AbstractNumber, AbstractNumberDomain } from './MemoryTransformer'
+import { SSAState } from '../analyses/ssa/SSAAbstractDomain'
 
 export interface NumIntervalValueAttribs extends AbstractElement {
 
@@ -128,6 +135,10 @@ export class NumIntervalValueDomain implements AbstractNumberDomain {
     }
 
     concretize(element: NumIntervalValue): Iterable<ConcreteNumber> {
+        throw new ImplementMeException();
+    }
+
+    concretizeOne(element: AbstractNumber): ConcreteNumber {
         throw new ImplementMeException();
     }
 

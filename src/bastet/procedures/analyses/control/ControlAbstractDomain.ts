@@ -26,7 +26,7 @@ import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "i
 import {ActorId} from "../../../syntax/app/Actor";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
+import { ConcreteDomain, ConcreteElement, ConcreteMemory } from '../../domains/ConcreteElements'
 import {App} from "../../../syntax/app/App";
 import {AfterStatementMonitoringEvent, SingularityEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Property} from "../../../syntax/Property";
@@ -37,6 +37,7 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {DataLocation, DataLocations, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
+import { DataAbstractState } from '../data/DataAbstractDomain'
 
 /**
  * Current thread state that is active or becomes active if...
@@ -582,6 +583,10 @@ export class ControlAbstractDomain implements AbstractDomain<ControlConcreteStat
     }
 
     concretize(element: ControlAbstractState): Iterable<ControlConcreteState> {
+        throw new ImplementMeException();
+    }
+
+    concretizeOne(element: ControlAbstractState): ConcreteMemory {
         throw new ImplementMeException();
     }
 

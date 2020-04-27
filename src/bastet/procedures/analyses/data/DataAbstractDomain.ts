@@ -140,6 +140,10 @@ export class DataAbstractDomain implements AbstractDomain<ConcreteMemory, DataAb
         throw new ImplementMeException();
     }
 
+    concretizeOne(element: DataAbstractState): ConcreteMemory {
+        throw new ImplementMeException();
+    }
+
     widen(element: DataAbstractState, precision: AbstractionPrecision): DataAbstractState {
         throw new ImplementMeException();
     }

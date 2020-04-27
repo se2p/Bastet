@@ -21,7 +21,7 @@
  */
 
 import {AbstractionPrecision} from "./AbstractDomain";
-import {ConcreteDomain, ConcreteStringList} from "./ConcreteElements";
+import { ConcreteDomain, ConcreteList, ConcreteString, ConcreteStringList } from './ConcreteElements'
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
@@ -80,6 +80,10 @@ export class StringListAbstractDomain implements AbstractStringListDomain {
     }
 
     concretize(element: AbstractStringList): Iterable<ConcreteStringList> {
+        throw new ImplementMeException();
+    }
+
+    concretizeOne(element: AbstractStringList): ConcreteStringList {
         throw new ImplementMeException();
     }
 

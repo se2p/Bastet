@@ -24,8 +24,9 @@ import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from ".
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Map as ImmMap, Record as ImmRec} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
-import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
+import { ConcreteDomain, ConcreteElement, ConcreteMemory } from '../../domains/ConcreteElements'
 import {Preconditions} from "../../../utils/Preconditions";
+import { ControlAbstractState } from '../control/ControlAbstractDomain'
 
 
 export interface SSAStateAttribs extends AbstractElement, SingletonStateWrapper {
@@ -155,6 +156,10 @@ export class SSAAbstractDomain implements AbstractDomain<ConcreteElement, SSASta
     }
 
     concretize(element: SSAState): Iterable<ConcreteElement> {
+        throw new ImplementMeException();
+    }
+
+    concretizeOne(element: SSAState): ConcreteMemory {
         throw new ImplementMeException();
     }
 

@@ -25,6 +25,7 @@ import {Lattice} from "../../lattices/Lattice";
 import {ConcreteDomain, ConcreteList, ConcreteString} from "./ConcreteElements";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {AbstractList} from "./MemoryTransformer";
+import { GraphAbstractState, GraphConcreteState } from '../analyses/graph/GraphAbstractDomain'
 
 
 export class ListValueDomain implements AbstractDomain<ConcreteList<ConcreteString>, AbstractList> {
@@ -36,6 +37,10 @@ export class ListValueDomain implements AbstractDomain<ConcreteList<ConcreteStri
     }
 
     concretize(element: AbstractList): Iterable<ConcreteList<ConcreteString>> {
+        throw new ImplementMeException();
+    }
+
+    concretizeOne(element: AbstractList): ConcreteList<ConcreteString> {
         throw new ImplementMeException();
     }
 

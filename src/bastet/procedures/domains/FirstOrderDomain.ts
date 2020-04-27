@@ -22,12 +22,12 @@
 
 
 import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
-import {ConcreteDomain, ConcreteElement} from "./ConcreteElements";
+import { ConcreteDomain, ConcreteElement, ConcreteNumber } from './ConcreteElements'
 import {FirstOrderFormula} from "../../utils/ConjunctiveNormalForm";
 import {LatticeWithComplements} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
-import {BooleanTheory} from "./MemoryTransformer";
+import { AbstractNumber, BooleanTheory } from './MemoryTransformer'
 
 export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
 
@@ -49,6 +49,10 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
     }
 
     concretize(element: F): Iterable<ConcreteElement> {
+        throw new ImplementMeException();
+    }
+
+    concretizeOne(element: AbstractNumber): ConcreteNumber {
         throw new ImplementMeException();
     }
 

@@ -24,9 +24,10 @@ import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from ".
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Record as ImmRec, Set as ImmSet} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
-import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
+import { ConcreteDomain, ConcreteElement, ConcreteString } from '../../domains/ConcreteElements'
 import {Preconditions} from "../../../utils/Preconditions";
 import {PartitionKey} from "../../algorithms/StateSet";
+import { AbstractString } from '../../domains/MemoryTransformer'
 
 export type GraphStateId = number;
 
@@ -160,6 +161,10 @@ export class GraphAbstractDomain implements AbstractDomain<GraphConcreteState, G
     }
 
     concretize(element: GraphAbstractState): Iterable<GraphConcreteState> {
+        throw new ImplementMeException();
+    }
+
+    concretizeOne(element: GraphAbstractState): GraphConcreteState {
         throw new ImplementMeException();
     }
 
