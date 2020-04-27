@@ -311,5 +311,6 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         covStats.put("coveredLocationsPercent", coverage.controlCoveragePercent);
         covStats.put("coveredLocationsAbs", coverage.coveredControlLocationsAbs);
         covStats.put("uncoveredLocationsAbs", coverage.uncoveredControlLocationsAbs);
+        covStats.put("uncoveredPerLocationAbs", coverage.numberOfUncoveredPerRelation);
     }
 }

@@ -23,7 +23,6 @@
 
 import {ReachedSet} from "../../../algorithms/StateSet";
 import {AbstractElement, AbstractElementVisitor, AbstractState} from "../../../../lattices/Lattice";
-import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
 import {App} from "../../../../syntax/app/App";
 import {AbstractStateVisitor, DelegatingStateVisitor} from "../../AbstractStates";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
@@ -40,11 +39,15 @@ export class ControlCoverageReport {
 
     private readonly _totalTaskLocations: number;
 
-    constructor(absUncoveredLocations: number, absCoveredLocations: number, totalTaskLocations: number) {
+    private readonly _numberOfUncoveredPerRelation: ImmMap<any, any>;
+
+    constructor(absUncoveredLocations: number, absCoveredLocations: number, totalTaskLocations: number,
+                numberOfUncoveredPerRelation: {}) {
         Preconditions.checkArgument(totalTaskLocations > 0);
         this._absUncoveredLocations = absUncoveredLocations;
         this._absCoveredLocations = absCoveredLocations;
         this._totalTaskLocations = totalTaskLocations;
+        this._numberOfUncoveredPerRelation = ImmMap(numberOfUncoveredPerRelation);
     }
 
     get uncoveredControlLocationsAbs(): number {
@@ -56,9 +59,12 @@ export class ControlCoverageReport {
     }
 
     get controlCoveragePercent(): number {
-        return this._absCoveredLocations / this._totalTaskLocations;
+        return Math.floor((this._absCoveredLocations / this._totalTaskLocations) * 10000) / 10000;
     }
 
+    get numberOfUncoveredPerRelation(): ImmMap<any, any> {
+        return this._numberOfUncoveredPerRelation;
+    }
 }
 
 /**
@@ -100,14 +106,26 @@ export class ControlCoverageExaminer {
         const reachedLocs = this.collectReachedLocs(task, reached);
 
         // 2. Collect the set of control locations of the task
-        const taskLocs = this.collectTaskLocs(task);
+        const taskLocsAll = this.collectTaskLocs(task);
+        const taskLocs = taskLocsAll.filter((l) => {
+            // Filter out some locations for this calculation
+           const relation = task.getTransitionRelationById(l.getRelationId());
+           return !(relation.entryLocationSet.contains(l.getLocationId())
+                || relation.exitLocationSet.contains(l.getLocationId()));
+        });
 
         // 3. Build the coverage report
         const uncoveredLocs = taskLocs.subtract(reachedLocs);
         const coveredLocs = taskLocs.subtract(uncoveredLocs);
 
+        const rwu = {};
+        for (const ucrl of uncoveredLocs) {
+            const relation = task.getTransitionRelationById(ucrl.getRelationId());
+            rwu[relation.name] = (rwu[relation.name] || 0) + 1;
+        }
+
         // ATTENTION: Dead code (unreachable code/locations are not considered by this calculation!)
-        return new ControlCoverageReport(uncoveredLocs.size, coveredLocs.size, taskLocs.size);
+        return new ControlCoverageReport(uncoveredLocs.size, coveredLocs.size, taskLocs.size, rwu);
     }
 
     private collectReachedLocs(task: App, reached: ReachedSet<AbstractState>): ImmSet<RelationLocation> {
