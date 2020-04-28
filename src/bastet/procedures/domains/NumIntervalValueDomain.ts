@@ -131,6 +131,10 @@ export class NumIntervalValueDomain implements AbstractNumberDomain {
         throw new ImplementMeException();
     }
 
+    concretizeOne(element: NumIntervalValue): ConcreteNumber {
+        throw new ImplementMeException();
+    }
+
     widen(element: NumIntervalValue, precision: AbstractionPrecision): NumIntervalValue {
         throw new ImplementMeException();
     }

@@ -38,6 +38,10 @@ export class FlatStringValueDomain implements AbstractDomain<ConcreteString, Abs
         throw new ImplementMeException();
     }
 
+    concretizeOne(element: AbstractString): ConcreteString {
+        throw new ImplementMeException();
+    }
+
     widen(element: AbstractString, precision: AbstractionPrecision): AbstractString {
         throw new ImplementMeException();
     }

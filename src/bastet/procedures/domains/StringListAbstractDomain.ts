@@ -83,6 +83,10 @@ export class StringListAbstractDomain implements AbstractStringListDomain {
         throw new ImplementMeException();
     }
 
+    concretizeOne(element: AbstractStringList): ConcreteStringList {
+        throw new ImplementMeException();
+    }
+
     widen(element: AbstractStringList, precision: AbstractionPrecision): AbstractStringList {
         throw new ImplementMeException();
     }

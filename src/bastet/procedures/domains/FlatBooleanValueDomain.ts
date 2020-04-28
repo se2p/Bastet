@@ -201,6 +201,10 @@ export class FlatBooleanValueDomain implements AbstractBooleanDomain<FlatBoolean
         throw new ImplementMeException();
     }
 
+    concretizeOne(element: FlatBooleanValue): ConcreteBoolean {
+        throw new ImplementMeException();
+    }
+
     widen(element: FlatBooleanValue, precision: AbstractionPrecision): FlatBooleanValue {
         throw new ImplementMeException();
     }

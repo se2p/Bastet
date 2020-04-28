@@ -55,6 +55,8 @@ export interface AbstractDomain<C extends ConcreteElement, E extends AbstractEle
 
     concretize(element: E): Iterable<C>;
 
+    concretizeOne(element: E): C;
+
     widen(element: E, precision: AbstractionPrecision): E;
 
     concreteDomain: ConcreteDomain<C>;

@@ -589,6 +589,10 @@ export class ControlAbstractDomain implements AbstractDomain<ControlConcreteStat
         throw new ImplementMeException();
     }
 
+    concretizeOne(element: ControlAbstractState): ControlConcreteState {
+        return this._wrapped.concretizeOne(element);
+    }
+
     widen(element: ControlAbstractState, precision: AbstractionPrecision): ControlAbstractState {
         throw new ImplementMeException();
     }

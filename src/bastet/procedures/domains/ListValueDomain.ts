@@ -39,6 +39,10 @@ export class ListValueDomain implements AbstractDomain<ConcreteList<ConcreteStri
         throw new ImplementMeException();
     }
 
+    concretizeOne(element: AbstractList): ConcreteList<ConcreteString> {
+        throw new ImplementMeException();
+    }
+
     widen(element: AbstractList, precision: AbstractionPrecision): AbstractList {
         throw new ImplementMeException();
     }

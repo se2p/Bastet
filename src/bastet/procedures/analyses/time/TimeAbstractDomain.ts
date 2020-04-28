@@ -149,6 +149,10 @@ export class TimeAbstractDomain implements AbstractDomain<ConcreteElement, TimeS
         throw new ImplementMeException();
     }
 
+    concretizeOne(element: TimeState): ConcreteElement {
+        return this._wrapped.concretizeOne(element);
+    }
+
     widen(element: TimeState, precision: AbstractionPrecision): TimeState {
         throw new ImplementMeException();
     }
