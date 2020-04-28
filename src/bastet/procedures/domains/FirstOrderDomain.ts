@@ -22,15 +22,16 @@
 
 
 import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
-import { ConcreteDomain, ConcreteElement, ConcreteNumber } from './ConcreteElements'
+import {ConcreteDomain, ConcreteElement, ConcreteNumber} from "./ConcreteElements";
 import {FirstOrderFormula} from "../../utils/ConjunctiveNormalForm";
 import {LatticeWithComplements} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
-import { AbstractNumber, BooleanTheory } from './MemoryTransformer'
+import {AbstractNumber, BooleanTheory} from "./MemoryTransformer";
+import {Z3Model} from "../../utils/smt/z3/Z3SMT";
 
 export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
-
+    prover: FirstOrderSolver<F>;
 }
 
 export class FirstOrderDomain<F extends FirstOrderFormula>
@@ -101,6 +102,7 @@ export abstract class FirstOrderSolver<F extends FirstOrderFormula> {
 
     public abstract release();
 
+    public abstract getModel(): Z3Model;
 }
 
 export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>

@@ -20,13 +20,20 @@
  */
 
 import {AbstractElementVisitor, AbstractState, LatticeWithComplements} from "../../../lattices/Lattice";
-import {Record as ImmRec} from "immutable"
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {Record as ImmRec} from "immutable";
+import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
 import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
-import {ConcreteDomain, ConcreteMemory} from "../../domains/ConcreteElements";
+import {
+    ConcreteBoolean,
+    ConcreteDomain, ConcreteList,
+    ConcreteMemory,
+    ConcreteNumber,
+    ConcreteString,
+} from "../../domains/ConcreteElements";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
 import {Preconditions} from "../../../utils/Preconditions";
+import {FirstOrderLattice, FirstOrderSolver} from "../../domains/FirstOrderDomain";
 
 export interface DataAbstractStateAttributes {
 
@@ -127,9 +134,11 @@ export class DataAbstractStateLattice implements LatticeWithComplements<DataAbst
 export class DataAbstractDomain implements AbstractDomain<ConcreteMemory, DataAbstractState> {
 
     private readonly _lattice: LatticeWithComplements<DataAbstractState>;
+    private readonly _solver: FirstOrderSolver<FirstOrderFormula>;
 
-    constructor(folLattice: LatticeWithComplements<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>) {
+    constructor(folLattice: FirstOrderLattice<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>) {
         this._lattice = new DataAbstractStateLattice(folLattice, propLattice);
+        this._solver = folLattice.prover;
     }
 
     abstract(elements: Iterable<ConcreteMemory>): DataAbstractState {
@@ -141,7 +150,38 @@ export class DataAbstractDomain implements AbstractDomain<ConcreteMemory, DataAb
     }
 
     concretizeOne(element: DataAbstractState): ConcreteMemory {
-        throw new ImplementMeException();
+        this._solver.push();
+        this._solver.assert(element.blockFormula);
+
+        const model = this._solver.getModel();
+
+        const numbers = new Map<string, ConcreteNumber>();
+        const strings = new Map<string, ConcreteString>();
+        const booleans = new Map<string, ConcreteBoolean>();
+        const lists = new Map<string, ConcreteList<ConcreteString>>();
+
+        model.getConstValues().forEach(constObj => {
+            const value = constObj.getValue();
+            const name = constObj.getName();
+
+            switch (typeof value) {
+                case 'boolean':
+                    booleans.set(name, new ConcreteBoolean(value));
+                    break;
+                case 'number':
+                    numbers.set(name, new ConcreteNumber(value));
+                    break;
+                case 'string':
+                    strings.set(name, new ConcreteString(value));
+                    break;
+                default:
+                    throw new ImplementMeForException("attributes of type " + typeof value);
+            }
+        });
+
+        this._solver.pop();
+
+        return new ConcreteMemory(numbers, strings, booleans, lists);
     }
 
     widen(element: DataAbstractState, precision: AbstractionPrecision): DataAbstractState {
