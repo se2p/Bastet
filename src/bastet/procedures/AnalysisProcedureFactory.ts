@@ -40,6 +40,7 @@ import {TimeAnalysis} from "./analyses/time/TimeAnalysis";
 import {StaticTimeProfile} from "../utils/TimeProfile";
 import {ConcreteElement} from "./domains/ConcreteElements";
 import {BastetConfiguration} from "../utils/BastetConfiguration";
+import {StructureStatistics} from "../syntax/app/StructureStatistics";
 
 export class MainAnalysisConfig extends BastetConfiguration {
 
@@ -74,6 +75,9 @@ export class AnalysisProcedureFactory {
 
                 this._statistics = new AnalysisStatistics("BASTET", {});
                 this._result = new MultiPropertyAnalysisResult(ImmSet<Property>(), ImmSet<Property>(), task.getProperties(), this._statistics);
+
+                const struStats = new StructureStatistics();
+                struStats.computeStatisitcs(task, this._statistics.withContext("Task"));
 
                 // TODO: Delete the context after the analysis is no more in use
                 const defaultContect = smt.createContext();
