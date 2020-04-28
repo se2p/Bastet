@@ -273,6 +273,8 @@ export class Z3Const {
                 return parseInt(ctx.get_numeral_string(constInterp));
             case "Bool":
                 return Z3_L_TRUE == ctx.get_bool_value(constInterp).val();
+            case "Real":
+                return parseFloat(ctx.get_numeral_string(constInterp));
             default:
                 throw new IllegalStateException(`Unknown const type '${sortString}'`)
         }
