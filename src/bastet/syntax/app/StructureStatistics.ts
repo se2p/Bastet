@@ -65,7 +65,7 @@ export class StructureStatistics {
         addTo.put("actorCount", actorCount);
         addTo.put("maxActorUserScriptCount", maxActorScriptCount);
         addTo.put("nonEmptyUserScriptCount", nonEmptyScripts);
-        addTo.put("nonUserScriptTransitionCount", maxUserScriptTransitions);
+        addTo.put("maxUserScriptTransitionCount", maxUserScriptTransitions);
         addTo.put("methodCount", allMethods.size);
     }
 
