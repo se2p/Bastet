@@ -872,6 +872,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         const concern = this.getStepConcern(inState);
 
         //  1. Activate the specification check thread (`after statement finished`)
+        //  (if the stepped thread is a program thread)
         if (this.isProgramConcern(concern)) {
             for (const [threadIndex, threadState] of inState.getThreadStates().entries()) {
                 const actor: Actor = this._task.getActorByName(threadState.getActorId());
@@ -913,18 +914,19 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return this.runStateCheckThreads(result);
     }
 
-    private hasNonWaitingRunnable(threads: ImmList<ThreadState>): boolean {
-        return threads.filter((ts) => ts.getComputationState() == ThreadComputationState.THREAD_STATE_YIELD
-            || ts.getComputationState() == ThreadComputationState.THREAD_STATE_RUNNING).size > 0;
+    private hasNonWaitingRunnable(threads: ImmList<ThreadState>, withConcern: Concern): boolean {
+        const nonWaitingRunnable = threads.filter((ts) =>
+            this._task.getActorByName(ts.getActorId()).concern == withConcern
+                && (ts.getComputationState() == ThreadComputationState.THREAD_STATE_YIELD
+                    || ts.getComputationState() == ThreadComputationState.THREAD_STATE_RUNNING));
+        return nonWaitingRunnable.size > 0;
     }
 
     private runStateCheckThreads(state: ControlAbstractState): ControlAbstractState[] {
         if (state.getConditionStates().size == 0) {
             return [state];
         } else {
-            const waitingThreads = state.getThreadStates().filter((ts) => ts.getComputationState() == ThreadComputationState.THREAD_STATE_WAIT);
-
-            if (this.hasNonWaitingRunnable(state.getThreadStates())) {
+            if (this.hasNonWaitingRunnable(state.getThreadStates(), Concerns.defaultProgramConcern())) {
                 return this.checkConditionAndWakeUpIfSatisfied(state);
 
             } else {
