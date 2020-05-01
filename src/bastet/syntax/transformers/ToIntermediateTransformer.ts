@@ -51,8 +51,6 @@ import {
     CloneStartEventContext,
     ConcreteActorModeContext,
     ConditionReachedEventContext,
-    CoreBoolExprContext,
-    CoreStringExprContext,
     CreateCloneOfStatementContext,
     DecimalLiteralExpressionContext,
     DeclarationStmtListContext,
@@ -1064,7 +1062,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitNumBrackets(ctx: NumBracketsContext) : TransformerResult {
-        return ctx.coreNumExpr().accept(this);
+        return ctx.numExpr().accept(this);
     }
 
     public visitNumDivExpression(ctx: NumDivExpressionContext) : TransformerResult {
@@ -1357,7 +1355,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitBoolParanthExpression(ctx: BoolParanthExpressionContext) : TransformerResult {
-        return ctx.coreBoolExpr().accept(this);
+        return ctx.boolExpr().accept(this);
     }
 
     public visitBoolVariableExpression(ctx: BoolVariableExpressionContext) : TransformerResult {
@@ -1462,11 +1460,11 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitDefaultBoolExpression(ctx: DefaultBoolExpressionContext) : TransformerResult {
-        return ctx.coreBoolExpr().accept(this);
+        return ctx.boolExpr().accept(this);
     }
 
     public visitDefaultNumExpr(ctx: DefaultNumExprContext) : TransformerResult {
-        return ctx.coreNumExpr().accept(this);
+        return ctx.numExpr().accept(this);
     }
 
     public visitDefaultStringExpression(ctx: DefaultStringExpressionContext) : TransformerResult {
@@ -1694,7 +1692,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitStringParanthExpression(ctx: StringParanthExpressionContext): TransformerResult {
-        return ctx.coreStringExpr().accept(this);
+        return ctx.stringExpr().accept(this);
     }
 
     public visitNumAsBoolExpression(ctx: NumAsBoolExpressionContext): TransformerResult {
@@ -1728,7 +1726,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitNumToFloatExpression(ctx: NumToFloatExpressionContext) : TransformerResult {
-        const tr = ctx.coreNumExpr().accept(this);
+        const tr = ctx.numExpr().accept(this);
         Preconditions.checkArgument(!(tr.node instanceof Identifier));
 
         return new TransformerResult(
@@ -1737,7 +1735,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitNumToIntExpression(ctx: NumToIntExpressionContext) : TransformerResult {
-        const tr = ctx.coreNumExpr().accept(this);
+        const tr = ctx.numExpr().accept(this);
         Preconditions.checkArgument(!(tr.node instanceof Identifier));
 
         return new TransformerResult(
@@ -2028,22 +2026,6 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
 
     visitBoolCallStatementExpression(ctx: BoolCallStatementExpressionContext): TransformerResult {
         return this.transformCallStatementToVariable(ctx.callStmt());
-    }
-
-    visitCoreStringExpression(ctx: CoreStringExprContext): TransformerResult {
-        return this.visitSingleChild(ctx);
-    }
-
-    visitCoreBoolExpression(ctx: CoreStringExprContext): TransformerResult {
-        return this.visitSingleChild(ctx);
-    }
-
-    visitCoreBoolExpr(ctx: CoreBoolExprContext): TransformerResult {
-        return this.visitSingleChild(ctx);
-    }
-
-    visitCoreNumExpression(ctx: CoreStringExprContext): TransformerResult {
-        return this.visitSingleChild(ctx);
     }
 
     visitChildren(node: RuleNode): TransformerResult {
