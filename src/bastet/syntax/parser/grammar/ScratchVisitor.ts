@@ -6,6 +6,7 @@ import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
 import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
 import { FullMethodDefinitionContext } from "./ScratchParser";
+import { ExternMethodDefinitionContext } from "./ScratchParser";
 import { RestartScriptContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
 import { ActorTypeContext } from "./ScratchParser";
@@ -151,12 +152,10 @@ import { ScriptAttributeListContext } from "./ScratchParser";
 import { ScriptAttributeContext } from "./ScratchParser";
 import { EventContext } from "./ScratchParser";
 import { MessageNamespaceContext } from "./ScratchParser";
-import { ExternMethodDefinitionContext } from "./ScratchParser";
-import { ExternMethodResultDeclarationContext } from "./ScratchParser";
-import { ExternMethodDefinitionListContext } from "./ScratchParser";
+import { MethodDefinitionListContext } from "./ScratchParser";
 import { MethodDefinitionContext } from "./ScratchParser";
 import { MethodResultDeclarationContext } from "./ScratchParser";
-import { MethodDefinitionListContext } from "./ScratchParser";
+import { ExternMethodResultDeclarationContext } from "./ScratchParser";
 import { MethodAttributeListContext } from "./ScratchParser";
 import { MethodAttributeContext } from "./ScratchParser";
 import { ParameterContext } from "./ScratchParser";
@@ -228,6 +227,14 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitFullMethodDefinition?: (ctx: FullMethodDefinitionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `ExternMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitExternMethodDefinition?: (ctx: ExternMethodDefinitionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `RestartScript`
@@ -1367,25 +1374,11 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitMessageNamespace?: (ctx: MessageNamespaceContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `ScratchParser.externMethodDefinition`.
+	 * Visit a parse tree produced by `ScratchParser.methodDefinitionList`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitExternMethodDefinition?: (ctx: ExternMethodDefinitionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `ScratchParser.externMethodResultDeclaration`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitExternMethodResultDeclaration?: (ctx: ExternMethodResultDeclarationContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `ScratchParser.externMethodDefinitionList`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitExternMethodDefinitionList?: (ctx: ExternMethodDefinitionListContext) => Result;
+	visitMethodDefinitionList?: (ctx: MethodDefinitionListContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `ScratchParser.methodDefinition`.
@@ -1402,11 +1395,11 @@ export interface ScratchVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitMethodResultDeclaration?: (ctx: MethodResultDeclarationContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `ScratchParser.methodDefinitionList`.
+	 * Visit a parse tree produced by `ScratchParser.externMethodResultDeclaration`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitMethodDefinitionList?: (ctx: MethodDefinitionListContext) => Result;
+	visitExternMethodResultDeclaration?: (ctx: ExternMethodResultDeclarationContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `ScratchParser.methodAttributeList`.

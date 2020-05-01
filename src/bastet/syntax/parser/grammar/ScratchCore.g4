@@ -34,7 +34,7 @@ actorMode :
   | 'role' # ActorRoleMode
   ;
 
-actorComponentsDefinition : resourceList declarationStmtList setStmtList externMethodDefinitionList methodDefinitionList scriptList ;
+actorComponentsDefinition : resourceList declarationStmtList setStmtList methodDefinitionList scriptList ;
 
 // The Scratch programming language is typically used to
 // write small games that take produce graphics and sounds as output.
@@ -108,16 +108,10 @@ messageNamespace : 'in' String # MessageNameSpace | #GlobalNameSpace;
 // reusable code blocks (also known as 'custom blocks').
 // A procedure is identified by a name and is parameterized
 // to take a number of arguments.
-externMethodDefinition : 'extern' ident parameterList externMethodResultDeclaration ;
-externMethodResultDeclaration :
-  'returns' type # ExternFunctionReturnDefinition
-  | # ExternVoidReturnDefinition
-  ;
-
-externMethodDefinitionList : externMethodDefinition* ;
-
+methodDefinitionList : methodDefinition* ;
 methodDefinition :
   'define' methodAttributeList ident parameterList stmtList methodResultDeclaration # FullMethodDefinition
+  | 'extern' ident parameterList externMethodResultDeclaration # ExternMethodDefinition
   ;
 
 methodResultDeclaration :
@@ -125,8 +119,10 @@ methodResultDeclaration :
   | # VoidReturnDefinition
   ;
 
-// A list of procedure definitions.
-methodDefinitionList : methodDefinition* ;
+externMethodResultDeclaration :
+  'returns' type # ExternFunctionReturnDefinition
+  | # ExternVoidReturnDefinition
+  ;
 
 // Attributes that can be assinged to a method
 methodAttributeList : methodAttribute* ;

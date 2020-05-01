@@ -6,6 +6,7 @@ import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
 import { FullMethodDefinitionContext } from "./ScratchParser";
+import { ExternMethodDefinitionContext } from "./ScratchParser";
 import { RestartScriptContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
 import { ActorTypeContext } from "./ScratchParser";
@@ -151,12 +152,10 @@ import { ScriptAttributeListContext } from "./ScratchParser";
 import { ScriptAttributeContext } from "./ScratchParser";
 import { EventContext } from "./ScratchParser";
 import { MessageNamespaceContext } from "./ScratchParser";
-import { ExternMethodDefinitionContext } from "./ScratchParser";
-import { ExternMethodResultDeclarationContext } from "./ScratchParser";
-import { ExternMethodDefinitionListContext } from "./ScratchParser";
+import { MethodDefinitionListContext } from "./ScratchParser";
 import { MethodDefinitionContext } from "./ScratchParser";
 import { MethodResultDeclarationContext } from "./ScratchParser";
-import { MethodDefinitionListContext } from "./ScratchParser";
+import { ExternMethodResultDeclarationContext } from "./ScratchParser";
 import { MethodAttributeListContext } from "./ScratchParser";
 import { MethodAttributeContext } from "./ScratchParser";
 import { ParameterContext } from "./ScratchParser";
@@ -240,6 +239,19 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitFullMethodDefinition?: (ctx: FullMethodDefinitionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `ExternMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 */
+	enterExternMethodDefinition?: (ctx: ExternMethodDefinitionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `ExternMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 */
+	exitExternMethodDefinition?: (ctx: ExternMethodDefinitionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `RestartScript`
@@ -2081,37 +2093,15 @@ export interface ScratchListener extends ParseTreeListener {
 	exitMessageNamespace?: (ctx: MessageNamespaceContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `ScratchParser.externMethodDefinition`.
+	 * Enter a parse tree produced by `ScratchParser.methodDefinitionList`.
 	 * @param ctx the parse tree
 	 */
-	enterExternMethodDefinition?: (ctx: ExternMethodDefinitionContext) => void;
+	enterMethodDefinitionList?: (ctx: MethodDefinitionListContext) => void;
 	/**
-	 * Exit a parse tree produced by `ScratchParser.externMethodDefinition`.
+	 * Exit a parse tree produced by `ScratchParser.methodDefinitionList`.
 	 * @param ctx the parse tree
 	 */
-	exitExternMethodDefinition?: (ctx: ExternMethodDefinitionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `ScratchParser.externMethodResultDeclaration`.
-	 * @param ctx the parse tree
-	 */
-	enterExternMethodResultDeclaration?: (ctx: ExternMethodResultDeclarationContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.externMethodResultDeclaration`.
-	 * @param ctx the parse tree
-	 */
-	exitExternMethodResultDeclaration?: (ctx: ExternMethodResultDeclarationContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `ScratchParser.externMethodDefinitionList`.
-	 * @param ctx the parse tree
-	 */
-	enterExternMethodDefinitionList?: (ctx: ExternMethodDefinitionListContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.externMethodDefinitionList`.
-	 * @param ctx the parse tree
-	 */
-	exitExternMethodDefinitionList?: (ctx: ExternMethodDefinitionListContext) => void;
+	exitMethodDefinitionList?: (ctx: MethodDefinitionListContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.methodDefinition`.
@@ -2136,15 +2126,15 @@ export interface ScratchListener extends ParseTreeListener {
 	exitMethodResultDeclaration?: (ctx: MethodResultDeclarationContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `ScratchParser.methodDefinitionList`.
+	 * Enter a parse tree produced by `ScratchParser.externMethodResultDeclaration`.
 	 * @param ctx the parse tree
 	 */
-	enterMethodDefinitionList?: (ctx: MethodDefinitionListContext) => void;
+	enterExternMethodResultDeclaration?: (ctx: ExternMethodResultDeclarationContext) => void;
 	/**
-	 * Exit a parse tree produced by `ScratchParser.methodDefinitionList`.
+	 * Exit a parse tree produced by `ScratchParser.externMethodResultDeclaration`.
 	 * @param ctx the parse tree
 	 */
-	exitMethodDefinitionList?: (ctx: MethodDefinitionListContext) => void;
+	exitExternMethodResultDeclaration?: (ctx: ExternMethodResultDeclarationContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.methodAttributeList`.
