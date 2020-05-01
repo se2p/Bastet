@@ -115,6 +115,10 @@ export class AppBuilder {
         const boostrapper = Actors.defaultBoostraper();
         result[boostrapper.ident] = boostrapper;
 
+        // Add the actor that is activated on termination
+        const terminator = Actors.defaultTerminator();
+        result[terminator.ident] = terminator;
+
         return result;
     }
 

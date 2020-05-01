@@ -28,7 +28,7 @@ import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 import {App} from "../../../syntax/app/App";
-import {AfterStatementMonitoringEvent, SingularityEvent} from "../../../syntax/ast/core/CoreEvent";
+import {AfterStatementMonitoringEvent, SingularityEvent, TerminationEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Property} from "../../../syntax/Property";
 import {TransRelId} from "../../../syntax/app/controlflow/TransitionRelation";
 import {ScriptId} from "../../../syntax/app/controlflow/Script";
@@ -508,6 +508,10 @@ export class ScheduleAbstractStateFactory {
                     // be scheduled by concern.
                     // The idea is that monitoring the program should be started
                     // if the program is fully initialized.
+                    threadState = ThreadComputationState.THREAD_STATE_DISABLED;
+
+                } else if (script.event instanceof TerminationEvent) {
+                    // Will be activated if no other thread has ops to execute
                     threadState = ThreadComputationState.THREAD_STATE_DISABLED;
                 }
 

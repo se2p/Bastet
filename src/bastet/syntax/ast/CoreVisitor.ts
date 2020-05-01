@@ -90,7 +90,12 @@ import {
     ReplaceElementAtStatement
 } from "./core/statements/ListStatement";
 import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
-import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
+import {
+    DeleteThisCloneStatement,
+    StopAllStatement,
+    StopThisStatement,
+    TerminationStatement
+} from "./core/statements/TerminationStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
 import {AssumeStatement} from "./core/statements/AssumeStatement";
 import {VariableWithDataLocation} from "./core/Variable";
@@ -111,11 +116,15 @@ import {
     NeverEvent,
     RenderedMonitoringEvent,
     SingularityEvent,
-    StartupEvent
+    StartupEvent, TerminationEvent
 } from "./core/CoreEvent";
 import {ActorType, BooleanType, FloatType, IntegerType, ListType, ScratchType, StringType} from "./core/ScratchType";
 import {SystemMessage} from "./core/Message";
-import {InitializeAnalysisStatement, SignalTargetReachedStatement} from "./core/statements/InternalStatement";
+import {
+    InitializeAnalysisStatement,
+    SignalTargetReachedStatement,
+    TerminateProgramStatement
+} from "./core/statements/InternalStatement";
 
 export interface CoreVisitor<R> {
 
@@ -128,6 +137,8 @@ export interface CoreEventVisitor<R> extends CoreVisitor<R> {
     visitMessageReceivedEvent(node: MessageReceivedEvent): R;
 
     visitBootstrapEvent(node: BootstrapEvent): R;
+
+    visitTerminationEvent(node: TerminationEvent): R;
 
     visitStartupEvent(node: StartupEvent): R;
 
@@ -277,6 +288,8 @@ export interface CoreCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
     visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): R;
+
+    visitTerminateProgramStatement(node: TerminateProgramStatement): R;
 
     visitSignalTargetReachedStatement(node: SignalTargetReachedStatement): R;
 
