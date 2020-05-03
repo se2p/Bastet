@@ -153,7 +153,8 @@ export class Bastet {
         // The intermediate language supports a (simple) version of prototypical inheritance.
         // Dissolve all inheritance relations now such the later analyses steps must not
         // care about handling inheritance.
-        const staticTaskModel: App = AppBuilder.dissolveInheritance(staticTaskModelWithInheritance);
+        const staticTaskModel: App = AppBuilder.removeIrrelevantMethods(
+            AppBuilder.dissolveInheritance(staticTaskModelWithInheritance));
         const add: AppToDot = new AppToDot();
         add.exportApp(staticTaskModel, "static");
 

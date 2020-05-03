@@ -85,7 +85,7 @@ import {
 import {
     DeleteThisCloneStatement,
     StopAllStatement,
-    StopThisStatement
+    StopThisStatement, TerminationStatement
 } from "../ast/core/statements/TerminationStatement";
 import {StopOthersInActorStatement} from "../ast/core/statements/StopOthersInActorStatement";
 import {ResetTimerStatement} from "../ast/core/statements/ResetTimerStatement";
@@ -129,7 +129,11 @@ import {
     UsherActorExpression
 } from "../ast/core/expressions/ActorExpression";
 import {Identifier} from "../ast/core/Identifier";
-import {InitializeAnalysisStatement, SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
+import {
+    InitializeAnalysisStatement,
+    SignalTargetReachedStatement,
+    TerminateProgramStatement
+} from "../ast/core/statements/InternalStatement";
 
 export enum DataLocationMode {
 
@@ -181,6 +185,10 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): AstNode {
+        return node;
+    }
+
+    visitTerminateProgramStatement(node: TerminateProgramStatement): AstNode {
         return node;
     }
 

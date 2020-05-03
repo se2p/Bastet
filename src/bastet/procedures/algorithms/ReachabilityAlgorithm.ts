@@ -34,8 +34,8 @@ import {getActiveBudget} from "../../utils/Budgets";
 const { performance } = require('perf_hooks');
 
 export const STAT_KEY_REACH_ITERATIONS = "iterations";
-export const STAT_KEY_REACH_REACHED = "reached states";
-export const STAT_KEY_REACH_FRONTIER = "frontier states";
+export const STAT_KEY_REACH_REACHED = "reachedStates";
+export const STAT_KEY_REACH_FRONTIER = "frontierStates";
 
 export class ReachabilityAlgorithmConfig extends BastetConfiguration {
 
@@ -91,7 +91,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
 
             // CHOOSE: Choose the next state to compute successors for.
             //      This step determines the state-space traversal strategy.
-            const e: E = frontier.pop();
+            const e: E = frontier.peek();
             frontier.remove(e);
 
             // SUCC: Compute the set of successor states

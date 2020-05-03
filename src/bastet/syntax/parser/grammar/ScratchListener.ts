@@ -6,10 +6,23 @@ import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 import { IdentExpressionContext } from "./ScratchParser";
 import { StrIdentExpressionContext } from "./ScratchParser";
 import { FullMethodDefinitionContext } from "./ScratchParser";
+import { ExternMethodDefinitionContext } from "./ScratchParser";
 import { RestartScriptContext } from "./ScratchParser";
 import { ListTypeContext } from "./ScratchParser";
 import { ActorTypeContext } from "./ScratchParser";
 import { PrimitiveContext } from "./ScratchParser";
+import { StringLiteralExpressionContext } from "./ScratchParser";
+import { StringVariableExpressionContext } from "./ScratchParser";
+import { StringParanthExpressionContext } from "./ScratchParser";
+import { StringCallStatementExpressionContext } from "./ScratchParser";
+import { NumAsStringExpressionContext } from "./ScratchParser";
+import { BoolAsStringExpressionContext } from "./ScratchParser";
+import { StringAttributeOfExpressionContext } from "./ScratchParser";
+import { JoinStringsExpressionContext } from "./ScratchParser";
+import { IthLetterOfStringExpressionContext } from "./ScratchParser";
+import { IthStringItemOfExpressionContext } from "./ScratchParser";
+import { DefaultStringExpressionContext } from "./ScratchParser";
+import { UnspecifiedStringExpressionContext } from "./ScratchParser";
 import { IntegerLiteralExpressionContext } from "./ScratchParser";
 import { DecimalLiteralExpressionContext } from "./ScratchParser";
 import { ConcreteActorModeContext } from "./ScratchParser";
@@ -31,77 +44,6 @@ import { ActorVariableExpressionContext } from "./ScratchParser";
 import { LocateActorExpressionContext } from "./ScratchParser";
 import { StartCloneActorExpressionContext } from "./ScratchParser";
 import { UsherActorExpressionContext } from "./ScratchParser";
-import { NumberExpressionContext } from "./ScratchParser";
-import { StringExpressionContext } from "./ScratchParser";
-import { AtomicMethodContext } from "./ScratchParser";
-import { DeleteAllFromStatementContext } from "./ScratchParser";
-import { DeleteIthFromStatementContext } from "./ScratchParser";
-import { AddElementToStatementContext } from "./ScratchParser";
-import { InsertAtStatementContext } from "./ScratchParser";
-import { ReplaceElementAtStatementContext } from "./ScratchParser";
-import { NeverEventContext } from "./ScratchParser";
-import { BootstapEventContext } from "./ScratchParser";
-import { AfterBootstrapMonitoringEventContext } from "./ScratchParser";
-import { StartupEventContext } from "./ScratchParser";
-import { CloneStartEventContext } from "./ScratchParser";
-import { MessageReceivedEventContext } from "./ScratchParser";
-import { ConditionReachedEventContext } from "./ScratchParser";
-import { RenderedMonitoringEventContext } from "./ScratchParser";
-import { AfterStatementMonitoringEventContext } from "./ScratchParser";
-import { FunctionReturnDefinitionContext } from "./ScratchParser";
-import { VoidReturnDefinitionContext } from "./ScratchParser";
-import { WaitSecsStatementContext } from "./ScratchParser";
-import { WaitUntilStatementContext } from "./ScratchParser";
-import { StopOthersInActorStatementContext } from "./ScratchParser";
-import { CreateCloneOfStatementContext } from "./ScratchParser";
-import { BroadcastMessageStatementContext } from "./ScratchParser";
-import { BroadcastAndWaitStatementContext } from "./ScratchParser";
-import { ResetTimerStatementContext } from "./ScratchParser";
-import { EpsilonStatementContext } from "./ScratchParser";
-import { AssumeStatementContext } from "./ScratchParser";
-import { SetStatementContext } from "./ScratchParser";
-import { BoolLiteralExpressionContext } from "./ScratchParser";
-import { BoolVariableExpressionContext } from "./ScratchParser";
-import { BoolParanthExpressionContext } from "./ScratchParser";
-import { BoolCallStatementExpressionContext } from "./ScratchParser";
-import { NumAsBoolExpressionContext } from "./ScratchParser";
-import { StringAsBoolExpressionContext } from "./ScratchParser";
-import { NegatedBoolExpressionContext } from "./ScratchParser";
-import { BoolAndExpressionContext } from "./ScratchParser";
-import { BoolOrExpressionContext } from "./ScratchParser";
-import { GreaterEqualExpressionContext } from "./ScratchParser";
-import { GreaterThanExpressionContext } from "./ScratchParser";
-import { LessThanExpressionContext } from "./ScratchParser";
-import { LessEqualExpressionContext } from "./ScratchParser";
-import { EqualsExpressionContext } from "./ScratchParser";
-import { StrContainsExpressionContext } from "./ScratchParser";
-import { DefaultBoolExpressionContext } from "./ScratchParser";
-import { UnspecifiedBoolExpressionContext } from "./ScratchParser";
-import { DeclareVariableContext } from "./ScratchParser";
-import { StringLiteralExpressionContext } from "./ScratchParser";
-import { StringVariableExpressionContext } from "./ScratchParser";
-import { StringParanthExpressionContext } from "./ScratchParser";
-import { StringCallStatementExpressionContext } from "./ScratchParser";
-import { NumAsStringExpressionContext } from "./ScratchParser";
-import { BoolAsStringExpressionContext } from "./ScratchParser";
-import { StringAttributeOfExpressionContext } from "./ScratchParser";
-import { JoinStringsExpressionContext } from "./ScratchParser";
-import { IthLetterOfStringExpressionContext } from "./ScratchParser";
-import { IthStringItemOfExpressionContext } from "./ScratchParser";
-import { DefaultStringExpressionContext } from "./ScratchParser";
-import { UnspecifiedStringExpressionContext } from "./ScratchParser";
-import { IntegerTypeContext } from "./ScratchParser";
-import { FloatingPointTypeContext } from "./ScratchParser";
-import { BooleanTypeContext } from "./ScratchParser";
-import { StringTypeContext } from "./ScratchParser";
-import { EnumTypeContext } from "./ScratchParser";
-import { UserMessageContext } from "./ScratchParser";
-import { SystemMessageContext } from "./ScratchParser";
-import { PureElseContext } from "./ScratchParser";
-import { ElseIfCaseContext } from "./ScratchParser";
-import { EmptyElseCaseContext } from "./ScratchParser";
-import { FlatVariableContext } from "./ScratchParser";
-import { QualifiedVariableContext } from "./ScratchParser";
 import { NumLiteralExpressionContext } from "./ScratchParser";
 import { NumVariableExpressionContext } from "./ScratchParser";
 import { NumBracketsContext } from "./ScratchParser";
@@ -122,6 +64,65 @@ import { NumPlusExpressionContext } from "./ScratchParser";
 import { NumMinusExpressionContext } from "./ScratchParser";
 import { DefaultNumExprContext } from "./ScratchParser";
 import { UnspecifiedNumExprContext } from "./ScratchParser";
+import { NumberExpressionContext } from "./ScratchParser";
+import { StringExpressionContext } from "./ScratchParser";
+import { AtomicMethodContext } from "./ScratchParser";
+import { DeleteAllFromStatementContext } from "./ScratchParser";
+import { DeleteIthFromStatementContext } from "./ScratchParser";
+import { AddElementToStatementContext } from "./ScratchParser";
+import { InsertAtStatementContext } from "./ScratchParser";
+import { ReplaceElementAtStatementContext } from "./ScratchParser";
+import { FunctionReturnDefinitionContext } from "./ScratchParser";
+import { VoidReturnDefinitionContext } from "./ScratchParser";
+import { WaitSecsStatementContext } from "./ScratchParser";
+import { WaitUntilStatementContext } from "./ScratchParser";
+import { StopOthersInActorStatementContext } from "./ScratchParser";
+import { CreateCloneOfStatementContext } from "./ScratchParser";
+import { BroadcastMessageStatementContext } from "./ScratchParser";
+import { BroadcastAndWaitStatementContext } from "./ScratchParser";
+import { ResetTimerStatementContext } from "./ScratchParser";
+import { EpsilonStatementContext } from "./ScratchParser";
+import { AssumeStatementContext } from "./ScratchParser";
+import { SetStatementContext } from "./ScratchParser";
+import { DeclareVariableContext } from "./ScratchParser";
+import { NeverEventContext } from "./ScratchParser";
+import { BootstapEventContext } from "./ScratchParser";
+import { AfterBootstrapMonitoringEventContext } from "./ScratchParser";
+import { StartupEventContext } from "./ScratchParser";
+import { CloneStartEventContext } from "./ScratchParser";
+import { MessageReceivedEventContext } from "./ScratchParser";
+import { ConditionReachedEventContext } from "./ScratchParser";
+import { RenderedMonitoringEventContext } from "./ScratchParser";
+import { AfterStatementMonitoringEventContext } from "./ScratchParser";
+import { IntegerTypeContext } from "./ScratchParser";
+import { FloatingPointTypeContext } from "./ScratchParser";
+import { BooleanTypeContext } from "./ScratchParser";
+import { StringTypeContext } from "./ScratchParser";
+import { EnumTypeContext } from "./ScratchParser";
+import { UserMessageContext } from "./ScratchParser";
+import { SystemMessageContext } from "./ScratchParser";
+import { PureElseContext } from "./ScratchParser";
+import { ElseIfCaseContext } from "./ScratchParser";
+import { EmptyElseCaseContext } from "./ScratchParser";
+import { FlatVariableContext } from "./ScratchParser";
+import { QualifiedVariableContext } from "./ScratchParser";
+import { BoolLiteralExpressionContext } from "./ScratchParser";
+import { BoolVariableExpressionContext } from "./ScratchParser";
+import { BoolParanthExpressionContext } from "./ScratchParser";
+import { BoolCallStatementExpressionContext } from "./ScratchParser";
+import { NumAsBoolExpressionContext } from "./ScratchParser";
+import { StringAsBoolExpressionContext } from "./ScratchParser";
+import { NegatedBoolExpressionContext } from "./ScratchParser";
+import { BoolAndExpressionContext } from "./ScratchParser";
+import { BoolOrExpressionContext } from "./ScratchParser";
+import { GreaterEqualExpressionContext } from "./ScratchParser";
+import { GreaterThanExpressionContext } from "./ScratchParser";
+import { LessThanExpressionContext } from "./ScratchParser";
+import { LessEqualExpressionContext } from "./ScratchParser";
+import { EqualsExpressionContext } from "./ScratchParser";
+import { StrContainsExpressionContext } from "./ScratchParser";
+import { DefaultBoolExpressionContext } from "./ScratchParser";
+import { UnspecifiedBoolExpressionContext } from "./ScratchParser";
 import { ControlStatementContext } from "./ScratchParser";
 import { NonControlStatementContext } from "./ScratchParser";
 import { AtomicBlockStatementContext } from "./ScratchParser";
@@ -150,14 +151,11 @@ import { ScriptListContext } from "./ScratchParser";
 import { ScriptAttributeListContext } from "./ScratchParser";
 import { ScriptAttributeContext } from "./ScratchParser";
 import { EventContext } from "./ScratchParser";
-import { CoreEventContext } from "./ScratchParser";
 import { MessageNamespaceContext } from "./ScratchParser";
-import { ExternMethodDefinitionContext } from "./ScratchParser";
-import { ExternMethodResultDeclarationContext } from "./ScratchParser";
-import { ExternMethodDefinitionListContext } from "./ScratchParser";
+import { MethodDefinitionListContext } from "./ScratchParser";
 import { MethodDefinitionContext } from "./ScratchParser";
 import { MethodResultDeclarationContext } from "./ScratchParser";
-import { MethodDefinitionListContext } from "./ScratchParser";
+import { ExternMethodResultDeclarationContext } from "./ScratchParser";
 import { MethodAttributeListContext } from "./ScratchParser";
 import { MethodAttributeContext } from "./ScratchParser";
 import { ParameterContext } from "./ScratchParser";
@@ -167,7 +165,6 @@ import { StmtListContext } from "./ScratchParser";
 import { AtomicBlockContext } from "./ScratchParser";
 import { StmtListPlainContext } from "./ScratchParser";
 import { ControlStmtContext } from "./ScratchParser";
-import { CoreControlStmtContext } from "./ScratchParser";
 import { IfStmtContext } from "./ScratchParser";
 import { ElseCaseContext } from "./ScratchParser";
 import { UntilStmtContext } from "./ScratchParser";
@@ -179,23 +176,18 @@ import { ExpressionListPlainContext } from "./ScratchParser";
 import { ExpressionStmtContext } from "./ScratchParser";
 import { StmtContext } from "./ScratchParser";
 import { NonCtrlStmtContext } from "./ScratchParser";
-import { CoreNonCtrlStmtContext } from "./ScratchParser";
 import { CommonStmtContext } from "./ScratchParser";
 import { ListStmtContext } from "./ScratchParser";
 import { SetStmtContext } from "./ScratchParser";
 import { SetStmtListContext } from "./ScratchParser";
 import { TerminationStmtContext } from "./ScratchParser";
 import { StringExprContext } from "./ScratchParser";
-import { CoreStringExprContext } from "./ScratchParser";
 import { BoolExprContext } from "./ScratchParser";
-import { CoreBoolExprContext } from "./ScratchParser";
-import { NumExprContext } from "./ScratchParser";
 import { NumOrStringExprContext } from "./ScratchParser";
-import { CoreNumExprContext } from "./ScratchParser";
+import { NumExprContext } from "./ScratchParser";
 import { ListExprContext } from "./ScratchParser";
 import { ActorExprContext } from "./ScratchParser";
 import { ExpressionContext } from "./ScratchParser";
-import { CoreExpressionContext } from "./ScratchParser";
 import { UnspecifiedExprContext } from "./ScratchParser";
 import { VariableContext } from "./ScratchParser";
 import { IdentContext } from "./ScratchParser";
@@ -249,6 +241,19 @@ export interface ScratchListener extends ParseTreeListener {
 	exitFullMethodDefinition?: (ctx: FullMethodDefinitionContext) => void;
 
 	/**
+	 * Enter a parse tree produced by the `ExternMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 */
+	enterExternMethodDefinition?: (ctx: ExternMethodDefinitionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `ExternMethodDefinition`
+	 * labeled alternative in `ScratchParser.methodDefinition`.
+	 * @param ctx the parse tree
+	 */
+	exitExternMethodDefinition?: (ctx: ExternMethodDefinitionContext) => void;
+
+	/**
 	 * Enter a parse tree produced by the `RestartScript`
 	 * labeled alternative in `ScratchParser.scriptAttribute`.
 	 * @param ctx the parse tree
@@ -299,6 +304,162 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitPrimitive?: (ctx: PrimitiveContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `StringLiteralExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterStringLiteralExpression?: (ctx: StringLiteralExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `StringLiteralExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitStringLiteralExpression?: (ctx: StringLiteralExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `StringVariableExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterStringVariableExpression?: (ctx: StringVariableExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `StringVariableExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitStringVariableExpression?: (ctx: StringVariableExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `StringParanthExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterStringParanthExpression?: (ctx: StringParanthExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `StringParanthExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitStringParanthExpression?: (ctx: StringParanthExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `StringCallStatementExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterStringCallStatementExpression?: (ctx: StringCallStatementExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `StringCallStatementExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitStringCallStatementExpression?: (ctx: StringCallStatementExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumAsStringExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumAsStringExpression?: (ctx: NumAsStringExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumAsStringExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumAsStringExpression?: (ctx: NumAsStringExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `BoolAsStringExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterBoolAsStringExpression?: (ctx: BoolAsStringExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `BoolAsStringExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitBoolAsStringExpression?: (ctx: BoolAsStringExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `StringAttributeOfExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterStringAttributeOfExpression?: (ctx: StringAttributeOfExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `StringAttributeOfExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitStringAttributeOfExpression?: (ctx: StringAttributeOfExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `JoinStringsExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterJoinStringsExpression?: (ctx: JoinStringsExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `JoinStringsExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitJoinStringsExpression?: (ctx: JoinStringsExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `IthLetterOfStringExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterIthLetterOfStringExpression?: (ctx: IthLetterOfStringExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `IthLetterOfStringExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitIthLetterOfStringExpression?: (ctx: IthLetterOfStringExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `IthStringItemOfExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterIthStringItemOfExpression?: (ctx: IthStringItemOfExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `IthStringItemOfExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitIthStringItemOfExpression?: (ctx: IthStringItemOfExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `DefaultStringExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterDefaultStringExpression?: (ctx: DefaultStringExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `DefaultStringExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitDefaultStringExpression?: (ctx: DefaultStringExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `UnspecifiedStringExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterUnspecifiedStringExpression?: (ctx: UnspecifiedStringExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `UnspecifiedStringExpression`
+	 * labeled alternative in `ScratchParser.stringExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitUnspecifiedStringExpression?: (ctx: UnspecifiedStringExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `IntegerLiteralExpression`
@@ -574,6 +735,266 @@ export interface ScratchListener extends ParseTreeListener {
 	exitUsherActorExpression?: (ctx: UsherActorExpressionContext) => void;
 
 	/**
+	 * Enter a parse tree produced by the `NumLiteralExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumLiteralExpression?: (ctx: NumLiteralExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumLiteralExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumLiteralExpression?: (ctx: NumLiteralExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumVariableExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumVariableExpression?: (ctx: NumVariableExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumVariableExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumVariableExpression?: (ctx: NumVariableExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumBrackets`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumBrackets?: (ctx: NumBracketsContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumBrackets`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumBrackets?: (ctx: NumBracketsContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumCallStatementExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumCallStatementExpression?: (ctx: NumCallStatementExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumCallStatementExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumCallStatementExpression?: (ctx: NumCallStatementExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `StringToFloatExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterStringToFloatExpression?: (ctx: StringToFloatExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `StringToFloatExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitStringToFloatExpression?: (ctx: StringToFloatExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `StringToIntExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterStringToIntExpression?: (ctx: StringToIntExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `StringToIntExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitStringToIntExpression?: (ctx: StringToIntExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `BoolToIntExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterBoolToIntExpression?: (ctx: BoolToIntExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `BoolToIntExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitBoolToIntExpression?: (ctx: BoolToIntExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumToFloatExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumToFloatExpression?: (ctx: NumToFloatExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumToFloatExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumToFloatExpression?: (ctx: NumToFloatExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumToIntExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumToIntExpression?: (ctx: NumToIntExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumToIntExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumToIntExpression?: (ctx: NumToIntExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `TimerExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterTimerExpression?: (ctx: TimerExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `TimerExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitTimerExpression?: (ctx: TimerExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `LengthOfStringExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterLengthOfStringExpression?: (ctx: LengthOfStringExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `LengthOfStringExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitLengthOfStringExpression?: (ctx: LengthOfStringExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `LengthOfListExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterLengthOfListExpression?: (ctx: LengthOfListExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `LengthOfListExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitLengthOfListExpression?: (ctx: LengthOfListExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `IndexOfExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterIndexOfExpression?: (ctx: IndexOfExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `IndexOfExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitIndexOfExpression?: (ctx: IndexOfExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumMulExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumMulExpression?: (ctx: NumMulExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumMulExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumMulExpression?: (ctx: NumMulExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumDivExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumDivExpression?: (ctx: NumDivExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumDivExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumDivExpression?: (ctx: NumDivExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumModExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumModExpression?: (ctx: NumModExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumModExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumModExpression?: (ctx: NumModExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumPlusExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumPlusExpression?: (ctx: NumPlusExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumPlusExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumPlusExpression?: (ctx: NumPlusExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NumMinusExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterNumMinusExpression?: (ctx: NumMinusExpressionContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NumMinusExpression`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitNumMinusExpression?: (ctx: NumMinusExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `DefaultNumExpr`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterDefaultNumExpr?: (ctx: DefaultNumExprContext) => void;
+	/**
+	 * Exit a parse tree produced by the `DefaultNumExpr`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitDefaultNumExpr?: (ctx: DefaultNumExprContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `UnspecifiedNumExpr`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	enterUnspecifiedNumExpr?: (ctx: UnspecifiedNumExprContext) => void;
+	/**
+	 * Exit a parse tree produced by the `UnspecifiedNumExpr`
+	 * labeled alternative in `ScratchParser.numExpr`.
+	 * @param ctx the parse tree
+	 */
+	exitUnspecifiedNumExpr?: (ctx: UnspecifiedNumExprContext) => void;
+
+	/**
 	 * Enter a parse tree produced by the `NumberExpression`
 	 * labeled alternative in `ScratchParser.numOrStringExpr`.
 	 * @param ctx the parse tree
@@ -676,123 +1097,6 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitReplaceElementAtStatement?: (ctx: ReplaceElementAtStatementContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `NeverEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	enterNeverEvent?: (ctx: NeverEventContext) => void;
-	/**
-	 * Exit a parse tree produced by the `NeverEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	exitNeverEvent?: (ctx: NeverEventContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `BootstapEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	enterBootstapEvent?: (ctx: BootstapEventContext) => void;
-	/**
-	 * Exit a parse tree produced by the `BootstapEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	exitBootstapEvent?: (ctx: BootstapEventContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `AfterBootstrapMonitoringEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	enterAfterBootstrapMonitoringEvent?: (ctx: AfterBootstrapMonitoringEventContext) => void;
-	/**
-	 * Exit a parse tree produced by the `AfterBootstrapMonitoringEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	exitAfterBootstrapMonitoringEvent?: (ctx: AfterBootstrapMonitoringEventContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `StartupEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	enterStartupEvent?: (ctx: StartupEventContext) => void;
-	/**
-	 * Exit a parse tree produced by the `StartupEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	exitStartupEvent?: (ctx: StartupEventContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `CloneStartEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	enterCloneStartEvent?: (ctx: CloneStartEventContext) => void;
-	/**
-	 * Exit a parse tree produced by the `CloneStartEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	exitCloneStartEvent?: (ctx: CloneStartEventContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `MessageReceivedEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	enterMessageReceivedEvent?: (ctx: MessageReceivedEventContext) => void;
-	/**
-	 * Exit a parse tree produced by the `MessageReceivedEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	exitMessageReceivedEvent?: (ctx: MessageReceivedEventContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `ConditionReachedEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	enterConditionReachedEvent?: (ctx: ConditionReachedEventContext) => void;
-	/**
-	 * Exit a parse tree produced by the `ConditionReachedEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	exitConditionReachedEvent?: (ctx: ConditionReachedEventContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `RenderedMonitoringEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	enterRenderedMonitoringEvent?: (ctx: RenderedMonitoringEventContext) => void;
-	/**
-	 * Exit a parse tree produced by the `RenderedMonitoringEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	exitRenderedMonitoringEvent?: (ctx: RenderedMonitoringEventContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `AfterStatementMonitoringEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	enterAfterStatementMonitoringEvent?: (ctx: AfterStatementMonitoringEventContext) => void;
-	/**
-	 * Exit a parse tree produced by the `AfterStatementMonitoringEvent`
-	 * labeled alternative in `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	exitAfterStatementMonitoringEvent?: (ctx: AfterStatementMonitoringEventContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `FunctionReturnDefinition`
@@ -951,227 +1255,6 @@ export interface ScratchListener extends ParseTreeListener {
 	exitSetStatement?: (ctx: SetStatementContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `BoolLiteralExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterBoolLiteralExpression?: (ctx: BoolLiteralExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `BoolLiteralExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitBoolLiteralExpression?: (ctx: BoolLiteralExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `BoolVariableExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterBoolVariableExpression?: (ctx: BoolVariableExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `BoolVariableExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitBoolVariableExpression?: (ctx: BoolVariableExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `BoolParanthExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterBoolParanthExpression?: (ctx: BoolParanthExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `BoolParanthExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitBoolParanthExpression?: (ctx: BoolParanthExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `BoolCallStatementExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterBoolCallStatementExpression?: (ctx: BoolCallStatementExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `BoolCallStatementExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitBoolCallStatementExpression?: (ctx: BoolCallStatementExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `NumAsBoolExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterNumAsBoolExpression?: (ctx: NumAsBoolExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `NumAsBoolExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitNumAsBoolExpression?: (ctx: NumAsBoolExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `StringAsBoolExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterStringAsBoolExpression?: (ctx: StringAsBoolExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `StringAsBoolExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitStringAsBoolExpression?: (ctx: StringAsBoolExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `NegatedBoolExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterNegatedBoolExpression?: (ctx: NegatedBoolExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `NegatedBoolExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitNegatedBoolExpression?: (ctx: NegatedBoolExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `BoolAndExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterBoolAndExpression?: (ctx: BoolAndExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `BoolAndExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitBoolAndExpression?: (ctx: BoolAndExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `BoolOrExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterBoolOrExpression?: (ctx: BoolOrExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `BoolOrExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitBoolOrExpression?: (ctx: BoolOrExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `GreaterEqualExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterGreaterEqualExpression?: (ctx: GreaterEqualExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `GreaterEqualExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitGreaterEqualExpression?: (ctx: GreaterEqualExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `GreaterThanExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterGreaterThanExpression?: (ctx: GreaterThanExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `GreaterThanExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitGreaterThanExpression?: (ctx: GreaterThanExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `LessThanExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterLessThanExpression?: (ctx: LessThanExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `LessThanExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitLessThanExpression?: (ctx: LessThanExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `LessEqualExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterLessEqualExpression?: (ctx: LessEqualExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `LessEqualExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitLessEqualExpression?: (ctx: LessEqualExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `EqualsExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterEqualsExpression?: (ctx: EqualsExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `EqualsExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitEqualsExpression?: (ctx: EqualsExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `StrContainsExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterStrContainsExpression?: (ctx: StrContainsExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `StrContainsExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitStrContainsExpression?: (ctx: StrContainsExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `DefaultBoolExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterDefaultBoolExpression?: (ctx: DefaultBoolExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `DefaultBoolExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitDefaultBoolExpression?: (ctx: DefaultBoolExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `UnspecifiedBoolExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterUnspecifiedBoolExpression?: (ctx: UnspecifiedBoolExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `UnspecifiedBoolExpression`
-	 * labeled alternative in `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitUnspecifiedBoolExpression?: (ctx: UnspecifiedBoolExpressionContext) => void;
-
-	/**
 	 * Enter a parse tree produced by the `DeclareVariable`
 	 * labeled alternative in `ScratchParser.declarationStmt`.
 	 * @param ctx the parse tree
@@ -1185,160 +1268,121 @@ export interface ScratchListener extends ParseTreeListener {
 	exitDeclareVariable?: (ctx: DeclareVariableContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `StringLiteralExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Enter a parse tree produced by the `NeverEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	enterStringLiteralExpression?: (ctx: StringLiteralExpressionContext) => void;
+	enterNeverEvent?: (ctx: NeverEventContext) => void;
 	/**
-	 * Exit a parse tree produced by the `StringLiteralExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Exit a parse tree produced by the `NeverEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	exitStringLiteralExpression?: (ctx: StringLiteralExpressionContext) => void;
+	exitNeverEvent?: (ctx: NeverEventContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `StringVariableExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Enter a parse tree produced by the `BootstapEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	enterStringVariableExpression?: (ctx: StringVariableExpressionContext) => void;
+	enterBootstapEvent?: (ctx: BootstapEventContext) => void;
 	/**
-	 * Exit a parse tree produced by the `StringVariableExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Exit a parse tree produced by the `BootstapEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	exitStringVariableExpression?: (ctx: StringVariableExpressionContext) => void;
+	exitBootstapEvent?: (ctx: BootstapEventContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `StringParanthExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Enter a parse tree produced by the `AfterBootstrapMonitoringEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	enterStringParanthExpression?: (ctx: StringParanthExpressionContext) => void;
+	enterAfterBootstrapMonitoringEvent?: (ctx: AfterBootstrapMonitoringEventContext) => void;
 	/**
-	 * Exit a parse tree produced by the `StringParanthExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Exit a parse tree produced by the `AfterBootstrapMonitoringEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	exitStringParanthExpression?: (ctx: StringParanthExpressionContext) => void;
+	exitAfterBootstrapMonitoringEvent?: (ctx: AfterBootstrapMonitoringEventContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `StringCallStatementExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Enter a parse tree produced by the `StartupEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	enterStringCallStatementExpression?: (ctx: StringCallStatementExpressionContext) => void;
+	enterStartupEvent?: (ctx: StartupEventContext) => void;
 	/**
-	 * Exit a parse tree produced by the `StringCallStatementExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Exit a parse tree produced by the `StartupEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	exitStringCallStatementExpression?: (ctx: StringCallStatementExpressionContext) => void;
+	exitStartupEvent?: (ctx: StartupEventContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumAsStringExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Enter a parse tree produced by the `CloneStartEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	enterNumAsStringExpression?: (ctx: NumAsStringExpressionContext) => void;
+	enterCloneStartEvent?: (ctx: CloneStartEventContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumAsStringExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Exit a parse tree produced by the `CloneStartEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	exitNumAsStringExpression?: (ctx: NumAsStringExpressionContext) => void;
+	exitCloneStartEvent?: (ctx: CloneStartEventContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `BoolAsStringExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Enter a parse tree produced by the `MessageReceivedEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	enterBoolAsStringExpression?: (ctx: BoolAsStringExpressionContext) => void;
+	enterMessageReceivedEvent?: (ctx: MessageReceivedEventContext) => void;
 	/**
-	 * Exit a parse tree produced by the `BoolAsStringExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Exit a parse tree produced by the `MessageReceivedEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	exitBoolAsStringExpression?: (ctx: BoolAsStringExpressionContext) => void;
+	exitMessageReceivedEvent?: (ctx: MessageReceivedEventContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `StringAttributeOfExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Enter a parse tree produced by the `ConditionReachedEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	enterStringAttributeOfExpression?: (ctx: StringAttributeOfExpressionContext) => void;
+	enterConditionReachedEvent?: (ctx: ConditionReachedEventContext) => void;
 	/**
-	 * Exit a parse tree produced by the `StringAttributeOfExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Exit a parse tree produced by the `ConditionReachedEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	exitStringAttributeOfExpression?: (ctx: StringAttributeOfExpressionContext) => void;
+	exitConditionReachedEvent?: (ctx: ConditionReachedEventContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `JoinStringsExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Enter a parse tree produced by the `RenderedMonitoringEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	enterJoinStringsExpression?: (ctx: JoinStringsExpressionContext) => void;
+	enterRenderedMonitoringEvent?: (ctx: RenderedMonitoringEventContext) => void;
 	/**
-	 * Exit a parse tree produced by the `JoinStringsExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Exit a parse tree produced by the `RenderedMonitoringEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	exitJoinStringsExpression?: (ctx: JoinStringsExpressionContext) => void;
+	exitRenderedMonitoringEvent?: (ctx: RenderedMonitoringEventContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `IthLetterOfStringExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Enter a parse tree produced by the `AfterStatementMonitoringEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	enterIthLetterOfStringExpression?: (ctx: IthLetterOfStringExpressionContext) => void;
+	enterAfterStatementMonitoringEvent?: (ctx: AfterStatementMonitoringEventContext) => void;
 	/**
-	 * Exit a parse tree produced by the `IthLetterOfStringExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
+	 * Exit a parse tree produced by the `AfterStatementMonitoringEvent`
+	 * labeled alternative in `ScratchParser.event`.
 	 * @param ctx the parse tree
 	 */
-	exitIthLetterOfStringExpression?: (ctx: IthLetterOfStringExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `IthStringItemOfExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterIthStringItemOfExpression?: (ctx: IthStringItemOfExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `IthStringItemOfExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitIthStringItemOfExpression?: (ctx: IthStringItemOfExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `DefaultStringExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterDefaultStringExpression?: (ctx: DefaultStringExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `DefaultStringExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitDefaultStringExpression?: (ctx: DefaultStringExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `UnspecifiedStringExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterUnspecifiedStringExpression?: (ctx: UnspecifiedStringExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `UnspecifiedStringExpression`
-	 * labeled alternative in `ScratchParser.coreStringExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitUnspecifiedStringExpression?: (ctx: UnspecifiedStringExpressionContext) => void;
+	exitAfterStatementMonitoringEvent?: (ctx: AfterStatementMonitoringEventContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `IntegerType`
@@ -1497,264 +1541,225 @@ export interface ScratchListener extends ParseTreeListener {
 	exitQualifiedVariable?: (ctx: QualifiedVariableContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumLiteralExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `BoolLiteralExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumLiteralExpression?: (ctx: NumLiteralExpressionContext) => void;
+	enterBoolLiteralExpression?: (ctx: BoolLiteralExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumLiteralExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `BoolLiteralExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumLiteralExpression?: (ctx: NumLiteralExpressionContext) => void;
+	exitBoolLiteralExpression?: (ctx: BoolLiteralExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumVariableExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `BoolVariableExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumVariableExpression?: (ctx: NumVariableExpressionContext) => void;
+	enterBoolVariableExpression?: (ctx: BoolVariableExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumVariableExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `BoolVariableExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumVariableExpression?: (ctx: NumVariableExpressionContext) => void;
+	exitBoolVariableExpression?: (ctx: BoolVariableExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumBrackets`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `BoolParanthExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumBrackets?: (ctx: NumBracketsContext) => void;
+	enterBoolParanthExpression?: (ctx: BoolParanthExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumBrackets`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `BoolParanthExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumBrackets?: (ctx: NumBracketsContext) => void;
+	exitBoolParanthExpression?: (ctx: BoolParanthExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumCallStatementExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `BoolCallStatementExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumCallStatementExpression?: (ctx: NumCallStatementExpressionContext) => void;
+	enterBoolCallStatementExpression?: (ctx: BoolCallStatementExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumCallStatementExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `BoolCallStatementExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumCallStatementExpression?: (ctx: NumCallStatementExpressionContext) => void;
+	exitBoolCallStatementExpression?: (ctx: BoolCallStatementExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `StringToFloatExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `NumAsBoolExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterStringToFloatExpression?: (ctx: StringToFloatExpressionContext) => void;
+	enterNumAsBoolExpression?: (ctx: NumAsBoolExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `StringToFloatExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `NumAsBoolExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitStringToFloatExpression?: (ctx: StringToFloatExpressionContext) => void;
+	exitNumAsBoolExpression?: (ctx: NumAsBoolExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `StringToIntExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `StringAsBoolExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterStringToIntExpression?: (ctx: StringToIntExpressionContext) => void;
+	enterStringAsBoolExpression?: (ctx: StringAsBoolExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `StringToIntExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `StringAsBoolExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitStringToIntExpression?: (ctx: StringToIntExpressionContext) => void;
+	exitStringAsBoolExpression?: (ctx: StringAsBoolExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `BoolToIntExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `NegatedBoolExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterBoolToIntExpression?: (ctx: BoolToIntExpressionContext) => void;
+	enterNegatedBoolExpression?: (ctx: NegatedBoolExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `BoolToIntExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `NegatedBoolExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitBoolToIntExpression?: (ctx: BoolToIntExpressionContext) => void;
+	exitNegatedBoolExpression?: (ctx: NegatedBoolExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumToFloatExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `BoolAndExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumToFloatExpression?: (ctx: NumToFloatExpressionContext) => void;
+	enterBoolAndExpression?: (ctx: BoolAndExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumToFloatExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `BoolAndExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumToFloatExpression?: (ctx: NumToFloatExpressionContext) => void;
+	exitBoolAndExpression?: (ctx: BoolAndExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumToIntExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `BoolOrExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumToIntExpression?: (ctx: NumToIntExpressionContext) => void;
+	enterBoolOrExpression?: (ctx: BoolOrExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumToIntExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `BoolOrExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumToIntExpression?: (ctx: NumToIntExpressionContext) => void;
+	exitBoolOrExpression?: (ctx: BoolOrExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `TimerExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `GreaterEqualExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterTimerExpression?: (ctx: TimerExpressionContext) => void;
+	enterGreaterEqualExpression?: (ctx: GreaterEqualExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `TimerExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `GreaterEqualExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitTimerExpression?: (ctx: TimerExpressionContext) => void;
+	exitGreaterEqualExpression?: (ctx: GreaterEqualExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `LengthOfStringExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `GreaterThanExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterLengthOfStringExpression?: (ctx: LengthOfStringExpressionContext) => void;
+	enterGreaterThanExpression?: (ctx: GreaterThanExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `LengthOfStringExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `GreaterThanExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitLengthOfStringExpression?: (ctx: LengthOfStringExpressionContext) => void;
+	exitGreaterThanExpression?: (ctx: GreaterThanExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `LengthOfListExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `LessThanExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterLengthOfListExpression?: (ctx: LengthOfListExpressionContext) => void;
+	enterLessThanExpression?: (ctx: LessThanExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `LengthOfListExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `LessThanExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitLengthOfListExpression?: (ctx: LengthOfListExpressionContext) => void;
+	exitLessThanExpression?: (ctx: LessThanExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `IndexOfExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `LessEqualExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterIndexOfExpression?: (ctx: IndexOfExpressionContext) => void;
+	enterLessEqualExpression?: (ctx: LessEqualExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `IndexOfExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `LessEqualExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitIndexOfExpression?: (ctx: IndexOfExpressionContext) => void;
+	exitLessEqualExpression?: (ctx: LessEqualExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumMulExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `EqualsExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumMulExpression?: (ctx: NumMulExpressionContext) => void;
+	enterEqualsExpression?: (ctx: EqualsExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumMulExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `EqualsExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumMulExpression?: (ctx: NumMulExpressionContext) => void;
+	exitEqualsExpression?: (ctx: EqualsExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumDivExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `StrContainsExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumDivExpression?: (ctx: NumDivExpressionContext) => void;
+	enterStrContainsExpression?: (ctx: StrContainsExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumDivExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `StrContainsExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumDivExpression?: (ctx: NumDivExpressionContext) => void;
+	exitStrContainsExpression?: (ctx: StrContainsExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumModExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `DefaultBoolExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumModExpression?: (ctx: NumModExpressionContext) => void;
+	enterDefaultBoolExpression?: (ctx: DefaultBoolExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumModExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `DefaultBoolExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumModExpression?: (ctx: NumModExpressionContext) => void;
+	exitDefaultBoolExpression?: (ctx: DefaultBoolExpressionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `NumPlusExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by the `UnspecifiedBoolExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterNumPlusExpression?: (ctx: NumPlusExpressionContext) => void;
+	enterUnspecifiedBoolExpression?: (ctx: UnspecifiedBoolExpressionContext) => void;
 	/**
-	 * Exit a parse tree produced by the `NumPlusExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by the `UnspecifiedBoolExpression`
+	 * labeled alternative in `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitNumPlusExpression?: (ctx: NumPlusExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `NumMinusExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterNumMinusExpression?: (ctx: NumMinusExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by the `NumMinusExpression`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitNumMinusExpression?: (ctx: NumMinusExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `DefaultNumExpr`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterDefaultNumExpr?: (ctx: DefaultNumExprContext) => void;
-	/**
-	 * Exit a parse tree produced by the `DefaultNumExpr`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitDefaultNumExpr?: (ctx: DefaultNumExprContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `UnspecifiedNumExpr`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterUnspecifiedNumExpr?: (ctx: UnspecifiedNumExprContext) => void;
-	/**
-	 * Exit a parse tree produced by the `UnspecifiedNumExpr`
-	 * labeled alternative in `ScratchParser.coreNumExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitUnspecifiedNumExpr?: (ctx: UnspecifiedNumExprContext) => void;
+	exitUnspecifiedBoolExpression?: (ctx: UnspecifiedBoolExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `ControlStatement`
@@ -2077,17 +2082,6 @@ export interface ScratchListener extends ParseTreeListener {
 	exitEvent?: (ctx: EventContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	enterCoreEvent?: (ctx: CoreEventContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.coreEvent`.
-	 * @param ctx the parse tree
-	 */
-	exitCoreEvent?: (ctx: CoreEventContext) => void;
-
-	/**
 	 * Enter a parse tree produced by `ScratchParser.messageNamespace`.
 	 * @param ctx the parse tree
 	 */
@@ -2099,37 +2093,15 @@ export interface ScratchListener extends ParseTreeListener {
 	exitMessageNamespace?: (ctx: MessageNamespaceContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `ScratchParser.externMethodDefinition`.
+	 * Enter a parse tree produced by `ScratchParser.methodDefinitionList`.
 	 * @param ctx the parse tree
 	 */
-	enterExternMethodDefinition?: (ctx: ExternMethodDefinitionContext) => void;
+	enterMethodDefinitionList?: (ctx: MethodDefinitionListContext) => void;
 	/**
-	 * Exit a parse tree produced by `ScratchParser.externMethodDefinition`.
+	 * Exit a parse tree produced by `ScratchParser.methodDefinitionList`.
 	 * @param ctx the parse tree
 	 */
-	exitExternMethodDefinition?: (ctx: ExternMethodDefinitionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `ScratchParser.externMethodResultDeclaration`.
-	 * @param ctx the parse tree
-	 */
-	enterExternMethodResultDeclaration?: (ctx: ExternMethodResultDeclarationContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.externMethodResultDeclaration`.
-	 * @param ctx the parse tree
-	 */
-	exitExternMethodResultDeclaration?: (ctx: ExternMethodResultDeclarationContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `ScratchParser.externMethodDefinitionList`.
-	 * @param ctx the parse tree
-	 */
-	enterExternMethodDefinitionList?: (ctx: ExternMethodDefinitionListContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.externMethodDefinitionList`.
-	 * @param ctx the parse tree
-	 */
-	exitExternMethodDefinitionList?: (ctx: ExternMethodDefinitionListContext) => void;
+	exitMethodDefinitionList?: (ctx: MethodDefinitionListContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.methodDefinition`.
@@ -2154,15 +2126,15 @@ export interface ScratchListener extends ParseTreeListener {
 	exitMethodResultDeclaration?: (ctx: MethodResultDeclarationContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `ScratchParser.methodDefinitionList`.
+	 * Enter a parse tree produced by `ScratchParser.externMethodResultDeclaration`.
 	 * @param ctx the parse tree
 	 */
-	enterMethodDefinitionList?: (ctx: MethodDefinitionListContext) => void;
+	enterExternMethodResultDeclaration?: (ctx: ExternMethodResultDeclarationContext) => void;
 	/**
-	 * Exit a parse tree produced by `ScratchParser.methodDefinitionList`.
+	 * Exit a parse tree produced by `ScratchParser.externMethodResultDeclaration`.
 	 * @param ctx the parse tree
 	 */
-	exitMethodDefinitionList?: (ctx: MethodDefinitionListContext) => void;
+	exitExternMethodResultDeclaration?: (ctx: ExternMethodResultDeclarationContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.methodAttributeList`.
@@ -2262,17 +2234,6 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitControlStmt?: (ctx: ControlStmtContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `ScratchParser.coreControlStmt`.
-	 * @param ctx the parse tree
-	 */
-	enterCoreControlStmt?: (ctx: CoreControlStmtContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.coreControlStmt`.
-	 * @param ctx the parse tree
-	 */
-	exitCoreControlStmt?: (ctx: CoreControlStmtContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.ifStmt`.
@@ -2396,17 +2357,6 @@ export interface ScratchListener extends ParseTreeListener {
 	exitNonCtrlStmt?: (ctx: NonCtrlStmtContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `ScratchParser.coreNonCtrlStmt`.
-	 * @param ctx the parse tree
-	 */
-	enterCoreNonCtrlStmt?: (ctx: CoreNonCtrlStmtContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.coreNonCtrlStmt`.
-	 * @param ctx the parse tree
-	 */
-	exitCoreNonCtrlStmt?: (ctx: CoreNonCtrlStmtContext) => void;
-
-	/**
 	 * Enter a parse tree produced by `ScratchParser.commonStmt`.
 	 * @param ctx the parse tree
 	 */
@@ -2473,17 +2423,6 @@ export interface ScratchListener extends ParseTreeListener {
 	exitStringExpr?: (ctx: StringExprContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `ScratchParser.coreStringExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterCoreStringExpr?: (ctx: CoreStringExprContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.coreStringExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitCoreStringExpr?: (ctx: CoreStringExprContext) => void;
-
-	/**
 	 * Enter a parse tree produced by `ScratchParser.boolExpr`.
 	 * @param ctx the parse tree
 	 */
@@ -2493,28 +2432,6 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitBoolExpr?: (ctx: BoolExprContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterCoreBoolExpr?: (ctx: CoreBoolExprContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.coreBoolExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitCoreBoolExpr?: (ctx: CoreBoolExprContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `ScratchParser.numExpr`.
-	 * @param ctx the parse tree
-	 */
-	enterNumExpr?: (ctx: NumExprContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.numExpr`.
-	 * @param ctx the parse tree
-	 */
-	exitNumExpr?: (ctx: NumExprContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.numOrStringExpr`.
@@ -2528,15 +2445,15 @@ export interface ScratchListener extends ParseTreeListener {
 	exitNumOrStringExpr?: (ctx: NumOrStringExprContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `ScratchParser.coreNumExpr`.
+	 * Enter a parse tree produced by `ScratchParser.numExpr`.
 	 * @param ctx the parse tree
 	 */
-	enterCoreNumExpr?: (ctx: CoreNumExprContext) => void;
+	enterNumExpr?: (ctx: NumExprContext) => void;
 	/**
-	 * Exit a parse tree produced by `ScratchParser.coreNumExpr`.
+	 * Exit a parse tree produced by `ScratchParser.numExpr`.
 	 * @param ctx the parse tree
 	 */
-	exitCoreNumExpr?: (ctx: CoreNumExprContext) => void;
+	exitNumExpr?: (ctx: NumExprContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.listExpr`.
@@ -2570,17 +2487,6 @@ export interface ScratchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitExpression?: (ctx: ExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `ScratchParser.coreExpression`.
-	 * @param ctx the parse tree
-	 */
-	enterCoreExpression?: (ctx: CoreExpressionContext) => void;
-	/**
-	 * Exit a parse tree produced by `ScratchParser.coreExpression`.
-	 * @param ctx the parse tree
-	 */
-	exitCoreExpression?: (ctx: CoreExpressionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `ScratchParser.unspecifiedExpr`.

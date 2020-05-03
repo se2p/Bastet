@@ -30,6 +30,8 @@ import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper} from "../Refiner";
 import {Set as ImmSet} from "immutable";
+import {LexiKey} from "../../../utils/Lexicographic";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 
 export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F extends AbstractState>
@@ -181,6 +183,18 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
 
     handleViolatingState(reached: ReachedSet<F>, violating: F) {
         return this.wrappedAnalysis.handleViolatingState(reached, violating);
+    }
+
+    compareStateOrder(a: E, b: E): number {
+        return this.wrappedAnalysis.compareStateOrder(a, b);
+    }
+
+    getLexiOrderKey(ofState: E): LexiKey {
+        return this.wrappedAnalysis.getLexiOrderKey(ofState);
+    }
+
+    finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
+        return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 }
 

@@ -38,6 +38,9 @@ import {
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {Concern} from "../../../syntax/Concern";
+import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
+import {App} from "../../../syntax/app/App";
+import {SystemVariables} from "../../../syntax/app/SystemVariables";
 
 export class DataTransferRelation implements LabeledTransferRelation<DataAbstractState> {
 
@@ -45,7 +48,8 @@ export class DataTransferRelation implements LabeledTransferRelation<DataAbstrac
 
     private readonly _theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
 
-    constructor(abstDomain: DataAbstractDomain, theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
+    constructor(abstDomain: DataAbstractDomain,
+                theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
         this._abstDomain = Preconditions.checkNotUndefined(abstDomain);
         this._theories = Preconditions.checkNotUndefined(theories);
     }

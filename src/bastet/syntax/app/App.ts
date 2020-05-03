@@ -31,6 +31,7 @@ import {TypeInformationStorage} from "../DeclarationScopes";
 import {Script} from "./controlflow/Script";
 import {SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
 import {BooleanExpression} from "../ast/core/expressions/BooleanExpression";
+import {SystemVariables} from "./SystemVariables";
 
 export class App {
 
@@ -44,6 +45,8 @@ export class App {
 
     private readonly _typeStorage: TypeInformationStorage;
 
+    private readonly _systemVariables: SystemVariables;
+
     constructor(origin: string, ident: string, actorMap: ActorMap, typeStorage: TypeInformationStorage) {
         this._origin = Preconditions.checkNotUndefined(origin);
         this._ident = Preconditions.checkNotEmpty(ident);
@@ -56,6 +59,8 @@ export class App {
                 this._transRelById.set(id, r);
             }
         }
+
+        this._systemVariables = new SystemVariables(typeStorage);
     }
 
     get typeStorage(): TypeInformationStorage {
@@ -84,6 +89,10 @@ export class App {
 
     get nonBootActors(): Actor[] {
         return Maps.values(this.actorMap).filter((a) => !a.isBootstrapper);
+    }
+
+    get systemVariables(): SystemVariables {
+        return this._systemVariables;
     }
 
     public getProperties(): ImmSet<Property> {
@@ -145,4 +154,6 @@ export class App {
         this.registerTrasitionRelation(script.transitions);
         return script;
     }
+
 }
+

@@ -14,8 +14,15 @@ actor MiniActor is RuntimeEntity begin
             define r as r + 0
             define r as r + 0
             define r as r + 0
-        end else begin
             define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+        end else begin
             define r as r + 1
         end
 

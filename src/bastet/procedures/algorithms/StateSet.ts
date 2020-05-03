@@ -23,6 +23,7 @@ import {AbstractElement} from "../../lattices/Lattice";
 import {Preconditions} from "../../utils/Preconditions";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {getTheOnlyElement} from "../../utils/Collections";
+import {Comparator, Heap} from 'heap-js';
 
 export interface PartitionKeyAttribs extends AbstractElement {
 
@@ -85,7 +86,7 @@ export interface ReachedSet<E extends AbstractElement> extends StateSet<E> {
 
 export interface FrontierSet<E extends AbstractElement> extends StateSet<E> {
 
-    pop(): E;
+    peek(): E;
 
 }
 
@@ -212,6 +213,66 @@ export class PartitionedOrderedSet<E extends AbstractElement> {
 
 }
 
+export const CHOOSE_EITHER: number = 0;
+export const CHOOSE_SECOND: number = +1;
+export const CHOOSE_FIRST: number = -1;
+
+export interface StateOrderComparator<E extends AbstractElement> {
+
+    compareStateOrder(a: E, b: E): number;
+
+}
+
+export class PriorityFrontierSet<E extends AbstractElement> implements FrontierSet<E> {
+
+    private readonly _elements: Heap<E>;
+
+    constructor(comparator: StateOrderComparator<E>) {
+        this._elements = new Heap((a, b) => {return comparator.compareStateOrder(a, b)});
+    }
+
+    public [Symbol.iterator](): IterableIterator<E> {
+        return this._elements[Symbol.iterator]();
+    }
+
+    add(element: E) {
+        return this._elements.add(element);
+    }
+
+    addAll(elements: Iterable<E>) {
+        for (const e of elements) {
+            this.add(e);
+        }
+    }
+
+    has(element: E): boolean {
+        return this._elements.contains(element);
+    }
+
+    getSize(): number {
+        return this._elements.length
+    }
+
+    isEmpty(): boolean {
+        return this._elements.length == 0;
+    }
+
+    peek(): E {
+        return this._elements.peek();
+    }
+
+    remove(element: E) {
+        this._elements.remove(element);
+    }
+
+    removeAll(elements: Iterable<E>) {
+        for (const e of elements) {
+            this.remove(e);
+        }
+    }
+
+}
+
 export class DefaultFrontierSet<E extends AbstractElement> implements FrontierSet<E> {
 
     private readonly _elements: Set<E>;
@@ -246,7 +307,7 @@ export class DefaultFrontierSet<E extends AbstractElement> implements FrontierSe
         return this._elements.size == 0;
     }
 
-    pop(): E {
+    peek(): E {
         for (const e of this._elements) {
             return e;
         }

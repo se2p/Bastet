@@ -63,6 +63,8 @@ import {StandardMergeOperatorFactory} from "../Operators";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {List as ImmList, Set as ImmSet} from "immutable";
 import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
+import {LexiKey} from "../../../utils/Lexicographic";
+import {SystemVariables} from "../../../syntax/app/SystemVariables";
 
 
 export class DataAnalysisConfig extends BastetConfiguration {
@@ -159,7 +161,8 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     private readonly _mergeOp: MergeOperator<DataAbstractState>;
 
-    constructor(config:{}, folLattice: LatticeWithComplements<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
+    constructor(config: {},
+                folLattice: LatticeWithComplements<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
                 theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
                 statistics: AnalysisStatistics) {
         Preconditions.checkNotUndefined(folLattice);
@@ -243,6 +246,17 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     handleViolatingState(reached: ReachedSet<AbstractState>, violating: AbstractState) {
         throw new ImplementMeException();
+    }
+
+    compareStateOrder(a: DataAbstractState, b: DataAbstractState): number {
+        throw new ImplementMeException();
+    }
+
+    getLexiOrderKey(ofState: DataAbstractState): LexiKey {
+        return new LexiKey([]);
+    }
+
+    finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
     }
 
 }

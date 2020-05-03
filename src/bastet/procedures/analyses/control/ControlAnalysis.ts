@@ -23,8 +23,8 @@ import {ProgramAnalysisWithLabelProducer, ProgramAnalysisWithLabels, WrappingPro
 import {
     ControlAbstractDomain,
     ControlAbstractState,
-    ControlConcreteState,
-    MethodCall,
+    ControlConcreteState, IndexedThread,
+    MethodCall, RelationLocation,
     ScheduleAbstractStateFactory
 } from "./ControlAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
@@ -36,12 +36,24 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
+import {
+    CHOOSE_EITHER,
+    CHOOSE_FIRST,
+    CHOOSE_SECOND,
+    FrontierSet,
+    PartitionKey,
+    ReachedSet
+} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {List as ImmList, Set as ImmSet} from "immutable";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import {LexiKey} from "../../../utils/Lexicographic";
+import {getTheOnlyElement} from "../../../utils/Collections";
+import {TransitionRelation} from "../../../syntax/app/controlflow/TransitionRelation";
+import {ControlCoverageExaminer} from "./coverage/ControlCoverage";
+import {ControlLocationExtractor} from "./ControlUtils";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -87,7 +99,12 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
         const result: ControlAbstractState[] = [];
         for (const r of this._transferRelation.abstractSucc(fromState)) {
-            if (!this.steppedOnLoophead(r) || this.refiner.checkIsFeasible(r)) {
+            const ctrlLocs: ImmSet<RelationLocation> = r.accept(new ControlLocationExtractor(this._task));
+            const loopHeads = ctrlLocs.filter((rl) => {
+                return this._task.getTransitionRelationById(rl.getRelationId()).isLoopHead(rl.getLocationId())
+            });
+
+            if (loopHeads.isEmpty() || this.refiner.checkIsFeasible(r, `Loop unrolling for ${loopHeads.toString()}`)) {
                 result.push(r);
             }
         }
@@ -252,9 +269,9 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     }
 
     private steppedOnLoophead(r: ControlAbstractState) {
-        const steppedThreads = r.getSteppedFor().map((i) => r.getIndexedThreadState(i));
+        const steppedthreads = r.getSteppedFor().map((i) => r.getIndexedThreadState(i));
 
-        for (const t of steppedThreads) {
+        for (const t of steppedthreads) {
             const ts = t.threadStatus;
             const relation = this._task.getTransitionRelationById(ts.getRelationLocation().getRelationId());
             if (relation.isLoopHead(ts.getRelationLocation().getLocationId())) {
@@ -267,5 +284,39 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
 
     handleViolatingState(reached: ReachedSet<AbstractState>, violating: AbstractState) {
         throw new ImplementMeException();
+    }
+
+    compareStateOrder(a: ControlAbstractState, b: ControlAbstractState): number {
+        const keyA = this.getLexiOrderKey(a);
+        const keyB = this.getLexiOrderKey(b);
+        return keyA.compareTo(keyB);
+    }
+
+    getLexiOrderKey(ofState: ControlAbstractState): LexiKey {
+        const steppedThreadsA = ofState.getSteppedFor().map((i) => ofState.getIndexedThreadState(i));
+
+        if (steppedThreadsA.size == 1) {
+            const steppedA: IndexedThread = getTheOnlyElement(steppedThreadsA);
+            const relLocA: RelationLocation = steppedA.threadStatus.getRelationLocation();
+            const relA: TransitionRelation = this._task.getTransitionRelationById(relLocA.getRelationId());
+            const rpoA: number = relA.getWaitAtMeetOrderOf(relLocA.getLocationId());
+
+            return new LexiKey([rpoA * -1]); // We use a Max-Priority-Queue. Larger elements are prefered but we
+            // what to process elements with the smaller wait-at-meet order first
+        }
+
+        return new LexiKey([]);
+    }
+
+    finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
+        this.wrappedAnalysis.finalizeResults(frontier, reached);
+
+        const examiner = new ControlCoverageExaminer();
+        const coverage = examiner.determineCoverageOf(this._task, reached);
+        const covStats = this._statistics.withContext("Coverage");
+        covStats.put("coveredLocationsPercent", coverage.controlCoveragePercent);
+        covStats.put("coveredLocationsAbs", coverage.coveredControlLocationsAbs);
+        covStats.put("uncoveredLocationsAbs", coverage.uncoveredControlLocationsAbs);
+        covStats.put("uncoveredPerLocationAbs", coverage.numberOfUncoveredPerRelation);
     }
 }

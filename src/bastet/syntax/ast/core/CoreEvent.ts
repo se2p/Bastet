@@ -128,6 +128,23 @@ export class SingularityEvent extends CoreEvent {
 
 }
 
+export class TerminationEvent extends CoreEvent {
+
+    constructor() {
+        super([]);
+    }
+
+    private static INSTANCE: TerminationEvent;
+
+    public static instance(): TerminationEvent {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new TerminationEvent();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
 export class RenderedMonitoringEvent extends CoreEvent {
 
     constructor() {

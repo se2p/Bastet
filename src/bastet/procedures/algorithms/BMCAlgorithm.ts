@@ -65,12 +65,13 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractState>
                 const targetState = reached.getAddedLast()[0];
                 Preconditions.checkState(this._analysis.target(targetState as E).length > 0);
 
+                const properties = this._analysis.target(targetState);
+
                 // Check the feasibility with the refiner
                 let isFeasible: boolean;
-                console.group("BMC Feasibility Check");
                 this._feasibilityCheckStats.startTimer();
                 try {
-                    isFeasible = this._refiner.checkIsFeasible(targetState as E);
+                    isFeasible = this._refiner.checkIsFeasible(targetState as E, `BMC target state feasibility for ${properties.toString()}`);
                     if (isFeasible) {
                         return [frontier, reached];
                     } else {
@@ -78,8 +79,6 @@ export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractState>
                     }
                 } finally {
                     this._feasibilityCheckStats.stopTimer();
-                    console.log(`${isFeasible ? "Feasible" : "Infeasible"}`)
-                    console.groupEnd();
                 }
             }
         } while (!frontier.isEmpty());

@@ -35,7 +35,7 @@ import {
     BootstrapEvent,
     NeverEvent,
     RenderedMonitoringEvent,
-    SingularityEvent
+    SingularityEvent, TerminationEvent
 } from "../ast/core/CoreEvent";
 import {TransitionRelation, TransitionRelations, TransRelId} from "./controlflow/TransitionRelation";
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
@@ -48,7 +48,11 @@ import {Concern, Concerns} from "../Concern";
 import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
 import {CallStatement} from "../ast/core/statements/CallStatement";
 import {Identifier} from "../ast/core/Identifier";
-import {InitializeAnalysisStatement, SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
+import {
+    InitializeAnalysisStatement,
+    SignalTargetReachedStatement,
+    TerminateProgramStatement
+} from "../ast/core/statements/InternalStatement";
 import {BooleanExpression} from "../ast/core/expressions/BooleanExpression";
 import {IfStatement} from "../ast/core/statements/ControlStatement";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
@@ -155,6 +159,7 @@ export class Actor {
         this._transRelMap = new ImmutableMap<TransRelId, TransitionRelation>(transRelMap.entries());
 
         Preconditions.checkArgument(initScript.event === BootstrapEvent.instance()
+            || initScript.event === TerminationEvent.instance()
             || initScript.event === SingularityEvent.instance());
     }
 
@@ -267,6 +272,15 @@ export class Actor {
         return false;
     }
 
+    get isTerminator(): boolean {
+        for (const s of this.scripts) {
+            if (s.event === TerminationEvent.instance()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public getConditionCheckScript(cond: BooleanExpression): Script {
         Preconditions.checkNotUndefined(cond);
         const ifConditionReached: StatementList = new StatementList([
@@ -313,6 +327,7 @@ export class Actor {
 export class Actors {
 
     private static _DEFAULT_BOOTSTRAPPER: Actor;
+    private static _DEFAULT_TERMINATOR: Actor;
 
     public static defaultBoostraper(): Actor {
         if (!Actors._DEFAULT_BOOTSTRAPPER) {
@@ -334,6 +349,24 @@ export class Actors {
         }
 
         return Actors._DEFAULT_BOOTSTRAPPER;
+    }
+
+    static defaultTerminator() {
+        if (!Actors._DEFAULT_TERMINATOR) {
+            // ATTENTION: Assumed to be a 'program concern'!
+            const termStmts = new StatementList([new TerminateProgramStatement()]);
+            const visitor: RelationBuildingVisitor = new RelationBuildingVisitor();
+            const transitions: TransitionRelation =
+                TransitionRelations.eliminateEpsilons(termStmts.accept(visitor));
+            const script: Script = new Script(Identifier.freshWithPrefix("termscript"),
+                TerminationEvent.instance(), false, transitions);
+            Actors._DEFAULT_TERMINATOR = new Actor(ActorMode.concrete(), "__TERMINATOR", [], [],
+                Concerns.defaultProgramConcern(),
+                {}, {}, script, {}, {},
+                [script], []);
+        }
+
+        return Actors._DEFAULT_TERMINATOR;
     }
 
 }

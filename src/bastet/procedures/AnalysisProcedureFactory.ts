@@ -40,6 +40,7 @@ import {TimeAnalysis} from "./analyses/time/TimeAnalysis";
 import {StaticTimeProfile} from "../utils/TimeProfile";
 import {ConcreteElement} from "./domains/ConcreteElements";
 import {BastetConfiguration} from "../utils/BastetConfiguration";
+import {StructureStatistics} from "../syntax/app/StructureStatistics";
 
 export class MainAnalysisConfig extends BastetConfiguration {
 
@@ -75,6 +76,9 @@ export class AnalysisProcedureFactory {
                 this._statistics = new AnalysisStatistics("BASTET", {});
                 this._result = new MultiPropertyAnalysisResult(ImmSet<Property>(), ImmSet<Property>(), task.getProperties(), this._statistics);
 
+                const struStats = new StructureStatistics();
+                struStats.computeStatisitcs(task, this._statistics.withContext("Task"));
+
                 // TODO: Delete the context after the analysis is no more in use
                 const defaultContect = smt.createContext();
                 const theories = new Z3Theories(defaultContect);
@@ -93,7 +97,10 @@ export class AnalysisProcedureFactory {
                 const reachabilityAlgorithm = new ReachabilityAlgorithm(config, outerAnalysis, this._statistics);
                 const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, outerAnalysis.refiner, outerAnalysis, this._statistics);
                 const multiPropertyAlgorithm = new MultiPropertyAlgorithm(config, task, bmcAlgorithm, outerAnalysis, this._statistics,
-                    (v, s, u, stats) => this.onAnalysisResult(v, s, u, stats));
+                    (v, s, u, stats) => {
+                    outerAnalysis.finalizeResults(frontier, reached);
+                    this.onAnalysisResult(v, s, u, stats);
+                });
 
                 const initialStates: GraphAbstractState[] = outerAnalysis.initialStatesFor(task);
                 frontier.addAll(initialStates);
@@ -109,6 +116,7 @@ export class AnalysisProcedureFactory {
 
             private onAnalysisResult(violated: ImmSet<Property>, satisifed: ImmSet<Property>, unknowns: ImmSet<Property>,
                                      mpaStatistics: AnalysisStatistics) {
+
                 const analysisDurtionMSec = mpaStatistics.contextTimer.totalDuration.toFixed(3);
 
                 mpaStatistics.put("num_violated", violated.size);

@@ -51,7 +51,7 @@ role MathActor begin
     // mathAtan approximates the Atan value in radians for a given "real" value
     // param n : float - the real value for which the Atan value is approximated
     // return result: float - the approximated interval of the Atan value
-    define  mathAtan  (input: float) begin
+    define atomic mathAtan  (input: float) begin
 
         if input > TWO_PI then begin
             declare asDeg as int
@@ -216,7 +216,7 @@ role MathActor begin
     //
     // param alpha : float - radians number for which the sin value will be approximated
     // return result: float - the approximated interval
-    define  mathSin  (input: float) begin
+    define atomic mathSin  (input: float) begin
         if input > TWO_PI then begin
             declare asDeg as int
             define asDeg as cast (radToDeg(input)) to int
@@ -348,7 +348,7 @@ role MathActor begin
      //
      // param alpha : float - radians number for which the cos value will be approximated
      // return result: float - the approximated interval
-    define  mathCos  (input: float) begin
+    define atomic mathCos  (input: float) begin
         if input > TWO_PI then begin
             declare asDeg as int
             define asDeg as cast (radToDeg(input)) to int
@@ -551,7 +551,7 @@ role MathActor begin
     end returns result: float
 
 
-    define mathSqrt(num: float) begin
+    define atomic mathSqrt(num: float) begin
         declare result as float
         define result as nearestPerfectSqrt(num)
 
@@ -563,7 +563,7 @@ role MathActor begin
         end
     end returns result: float
 
-    define mathAbsF(n: float) begin
+    define atomic mathAbsF(n: float) begin
         if n < 0.0 then begin
             define result as n * (0.0-1.0)
         end else begin
@@ -735,7 +735,7 @@ extern _RUNTIME_getInitialActors () returns list of string
     end
 
     // @Category "Specification"
-    define touchingObjects (fst: actor, snd: actor) begin
+    define atomic touchingObjects (fst: actor, snd: actor) begin
             declare size_fst as float
             declare width as float
             declare height as float
@@ -789,7 +789,7 @@ extern _RUNTIME_getInitialActors () returns list of string
     end returns result : boolean
 
     // @Category "Specification"
-    define touchingMousePointer (obj: actor) begin
+    define atomic touchingMousePointer (obj: actor) begin
         declare x as int
         declare y as int
         define x as cast attribute "x" of obj to int
@@ -1022,11 +1022,31 @@ role ScratchSprite is ScratchEntity begin
         define y as y + tmpy
     end
 
-    define changeXBy (increment: int) begin
+    // @Category "Motion"
+    define atomic goTo (newX: int, newY: int) begin
+        define x as newX
+        define y as newY
+    end
+
+    define atomic hide () begin
+        define visible as false
+    end
+
+    define atomic show () begin
+        define visible as true
+    end
+
+    // @Category "Motion"
+    define atomic goToRandomPosition () begin
+        define x as randomIntegerBetween(0-240, 240)
+        define y as randomIntegerBetween(0-180, 180)
+    end
+
+    define atomic changeXBy (increment: int) begin
        // set attribute "x" to (attribute "x" + increment)
     end
 
-    define changeCostumeTo (id: string) begin
+    define atomic changeCostumeTo (id: string) begin
         changeActiveGraphicTo(id)
     end
 
@@ -1101,7 +1121,7 @@ role ScratchSprite is ScratchEntity begin
     end returns result : boolean
 
     // @Category "Sensing"
-    define touchingColor (clr: int) begin
+    define atomic touchingColor (clr: int) begin
         // ...
     end returns result : boolean
 
@@ -1130,12 +1150,12 @@ role ScratchSprite is ScratchEntity begin
     end
 
     // @Category "looks"
-    define turnLeft(degrees: int) begin
+    define atomic turnLeft(degrees: int) begin
         setDirection(direction - degrees)
     end
 
     // @Category "looks"
-    define turnRight(degrees: int) begin
+    define atomic turnRight(degrees: int) begin
         setDirection(direction + degrees)
     end
 
@@ -1161,15 +1181,15 @@ role ScratchStage is ScratchEntity begin
 
     define current_idx as 0
 
-    define switchBackdropTo (id: string) begin
+    define atomic switchBackdropTo (id: string) begin
         changeActiveGraphicTo(id)
     end
 
-    define switchBackdropToAndWait (id: string) begin
+    define atomic switchBackdropToAndWait (id: string) begin
 
     end
 
-    define nextBackdrop () begin
+    define atomic nextBackdrop () begin
         declare idx as int
         define idx as getGraphicIndexById(active_graphic_name)
         define idx as (current_idx+1) mod getNumGraphics()
@@ -1180,7 +1200,7 @@ role ScratchStage is ScratchEntity begin
         changeActiveGraphicTo(id)
     end
 
-    define previousBackdrop() begin
+    define atomic previousBackdrop() begin
         declare idx as int
         define idx as getGraphicIndexById(active_graphic_name)
         define idx as (current_idx-1) mod getNumGraphics()
@@ -1191,7 +1211,7 @@ role ScratchStage is ScratchEntity begin
         changeActiveGraphicTo(id)
     end
 
-    define randomBackdrop() begin
+    define atomic randomBackdrop() begin
          declare idx as int
          define idx as getGraphicIndexById(active_graphic_name)
          define idx as randomIntegerBetween(0, getNumGraphics()-1)

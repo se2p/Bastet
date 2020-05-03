@@ -80,27 +80,37 @@ import {
     StringExpression,
     StringLiteral
 } from "../../../syntax/ast/core/expressions/StringExpression";
-import {AfterStatementMonitoringEvent, MessageReceivedEvent} from "../../../syntax/ast/core/CoreEvent";
+import {
+    AfterStatementMonitoringEvent,
+    MessageReceivedEvent,
+    TerminationEvent
+} from "../../../syntax/ast/core/CoreEvent";
 import {Concern, Concerns} from "../../../syntax/Concern";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {Script, ScriptId} from "../../../syntax/app/controlflow/Script";
 import {getTheNextElement, getTheOnlyElement} from "../../../utils/Collections";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {BOOTSTRAP_FINISHED_MESSAGE, SystemMessage} from "../../../syntax/ast/core/Message";
-import {ActorType, IntegerType} from "../../../syntax/ast/core/ScratchType";
+import {ActorType, BooleanType, IntegerType} from "../../../syntax/ast/core/ScratchType";
 import {
     LocateActorExpression,
     StartCloneActorExpression,
     UsherActorExpression
 } from "../../../syntax/ast/core/expressions/ActorExpression";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {BooleanExpression, NumGreaterEqualExpression} from "../../../syntax/ast/core/expressions/BooleanExpression";
+import {
+    BooleanExpression,
+    BooleanLiteral,
+    NumGreaterEqualExpression
+} from "../../../syntax/ast/core/expressions/BooleanExpression";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {OptionalAstNode} from "../../../syntax/ast/AstNode";
-import {SignalTargetReachedStatement} from "../../../syntax/ast/core/statements/InternalStatement";
+import {
+    SignalTargetReachedStatement,
+    TerminateProgramStatement
+} from "../../../syntax/ast/core/statements/InternalStatement";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {ConcreteElement} from "../../domains/ConcreteElements";
-import {GLOBAL_TIME_MICROS_VAR} from "../time/TimeTransferRelation";
 import {
     IntegerLiteral,
     MultiplyExpression,
@@ -252,10 +262,6 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
     private readonly _task: App;
 
-    private readonly _threadWaitUntilMicrosVariable: VariableWithDataLocation;
-
-    private readonly _globalTimeMicrosVariable: VariableWithDataLocation;
-
     private readonly _accelInfoMap: Map<ScriptId, AccelInfo>;
 
     constructor(config: ControlAnalysisConfig, task: App, wrappedTransferRelation: LabeledTransferRelation<AbstractElement>,
@@ -265,15 +271,6 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         this._wrappedTransferRelation = Preconditions.checkNotUndefined(wrappedTransferRelation);
         this._wrappedDomain = Preconditions.checkNotUndefined(wrappedDomain);
         this._accelInfoMap = new Map();
-
-        // TODO: Move the declaration of the following variables to the `App`/`AppBuilder`/`Actor`
-        this._threadWaitUntilMicrosVariable = new VariableWithDataLocation(
-            DataLocations.createTypedLocation(new Identifier("__wait_until_micros"), IntegerType.instance()));
-        this._task.typeStorage.getScopeOf(this._threadWaitUntilMicrosVariable.qualifiedName).putVariable(this._threadWaitUntilMicrosVariable);
-
-        // The following var is currently registered by the `TimeAnalysis`
-        this._globalTimeMicrosVariable = new VariableWithDataLocation(
-            DataLocations.createTypedLocation(new Identifier(GLOBAL_TIME_MICROS_VAR), IntegerType.instance()));
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
@@ -617,10 +614,18 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     .withFailedFor(properties)), true]];
 
         } else if (stepOp.ast instanceof BeginAtomicStatement) {
-            return [[this.incrementAtomic(result, threadToStep), true]];
+            return [[this.incrementAtomic(result, threadToStep), false]];
 
         } else if (stepOp.ast instanceof EndAtomicStatement) {
-            return [[this.decrementAtomic(result, threadToStep), true]];
+            return [[this.decrementAtomic(result, threadToStep), false]];
+
+        } else if (stepOp.ast instanceof TerminateProgramStatement) {
+            return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                ts.withOperations(ImmList([stepOp.ident,
+                ProgramOperations.constructOp(new StoreEvalResultToVariableStatement(
+                    this._task.systemVariables.programTerminatedVariable,
+                    BooleanLiteral.true()
+                ))]))), false]];
 
         } else if (stepOp.ast instanceof CallStatement) {
             // The following lines realize the inter-procedural analysis.
@@ -640,15 +645,17 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
                     const ops: ProgramOperation[] = [
                         new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_micros),
-                            new ExpressionList([]), OptionalAstNode.with(this._threadWaitUntilMicrosVariable)),
-                        new StoreEvalResultToVariableStatement(this._threadWaitUntilMicrosVariable,
-                            new PlusExpression(this._threadWaitUntilMicrosVariable, new MultiplyExpression(secondsExpression, IntegerLiteral.of(1000000))))
+                            new ExpressionList([]), OptionalAstNode.with(this._task.systemVariables.threadWaitUntilMicrosVariable)),
+                        new StoreEvalResultToVariableStatement(this._task.systemVariables.threadWaitUntilMicrosVariable,
+                            new PlusExpression(this._task.systemVariables.threadWaitUntilMicrosVariable,
+                                new MultiplyExpression(secondsExpression, IntegerLiteral.of(1000000))))
                     ].map((ast) => ProgramOperationFactory.createFor(ast));
 
-                    const waitUntilCond = new NumGreaterEqualExpression(this._globalTimeMicrosVariable, this._threadWaitUntilMicrosVariable);
+                    const waitUntilCond = new NumGreaterEqualExpression(this._task.systemVariables.globalTimeMicrosVariable,
+                        this._task.systemVariables.threadWaitUntilMicrosVariable);
                     const accelInfo = new AccelInfo(threadToStep.threadStatus.getActorId(),
-                        waitUntilCond, new NumberVariableExpression(this._globalTimeMicrosVariable),
-                        new PlusExpression(this._threadWaitUntilMicrosVariable, IntegerLiteral.of(1)));
+                        waitUntilCond, new NumberVariableExpression(this._task.systemVariables.globalTimeMicrosVariable),
+                        new PlusExpression(this._task.systemVariables.threadWaitUntilMicrosVariable, IntegerLiteral.of(1)));
 
                     const checkThread: ThreadState = this.createConditionCheckThread(steppedActor.ident, waitUntilCond);
                     this._accelInfoMap.set(checkThread.getScriptId(), accelInfo);
@@ -783,12 +790,16 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
     private incrementAtomic(state: ControlAbstractState, thread: IndexedThread): ControlAbstractState {
         return state.withThreadStateUpdate(thread.threadIndex,
-            (ts) => ts.withIncrementedAtomic());
+            (ts) => ts
+                .withIncrementedAtomic()
+                .withOperations(ts.getOperations().concat([ProgramOperations.constructOp(new BeginAtomicStatement())])));
     }
 
     private decrementAtomic(state: ControlAbstractState, thread: IndexedThread): ControlAbstractState {
         return state.withThreadStateUpdate(thread.threadIndex,
-            (ts) => ts.withDecrementedAtomic());
+            (ts) => ts
+                .withDecrementedAtomic()
+                .withOperations(ts.getOperations().concat([ProgramOperations.constructOp(new EndAtomicStatement())])));
     }
 
     private getCallingStatement(callInformation: MethodCall): CallStatement {
@@ -868,6 +879,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         const concern = this.getStepConcern(inState);
 
         //  1. Activate the specification check thread (`after statement finished`)
+        //  (if the stepped thread is a program thread)
         if (this.isProgramConcern(concern)) {
             for (const [threadIndex, threadState] of inState.getThreadStates().entries()) {
                 const actor: Actor = this._task.getActorByName(threadState.getActorId());
@@ -905,22 +917,22 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         // 3. Check if threads that wait for certain conditions can continue to run
         //    (assume certain conditions to hold if this accelerates the analysis without being unsound)
-
         return this.runStateCheckThreads(result);
     }
 
-    private hasNonWaitingRunnable(threads: ImmList<ThreadState>): boolean {
-        return threads.filter((ts) => ts.getComputationState() == ThreadComputationState.THREAD_STATE_YIELD
-            || ts.getComputationState() == ThreadComputationState.THREAD_STATE_RUNNING).size > 0;
+    private hasNonWaitingRunnable(threads: ImmList<ThreadState>, withConcern: Concern): boolean {
+        const nonWaitingRunnable = threads.filter((ts) =>
+            this._task.getActorByName(ts.getActorId()).concern == withConcern
+                && (ts.getComputationState() == ThreadComputationState.THREAD_STATE_YIELD
+                    || ts.getComputationState() == ThreadComputationState.THREAD_STATE_RUNNING));
+        return nonWaitingRunnable.size > 0;
     }
 
     private runStateCheckThreads(state: ControlAbstractState): ControlAbstractState[] {
         if (state.getConditionStates().size == 0) {
             return [state];
         } else {
-            const waitingThreads = state.getThreadStates().filter((ts) => ts.getComputationState() == ThreadComputationState.THREAD_STATE_WAIT);
-
-            if (this.hasNonWaitingRunnable(state.getThreadStates())) {
+            if (this.hasNonWaitingRunnable(state.getThreadStates(), Concerns.defaultProgramConcern())) {
                 return this.checkConditionAndWakeUpIfSatisfied(state);
 
             } else {
@@ -931,7 +943,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 const acceleratable: AccelInfo[] = this.filterAcceleratableConditionThreads(state.getConditionStates());
 
                 // For now, we only consider an acceleration based on the time variable
-                const timeAccel = acceleratable.filter((ac) => ac.variantVariable.variable == this._globalTimeMicrosVariable);
+                const timeAccel = acceleratable.filter((ac) => ac.variantVariable.variable == this._task.systemVariables.globalTimeMicrosVariable);
                 if (timeAccel.length == 1) {
                     // We can immediately accelerate in this case
                     const accelInfo = timeAccel[0];
@@ -1083,11 +1095,12 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
     private schedule(predState: ControlAbstractState, succState: ControlAbstractState,
                      steppedThreadIndex: number): ControlAbstractState[] {
         let result: ControlAbstractState = succState;
-        const steppedThread: IndexedThread = succState.getIndexedThreadState(steppedThreadIndex);
 
+        const steppedThread: IndexedThread = succState.getIndexedThreadState(steppedThreadIndex);
         const nextOps = this.resolveLeavingOps(succState, steppedThread); // Use 'succState' to solve issues with new 'actorScopes' information
+
+        // Finish the atomic operations without interruptions by another thread
         if (nextOps.length > 0 && steppedThread.threadStatus.getInAtomicMode() > 0) {
-            // Finish the atomic operations without interruptions by another thread
             return [result.withThreadStateUpdate(steppedThread.threadIndex, (ts) =>
                 ts.withComputationState(ThreadComputationState.THREAD_STATE_RUNNING))];
         }
@@ -1098,7 +1111,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 ts.withComputationState(ThreadComputationState.THREAD_STATE_DONE));
 
         } else {
-            // YIELD the current state if it is not yet on a terminating control location of the script.
+            // YIELD the current thread if it is not yet on a terminating control location of the script.
             if (steppedThread.threadStatus.getComputationState() == ThreadComputationState.THREAD_STATE_RUNNING) {
                 result = result.withThreadStateUpdate(steppedThread.threadIndex, (ts) =>
                     ts.withComputationState(ThreadComputationState.THREAD_STATE_YIELD));
@@ -1110,6 +1123,19 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         if (continueWithNextThreadAt > -1) {
             result = result.withThreadStateUpdate(continueWithNextThreadAt, (ts) =>
                 ts.withComputationState(ThreadComputationState.THREAD_STATE_RUNNING));
+        } else {
+            // Activate the termination thread
+            result = result.withThreadStates(result.getThreadStates().map((ts => {
+                const actor: Actor = this._task.getActorByName(ts.actorId);
+                const script = actor.getScript(ts.getScriptId());
+                if (script.event == TerminationEvent.instance()) {
+                    if (ts.getComputationState() == ThreadComputationState.THREAD_STATE_DISABLED) {
+                        ts = ts.withComputationState(ThreadComputationState.THREAD_STATE_RUNNING);
+                    }
+                }
+
+                return ts;
+            })));
         }
 
         this.checkSchedule(result);

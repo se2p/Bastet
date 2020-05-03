@@ -4,7 +4,6 @@ import ScratchLiterals;
 
 // A program has a name and is composed of a list of actors.
 // The term 'actor' is used to describe one entity in the Scratch world.
-// We use the terms 'script group' and 'entity' as synonyms for 'actor'.
 program : fileType ident importDefinitionList actorDefinitionList EOF ;
 
 fileType : 'program' | 'module' ;
@@ -14,8 +13,9 @@ importDefinitionList : importDefinition* ;
 importDefinition : 'import' importSelector 'from' resourceLocator ;
 
 importSelector :
-      ident # ImportSelectedActor
-    | '*' # ImportAllActors ;
+  ident # ImportSelectedActor
+  | '*' # ImportAllActors
+  ;
 
 // Actors in a list of actors are separated by whitespace
 actorDefinitionList : actorDefinition* ;
@@ -30,17 +30,11 @@ actorDefinition : actorMode ident inheritsFrom 'begin' actorComponentsDefinition
 inheritsFrom : 'is' ident (',' ident)* | ;
 
 actorMode :
-      'actor' # ConcreteActorMode
-    | 'role' # ActorRoleMode
-    ;
+  'actor' # ConcreteActorMode
+  | 'role' # ActorRoleMode
+  ;
 
-// Whe distinguish between three types of actors:
-// A generic actor type ('actor'), the stage, and a type for sprites.
-// Both the stage and the sprites are actors.
-// A Scratch program must have at most (and typically at least) one
-// actor of type 'stage' and consists of arbitrary many sprites.
-
-actorComponentsDefinition : resourceList declarationStmtList setStmtList externMethodDefinitionList methodDefinitionList scriptList ;
+actorComponentsDefinition : resourceList declarationStmtList setStmtList methodDefinitionList scriptList ;
 
 // The Scratch programming language is typically used to
 // write small games that take produce graphics and sounds as output.
@@ -52,8 +46,8 @@ resource : resourceType ident resourceLocator ;
 
 resourceType :
   'image' # ImageResource
-| 'sound' # SoundResource
-;
+  | 'sound' # SoundResource
+  ;
 
 // A list of resources is separated by whitespaces.
 resourceList : resource* ;
@@ -61,9 +55,7 @@ resourceList : resource* ;
 // Decalration of a variable. Depending on the possition of the
 // declaration statement, the variable is either local to the actor
 // or local to the current stack of a script execution.
-declarationStmt :
-    'declare' ident 'as' type # DeclareVariable
-    ;
+declarationStmt : 'declare' ident 'as' type # DeclareVariable ;
 
 // A list of variable declarations.
 declarationStmtList : declarationStmt* ;
@@ -71,18 +63,18 @@ declarationStmtList : declarationStmt* ;
 // The list of datatypes that are allowed for the declaration
 // of variables and attributes.
 type :
- 'list' 'of' type # ListType
- | 'actor' # ActorType
- | primitiveType # Primitive
- ;
+  'list' 'of' type # ListType
+  | 'actor' # ActorType
+  | primitiveType # Primitive
+  ;
 
 primitiveType:
- 'int' # IntegerType
- | 'float' # FloatingPointType
- | 'boolean' # BooleanType
- | 'string' # StringType
- | 'enum' '[' expressionListPlain ']' # EnumType
- ;
+  'int' # IntegerType
+  | 'float' # FloatingPointType
+  | 'boolean' # BooleanType
+  | 'string' # StringType
+  | 'enum' '[' expressionListPlain ']' # EnumType
+  ;
 
 // A script is the central unit that of a Scratch program that
 // defines the behavior (and with it the control and data flow).
@@ -97,20 +89,18 @@ scriptAttribute : 'restart' # RestartScript ;
 
 // Scratch programs are written in an event-driven manner.
 // The different events that can trigger the execution
-// of a script are defined by the non-terminal `CoreEvent`.
-event : coreEvent ;
-
-coreEvent :
-    'never' # NeverEvent
- |  'bootstrap' # BootstapEvent
- |  'bootstrap' 'finished' # AfterBootstrapMonitoringEvent
- |  'startup' # StartupEvent
- |  'started' 'as' 'clone' # CloneStartEvent
- |  'received' 'message' stringExpr messageNamespace parameterList # MessageReceivedEvent
- |  'reached condition' boolExpr # ConditionReachedEvent
- |  'rendered' # RenderedMonitoringEvent
- |  'statement' 'finished' # AfterStatementMonitoringEvent
- ;
+// of a script are defined by the non-terminal `event`.
+event :
+  'never' # NeverEvent
+  | 'bootstrap' # BootstapEvent
+  | 'bootstrap' 'finished' # AfterBootstrapMonitoringEvent
+  | 'startup' # StartupEvent
+  | 'started' 'as' 'clone' # CloneStartEvent
+  | 'received' 'message' stringExpr messageNamespace parameterList # MessageReceivedEvent
+  | 'reached condition' boolExpr # ConditionReachedEvent
+  | 'rendered' # RenderedMonitoringEvent
+  | 'statement' 'finished' # AfterStatementMonitoringEvent
+  ;
 
 messageNamespace : 'in' String # MessageNameSpace | #GlobalNameSpace;
 
@@ -118,33 +108,28 @@ messageNamespace : 'in' String # MessageNameSpace | #GlobalNameSpace;
 // reusable code blocks (also known as 'custom blocks').
 // A procedure is identified by a name and is parameterized
 // to take a number of arguments.
-externMethodDefinition : 'extern' ident parameterList externMethodResultDeclaration ;
-externMethodResultDeclaration :
-    'returns' type # ExternFunctionReturnDefinition
-    | # ExternVoidReturnDefinition
-    ;
-externMethodDefinitionList : externMethodDefinition* ;
-
+methodDefinitionList : methodDefinition* ;
 methodDefinition :
-      'define' methodAttributeList ident parameterList stmtList methodResultDeclaration # FullMethodDefinition
-    ;
+  'define' methodAttributeList ident parameterList stmtList methodResultDeclaration # FullMethodDefinition
+  | 'extern' ident parameterList externMethodResultDeclaration # ExternMethodDefinition
+  ;
 
 methodResultDeclaration :
-    'returns' ident ':' type # FunctionReturnDefinition
-    | # VoidReturnDefinition
-    ;
+  'returns' ident ':' type # FunctionReturnDefinition
+  | # VoidReturnDefinition
+  ;
 
-// A list of procedure definitions.
-methodDefinitionList : methodDefinition* ;
+externMethodResultDeclaration :
+  'returns' type # ExternFunctionReturnDefinition
+  | # ExternVoidReturnDefinition
+  ;
 
 // Attributes that can be assinged to a method
 methodAttributeList : methodAttribute* ;
 methodAttribute : 'atomic' # AtomicMethod ;
 
 // A procedure parameter.
-parameter :
-    ident ':' type
-    ;
+parameter : ident ':' type ;
 
 // A list of method parameters in brackets.
 parameterList : '(' parameterListPlain ')' ;
@@ -167,22 +152,20 @@ stmtListPlain : stmt* ;
 
 // The control flow of Scratch program is controlled by
 // designated control-flow statements.
-controlStmt : coreControlStmt;
-
-coreControlStmt :
-    ifStmt
- |  untilStmt
- |  repeatTimesStmt
- |  repeatForeverStmt
- |  callStmt
- ;
+controlStmt :
+  ifStmt
+  | untilStmt
+  | repeatTimesStmt
+  | repeatForeverStmt
+  | callStmt
+  ;
 
 // A conditional statement. Either in the form of an 'if ... then ...'
 // or an 'if ... then ... else ...'.
 ifStmt : 'if' boolExpr 'then' stmtList elseCase ;
 
 elseCase :
-    'else' stmtList # PureElse
+  'else' stmtList # PureElse
   | 'else' ifStmt # ElseIfCase
   | # EmptyElseCase
   ;
@@ -219,159 +202,151 @@ expressionStmt : 'evaluate' expression ;
 
 // The list of statements that are available in Scratch.
 stmt :
-      controlStmt # ControlStatement
-    | nonCtrlStmt # NonControlStatement
-    | atomicBlock # AtomicBlockStatement
-    | '@' Identifier expressionList stmt # AttributedStatement
-    ;
+  controlStmt # ControlStatement
+  | nonCtrlStmt # NonControlStatement
+  | atomicBlock # AtomicBlockStatement
+  | '@' Identifier expressionList stmt # AttributedStatement
+  ;
 
-nonCtrlStmt : coreNonCtrlStmt ;
-
-coreNonCtrlStmt :
- expressionStmt
- |  commonStmt
- |  listStmt
- |  declarationStmt
- ;
+nonCtrlStmt :
+  expressionStmt
+  | commonStmt
+  | listStmt
+  | declarationStmt
+  ;
 
 commonStmt  :
-    'wait' numExpr 'seconds' # WaitSecsStatement
- |  'wait' 'until' boolExpr # WaitUntilStatement
- |  'stop' 'other' 'scripts' 'in' 'actor' # StopOthersInActorStatement
- |  'create' 'clone' 'of' stringExpr # CreateCloneOfStatement
- |  'broadcast' message # BroadcastMessageStatement
- |  'broadcast' message 'and' 'wait' # BroadcastAndWaitStatement
- |  'reset' 'timer' # ResetTimerStatement
- |  'epsilon' # EpsilonStatement
- |  'assume' boolExpr # AssumeStatement
- |  setStmt # SetStatement
- ;
+  'wait' numExpr 'seconds' # WaitSecsStatement
+  | 'wait' 'until' boolExpr # WaitUntilStatement
+  | 'stop' 'other' 'scripts' 'in' 'actor' # StopOthersInActorStatement
+  | 'create' 'clone' 'of' stringExpr # CreateCloneOfStatement
+  | 'broadcast' message # BroadcastMessageStatement
+  | 'broadcast' message 'and' 'wait' # BroadcastAndWaitStatement
+  | 'reset' 'timer' # ResetTimerStatement
+  | 'epsilon' # EpsilonStatement
+  | 'assume' boolExpr # AssumeStatement
+  | setStmt # SetStatement
+  ;
 
 listStmt :
-    'delete' 'all' 'from' variable # DeleteAllFromStatement
- |  'delete'  numExpr  'of'  variable # DeleteIthFromStatement
- |  'add'  stringExpr  'to'  variable # AddElementToStatement
- |  'insert'  stringExpr  'at'  numExpr  'of'  variable # InsertAtStatement
- |  'replace' 'item'  numExpr 'of' variable  'by'  stringExpr # ReplaceElementAtStatement
- ;
+  'delete' 'all' 'from' variable # DeleteAllFromStatement
+  | 'delete'  numExpr  'of'  variable # DeleteIthFromStatement
+  | 'add'  stringExpr  'to'  variable # AddElementToStatement
+  | 'insert'  stringExpr  'at'  numExpr  'of'  variable # InsertAtStatement
+  | 'replace' 'item'  numExpr 'of' variable  'by'  stringExpr # ReplaceElementAtStatement
+  ;
 
 setStmt :
-    'define' variable 'as' expression # StoreEvalResultStatement
- |  'define' variable 'as' callStmt # StoreCallResultStatement
- ;
+  'define' variable 'as' expression # StoreEvalResultStatement
+  | 'define' variable 'as' callStmt # StoreCallResultStatement
+  ;
 
 setStmtList : setStmt* ;
 
 terminationStmt :
-    'stop' 'all' # StopAll
- |  'stop' 'this' 'script' # StopThis
- |  'delete' 'this' 'clone' # DeleteThisClone
- ;
-
-stringExpr : coreStringExpr ;
-
-coreStringExpr :
-   String # StringLiteralExpression
- |  variable # StringVariableExpression
- |  '(' coreStringExpr ')' # StringParanthExpression
- |  callStmt # StringCallStatementExpression
-
- |  'cast' numExpr 'to' 'string' # NumAsStringExpression
- |  'cast' boolExpr 'to' 'string' # BoolAsStringExpression
-
- |  'attribute'  stringExpr 'of' actorExpr  # StringAttributeOfExpression               // query an attribute value of an actor (sprites, the stage)
-
- |  'join'  stringExpr stringExpr # JoinStringsExpression
- |  'letter'  numExpr 'of'  stringExpr # IthLetterOfStringExpression
- |  'item'  numExpr 'of'  variable # IthStringItemOfExpression
-
- |  'default' String 'for' stringExpr # DefaultStringExpression
- |  '?string' # UnspecifiedStringExpression
- ;
-
-boolExpr : coreBoolExpr ;
-
-coreBoolExpr  :
-    Boolean # BoolLiteralExpression
- |  variable # BoolVariableExpression
- |  '(' coreBoolExpr ')' # BoolParanthExpression
- |  callStmt # BoolCallStatementExpression
-
- |  'cast' numExpr 'to' 'boolean' # NumAsBoolExpression
- |  'cast' stringExpr 'to' 'boolean' # StringAsBoolExpression
-
- |  'not'  coreBoolExpr # NegatedBoolExpression
- |  coreBoolExpr  'and'  coreBoolExpr # BoolAndExpression
- |  coreBoolExpr  'or'  coreBoolExpr # BoolOrExpression
-
- |  numOrStringExpr  '>='  numOrStringExpr # GreaterEqualExpression
- |  numOrStringExpr  '>'  numOrStringExpr # GreaterThanExpression
- |  numOrStringExpr  '<'  numOrStringExpr # LessThanExpression
- |  numOrStringExpr  '<='  numOrStringExpr # LessEqualExpression
- |  numOrStringExpr  '='  numOrStringExpr # EqualsExpression
-
- |  stringExpr  'contains'  stringExpr # StrContainsExpression
-
- |  'default' Boolean 'for' coreBoolExpr # DefaultBoolExpression
- |  '?bool' # UnspecifiedBoolExpression
- ;
-
-numExpr : coreNumExpr ;
-
-numOrStringExpr :
-    numExpr # NumberExpression
-    | stringExpr # StringExpression ;
-
-coreNumExpr  :
-    number # NumLiteralExpression
- |  variable # NumVariableExpression
- |  '(' coreNumExpr ')' # NumBrackets
- |  callStmt # NumCallStatementExpression
-
- |  'cast' stringExpr 'to' 'float' # StringToFloatExpression
- |  'cast' stringExpr 'to' 'int' # StringToIntExpression
- |  'cast' boolExpr 'to' 'int' # BoolToIntExpression
- |  'cast' coreNumExpr 'to' 'float' # NumToFloatExpression
- |  'cast' coreNumExpr 'to' 'int' # NumToIntExpression
-
- |  'timer' # TimerExpression
-
- |  'length' 'of' stringExpr # LengthOfStringExpression
- |  'length' 'of' 'list' variable # LengthOfListExpression
- |  'index' 'of' expression 'in' variable # IndexOfExpression
-
- |  coreNumExpr  '*'  coreNumExpr # NumMulExpression
- |  coreNumExpr  '/'  coreNumExpr # NumDivExpression
- |  coreNumExpr  'mod'  coreNumExpr # NumModExpression
- |  coreNumExpr  '+'  coreNumExpr # NumPlusExpression
- |  coreNumExpr  '-'  coreNumExpr # NumMinusExpression
-
- | 'default' number 'for' coreNumExpr # DefaultNumExpr
- | '?number' # UnspecifiedNumExpr
- ;
-
-listExpr :
-    variable # ListVariableExpression
- |  '[' expressionListPlain ']' # ListWithElementsExpression
- ;
-
-actorExpr:
-    variable # ActorVariableExpression
- | 'locate' 'actor' stringExpr # LocateActorExpression
- | 'start' 'clone' 'of' actorExpr # StartCloneActorExpression
- | 'start' 'actor' stringExpr 'as' ident # UsherActorExpression
+  'stop' 'all' # StopAll
+  | 'stop' 'this' 'script' # StopThis
+  | 'delete' 'this' 'clone' # DeleteThisClone
   ;
 
-expression : coreExpression ;
+stringExpr :
+  String # StringLiteralExpression
+  | variable # StringVariableExpression
+  | '(' stringExpr ')' # StringParanthExpression
+  | callStmt # StringCallStatementExpression
 
-coreExpression :
-    stringExpr
- |  numExpr
- |  boolExpr
- |  listExpr
- |  actorExpr
+  | 'cast' numExpr 'to' 'string' # NumAsStringExpression
+  | 'cast' boolExpr 'to' 'string' # BoolAsStringExpression
 
- |  unspecifiedExpr ;
+  | 'attribute'  stringExpr 'of' actorExpr  # StringAttributeOfExpression  // query an attribute value of an actor (sprites, the stage)
+
+  | 'join'  stringExpr stringExpr # JoinStringsExpression
+  | 'letter'  numExpr 'of'  stringExpr # IthLetterOfStringExpression
+  | 'item'  numExpr 'of'  variable # IthStringItemOfExpression
+
+  | 'default' String 'for' stringExpr # DefaultStringExpression
+  | '?string' # UnspecifiedStringExpression
+  ;
+
+boolExpr  :
+    Boolean # BoolLiteralExpression
+  | variable # BoolVariableExpression
+  | '(' boolExpr ')' # BoolParanthExpression
+  | callStmt # BoolCallStatementExpression
+
+  | 'cast' numExpr 'to' 'boolean' # NumAsBoolExpression
+  | 'cast' stringExpr 'to' 'boolean' # StringAsBoolExpression
+
+  | 'not'  boolExpr # NegatedBoolExpression
+  | boolExpr  'and'  boolExpr # BoolAndExpression
+  | boolExpr  'or'  boolExpr # BoolOrExpression
+
+  | numOrStringExpr  '>='  numOrStringExpr # GreaterEqualExpression
+  | numOrStringExpr  '>'  numOrStringExpr # GreaterThanExpression
+  | numOrStringExpr  '<'  numOrStringExpr # LessThanExpression
+  | numOrStringExpr  '<='  numOrStringExpr # LessEqualExpression
+  | numOrStringExpr  '='  numOrStringExpr # EqualsExpression
+
+  | stringExpr  'contains'  stringExpr # StrContainsExpression
+
+  | 'default' Boolean 'for' boolExpr # DefaultBoolExpression
+  | '?bool' # UnspecifiedBoolExpression
+  ;
+
+numOrStringExpr :
+  numExpr # NumberExpression
+  | stringExpr # StringExpression
+  ;
+
+numExpr  :
+  number # NumLiteralExpression
+  | variable # NumVariableExpression
+  | '(' numExpr ')' # NumBrackets
+  | callStmt # NumCallStatementExpression
+
+  | 'cast' stringExpr 'to' 'float' # StringToFloatExpression
+  | 'cast' stringExpr 'to' 'int' # StringToIntExpression
+  | 'cast' boolExpr 'to' 'int' # BoolToIntExpression
+  | 'cast' numExpr 'to' 'float' # NumToFloatExpression
+  | 'cast' numExpr 'to' 'int' # NumToIntExpression
+
+  | 'timer' # TimerExpression
+
+  | 'length' 'of' stringExpr # LengthOfStringExpression
+  | 'length' 'of' 'list' variable # LengthOfListExpression
+  | 'index' 'of' expression 'in' variable # IndexOfExpression
+
+  | numExpr  '*'  numExpr # NumMulExpression
+  | numExpr  '/'  numExpr # NumDivExpression
+  | numExpr  'mod'  numExpr # NumModExpression
+  | numExpr  '+'  numExpr # NumPlusExpression
+  | numExpr  '-'  numExpr # NumMinusExpression
+
+  | 'default' number 'for' numExpr # DefaultNumExpr
+  | '?number' # UnspecifiedNumExpr
+  ;
+
+listExpr :
+  variable # ListVariableExpression
+  |  '[' expressionListPlain ']' # ListWithElementsExpression
+  ;
+
+actorExpr:
+  variable # ActorVariableExpression
+  | 'locate' 'actor' stringExpr # LocateActorExpression
+  | 'start' 'clone' 'of' actorExpr # StartCloneActorExpression
+  | 'start' 'actor' stringExpr 'as' ident # UsherActorExpression
+  ;
+
+expression :
+  stringExpr
+  | numExpr
+  | boolExpr
+  | listExpr
+  | actorExpr
+
+  | unspecifiedExpr
+  ;
 
 // This type of expression is used to allow for representing
 // Scratch programs for that not all expressions have been specified
@@ -379,23 +354,25 @@ coreExpression :
 unspecifiedExpr : '?expr' ;
 
 variable :
-      ident # FlatVariable
-    | ident '.' ident # QualifiedVariable;
+  ident # FlatVariable
+  | ident '.' ident # QualifiedVariable
+  ;
 
 ident :
-    Identifier # IdentExpression
-    | 'strid' String # StrIdentExpression
-    ;
+  Identifier # IdentExpression
+  | 'strid' String # StrIdentExpression
+  ;
 
 number :
-    IntegerLiteral # IntegerLiteralExpression
-    | DecimalLiteral # DecimalLiteralExpression
- ;
+  IntegerLiteral # IntegerLiteralExpression
+  | DecimalLiteral # DecimalLiteralExpression
+  ;
 
 Boolean : Bool ;
 
 resourceLocator : String ;
 
-message : stringExpr # UserMessage
-    | String '/' stringExpr expressionList # SystemMessage
-    ;
+message :
+  stringExpr # UserMessage
+  | String '/' stringExpr expressionList # SystemMessage
+  ;

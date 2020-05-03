@@ -24,6 +24,7 @@ import {NumIntervalValue} from "../procedures/domains/NumIntervalValueDomain";
 import {OperationId, ProgramOperation} from "../syntax/app/controlflow/ops/ProgramOperation";
 import {ImplementMeException} from "../core/exceptions/ImplementMeException";
 import {ConcreteNumber} from "../procedures/domains/ConcreteElements";
+import {EndAtomicStatement} from "../syntax/ast/core/statements/ControlStatement";
 
 /**
  * A STATIC time profile for a given program operation.
@@ -56,13 +57,18 @@ export class StaticTimeProfile implements ProgramTimeProfile {
     private readonly _opTimes: Map<OperationId, OperationTimeProfile>;
 
     private readonly _avgOpProfile: OperationTimeProfile;
+    private readonly _avgAtomicBlockProfile: OperationTimeProfile;
 
     constructor() {
         this._opTimes = new Map();
         this._avgOpProfile = new OperationTimeProfile(
             new NumIntervalValue(
-                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 50),
-                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 150)));
+                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 10),
+                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 1000)));
+        this._avgAtomicBlockProfile = new OperationTimeProfile(
+            new NumIntervalValue(
+                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 100),
+                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 10000)));
     }
 
     public widen(op: ProgramOperation, minNanos: number, maxNanos: number) {
@@ -70,7 +76,11 @@ export class StaticTimeProfile implements ProgramTimeProfile {
     }
 
     public getOpProfile(op: ProgramOperation): OperationTimeProfile {
-        return this._avgOpProfile;
+        if (op.ast instanceof EndAtomicStatement) {
+            return this._avgAtomicBlockProfile;
+        } else {
+            return this._avgOpProfile;
+        }
     }
 
 }
