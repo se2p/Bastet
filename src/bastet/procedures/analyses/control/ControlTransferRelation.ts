@@ -1079,7 +1079,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             (op) => {return this.scopeOperations([op], state.getActorScopes(),
                 conditionScopeStack, conditionScopeStack)[0]});
 
-        return checkResult.filter((([e, t]) => Lattices.isFeasible(e, this._wrappedDomain.lattice)));
+        return checkResult.filter((([e, t]) => Lattices.isFeasible(e, this._wrappedDomain.lattice, "Condition Check")));
     }
 
     private restartThread(baseState: ControlAbstractState, threadIndex: number): ControlAbstractState {
