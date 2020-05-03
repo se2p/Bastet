@@ -32,6 +32,16 @@ test("Test pointTowards 1 unsafe", done => {
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
+test("Test pointTowardsPos 1 safe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-pointTowards-1_SAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
+test("Test pointTowardsPos 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-pointTowards-1_UNSAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
 test("Test moveSteps 1 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-moveSteps-1_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);

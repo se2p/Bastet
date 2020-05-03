@@ -983,6 +983,20 @@ role ScratchSprite is ScratchEntity begin
          end
     end
 
+
+    define atomic pointTowardsPos(targetX: int, targetY: int) begin
+       declare dx as float
+       declare dy as float
+       define dx as cast (targetX - x) to float
+       define dy as cast (targetY - y) to float
+
+       if dx = 0.0 and dy = 0.0 then begin
+           define direction as 90
+        end else begin
+           define direction as cast radToDeg(mathAtan2(dy, dx)) to int
+        end
+    end
+
     define atomic pointTowardsSelf() begin
     end
 
