@@ -1096,66 +1096,85 @@ role ScratchSprite is ScratchEntity begin
     end returns result : boolean
 
     // @Category "Sensing"
-    define atomic touchingObject (obj: actor) begin
-        declare size_fst as float
-        declare width as float
-        declare height as float
+    define atomic touchingObject (snd: actor) begin
+            declare x_fst as int
+            define x_fst as x
+            declare y_fst as int
+            define y_fst as y
 
-        // TODO: Query attributes of myself and the other actor
-        define width as cast active_graphic_width to float
-        define height as cast active_graphic_height to float
-        define size_fst as cast size to float
+            assume x_fst < 720
+            assume x_fst > 0-720
+            assume y_fst < 720
+            assume y_fst > 0-720
 
-        define width as width * (size_fst / 100.0)
-        define height as height * (size_fst / 100.0)
+            declare x_snd as int
+            define x_snd as cast attribute "x" of snd to int
+            declare y_snd as int
+            define y_snd as cast attribute "y" of snd to int
 
-        declare size_snd as float
-        declare width_other as float
-        declare height_other as float
-        define width_other as cast (cast attribute "active_graphic_width" of obj to int) to float
-        define height_other as cast (cast attribute "active_graphic_height" of obj to int) to float
+            assume x_snd <= 720
+            assume x_snd >= 0-720
+            assume y_snd <= 720
+            assume y_snd >= 0-720
 
-        define size_snd as cast (cast attribute "size" of obj to int) to float
-        define width_other as width_other * (size_snd / 100.0)
-        define height_other as height_other * (size_snd / 100.0)
+            declare width_fst as int
+            declare height_fst as int
+            define width_fst as active_graphic_width
+            define height_fst as active_graphic_height
 
-        declare x_other as float
-        define x_other as cast (cast attribute "x" of obj to int) to float
-        declare y_other as float
-        define y_other as cast (cast attribute "y" of obj to int) to float
+            declare size_fst as float
+            define size_fst as cast size to float
+            assume size_fst > 0.0
+            assume size_fst < 1000.0
 
-        declare x_this as float
-        define x_this as cast x to float
-        declare y_this as float
-        define y_this as cast y to float
+            declare width_snd as int
+            declare height_snd as int
+            define width_snd as cast attribute "active_graphic_width" of snd to int
+            define height_snd as cast attribute "active_graphic_height" of snd to int
 
-        define result as false
+            declare size_snd as float
+            define size_snd as cast (cast attribute "size" of snd to int) to float
+            assume size_snd > 0.0
+            assume size_snd < 16000.0
 
-        declare condOne as boolean
-        declare condTwo as boolean
-        declare condThree as boolean
-        declare condFour as boolean
-        declare condFive as boolean
+            define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
+            define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
 
-        assume width_other < 1000.0
-        assume width_other > 0.0
-        assume width < 1000.0
-        assume width > 0.0
-        assume height_other < 1000.0
-        assume height_other > 0.0
-        assume height < 1000.0
-        assume height > 0.0
+            define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
+            define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
 
-        define condOne as (x_this + width / 2.0 > x_other - width_other / 2.0 and y_this + height / 2.0 > y_other - height_other / 2.0)
-        define condTwo as (x_this - width / 2.0 < x_other + width_other / 2.0 and  y_this + height / 2.0 > y_other - height_other / 2.0)
-        define condThree as (x_other + width_other / 2.0 > x_this - width / 2.0 and y_other + height_other / 2.0 > y_this - height / 2.0)
-        define condFour as (x_other - width_other / 2.0 < x_this + width / 2.0 and  y_other + height_other / 2.0 > y_this - height / 2.0)
-        define condFive as (x_this = x_other and y_this = y_other)
+            define width_fst as width_fst / 2
+            define width_snd as width_snd / 2
+            define height_fst as height_fst / 2
+            define height_snd as height_snd / 2
 
-        if (condOne or condTwo or condThree or condFour or condFive) then begin
-            define result as true
-        end
+            define result as false
 
+            declare condOne as boolean
+            declare condTwo as boolean
+            declare condThree as boolean
+            declare condFour as boolean
+            declare condFive as boolean
+
+            assume width_snd <= 720
+            assume width_snd > 0
+            assume width_fst < 720
+            assume width_fst > 0
+
+            assume height_snd <= 720
+            assume height_snd > 0
+            assume height_fst <= 720
+            assume height_fst > 0
+
+            define condOne as (x_fst + width_fst > x_snd - width_snd and y_fst + height_fst > y_snd - height_snd)
+            define condTwo as (x_fst - width_fst < x_snd + width_snd and  y_fst + height_fst > y_snd - height_snd)
+            define condThree as (x_snd + width_snd > x_fst - width_fst and y_snd + height_snd > y_fst - height_fst)
+            define condFour as (x_snd - width_snd < x_fst + width_fst and  y_snd + height_snd > y_fst - height_fst)
+            define condFive as (x_fst = x_snd and y_fst = y_snd)
+
+            if (condOne or condTwo or condThree or condFour or condFive) then begin
+                define result as true
+            end
     end returns result : boolean
 
     // @Category "Sensing"
