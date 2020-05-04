@@ -36,9 +36,7 @@ actor CatObserver is Observer begin
     declare last_touch as int
     declare last_msg as int
 
-    define atomic isBehaviorSatisfied () begin
-        define result as true
-
+    define atomic checkBehaviorSatisfied () begin
         if touchingObjects(cat_id, ball_id) then begin
             define last_touch as _RUNTIME_micros()
         end
@@ -48,10 +46,9 @@ actor CatObserver is Observer begin
         end
 
         if last_msg - last_touch > 200000 then begin
-            define result as false
+            _RUNTIME_signalFailure("There should be a message if the ball is touched by the cat.")
         end
-
-    end returns result: boolean
+    end
 
     define atomic storeRelevantStateInfosForNext () begin
 
@@ -68,7 +65,7 @@ actor CatObserver is Observer begin
         define last_msg as 0
 
         // First specification check (base condition)
-        assert(isBehaviorSatisfied())
+        checkBehaviorSatisfied()
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
@@ -76,7 +73,7 @@ actor CatObserver is Observer begin
 
     script on statement finished do begin
         // The actual specification check
-        assert(isBehaviorSatisfied())
+        checkBehaviorSatisfied()
 
         // Store the relevant attributes
         storeRelevantStateInfosForNext()
