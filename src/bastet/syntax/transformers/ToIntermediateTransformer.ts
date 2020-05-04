@@ -1422,7 +1422,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitCloneStartEvent(ctx: CloneStartEventContext) : TransformerResult {
-        return TransformerResult.withNode(new CloneStartEvent());
+        return TransformerResult.withNode(CloneStartEvent.instance());
     }
 
     public visitConditionReachedEvent(ctx: ConditionReachedEventContext) : TransformerResult {
@@ -1606,23 +1606,23 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitNeverEvent(ctx: NeverEventContext) : TransformerResult {
-        return TransformerResult.withNode(new NeverEvent());
+        return TransformerResult.withNode(NeverEvent.instance());
     }
 
     public visitRenderedMonitoringEvent(ctx: RenderedMonitoringEventContext) : TransformerResult {
-        return TransformerResult.withNode(new RenderedMonitoringEvent());
+        return TransformerResult.withNode(RenderedMonitoringEvent.instance());
     }
 
     public visitBootstapEvent(ctx: BootstapEventContext) : TransformerResult {
-        return TransformerResult.withNode(new BootstrapEvent());
+        return TransformerResult.withNode(BootstrapEvent.instance());
     }
 
     public visitAfterBootstrapMonitoringEvent(ctx: AfterBootstrapMonitoringEventContext) : TransformerResult {
-        return TransformerResult.withNode(new AfterBootstrapMonitoringEvent());
+        return TransformerResult.withNode(AfterBootstrapMonitoringEvent.instance());
     }
 
     public visitAfterStatementMonitoringEvent(ctx: AfterStatementMonitoringEventContext) : TransformerResult {
-        return TransformerResult.withNode(new AfterStatementMonitoringEvent());
+        return TransformerResult.withNode(AfterStatementMonitoringEvent.instance());
     }
 
     public visitNumAsStringExpression(ctx: NumAsStringExpressionContext) : TransformerResult {
@@ -1680,7 +1680,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitStartupEvent(ctx: StartupEventContext) : TransformerResult {
-        return TransformerResult.withNode(new StartupEvent());
+        return TransformerResult.withNode(StartupEvent.instance());
     }
 
     public visitStopAll(ctx: StopAllContext) : TransformerResult {

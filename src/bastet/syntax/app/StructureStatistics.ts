@@ -24,7 +24,7 @@
 import {AnalysisStatistics} from "../../procedures/analyses/AnalysisStatistics";
 import {App} from "./App";
 import {Preconditions} from "../../utils/Preconditions";
-import {BootstrapEvent, NeverEvent} from "../ast/core/CoreEvent";
+import {BootstrapEvent, NeverEvent, TerminationEvent} from "../ast/core/CoreEvent";
 import {Concern, Concerns} from "../Concern";
 
 export class StructureStatistics {
@@ -47,9 +47,11 @@ export class StructureStatistics {
                 if (script.transitions.transitions.size > 0) {
                     if (script.event != NeverEvent.instance()) {
                         if (script.event != BootstrapEvent.instance()) {
-                            nonEmptyScripts++;
-                            nonEmptyActorScripts++;
-                            maxUserScriptTransitions = Math.max(maxUserScriptTransitions, script.transitions.transitions.size);
+                            if (script.event != TerminationEvent.instance()) {
+                                nonEmptyScripts++;
+                                nonEmptyActorScripts++;
+                                maxUserScriptTransitions = Math.max(maxUserScriptTransitions, script.transitions.transitions.size);
+                            }
                         }
                     }
                 }
