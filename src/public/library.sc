@@ -557,9 +557,9 @@ role MathActor begin
 
         if not (num = result) then begin
             // Three iterations of newton
-            define result as (result + (num /result)) / 2.0
-            define result as (result + (num /result)) / 2.0
-            define result as (result + (num /result)) / 2.0
+            define result as (result + (num / result)) / 2.0
+            define result as (result + (num / result)) / 2.0
+            define result as (result + (num / result)) / 2.0
         end
     end returns result: float
 
@@ -819,16 +819,16 @@ extern _RUNTIME_getInitialActors () returns list of string
         define x as cast attribute "x" of obj to int
         define y as cast attribute "y" of obj to int
 
-        declare width as int
-        declare height as int
-        define width as cast attribute "active_graphic_width" of obj to int
-        define height as cast attribute "active_graphic_height" of obj to int
+        declare half_width as int
+        declare half_height as int
+        define half_width as cast attribute "active_graphic_half_width" of obj to int
+        define half_height as cast attribute "active_graphic_half_height" of obj to int
 
         define result as true
-        if not (getMouseX() < x + width / 2
-            or getMouseX() > x - width / 2
-            or getMouseY() < y + height / 2
-            or getMouseY() > y - height / 2) then begin
+        if not (getMouseX() < x + half_width
+            or getMouseX() > x - half_width
+            or getMouseY() < y + half_height
+            or getMouseY() > y - half_height) then begin
 
             define result as false
         end
@@ -872,8 +872,8 @@ role ScratchEntity is RuntimeEntity begin
         define active_graphic_width as getImageWidth(id)
         define active_graphic_height as getImageHeight(id)
 
-        define active_graphic_width as getImageWidth(id) / 2
-        define active_graphic_height as getImageHeight(id) / 2
+        define active_graphic_half_width as getImageWidth(id) / 2
+        define active_graphic_half_height as getImageHeight(id) / 2
         //FIXME Set graphic pixels, this is currently not done as we do not supports lists yet
     end
 
