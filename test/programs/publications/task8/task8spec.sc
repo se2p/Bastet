@@ -31,49 +31,46 @@ actor CatObserver is Observer begin
 
     declare cat_id as actor
     declare ball_id as actor
-    declare actors_touching as boolean
 
-    declare last_touch as int
-    declare last_msg as int
+    declare state as int
+    declare state_enter_time as int
 
     define atomic checkBehaviorSatisfied () begin
-        if touchingObjects(cat_id, ball_id) then begin
-            define last_touch as _RUNTIME_micros()
+        if state = 0 then begin
+            declare touch as boolean
+            define touch as touchingObjects(cat_id, ball_id)
+
+            if touch then begin
+                define state as 1
+                define state_enter_time as _RUNTIME_micros()
+            end
+        end else if state = 1 then begin
+            declare msg as boolean
+            define msg as length of (attribute "bubbleText" of cat_id) > 0
+
+            if msg then begin
+                define state as 0
+                define state_enter_time as _RUNTIME_micros()
+            end else begin
+                if _RUNTIME_micros() - state_enter_time > 200000 then begin
+                    _RUNTIME_signalFailure("There should be a message if the ball is touched by the cat.")
+                end
+            end
         end
-
-        if length of (attribute "bubbleText" of cat_id) > 0 then begin
-            define last_msg as _RUNTIME_micros()
-        end
-
-        if last_msg - last_touch > 200000 then begin
-            _RUNTIME_signalFailure("There should be a message if the ball is touched by the cat.")
-        end
-    end
-
-    define atomic storeRelevantStateInfosForNext () begin
-
     end
 
     script on bootstrap finished do begin
         define cat_id as locate actor "Katze"
         define ball_id as locate actor "Ball"
 
-        define last_touch as 0
-        define last_msg as 0
+        define state as 0
+        define state_enter_time as _RUNTIME_micros()
 
-        // First specification check (base condition)
         checkBehaviorSatisfied()
-
-        // Store the relevant attributes
-        storeRelevantStateInfosForNext()
     end
 
     script on statement finished do begin
-        // The actual specification check
         checkBehaviorSatisfied()
-
-        // Store the relevant attributes
-        storeRelevantStateInfosForNext()
     end
 
 end
