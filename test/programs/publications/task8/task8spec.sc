@@ -54,9 +54,6 @@ actor CatObserver is Observer begin
 
     end
 
-    script on bootstrap do begin
-    end
-
     script on bootstrap finished do begin
         define cat_id as locate actor "Katze"
         define ball_id as locate actor "Ball"
