@@ -758,34 +758,29 @@ extern _RUNTIME_getInitialActors () returns list of string
 
         declare width_fst as int
         declare height_fst as int
-        define width_fst as cast attribute "active_graphic_width" of fst to int
-        define height_fst as cast attribute "active_graphic_height" of fst to int
+        define width_fst as cast attribute "active_graphic_half_width" of fst to int
+        define height_fst as cast attribute "active_graphic_half_height" of fst to int
 
-        declare size_fst as float
-        define size_fst as cast (cast attribute "size" of fst to int) to float
-        assume size_fst > 0.0
-        assume size_fst < 1000.0
+//        declare size_fst as float
+//        define size_fst as cast (cast attribute "size" of fst to int) to float
+//        assume size_fst > 0.0
+//        assume size_fst < 1000.0
 
         declare width_snd as int
         declare height_snd as int
-        define width_snd as cast attribute "active_graphic_width" of snd to int
-        define height_snd as cast attribute "active_graphic_height" of snd to int
+        define width_snd as cast attribute "active_graphic_half_width" of snd to int
+        define height_snd as cast attribute "active_graphic_half_height" of snd to int
 
-        declare size_snd as float
-        define size_snd as cast (cast attribute "size" of snd to int) to float
-        assume size_snd > 0.0
-        assume size_snd < 16000.0
-
-        define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
-        define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
-
-        define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
-        define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
-
-        define width_fst as width_fst / 2
-        define width_snd as width_snd / 2
-        define height_fst as height_fst / 2
-        define height_snd as height_snd / 2
+//        declare size_snd as float
+//        define size_snd as cast (cast attribute "size" of snd to int) to float
+//        assume size_snd > 0.0
+//        assume size_snd < 16000.0
+//
+//        define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
+//        define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
+//
+//        define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
+//        define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
 
         define result as false
 
@@ -853,6 +848,9 @@ role ScratchEntity is RuntimeEntity begin
     declare active_graphic_width as int
     declare active_graphic_height as int
 
+    declare active_graphic_half_width as int
+    declare active_graphic_half_height as int
+
     declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
     declare color_effect_value as float
     declare fisheye_effect_value as float
@@ -873,6 +871,9 @@ role ScratchEntity is RuntimeEntity begin
         define active_graphic_name as id
         define active_graphic_width as getImageWidth(id)
         define active_graphic_height as getImageHeight(id)
+
+        define active_graphic_width as getImageWidth(id) / 2
+        define active_graphic_height as getImageHeight(id) / 2
         //FIXME Set graphic pixels, this is currently not done as we do not supports lists yet
     end
 
@@ -1119,34 +1120,29 @@ role ScratchSprite is ScratchEntity begin
 
             declare width_fst as int
             declare height_fst as int
-            define width_fst as active_graphic_width
-            define height_fst as active_graphic_height
+            define width_fst as active_graphic_half_width
+            define height_fst as active_graphic_half_height
 
-            declare size_fst as float
-            define size_fst as cast size to float
-            assume size_fst > 0.0
-            assume size_fst < 1000.0
+//            declare size_fst as float
+//            define size_fst as cast size to float
+//            assume size_fst > 0.0
+//            assume size_fst < 1000.0
 
             declare width_snd as int
             declare height_snd as int
-            define width_snd as cast attribute "active_graphic_width" of snd to int
-            define height_snd as cast attribute "active_graphic_height" of snd to int
+            define width_snd as cast attribute "active_graphic_half_width" of snd to int
+            define height_snd as cast attribute "active_graphic_half_height" of snd to int
 
-            declare size_snd as float
-            define size_snd as cast (cast attribute "size" of snd to int) to float
-            assume size_snd > 0.0
-            assume size_snd < 16000.0
+//            declare size_snd as float
+//            define size_snd as cast (cast attribute "size" of snd to int) to float
+//            assume size_snd > 0.0
+//            assume size_snd < 16000.0
 
-            define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
-            define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
-
-            define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
-            define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
-
-            define width_fst as width_fst / 2
-            define width_snd as width_snd / 2
-            define height_fst as height_fst / 2
-            define height_snd as height_snd / 2
+//            define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
+//            define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
+//
+//            define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
+//            define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
 
             define result as false
 
