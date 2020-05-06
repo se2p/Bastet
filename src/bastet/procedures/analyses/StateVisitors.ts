@@ -31,6 +31,9 @@ import {App} from "../../syntax/app/App";
 import {Preconditions} from "../../utils/Preconditions";
 import {CorePrintVisitor} from "../../syntax/ast/CorePrintVisitor";
 import {TimeState} from "./time/TimeAbstractDomain";
+import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
+import {Map as ImmMap} from "immutable";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 export class StateLabelVisitor implements AbstractStateVisitor<string> {
 
@@ -111,4 +114,30 @@ export class PenSizeVisitor extends DelegatingStateVisitor<number> {
 
 }
 
+export class SSAMapVisitor implements AbstractStateVisitor<ImmMap<string, number>> {
 
+    visit(element: AbstractElement): ImmMap<string, number> {
+        throw new ImplementMeForException(element.constructor.name);
+    }
+
+    visitControlAbstractState(element: ControlAbstractState): ImmMap<string, number> {
+        return element.wrappedState.accept(this);
+    }
+
+    visitDataAbstractState(element: DataAbstractState): ImmMap<string, number> {
+        throw new IllegalArgumentException("Abstract state didnt contain SSAState");
+    }
+
+    visitGraphAbstractState(element: GraphAbstractState): ImmMap<string, number> {
+        return element.wrappedState.accept(this);
+    }
+
+    visitSSAState(element: SSAState): ImmMap<string, number> {
+        return element.getSSA();
+    }
+
+    visitTimeState(element: TimeState): ImmMap<string, number> {
+        return element.wrappedState.accept(this);
+    }
+
+}
