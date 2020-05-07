@@ -64,7 +64,7 @@ export interface ControlConcreteState {
 
 }
 
-export interface ScriptLocationAttributes {
+export interface RelationLocationAttributes {
 
     /** Unique identifier of the actor */
     actor: ActorId;
@@ -83,7 +83,7 @@ const RelationLocationRecord = ImmRec({
     location: 0
 });
 
-export class RelationLocation extends RelationLocationRecord implements ScriptLocationAttributes {
+export class RelationLocation extends RelationLocationRecord implements RelationLocationAttributes {
 
     constructor(actor: ActorId, relation: TransRelId, location: LocationId) {
         super({actor: actor, relation: relation, location: location});
