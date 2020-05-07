@@ -82,7 +82,7 @@ actor DirectorObserver is Observer begin
         define director_towards_monkey as director_x_towards_monkey or director_y_towards_monkey
 
         declare director_at_monkey as boolean
-        define director_at_monkey as touchingObjects(director, monkey)
+        define director_at_monkey as not (areDisjoint(director, monkey))
 
         if director_towards_monkey or director_at_monkey then begin
            define last_move_towards as _RUNTIME_micros()
@@ -94,7 +94,7 @@ actor DirectorObserver is Observer begin
         end
 
         // Store information for the next step
-        define director_last_x as director_x 
+        define director_last_x as director_x
         define director_last_y as director_y
 
         define monkey_last_x as monkey_x
