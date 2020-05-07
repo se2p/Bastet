@@ -41,3 +41,13 @@ test("Test touchingObjects 1 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObjects-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
+
+test("Test touchingObject 2 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObject-2_UNSAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
+
+test("Test isDisjointFrom 1 unsafe", done => {
+    const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-isDisjointFrom-1_UNSAFE.sc"
+    utils.execFixture(fixtureRelPath, done);
+}, utils.timeout);
