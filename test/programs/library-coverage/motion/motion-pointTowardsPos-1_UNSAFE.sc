@@ -9,8 +9,8 @@ actor ActorB is ScratchSprite begin
         pointTowardsPos(0,0)
 
         if (direction < 185 or direction > 175)  then begin
-        end else begin
             _RUNTIME_signalFailure("pointTowardsTest")
+        end else begin
         end
     end
 

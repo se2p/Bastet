@@ -994,23 +994,13 @@ role ScratchSprite is ScratchEntity begin
     //
 
     define atomic pointTowards (s: actor) begin
-        // Todo what about random?
         declare targetX as int
         declare targetY as int
 
         define targetX as cast (attribute "x" of s) to int
         define targetY as cast (attribute "y" of s) to int
 
-        declare dx as float
-        declare dy as float
-        define dx as cast (targetX - x) to float
-        define dy as cast (targetY - y) to float
-
-        if dx = 0.0 and dy = 0.0 then begin
-            define direction as 90
-         end else begin
-            define direction as cast radToDeg(mathAtan2(dy, dx)) to int
-         end
+        pointTowardsPos(targetX, targetY)
     end
 
 
