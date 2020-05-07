@@ -88,7 +88,7 @@ export class App {
     }
 
     get nonBootActors(): Actor[] {
-        return Maps.values(this.actorMap).filter((a) => !a.isBootstrapper);
+        return Maps.values(this.actorMap).filter((a) => !a.isBootstrapper && !a.isTerminator);
     }
 
     get systemVariables(): SystemVariables {
