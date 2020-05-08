@@ -22,7 +22,7 @@
 
 
 import {WitnessHandler} from "../../WitnessHandlers";
-import {GraphAbstractState, GraphConcreteState} from "../GraphAbstractDomain";
+import {GraphAbstractState} from "../GraphAbstractDomain";
 import {ReachedSet} from "../../../algorithms/StateSet";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {GraphReachedSetWrapper} from "../GraphStatesSetWrapper";
@@ -35,12 +35,14 @@ import {ConcreteMemory, ConcretePrimitive} from "../../../domains/ConcreteElemen
 import {IllegalArgumentException} from "../../../../core/exceptions/IllegalArgumentException";
 import {SSAMapVisitor} from "../../StateVisitors";
 import {Map as ImmMap} from "immutable";
+import {GraphAnalysis} from "../GraphAnalysis";
+import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
-    private readonly _analysis: ProgramAnalysis<GraphConcreteState, GraphAbstractState, GraphAbstractState>;
+    private readonly _analysis: GraphAnalysis;
 
-    constructor(analysis: ProgramAnalysis<GraphConcreteState, GraphAbstractState, GraphAbstractState>) {
+    constructor(analysis: GraphAnalysis) {
         this._analysis = analysis;
     }
 
@@ -53,6 +55,9 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             .toArray()
             .map(property => property.getText);
 
+        let previousState;
+        const visitor = new CorePrintVisitor();
+
         for (const graphAbstractState of counterExample.path.states) {
             const step = new ErrorWitnessStep();
             const ssaMap = WitnessExporter.mapToSSAMap(graphAbstractState);
@@ -64,17 +69,23 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                 step.targets.push(target);
             })
 
+            if (previousState) {
+                step.action = this._analysis.getTransitionLabel(previousState, graphAbstractState)
+                    .map(o => o.ast.accept(visitor)).join(";");
+            }
+
             errorWitness.steps.push(step);
+            previousState = graphAbstractState;
         }
 
-        WitnessExporter.removeDuplicateSteps(errorWitness.steps);
+        WitnessExporter.removeSteps(errorWitness.steps, [WitnessExporter.isStepDuplicate, WitnessExporter.isStepEmpty])
 
         this.exportErrorWitness(errorWitness);
     }
 
     private mapGraphAbstractStateToDataConcreteState(graphAbstractState: GraphAbstractState): ConcreteMemory {
         // TODO get GraphConcreteState and implement ConcreteStateVisitor in order to get DataConcreteState(?)
-        let analysis = this._analysis;
+        let analysis: ProgramAnalysis<any, any, any> = this._analysis;
         while (!(analysis instanceof DataAnalysis)) {
             analysis = analysis['_wrappedAnalysis'];
         }
@@ -162,16 +173,28 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return graphAbstractState.accept(new SSAMapVisitor());
     }
 
-    private static removeDuplicateSteps(steps: ErrorWitnessStep[]): void {
+    private static isStepEmpty(errorWitness: ErrorWitnessStep): boolean {
+        return errorWitness.targets.length === 0 && !errorWitness.action;
+    }
+
+    private static isStepDuplicate(errorWitness: ErrorWitnessStep, other: ErrorWitnessStep): boolean {
+        return !WitnessExporter.xor(!errorWitness, !other) && JSON.stringify(errorWitness.targets) === JSON.stringify(other.targets);
+    }
+
+    private static xor(a: boolean, b: boolean): boolean {
+        return (a && !b) || (!a && b);
+    }
+
+    private static removeSteps(steps: ErrorWitnessStep[], predicates: ((errorWitness: ErrorWitnessStep, prev: ErrorWitnessStep) => boolean)[]): void {
         const stepsToRemove = [];
 
-        let previousStep = "";
+        let previousStep;
         for (const step of steps) {
-            const stepJSON = JSON.stringify(step);
-            if (previousStep === stepJSON) {
+            if (predicates.some((predicate) => predicate(step, previousStep))) {
                 stepsToRemove.push(step);
             }
-            previousStep = stepJSON;
+
+            previousStep = step;
         }
 
         for (const stepToRemove of stepsToRemove) {
