@@ -114,29 +114,29 @@ export class PenSizeVisitor extends DelegatingStateVisitor<number> {
 
 }
 
-export class SSAMapVisitor implements AbstractStateVisitor<ImmMap<string, number>> {
+export class SSAStateVisitor implements AbstractStateVisitor<SSAState> {
 
-    visit(element: AbstractElement): ImmMap<string, number> {
+    visit(element: AbstractElement): SSAState {
         throw new ImplementMeForException(element.constructor.name);
     }
 
-    visitControlAbstractState(element: ControlAbstractState): ImmMap<string, number> {
+    visitControlAbstractState(element: ControlAbstractState): SSAState {
         return element.wrappedState.accept(this);
     }
 
-    visitDataAbstractState(element: DataAbstractState): ImmMap<string, number> {
+    visitDataAbstractState(element: DataAbstractState): SSAState {
         throw new IllegalArgumentException("Abstract state didnt contain SSAState");
     }
 
-    visitGraphAbstractState(element: GraphAbstractState): ImmMap<string, number> {
+    visitGraphAbstractState(element: GraphAbstractState): SSAState {
         return element.wrappedState.accept(this);
     }
 
-    visitSSAState(element: SSAState): ImmMap<string, number> {
-        return element.getSSA();
+    visitSSAState(element: SSAState): SSAState {
+        return element;
     }
 
-    visitTimeState(element: TimeState): ImmMap<string, number> {
+    visitTimeState(element: TimeState): SSAState {
         return element.wrappedState.accept(this);
     }
 

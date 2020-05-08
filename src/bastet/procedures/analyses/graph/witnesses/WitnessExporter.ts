@@ -33,7 +33,7 @@ import {DataAnalysis} from "../../data/DataAnalysis";
 import {DataAbstractState} from "../../data/DataAbstractDomain";
 import {ConcreteMemory, ConcretePrimitive} from "../../../domains/ConcreteElements";
 import {IllegalArgumentException} from "../../../../core/exceptions/IllegalArgumentException";
-import {SSAMapVisitor} from "../../StateVisitors";
+import {SSAStateVisitor} from "../../StateVisitors";
 import {Map as ImmMap} from "immutable";
 import {GraphAnalysis} from "../GraphAnalysis";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
@@ -56,29 +56,30 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             .map(property => property.getText);
 
         let previousState;
-        const visitor = new CorePrintVisitor();
+        const labelPrintVisitor = new CorePrintVisitor();
+        const ssaStateVisitor = new SSAStateVisitor();
 
         for (const graphAbstractState of counterExample.path.states) {
             const step = new ErrorWitnessStep();
-            const ssaMap = WitnessExporter.mapToSSAMap(graphAbstractState);
-            const memoryInStep = WitnessExporter.filterBySSAMap(errorState, ssaMap);
+            const ssaState = graphAbstractState.accept(ssaStateVisitor);
+            const memoryInStep = ssaState.getPrimitiveAttributes(errorState);
             const targetStates = WitnessExporter.groupByTargets(memoryInStep);
 
             targetStates.forEach((state, targetName) => {
-                const target = WitnessExporter.mapToTarget(targetName, state);
+                const target = Target.fromConcretePrimitives(targetName, state);
                 step.targets.push(target);
             })
 
             if (previousState) {
                 step.action = this._analysis.getTransitionLabel(previousState, graphAbstractState)
-                    .map(o => o.ast.accept(visitor)).join(";");
+                    .map(o => o.ast.accept(labelPrintVisitor)).join(";");
             }
 
             errorWitness.steps.push(step);
             previousState = graphAbstractState;
         }
 
-        WitnessExporter.removeSteps(errorWitness.steps, [WitnessExporter.isStepDuplicate, WitnessExporter.isStepEmpty])
+        errorWitness.steps = errorWitness.steps.filter(witness => !witness.isEmpty());
 
         this.exportErrorWitness(errorWitness);
     }
@@ -100,18 +101,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return dataAnalysis.abstractDomain.concretizeOne(dataAbstractState);
     }
 
-    private static mapToTarget(name: string, attributes: Map<string, ConcretePrimitive<any>>): Target {
-        const targetObj = new Target();
-        targetObj.name = name;
-
-        attributes.forEach((value, name) => {
-            targetObj[name] = value.value;
-        })
-
-        return targetObj;
-    }
-
-    private static groupByTargets<T>(map: Map<string, T>): Map<string, Map<string, T>> {
+    private static groupByTargets<T>(map: ImmMap<string, T>): Map<string, Map<string, T>> {
         const targets = new Map<string, Map<string, T>>();
 
         map.forEach((value, attributeWithTarget) => {
@@ -133,25 +123,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return targets;
     }
 
-    private static filterBySSAMap(memory: ConcreteMemory, ssaMap: ImmMap<string, number>): Map<string, ConcretePrimitive<any>> {
-        const attributes = new Map<string, ConcretePrimitive<any>>();
-
-        ssaMap.forEach((ssaIndex, attributeName) => {
-            const attributeWithIndex = `${attributeName}@${ssaIndex}`;
-
-            const attribute = memory.getPrimitiveAttributeByName(attributeWithIndex);
-
-            if (!attribute) {
-                // TODO why are attributes in SSAMap but not in memory?
-                // console.log(`${attributeWithIndex} was undefined`);
-            } else {
-                attributes.set(attributeName, attribute);
-            }
-        })
-
-        return attributes;
-    }
-
     private static mapToTargetName(attributeWithTargetName: string): {attribute: string, target: string} {
         const indexFirstAt = attributeWithTargetName.indexOf("@");
         const indexLastAt = attributeWithTargetName.lastIndexOf("@");
@@ -167,40 +138,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
     private static isTargetAttribute(attribute: string): boolean {
         return attribute.includes("@");
-    }
-
-    private static mapToSSAMap(graphAbstractState: GraphAbstractState): ImmMap<string, number> {
-        return graphAbstractState.accept(new SSAMapVisitor());
-    }
-
-    private static isStepEmpty(errorWitness: ErrorWitnessStep): boolean {
-        return errorWitness.targets.length === 0 && !errorWitness.action;
-    }
-
-    private static isStepDuplicate(errorWitness: ErrorWitnessStep, other: ErrorWitnessStep): boolean {
-        return !WitnessExporter.xor(!errorWitness, !other) && JSON.stringify(errorWitness.targets) === JSON.stringify(other.targets);
-    }
-
-    private static xor(a: boolean, b: boolean): boolean {
-        return (a && !b) || (!a && b);
-    }
-
-    private static removeSteps(steps: ErrorWitnessStep[], predicates: ((errorWitness: ErrorWitnessStep, prev: ErrorWitnessStep) => boolean)[]): void {
-        const stepsToRemove = [];
-
-        let previousStep;
-        for (const step of steps) {
-            if (predicates.some((predicate) => predicate(step, previousStep))) {
-                stepsToRemove.push(step);
-            }
-
-            previousStep = step;
-        }
-
-        for (const stepToRemove of stepsToRemove) {
-            const index = steps.indexOf(stepToRemove);
-            steps.splice(index, 1);
-        }
     }
 
     public extractCounterExample(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState): GraphSafetyCounterexample {
@@ -221,11 +158,27 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
 class Target {
     name: string;
+
+    static fromConcretePrimitives(name: string, attributes: Map<string, ConcretePrimitive<any>>) : Target {
+        const target = new Target();
+        target.name = name;
+
+        attributes.forEach((value, attribute) => {
+            target[attribute] = value.value;
+        })
+
+        return target;
+    }
 }
+
 
 class ErrorWitnessStep {
     action: string;
     targets: Target[] = [];
+
+    isEmpty(): boolean {
+        return !this.action || this.targets.length === 0;
+    }
 }
 
 class ErrorWitness {
