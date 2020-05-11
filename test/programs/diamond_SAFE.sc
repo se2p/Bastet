@@ -2,22 +2,22 @@ program Mini1Program
 
 actor MiniActor is RuntimeEntity begin
 
-    define inc (n: number) begin
+    define inc (n: int) begin
         define result as n + 1
-    end returns result: number
+    end returns result: int
 
-    define dec (n: number) begin
+    define dec (n: int) begin
         define result as n - 1
-    end returns result: number
+    end returns result: int
 
     script on startup do begin
-        declare x as number
-        declare y as number
-        declare z as number
+        declare x as int
+        declare y as int
+        declare z as int
 
-        declare a as number
-        declare b as number
-        declare c as number
+        declare a as int
+        declare b as int
+        declare c as int
 
         assume a > 0
         assume b > 0
