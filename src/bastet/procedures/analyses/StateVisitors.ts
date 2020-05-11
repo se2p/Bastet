@@ -31,6 +31,35 @@ import {App} from "../../syntax/app/App";
 import {Preconditions} from "../../utils/Preconditions";
 import {CorePrintVisitor} from "../../syntax/ast/CorePrintVisitor";
 import {TimeState} from "./time/TimeAbstractDomain";
+import {ControlLocationExtractor} from "./control/ControlUtils";
+
+export class PaperLabelVisitor extends DelegatingStateVisitor<string> {
+
+    private readonly _task: App;
+
+    constructor(task: App) {
+        super();
+        this._task = Preconditions.checkNotUndefined(task);
+    }
+
+    protected defaultResultFor(element: AbstractElement): string {
+        return "";
+    }
+
+    visitGraphAbstractState(element: GraphAbstractState): string {
+        const wrappedLabel: string = element.getWrappedState().accept(this);
+        return `${element.getId()} ${wrappedLabel}`;
+    }
+
+    visitControlAbstractState(element: ControlAbstractState): string {
+        const v = new ControlLocationExtractor(this._task);
+        return "@ " + element.accept(v).map( rl => rl.getLocationId()).toArray().toString();
+    }
+
+}
+
+
+
 
 export class StateLabelVisitor implements AbstractStateVisitor<string> {
 
