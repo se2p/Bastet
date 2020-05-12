@@ -31,6 +31,8 @@ describe("AppBuilder", () => {
             program Test
             
             role A begin
+                define atomic base (cond: boolean) begin
+                end
                 extern _RUN_foo () returns int
             end
             
@@ -65,6 +67,7 @@ describe("AppBuilder", () => {
             expect(diss.getActorByName("D").methodMap.keys()).toContain("anton");
             expect(diss.getActorByName("D").methodMap.keys()).not.toContain("_RUN_foo");
             expect(diss.getActorByName("D").externalMethodMap.keys()).toContain("_RUN_foo");
+            expect(diss.getActorByName("D").methodMap.keys()).toContain("base");
             expect(diss.getActorByName("C").methodMap.keys()).toContain("assert");
         });
 
