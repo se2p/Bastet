@@ -1,4 +1,4 @@
-FROM node:13-alpine AS base
+FROM node:14-alpine AS base
 
 RUN apk add --no-cache bash
 
@@ -21,4 +21,3 @@ RUN npm install -D @types/node
 
 RUN npm run build-no-lint
 
-CMD ["npm", "start"]
