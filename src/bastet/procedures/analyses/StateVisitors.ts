@@ -23,7 +23,7 @@
 
 import {AbstractStateVisitor, DelegatingStateVisitor} from "./AbstractStates";
 import {AbstractElement} from "../../lattices/Lattice";
-import {ControlAbstractState, ThreadState} from "./control/ControlAbstractDomain";
+import {ControlAbstractState, RelationLocation, ThreadState} from "./control/ControlAbstractDomain";
 import {DataAbstractState} from "./data/DataAbstractDomain";
 import {GraphAbstractState} from "./graph/GraphAbstractDomain";
 import {SSAState} from "./ssa/SSAAbstractDomain";
@@ -48,18 +48,16 @@ export class PaperLabelVisitor extends DelegatingStateVisitor<string> {
 
     visitGraphAbstractState(element: GraphAbstractState): string {
         const wrappedLabel: string = element.getWrappedState().accept(this);
-        return `${element.getId()} ${wrappedLabel}`;
+        return `e${element.getId()} ${wrappedLabel}`;
     }
 
     visitControlAbstractState(element: ControlAbstractState): string {
         const v = new ControlLocationExtractor(this._task);
-        return "@ " + element.accept(v).map( rl => rl.getLocationId()).toArray().toString();
+        const relName = (rl: RelationLocation) => this._task.getTransitionRelationById(rl.getRelationId()).name;
+        return "@ " + element.accept(v).map( rl => `${rl.getActorId()}:${relName(rl)}:${rl.getLocationId()}`).toArray().toString();
     }
 
 }
-
-
-
 
 export class StateLabelVisitor implements AbstractStateVisitor<string> {
 
