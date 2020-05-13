@@ -69,6 +69,7 @@ describe("AppBuilder", () => {
             expect(diss.getActorByName("D").externalMethodMap.keys()).toContain("_RUN_foo");
             expect(diss.getActorByName("D").methodMap.keys()).toContain("base");
             expect(diss.getActorByName("C").methodMap.keys()).toContain("assert");
+            expect(diss.getActorByName("C").methodMap.keys()).toContain("base");
         });
 
     });
