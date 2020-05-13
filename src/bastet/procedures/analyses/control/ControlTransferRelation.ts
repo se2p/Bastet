@@ -972,26 +972,28 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         for (const [threadIndex, threadState] of state.getThreadStates().entries()) {
             Preconditions.checkNotUndefined(threadState);
             if (threadState.getComputationState() == ThreadComputationState.THREAD_STATE_WAIT) {
-                const waitingForCondThreadIDs = threadState.getWaitingForThreads().union(conditionCheckThreadIDs);
-                Preconditions.checkState(waitingForCondThreadIDs.size == 1);
-                const waitingForCondThreadID: ThreadId = getTheOnlyElement(waitingForCondThreadIDs);
+                const waitingForCondThreadIDs = threadState.getWaitingForThreads().intersect(conditionCheckThreadIDs);
+                Preconditions.checkState(waitingForCondThreadIDs.size <= 1);
+                if (waitingForCondThreadIDs.size > 0) {
+                    const waitingForCondThreadID: ThreadId = getTheOnlyElement(waitingForCondThreadIDs);
 
-                // Check condition
-                const condThread: ThreadState = condThreadIdToState.get(waitingForCondThreadID);
-                const wrappedCondStates: [AbstractElement, boolean][] = this.runConditionThread(state, condThread);
-                //
+                    // Check condition
+                    const condThread: ThreadState = condThreadIdToState.get(waitingForCondThreadID);
+                    const wrappedCondStates: [AbstractElement, boolean][] = this.runConditionThread(state, condThread);
+                    //
 
-                let succStates: ImmList<ThreadState> = ImmList();
-                for (const [condCheckedState, checkResult] of wrappedCondStates) {
-                    if (checkResult) {
-                        succStates = succStates.push(threadState
-                            .withComputationState(ThreadComputationState.THREAD_STATE_YIELD)
-                            .withRemovedWaitingFor(waitingForCondThreadID))
-                    } else {
-                        succStates = succStates.push(threadState);
+                    let succStates: ImmList<ThreadState> = ImmList();
+                    for (const [condCheckedState, checkResult] of wrappedCondStates) {
+                        if (checkResult) {
+                            succStates = succStates.push(threadState
+                                .withComputationState(ThreadComputationState.THREAD_STATE_YIELD)
+                                .withRemovedWaitingFor(waitingForCondThreadID))
+                        } else {
+                            succStates = succStates.push(threadState);
+                        }
                     }
+                    threadSuccStates = threadSuccStates.set(threadIndex, succStates);
                 }
-                threadSuccStates = threadSuccStates.set(threadIndex, succStates);
             }
         }
 
