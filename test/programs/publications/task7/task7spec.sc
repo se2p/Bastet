@@ -39,10 +39,6 @@ actor ElephantObserver is Observer begin
            define last_change as _RUNTIME_micros()
         end
 
-       if _RUNTIME_micros() > 10000000 then begin
-           _RUNTIME_signalFailure("10s")
-       end
-
        // The actual invariant check
        if _RUNTIME_micros() - last_change > 1200000 then begin
            _RUNTIME_signalFailure("The costume must change within 1.2s")
