@@ -353,7 +353,11 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitCallStatement(node: CallStatement): string {
-        return `${node.calledMethod.text}(${node.args.accept(this)})`;
+        if (node.assignResultTo.isPresent()) {
+            return `define ${node.assignResultTo.value().accept(this)} as ${node.calledMethod.text}(${node.args.accept(this)})`;
+        } else {
+            return `${node.calledMethod.text}(${node.args.accept(this)})`;
+        }
     }
 
     visitIfStatement(node: IfStatement): string {
