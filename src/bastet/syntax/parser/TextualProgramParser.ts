@@ -20,15 +20,15 @@
  */
 
 import {BailErrorStrategy, CharStreams, CommonTokenStream, TokenStream} from 'antlr4ts';
-import {ScratchLexer} from "./grammar/ScratchLexer";
-import {ProgramContext, ScratchParser} from "./grammar/ScratchParser";
+import {LeilaLexer} from "./grammar/LeilaLexer";
+import {ProgramContext, LeilaParser} from "./grammar/LeilaParser";
 import fs from "fs";
 import path from "path";
 import {ProgramParser} from "./ProgramParser";
 import {Preconditions} from "../../utils/Preconditions";
 import {ParsingException} from "../../core/exceptions/ParsingException";
 
-class MyScratchCoreParser extends ScratchParser {
+class MyScratchCoreParser extends LeilaParser {
 
     constructor(input: TokenStream) {
         super(input);
@@ -63,7 +63,7 @@ export class TextualProgramParser implements ProgramParser {
     public parseSource(basename: string, sourcecode: string): ProgramContext {
         // Create a character stream and the lexer
         const inputStream = CharStreams.fromString(sourcecode);
-        const lexer = new ScratchLexer(inputStream);
+        const lexer = new LeilaLexer(inputStream);
         const tokenStream = new CommonTokenStream(lexer);
 
         // Create the parser

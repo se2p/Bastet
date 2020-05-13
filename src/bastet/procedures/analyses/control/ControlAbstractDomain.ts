@@ -28,7 +28,7 @@ import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import { ConcreteDomain, ConcreteElement, ConcreteMemory } from '../../domains/ConcreteElements'
 import {App} from "../../../syntax/app/App";
-import {AfterStatementMonitoringEvent, SingularityEvent} from "../../../syntax/ast/core/CoreEvent";
+import {AfterStatementMonitoringEvent, SingularityEvent, TerminationEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Property} from "../../../syntax/Property";
 import {TransRelId} from "../../../syntax/app/controlflow/TransitionRelation";
 import {ScriptId} from "../../../syntax/app/controlflow/Script";
@@ -65,7 +65,7 @@ export interface ControlConcreteState {
 
 }
 
-export interface ScriptLocationAttributes {
+export interface RelationLocationAttributes {
 
     /** Unique identifier of the actor */
     actor: ActorId;
@@ -84,7 +84,7 @@ const RelationLocationRecord = ImmRec({
     location: 0
 });
 
-export class RelationLocation extends RelationLocationRecord implements ScriptLocationAttributes {
+export class RelationLocation extends RelationLocationRecord implements RelationLocationAttributes {
 
     constructor(actor: ActorId, relation: TransRelId, location: LocationId) {
         super({actor: actor, relation: relation, location: location});
@@ -509,6 +509,10 @@ export class ScheduleAbstractStateFactory {
                     // be scheduled by concern.
                     // The idea is that monitoring the program should be started
                     // if the program is fully initialized.
+                    threadState = ThreadComputationState.THREAD_STATE_DISABLED;
+
+                } else if (script.event instanceof TerminationEvent) {
+                    // Will be activated if no other thread has ops to execute
                     threadState = ThreadComputationState.THREAD_STATE_DISABLED;
                 }
 

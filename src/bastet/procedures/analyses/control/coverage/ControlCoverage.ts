@@ -24,12 +24,12 @@
 import {ReachedSet} from "../../../algorithms/StateSet";
 import {AbstractElement, AbstractElementVisitor, AbstractState} from "../../../../lattices/Lattice";
 import {App} from "../../../../syntax/app/App";
-import {AbstractStateVisitor, DelegatingStateVisitor} from "../../AbstractStates";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {ControlAbstractState, IndexedThread, RelationLocation} from "../ControlAbstractDomain";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {TransitionRelation} from "../../../../syntax/app/controlflow/TransitionRelation";
 import {ActorId} from "../../../../syntax/app/Actor";
+import {ControlLocationExtractor} from "../ControlUtils";
 
 export class ControlCoverageReport {
 
@@ -65,38 +65,6 @@ export class ControlCoverageReport {
     get numberOfUncoveredPerRelation(): ImmMap<any, any> {
         return this._numberOfUncoveredPerRelation;
     }
-}
-
-/**
- * Extracts the set of control locations to that the abstract
- * state made a step to.
- */
-class ControlLocationExtractor extends DelegatingStateVisitor<ImmSet<RelationLocation>> {
-
-    private readonly _task: App;
-
-    constructor(task: App) {
-        super();
-        this._task = Preconditions.checkNotUndefined(task);
-    }
-
-    protected defaultResultFor(element: AbstractElement): ImmSet<RelationLocation> {
-        return ImmSet<RelationLocation>();
-    }
-
-    public visitControlAbstractState(element: ControlAbstractState): ImmSet<RelationLocation> {
-        const steppedThreads = element.getSteppedFor().map((i) => element.getIndexedThreadState(i));
-
-        let result = ImmSet();
-
-        for (const steppedThread of steppedThreads) {
-            const relLoc: RelationLocation = steppedThread.threadStatus.getRelationLocation();
-            result = result.add(relLoc);
-        }
-
-        return result;
-    }
-
 }
 
 export class ControlCoverageExaminer {

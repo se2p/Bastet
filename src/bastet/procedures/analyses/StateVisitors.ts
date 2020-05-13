@@ -23,7 +23,7 @@
 
 import {AbstractStateVisitor, DelegatingStateVisitor} from "./AbstractStates";
 import {AbstractElement} from "../../lattices/Lattice";
-import {ControlAbstractState, ThreadState} from "./control/ControlAbstractDomain";
+import {ControlAbstractState, RelationLocation, ThreadState} from "./control/ControlAbstractDomain";
 import {DataAbstractState} from "./data/DataAbstractDomain";
 import {GraphAbstractState} from "./graph/GraphAbstractDomain";
 import {SSAState} from "./ssa/SSAAbstractDomain";
@@ -31,9 +31,36 @@ import {App} from "../../syntax/app/App";
 import {Preconditions} from "../../utils/Preconditions";
 import {CorePrintVisitor} from "../../syntax/ast/CorePrintVisitor";
 import {TimeState} from "./time/TimeAbstractDomain";
+import {ControlLocationExtractor} from "./control/ControlUtils";
 import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {Map as ImmMap} from "immutable";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+
+export class PaperLabelVisitor extends DelegatingStateVisitor<string> {
+
+    private readonly _task: App;
+
+    constructor(task: App) {
+        super();
+        this._task = Preconditions.checkNotUndefined(task);
+    }
+
+    protected defaultResultFor(element: AbstractElement): string {
+        return "";
+    }
+
+    visitGraphAbstractState(element: GraphAbstractState): string {
+        const wrappedLabel: string = element.getWrappedState().accept(this);
+        return `e${element.getId()} ${wrappedLabel}`;
+    }
+
+    visitControlAbstractState(element: ControlAbstractState): string {
+        const v = new ControlLocationExtractor(this._task);
+        const relName = (rl: RelationLocation) => this._task.getTransitionRelationById(rl.getRelationId()).name;
+        return "@ " + element.accept(v).map( rl => `${rl.getActorId()}:${relName(rl)}:${rl.getLocationId()}`).toArray().toString();
+    }
+
+}
 
 export class StateLabelVisitor implements AbstractStateVisitor<string> {
 

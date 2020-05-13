@@ -1,44 +1,45 @@
-program Mini1Program
+program TestProgram
 
-actor MiniActor is RuntimeEntity begin
+actor Beetle is ScratchSprite begin
 
-    declare PI as float
-    define PI as 3.14159265359
-
-    define atomic atan(n: float) begin
-    end returns result: float
-
-   define atomic atan2(x: float, y: float) begin
-        if x > 0.0 then begin
-            label("a")
-        end else if x < 0.0 and y > 0.0 then begin
-            label("b")
-            if x = 0.0 then begin
-                assume result > 0.1
-                assume result < 0.9
-            end else if x < 0.5 and x > 0.0 then begin
-                assume result > 0.5
-                assume result < 0.9
-            end
-        end else begin
-            label("c")
-        end
-    end returns result: float
+    declare state as int
 
     script on startup do begin
-        declare x as float
-        define x as 0.0-35.0
-        declare y as float
-        define y as 0.0
-
-        declare result as float
-        define result as atan2(x, y)
-
-        epsilon
-        epsilon
-
-        if result = PI then begin
-            _RUNTIME_signalFailure("Property must not be PI")
+        hide()
+        define state as 0
+        repeat forever begin
+            if state = 0 then begin
+                wait 1 seconds
+                declare mx as int
+                define mx as mouseX()
+                if mx > 0-200 and mx < 0-100 then begin
+                    define state as 1
+                end else begin
+                    define state as 0
+                end
+            end else if state = 1 then begin
+                 wait 1 seconds
+                declare mx as int
+                define mx as mouseX()
+                if mx > 0-100 and mx < 0 then begin
+                    define state as 2
+                end else begin
+                    define state as 0
+                end
+            end else if state = 2 then begin
+                 wait 1 seconds
+                declare mx as int
+                define mx as mouseX()
+                if mx > 0 and mx < 100 then begin
+                    _RUNTIME_signalFailure("Bug revealed!")
+                end else begin
+                    define state as 0
+                end
+            end
         end
     end
+
 end
+
+
+

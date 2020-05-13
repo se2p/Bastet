@@ -137,10 +137,11 @@ import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpressio
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {
     InitializeAnalysisStatement,
-    SignalTargetReachedStatement
+    SignalTargetReachedStatement, TerminateProgramStatement
 } from "../../../syntax/ast/core/statements/InternalStatement";
 import {DataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {getTheOnlyElement} from "../../../utils/Collections";
+import {SystemVariables} from "../../../syntax/app/SystemVariables";
 
 abstract class TransformingVisitor<RT, B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
     F extends AbstractFloat, S extends AbstractString, L extends AbstractList> implements CoreVisitor<RT> {
@@ -521,6 +522,10 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
             throw new ImplementMeForException(method);
         }
 
+        return this._mem;
+    }
+
+    visitTerminateProgramStatement(node: TerminateProgramStatement): B {
         return this._mem;
     }
 

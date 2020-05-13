@@ -1,6 +1,6 @@
 grammar Scratch;
 
-import ScratchCore;
+import Leila;
 
 event :
     coreEvent # InCoreEvent

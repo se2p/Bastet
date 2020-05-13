@@ -20,6 +20,7 @@
  */
 
 import {Record as ImmRec} from "immutable";
+import {PerfTimer} from "../utils/PerfTimer";
 
 export interface AbstractElement extends ImmRec<any> {
 
@@ -80,8 +81,29 @@ export interface LatticeWithComplements<E extends AbstractElement> extends Latti
 
 export class Lattices {
 
-    public static isFeasible<E extends AbstractElement>(element: E, inLattice: Lattice<E>) {
+    private static isFeasible0<E extends AbstractElement>(element: E, inLattice: Lattice<E>) {
         return !inLattice.isIncluded(element, inLattice.bottom());
+    }
+
+    public static isFeasible<E extends AbstractElement>(element: E, inLattice: Lattice<E>, purpose: string = null) {
+        let isFeasible: boolean;
+        if (purpose) {
+            console.group(`Feasibility Check (${purpose})...`);
+        } else {
+            console.group("Feasibility Check...");
+        }
+
+        const timer = new PerfTimer(null);
+        timer.start();
+        try {
+            isFeasible = this.isFeasible0(element, inLattice);
+            return isFeasible;
+        } finally {
+            timer.stop();
+            console.log(`${isFeasible ? "Feasible" : "Infeasible"} ${timer.lastIntervalDuration}`)
+            console.groupEnd();
+        }
+
     }
 
 }

@@ -15,7 +15,7 @@ import {
     NeverEvent,
     RenderedMonitoringEvent,
     SingularityEvent,
-    StartupEvent
+    StartupEvent, TerminationEvent
 } from "./core/CoreEvent";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {
@@ -92,7 +92,12 @@ import {
     DeclareStackVariableStatement,
     DeclareSystemVariableStatement
 } from "./core/statements/DeclarationStatement";
-import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
+import {
+    DeleteThisCloneStatement,
+    StopAllStatement,
+    StopThisStatement,
+    TerminationStatement
+} from "./core/statements/TerminationStatement";
 import {EpsilonStatement} from "./core/statements/EpsilonStatement";
 import {ExpressionStatement} from "./core/statements/ExpressionStatement";
 import {ResetTimerStatement} from "./core/statements/ResetTimerStatement";
@@ -101,7 +106,11 @@ import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
 import {SystemMessage, UserMessage} from "./core/Message";
-import {InitializeAnalysisStatement, SignalTargetReachedStatement} from "./core/statements/InternalStatement";
+import {
+    InitializeAnalysisStatement,
+    SignalTargetReachedStatement,
+    TerminateProgramStatement
+} from "./core/statements/InternalStatement";
 
 export class CorePrintVisitor implements CoreEventVisitor<string>,
     CoreBoolExpressionVisitor<string>, CoreNumberExpressionVisitor<string>,
@@ -127,6 +136,10 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
         return "initialize analysis";
     }
 
+    visitTerminateProgramStatement(node: TerminateProgramStatement): string {
+        return "program termination";
+    }
+
     visitAfterBootstrapMonitoringEvent(node: AfterBootstrapMonitoringEvent): string {
         return `bootstrap finished`;
     }
@@ -137,6 +150,10 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
 
     visitBootstrapEvent(node: BootstrapEvent): string {
         return `bootstrap`;
+    }
+
+    visitTerminationEvent(node: TerminationEvent): string {
+        return 'termination';
     }
 
     visitCloneStartEvent(node: CloneStartEvent): string {
@@ -336,7 +353,11 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitCallStatement(node: CallStatement): string {
-        return `${node.calledMethod.text}(${node.args.accept(this)})`;
+        if (node.assignResultTo.isPresent()) {
+            return `define ${node.assignResultTo.value().accept(this)} as ${node.calledMethod.text}(${node.args.accept(this)})`;
+        } else {
+            return `${node.calledMethod.text}(${node.args.accept(this)})`;
+        }
     }
 
     visitIfStatement(node: IfStatement): string {

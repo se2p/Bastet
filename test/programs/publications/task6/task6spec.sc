@@ -82,7 +82,7 @@ actor DirectorObserver is Observer begin
         define director_towards_monkey as director_x_towards_monkey or director_y_towards_monkey
 
         declare director_at_monkey as boolean
-        define director_at_monkey as touchingObjects(director, monkey)
+        define director_at_monkey as not (areDisjoint(director, monkey))
 
         if director_towards_monkey or director_at_monkey then begin
            define last_move_towards as _RUNTIME_micros()
@@ -93,19 +93,12 @@ actor DirectorObserver is Observer begin
            _RUNTIME_signalFailure("The director must move towards the monkey.")
         end
 
-    end
+        // Store information for the next step
+        define director_last_x as director_x
+        define director_last_y as director_y
 
-    define atomic storeRelevantStateInfosForNext () begin
-        // Actor 1
-        define director_last_x as cast attribute "x" of director to int
-        define director_last_y as cast attribute "y" of director to int
-
-        // Actor 2
-        define monkey_last_x as cast attribute "x" of monkey to int
-        define monkey_last_y as cast attribute "y" of monkey to int
-    end
-
-    script on bootstrap do begin
+        define monkey_last_x as monkey_x
+        define monkey_last_y as monkey_y
     end
 
     script on bootstrap finished do begin
@@ -113,19 +106,11 @@ actor DirectorObserver is Observer begin
         define monkey as locate actor "Affe"
         define last_move_towards as _RUNTIME_micros()
 
-        // First specification check (base condition)
         checkBehaviorSatisfied()
-
-        // Store the relevant attributes
-        storeRelevantStateInfosForNext()
     end
 
     script on statement finished do begin
-        // The actual specification check
         checkBehaviorSatisfied()
-
-        // Store the relevant attributes
-        storeRelevantStateInfosForNext()
     end
 
 end

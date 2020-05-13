@@ -36,6 +36,14 @@ export class InitializeAnalysisStatement extends Statement implements InternalSt
 
 }
 
+export class TerminateProgramStatement extends Statement implements InternalStatement {
+
+    constructor() {
+        super([]);
+    }
+
+}
+
 export class SignalTargetReachedStatement extends Statement implements InternalStatement {
 
     private readonly _targetCharacteristics: ExpressionList;

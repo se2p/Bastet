@@ -35,22 +35,7 @@ export class DataRefiner implements Refiner<DataAbstractState> {
     }
 
     checkIsFeasible(e: DataAbstractState, purpose: string = null): boolean {
-        let isFeasible: boolean;
-        if (purpose) {
-            console.group(`Feasibility Check (${purpose})...`);
-        } else {
-            console.group("Feasibility Check...");
-        }
-        const timer = new PerfTimer(null);
-        timer.start();
-        try {
-            isFeasible = Lattices.isFeasible(e, this._lattice);
-            return isFeasible;
-        } finally {
-            timer.stop();
-            console.log(`${isFeasible ? "Feasible" : "Infeasible"} ${timer.lastIntervalDuration}`)
-            console.groupEnd();
-        }
+        return Lattices.isFeasible(e, this._lattice, purpose);
     }
 
 }

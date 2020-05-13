@@ -1,15 +1,65 @@
 module ScratchLibrary
 
-actor IOActor begin
+actor IOActor is RuntimeEntity begin
 
-    declare mouseX as int
+    declare mouse_x as int
 
-    declare mouseY as int
+    declare mouse_y as int
 
     declare answer as string
 
     // Key code of the currently pressed key
     declare key_pressed as int
+
+    script on message "ASK" () in "SYSTEM" do begin
+        declare nondet_str as string
+        define answer as nondet_str
+        declare inputDurationSecs as int
+        assume inputDurationSecs > 0
+        assume inputDurationSecs < 30
+        wait inputDurationSecs seconds
+        // UNSOUND: might wait arbitrarily long
+    end
+
+end
+
+role KeyboardIO begin
+
+    declare KEY_ANY as int
+    declare KEY_ENTER as int
+    declare KEY_SPACE as int
+    declare KEY_LEFT as int
+    declare KEY_UP as int
+    declare KEY_RIGHT as int
+    declare KEY_DOWN as int
+
+    define KEY_ANY as 0
+    define KEY_ENTER as 13
+    define KEY_SPACE as 32
+    define KEY_LEFT as 37
+    define KEY_UP as 38
+    define KEY_RIGHT as 39
+    define KEY_DOWN as 40
+
+    define atomic stringToKey(s: string) begin
+        if s = " " then begin
+            define result as KEY_SPACE
+        end else if s = "ArrowLeft" or s = "Left" then begin
+            define result as KEY_LEFT
+        end else if s = "ArrowRight" or s = "Right" then begin
+            define result as KEY_LEFT
+        end else if s = "ArrowUp" or s = "Up" then begin
+            define result as KEY_UP
+        end else if s = "ArrowDown" or s = "Down" then begin
+            define result as KEY_DOWN
+        end else if s = "Enter" then begin
+            define result as KEY_ENTER
+        end else if s = "Any" then begin
+            // Any key
+        end else begin
+            _RUNTIME_signalFailure("Unknown key string")
+        end
+    end returns result : int
 
 end
 
@@ -557,25 +607,33 @@ role MathActor begin
 
         if not (num = result) then begin
             // Three iterations of newton
-            define result as (result + (num /result)) / 2.0
-            define result as (result + (num /result)) / 2.0
-            define result as (result + (num /result)) / 2.0
+            define result as (result + (num / result)) / 2.0
+            define result as (result + (num / result)) / 2.0
+            define result as (result + (num / result)) / 2.0
         end
     end returns result: float
 
-    define atomic mathAbsF(n: float) begin
-        if n < 0.0 then begin
-            define result as n * (0.0-1.0)
+    define atomic mathAbs(n: int) begin
+        if n < 0 then begin
+            define result as 0 - n
         end else begin
             define result as n
         end
+    end returns result: int
 
+    define atomic mathAbsF(n: float) begin
+        if n < 0.0 then begin
+            define result as 0.0 - n
+        end else begin
+            define result as n
+        end
     end returns result: float
+
 end
 
-role RuntimeEntity is MathActor begin
+role RuntimeEntity is MathActor, KeyboardIO begin
 
-extern _RUNTIME_getInitialActors () returns list of string
+    extern _RUNTIME_getInitialActors () returns list of string
 
     extern _RUNTIME_getClonesOf (ac: string) returns list of string
 
@@ -622,8 +680,6 @@ extern _RUNTIME_getInitialActors () returns list of string
     // See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
     extern randomBetween (intervalStart: int, intervalEnd: int) returns int
 
-    extern mathAbs (n: int) returns int
-
     extern mathCeiling (n: int) returns int
 
     extern mathTan (n: int) returns int
@@ -641,20 +697,6 @@ extern _RUNTIME_getInitialActors () returns list of string
     extern mathPowten(n: int) returns int
 
     extern label (str: string)
-
-    define getMouseX()  begin
-        declare io as actor
-
-        define io as locate actor "IOActor"
-        define result as cast (attribute "mouseX" of io) to int
-    end returns result: int
-
-    define getMouseY()  begin
-        declare io as actor
-
-        define io as locate actor "IOActor"
-        define result as cast (attribute "mouseY" of io) to int
-    end returns result: int
 
     define getGraphicIdByIndex (idx: int) begin
         define result as ""
@@ -723,68 +765,188 @@ extern _RUNTIME_getInitialActors () returns list of string
     define atomic microseconds() begin
         define result as _RUNTIME_micros()
     end returns result: int
-    end
 
-    role Observer is RuntimeEntity begin
+    // @Category "Sensing"
+    // @Block "mouse down?"
+    define atomic mouseDown () begin
+    end returns result : boolean
+
+    // @Category "Sensing"
+    // @Block "mouse x"
+    define atomic mouseX() begin
+        // NON-DET position
+    end returns result: int
+
+    // @Category "Sensing"
+    // @Block "mouse y"
+    define atomic mouseY()  begin
+        // NON-DET position
+    end returns result: int
+
+end
+
+role Observer is RuntimeEntity begin
 
     // @Category "Specification"
-    define atomic assert (condition: boolean) begin
-        if not condition then begin
+    define atomic assert (cond: boolean) begin
+        if not cond then begin
             _RUNTIME_signalFailure("Asserted property must be satisfied!")
         end
     end
 
     // @Category "Specification"
     define atomic touchingObjects (fst: actor, snd: actor) begin
-            declare size_fst as float
-            declare width as float
-            declare height as float
+        declare x_fst as int
+        define x_fst as cast attribute "x" of fst to int
+        declare y_fst as int
+        define y_fst as cast attribute "y" of fst to int
 
-            // TODO: Query attributes of myself and the other actor
-            define width as cast (cast attribute "active_graphic_width" of fst to int) to float
-            define height as cast (cast attribute "active_graphic_height" of fst to int) to float
-            define size_fst as cast (cast attribute "size" of fst to int) to float
+        assume x_fst < 720
+        assume x_fst > 0-720
+        assume y_fst < 720
+        assume y_fst > 0-720
 
-            define width as width * (size_fst / 100.0)
-            define height as height * (size_fst / 100.0)
+        declare x_snd as int
+        define x_snd as cast attribute "x" of snd to int
+        declare y_snd as int
+        define y_snd as cast attribute "y" of snd to int
 
-            declare size_snd as float
-            declare width_snd as float
-            declare height_snd as float
-            define width_snd as cast (cast attribute "active_graphic_width" of snd to int) to float
-            define height_snd as cast (cast attribute "active_graphic_height" of snd to int) to float
+        assume x_snd <= 720
+        assume x_snd >= 0-720
+        assume y_snd <= 720
+        assume y_snd >= 0-720
 
-            define size_snd as cast (cast attribute "size" of snd to int) to float
-            define width_snd as width_snd * (size_snd / 100.0)
-            define height_snd as height_snd * (size_snd / 100.0)
+        declare width_fst as int
+        declare height_fst as int
+        define width_fst as cast attribute "active_graphic_half_width" of fst to int
+        define height_fst as cast attribute "active_graphic_half_height" of fst to int
 
-            declare x_snd as float
-            define x_snd as cast (cast attribute "x" of snd to int) to float
-            declare y_snd as float
-            define y_snd as cast (cast attribute "y" of snd to int) to float
+//        declare size_fst as float
+//        define size_fst as cast (cast attribute "size" of fst to int) to float
+//        assume size_fst > 0.0
+//        assume size_fst < 1000.0
 
-            declare x_fst as float
-            define x_fst as cast (cast attribute "x" of fst to int) to float
-            declare y_fst as float
-            define y_fst as cast (cast attribute "y" of fst to int) to float
+        declare width_snd as int
+        declare height_snd as int
+        define width_snd as cast attribute "active_graphic_half_width" of snd to int
+        define height_snd as cast attribute "active_graphic_half_height" of snd to int
 
-            define result as false
+//        declare size_snd as float
+//        define size_snd as cast (cast attribute "size" of snd to int) to float
+//        assume size_snd > 0.0
+//        assume size_snd < 16000.0
+//
+//        define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
+//        define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
+//
+//        define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
+//        define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
 
-            declare condOne as boolean
-            declare condTwo as boolean
-            declare condThree as boolean
-            declare condFour as boolean
-            declare condFive as boolean
+        define result as false
 
-            define condOne as (x_fst + width / 2.0 > x_snd - width_snd / 2.0 and y_fst + height / 2.0 > y_snd - height_snd / 2.0)
-            define condTwo as (x_fst - width / 2.0 < x_snd + width_snd / 2.0 and  y_fst + height / 2.0 > y_snd - height_snd / 2.0)
-            define condThree as (x_snd + width_snd / 2.0 > x_fst - width / 2.0 and y_snd + height_snd / 2.0 > y_fst - height / 2.0)
-            define condFour as (x_snd - width_snd / 2.0 < x_fst + width / 2.0 and  y_snd + height_snd / 2.0 > y_fst - height / 2.0)
-            define condFive as (x_fst = x_snd and y_fst = y_snd)
+        declare condOne as boolean
+        declare condTwo as boolean
+        declare condThree as boolean
+        declare condFour as boolean
+        declare condFive as boolean
 
-            if (condOne or condTwo or condThree or condFour or condFive) then begin
-                define result as true
-            end
+        assume width_snd <= 720
+        assume width_snd > 0
+        assume width_fst < 720
+        assume width_fst > 0
+
+        assume height_snd <= 720
+        assume height_snd > 0
+        assume height_fst <= 720
+        assume height_fst > 0
+
+        define condOne as (x_fst + width_fst > x_snd - width_snd and y_fst + height_fst > y_snd - height_snd)
+        define condTwo as (x_fst - width_fst < x_snd + width_snd and  y_fst + height_fst > y_snd - height_snd)
+        define condThree as (x_snd + width_snd > x_fst - width_fst and y_snd + height_snd > y_fst - height_fst)
+        define condFour as (x_snd - width_snd < x_fst + width_fst and  y_snd + height_snd > y_fst - height_fst)
+        define condFive as (x_fst = x_snd and y_fst = y_snd)
+
+        if (condOne or condTwo or condThree or condFour or condFive) then begin
+            define result as true
+        end
+
+    end returns result : boolean
+
+    // @Category "Specification"
+    define atomic areDisjoint(fst: actor, snd: actor) begin
+        declare x_fst as int
+        define x_fst as cast attribute "x" of fst to int
+        declare y_fst as int
+        define y_fst as cast attribute "y" of fst to int
+
+        assume x_fst < 720
+        assume x_fst > 0-720
+        assume y_fst < 720
+        assume y_fst > 0-720
+
+        declare x_snd as int
+        define x_snd as cast attribute "x" of snd to int
+        declare y_snd as int
+        define y_snd as cast attribute "y" of snd to int
+
+        assume x_snd <= 720
+        assume x_snd >= 0-720
+        assume y_snd <= 720
+        assume y_snd >= 0-720
+
+        declare width_fst as int
+        declare height_fst as int
+        define width_fst as cast attribute "active_graphic_half_width" of fst to int
+        define height_fst as cast attribute "active_graphic_half_height" of fst to int
+
+//        declare size_fst as float
+//        define size_fst as cast (cast attribute "size" of fst to int) to float
+//        assume size_fst > 0.0
+//        assume size_fst < 1000.0
+
+        declare width_snd as int
+        declare height_snd as int
+        define width_snd as cast attribute "active_graphic_half_width" of snd to int
+        define height_snd as cast attribute "active_graphic_half_height" of snd to int
+
+//        declare size_snd as float
+//        define size_snd as cast (cast attribute "size" of snd to int) to float
+//        assume size_snd > 0.0
+//        assume size_snd < 16000.0
+//
+//        define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
+//        define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
+//
+//        define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
+//        define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
+
+        define result as false
+
+        declare condOne as boolean
+        declare condTwo as boolean
+        declare condThree as boolean
+        declare condFour as boolean
+        declare condFive as boolean
+
+        assume width_snd <= 720
+        assume width_snd > 0
+        assume width_fst < 720
+        assume width_fst > 0
+
+        assume height_snd <= 720
+        assume height_snd > 0
+        assume height_fst <= 720
+        assume height_fst > 0
+
+        define condOne as (x_fst + width_fst > x_snd - width_snd and y_fst + height_fst > y_snd - height_snd)
+        define condTwo as (x_fst - width_fst < x_snd + width_snd and  y_fst + height_fst > y_snd - height_snd)
+        define condThree as (x_snd + width_snd > x_fst - width_fst and y_snd + height_snd > y_fst - height_fst)
+        define condFour as (x_snd - width_snd < x_fst + width_fst and  y_snd + height_snd > y_fst - height_fst)
+        define condFive as (x_fst = x_snd and y_fst = y_snd)
+
+        if not (condOne and condTwo and condThree and condFour and condFive) then begin
+            define result as true
+        end
 
     end returns result : boolean
 
@@ -795,19 +957,32 @@ extern _RUNTIME_getInitialActors () returns list of string
         define x as cast attribute "x" of obj to int
         define y as cast attribute "y" of obj to int
 
-        declare width as int
-        declare height as int
-        define width as cast attribute "active_graphic_width" of obj to int
-        define height as cast attribute "active_graphic_height" of obj to int
+        declare half_width as int
+        declare half_height as int
+        define half_width as cast attribute "active_graphic_half_width" of obj to int
+        define half_height as cast attribute "active_graphic_half_height" of obj to int
 
         define result as true
-        if not (getMouseX() < x + width / 2
-            or getMouseX() > x - width / 2
-            or getMouseY() < y + height / 2
-            or getMouseY() > y - height / 2) then begin
+        if not (mouseX() < x + half_width
+            or mouseX() > x - half_width
+            or mouseY() < y + half_height
+            or mouseY() > y - half_height) then begin
 
             define result as false
         end
+    end returns result : boolean
+
+    // @Category "Sensing"
+    // @Block "key (int as key) pressed?"
+    define atomic keyPressedByCode (key: int) begin
+    end returns result : boolean
+
+    // @Category "Sensing"
+    // @Block "key (string as key) pressed?"
+    define atomic keyPressedByName (name: string) begin
+        declare key as int
+        define key as stringToKey(name)
+        define result as keyPressedByCode(key)
     end returns result : boolean
 
 end
@@ -823,6 +998,9 @@ role ScratchEntity is RuntimeEntity begin
     declare active_graphic_name as string
     declare active_graphic_width as int
     declare active_graphic_height as int
+
+    declare active_graphic_half_width as int
+    declare active_graphic_half_height as int
 
     declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
     declare color_effect_value as float
@@ -844,6 +1022,9 @@ role ScratchEntity is RuntimeEntity begin
         define active_graphic_name as id
         define active_graphic_width as getImageWidth(id)
         define active_graphic_height as getImageHeight(id)
+
+        define active_graphic_half_width as getImageWidth(id) / 2
+        define active_graphic_half_height as getImageHeight(id) / 2
         //FIXME Set graphic pixels, this is currently not done as we do not supports lists yet
     end
 
@@ -912,6 +1093,12 @@ role ScratchEntity is RuntimeEntity begin
     define volume () begin
     end returns result : int
 
+    // @Category "Sensing"
+    // @Block "ask (question as string) and wait"
+    define atomic askAndWait (question: string) begin
+        broadcast "ASK" () to "SYSTEM"
+    end
+
 end
 
 role ScratchSprite is ScratchEntity begin
@@ -964,23 +1151,27 @@ role ScratchSprite is ScratchEntity begin
     //
 
     define atomic pointTowards (s: actor) begin
-        // Todo what about random?
         declare targetX as int
         declare targetY as int
 
         define targetX as cast (attribute "x" of s) to int
         define targetY as cast (attribute "y" of s) to int
 
-        declare dx as float
-        declare dy as float
-        define dx as cast (targetX - x) to float
-        define dy as cast (targetY - y) to float
+        pointTowardsPos(targetX, targetY)
+    end
 
-        if dx = 0.0 and dy = 0.0 then begin
-            define direction as 90
-         end else begin
-            define direction as cast radToDeg(mathAtan2(dy, dx)) to int
-         end
+
+    define atomic pointTowardsPos(targetX: int, targetY: int) begin
+       declare dx as float
+       declare dy as float
+       define dx as cast (targetX - x) to float
+       define dy as cast (targetY - y) to float
+
+       if dx = 0.0 and dy = 0.0 then begin
+           define direction as 90
+        end else begin
+           define direction as cast radToDeg(mathAtan2(dy, dx)) to int
+        end
     end
 
     define atomic pointTowardsSelf() begin
@@ -1008,6 +1199,26 @@ role ScratchSprite is ScratchEntity begin
         define y as y + tmpy
     end
 
+    // @Category "Motion"
+    define atomic goTo (newX: int, newY: int) begin
+        define x as newX
+        define y as newY
+    end
+
+    define atomic hide () begin
+        define visible as false
+    end
+
+    define atomic show () begin
+        define visible as true
+    end
+
+    // @Category "Motion"
+    define atomic goToRandomPosition () begin
+        define x as randomIntegerBetween(0-240, 240)
+        define y as randomIntegerBetween(0-180, 180)
+    end
+
     define atomic changeXBy (increment: int) begin
        // set attribute "x" to (attribute "x" + increment)
     end
@@ -1023,67 +1234,175 @@ role ScratchSprite is ScratchEntity begin
 
     // @Category "Sensing"
     define atomic touchingMousePointer () begin
-        if not (getMouseX() < x
-                or getMouseX() > x + active_graphic_width
-                or getMouseY() < y
-                or getMouseY() > y + active_graphic_height) then begin
+        if not (mouseX() < x
+                or mouseX() > x + active_graphic_half_width
+                or mouseY() < y
+                or mouseY() > y + active_graphic_half_height) then begin
 
             define result as false
         end
     end returns result : boolean
 
     // @Category "Sensing"
-    define atomic touchingObject (obj: actor) begin
-        declare size_fst as float
-        declare width as float
-        declare height as float
+    define atomic touchingObject (snd: actor) begin
+            declare x_fst as int
+            define x_fst as x
+            declare y_fst as int
+            define y_fst as y
 
-        // TODO: Query attributes of myself and the other actor
-        define width as cast active_graphic_width to float
-        define height as cast active_graphic_height to float
-        define size_fst as cast size to float
+            assume x_fst < 720
+            assume x_fst > 0-720
+            assume y_fst < 720
+            assume y_fst > 0-720
 
-        define width as width * (size_fst / 100.0)
-        define height as height * (size_fst / 100.0)
+            declare x_snd as int
+            define x_snd as cast attribute "x" of snd to int
+            declare y_snd as int
+            define y_snd as cast attribute "y" of snd to int
 
-        declare size_snd as float
-        declare width_other as float
-        declare height_other as float
-        define width_other as cast (cast attribute "active_graphic_width" of obj to int) to float
-        define height_other as cast (cast attribute "active_graphic_height" of obj to int) to float
+            assume x_snd <= 720
+            assume x_snd >= 0-720
+            assume y_snd <= 720
+            assume y_snd >= 0-720
 
-        define size_snd as cast (cast attribute "size" of obj to int) to float
-        define width_other as width_other * (size_snd / 100.0)
-        define height_other as height_other * (size_snd / 100.0)
+            declare width_fst as int
+            declare height_fst as int
+            define width_fst as active_graphic_half_width
+            define height_fst as active_graphic_half_height
 
-        declare x_other as float
-        define x_other as cast (cast attribute "x" of obj to int) to float
-        declare y_other as float
-        define y_other as cast (cast attribute "y" of obj to int) to float
+//            declare size_fst as float
+//            define size_fst as cast size to float
+//            assume size_fst > 0.0
+//            assume size_fst < 1000.0
 
-        declare x_this as float
-        define x_this as cast x to float
-        declare y_this as float
-        define y_this as cast y to float
+            declare width_snd as int
+            declare height_snd as int
+            define width_snd as cast attribute "active_graphic_half_width" of snd to int
+            define height_snd as cast attribute "active_graphic_half_height" of snd to int
 
-        define result as false
+//            declare size_snd as float
+//            define size_snd as cast (cast attribute "size" of snd to int) to float
+//            assume size_snd > 0.0
+//            assume size_snd < 16000.0
 
-        declare condOne as boolean
-        declare condTwo as boolean
-        declare condThree as boolean
-        declare condFour as boolean
-        declare condFive as boolean
+//            define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
+//            define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
+//
+//            define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
+//            define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
 
-        define condOne as (x_this + width / 2.0 > x_other - width_other / 2.0 and y_this + height / 2.0 > y_other - height_other / 2.0)
-        define condTwo as (x_this - width / 2.0 < x_other + width_other / 2.0 and  y_this + height / 2.0 > y_other - height_other / 2.0)
-        define condThree as (x_other + width_other / 2.0 > x_this - width / 2.0 and y_other + height_other / 2.0 > y_this - height / 2.0)
-        define condFour as (x_other - width_other / 2.0 < x_this + width / 2.0 and  y_other + height_other / 2.0 > y_this - height / 2.0)
-        define condFive as (x_this = x_other and y_this = y_other)
+            define result as false
 
-        if (condOne or condTwo or condThree or condFour or condFive) then begin
-            define result as true
-        end
+            declare condOne as boolean
+            declare condTwo as boolean
+            declare condThree as boolean
+            declare condFour as boolean
+            declare condFive as boolean
 
+            assume width_snd <= 720
+            assume width_snd > 0
+            assume width_fst < 720
+            assume width_fst > 0
+
+            assume height_snd <= 720
+            assume height_snd > 0
+            assume height_fst <= 720
+            assume height_fst > 0
+
+            declare a as boolean
+            declare b as boolean
+
+
+            define condOne as (x_fst + width_fst > x_snd - width_snd and y_fst + height_fst > y_snd - height_snd)
+            define condTwo as (x_fst - width_fst < x_snd + width_snd and  y_fst + height_fst > y_snd - height_snd)
+            define condThree as (x_snd + width_snd > x_fst - width_fst and y_snd + height_snd > y_fst - height_fst)
+            define condFour as (x_snd - width_snd < x_fst + width_fst and  y_snd + height_snd > y_fst - height_fst)
+            define condFive as (x_fst = x_snd and y_fst = y_snd)
+
+            if (condOne or condTwo or condThree or condFour or condFive) then begin
+                define result as true
+            end
+    end returns result : boolean
+
+
+    // @Category "Sensing"
+    define atomic isDisjointFrom(snd: actor) begin
+            declare x_fst as int
+            define x_fst as x
+            declare y_fst as int
+            define y_fst as y
+
+            assume x_fst < 720
+            assume x_fst > 0-720
+            assume y_fst < 720
+            assume y_fst > 0-720
+
+            declare x_snd as int
+            define x_snd as cast attribute "x" of snd to int
+            declare y_snd as int
+            define y_snd as cast attribute "y" of snd to int
+
+            assume x_snd <= 720
+            assume x_snd >= 0-720
+            assume y_snd <= 720
+            assume y_snd >= 0-720
+
+            declare width_fst as int
+            declare height_fst as int
+            define width_fst as active_graphic_half_width
+            define height_fst as active_graphic_half_height
+
+//            declare size_fst as float
+//            define size_fst as cast size to float
+//            assume size_fst > 0.0
+//            assume size_fst < 1000.0
+
+            declare width_snd as int
+            declare height_snd as int
+            define width_snd as cast attribute "active_graphic_half_width" of snd to int
+            define height_snd as cast attribute "active_graphic_half_height" of snd to int
+
+//            declare size_snd as float
+//            define size_snd as cast (cast attribute "size" of snd to int) to float
+//            assume size_snd > 0.0
+//            assume size_snd < 16000.0
+
+//            define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
+//            define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
+//
+//            define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
+//            define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
+
+            define result as false
+
+            declare condOne as boolean
+            declare condTwo as boolean
+            declare condThree as boolean
+            declare condFour as boolean
+            declare condFive as boolean
+
+            assume width_snd <= 720
+            assume width_snd > 0
+            assume width_fst < 720
+            assume width_fst > 0
+
+            assume height_snd <= 720
+            assume height_snd > 0
+            assume height_fst <= 720
+            assume height_fst > 0
+
+            declare a as boolean
+            declare b as boolean
+
+            define condOne as (x_fst + width_fst > x_snd - width_snd and y_fst + height_fst > y_snd - height_snd)
+            define condTwo as (x_fst - width_fst < x_snd + width_snd and  y_fst + height_fst > y_snd - height_snd)
+            define condThree as (x_snd + width_snd > x_fst - width_fst and y_snd + height_snd > y_fst - height_fst)
+            define condFour as (x_snd - width_snd < x_fst + width_fst and  y_snd + height_snd > y_fst - height_fst)
+            define condFive as (x_fst = x_snd and y_fst = y_snd)
+
+            if not (condOne and condTwo and condThree and condFour and condFive) then begin
+                define result as true
+            end
     end returns result : boolean
 
     // @Category "Sensing"
@@ -1098,7 +1417,18 @@ role ScratchSprite is ScratchEntity begin
 
     // @Category "Sensing"
     define distanceToMousePointer () begin
+        define result as distanceTo(mouseX(), mouseY())
+    end returns result : int
+
+    define distanceTo (targetX: int, targetY: int) begin
+        // We use a 'TaxiCap' approximation:
+        //      https://en.wikibooks.org/wiki/Algorithms/Distance_approximations
         // ...
+        declare dx as int
+        declare dy as int
+        define dx as mathAbs(x - targetX)
+        define dy as mathAbs(y - targetY)
+        define result as dx + dy
     end returns result : int
 
     define atomic sayTextFor (msg: string, scs: int) begin

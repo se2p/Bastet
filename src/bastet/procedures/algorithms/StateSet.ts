@@ -273,12 +273,17 @@ export class PriorityFrontierSet<E extends AbstractElement> implements FrontierS
 
 }
 
+export enum PeekMode { PeekFirstAdded, PeekLastAdded};
+
 export class DefaultFrontierSet<E extends AbstractElement> implements FrontierSet<E> {
 
     private readonly _elements: Set<E>;
 
-    constructor() {
+    private readonly _peekMode: PeekMode;
+
+    constructor(mode: PeekMode = PeekMode.PeekFirstAdded) {
         this._elements = new Set();
+        this._peekMode = mode;
     }
 
     public [Symbol.iterator](): IterableIterator<E> {

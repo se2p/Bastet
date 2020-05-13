@@ -115,6 +115,10 @@ export class AppBuilder {
         const boostrapper = Actors.defaultBoostraper();
         result[boostrapper.ident] = boostrapper;
 
+        // Add the actor that is activated on termination
+        const terminator = Actors.defaultTerminator();
+        result[terminator.ident] = terminator;
+
         return result;
     }
 
@@ -306,19 +310,20 @@ export class AppBuilder {
         const worklist: Actor[] = [];
         const handled: Set<String> = new Set();
 
-        if (actor.inheritFrom.length > 0) {
-            worklist.push(actor);
+        for (const ihfrom of actor.inheritFrom) {
+            worklist.push(ihfrom);
         }
 
         while (worklist.length > 0) {
             const work = worklist.pop();
-            for (const copyFrom of work.inheritFrom) {
-                if (handled.has(copyFrom.ident)) {
-                    throw new IllegalStateException("Cycle in the inheritance relation?");
+            result = this.concatActors(result, work);
+            if (handled.has(work.ident)) {
+                throw new IllegalStateException("Cycle in the inheritance relation?");
+            } else {
+                handled.add(work.ident);
+                for (const copyFrom of work.inheritFrom) {
+                    worklist.push(copyFrom);
                 }
-                result = this.concatActors(result, copyFrom);
-                handled.add(copyFrom.ident);
-                worklist.push(copyFrom);
             }
         }
 

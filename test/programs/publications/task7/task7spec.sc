@@ -31,9 +31,7 @@ actor ElephantObserver is Observer begin
     declare actor_1_prev_costume as string
     declare last_change as int
 
-    define atomic isBehaviorSatisfied () begin
-        define result as true
-
+    define atomic checkBehaviorSatisfied () begin
         // (a) Attributes of the first actor
         define actor_1_costume as attribute "active_graphic_name" of actor_1_id
 
@@ -43,16 +41,10 @@ actor ElephantObserver is Observer begin
 
        // The actual invariant check
        if _RUNTIME_micros() - last_change > 1200000 then begin
-           define result as false
+           _RUNTIME_signalFailure("The costume must change within 120msec.")
        end
-    end returns result: boolean
 
-    define atomic storeRelevantStateInfosForNext () begin
         define actor_1_prev_costume as actor_1_costume
-    end
-
-    script on startup do begin
-
     end
 
     script on bootstrap finished do begin
@@ -60,18 +52,12 @@ actor ElephantObserver is Observer begin
         define actor_1_id as locate actor "Elefant1"
 
         // First specification check (base condition)
-        assert(isBehaviorSatisfied())
-
-        // Store the relevant attributes
-        storeRelevantStateInfosForNext()
+        checkBehaviorSatisfied()
     end
 
     script on statement finished do begin
         // The actual specification check
-        assert(isBehaviorSatisfied())
-
-        // Store the relevant attributes
-        storeRelevantStateInfosForNext()
+        checkBehaviorSatisfied()
     end
 
 end

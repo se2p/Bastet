@@ -28,8 +28,8 @@ Upcoming versions will support:
 
 ### Development Environment
 
-- IDE: JetBrains WebStorm 2019.x / 2020.x
-- NodeJs 13.9 (Current)
+- IDE: JetBrains WebStorm 2020.x
+- NodeJs 14.2 (Current)
 - TypeScript 3.8 (npm install -g typescript)
 - UMLet UML Editor 14.3
 

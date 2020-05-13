@@ -19,7 +19,7 @@
  *
  */
 
-import {AbstractNode} from "../AstNode";
+import {AbstractNode, AstNode} from "../AstNode";
 import {AstNodeList} from "../AstNodeList";
 import {Identifier} from "./Identifier";
 import {ParameterDeclarationList} from "./ParameterDeclaration";
@@ -128,6 +128,40 @@ export class MethodDefinition extends MethodSignature {
     get isAtomic(): boolean {
         return this._isAtomic;
     }
+
+}
+
+export type MethodDefinitionType = MethodDefinition | ExternMethodDeclaration ;
+
+export class MethodDefinitions extends AstNodeList<MethodSignature> {
+
+    private readonly _fullMethodDefinitions: MethodDefinitionList;
+
+    private readonly _externalMethods: MethodSignatureList;
+
+    constructor(full: MethodDefinition[], external: ExternMethodDeclaration[]) {
+        const elements: MethodSignature[] = [];
+        full.forEach((e) => elements.push(e));
+        external.forEach((e) => elements.push(e));
+        super(elements);
+        this._externalMethods = new MethodSignatureList(external.slice());
+        this._fullMethodDefinitions = new MethodDefinitionList(full.slice());
+    }
+
+    public getFullMethodDefinitions(): MethodDefinitionList {
+        return this._fullMethodDefinitions;
+    }
+
+    public getExternalMethods(): MethodSignatureList {
+        return this._externalMethods;
+    }
+
+    public static fromMixed(elements: MethodDefinitionType[]): MethodDefinitions {
+        const fullMethodDefinitions = elements.filter((m) => m instanceof MethodDefinition) as MethodDefinition[];
+        const externalMethods = elements.filter((m) => m instanceof ExternMethodDeclaration) as ExternMethodDeclaration[];
+        return new MethodDefinitions(fullMethodDefinitions, externalMethods);
+    }
+
 }
 
 export class MethodDefinitionList extends AstNodeList<MethodDefinition> {

@@ -59,7 +59,7 @@ export class MessageReceivedEvent extends CoreEvent {
 
 export class BootstrapEvent extends MessageReceivedEvent {
 
-    constructor() {
+    private constructor() {
         super(SYSTEM_NAMESPACE, BOOTSTRAP_MESSAGE.messageid, ParameterDeclarationList.empty());
     }
 
@@ -76,7 +76,7 @@ export class BootstrapEvent extends MessageReceivedEvent {
 
 export class StartupEvent extends MessageReceivedEvent {
 
-    constructor() {
+    private constructor() {
         super(SYSTEM_NAMESPACE, GREENFLAG_MESSAGE.messageid, ParameterDeclarationList.empty());
     }
 
@@ -93,7 +93,7 @@ export class StartupEvent extends MessageReceivedEvent {
 
 export class NeverEvent extends CoreEvent {
 
-    constructor() {
+    private constructor() {
         super([]);
     }
 
@@ -113,7 +113,7 @@ export class NeverEvent extends CoreEvent {
  */
 export class SingularityEvent extends CoreEvent {
 
-    constructor() {
+    private constructor() {
         super([]);
     }
 
@@ -128,9 +128,26 @@ export class SingularityEvent extends CoreEvent {
 
 }
 
+export class TerminationEvent extends CoreEvent {
+
+    private constructor() {
+        super([]);
+    }
+
+    private static INSTANCE: TerminationEvent;
+
+    public static instance(): TerminationEvent {
+        if (!this.INSTANCE) {
+            this.INSTANCE = new TerminationEvent();
+        }
+        return this.INSTANCE;
+    }
+
+}
+
 export class RenderedMonitoringEvent extends CoreEvent {
 
-    constructor() {
+    private constructor() {
         super([]);
     }
 
@@ -147,7 +164,7 @@ export class RenderedMonitoringEvent extends CoreEvent {
 
 export class AfterBootstrapMonitoringEvent extends MessageReceivedEvent {
 
-    constructor() {
+    private constructor() {
         super(SYSTEM_NAMESPACE, BOOTSTRAP_FINISHED_MESSAGE.messageid, ParameterDeclarationList.empty());
     }
 
@@ -164,7 +181,7 @@ export class AfterBootstrapMonitoringEvent extends MessageReceivedEvent {
 
 export class AfterStatementMonitoringEvent extends CoreEvent {
 
-    constructor() {
+    private constructor() {
         super([]);
     }
 
@@ -181,7 +198,7 @@ export class AfterStatementMonitoringEvent extends CoreEvent {
 
 export class CloneStartEvent extends CoreEvent {
 
-    constructor() {
+    private constructor() {
         super([]);
     }
 

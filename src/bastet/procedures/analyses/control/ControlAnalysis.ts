@@ -53,6 +53,9 @@ import {LexiKey} from "../../../utils/Lexicographic";
 import {getTheOnlyElement} from "../../../utils/Collections";
 import {TransitionRelation} from "../../../syntax/app/controlflow/TransitionRelation";
 import {ControlCoverageExaminer} from "./coverage/ControlCoverage";
+import {ControlLocationExtractor} from "./ControlUtils";
+import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
+import {ReturnStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -98,7 +101,12 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
         const result: ControlAbstractState[] = [];
         for (const r of this._transferRelation.abstractSucc(fromState)) {
-            if (!this.steppedOnLoophead(r) || this.refiner.checkIsFeasible(r, "Loop unrolling")) {
+            const ctrlLocs: ImmSet<RelationLocation> = r.accept(new ControlLocationExtractor(this._task));
+            const loopHeads = ctrlLocs.filter((rl) => {
+                return this._task.getTransitionRelationById(rl.getRelationId()).isLoopHead(rl.getLocationId())
+            });
+
+            if (loopHeads.isEmpty() || this.refiner.checkIsFeasible(r, `Loop unrolling for ${loopHeads.toString()}`)) {
                 result.push(r);
             }
         }
@@ -237,7 +245,18 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
                 }
                 result.push(t);
             } else {
-                return steppedThread.getOperations().map(oid => ProgramOperation.for(oid)).toArray();
+                const fromRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
+                const toRelation = this._task.getTransitionRelationById(toLocation.getRelationId());
+
+                const calls = fromRelation.transitionsFrom(fromLocation.getLocationId())
+                    .map(t => ProgramOperation.for(t.opId))
+                    .filter(o => o.ast instanceof CallStatement || o.ast instanceof ReturnStatement);
+                if (calls.length > 0) {
+                    const call = getTheOnlyElement(calls);
+                    result.push(call);
+                } else {
+                    return steppedThread.getOperations().map(oid => ProgramOperation.for(oid)).toArray();
+                }
             }
         }
 

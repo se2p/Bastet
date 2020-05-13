@@ -65,6 +65,7 @@ import {List as ImmList, Set as ImmSet} from "immutable";
 import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
+import {SystemVariables} from "../../../syntax/app/SystemVariables";
 
 
 export class DataAnalysisConfig extends BastetConfiguration {
@@ -161,7 +162,8 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     private readonly _mergeOp: MergeOperator<DataAbstractState>;
 
-    constructor(config:{}, folLattice: FirstOrderLattice<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
+    constructor(config: {},
+                folLattice: FirstOrderLattice<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
                 theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
                 statistics: AnalysisStatistics) {
         Preconditions.checkNotUndefined(folLattice);

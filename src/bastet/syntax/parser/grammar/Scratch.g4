@@ -1,4 +1,0 @@
-grammar Scratch;
-
-import ScratchCore;
-

@@ -34,7 +34,7 @@ export class ControlFlows {
 
         for (let a of unionActors) {
             if (resultActorsMap[a.ident]) {
-                if (a.isBootstrapper) {
+                if (a.isBootstrapper || a.isTerminator) {
                     Preconditions.checkState(resultActorsMap[a.ident] === a);
                     continue;
                 }
