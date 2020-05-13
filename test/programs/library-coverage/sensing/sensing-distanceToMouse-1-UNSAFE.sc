@@ -3,7 +3,7 @@ program TestProgram
 actor Ball1 is ScratchSprite begin
 
     script on startup do begin
-        goto(0-50,0)
+        goTo(0-50,0)
         repeat forever begin
             if distanceToMousePointer() < 10 then begin
                 broadcast "Inc"
@@ -19,7 +19,7 @@ actor Ball2 is ScratchSprite begin
     define signaled as false
 
     script on startup do begin
-        goto(50,0)
+        goTo(50,0)
         repeat forever begin
             if distanceToMousePointer() < 10 then begin
                 if signaled then begin

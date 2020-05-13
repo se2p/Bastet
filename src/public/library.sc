@@ -613,14 +613,22 @@ role MathActor begin
         end
     end returns result: float
 
-    define atomic mathAbsF(n: float) begin
-        if n < 0.0 then begin
-            define result as n * (0.0-1.0)
+    define atomic mathAbs(n: int) begin
+        if n < 0 then begin
+            define result as 0 - n
         end else begin
             define result as n
         end
+    end returns result: int
 
+    define atomic mathAbsF(n: float) begin
+        if n < 0.0 then begin
+            define result as 0.0 - n
+        end else begin
+            define result as n
+        end
     end returns result: float
+
 end
 
 role RuntimeEntity is MathActor, KeyboardIO begin
@@ -671,8 +679,6 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     // See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
     extern randomBetween (intervalStart: int, intervalEnd: int) returns int
-
-    extern mathAbs (n: int) returns int
 
     extern mathCeiling (n: int) returns int
 
@@ -1415,7 +1421,18 @@ role ScratchSprite is ScratchEntity begin
 
     // @Category "Sensing"
     define distanceToMousePointer () begin
+        define result as distanceTo(mouseX(), mouseY())
+    end returns result : int
+
+    define distanceTo (targetX: int, targetY: int) begin
+        // We use a 'TaxiCap' approximation:
+        //      https://en.wikibooks.org/wiki/Algorithms/Distance_approximations
         // ...
+        declare dx as int
+        declare dy as int
+        define dx as mathAbs(x - targetX)
+        define dy as mathAbs(y - targetY)
+        define result as dx + dy
     end returns result : int
 
     define atomic sayTextFor (msg: string, scs: int) begin
