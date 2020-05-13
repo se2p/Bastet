@@ -723,7 +723,7 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
             const updatedMethodDefList: MethodDefinitionList = new MethodDefinitionList(
                 runtimeMethods.concat((methods.node as MethodDefinitions).getFullMethodDefinitions().elements));
 
-            return TransformerResult.withNode(new ActorDefinition(
+            const result = new ActorDefinition(
                 actorMode,
                 ident as Identifier,
                 inheritesFrom,
@@ -732,7 +732,9 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
                 initStatements,
                 updatedMethodDefList,
                 methods.nodeOnly<MethodDefinitions>().getExternalMethods(),
-                scripts.node as ScriptDefinitionList));
+                scripts.node as ScriptDefinitionList);
+
+            return TransformerResult.withNode(result);
 
         } finally {
             this._activeDeclarationScope = this._activeDeclarationScope.endScope();
@@ -1558,12 +1560,12 @@ class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
     }
 
     public visitSystemMessage(ctx: SystemMessageContext) : TransformerResult {
-        const strTr = ctx.stringExpr().accept(this);
-        const payloadTr = ctx.payload.accept(this);
+        const messageIdTr = ctx.stringExpr().accept(this);
+        const channel = StringLiteral.from(ctx.String().text);
+        const payloadTr = ctx.expressionList().accept(this);
         return new TransformerResult(
-            StatementLists.concat(strTr.statementsToPrepend, payloadTr.statementsToPrepend),
-            new SystemMessage(StringLiteral.from(ctx.String().text),
-                strTr.node as StringExpression,
+            StatementLists.concat(messageIdTr.statementsToPrepend, payloadTr.statementsToPrepend),
+            new SystemMessage(channel, messageIdTr.node as StringExpression,
                 payloadTr.node as ExpressionList));
     }
 
