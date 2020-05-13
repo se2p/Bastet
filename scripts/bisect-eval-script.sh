@@ -23,6 +23,7 @@ then
 fi
 
 ./scripts/bastet.sh \
+    -c config/default.json,config/benchmarking.delta.json \
     -I src/public/library.sc \
     -P $PROGRAM \
     -S test/programs/empty.sc \
