@@ -424,9 +424,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         for (const [ti, ts] of result.threadStates.entries()) {
             if (ts.getComputationState() != ThreadComputationState.THREAD_STATE_FAILURE) {
-                const leaving = this.resolveLeavingOps(cs, new IndexedThread(ts, ti));
-                if (leaving.length == 0) {
-                    result = result.withThreadStateUpdate(ti, (ts) => ts.withComputationState(ThreadComputationState.THREAD_STATE_DONE));
+                if (ts.getWaitingForThreads().size == 0) { // might wight for a condition check thread, which might conduct acceleration
+                    const leaving = this.resolveLeavingOps(cs, new IndexedThread(ts, ti));
+                    if (leaving.length == 0) {
+                        result = result.withThreadStateUpdate(ti, (ts) => ts.withComputationState(ThreadComputationState.THREAD_STATE_DONE));
+                    }
                 }
             }
         }
@@ -910,7 +912,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
                 result = result.withThreadStateUpdate(threadIndex, (ts) => ts.withWaitingForThreads(stillWaitingFor));
                 if (stillWaitingFor.size == 0) {
-                    result = result.withThreadStateUpdate(threadIndex, (ts) => ts.withComputationState(ThreadComputationState.THREAD_STATE_YIELD));
+//                    if (this.resolveLeavingOps(result, result.getIndexedThreadState(threadIndex)).length == 0) {
+//                        result = result.withThreadStateUpdate(threadIndex, (ts) => ts.withComputationState(ThreadComputationState.THREAD_STATE_DONE));
+//                    } else {
+                        result = result.withThreadStateUpdate(threadIndex, (ts) => ts.withComputationState(ThreadComputationState.THREAD_STATE_YIELD));
+//                    }
                 }
             }
         }
