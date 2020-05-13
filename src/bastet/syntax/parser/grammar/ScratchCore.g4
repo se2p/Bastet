@@ -96,8 +96,8 @@ event :
   | 'bootstrap' 'finished' # AfterBootstrapMonitoringEvent
   | 'startup' # StartupEvent
   | 'started' 'as' 'clone' # CloneStartEvent
-  | 'received' 'message' stringExpr messageNamespace parameterList # MessageReceivedEvent
-  | 'reached condition' boolExpr # ConditionReachedEvent
+  | 'message' stringExpr parameterList messageNamespace # MessageReceivedEvent
+  | 'condition' boolExpr # ConditionReachedEvent
   | 'rendered' # RenderedMonitoringEvent
   | 'statement' 'finished' # AfterStatementMonitoringEvent
   ;
@@ -374,5 +374,5 @@ resourceLocator : String ;
 
 message :
   stringExpr # UserMessage
-  | String '/' stringExpr expressionList # SystemMessage
+  | stringExpr expressionList 'to' String # SystemMessage
   ;
