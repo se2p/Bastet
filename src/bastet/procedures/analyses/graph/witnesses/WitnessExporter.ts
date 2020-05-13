@@ -157,17 +157,28 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 }
 
 class Target {
+    private static readonly SCRATCH_TARGET_ATTRIBUTES = ['x', 'y', 'direction', 'draggable', 'rotationStyle', 'visible', 'size'];
     name: string;
+    scratchAttributes: {[key: string]: string | boolean | number} = {};
+    userDefinedAttributes: {[key: string]: string | boolean | number} = {};
 
     static fromConcretePrimitives(name: string, attributes: Map<string, ConcretePrimitive<any>>) : Target {
         const target = new Target();
         target.name = name;
 
         attributes.forEach((value, attribute) => {
-            target[attribute] = value.value;
+            if (this.isScratchAttribute(attribute)) {
+                target.scratchAttributes[attribute] = value.value;
+            } else {
+                target.userDefinedAttributes[attribute] = value.value;
+            }
         })
 
         return target;
+    }
+
+    static isScratchAttribute(name: string): boolean {
+        return this.SCRATCH_TARGET_ATTRIBUTES.includes(name);
     }
 }
 
