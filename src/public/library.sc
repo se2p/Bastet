@@ -2,14 +2,64 @@ module ScratchLibrary
 
 actor IOActor begin
 
-    declare mouseX as int
+    declare mouse_x as int
 
-    declare mouseY as int
+    declare mouse_y as int
 
     declare answer as string
 
     // Key code of the currently pressed key
     declare key_pressed as int
+
+    script on message "ASK" () in "SYSTEM" do begin
+        declare nondet_str as string
+        define answer as nondet_str
+        declare inputDurationSecs as int
+        assume inputDurationSecs > 0
+        assume inputDurationSecs < 30
+        wait inputDurationSecs seconds
+        // UNSOUND: might wait arbitrarily long
+    end
+
+end
+
+role KeyboardIO begin
+
+    declare KEY_ANY as int
+    declare KEY_ENTER as int
+    declare KEY_SPACE as int
+    declare KEY_LEFT as int
+    declare KEY_UP as int
+    declare KEY_RIGHT as int
+    declare KEY_DOWN as int
+
+    define KEY_ANY as 0
+    define KEY_ENTER as 13
+    define KEY_SPACE as 32
+    define KEY_LEFT as 37
+    define KEY_UP as 38
+    define KEY_RIGHT as 39
+    define KEY_DOWN as 40
+
+    define atomic stringToKey(s: string) begin
+        if s = " " then begin
+            define result as KEY_SPACE
+        end else if s = "ArrowLeft" or s = "Left" then begin
+            define result as KEY_LEFT
+        end else if s = "ArrowRight" or s = "Right" then begin
+            define result as KEY_LEFT
+        end else if s = "ArrowUp" or s = "Up" then begin
+            define result as KEY_UP
+        end else if s = "ArrowDown" or s = "Down" then begin
+            define result as KEY_DOWN
+        end else if s = "Enter" then begin
+            define result as KEY_ENTER
+        end else if s = "Any" then begin
+            // Any key
+        end else begin
+            _RUNTIME_signalFailure("Unknown key string")
+        end
+    end returns result : int
 
 end
 
@@ -573,9 +623,9 @@ role MathActor begin
     end returns result: float
 end
 
-role RuntimeEntity is MathActor begin
+role RuntimeEntity is MathActor, KeyboardIO begin
 
-extern _RUNTIME_getInitialActors () returns list of string
+    extern _RUNTIME_getInitialActors () returns list of string
 
     extern _RUNTIME_getClonesOf (ac: string) returns list of string
 
@@ -641,20 +691,6 @@ extern _RUNTIME_getInitialActors () returns list of string
     extern mathPowten(n: int) returns int
 
     extern label (str: string)
-
-    define getMouseX()  begin
-        declare io as actor
-
-        define io as locate actor "IOActor"
-        define result as cast (attribute "mouseX" of io) to int
-    end returns result: int
-
-    define getMouseY()  begin
-        declare io as actor
-
-        define io as locate actor "IOActor"
-        define result as cast (attribute "mouseY" of io) to int
-    end returns result: int
 
     define getGraphicIdByIndex (idx: int) begin
         define result as ""
@@ -723,13 +759,35 @@ extern _RUNTIME_getInitialActors () returns list of string
     define atomic microseconds() begin
         define result as _RUNTIME_micros()
     end returns result: int
-    end
 
-    role Observer is RuntimeEntity begin
+    // @Category "Sensing"
+    // @Block "mouse down?"
+    define atomic mouseDown () begin
+    end returns result : boolean
+
+    // @Category "Sensing"
+    // @Block "mouse x"
+    define atomic mouseX() begin
+        declare io as actor
+        define io as locate actor "IOActor"
+        define result as cast (attribute "mouse_x" of io) to int
+    end returns result: int
+
+    // @Category "Sensing"
+    // @Block "mouse y"
+    define atomic mouseY()  begin
+        declare io as actor
+        define io as locate actor "IOActor"
+        define result as cast (attribute "mouse_y" of io) to int
+    end returns result: int
+
+end
+
+role Observer is RuntimeEntity begin
 
     // @Category "Specification"
-    define atomic assert (condition: boolean) begin
-        if not condition then begin
+    define atomic assert (cond: boolean) begin
+        if not cond then begin
             _RUNTIME_signalFailure("Asserted property must be satisfied!")
         end
     end
@@ -903,13 +961,26 @@ extern _RUNTIME_getInitialActors () returns list of string
         define half_height as cast attribute "active_graphic_half_height" of obj to int
 
         define result as true
-        if not (getMouseX() < x + half_width
-            or getMouseX() > x - half_width
-            or getMouseY() < y + half_height
-            or getMouseY() > y - half_height) then begin
+        if not (mouseX() < x + half_width
+            or mouseX() > x - half_width
+            or mouseY() < y + half_height
+            or mouseY() > y - half_height) then begin
 
             define result as false
         end
+    end returns result : boolean
+
+    // @Category "Sensing"
+    // @Block "key (int as key) pressed?"
+    define atomic keyPressedByCode (key: int) begin
+    end returns result : boolean
+
+    // @Category "Sensing"
+    // @Block "key (string as key) pressed?"
+    define atomic keyPressedByName (name: string) begin
+        declare key as int
+        define key as stringToKey(name)
+        return keyPressedByCode(key)
     end returns result : boolean
 
 end
@@ -1019,6 +1090,12 @@ role ScratchEntity is RuntimeEntity begin
     // @Block "volume"
     define volume () begin
     end returns result : int
+
+    // @Category "Sensing"
+    // @Block "ask (question as string) and wait"
+    define atomic askAndWait (question: string) begin
+        broadcast "ASK" () to "SYSTEM"
+    end
 
 end
 
@@ -1155,10 +1232,10 @@ role ScratchSprite is ScratchEntity begin
 
     // @Category "Sensing"
     define atomic touchingMousePointer () begin
-        if not (getMouseX() < x
-                or getMouseX() > x + active_graphic_half_width
-                or getMouseY() < y
-                or getMouseY() > y + active_graphic_half_height) then begin
+        if not (mouseX() < x
+                or mouseX() > x + active_graphic_half_width
+                or mouseY() < y
+                or mouseY() > y + active_graphic_half_height) then begin
 
             define result as false
         end
