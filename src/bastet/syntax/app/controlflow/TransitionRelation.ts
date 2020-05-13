@@ -26,6 +26,7 @@ import {ControlLocation, LocationId} from "./ControlLocation";
 import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
 import {Preconditions} from "../../../utils/Preconditions";
 import {ControlDominance, DominanceMode} from "./Dominators";
+import {CorePrintVisitor} from "../../ast/CorePrintVisitor";
 
 const toposort = require('toposort');
 
@@ -345,7 +346,7 @@ export class TransitionRelation {
         let lines: string[] = [];
         for (let fromId of this._locations) {
             for (let t of this.transitionsFrom(fromId)) {
-                lines.push(`(${fromId}) ${t.opId} (${t.target})`);
+                lines.push(`(${fromId}) ${ProgramOperations.withID(t.opId).ast.accept(new CorePrintVisitor())} (${t.target})`);
             }
         }
         return lines.join("\n");
