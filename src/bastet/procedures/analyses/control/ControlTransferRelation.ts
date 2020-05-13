@@ -936,7 +936,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 return this.checkConditionAndWakeUpIfSatisfied(state);
 
             } else {
-                // Acceleration applicable
+                // Acceleration applicable (no runnable program thread)
 
                 // Group the conditions by the variant variable (which should be accelerated)
                 // (assuming that there is no dependency between the variables to accelerate)
