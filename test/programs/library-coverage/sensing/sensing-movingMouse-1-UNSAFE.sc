@@ -18,7 +18,7 @@ actor Beetle is ScratchSprite begin
                     define state as 0
                 end
             end else if state = 1 then begin
-                 wait 1 seconds
+                wait 1 seconds
                 declare mx as int
                 define mx as mouseX()
                 if mx > 0-100 and mx < 0 then begin
@@ -27,13 +27,20 @@ actor Beetle is ScratchSprite begin
                     define state as 0
                 end
             end else if state = 2 then begin
-                 wait 1 seconds
+                wait 1 seconds
                 declare mx as int
                 define mx as mouseX()
                 if mx > 0 and mx < 100 then begin
-                    _RUNTIME_signalFailure("Bug revealed!")
+                    define state as 3
                 end else begin
                     define state as 0
+                end
+            end else if state = 3 then begin
+                wait 1 seconds
+                declare mx as int
+                define mx as mouseX()
+                if mx > 100 then begin
+                    _RUNTIME_signalFailure("Bug revealed!")
                 end
             end
         end

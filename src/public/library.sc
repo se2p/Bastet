@@ -1,6 +1,6 @@
 module ScratchLibrary
 
-actor IOActor begin
+actor IOActor is RuntimeEntity begin
 
     declare mouse_x as int
 
@@ -774,17 +774,13 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     // @Category "Sensing"
     // @Block "mouse x"
     define atomic mouseX() begin
-        declare io as actor
-        define io as locate actor "IOActor"
-        define result as cast (attribute "mouse_x" of io) to int
+        // NON-DET position
     end returns result: int
 
     // @Category "Sensing"
     // @Block "mouse y"
     define atomic mouseY()  begin
-        declare io as actor
-        define io as locate actor "IOActor"
-        define result as cast (attribute "mouse_y" of io) to int
+        // NON-DET position
     end returns result: int
 
 end

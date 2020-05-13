@@ -16,7 +16,10 @@ end
 actor Ball2 is ScratchSprite begin
 
     declare signaled as boolean
-    define signaled as false
+
+    script on bootstrap do begin
+        define signaled as false
+    end
 
     script on startup do begin
         goTo(50,0)
