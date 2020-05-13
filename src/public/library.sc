@@ -980,7 +980,7 @@ role Observer is RuntimeEntity begin
     define atomic keyPressedByName (name: string) begin
         declare key as int
         define key as stringToKey(name)
-        return keyPressedByCode(key)
+        define result as keyPressedByCode(key)
     end returns result : boolean
 
 end

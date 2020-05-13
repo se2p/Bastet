@@ -19,7 +19,7 @@
  *
  */
 
-import {ProgramContext} from "./grammar/ScratchParser";
+import {ProgramContext} from "./grammar/LeilaParser";
 
 export interface ProgramParser {
 

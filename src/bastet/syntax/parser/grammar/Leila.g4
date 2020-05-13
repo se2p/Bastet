@@ -1,6 +1,6 @@
-grammar ScratchCore;
+grammar Leila;
 
-import ScratchLiterals;
+import LeilaLiterals;
 
 // A program has a name and is composed of a list of actors.
 // The term 'actor' is used to describe one entity in the Scratch world.

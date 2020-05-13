@@ -19,10 +19,10 @@
  *
  */
 
-import {ScratchVisitor} from "./grammar/ScratchVisitor";
+import {LeilaVisitor} from "./grammar/LeilaVisitor";
 import {ErrorNode, ParseTree, RuleNode, TerminalNode} from "antlr4ts/tree";
 
-export class RawAstToDotVisitor implements ScratchVisitor<void> {
+export class RawAstToDotVisitor implements LeilaVisitor<void> {
 
     private _dot: string[];
     private _idseq: number;

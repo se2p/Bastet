@@ -20,7 +20,7 @@
  */
 
 import {ErrorNode, ParseTree, RuleNode, TerminalNode} from "antlr4ts/tree";
-import {ScratchVisitor} from "../parser/grammar/ScratchVisitor";
+import {LeilaVisitor} from "../parser/grammar/LeilaVisitor";
 import {AbsentAstNode, AstNode, OptionalAstNode, PresentAstNode} from "../ast/AstNode";
 import {
     ActorComponentsDefinitionContext,
@@ -171,7 +171,7 @@ import {
     VoidReturnDefinitionContext,
     WaitSecsStatementContext,
     WaitUntilStatementContext
-} from "../parser/grammar/ScratchParser";
+} from "../parser/grammar/LeilaParser";
 import {ProgramDefinition} from "../ast/core/ModuleDefinition";
 import {Identifier} from "../ast/core/Identifier";
 import {
@@ -394,7 +394,7 @@ class TransformerResultList<E extends AstNode> {
     }
 }
 
-class ToIntermediateVisitor implements ScratchVisitor<TransformerResult> {
+class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
     private readonly _methodLibrary: App;
     private readonly _typeStack: Array<ScratchType>;

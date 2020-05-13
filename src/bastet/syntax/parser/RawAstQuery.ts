@@ -20,10 +20,10 @@
  */
 
 import {ErrorNode, ParseTree, RuleNode, TerminalNode} from "antlr4ts/tree";
-import {ScratchVisitor} from "./grammar/ScratchVisitor";
+import {LeilaVisitor} from "./grammar/LeilaVisitor";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
-class QueringVisitor implements ScratchVisitor<RuleNode[]> {
+class QueringVisitor implements LeilaVisitor<RuleNode[]> {
 
     private readonly pred: (RuleNode) => boolean;
 
