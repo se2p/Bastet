@@ -5,8 +5,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 PROGRAM="$1"
 MAX_MSECS="$2"
 
-# Root directory of BASTET
-cd $SCRIPT_DIR/..
+cd $BASTET_ROOT
 
 RESULT_FILE=$(mktemp)
 
