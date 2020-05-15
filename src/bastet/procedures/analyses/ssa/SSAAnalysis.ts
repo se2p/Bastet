@@ -39,6 +39,7 @@ import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {SSAMergeOperator} from "./SSAMergeOperator";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
+import {AccessibilityRelation} from "../Accessibility";
 
 
 export class SSAAnalysisConfig extends BastetConfiguration {
@@ -168,6 +169,14 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
 
     finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
+    }
+
+    chooseFinitePathTo(reached: ReachedSet<F>, state: F): F[] {
+        return this.wrappedAnalysis.chooseFinitePathTo(reached, state);
+    }
+
+    testify(accessibility: AccessibilityRelation<SSAState, F>, state: F): AccessibilityRelation<SSAState, F> {
+        return this.wrappedAnalysis.testify(accessibility, state);
     }
 
 }

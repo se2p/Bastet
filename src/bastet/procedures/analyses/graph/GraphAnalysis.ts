@@ -20,6 +20,7 @@
  */
 
 import {
+    AccessibilityAwarePathOperator,
     MergeIntoOperator,
     ProgramAnalysis,
     StopOperator,
@@ -63,6 +64,7 @@ import {DummyHandler, WitnessHandler} from "../WitnessHandlers";
 import {WitnessExporter} from "./witnesses/WitnessExporter";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {LexiKey} from "../../../utils/Lexicographic";
+import { AccessibilityRelation } from "../Accessibility";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 
@@ -90,7 +92,7 @@ export class GraphAnalysisConfig extends BastetConfiguration {
 
 export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState, GraphAbstractState>,
     Unwrapper<GraphAbstractState, AbstractElement>, StatePartitionOperator<GraphAbstractState>,
-    TransitionLabelProvider<GraphAbstractState> {
+    TransitionLabelProvider<GraphAbstractState>, AccessibilityAwarePathOperator<GraphAbstractState, AbstractState> {
 
     private readonly _abstractDomain: AbstractDomain<GraphConcreteState, GraphAbstractState>;
 
@@ -131,7 +133,9 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         }
 
         if (this._config.stopOperator == 'CheckCoverage') {
-            this._stopOp = new GraphCoverCheckStopOperator(this.wrappedAnalysis, (e) => {return this.unwrap(e)});
+            this._stopOp = new GraphCoverCheckStopOperator(this.wrappedAnalysis, (e) => {
+                return this.unwrap(e)
+            });
         } else if (this._config.stopOperator == 'NoStop') {
             this._stopOp = new NoStopOperator();
         } else {
@@ -145,6 +149,10 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         } else {
             throw new IllegalArgumentException("Illegal witness handler configuration");
         }
+    }
+
+    chooseFinitePathAlong(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): AbstractState[] {
+        throw new ImplementMeException();
     }
 
     abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
@@ -274,6 +282,14 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
 
     finalizeResults(frontier: FrontierSet<GraphAbstractState>, reached: ReachedSet<GraphAbstractState>) {
         this.wrappedAnalysis.finalizeResults(frontier, reached);
+    }
+
+    chooseFinitePathTo(reached: ReachedSet<GraphAbstractState>, state: GraphAbstractState): GraphAbstractState[] {
+        throw new ImplementMeException();
+    }
+
+    testify(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
+        throw new ImplementMeException();
     }
 
 

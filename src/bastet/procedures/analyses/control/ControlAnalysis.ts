@@ -19,7 +19,12 @@
  *
  */
 
-import {ProgramAnalysisWithLabelProducer, ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
+import {
+    AccessibilityAwarePathOperator,
+    ProgramAnalysisWithLabelProducer,
+    ProgramAnalysisWithLabels,
+    WrappingProgramAnalysis
+} from "../ProgramAnalysis";
 import {
     ControlAbstractDomain,
     ControlAbstractState,
@@ -56,6 +61,7 @@ import {ControlCoverageExaminer} from "./coverage/ControlCoverage";
 import {ControlLocationExtractor} from "./ControlUtils";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {ReturnStatement} from "../../../syntax/ast/core/statements/ControlStatement";
+import { AccessibilityRelation } from "../Accessibility";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -71,7 +77,7 @@ export class ControlAnalysisConfig extends BastetConfiguration {
 
 export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<ControlConcreteState, ControlAbstractState, AbstractState>,
     WrappingProgramAnalysis<ControlConcreteState, ControlAbstractState, AbstractState>,
-    Unwrapper<ControlAbstractState, AbstractElement> {
+    Unwrapper<ControlAbstractState, AbstractElement>, AccessibilityAwarePathOperator<ControlAbstractState, AbstractState> {
 
     private readonly _config: ControlAnalysisConfig;
 
@@ -89,13 +95,13 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
 
     constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>, statistics: AnalysisStatistics) {
         this._config = new ControlAnalysisConfig(config);
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new ControlAbstractDomain(wrappedAnalysis.abstractDomain);
         this._transferRelation = new ControlTransferRelation(this._config, task, this.wrappedAnalysis,
-            this._wrappedAnalysis.abstractDomain);
+            this._wrappedAnalysis.abstractDomain, this._statistics);
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
-        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
@@ -332,4 +338,18 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         covStats.put("uncoveredLocationsAbs", coverage.uncoveredControlLocationsAbs);
         covStats.put("uncoveredPerLocationAbs", coverage.numberOfUncoveredPerRelation);
     }
+
+
+    chooseFinitePathAlong(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): AbstractState[] {
+        throw new ImplementMeException();
+    }
+
+    chooseFinitePathTo(reached: ReachedSet<AbstractState>, state: AbstractState): AbstractState[] {
+        throw new ImplementMeException();
+    }
+
+    testify(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {
+        throw new ImplementMeException();
+    }
+
 }

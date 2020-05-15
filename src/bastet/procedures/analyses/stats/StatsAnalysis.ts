@@ -32,6 +32,7 @@ import {Refiner, Unwrapper} from "../Refiner";
 import {Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {AccessibilityRelation} from "../Accessibility";
 
 
 export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F extends AbstractState>
@@ -195,6 +196,14 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
 
     finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
+    }
+
+    testify(accessibility: AccessibilityRelation<E, F>, state: F): AccessibilityRelation<E, F> {
+        return this.wrappedAnalysis.testify(accessibility, state);
+    }
+
+    chooseFinitePathTo(reached: ReachedSet<F>, state: F): F[] {
+        return this.wrappedAnalysis.chooseFinitePathTo(reached, state);
     }
 }
 

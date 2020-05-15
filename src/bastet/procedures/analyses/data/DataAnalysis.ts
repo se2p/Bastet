@@ -19,7 +19,7 @@
  *
  */
 
-import {MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
+import {AccessibilityAwarePathOperator, MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
 import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
@@ -65,6 +65,8 @@ import {List as ImmList, Set as ImmSet} from "immutable";
 import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {SystemVariables} from "../../../syntax/app/SystemVariables";
+import { AccessibilityRelation } from "../Accessibility";
+import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 
 
 export class DataAnalysisConfig extends BastetConfiguration {
@@ -145,7 +147,7 @@ export class Theories implements TransformerTheories<FirstOrderFormula, BooleanF
 }
 
 export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState, AbstractState>,
-    LabeledTransferRelation<DataAbstractState> {
+    LabeledTransferRelation<DataAbstractState>, AccessibilityAwarePathOperator<DataAbstractState, AbstractState> {
 
     private readonly _theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
 
@@ -175,6 +177,10 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         this._refiner = new DataRefiner(this._abstractDomain.lattice);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = StandardMergeOperatorFactory.create(this._config.mergeOperator, this._abstractDomain);
+    }
+
+    chooseFinitePathAlong(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): AbstractState[] {
+        throw new ImplementMeException();
     }
 
     abstractSucc(fromState: DataAbstractState): Iterable<DataAbstractState> {
@@ -257,6 +263,14 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     }
 
     finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
+    }
+
+    chooseFinitePathTo(reached: ReachedSet<AbstractState>, state: AbstractState): AbstractState[] {
+        throw new ImplementMeException();
+    }
+
+    testify(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<DataAbstractState, AbstractState> {
+        throw new ImplementMeException();
     }
 
 }

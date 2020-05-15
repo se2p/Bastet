@@ -19,7 +19,12 @@
  *
  */
 
-import {ProgramAnalysis, ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
+import {
+    AccessibilityAwarePathOperator,
+    ProgramAnalysis,
+    ProgramAnalysisWithLabels,
+    WrappingProgramAnalysis
+} from "../ProgramAnalysis";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AnalysisStatistics} from "../AnalysisStatistics";
@@ -39,12 +44,13 @@ import {Map as ImmMap, List as ImmList, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {TimeAbstractDomain, TimeState} from "./TimeAbstractDomain";
 import {TimeMergeOperator} from "./TimeMergeOperator";
+import { AccessibilityRelation } from "../Accessibility";
 
 
 export class TimeAnalysis<F extends AbstractState>
     implements WrappingProgramAnalysis<ConcreteElement, TimeState, F>,
         Unwrapper<TimeState, AbstractElement>,
-        LabeledTransferRelation<TimeState>{
+        LabeledTransferRelation<TimeState>, AccessibilityAwarePathOperator<TimeState, F> {
 
     private readonly _abstractDomain: TimeAbstractDomain;
 
@@ -73,7 +79,19 @@ export class TimeAnalysis<F extends AbstractState>
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._transfer = new TimeTransferRelation(task, timeProfile,
             new LabeledTransferRelationImpl(null,
-            (from, op, co) => wrappedAnalysis.abstractSuccFor(from, op, co)));
+                (from, op, co) => wrappedAnalysis.abstractSuccFor(from, op, co)));
+    }
+
+    chooseFinitePathAlong(accessibility: AccessibilityRelation<F, F>, state: F): F[] {
+        throw new ImplementMeException();
+    }
+
+    testify(accessibility: AccessibilityRelation<TimeState, F>, state: F): AccessibilityRelation<TimeState, F> {
+        throw new ImplementMeException();
+    }
+
+    chooseFinitePathTo(reached: ReachedSet<F>, state: F): F[] {
+        throw new ImplementMeException();
     }
 
     abstractSucc(fromState: TimeState): Iterable<TimeState> {
