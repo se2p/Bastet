@@ -40,6 +40,7 @@ import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
+    private static readonly IRRELEVANT_TARGETS = ['IOActor'];
     private readonly _analysis: GraphAnalysis;
 
     constructor(analysis: GraphAnalysis) {
@@ -64,9 +65,12 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             const ssaState = graphAbstractState.accept(ssaStateVisitor);
             const memoryInStep = ssaState.getPrimitiveAttributes(errorState);
             const targetStates = WitnessExporter.groupByTargets(memoryInStep);
+            const globalTime = memoryInStep.get("__global_time_micros")
+            step.timestamp = globalTime ? globalTime.value : 0;
 
             targetStates.forEach((state, targetName) => {
                 const target = Target.fromConcretePrimitives(targetName, state);
+                target.removeUserDefinedAttributes(['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE', 'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT'])
                 step.targets.push(target);
             })
 
@@ -80,7 +84,10 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         }
 
         errorWitness.steps = errorWitness.steps.filter(witness => !witness.isEmpty());
+        errorWitness.steps = WitnessExporter.combineMouseCallSteps(errorWitness.steps);
+        // errorWitness.steps = WitnessExporter.removeIrrelevantTransitions(errorWitness.steps);
 
+        // errorWitness.steps[0].action = "Initial state";
         this.exportErrorWitness(errorWitness);
     }
 
@@ -108,13 +115,15 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             if (this.isTargetAttribute(attributeWithTarget)) {
                 const {attribute, target} = WitnessExporter.mapToTargetName(attributeWithTarget);
 
-                let targetMap = targets.get(target);
-                if (!targetMap) {
-                    targetMap = new Map<string, T>();
-                }
+                if (!this.IRRELEVANT_TARGETS.includes(target)) {
+                    let targetMap = targets.get(target);
+                    if (!targetMap) {
+                        targetMap = new Map<string, T>();
+                    }
 
-                targetMap.set(attribute, value);
-                targets.set(target, targetMap);
+                    targetMap.set(attribute, value);
+                    targets.set(target, targetMap);
+                }
             } else {
                 // TODO figure out what to do with other attributes (__op_time_129, ...)
             }
@@ -140,6 +149,64 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return attribute.includes("@");
     }
 
+    private static combineMouseCallSteps(steps: ErrorWitnessStep[]): ErrorWitnessStep[] {
+        const filteredArray = [];
+        const mouseXTmpVariableMatcher = /^define (__tmp_[0-9]+) as mouseX\(\)$/;
+
+        let current = steps[0];
+        let index = 0;
+        let mouseXTmpVariableName = undefined;
+        let mouseXTmpVariableAssignmentToRegex: RegExp = undefined;
+        let mousePosition: MousePosition = new MousePosition(0, 0);
+        while (current != undefined) {
+            if (!mouseXTmpVariableName) {
+                const regexMatches = mouseXTmpVariableMatcher.exec(current.action);
+                if (regexMatches && regexMatches.length > 1) {
+                    mouseXTmpVariableName = regexMatches[1];
+                    mouseXTmpVariableAssignmentToRegex = new RegExp(`^define ([a-z]+) as ${mouseXTmpVariableName}$`);
+                }
+
+                filteredArray.push(current);
+            } else {
+                Preconditions.checkNotUndefined(mouseXTmpVariableAssignmentToRegex);
+                const regexMatches = mouseXTmpVariableAssignmentToRegex.exec(current.action);
+                if (regexMatches && regexMatches.length > 1) {
+                    const mouseXVariable = regexMatches[1];
+
+                    current.action = "Mouse input"
+                    mouseXTmpVariableName = undefined;
+                    filteredArray.push(current);
+
+                    mousePosition = new MousePosition(current.targets[0].userDefinedAttributes[mouseXVariable] as number, mousePosition.y);
+                }
+            }
+            current.mousePosition = mousePosition;
+
+            index++;
+            current = steps[index];
+        }
+
+        return filteredArray;
+    }
+
+    private static removeIrrelevantTransitions(steps: ErrorWitnessStep[]): ErrorWitnessStep[] {
+        const filteredArray = [];
+
+        let previous = null;
+        let current = steps[0];
+        let index = 0;
+        while (current != undefined) {
+            if (current.relevantTransition(previous)) {
+                filteredArray.push(current);
+                previous = current;
+            }
+            index++;
+            current = steps[index];
+        }
+
+        return filteredArray;
+    }
+
     public extractCounterExample(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState): GraphSafetyCounterexample {
         Preconditions.checkArgument(reached instanceof GraphReachedSetWrapper);
         const reachedSetWrapper = reached as GraphReachedSetWrapper<GraphAbstractState>;
@@ -159,8 +226,16 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 class Target {
     private static readonly SCRATCH_TARGET_ATTRIBUTES = ['x', 'y', 'direction', 'draggable', 'rotationStyle', 'visible', 'size'];
     name: string;
-    scratchAttributes: {[key: string]: string | boolean | number} = {};
+    scratchAttributes: {[key: string]: string | boolean | number} = {}; //TODO add default scratch attributes
     userDefinedAttributes: {[key: string]: string | boolean | number} = {};
+
+    removeUserDefinedAttributes(attributeToRemove: string[]) {
+        for (const attribute of attributeToRemove) {
+            if (this.userDefinedAttributes[attribute] != undefined) {
+                delete this.userDefinedAttributes[attribute];
+            }
+        }
+    }
 
     static fromConcretePrimitives(name: string, attributes: Map<string, ConcretePrimitive<any>>) : Target {
         const target = new Target();
@@ -182,13 +257,37 @@ class Target {
     }
 }
 
+class Wait {
+    millis: number;
+}
+
+class MousePosition {
+    readonly x: number;
+    readonly y: number;
+
+    constructor(x: number, y: number) {
+        Preconditions.checkArgument(x !== undefined && y !== undefined);
+        this.x = x;
+        this.y = y;
+    }
+}
 
 class ErrorWitnessStep {
+    timestamp: number;
     action: string;
+    mousePosition: MousePosition;
+    wait: Wait;
     targets: Target[] = [];
 
     isEmpty(): boolean {
         return !this.action || this.targets.length === 0;
+    }
+
+    relevantTransition(prev: ErrorWitnessStep) {
+        this.targets = this.targets.sort((t1, t2) => t1.name.localeCompare(t2.name));
+        return !prev
+            || prev.mousePosition !== this.mousePosition
+            || this.timestamp - prev.timestamp > 1000;
     }
 }
 
