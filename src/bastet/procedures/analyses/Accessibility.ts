@@ -21,6 +21,7 @@
  */
 
 import {AbstractElement, AbstractState} from "../../lattices/Lattice";
+import {ConcreteElement} from "../domains/ConcreteElements";
 
 /**
  * The accessibility relation of an abstract reachability graph
@@ -32,8 +33,39 @@ import {AbstractElement, AbstractState} from "../../lattices/Lattice";
  */
 export interface AccessibilityRelation<E extends AbstractElement, F extends AbstractState> {
 
+    /**
+     *
+     * @param state
+     * @throws Exception if `state` is not in the accessibility relation.
+     */
     successorsOf(state: AbstractState): Iterable<AbstractState>;
 
+    /**
+     * Important: Only the initial state has the empty set of predecessor states.
+     * An exception is throw for all other states that are not in the
+     * accessibility relation.
+     *
+     * @param state
+     */
     predecessorsOf(state: AbstractState): Iterable<AbstractState>;
+
+    /**
+     * Is the given abstract state `state` reachable on in this
+     * accessibility relation?
+     */
+    isReachable(state: AbstractState): boolean;
+
+}
+
+/**
+ * An accessibility relation that pairs a particular set of concrete states
+ * to each abstract state.
+ *
+ * Helper to testify to a particular test case.
+ */
+export interface ConcretizedAccessibilityRelation<E extends AbstractElement, F extends AbstractState>
+    extends AccessibilityRelation<E, F> {
+
+    getOneConcretizedFor(state: AbstractState): ConcreteElement;
 
 }
