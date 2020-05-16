@@ -30,7 +30,7 @@ import {DataAnalysis} from "./analyses/data/DataAnalysis";
 import {BDDLibraryFactory} from "../utils/bdd/BDD";
 import {Z3Theories} from "../utils/smt/z3/Z3Theories";
 import {SSAAnalysis} from "./analyses/ssa/SSAAnalysis";
-import {BMCAlgorithm} from "./algorithms/BMCAlgorithm";
+import {FeasibilityAlgorithm} from "./algorithms/FeasibilityAlgorithm";
 import {MultiPropertyAlgorithm} from "./algorithms/MultiPropertyAlgorithm";
 import {Property} from "../syntax/Property";
 import {Set as ImmSet} from "immutable";
@@ -95,7 +95,7 @@ export class AnalysisProcedureFactory {
                 const [frontier, reached] = outerAnalysis.createStateSets();
 
                 const reachabilityAlgorithm = new ReachabilityAlgorithm(config, outerAnalysis, this._statistics);
-                const bmcAlgorithm = new BMCAlgorithm(reachabilityAlgorithm, outerAnalysis.refiner, outerAnalysis, this._statistics);
+                const bmcAlgorithm = new FeasibilityAlgorithm(reachabilityAlgorithm, outerAnalysis.refiner, outerAnalysis, this._statistics);
                 const multiPropertyAlgorithm = new MultiPropertyAlgorithm(config, task, bmcAlgorithm, outerAnalysis, this._statistics,
                     (v, s, u, stats) => {
                     outerAnalysis.finalizeResults(frontier, reached);
