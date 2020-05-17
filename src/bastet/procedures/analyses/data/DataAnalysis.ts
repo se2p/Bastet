@@ -19,14 +19,14 @@
  *
  */
 
-import {AccessibilityAwarePathOperator, MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
+import {MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
 import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {DataTransferRelation} from "./DataTransferRelation";
-import {ConcreteMemory} from "../../domains/ConcreteElements";
+import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
 import {
     AbstractNumber,
@@ -64,9 +64,7 @@ import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgument
 import {List as ImmList, Set as ImmSet} from "immutable";
 import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
 import {LexiKey} from "../../../utils/Lexicographic";
-import {SystemVariables} from "../../../syntax/app/SystemVariables";
 import { AccessibilityRelation } from "../Accessibility";
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 
 
 export class DataAnalysisConfig extends BastetConfiguration {
@@ -147,7 +145,7 @@ export class Theories implements TransformerTheories<FirstOrderFormula, BooleanF
 }
 
 export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState, AbstractState>,
-    LabeledTransferRelation<DataAbstractState>, AccessibilityAwarePathOperator<DataAbstractState, AbstractState> {
+    LabeledTransferRelation<DataAbstractState> {
 
     private readonly _theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
 
@@ -265,11 +263,19 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
     }
 
-    chooseFinitePathTo(reached: ReachedSet<AbstractState>, state: AbstractState): AbstractState[] {
+    testify(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<DataAbstractState, AbstractState> {
         throw new ImplementMeException();
     }
 
-    testify(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<DataAbstractState, AbstractState> {
+    testifyConcrete(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+        throw new ImplementMeException();
+    }
+
+    testifyConcreteOne(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+        throw new ImplementMeException();
+    }
+
+    testifyOne(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<DataAbstractState, AbstractState> {
         throw new ImplementMeException();
     }
 

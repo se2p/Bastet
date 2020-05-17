@@ -38,7 +38,7 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
        JoinOperator<E>, TargetOperator<E>, MergeIntoOperator<E, F>,
        MergeOperator<E>, StopOperator<E, F>, WidenOperator<E>, PartitionOperator<E, F>,
        WitnessHandler<F>, TraversalOrderOperator<E, F>, ResultFinalization<F>,
-       PathOperator<E, F> {
+       TestificationOperator<E, F> {
 
     abstractDomain: AbstractDomain<C, E>;
 
@@ -54,34 +54,23 @@ export interface TestificationOperator<E extends AbstractElement, F extends Abst
 
     testify(accessibility: AccessibilityRelation<E, F>, state: F): AccessibilityRelation<E, F>;
 
-}
-
-export interface PathOperator<E extends AbstractElement, F extends AbstractState> extends TestificationOperator<E, F> {
-
     /**
-     * The generalziation of `AccessibilityAwarePathOperator`.
-     *
-     * Here, we assume the coarsest possible accessibility relation, that is,
-     * one from which all states could---since the AR is an overapproximation
-     * be reachable from all other states.
-     *
-     * @param state
-     */
-    chooseFinitePathTo(reached: ReachedSet<F>, state: F): F[];
-
-}
-
-export interface AccessibilityAwarePathOperator<E extends AbstractElement, F extends AbstractState> extends PathOperator<E, F> {
-
-    /**
-     * Given an accessibility relation `accessibility` that defines a set of paths,
-     * choose one of them randomly that reaches the state `state, and
-     * that is considered feasible at the level of abstraction the state interpreter operates.
+     * Guarantees to return at most one abstract path.
      *
      * @param accessibility
      * @param state
      */
-    chooseFinitePathAlong(accessibility: AccessibilityRelation<F, F>, state: F): F[];
+    testifyOne(accessibility: AccessibilityRelation<E, F>, state: F): AccessibilityRelation<E, F>;
+
+    testifyConcrete(accessibility: AccessibilityRelation<E, F>, state: F): Iterable<ConcreteElement[]>;
+
+    /**
+     * Guaratnees to return at most one concrete path.
+     *
+     * @param accessibility
+     * @param state
+     */
+    testifyConcreteOne(accessibility: AccessibilityRelation<E, F>, state: F): Iterable<ConcreteElement[]>;
 
 }
 

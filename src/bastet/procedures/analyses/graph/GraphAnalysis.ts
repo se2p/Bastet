@@ -20,7 +20,6 @@
  */
 
 import {
-    AccessibilityAwarePathOperator,
     MergeIntoOperator,
     ProgramAnalysis,
     StopOperator,
@@ -65,6 +64,7 @@ import {WitnessExporter} from "./witnesses/WitnessExporter";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {LexiKey} from "../../../utils/Lexicographic";
 import { AccessibilityRelation } from "../Accessibility";
+import {ConcreteElement} from "../../domains/ConcreteElements";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 
@@ -92,7 +92,7 @@ export class GraphAnalysisConfig extends BastetConfiguration {
 
 export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState, GraphAbstractState>,
     Unwrapper<GraphAbstractState, AbstractElement>, StatePartitionOperator<GraphAbstractState>,
-    TransitionLabelProvider<GraphAbstractState>, AccessibilityAwarePathOperator<GraphAbstractState, AbstractState> {
+    TransitionLabelProvider<GraphAbstractState> {
 
     private readonly _abstractDomain: AbstractDomain<GraphConcreteState, GraphAbstractState>;
 
@@ -284,13 +284,20 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    chooseFinitePathTo(reached: ReachedSet<GraphAbstractState>, state: GraphAbstractState): GraphAbstractState[] {
-        throw new ImplementMeException();
-    }
-
     testify(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
         throw new ImplementMeException();
     }
 
+    testifyConcrete(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
+        throw new ImplementMeException();
+    }
+
+    testifyConcreteOne(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
+        throw new ImplementMeException();
+    }
+
+    testifyOne(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
+        throw new ImplementMeException();
+    }
 
 }

@@ -20,7 +20,6 @@
  */
 
 import {
-    AccessibilityAwarePathOperator,
     ProgramAnalysisWithLabelProducer,
     ProgramAnalysisWithLabels,
     WrappingProgramAnalysis
@@ -77,7 +76,7 @@ export class ControlAnalysisConfig extends BastetConfiguration {
 
 export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<ControlConcreteState, ControlAbstractState, AbstractState>,
     WrappingProgramAnalysis<ControlConcreteState, ControlAbstractState, AbstractState>,
-    Unwrapper<ControlAbstractState, AbstractElement>, AccessibilityAwarePathOperator<ControlAbstractState, AbstractState> {
+    Unwrapper<ControlAbstractState, AbstractElement> {
 
     private readonly _config: ControlAnalysisConfig;
 
@@ -339,17 +338,21 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         covStats.put("uncoveredPerLocationAbs", coverage.numberOfUncoveredPerRelation);
     }
 
-
-    chooseFinitePathAlong(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): AbstractState[] {
-        throw new ImplementMeException();
-    }
-
-    chooseFinitePathTo(reached: ReachedSet<AbstractState>, state: AbstractState): AbstractState[] {
-        throw new ImplementMeException();
-    }
-
     testify(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {
-        throw new ImplementMeException();
+        throw new Error("Method not implemented.");
     }
+
+    testifyOne(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {
+        throw new Error("Method not implemented.");
+    }
+
+    testifyConcrete(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): Iterable<import("../../domains/ConcreteElements").ConcreteElement[]> {
+        throw new Error("Method not implemented.");
+    }
+
+    testifyConcreteOne(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): Iterable<import("../../domains/ConcreteElements").ConcreteElement[]> {
+        throw new Error("Method not implemented.");
+    }
+
 
 }

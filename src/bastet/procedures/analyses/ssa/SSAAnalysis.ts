@@ -171,12 +171,20 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    chooseFinitePathTo(reached: ReachedSet<F>, state: F): F[] {
-        return this.wrappedAnalysis.chooseFinitePathTo(reached, state);
-    }
-
     testify(accessibility: AccessibilityRelation<SSAState, F>, state: F): AccessibilityRelation<SSAState, F> {
         return this.wrappedAnalysis.testify(accessibility, state);
+    }
+
+    testifyConcrete(accessibility: AccessibilityRelation<SSAState, F>, state: F): Iterable<ConcreteElement[]> {
+        throw new ImplementMeException();
+    }
+
+    testifyConcreteOne(accessibility: AccessibilityRelation<SSAState, F>, state: F): Iterable<ConcreteElement[]> {
+        throw new ImplementMeException();
+    }
+
+    testifyOne(accessibility: AccessibilityRelation<SSAState, F>, state: F): AccessibilityRelation<SSAState, F> {
+        return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 
 }
