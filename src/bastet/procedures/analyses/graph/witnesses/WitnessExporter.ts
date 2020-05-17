@@ -31,7 +31,7 @@ import {GraphSafetyCounterexample} from "./GraphCounterexample";
 import {ProgramAnalysis} from "../../ProgramAnalysis";
 import {DataAnalysis} from "../../data/DataAnalysis";
 import {DataAbstractState} from "../../data/DataAbstractDomain";
-import {ConcreteMemory, ConcretePrimitive} from "../../../domains/ConcreteElements";
+import {ConcreteMemory} from "../../../domains/ConcreteElements";
 import {IllegalArgumentException} from "../../../../core/exceptions/IllegalArgumentException";
 import {SSAStateVisitor} from "../../StateVisitors";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
@@ -43,10 +43,14 @@ import {ControlLocationExtractor} from "../../control/ControlUtils";
 import {ImplementMeForException} from "../../../../core/exceptions/ImplementMeException";
 import {Action, ErrorWitnessActionVisitor} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
+import {ErrorWitness, ErrorWitnessStep, MousePosition, Target} from "./ErrorWitness";
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
     private static readonly IRRELEVANT_TARGETS = ['IOActor'];
+    private static readonly IRRELEVANT_USER_DEFINED_ATTRIBUTES = ['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE',
+        'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT'];
+
     private readonly _analysis: GraphAnalysis;
     private readonly _task: App;
 
@@ -83,7 +87,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
             targetStates.forEach((state, targetName) => {
                 const target = Target.fromConcretePrimitives(targetName, state);
-                target.removeUserDefinedAttributes(['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE', 'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT'])
+                target.removeUserDefinedAttributes(WitnessExporter.IRRELEVANT_USER_DEFINED_ATTRIBUTES);
                 step.targets.push(target);
             })
 
@@ -275,82 +279,4 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         let fs = require('fs');
         fs.writeFileSync("output/error-witness.json", JSON.stringify(errorWitness, null, 2));
     }
-}
-
-class Target {
-    private static readonly SCRATCH_TARGET_ATTRIBUTES = ['x', 'y', 'direction', 'draggable', 'rotationStyle', 'visible', 'size'];
-    name: string;
-    scratchAttributes: {[key: string]: string | boolean | number} = {}; //TODO add default scratch attributes
-    userDefinedAttributes: {[key: string]: string | boolean | number} = {};
-
-    removeUserDefinedAttributes(attributeToRemove: string[]) {
-        for (const attribute of attributeToRemove) {
-            if (this.userDefinedAttributes[attribute] != undefined) {
-                delete this.userDefinedAttributes[attribute];
-            }
-        }
-    }
-
-    static fromConcretePrimitives(name: string, attributes: Map<string, ConcretePrimitive<any>>) : Target {
-        const target = new Target();
-        target.name = name;
-
-        attributes.forEach((value, attribute) => {
-            if (this.isScratchAttribute(attribute)) {
-                target.scratchAttributes[attribute] = value.value;
-            } else {
-                target.userDefinedAttributes[attribute] = value.value;
-            }
-        })
-
-        return target;
-    }
-
-    static isScratchAttribute(name: string): boolean {
-        return this.SCRATCH_TARGET_ATTRIBUTES.includes(name);
-    }
-}
-
-class MousePosition {
-    readonly x: number;
-    readonly y: number;
-
-    constructor(x: number, y: number) {
-        Preconditions.checkArgument(x !== undefined && y !== undefined);
-        this.x = x;
-        this.y = y;
-    }
-}
-
-export class ErrorWitnessStep {
-    timestamp: number;
-    action: Action;
-    actionArgs;
-    actionLabel: string;
-    actionTargetName: string;
-    mousePosition: MousePosition;
-    targets: Target[] = [];
-
-    isEmpty(): boolean {
-        return !this.action || this.targets.length === 0;
-    }
-
-    relevantTransition(prev: ErrorWitnessStep) {
-        this.targets = this.targets.sort((t1, t2) => t1.name.localeCompare(t2.name));
-        return !prev
-            || this.timestamp - prev.timestamp > 1000
-            || JSON.stringify(this.targets) !== JSON.stringify(prev.targets);
-    }
-
-    getUserDefinedAttributeValue(targetName: string, attribute: string): any {
-        const target = this.targets.find(t => t.name === targetName);
-        Preconditions.checkNotUndefined(target);
-        return target.userDefinedAttributes[attribute];
-    }
-}
-
-class ErrorWitness {
-    programName: string;
-    violations: string[];
-    steps: ErrorWitnessStep[] = [];
 }
