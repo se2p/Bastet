@@ -31,10 +31,90 @@ import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStateme
 import {BooleanExpression} from "../../../syntax/ast/core/expressions/BooleanExpression";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AbstractStates} from "../AbstractStates";
+import {
+    AbstractBoolean,
+    AbstractFloat,
+    AbstractInteger, AbstractList,
+    AbstractReal, AbstractString,
+    TransformerTheories
+} from "../../domains/MemoryTransformer";
+import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
+import {TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
+import {BooleanType} from "../../../syntax/ast/core/ScratchType";
+import {DataAbstractDomain} from "./DataAbstractDomain";
 
-export type StateId = number;
+export class BranchingAlternative {
+
+    private readonly _work: AbstractState;
+    private readonly _branchStart: AbstractState;
+    private readonly _branchName : string;
+    private readonly _branchCondition: BooleanFormula;
+    private readonly _branchPredicate: BooleanFormula;
+    private readonly _branchPredicateEquiv: BooleanFormula;
+
+    constructor(work: AbstractState, branchStart: AbstractState, branchName: string,
+                branchCondition: BooleanFormula, branchPredicate: BooleanFormula, branchPredicateEquiv: BooleanFormula) {
+        this._work = work;
+        this._branchStart = branchStart;
+        this._branchName = branchName;
+        this._branchCondition = branchCondition;
+        this._branchPredicate = branchPredicate;
+        this._branchPredicateEquiv = branchPredicateEquiv;
+    }
+
+    get startState(): AbstractState {
+        return this._work;
+    }
+
+    get branchStart(): AbstractState {
+        return this._branchStart;
+    }
+
+    get branchName(): string {
+        return this._branchName;
+    }
+
+    get branchCondition(): BooleanFormula {
+        return this._branchCondition;
+    }
+
+    get branchPredicate(): BooleanFormula {
+        return this._branchPredicate;
+    }
+
+    get branchPredicateEquiv(): BooleanFormula {
+        return this._branchPredicateEquiv;
+    }
+}
+
+export class BranchingAlternatives {
+
+    private readonly _alternatives: BranchingAlternative[];
+
+    constructor() {
+        this._alternatives = [];
+    }
+
+    push(alternative: BranchingAlternative) {
+        this._alternatives.push(alternative);
+    }
+
+    get elements(): BranchingAlternative[] {
+        return this._alternatives.slice();
+    }
+}
 
 export class DataTestifier implements TestificationOperator<AbstractState, AbstractState> {
+
+    protected readonly _theories: TransformerTheories<AbstractBoolean, AbstractBoolean, AbstractInteger,
+        AbstractReal, AbstractFloat, AbstractString, AbstractList>;
+    private readonly _domain: DataAbstractDomain;
+
+    constructor(theories: TransformerTheories<AbstractBoolean, AbstractBoolean, AbstractInteger, AbstractReal, AbstractFloat, AbstractString, AbstractList>,
+                abstractDomain: DataAbstractDomain) {
+        this._theories = Preconditions.checkNotUndefined(theories);
+        this._domain = Preconditions.checkNotUndefined(abstractDomain);
+    }
 
     testify(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState, AbstractState> {
         throw new ImplementMeException();
@@ -50,9 +130,34 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
      * @param targetState
      */
     testifyOne(accessibility: AccessibilityRelation<AbstractState, AbstractState>, targetState: AbstractState): AccessibilityRelation<AbstractState, AbstractState> {
+        const alternatives = this.determineBranchingAlternatives(accessibility, targetState);
+
+        // Create the branching formula
+        let branchingFormula: BooleanFormula = this._theories.boolTheory.trueBool();
+        for (const a of alternatives.elements) {
+            branchingFormula = this._theories.boolTheory.and(branchingFormula, a.branchCondition);
+        }
+        Object.freeze(branchingFormula);
+
+        // Extract the trace formula
+        const traceFormula: BooleanFormula = this.recoverTraceFormula(accessibility, targetState);
+
+        // Build the path-choice query
+        const choiceQuery = this._theories.boolTheory.and(traceFormula, branchingFormula);
+
+        // Get one satisfying assignment (model of the choiceQuery formula)
+
+        // Testify the accessibility relation based on the model for the `choiceQuery` formula
+
+        // return the result (strengthened accessibility relation)
+
+        throw new ImplementMeException();
+    }
+
+    private determineBranchingAlternatives(accessibility: AccessibilityRelation<AbstractState, AbstractState>, targetState: AbstractState): BranchingAlternatives {
         const initialState: AbstractState = this.getInitialState(accessibility);
-        const worklist : AbstractState[] = [ initialState ];
-        const branchings: [string, BooleanFormula][] = [];
+        const worklist: AbstractState[] = [initialState];
+        const result: BranchingAlternatives = new BranchingAlternatives();
 
         while (worklist.length > 0) {
             const work = worklist.pop();
@@ -61,13 +166,16 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
                 Preconditions.checkArgument(assumes.length > 0);
 
                 const branchName: string = this.createBranchName(work, branchStartState);
-                // const branchCondition: BooleanFormula = this.createBranchCondition(assumes);
+                const branchCondition: BooleanFormula = this.createBranchCondition(assumes);
+                const branchPredicate: BooleanFormula = this.createBranchPredicate(branchName);
+                const branchPredicateEquiv: BooleanFormula = this.createBranchEquivPredicate(branchPredicate, branchCondition);
+                result.push(new BranchingAlternative(work, branchStartState, branchName, branchCondition, branchPredicate, branchPredicateEquiv));
 
                 worklist.push(succ);
             }
         }
 
-        throw new ImplementMeException();
+        return result;
     }
 
     private getBranchingTo(ar: AccessibilityRelation<AbstractState, AbstractState>, from: AbstractState): [AbstractState, AssumeOperation[], AbstractState][] {
@@ -106,5 +214,22 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         const branchStartStateId = AbstractStates.extractStateId(branchStartState);
 
         return `_BRANCH_${stateId}_${branchStartStateId}`;
+    }
+
+    private createBranchCondition(assumes: AssumeOperation[]): BooleanFormula {
+        throw new ImplementMeException();
+    }
+
+    private createBranchPredicate(branchName: string): BooleanFormula {
+        return this._theories.boolTheory.abstractBooleanValue(
+            new VariableWithDataLocation(new TypedDataLocation(branchName, BooleanType.instance().typeId)));
+    }
+
+    private createBranchEquivPredicate(branchPredicate: BooleanFormula, branchCondition: BooleanFormula): BooleanFormula {
+        return this._theories.boolTheory.equal(branchCondition, branchPredicate);
+    }
+
+    private recoverTraceFormula(accessibility: AccessibilityRelation<AbstractState, AbstractState>, targetState: AbstractState): BooleanFormula {
+        throw new ImplementMeException();
     }
 }

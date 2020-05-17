@@ -175,7 +175,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         this._theories = new Theories(this._config.encodeFloatsAs, Preconditions.checkNotUndefined(theories));
         this._abstractDomain = new DataAbstractDomain(folLattice, propLattice);
         this._transferRelation = new DataTransferRelation(this._abstractDomain, this._theories);
-        this._testifier = new DataTestifier();
+        this._testifier = new DataTestifier(this._theories, this._abstractDomain);
         this._refiner = new DataRefiner(this._abstractDomain.lattice);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = StandardMergeOperatorFactory.create(this._config.mergeOperator, this._abstractDomain);
