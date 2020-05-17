@@ -175,16 +175,19 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
+    testifyOne(accessibility: AccessibilityRelation<SSAState, F>, state: F): AccessibilityRelation<SSAState, F> {
+        return this.wrappedAnalysis.testifyOne(accessibility, state);
+    }
+
     testifyConcrete(accessibility: AccessibilityRelation<SSAState, F>, state: F): Iterable<ConcreteElement[]> {
         throw new ImplementMeException();
     }
 
     testifyConcreteOne(accessibility: AccessibilityRelation<SSAState, F>, state: F): Iterable<ConcreteElement[]> {
-        throw new ImplementMeException();
-    }
+        const resultWithSSA = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
 
-    testifyOne(accessibility: AccessibilityRelation<SSAState, F>, state: F): AccessibilityRelation<SSAState, F> {
-        return this.wrappedAnalysis.testifyOne(accessibility, state);
+        // TODO: Remove the SSA-Indices from the concrete elements along the path
+        throw new ImplementMeException();
     }
 
 }

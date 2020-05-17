@@ -28,10 +28,10 @@ import {GraphPath, GraphPathSet} from "./GraphPath";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import {AccessibilityRelation} from "../Accessibility";
 
 export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState>
-    implements ReachedSet<GraphAbstractState>
-{
+    implements ReachedSet<GraphAbstractState>, AccessibilityRelation<E, E> {
 
     private readonly _frontierSet: FrontierSet<E>;
 
@@ -177,8 +177,16 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
         throw new ImplementMeException();
     }
 
-    public queryAllPathsTo(element: E): GraphPathSet {
-        throw new ImplementMeException();
+    successorsOf(state: E): Iterable<E> {
+        throw new Error("Method not implemented.");
+    }
+
+    predecessorsOf(state: E): Iterable<E> {
+        throw new Error("Method not implemented.");
+    }
+
+    isReachable(state: E): boolean {
+        throw new Error("Method not implemented.");
     }
 
 }

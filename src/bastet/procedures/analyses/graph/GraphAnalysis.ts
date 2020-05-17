@@ -285,19 +285,19 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
     }
 
     testify(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
-        throw new ImplementMeException();
-    }
-
-    testifyConcrete(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
-        throw new ImplementMeException();
-    }
-
-    testifyConcreteOne(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
-        throw new ImplementMeException();
+        return this.wrappedAnalysis.testify(accessibility, state);
     }
 
     testifyOne(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
-        throw new ImplementMeException();
+        return this.wrappedAnalysis.testify(accessibility, state);
+    }
+
+    testifyConcrete(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
+        return this.wrappedAnalysis.testifyConcrete(accessibility, state);
+    }
+
+    testifyConcreteOne(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
+        return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
 }
