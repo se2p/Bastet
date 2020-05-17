@@ -34,18 +34,24 @@ import {DataAbstractState} from "../../data/DataAbstractDomain";
 import {ConcreteMemory, ConcretePrimitive} from "../../../domains/ConcreteElements";
 import {IllegalArgumentException} from "../../../../core/exceptions/IllegalArgumentException";
 import {SSAStateVisitor} from "../../StateVisitors";
-import {Map as ImmMap} from "immutable";
+import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {GraphAnalysis} from "../GraphAnalysis";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
 import {MouseReadEvent, MouseReadEventVisitor} from "../../../../syntax/ast/MouseReadEventVisitor";
+import {App} from "../../../../syntax/app/App";
+import {ControlAbstractState, RelationLocation} from "../../control/ControlAbstractDomain";
+import {ControlLocationExtractor} from "../../control/ControlUtils";
+import {ImplementMeForException} from "../../../../core/exceptions/ImplementMeException";
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
     private static readonly IRRELEVANT_TARGETS = ['IOActor'];
     private readonly _analysis: GraphAnalysis;
+    private readonly _task: App;
 
-    constructor(analysis: GraphAnalysis) {
+    constructor(analysis: GraphAnalysis, task: App) {
         this._analysis = analysis;
+        this._task = task;
     }
 
     handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
@@ -62,13 +68,15 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         const labelPrintVisitor = new CorePrintVisitor();
         const mouseReadEventVisitor = new MouseReadEventVisitor();
         const ssaStateVisitor = new SSAStateVisitor();
+        const controlLocationExtractor = new ControlLocationExtractor(this._task);
 
         for (const currentState of counterExample.path.states) {
             const step = new ErrorWitnessStep();
+            step.actionTargetName = WitnessExporter.getActionTargetName(currentState, controlLocationExtractor);
             const ssaState = currentState.accept(ssaStateVisitor);
             const memoryInStep = ssaState.getPrimitiveAttributes(errorState);
             const targetStates = WitnessExporter.groupByTargets(memoryInStep);
-            const globalTime = memoryInStep.get("__global_time_micros")
+            const globalTime = memoryInStep.get("__global_time_micros");
             step.timestamp = globalTime ? globalTime.value : 0;
 
             targetStates.forEach((state, targetName) => {
@@ -87,8 +95,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                     const mouseX = mouseEvent.readXFrom;
                     const mouseY = mouseEvent.readYFrom;
 
-                    const x = mouseX ? step.getUserDefinedAttributeValue(mouseX) : mousePosition.x;
-                    const y = mouseY ? step.getUserDefinedAttributeValue(mouseY) : mousePosition.y;
+                    const x = mouseX ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseX) : mousePosition.x;
+                    const y = mouseY ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseY) : mousePosition.y;
                     mousePosition = new MousePosition(x, y);
                 }
             }
@@ -122,6 +130,28 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         const dataAbstractState = abstractState as DataAbstractState;
 
         return dataAnalysis.abstractDomain.concretizeOne(dataAbstractState);
+    }
+
+    private static mapGraphAbstractStateToControlAbstractState(graphAbstractState: GraphAbstractState): ControlAbstractState {
+        let abstractState: any = graphAbstractState;
+        while (abstractState && !(abstractState instanceof ControlAbstractState)) {
+            abstractState = abstractState.getWrappedState();
+        }
+
+        return abstractState as ControlAbstractState;
+    }
+
+    private static getActionTargetName(graphAbstractState: GraphAbstractState, controlLocationExtractor: ControlLocationExtractor): string {
+        const controlAbstractState = this.mapGraphAbstractStateToControlAbstractState(graphAbstractState);
+        const controlLocations: ImmSet<RelationLocation> = controlLocationExtractor.visitControlAbstractState(controlAbstractState);
+
+        if (controlLocations.size === 0) {
+            return undefined;
+        } else if (controlLocations.size === 1) {
+            return controlLocations.toArray()[0].getActorId();
+        } else {
+            throw new ImplementMeForException("when a control abstract state has multiple control locations");
+        }
     }
 
     private static groupByTargets<T>(map: ImmMap<string, T>): Map<string, Map<string, T>> {
@@ -265,6 +295,7 @@ class MousePosition {
 export class ErrorWitnessStep {
     timestamp: number;
     action: string;
+    actionTargetName: string;
     mousePosition: MousePosition;
     wait: Wait;
     targets: Target[] = [];
@@ -280,9 +311,10 @@ export class ErrorWitnessStep {
             || JSON.stringify(this.targets) !== JSON.stringify(prev.targets);
     }
 
-    getUserDefinedAttributeValue(attribute: string): any {
-        const target = this.targets.find(t => t.userDefinedAttributes[attribute] !== undefined);
-        return target ? target.userDefinedAttributes[attribute] : undefined;
+    getUserDefinedAttributeValue(targetName: string, attribute: string): any {
+        const target = this.targets.find(t => t.name === targetName);
+        Preconditions.checkNotUndefined(target);
+        return target.userDefinedAttributes[attribute];
     }
 }
 
