@@ -61,7 +61,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
                 Preconditions.checkArgument(assumes.length > 0);
 
                 const branchName: string = this.createBranchName(work, branchStartState);
-                const branchCondition: BooleanFormula = this.createBranchCondition(assumes);
+                // const branchCondition: BooleanFormula = this.createBranchCondition(assumes);
 
                 worklist.push(succ);
             }

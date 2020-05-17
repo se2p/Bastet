@@ -177,11 +177,11 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
         throw new ImplementMeException();
     }
 
-    successorsOf(state: E): Iterable<E> {
+    successorsOf(state: E): E[] {
         throw new Error("Method not implemented.");
     }
 
-    predecessorsOf(state: E): Iterable<E> {
+    predecessorsOf(state: E): E[] {
         throw new Error("Method not implemented.");
     }
 
