@@ -39,7 +39,7 @@ export interface AccessibilityRelation<E extends AbstractElement, F extends Abst
      * @param state
      * @throws Exception if `state` is not in the accessibility relation.
      */
-    successorsOf(state: F): Iterable<F>;
+    successorsOf(state: F): F[];
 
     /**
      * Important: Only the initial state has the empty set of predecessor states.
@@ -48,7 +48,7 @@ export interface AccessibilityRelation<E extends AbstractElement, F extends Abst
      *
      * @param state
      */
-    predecessorsOf(state: F): Iterable<F>;
+    predecessorsOf(state: F): F[];
 
     /**
      * Is the given abstract state `state` reachable on in this
