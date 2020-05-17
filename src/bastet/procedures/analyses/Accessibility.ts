@@ -22,6 +22,7 @@
 
 import {AbstractElement, AbstractState} from "../../lattices/Lattice";
 import {ConcreteElement} from "../domains/ConcreteElements";
+import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
 
 /**
  * The accessibility relation of an abstract reachability graph
@@ -54,6 +55,13 @@ export interface AccessibilityRelation<E extends AbstractElement, F extends Abst
      * accessibility relation? (overapproximation!)
      */
     isReachable(state: F): boolean;
+
+}
+
+export interface LabeledAccessibilityRelation<E extends AbstractElement, F extends AbstractState>
+    extends AccessibilityRelation<E, F> {
+
+    getTransitionLabel(from: E, to: E): ProgramOperation[];
 
 }
 

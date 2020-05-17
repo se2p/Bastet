@@ -65,6 +65,7 @@ import {List as ImmList, Set as ImmSet} from "immutable";
 import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
 import {LexiKey} from "../../../utils/Lexicographic";
 import { AccessibilityRelation } from "../Accessibility";
+import {DataTestifier} from "./DataTestifier";
 
 
 export class DataAnalysisConfig extends BastetConfiguration {
@@ -155,6 +156,8 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     private readonly _refiner: DataRefiner;
 
+    private readonly _testifier: DataTestifier;
+
     private readonly _statistics: AnalysisStatistics;
 
     private readonly _config: DataAnalysisConfig;
@@ -172,6 +175,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         this._theories = new Theories(this._config.encodeFloatsAs, Preconditions.checkNotUndefined(theories));
         this._abstractDomain = new DataAbstractDomain(folLattice, propLattice);
         this._transferRelation = new DataTransferRelation(this._abstractDomain, this._theories);
+        this._testifier = new DataTestifier();
         this._refiner = new DataRefiner(this._abstractDomain.lattice);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = StandardMergeOperatorFactory.create(this._config.mergeOperator, this._abstractDomain);
@@ -264,19 +268,19 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     }
 
     testify(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<DataAbstractState, AbstractState> {
-        throw new ImplementMeException();
+        return this._testifier.testify(accessibility, state);
     }
 
     testifyConcrete(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
-        throw new ImplementMeException();
+        return this._testifier.testifyConcrete(accessibility, state);
     }
 
     testifyConcreteOne(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
-        throw new ImplementMeException();
+        return this._testifier.testifyConcreteOne(accessibility, state);
     }
 
     testifyOne(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<DataAbstractState, AbstractState> {
-        throw new ImplementMeException();
+        return this._testifier.testifyOne(accessibility, state);
     }
 
 }
