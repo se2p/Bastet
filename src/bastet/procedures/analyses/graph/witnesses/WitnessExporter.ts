@@ -58,17 +58,12 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             .map(property => property.getText);
 
         let previousState: GraphAbstractState = undefined;
-        let prevPrev: GraphAbstractState = undefined;
-        const array: GraphAbstractState[] = Array.from(counterExample.path.states);
-        let currentState: GraphAbstractState = array[0];
-        let nextState: GraphAbstractState = array[1];
-        let index = 0;
         let mousePosition: MousePosition = new MousePosition(0, 0);
         const labelPrintVisitor = new CorePrintVisitor();
         const mouseReadEventVisitor = new MouseReadEventVisitor();
         const ssaStateVisitor = new SSAStateVisitor();
 
-        while(currentState) {
+        for (const currentState of counterExample.path.states) {
             const step = new ErrorWitnessStep();
             const ssaState = currentState.accept(ssaStateVisitor);
             const memoryInStep = ssaState.getPrimitiveAttributes(errorState);
@@ -98,18 +93,10 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                 }
             }
 
-            if (prevPrev) {
-                // step['mouseEvent'] = this._analysis.getTransitionLabel(prevPrev, previousState)
-                //     .map(o => o.ast.accept(mouseReadEventVisitor)).join(";");
-            }
             step.mousePosition = mousePosition;
 
             errorWitness.steps.push(step);
-            index++;
-            prevPrev = previousState;
             previousState = currentState;
-            currentState = array[index];
-            nextState = array[index + 1];
         }
 
         errorWitness.steps = errorWitness.steps.filter(witness => !witness.isEmpty());
