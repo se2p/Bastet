@@ -37,6 +37,7 @@ import {SSAStateVisitor} from "../../StateVisitors";
 import {Map as ImmMap} from "immutable";
 import {GraphAnalysis} from "../GraphAnalysis";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
+import {MouseReadEvent, MouseReadEventVisitor} from "../../../../syntax/ast/MouseReadEventVisitor";
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
@@ -56,13 +57,20 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             .toArray()
             .map(property => property.getText);
 
-        let previousState;
+        let previousState: GraphAbstractState = undefined;
+        let prevPrev: GraphAbstractState = undefined;
+        const array: GraphAbstractState[] = Array.from(counterExample.path.states);
+        let currentState: GraphAbstractState = array[0];
+        let nextState: GraphAbstractState = array[1];
+        let index = 0;
+        let mousePosition: MousePosition = new MousePosition(0, 0);
         const labelPrintVisitor = new CorePrintVisitor();
+        const mouseReadEventVisitor = new MouseReadEventVisitor();
         const ssaStateVisitor = new SSAStateVisitor();
 
-        for (const graphAbstractState of counterExample.path.states) {
+        while(currentState) {
             const step = new ErrorWitnessStep();
-            const ssaState = graphAbstractState.accept(ssaStateVisitor);
+            const ssaState = currentState.accept(ssaStateVisitor);
             const memoryInStep = ssaState.getPrimitiveAttributes(errorState);
             const targetStates = WitnessExporter.groupByTargets(memoryInStep);
             const globalTime = memoryInStep.get("__global_time_micros")
@@ -75,19 +83,40 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             })
 
             if (previousState) {
-                step.action = this._analysis.getTransitionLabel(previousState, graphAbstractState)
+                step.action = this._analysis.getTransitionLabel(previousState, currentState)
                     .map(o => o.ast.accept(labelPrintVisitor)).join(";");
+                const mouseEvent: MouseReadEvent = this._analysis.getTransitionLabel(previousState, currentState)
+                    .map(o => o.ast.accept(mouseReadEventVisitor))[0];
+
+                if (mouseEvent) {
+                    const mouseX = mouseEvent.readXFrom;
+                    const mouseY = mouseEvent.readYFrom;
+
+                    const x = mouseX ? step.getUserDefinedAttributeValue(mouseX) : mousePosition.x;
+                    const y = mouseY ? step.getUserDefinedAttributeValue(mouseY) : mousePosition.y;
+                    mousePosition = new MousePosition(x, y);
+                }
             }
 
+            if (prevPrev) {
+                // step['mouseEvent'] = this._analysis.getTransitionLabel(prevPrev, previousState)
+                //     .map(o => o.ast.accept(mouseReadEventVisitor)).join(";");
+            }
+            step.mousePosition = mousePosition;
+
             errorWitness.steps.push(step);
-            previousState = graphAbstractState;
+            index++;
+            prevPrev = previousState;
+            previousState = currentState;
+            currentState = array[index];
+            nextState = array[index + 1];
         }
 
         errorWitness.steps = errorWitness.steps.filter(witness => !witness.isEmpty());
-        errorWitness.steps = WitnessExporter.combineMouseCallSteps(errorWitness.steps);
-        // errorWitness.steps = WitnessExporter.removeIrrelevantTransitions(errorWitness.steps);
+        errorWitness.steps = WitnessExporter.removeIrrelevantTransitions(errorWitness.steps);
+        WitnessExporter.setMouseInputAction(errorWitness.steps);
 
-        // errorWitness.steps[0].action = "Initial state";
+        errorWitness.steps[0].action = "Initial state";
         this.exportErrorWitness(errorWitness);
     }
 
@@ -149,44 +178,18 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return attribute.includes("@");
     }
 
-    private static combineMouseCallSteps(steps: ErrorWitnessStep[]): ErrorWitnessStep[] {
-        const filteredArray = [];
-        const mouseXTmpVariableMatcher = /^define (__tmp_[0-9]+) as mouseX\(\)$/;
+    private static setMouseInputAction(steps: ErrorWitnessStep[]): void {
+        let prevMousePos: MousePosition = undefined;
 
-        let current = steps[0];
-        let index = 0;
-        let mouseXTmpVariableName = undefined;
-        let mouseXTmpVariableAssignmentToRegex: RegExp = undefined;
-        let mousePosition: MousePosition = new MousePosition(0, 0);
-        while (current != undefined) {
-            if (!mouseXTmpVariableName) {
-                const regexMatches = mouseXTmpVariableMatcher.exec(current.action);
-                if (regexMatches && regexMatches.length > 1) {
-                    mouseXTmpVariableName = regexMatches[1];
-                    mouseXTmpVariableAssignmentToRegex = new RegExp(`^define ([a-z]+) as ${mouseXTmpVariableName}$`);
-                }
+        for (const step of steps) {
+            const currMousePos = step.mousePosition;
 
-                filteredArray.push(current);
-            } else {
-                Preconditions.checkNotUndefined(mouseXTmpVariableAssignmentToRegex);
-                const regexMatches = mouseXTmpVariableAssignmentToRegex.exec(current.action);
-                if (regexMatches && regexMatches.length > 1) {
-                    const mouseXVariable = regexMatches[1];
-
-                    current.action = "Mouse input"
-                    mouseXTmpVariableName = undefined;
-                    filteredArray.push(current);
-
-                    mousePosition = new MousePosition(current.targets[0].userDefinedAttributes[mouseXVariable] as number, mousePosition.y);
-                }
+            if (prevMousePos && (prevMousePos.x !== currMousePos.x || prevMousePos.y !== currMousePos.y)) {
+                step.action = "Mouse input";
             }
-            current.mousePosition = mousePosition;
 
-            index++;
-            current = steps[index];
+            prevMousePos = currMousePos;
         }
-
-        return filteredArray;
     }
 
     private static removeIrrelevantTransitions(steps: ErrorWitnessStep[]): ErrorWitnessStep[] {
@@ -272,7 +275,7 @@ class MousePosition {
     }
 }
 
-class ErrorWitnessStep {
+export class ErrorWitnessStep {
     timestamp: number;
     action: string;
     mousePosition: MousePosition;
@@ -286,8 +289,13 @@ class ErrorWitnessStep {
     relevantTransition(prev: ErrorWitnessStep) {
         this.targets = this.targets.sort((t1, t2) => t1.name.localeCompare(t2.name));
         return !prev
-            || prev.mousePosition !== this.mousePosition
-            || this.timestamp - prev.timestamp > 1000;
+            || this.timestamp - prev.timestamp > 1000
+            || JSON.stringify(this.targets) !== JSON.stringify(prev.targets);
+    }
+
+    getUserDefinedAttributeValue(attribute: string): any {
+        const target = this.targets.find(t => t.userDefinedAttributes[attribute] !== undefined);
+        return target ? target.userDefinedAttributes[attribute] : undefined;
     }
 }
 
