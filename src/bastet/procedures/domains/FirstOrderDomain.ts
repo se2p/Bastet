@@ -22,47 +22,93 @@
 
 
 import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
-import {ConcreteDomain, ConcreteElement, ConcreteNumber} from "./ConcreteElements";
+import {
+    ConcreteBoolean,
+    ConcreteDomain,
+    ConcreteElement,
+    ConcreteList, ConcreteMemory,
+    ConcreteNumber,
+    ConcreteString
+} from "./ConcreteElements";
 import {FirstOrderFormula} from "../../utils/ConjunctiveNormalForm";
 import {LatticeWithComplements} from "../../lattices/Lattice";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
-import {AbstractNumber, BooleanTheory} from "./MemoryTransformer";
 import {Z3Model} from "../../utils/smt/z3/Z3SMT";
+import {BooleanTheory} from "./MemoryTransformer";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
     prover: FirstOrderSolver<F>;
 }
 
 export class FirstOrderDomain<F extends FirstOrderFormula>
-    implements AbstractDomain<ConcreteElement, F> {
+    implements AbstractDomain<ConcreteMemory, F> {
 
-    private readonly _concreteDomain: ConcreteDomain<ConcreteElement>;
     private readonly _lattice: FirstOrderLattice<F>;
 
-    constructor(concreteDomain: ConcreteDomain<ConcreteElement>, lattice: FirstOrderLattice<F>) {
-        this._concreteDomain = Preconditions.checkNotUndefined(concreteDomain);
+    constructor(lattice: FirstOrderLattice<F>) {
         this._lattice = Preconditions.checkNotUndefined(lattice);
     }
 
-    abstract(elements: Iterable<ConcreteElement>): F {
+    get solver(): FirstOrderSolver<F> {
+        return this._lattice.prover;
+    }
+
+    abstract(elements: Iterable<ConcreteMemory>): F {
         throw new ImplementMeException();
     }
 
-    concretize(element: F): Iterable<ConcreteElement> {
+    concretize(element: F): Iterable<ConcreteMemory> {
         throw new ImplementMeException();
     }
 
-    concretizeOne(element: AbstractNumber): ConcreteNumber {
-        throw new ImplementMeException();
+    concretizeOne(element: F): ConcreteMemory {
+        this.solver.push();
+        this.solver.assert(element);
+
+        // TODO: Use a generic FirstOrderModel type instead of Z3Model
+        if (this.solver.isUnsat()) {
+            throw new IllegalArgumentException("Model only available for satisfiabe formula!");
+        }
+
+        const model = this.solver.getModel();
+
+        const numbers = new Map<string, ConcreteNumber>();
+        const strings = new Map<string, ConcreteString>();
+        const booleans = new Map<string, ConcreteBoolean>();
+        const lists = new Map<string, ConcreteList<ConcreteString>>();
+
+        model.getConstValues().forEach(constObj => {
+            const value = constObj.getValue();
+            const name = constObj.getName();
+
+            switch (typeof value) {
+                case 'boolean':
+                    booleans.set(name, new ConcreteBoolean(value));
+                    break;
+                case 'number':
+                    numbers.set(name, new ConcreteNumber(value));
+                    break;
+                case 'string':
+                    strings.set(name, new ConcreteString(value));
+                    break;
+                default:
+                    throw new ImplementMeForException("attributes of type " + typeof value);
+            }
+        });
+
+        this.solver.pop();
+
+        return new ConcreteMemory(numbers, strings, booleans, lists);
     }
 
     widen(element: F, precision: AbstractionPrecision): F {
         throw new ImplementMeException();
     }
 
-    get concreteDomain(): ConcreteDomain<ConcreteElement> {
-        return this._concreteDomain;
+    get concreteDomain(): ConcreteDomain<ConcreteMemory> {
+        throw new ImplementMeException();
     }
 
     get lattice(): FirstOrderLattice<F> {
@@ -157,4 +203,5 @@ export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
     get prover(): FirstOrderSolver<F> {
         return this._prover;
     }
+
 }

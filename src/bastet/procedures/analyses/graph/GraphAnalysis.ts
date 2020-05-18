@@ -30,8 +30,7 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {
     GraphAbstractDomain,
     GraphAbstractState,
-    GraphAbstractStateFactory,
-    GraphConcreteState
+    GraphAbstractStateFactory
 } from "./GraphAbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {GraphTransferRelation} from "./GraphTransferRelation";
@@ -63,6 +62,9 @@ import {DummyHandler, WitnessHandler} from "../WitnessHandlers";
 import {WitnessExporter} from "./witnesses/WitnessExporter";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {LexiKey} from "../../../utils/Lexicographic";
+import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
+import {ConcreteElement} from "../../domains/ConcreteElements";
+import {PathExporter} from "./witnesses/PathExporter";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 
@@ -88,11 +90,11 @@ export class GraphAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState, GraphAbstractState>,
+export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
     Unwrapper<GraphAbstractState, AbstractElement>, StatePartitionOperator<GraphAbstractState>,
     TransitionLabelProvider<GraphAbstractState> {
 
-    private readonly _abstractDomain: AbstractDomain<GraphConcreteState, GraphAbstractState>;
+    private readonly _abstractDomain: AbstractDomain<ConcreteElement, GraphAbstractState>;
 
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any, any>;
 
@@ -131,7 +133,9 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         }
 
         if (this._config.stopOperator == 'CheckCoverage') {
-            this._stopOp = new GraphCoverCheckStopOperator(this.wrappedAnalysis, (e) => {return this.unwrap(e)});
+            this._stopOp = new GraphCoverCheckStopOperator(this.wrappedAnalysis, (e) => {
+                return this.unwrap(e)
+            });
         } else if (this._config.stopOperator == 'NoStop') {
             this._stopOp = new NoStopOperator();
         } else {
@@ -142,9 +146,15 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
             this._witnessHandler = DummyHandler.create();
         } else if (this._config.witnessHandler == 'ExportWitness') {
             this._witnessHandler = new WitnessExporter(this, this._task);
+        } else if (this._config.witnessHandler == 'ExportPath') {
+            this._witnessHandler = new PathExporter(this, this);
         } else {
             throw new IllegalArgumentException("Illegal witness handler configuration");
         }
+    }
+
+    chooseFinitePathAlong(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): AbstractState[] {
+        throw new ImplementMeException();
     }
 
     abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
@@ -208,7 +218,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         return this._refiner;
     }
 
-    get abstractDomain(): AbstractDomain<GraphConcreteState, GraphAbstractState> {
+    get abstractDomain(): AbstractDomain<ConcreteElement, GraphAbstractState> {
         return this._abstractDomain;
     }
 
@@ -276,5 +286,21 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
+    testify(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
+        return this.wrappedAnalysis.testify(accessibility, state);
+    }
+
+    testifyOne(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
+        const reaching = AccessibilityRelations.backwardsAccessible(accessibility, state, this, this.abstractDomain);
+        return this.wrappedAnalysis.testifyOne(reaching, state);
+    }
+
+    testifyConcrete(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
+        return this.wrappedAnalysis.testifyConcrete(accessibility, state);
+    }
+
+    testifyConcreteOne(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
+        return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
+    }
 
 }

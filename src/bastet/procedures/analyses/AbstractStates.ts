@@ -19,13 +19,15 @@
  *
  */
 
-import {AbstractElement, AbstractElementVisitor} from "../../lattices/Lattice";
+import {AbstractElement, AbstractElementVisitor, AbstractState} from "../../lattices/Lattice";
 import {GraphAbstractState} from "./graph/GraphAbstractDomain";
 import {ControlAbstractState} from "./control/ControlAbstractDomain";
 import {SSAState} from "./ssa/SSAAbstractDomain";
 import {DataAbstractState} from "./data/DataAbstractDomain";
 import {TimeState} from "./time/TimeAbstractDomain";
-import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
+import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
+import {Preconditions} from "../../utils/Preconditions";
+import {ProgramAnalysis} from "./ProgramAnalysis";
 
 export interface SingletonStateWrapper {
 
@@ -65,3 +67,13 @@ export interface AbstractStateVisitor<T> extends AbstractElementVisitor<T> {
 
 }
 
+export class AbstractStates {
+
+    public static extractStateId(e: AbstractState): number {
+        if (e instanceof GraphAbstractState) {
+            return e.getId();
+        }
+        throw new ImplementMeForException(e.constructor.name);
+    }
+
+}

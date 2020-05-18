@@ -33,7 +33,7 @@ import {
 } from "../../domains/ConcreteElements";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
 import {Preconditions} from "../../../utils/Preconditions";
-import {FirstOrderLattice, FirstOrderSolver} from "../../domains/FirstOrderDomain";
+import {FirstOrderDomain, FirstOrderLattice, FirstOrderSolver} from "../../domains/FirstOrderDomain";
 
 export interface DataAbstractStateAttributes {
 
@@ -133,11 +133,13 @@ export class DataAbstractStateLattice implements LatticeWithComplements<DataAbst
 
 export class DataAbstractDomain implements AbstractDomain<ConcreteMemory, DataAbstractState> {
 
+    private readonly _folDomain : FirstOrderDomain<FirstOrderFormula>;
     private readonly _lattice: LatticeWithComplements<DataAbstractState>;
     private readonly _solver: FirstOrderSolver<FirstOrderFormula>;
 
     constructor(folLattice: FirstOrderLattice<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>) {
         this._lattice = new DataAbstractStateLattice(folLattice, propLattice);
+        this._folDomain = new FirstOrderDomain(folLattice);
         this._solver = folLattice.prover;
     }
 
@@ -150,38 +152,7 @@ export class DataAbstractDomain implements AbstractDomain<ConcreteMemory, DataAb
     }
 
     concretizeOne(element: DataAbstractState): ConcreteMemory {
-        this._solver.push();
-        this._solver.assert(element.blockFormula);
-
-        const model = this._solver.getModel();
-
-        const numbers = new Map<string, ConcreteNumber>();
-        const strings = new Map<string, ConcreteString>();
-        const booleans = new Map<string, ConcreteBoolean>();
-        const lists = new Map<string, ConcreteList<ConcreteString>>();
-
-        model.getConstValues().forEach(constObj => {
-            const value = constObj.getValue();
-            const name = constObj.getName();
-
-            switch (typeof value) {
-                case 'boolean':
-                    booleans.set(name, new ConcreteBoolean(value));
-                    break;
-                case 'number':
-                    numbers.set(name, new ConcreteNumber(value));
-                    break;
-                case 'string':
-                    strings.set(name, new ConcreteString(value));
-                    break;
-                default:
-                    throw new ImplementMeForException("attributes of type " + typeof value);
-            }
-        });
-
-        this._solver.pop();
-
-        return new ConcreteMemory(numbers, strings, booleans, lists);
+        return this._folDomain.concretizeOne(element.blockFormula);
     }
 
     widen(element: DataAbstractState, precision: AbstractionPrecision): DataAbstractState {
@@ -196,6 +167,9 @@ export class DataAbstractDomain implements AbstractDomain<ConcreteMemory, DataAb
         throw new ImplementMeException();
     }
 
+    get folDomain(): FirstOrderDomain<FirstOrderFormula> {
+        return this._folDomain;
+    }
 }
 
 

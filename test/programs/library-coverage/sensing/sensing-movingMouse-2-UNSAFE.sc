@@ -31,6 +31,7 @@ actor Beetle is ScratchSprite begin
                 declare mx as int
                 define mx as mouseX()
                 if mx > 0 and mx < 100 then begin
+                    show()
                     _RUNTIME_signalFailure("Bug revealed!")
                 end else begin
                     define state as 0

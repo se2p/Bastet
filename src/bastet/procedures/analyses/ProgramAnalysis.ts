@@ -31,12 +31,15 @@ import {Concern} from "../../syntax/Concern";
 import {LabeledTransferRelation} from "./TransferRelation";
 import {WitnessHandler} from "./WitnessHandlers";
 import {LexiKey} from "../../utils/Lexicographic";
+import {AccessibilityRelation} from "./Accessibility";
+import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
 
 export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
    extends AbstractSuccOperator<E>,
        JoinOperator<E>, TargetOperator<E>, MergeIntoOperator<E, F>,
        MergeOperator<E>, StopOperator<E, F>, WidenOperator<E>, PartitionOperator<E, F>,
-       WitnessHandler<F>, TraversalOrderOperator<E, F>, ResultFinalization<F> {
+       WitnessHandler<F>, TraversalOrderOperator<E, F>, ResultFinalization<F>,
+       TestificationOperator<E, F> {
 
     abstractDomain: AbstractDomain<C, E>;
 
@@ -45,6 +48,30 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
     initialStatesFor(task: App): E[];
 
     createStateSets(): [FrontierSet<F>, ReachedSet<F>];
+
+}
+
+export interface TestificationOperator<E extends AbstractElement, F extends AbstractState> {
+
+    testify(accessibility: AccessibilityRelation<E, F>, state: F): AccessibilityRelation<E, F>;
+
+    /**
+     * Guarantees to return at most one abstract path.
+     *
+     * @param accessibility
+     * @param state
+     */
+    testifyOne(accessibility: AccessibilityRelation<E, F>, state: F): AccessibilityRelation<E, F>;
+
+    testifyConcrete(accessibility: AccessibilityRelation<E, F>, state: F): Iterable<ConcreteElement[]>;
+
+    /**
+     * Guaratnees to return at most one concrete path.
+     *
+     * @param accessibility
+     * @param state
+     */
+    testifyConcreteOne(accessibility: AccessibilityRelation<E, F>, state: F): Iterable<ConcreteElement[]>;
 
 }
 
@@ -121,6 +148,14 @@ export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends 
 export interface TransitionLabelProvider<E extends AbstractElement> {
 
     getTransitionLabel(from: E, to: E): ProgramOperation[];
+
+}
+
+export class UnavailableTransitionLabelProvider<E extends AbstractState> implements TransitionLabelProvider<E> {
+
+    getTransitionLabel(from: E, to: E): ProgramOperation[] {
+        throw new NotSupportedException();
+    }
 
 }
 

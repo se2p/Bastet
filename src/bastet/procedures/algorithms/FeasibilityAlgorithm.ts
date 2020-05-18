@@ -33,7 +33,7 @@ import {getActiveBudget} from "../../utils/Budgets";
 
 export const STAT_KEY_BMC_ITERATIONS = "iterations";
 
-export class BMCAlgorithm<C extends ConcreteElement, E extends AbstractState>
+export class FeasibilityAlgorithm<C extends ConcreteElement, E extends AbstractState>
     implements AnalysisAlgorithm<C, E> {
 
     private readonly _analysis: ProgramAnalysis<C, E, E>;

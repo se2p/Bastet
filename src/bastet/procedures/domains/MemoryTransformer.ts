@@ -305,6 +305,8 @@ export interface TheoryIndependent<E extends AbstractElement> {
 
     simplify(element: E): E;
 
+    stringRepresentation(element: E): string;
+
 }
 
 export interface AbstractTheories<M extends AbstractMemory, B extends AbstractBoolean,

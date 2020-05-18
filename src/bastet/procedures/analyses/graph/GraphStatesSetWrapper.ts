@@ -28,10 +28,14 @@ import {GraphPath, GraphPathSet} from "./GraphPath";
 import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
 import {Set as ImmSet, Stack as ImmStack} from "immutable";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import {AccessibilityRelation} from "../Accessibility";
+import {TransitionLabelProvider, UnavailableTransitionLabelProvider} from "../ProgramAnalysis";
+import {Concretizer, UnavailableConcretizer} from "../../domains/AbstractDomain";
+import { ConcreteElement } from "../../domains/ConcreteElements";
+import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 
 export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState>
-    implements ReachedSet<GraphAbstractState>
-{
+    implements ReachedSet<GraphAbstractState>, AccessibilityRelation<E, E> {
 
     private readonly _frontierSet: FrontierSet<E>;
 
@@ -206,8 +210,28 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
         return new GraphPath(pathToElement);
     }
 
-    public queryAllPathsTo(element: E): GraphPathSet {
-        throw new ImplementMeException();
+    initial(): Iterable<E> {
+        return this.getRootStates() as Iterable<E>;
+    }
+
+    successorsOf(state: E): E[] {
+        return Array.from(this.getChildrenOf(state.id)).map(id => this._idToStateMap.get(id));
+    }
+
+    predecessorsOf(state: E): E[] {
+        return Array.from(state.predecessors.map((id) => this._idToStateMap.get(id)));
+    }
+
+    isReachable(state: E): boolean {
+        return true;
+    }
+
+    labeler(): TransitionLabelProvider<E> {
+        return new UnavailableTransitionLabelProvider();
+    }
+
+    concretizer(): Concretizer<ConcreteElement, E> {
+        return new UnavailableConcretizer();
     }
 
 }

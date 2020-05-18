@@ -24,16 +24,11 @@ import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from ".
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Record as ImmRec, Set as ImmSet} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
-import { ConcreteDomain, ConcreteElement, ConcreteString } from '../../domains/ConcreteElements'
+import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
 import {PartitionKey} from "../../algorithms/StateSet";
-import { AbstractString } from '../../domains/MemoryTransformer'
 
 export type GraphStateId = number;
-
-export interface GraphConcreteState extends ConcreteElement {
-
-}
 
 export interface GraphAbstractStateAttribs extends AbstractElement, SingletonStateWrapper {
 
@@ -142,7 +137,7 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
     }
 }
 
-export class GraphAbstractDomain implements AbstractDomain<GraphConcreteState, GraphAbstractState> {
+export class GraphAbstractDomain implements AbstractDomain<ConcreteElement, GraphAbstractState> {
 
     private readonly _lattice: GraphAbstractStateLattice;
     private readonly _wrapped: AbstractDomain<ConcreteElement, AbstractElement>;
@@ -156,23 +151,23 @@ export class GraphAbstractDomain implements AbstractDomain<GraphConcreteState, G
         return this._lattice;
     }
 
-    abstract(elements: Iterable<GraphConcreteState>): GraphAbstractState {
+    abstract(elements: Iterable<ConcreteElement>): GraphAbstractState {
         throw new ImplementMeException();
     }
 
-    concretize(element: GraphAbstractState): Iterable<GraphConcreteState> {
+    concretize(element: GraphAbstractState): Iterable<ConcreteElement> {
         throw new ImplementMeException();
     }
 
-    concretizeOne(element: GraphAbstractState): GraphConcreteState {
-        throw new ImplementMeException();
+    concretizeOne(element: GraphAbstractState): ConcreteElement {
+        return this._wrapped.concretizeOne(element);
     }
 
     widen(element: GraphAbstractState, precision: AbstractionPrecision): GraphAbstractState {
         throw new ImplementMeException();
     }
 
-    get concreteDomain(): ConcreteDomain<GraphConcreteState> {
+    get concreteDomain(): ConcreteDomain<ConcreteElement> {
         throw new ImplementMeException();
     }
 }

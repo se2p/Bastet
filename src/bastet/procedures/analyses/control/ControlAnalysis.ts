@@ -19,7 +19,11 @@
  *
  */
 
-import {ProgramAnalysisWithLabelProducer, ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
+import {
+    ProgramAnalysisWithLabelProducer,
+    ProgramAnalysisWithLabels,
+    WrappingProgramAnalysis
+} from "../ProgramAnalysis";
 import {
     ControlAbstractDomain,
     ControlAbstractState,
@@ -56,6 +60,8 @@ import {ControlCoverageExaminer} from "./coverage/ControlCoverage";
 import {ControlLocationExtractor} from "./ControlUtils";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {ReturnStatement} from "../../../syntax/ast/core/statements/ControlStatement";
+import { AccessibilityRelation } from "../Accessibility";
+import {ConcreteElement} from "../../domains/ConcreteElements";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -89,13 +95,13 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
 
     constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>, statistics: AnalysisStatistics) {
         this._config = new ControlAnalysisConfig(config);
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new ControlAbstractDomain(wrappedAnalysis.abstractDomain);
         this._transferRelation = new ControlTransferRelation(this._config, task, this.wrappedAnalysis,
-            this._wrappedAnalysis.abstractDomain);
+            this._wrappedAnalysis.abstractDomain, this._statistics);
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
-        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
@@ -332,4 +338,22 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
         covStats.put("uncoveredLocationsAbs", coverage.uncoveredControlLocationsAbs);
         covStats.put("uncoveredPerLocationAbs", coverage.numberOfUncoveredPerRelation);
     }
+
+    testify(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {
+        return this._wrappedAnalysis.testify(accessibility, state);
+    }
+
+    testifyOne(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {
+        return this._wrappedAnalysis.testifyOne(accessibility, state);
+    }
+
+    testifyConcrete(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+        return this._wrappedAnalysis.testifyConcrete(accessibility, state);
+    }
+
+    testifyConcreteOne(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+        return this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
+    }
+
+
 }

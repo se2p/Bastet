@@ -137,7 +137,7 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitTerminateProgramStatement(node: TerminateProgramStatement): string {
-        return "program termination";
+        return "HALT";
     }
 
     visitAfterBootstrapMonitoringEvent(node: AfterBootstrapMonitoringEvent): string {

@@ -22,6 +22,7 @@
 
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {ConcreteDomain, ConcreteElement} from "./ConcreteElements";
+import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
 
 export class ConcreteNumberElement implements ConcreteElement {
 
@@ -47,15 +48,31 @@ export interface AbstractionPrecision {
 
 }
 
-export interface AbstractDomain<C extends ConcreteElement, E extends AbstractElement> {
-
-    lattice: Lattice<E>;
-
-    abstract(elements: Iterable<C>): E;
+export interface Concretizer<C extends ConcreteElement, E extends AbstractElement> {
 
     concretize(element: E): Iterable<C>;
 
     concretizeOne(element: E): C;
+
+}
+
+export class UnavailableConcretizer<C extends ConcreteElement, E extends AbstractElement> implements Concretizer<C, E> {
+
+    concretize(element: E): Iterable<C> {
+        throw new NotSupportedException();
+    }
+
+    concretizeOne(element: E): C {
+        throw new NotSupportedException();
+    }
+
+}
+
+export interface AbstractDomain<C extends ConcreteElement, E extends AbstractElement> extends Concretizer<C, E> {
+
+    lattice: Lattice<E>;
+
+    abstract(elements: Iterable<C>): E;
 
     widen(element: E, precision: AbstractionPrecision): E;
 

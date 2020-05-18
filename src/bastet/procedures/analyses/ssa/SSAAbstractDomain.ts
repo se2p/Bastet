@@ -177,8 +177,8 @@ export class SSAAbstractDomain implements AbstractDomain<ConcreteElement, SSASta
         throw new ImplementMeException();
     }
 
-    concretizeOne(element: SSAState): ConcreteMemory {
-        throw new ImplementMeException();
+    concretizeOne(element: SSAState): ConcreteElement {
+        return this._wrapped.concretizeOne(element);
     }
 
     widen(element: SSAState, precision: AbstractionPrecision): SSAState {

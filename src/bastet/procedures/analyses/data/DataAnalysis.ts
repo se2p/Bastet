@@ -26,7 +26,7 @@ import {App} from "../../../syntax/app/App";
 import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {DataTransferRelation} from "./DataTransferRelation";
-import {ConcreteMemory} from "../../domains/ConcreteElements";
+import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
 import {
     AbstractNumber,
@@ -64,8 +64,9 @@ import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgument
 import {List as ImmList, Set as ImmSet} from "immutable";
 import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
 import {LexiKey} from "../../../utils/Lexicographic";
+import { AccessibilityRelation } from "../Accessibility";
+import {DataTestifier} from "./DataTestifier";
 import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
-import {SystemVariables} from "../../../syntax/app/SystemVariables";
 
 
 export class DataAnalysisConfig extends BastetConfiguration {
@@ -143,6 +144,10 @@ export class Theories implements TransformerTheories<FirstOrderFormula, BooleanF
         return this._wrapped.simplify(element);
     }
 
+    stringRepresentation(element: FirstOrderFormula): string {
+        return this._wrapped.stringRepresentation(element);
+    }
+
 }
 
 export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState, AbstractState>,
@@ -156,14 +161,15 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     private readonly _refiner: DataRefiner;
 
+    private readonly _testifier: DataTestifier;
+
     private readonly _statistics: AnalysisStatistics;
 
     private readonly _config: DataAnalysisConfig;
 
     private readonly _mergeOp: MergeOperator<DataAbstractState>;
 
-    constructor(config: {},
-                folLattice: FirstOrderLattice<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
+    constructor(config:{}, folLattice: FirstOrderLattice<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
                 theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
                 statistics: AnalysisStatistics) {
         Preconditions.checkNotUndefined(folLattice);
@@ -173,9 +179,14 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         this._theories = new Theories(this._config.encodeFloatsAs, Preconditions.checkNotUndefined(theories));
         this._abstractDomain = new DataAbstractDomain(folLattice, propLattice);
         this._transferRelation = new DataTransferRelation(this._abstractDomain, this._theories);
+        this._testifier = new DataTestifier(this._theories, this._abstractDomain);
         this._refiner = new DataRefiner(this._abstractDomain.lattice);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = StandardMergeOperatorFactory.create(this._config.mergeOperator, this._abstractDomain);
+    }
+
+    chooseFinitePathAlong(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): AbstractState[] {
+        throw new ImplementMeException();
     }
 
     abstractSucc(fromState: DataAbstractState): Iterable<DataAbstractState> {
@@ -258,6 +269,22 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     }
 
     finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
+    }
+
+    testify(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<DataAbstractState, AbstractState> {
+        return this._testifier.testify(accessibility, state);
+    }
+
+    testifyConcrete(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+        return this._testifier.testifyConcrete(accessibility, state);
+    }
+
+    testifyConcreteOne(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+        return this._testifier.testifyConcreteOne(accessibility, state);
+    }
+
+    testifyOne(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<DataAbstractState, AbstractState> {
+        return this._testifier.testifyOne(accessibility, state);
     }
 
 }

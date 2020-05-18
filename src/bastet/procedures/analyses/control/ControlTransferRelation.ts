@@ -120,6 +120,7 @@ import {
 } from "../../../syntax/ast/core/expressions/NumberExpression";
 import {freshId} from "../../../utils/Seq";
 import {RelationBuildingVisitor} from "../../../syntax/app/controlflow/RelationBuildingVisitor";
+import {AnalysisStatistics} from "../AnalysisStatistics";
 
 class StepInformation {
 
@@ -264,13 +265,29 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
     private readonly _accelInfoMap: Map<ScriptId, AccelInfo>;
 
+    private readonly _stats: AnalysisStatistics;
+    private readonly _resolveOpsStats: AnalysisStatistics;
+    private readonly _chooseStats: AnalysisStatistics;
+    private readonly _interpreteStats: AnalysisStatistics;
+    private readonly _checkCondStats: AnalysisStatistics;
+    private readonly _scheduleStats: AnalysisStatistics;
+    private readonly _wrappedTransferStats: AnalysisStatistics;
+
     constructor(config: ControlAnalysisConfig, task: App, wrappedTransferRelation: LabeledTransferRelation<AbstractElement>,
-                wrappedDomain: AbstractDomain<ConcreteElement, AbstractElement>) {
+                wrappedDomain: AbstractDomain<ConcreteElement, AbstractElement>,
+                statistics: AnalysisStatistics) {
         this._task = Preconditions.checkNotUndefined(task);
         this._config = Preconditions.checkNotUndefined(config);
         this._wrappedTransferRelation = Preconditions.checkNotUndefined(wrappedTransferRelation);
         this._wrappedDomain = Preconditions.checkNotUndefined(wrappedDomain);
         this._accelInfoMap = new Map();
+        this._stats = Preconditions.checkNotUndefined(statistics).withContext("Transfer");
+        this._resolveOpsStats = this._stats.withContext("ResolveLeavingOps");
+        this._chooseStats = this._stats.withContext("Choose");
+        this._interpreteStats = this._stats.withContext("Interprete");
+        this._checkCondStats = this._stats.withContext("CheckCond");
+        this._scheduleStats = this._stats.withContext("Schedule");
+        this._wrappedTransferStats = this._stats.withContext("WrappedTransfer");
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
@@ -313,15 +330,21 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
             for (const op of leavingOps) { // Multiple leaving ops in case of branchings
                 // Interpret the operation `op` for thread `threadToStep` in state `fromState`
+                this._interpreteStats.startTimer();
                 const succStates0: ControlAbstractState[] = this.interprete(fromState, threadToStep, op);
+                this._interpreteStats.stopTimer();
 
                 // Wake up threads (set status YIELD) that have been waiting for a condition to be reached
+                this._checkCondStats.startTimer();
                 const succStates1: ControlAbstractState[] = mapExpand(succStates0, (e) => this.awaikConditionCheckThreads(e));
+                this._checkCondStats.stopTimer();
 
                 // Schedule the threads to run in the next iterations
+                this._scheduleStats.startTimer();
                 for (const succState of succStates1) {
                     result = result.concat(this.schedule(fromState, succState, threadToStep.threadIndex));
                 }
+                this._scheduleStats.stopTimer();
             }
         }
 
@@ -358,6 +381,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
      * Returns either a singleton-list or the empty list.
      */
     private resolveLeavingOps(fromState: ControlAbstractState, thread: IndexedThread): StepInformation[] {
+        this._resolveOpsStats.startTimer();
         const threadState = thread.threadStatus;
         const fromLocation: RelationLocation = threadState.getRelationLocation();
         const fromRelation: TransitionRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
@@ -377,6 +401,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     threadState.getCallStack(), scopeStack));
         }
 
+        this._resolveOpsStats.stopTimer();
         return result;
     }
 
@@ -399,9 +424,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             const ops = threadToStepPrime.threadStatus.getOperations().map((oid) => ProgramOperation.for(oid));
             const opsConcern = this._task.getActorByName(threadToStepPrime.threadStatus.getActorId()).concern;
 
+            this._wrappedTransferStats.startTimer();
             const wrappedAnalysisResults: Iterable<AbstractElement> = considerInterpretationFinished
                 ? [r.getWrappedState()]
                 : Transfers.withIntermediateOps(this._wrappedTransferRelation, r.wrappedState, ops, opsConcern);
+            this._wrappedTransferStats.stopTimer();
 
             // Combine the result
             Preconditions.checkNotUndefined(r);
@@ -424,9 +451,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         for (const [ti, ts] of result.threadStates.entries()) {
             if (ts.getComputationState() != ThreadComputationState.THREAD_STATE_FAILURE) {
-                const leaving = this.resolveLeavingOps(cs, new IndexedThread(ts, ti));
-                if (leaving.length == 0) {
-                    result = result.withThreadStateUpdate(ti, (ts) => ts.withComputationState(ThreadComputationState.THREAD_STATE_DONE));
+                if (ts.getWaitingForThreads().size == 0) { // might wight for a condition check thread, which might conduct acceleration
+                    const leaving = this.resolveLeavingOps(cs, new IndexedThread(ts, ti));
+                    if (leaving.length == 0) {
+                        result = result.withThreadStateUpdate(ti, (ts) => ts.withComputationState(ThreadComputationState.THREAD_STATE_DONE));
+                    }
                 }
             }
         }
@@ -910,7 +939,11 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
                 result = result.withThreadStateUpdate(threadIndex, (ts) => ts.withWaitingForThreads(stillWaitingFor));
                 if (stillWaitingFor.size == 0) {
-                    result = result.withThreadStateUpdate(threadIndex, (ts) => ts.withComputationState(ThreadComputationState.THREAD_STATE_YIELD));
+//                    if (this.resolveLeavingOps(result, result.getIndexedThreadState(threadIndex)).length == 0) {
+//                        result = result.withThreadStateUpdate(threadIndex, (ts) => ts.withComputationState(ThreadComputationState.THREAD_STATE_DONE));
+//                    } else {
+                        result = result.withThreadStateUpdate(threadIndex, (ts) => ts.withComputationState(ThreadComputationState.THREAD_STATE_YIELD));
+//                    }
                 }
             }
         }
@@ -936,7 +969,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 return this.checkConditionAndWakeUpIfSatisfied(state);
 
             } else {
-                // Acceleration applicable
+                // Acceleration applicable (no runnable program thread)
 
                 // Group the conditions by the variant variable (which should be accelerated)
                 // (assuming that there is no dependency between the variables to accelerate)

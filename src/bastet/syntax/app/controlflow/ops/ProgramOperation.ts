@@ -25,6 +25,7 @@ import {Preconditions} from "../../../../utils/Preconditions";
 import {BooleanExpression, NegationExpression} from "../../../ast/core/expressions/BooleanExpression";
 import {EpsilonStatement} from "../../../ast/core/statements/EpsilonStatement";
 import {BooleanType} from "../../../ast/core/ScratchType";
+import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
 
 export type OperationId = number;
 
@@ -115,6 +116,10 @@ export class ProgramOperations {
     private static idToAstMap: Map<OperationId, AstNode> = new Map();
     private static opMap: Map<OperationId, ProgramOperation> = new Map();
     private static idSequencePos: OperationId;
+
+    public static isAssumingOp(op: ProgramOperation): boolean {
+        throw new ImplementMeException();
+    }
 
     public static fresh(): OperationId {
         if (isNaN(ProgramOperations.idSequencePos)) {

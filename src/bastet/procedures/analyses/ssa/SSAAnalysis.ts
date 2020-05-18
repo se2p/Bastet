@@ -39,6 +39,7 @@ import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {SSAMergeOperator} from "./SSAMergeOperator";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
+import {AccessibilityRelation} from "../Accessibility";
 
 
 export class SSAAnalysisConfig extends BastetConfiguration {
@@ -168,6 +169,25 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
 
     finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
+    }
+
+    testify(accessibility: AccessibilityRelation<SSAState, F>, state: F): AccessibilityRelation<SSAState, F> {
+        return this.wrappedAnalysis.testify(accessibility, state);
+    }
+
+    testifyOne(accessibility: AccessibilityRelation<SSAState, F>, state: F): AccessibilityRelation<SSAState, F> {
+        return this.wrappedAnalysis.testifyOne(accessibility, state);
+    }
+
+    testifyConcrete(accessibility: AccessibilityRelation<SSAState, F>, state: F): Iterable<ConcreteElement[]> {
+        throw new ImplementMeException();
+    }
+
+    testifyConcreteOne(accessibility: AccessibilityRelation<SSAState, F>, state: F): Iterable<ConcreteElement[]> {
+        const resultWithSSA = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
+
+        // TODO: Remove the SSA-Indices from the concrete elements along the path
+        throw new ImplementMeException();
     }
 
 }

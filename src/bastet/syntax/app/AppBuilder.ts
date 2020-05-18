@@ -20,6 +20,7 @@
  */
 
 import {Actor, ActorMap, Actors} from "./Actor";
+import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable";
 import {App} from "./App";
 import {AppResource, AppResourceMap} from "./AppResource";
 import {Script} from "./controlflow/Script";
@@ -361,10 +362,12 @@ export class AppBuilder {
             }
         }
         const methods = new ImmutableList(Array.from(methodMap.values()))
-
         const externalMethods = Maps.mergeImmutableMaps(main.externalMethodMap, secondary.externalMethodMap);
         const datalocs = Maps.mergeImmutableMaps(main.datalocMap, secondary.datalocMap);
-        const scripts = Lists.concatImmutableLists(main.scripts, secondary.scripts);
+
+        const mainNonInitScripts = new ImmutableList(main.scripts.createMutable().filter(s => s != main.initScript));
+        const secondNonInitScripts = new ImmutableList(secondary.scripts.createMutable().filter(s => s != secondary.initScript));
+        const scripts = Lists.concatImmutableLists(mainNonInitScripts, secondNonInitScripts);
 
         // TODO: The way we dedetermine the concern of an actor is somehow hacky.
         //  We could take advantage of the inheritance relation

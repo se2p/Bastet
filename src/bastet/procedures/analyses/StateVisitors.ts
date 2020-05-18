@@ -81,6 +81,13 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
         return `${wasStepped(threadIndex) ? "*" : ""}[${t.getThreadId()} ${t.getActorId()} ${t.getScriptId()} ${script.event.accept(astVisitor)} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()} ${t.getWaitingForThreads().join("+")}]`;
     }
 
+    private formatConditionThreadDetails(cs: ControlAbstractState, t: ThreadState, threadIndex: number): string {
+        const steppedForIndices = cs.getSteppedFor();
+        const wasStepped = (i) => { return steppedForIndices.contains(i) };
+        return `COND ${wasStepped(threadIndex) ? "*" : ""}[${t.getThreadId()} ${t.getActorId()} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()} ${t.getWaitingForThreads().join("+")}]`;
+    }
+
+
     visit(element: AbstractElement): string {
         return "";
     }
@@ -90,10 +97,13 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
         const wasStepped = (i) => { return steppedForIndices.contains(i) };
 
         const wrappedLabel: string = element.getWrappedState().accept(this);
-        const controlLabel: string = element.getThreadStates()
+        const controlLabel1: string = element.getThreadStates()
             .map((t, i) => this.formatActorScriptThreadDetails(element, t, i))
             .join("\n");
-        return `${controlLabel}\n${wrappedLabel}`;
+        const controlLabel2: string = element.getConditionStates()
+            .map((t, i) => this.formatConditionThreadDetails(element, t, i))
+            .join("\n");
+        return `${controlLabel1}\n${controlLabel2}\n${wrappedLabel}`;
     }
 
     visitDataAbstractState(element: DataAbstractState): string {

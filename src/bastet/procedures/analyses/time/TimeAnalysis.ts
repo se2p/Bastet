@@ -19,7 +19,11 @@
  *
  */
 
-import {ProgramAnalysis, ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
+import {
+    ProgramAnalysis,
+    ProgramAnalysisWithLabels,
+    WrappingProgramAnalysis
+} from "../ProgramAnalysis";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AnalysisStatistics} from "../AnalysisStatistics";
@@ -39,12 +43,13 @@ import {Map as ImmMap, List as ImmList, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {TimeAbstractDomain, TimeState} from "./TimeAbstractDomain";
 import {TimeMergeOperator} from "./TimeMergeOperator";
+import {AccessibilityRelation} from "../Accessibility";
 
 
 export class TimeAnalysis<F extends AbstractState>
     implements WrappingProgramAnalysis<ConcreteElement, TimeState, F>,
         Unwrapper<TimeState, AbstractElement>,
-        LabeledTransferRelation<TimeState>{
+        LabeledTransferRelation<TimeState> {
 
     private readonly _abstractDomain: TimeAbstractDomain;
 
@@ -73,7 +78,7 @@ export class TimeAnalysis<F extends AbstractState>
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._transfer = new TimeTransferRelation(task, timeProfile,
             new LabeledTransferRelationImpl(null,
-            (from, op, co) => wrappedAnalysis.abstractSuccFor(from, op, co)));
+                (from, op, co) => wrappedAnalysis.abstractSuccFor(from, op, co)));
     }
 
     abstractSucc(fromState: TimeState): Iterable<TimeState> {
@@ -162,4 +167,21 @@ export class TimeAnalysis<F extends AbstractState>
     finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
+
+    testify(accessibility: AccessibilityRelation<TimeState, F>, state: F): AccessibilityRelation<TimeState, F> {
+        return this.wrappedAnalysis.testify(accessibility, state);
+    }
+
+    testifyConcrete(accessibility: AccessibilityRelation<TimeState, F>, state: F): Iterable<ConcreteElement[]> {
+        return this.wrappedAnalysis.testifyConcrete(accessibility, state);
+    }
+
+    testifyConcreteOne(accessibility: AccessibilityRelation<TimeState, F>, state: F): Iterable<ConcreteElement[]> {
+        return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
+    }
+
+    testifyOne(accessibility: AccessibilityRelation<TimeState, F>, state: F): AccessibilityRelation<TimeState, F> {
+        return this.wrappedAnalysis.testifyOne(accessibility, state);
+    }
+
 }

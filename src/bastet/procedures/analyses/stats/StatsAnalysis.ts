@@ -32,6 +32,7 @@ import {Refiner, Unwrapper} from "../Refiner";
 import {Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {AccessibilityRelation} from "../Accessibility";
 
 
 export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F extends AbstractState>
@@ -48,6 +49,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
     private readonly _targetStats: AnalysisStatistics;
     private readonly _otherStats: AnalysisStatistics;
     private readonly _joinStats: AnalysisStatistics;
+    private readonly _testifyStats: AnalysisStatistics;
 
     constructor(wrappedAnalysis: ProgramAnalysis<any, any, F>, statistics: AnalysisStatistics) {
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);
@@ -58,6 +60,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         this._mergeIntoStats = this._statistics.withContext("mergeInto");
         this._joinStats = this._statistics.withContext("join");
         this._targetStats = this._statistics.withContext("target");
+        this._testifyStats = this._statistics.withContext("testify");
         this._otherStats = this._statistics.withContext("other");
 
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
@@ -196,5 +199,30 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
     finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
+
+    testify(accessibility: AccessibilityRelation<E, F>, state: F): AccessibilityRelation<E, F> {
+        return this._testifyStats.runWithTimer(() => {
+            return this.wrappedAnalysis.testify(accessibility, state);
+        });
+    }
+
+    testifyConcrete(accessibility: AccessibilityRelation<E, F>, state: F): Iterable<ConcreteElement[]> {
+        return this._testifyStats.runWithTimer(() => {
+            return this.wrappedAnalysis.testifyConcrete(accessibility, state);
+        });
+    }
+
+    testifyConcreteOne(accessibility: AccessibilityRelation<E, F>, state: F): Iterable<ConcreteElement[]> {
+        return this._testifyStats.runWithTimer(() => {
+            return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
+        });
+    }
+
+    testifyOne(accessibility: AccessibilityRelation<E, F>, state: F): AccessibilityRelation<E, F> {
+        return this._testifyStats.runWithTimer(() => {
+            return this.wrappedAnalysis.testifyOne(accessibility, state);
+        });
+    }
+
 }
 
