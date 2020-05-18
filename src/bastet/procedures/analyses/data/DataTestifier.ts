@@ -23,7 +23,7 @@
 import {TestificationOperator, TransitionLabelProvider} from "../ProgramAnalysis";
 import {AbstractState} from "../../../lattices/Lattice";
 import {AccessibilityRelation} from "../Accessibility";
-import {ConcreteElement} from "../../domains/ConcreteElements";
+import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {BooleanFormula} from "../../../utils/ConjunctiveNormalForm";
@@ -146,13 +146,14 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         const choiceQuery = this._theories.boolTheory.and(traceFormula, branchingFormula);
 
         // Get one satisfying assignment (model of the choiceQuery formula)
+        const satAssignement: ConcreteMemory = this._domain.folDomain.concretizeOne(choiceQuery);
 
         // Testify the accessibility relation based on the model for the `choiceQuery` formula
         // - make sure to return the empty accessibility relation in case the formula is infeasible
+        const result: AccessibilityRelation<AbstractState, AbstractState> = this.strenghtenRelation(accessibility, alternatives, satAssignement);
 
         // return the result (strengthened accessibility relation)
-
-        throw new ImplementMeException();
+        return result;
     }
 
     private determineBranchingAlternatives(accessibility: AccessibilityRelation<AbstractState, AbstractState>, targetState: AbstractState): BranchingAlternatives {
@@ -231,6 +232,11 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
     }
 
     private recoverTraceFormula(accessibility: AccessibilityRelation<AbstractState, AbstractState>, targetState: AbstractState): BooleanFormula {
+        throw new ImplementMeException();
+    }
+
+    private strenghtenRelation(accessibility: AccessibilityRelation<AbstractState, AbstractState>,
+                               alternatives: BranchingAlternatives, satAssignement: ConcreteMemory): AccessibilityRelation<AbstractState, AbstractState> {
         throw new ImplementMeException();
     }
 }
