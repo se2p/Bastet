@@ -36,6 +36,7 @@ import {ImplementMeException, ImplementMeForException} from "../../core/exceptio
 import {Preconditions} from "../../utils/Preconditions";
 import {Z3Model} from "../../utils/smt/z3/Z3SMT";
 import {BooleanTheory} from "./MemoryTransformer";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
     prover: FirstOrderSolver<F>;
@@ -67,6 +68,10 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
         this.solver.assert(element);
 
         // TODO: Use a generic FirstOrderModel type instead of Z3Model
+        if (this.solver.isUnsat()) {
+            throw new IllegalArgumentException("Model only available for satisfiabe formula!");
+        }
+
         const model = this.solver.getModel();
 
         const numbers = new Map<string, ConcreteNumber>();

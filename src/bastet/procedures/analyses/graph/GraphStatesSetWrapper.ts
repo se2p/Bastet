@@ -29,6 +29,10 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {AccessibilityRelation} from "../Accessibility";
+import {TransitionLabelProvider, UnavailableTransitionLabelProvider} from "../ProgramAnalysis";
+import {Concretizer, UnavailableConcretizer} from "../../domains/AbstractDomain";
+import { ConcreteElement } from "../../domains/ConcreteElements";
+import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 
 export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState>
     implements ReachedSet<GraphAbstractState>, AccessibilityRelation<E, E> {
@@ -177,16 +181,28 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
         throw new ImplementMeException();
     }
 
+    initial(): Iterable<E> {
+        return this.getRootStates() as Iterable<E>;
+    }
+
     successorsOf(state: E): E[] {
-        throw new Error("Method not implemented.");
+        return Array.from(this.getChildrenOf(state.id)).map(id => this._idToStateMap.get(id));
     }
 
     predecessorsOf(state: E): E[] {
-        throw new Error("Method not implemented.");
+        return Array.from(state.predecessors.map((id) => this._idToStateMap.get(id)));
     }
 
     isReachable(state: E): boolean {
-        throw new Error("Method not implemented.");
+        return true;
+    }
+
+    labeler(): TransitionLabelProvider<E> {
+        return new UnavailableTransitionLabelProvider();
+    }
+
+    concretizer(): Concretizer<ConcreteElement, E> {
+        return new UnavailableConcretizer();
     }
 
 }

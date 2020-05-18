@@ -61,6 +61,7 @@ import {ControlLocationExtractor} from "./ControlUtils";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {ReturnStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 import { AccessibilityRelation } from "../Accessibility";
+import {ConcreteElement} from "../../domains/ConcreteElements";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -339,19 +340,19 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     }
 
     testify(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {
-        throw new Error("Method not implemented.");
+        return this._wrappedAnalysis.testify(accessibility, state);
     }
 
     testifyOne(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {
-        throw new Error("Method not implemented.");
+        return this._wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): Iterable<import("../../domains/ConcreteElements").ConcreteElement[]> {
-        throw new Error("Method not implemented.");
+    testifyConcrete(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+        return this._wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): Iterable<import("../../domains/ConcreteElements").ConcreteElement[]> {
-        throw new Error("Method not implemented.");
+    testifyConcreteOne(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+        return this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
 

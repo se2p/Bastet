@@ -144,6 +144,10 @@ export class Theories implements TransformerTheories<FirstOrderFormula, BooleanF
         return this._wrapped.simplify(element);
     }
 
+    stringRepresentation(element: FirstOrderFormula): string {
+        return this._wrapped.stringRepresentation(element);
+    }
+
 }
 
 export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState, AbstractState>,

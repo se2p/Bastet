@@ -793,6 +793,10 @@ export class Z3Theories implements AbstractTheories<Z3Formula, Z3BooleanFormula,
         }
     }
 
+    stringRepresentation(element: Z3Formula): string {
+        return this._ctx.ast_to_string(element.getAST());
+    }
+
 }
 
 export class Z3FirstOrderLattice extends SMTFirstOrderLattice<Z3FirstOrderFormula> {

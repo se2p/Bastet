@@ -32,6 +32,7 @@ import {LabeledTransferRelation} from "./TransferRelation";
 import {WitnessHandler} from "./WitnessHandlers";
 import {LexiKey} from "../../utils/Lexicographic";
 import {AccessibilityRelation} from "./Accessibility";
+import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
 
 export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
    extends AbstractSuccOperator<E>,
@@ -147,6 +148,14 @@ export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends 
 export interface TransitionLabelProvider<E extends AbstractElement> {
 
     getTransitionLabel(from: E, to: E): ProgramOperation[];
+
+}
+
+export class UnavailableTransitionLabelProvider<E extends AbstractState> implements TransitionLabelProvider<E> {
+
+    getTransitionLabel(from: E, to: E): ProgramOperation[] {
+        throw new NotSupportedException();
+    }
 
 }
 

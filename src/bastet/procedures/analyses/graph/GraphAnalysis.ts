@@ -62,8 +62,9 @@ import {DummyHandler, WitnessHandler} from "../WitnessHandlers";
 import {WitnessExporter} from "./witnesses/WitnessExporter";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {LexiKey} from "../../../utils/Lexicographic";
-import { AccessibilityRelation } from "../Accessibility";
+import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
 import {ConcreteElement} from "../../domains/ConcreteElements";
+import {PathExporter} from "./witnesses/PathExporter";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 
@@ -145,6 +146,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
             this._witnessHandler = DummyHandler.create();
         } else if (this._config.witnessHandler == 'ExportWitness') {
             this._witnessHandler = new WitnessExporter();
+        } else if (this._config.witnessHandler == 'ExportPath') {
+            this._witnessHandler = new PathExporter(this, this);
         } else {
             throw new IllegalArgumentException("Illegal witness handler configuration");
         }
@@ -288,7 +291,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     testifyOne(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
-        return this.wrappedAnalysis.testify(accessibility, state);
+        const reaching = AccessibilityRelations.backwardsAccessible(accessibility, state, this, this.abstractDomain);
+        return this.wrappedAnalysis.testifyOne(reaching, state);
     }
 
     testifyConcrete(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {

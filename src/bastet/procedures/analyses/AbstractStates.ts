@@ -26,6 +26,8 @@ import {SSAState} from "./ssa/SSAAbstractDomain";
 import {DataAbstractState} from "./data/DataAbstractDomain";
 import {TimeState} from "./time/TimeAbstractDomain";
 import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
+import {Preconditions} from "../../utils/Preconditions";
+import {ProgramAnalysis} from "./ProgramAnalysis";
 
 export interface SingletonStateWrapper {
 
@@ -68,7 +70,10 @@ export interface AbstractStateVisitor<T> extends AbstractElementVisitor<T> {
 export class AbstractStates {
 
     public static extractStateId(e: AbstractState): number {
-        throw new ImplementMeException();
+        if (e instanceof GraphAbstractState) {
+            return e.getId();
+        }
+        throw new ImplementMeForException(e.constructor.name);
     }
 
 }

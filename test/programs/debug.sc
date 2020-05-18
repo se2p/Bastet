@@ -1,45 +1,39 @@
-program TestProgram
+program Mini1Program
 
-actor Beetle is ScratchSprite begin
+actor MiniActor is RuntimeEntity begin
 
-    declare state as int
+    define atomic inc (n: int) begin
+        define result as n + 1
+    end returns result: int
 
     script on startup do begin
-        hide()
-        define state as 0
-        repeat forever begin
-            if state = 0 then begin
-                wait 1 seconds
-                declare mx as int
-                define mx as mouseX()
-                if mx > 0-200 and mx < 0-100 then begin
-                    define state as 1
-                end else begin
-                    define state as 0
-                end
-            end else if state = 1 then begin
-                 wait 1 seconds
-                declare mx as int
-                define mx as mouseX()
-                if mx > 0-100 and mx < 0 then begin
-                    define state as 2
-                end else begin
-                    define state as 0
-                end
-            end else if state = 2 then begin
-                 wait 1 seconds
-                declare mx as int
-                define mx as mouseX()
-                if mx > 0 and mx < 100 then begin
-                    _RUNTIME_signalFailure("Bug revealed!")
-                end else begin
-                    define state as 0
-                end
-            end
+        declare x as int
+        define x as 42
+        declare n as int
+        declare m as int
+        declare b as boolean
+
+        if b then begin
+            define x as x
+        end
+
+        if n = 0 then begin
+            define x as x + 1
+        end else begin
+            define x as x + 0
+        end
+
+        if m = 0 then begin
+            define x as x + 1
+        end else begin
+            define x as x + 0
+        end
+
+
+        if (x = 42) then begin
+            _RUNTIME_signalFailure("This must not happen!")
         end
     end
 
 end
-
-
 
