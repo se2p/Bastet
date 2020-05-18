@@ -44,7 +44,6 @@ import {BooleanType} from "../../../syntax/ast/core/ScratchType";
 import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {getTheOnlyElement} from "../../../utils/Collections";
 import {DataTransformerVisitor} from "./DataTransformerVisitor";
-import {Bool} from "../../../utils/smt/z3/libz3";
 
 class BranchingAlternative {
 
@@ -165,7 +164,8 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
 
         // Testify the accessibility relation based on the model for the `choiceQuery` formula
         // - make sure to return the empty accessibility relation in case the formula is infeasible
-        const result: AccessibilityRelation<AbstractState, AbstractState> = this.strenghtenRelation(accessibility, alternatives, satAssignement);
+        const result: AccessibilityRelation<AbstractState, AbstractState> = this.strenghtenRelation(
+            accessibility, alternatives, satAssignement, targetState);
 
         // return the result (strengthened accessibility relation)
         return result;
@@ -307,9 +307,9 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
     }
 
     private strenghtenRelation(accessibility: AccessibilityRelation<AbstractState, AbstractState>,
-                               alternatives: BranchingAlternatives, satAssignement: ConcreteMemory): AccessibilityRelation<AbstractState, AbstractState> {
-        // FIXME: This approach does not yet work with branching variables that are DONT-CARE
-        return AccessibilityRelations.filterForwards(accessibility, (s1, s2) => {
+                               alternatives: BranchingAlternatives, satAssignement: ConcreteMemory,
+                               targetState: AbstractState): AccessibilityRelation<AbstractState, AbstractState> {
+        const result = AccessibilityRelations.filterForwards(accessibility, (s1, s2) => {
             const branchName = this.createBranchName(s1, s2);
             const assignement = satAssignement.booleanMem.get(branchName);
             if (assignement !== undefined) {
@@ -322,5 +322,10 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
 
             return true;
         });
+
+        // FIXME: This approach does not yet work with branching variables that are DONT-CARE
+        // (which might be the cause of violating the following invariant:)
+        Preconditions.checkState(result.isReachable(targetState), "The target state must be reachable in the strengthened relation!");
+        return result;
     }
 }
