@@ -30,10 +30,6 @@ import {PartitionKey} from "../../algorithms/StateSet";
 
 export type GraphStateId = number;
 
-export interface GraphConcreteState extends ConcreteElement {
-
-}
-
 export interface GraphAbstractStateAttribs extends AbstractElement, SingletonStateWrapper {
 
     id: GraphStateId;

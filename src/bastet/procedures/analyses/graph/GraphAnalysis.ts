@@ -30,8 +30,7 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {
     GraphAbstractDomain,
     GraphAbstractState,
-    GraphAbstractStateFactory,
-    GraphConcreteState
+    GraphAbstractStateFactory
 } from "./GraphAbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {GraphTransferRelation} from "./GraphTransferRelation";
@@ -90,11 +89,11 @@ export class GraphAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState, GraphAbstractState, GraphAbstractState>,
+export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
     Unwrapper<GraphAbstractState, AbstractElement>, StatePartitionOperator<GraphAbstractState>,
     TransitionLabelProvider<GraphAbstractState> {
 
-    private readonly _abstractDomain: AbstractDomain<GraphConcreteState, GraphAbstractState>;
+    private readonly _abstractDomain: AbstractDomain<ConcreteElement, GraphAbstractState>;
 
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any, any>;
 
@@ -216,7 +215,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<GraphConcreteState
         return this._refiner;
     }
 
-    get abstractDomain(): AbstractDomain<GraphConcreteState, GraphAbstractState> {
+    get abstractDomain(): AbstractDomain<ConcreteElement, GraphAbstractState> {
         return this._abstractDomain;
     }
 
