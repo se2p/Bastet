@@ -590,7 +590,7 @@ export class ControlAbstractDomain implements AbstractDomain<ControlConcreteStat
     }
 
     concretizeOne(element: ControlAbstractState): ControlConcreteState {
-        return this._wrapped.concretizeOne(element);
+        return this._wrapped.concretizeOne(element.getWrappedState());
     }
 
     widen(element: ControlAbstractState, precision: AbstractionPrecision): ControlAbstractState {
