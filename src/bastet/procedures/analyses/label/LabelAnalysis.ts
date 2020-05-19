@@ -66,6 +66,8 @@ export class LabelAnalysis<F extends AbstractState>
 
     private readonly _task: App;
 
+    private _bigStepNumber: number;
+
     constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics) {
         this._task = Preconditions.checkNotUndefined(task);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);
@@ -73,7 +75,8 @@ export class LabelAnalysis<F extends AbstractState>
         this._abstractDomain = new LabelAbstractDomain(wrappedAnalysis.abstractDomain);
         this._mergeOperator = new MergeJoinOperator(this._abstractDomain);
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
-        this._transfer = new LabelTransferRelation(wrappedAnalysis);
+        this._transfer = new LabelTransferRelation(wrappedAnalysis, () => this._bigStepNumber);
+        this._bigStepNumber = 0;
     }
 
     getTransitionLabel(fromState: LabelState, toState: LabelState): ProgramOperation[] {
@@ -82,15 +85,26 @@ export class LabelAnalysis<F extends AbstractState>
             return Array.from(transfers.map((t) => t.getOp()));
         }
 
-        const result: ProgramOperation[] = [];
-        for (const transfer of toState.getTransfers()) {
-            // FIXME: The previous state can be an intermediate state which has to be skipped
-            //   to make a meaningful comparison
-            if (transfer.getFrom() == fromState) {
-                result.push(transfer.getOp());
+        const worklist: [LabelState, ProgramOperation[]][] = [];
+        worklist.push([toState, []]);
+
+        const relevantBigSteps = new Set<number>(toState.getTransfers().map((t) => t.getBigStep()));
+
+        while (worklist.length > 0) {
+            const [work, workOps] = worklist.pop();
+            for (const t of work.getTransfers()) {
+                if (relevantBigSteps.has(t.getBigStep())) {
+                    const from = t.getFrom() as LabelState;
+                    if (from == fromState) {
+                        return workOps;
+                    } else {
+                        worklist.push([from, [t.getOp()].concat(workOps)]);
+                    }
+                }
             }
         }
-        return result;
+
+        return [];
     }
 
     abstractSucc(fromState: LabelState): Iterable<LabelState> {
@@ -129,6 +143,7 @@ export class LabelAnalysis<F extends AbstractState>
     }
 
     widen(state: LabelState): LabelState {
+        this._bigStepNumber++;
         return this._wrappedAnalysis.widen(state.getWrappedState());
     }
 

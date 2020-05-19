@@ -32,7 +32,9 @@ export interface LabeledTransferAttributes {
 
     from: AbstractElement,
 
-    op: OperationId
+    op: OperationId,
+
+    bigStep: number
 
 }
 
@@ -40,18 +42,24 @@ const LabeledTransferRecord = ImmRec({
 
     from: null,
 
-    op: ProgramOperations.epsilon().ident
+    op: ProgramOperations.epsilon().ident,
+
+    bigStep: -1
 
 });
 
 export class LabeledTransfer extends LabeledTransferRecord implements LabeledTransferAttributes {
 
-    constructor(from: AbstractElement, op: ProgramOperation) {
-        super({from: from, op: op.ident});
+    constructor(from: AbstractElement, op: ProgramOperation, bigStep: number) {
+        super({from: from, op: op.ident, bigStep: bigStep});
     }
 
     public getFrom(): AbstractElement {
         return this.get('from');
+    }
+
+    public getBigStep(): number {
+        return this.get('bigStep');
     }
 
     public getOp(): ProgramOperation {

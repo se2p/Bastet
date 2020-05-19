@@ -33,9 +33,11 @@ import {NotSupportedException} from "../../../core/exceptions/NotSupportedExcept
 export class LabelTransferRelation implements LabeledTransferRelation<LabelState> {
 
     private readonly _wrappedTransfer: LabeledTransferRelation<AbstractElement>;
+    private readonly _bigStepProvider: () => number;
 
-    constructor(wrappedTransfer: LabeledTransferRelation<AbstractElement>) {
+    constructor(wrappedTransfer: LabeledTransferRelation<AbstractElement>, bigStepProvider: () => number) {
         this._wrappedTransfer = wrappedTransfer;
+        this._bigStepProvider = bigStepProvider;
     }
 
     abstractSucc(fromState: LabelState): Iterable<LabelState> {
@@ -45,7 +47,9 @@ export class LabelTransferRelation implements LabeledTransferRelation<LabelState
     abstractSuccFor(fromState: LabelState, op: ProgramOperation, co: Concern): Iterable<LabelState> {
         const result: LabelState[] = [];
         for (const w of this._wrappedTransfer.abstractSuccFor(fromState.wrappedState, op, co)) {
-            result.push(fromState.withTransfers(ImmList([new LabeledTransfer(fromState, op)])).withWrappedState(w));
+            result.push(fromState
+                .withTransfers(ImmList([new LabeledTransfer(fromState, op, this._bigStepProvider())]))
+                .withWrappedState(w));
         }
         return result;
     }
