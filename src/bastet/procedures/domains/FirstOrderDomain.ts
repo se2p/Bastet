@@ -72,7 +72,7 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
 
         // TODO: Use a generic FirstOrderModel type instead of Z3Model
         if (this.solver.isUnsat()) {
-            throw new IllegalArgumentException("Model only available for satisfiabe formula!");
+            throw new IllegalArgumentException("Model only available for satisfiable formula!");
         }
 
         const model = this.solver.getModel();
