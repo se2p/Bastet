@@ -149,9 +149,10 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         let branchingFormula: BooleanFormula = this._theories.boolTheory.trueBool();
         for (const a of alternatives.elements) {
             branchingFormula = this._theories.boolTheory.and(branchingFormula, a.branchPredicateEquiv);
+            // console.log(this._theories.stringRepresentation(a.branchPredicateEquiv));
         }
         Object.freeze(branchingFormula);
-        console.log(this._theories.stringRepresentation(branchingFormula));
+        // console.log(this._theories.stringRepresentation(branchingFormula));
 
         // Extract the trace formula
         const traceFormula: BooleanFormula = this.recoverTraceFormula(accessibility, targetState);

@@ -3,7 +3,8 @@
  *
  *   Copyright 2019 by University of Passau (uni-passau.de)
  *
- *   Maintained by Andreas Stahlbauer (firstname@lastname.net)
+ *   Maintained by Andreas Stahlbauer (firstname@lastname.net),
+ *   see the file CONTRIBUTORS.md for the list of contributors.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -20,8 +21,8 @@
  */
 
 import {
-    ProgramAnalysis, ProgramAnalysisWithLabelProducer,
-    ProgramAnalysisWithLabels,
+    ProgramAnalysis,
+    ProgramAnalysisWithLabels, TransitionLabelProvider,
     WrappingProgramAnalysis
 } from "../ProgramAnalysis";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
@@ -33,93 +34,101 @@ import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
-import {ProgramTimeProfile} from "../../../utils/TimeProfile";
-import {TimeTransferRelation} from "./TimeTransferRelation";
 import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Map as ImmMap, List as ImmList, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
-import {TimeAbstractDomain, TimeState} from "./TimeAbstractDomain";
-import {TimeMergeOperator} from "./TimeMergeOperator";
 import {AccessibilityRelation} from "../Accessibility";
+import {LabelAbstractDomain, LabelState} from "./LabelAbstractDomain";
+import {LabelTransferRelation} from "./LabelTransferRelation";
+import {MergeJoinOperator} from "../Operators";
 
 
-export class TimeAnalysis<F extends AbstractState>
-    implements WrappingProgramAnalysis<ConcreteElement, TimeState, F>,
-        ProgramAnalysisWithLabelProducer<ConcreteElement, TimeState, F>,
-        Unwrapper<TimeState, AbstractElement>,
-        LabeledTransferRelation<TimeState> {
+export class LabelAnalysis<F extends AbstractState>
+    implements WrappingProgramAnalysis<ConcreteElement, LabelState, F>,
+        TransitionLabelProvider<LabelState>,
+        Unwrapper<LabelState, AbstractElement>,
+        LabeledTransferRelation<LabelState> {
 
-    private readonly _abstractDomain: TimeAbstractDomain;
+    private readonly _abstractDomain: LabelAbstractDomain;
 
-    private readonly _wrappedAnalysis: ProgramAnalysisWithLabelProducer<any, any, F>;
+    private readonly _wrappedAnalysis: ProgramAnalysis<any, any, F>;
 
     private readonly _statistics: AnalysisStatistics;
 
-    private readonly _timeProfile: ProgramTimeProfile;
+    private readonly _transfer: LabelTransferRelation;
 
-    private readonly _transfer: TimeTransferRelation;
+    private readonly _refiner: WrappingRefiner<LabelState, any>;
 
-    private readonly _mergeOperator: TimeMergeOperator;
-
-    private readonly _refiner: WrappingRefiner<TimeState, any>;
+    private readonly _mergeOperator: MergeJoinOperator<LabelState>;
 
     private readonly _task: App;
 
-    constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabelProducer<any, any, F>, statistics: AnalysisStatistics,
-                timeProfile: ProgramTimeProfile) {
+    constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics) {
         this._task = Preconditions.checkNotUndefined(task);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
-        this._timeProfile = Preconditions.checkNotUndefined(timeProfile);
-        this._abstractDomain = new TimeAbstractDomain(wrappedAnalysis.abstractDomain);
-        this._mergeOperator = new TimeMergeOperator(wrappedAnalysis);
+        this._abstractDomain = new LabelAbstractDomain(wrappedAnalysis.abstractDomain);
+        this._mergeOperator = new MergeJoinOperator(this._abstractDomain);
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
-        this._transfer = new TimeTransferRelation(task, timeProfile, wrappedAnalysis);
+        this._transfer = new LabelTransferRelation(wrappedAnalysis);
     }
 
-    getTransitionLabel(from: TimeState, to: TimeState): ProgramOperation[] {
-        return this._wrappedAnalysis.getTransitionLabel(from.getWrappedState(), to.getWrappedState());
+    getTransitionLabel(fromState: LabelState, toState: LabelState): ProgramOperation[] {
+        const transfers = toState.getTransfers();
+        if (transfers.size <= 1) {
+            return Array.from(transfers.map((t) => t.getOp()));
+        }
+
+        const result: ProgramOperation[] = [];
+        for (const transfer of toState.getTransfers()) {
+            // FIXME: The previous state can be an intermediate state which has to be skipped
+            //   to make a meaningful comparison
+            if (transfer.getFrom() == fromState) {
+                result.push(transfer.getOp());
+            }
+        }
+        return result;
     }
 
-    abstractSucc(fromState: TimeState): Iterable<TimeState> {
+    abstractSucc(fromState: LabelState): Iterable<LabelState> {
         return this._transfer.abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: TimeState, op: ProgramOperation, co: Concern): Iterable<TimeState> {
+    abstractSuccFor(fromState: LabelState, op: ProgramOperation, co: Concern): Iterable<LabelState> {
         return this._transfer.abstractSuccFor(fromState, op, co);
     }
 
-    initialStatesFor(task: App): TimeState[] {
+    initialStatesFor(task: App): LabelState[] {
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            return new TimeState(ImmList([]), w);
+            return new LabelState(ImmList([]), w);
         } );
     }
 
-    join(state1: TimeState, state2: TimeState): TimeState {
+    join(state1: LabelState, state2: LabelState): LabelState {
         return this._abstractDomain.lattice.join(state1, state2);
     }
 
-    merge(state1: TimeState, state2: TimeState): TimeState {
+    merge(state1: LabelState, state2: LabelState): LabelState {
         return this._mergeOperator.merge(state1, state2);
     }
 
-    shouldMerge(state1: TimeState, state2: TimeState): boolean {
+    shouldMerge(state1: LabelState, state2: LabelState): boolean {
         return this._mergeOperator.shouldMerge(state1, state2);
     }
 
-    stop(state: TimeState, reached: Iterable<F>, unwrapper: (e: F) => TimeState): boolean {
+    stop(state: LabelState, reached: Iterable<F>, unwrapper: (e: F) => LabelState): boolean {
         return this._wrappedAnalysis.stop(state, reached, unwrapper);
     }
 
-    target(state: TimeState): Property[] {
+    target(state: LabelState): Property[] {
         return this._wrappedAnalysis.target(state.getWrappedState());
     }
 
-    widen(state: TimeState): TimeState {
+    widen(state: LabelState): LabelState {
         return this._wrappedAnalysis.widen(state.getWrappedState());
     }
 
@@ -127,11 +136,11 @@ export class TimeAnalysis<F extends AbstractState>
         return this._wrappedAnalysis.createStateSets();
     }
 
-    get abstractDomain(): AbstractDomain<ConcreteElement, TimeState> {
+    get abstractDomain(): AbstractDomain<ConcreteElement, LabelState> {
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<TimeState> {
+    get refiner(): Refiner<LabelState> {
         return this._refiner;
     }
 
@@ -139,19 +148,19 @@ export class TimeAnalysis<F extends AbstractState>
         return this._wrappedAnalysis;
     }
 
-    unwrap(e: TimeState): AbstractElement {
+    unwrap(e: LabelState): AbstractElement {
         return e.getWrappedState();
     }
 
-    mergeInto(state: TimeState, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => TimeState, wrapper: (TimeState) => F): [FrontierSet<F>, ReachedSet<F>] {
+    mergeInto(state: LabelState, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => LabelState, wrapper: (LabelState) => F): [FrontierSet<F>, ReachedSet<F>] {
         throw new ImplementMeException();
     }
 
-    partitionOf(ofState: TimeState, reached: ReachedSet<F>): Iterable<F> {
+    partitionOf(ofState: LabelState, reached: ReachedSet<F>): Iterable<F> {
         return this._wrappedAnalysis.partitionOf(ofState.getWrappedState(), reached);
     }
 
-    getPartitionKeys(element: TimeState): ImmSet<PartitionKey> {
+    getPartitionKeys(element: LabelState): ImmSet<PartitionKey> {
         return this._wrappedAnalysis.getPartitionKeys(element.getWrappedState());
     }
 
@@ -159,11 +168,11 @@ export class TimeAnalysis<F extends AbstractState>
         throw new ImplementMeException();
     }
 
-    compareStateOrder(a: TimeState, b: TimeState): number {
+    compareStateOrder(a: LabelState, b: LabelState): number {
         throw new ImplementMeException();
     }
 
-    getLexiOrderKey(ofState: TimeState): LexiKey {
+    getLexiOrderKey(ofState: LabelState): LexiKey {
         return this._wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
     }
 
@@ -171,19 +180,19 @@ export class TimeAnalysis<F extends AbstractState>
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<TimeState, F>, state: F): AccessibilityRelation<TimeState, F> {
+    testify(accessibility: AccessibilityRelation<LabelState, F>, state: F): AccessibilityRelation<LabelState, F> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<TimeState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<LabelState, F>, state: F): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<TimeState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<LabelState, F>, state: F): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<TimeState, F>, state: F): AccessibilityRelation<TimeState, F> {
+    testifyOne(accessibility: AccessibilityRelation<LabelState, F>, state: F): AccessibilityRelation<LabelState, F> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 

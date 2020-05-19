@@ -135,7 +135,7 @@ export class LabeledTransferRelationImpl<E extends AbstractElement> implements L
 
     abstractSucc(fromState: E): Iterable<E> {
         if (!this._abstractSucc) {
-            throw new IllegalStateException("This transfer is intended to be used with labels only!");
+            throw new IllegalStateException("This transfer is intended to be used with label only!");
         }
         return this._abstractSucc(fromState);
     }

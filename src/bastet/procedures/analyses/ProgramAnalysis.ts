@@ -160,7 +160,7 @@ export class UnavailableTransitionLabelProvider<E extends AbstractState> impleme
 }
 
 export interface ProgramAnalysisWithLabelProducer<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
-    extends ProgramAnalysis<C, E, F>, TransitionLabelProvider<E> {
+    extends ProgramAnalysisWithLabels<C, E, F>, TransitionLabelProvider<E> {
 
     getTransitionLabel(from: E, to: E): ProgramOperation[];
 

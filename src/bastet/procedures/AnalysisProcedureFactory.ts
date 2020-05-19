@@ -41,6 +41,7 @@ import {StaticTimeProfile} from "../utils/TimeProfile";
 import {ConcreteElement} from "./domains/ConcreteElements";
 import {BastetConfiguration} from "../utils/BastetConfiguration";
 import {StructureStatistics} from "../syntax/app/StructureStatistics";
+import {LabelAnalysis} from "./analyses/label/LabelAnalysis";
 
 export class MainAnalysisConfig extends BastetConfiguration {
 
@@ -86,7 +87,8 @@ export class AnalysisProcedureFactory {
                 const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
                 const dataAnalysis = new DataAnalysis(config, firstOrderLattice, bddlib.lattice, theories, this._statistics);
-                const ssaAnalysis = new SSAAnalysis(config, task, dataAnalysis, this._statistics);
+                const labelAnalysis = new LabelAnalysis(task, dataAnalysis, this._statistics);
+                const ssaAnalysis = new SSAAnalysis(config, task, labelAnalysis, this._statistics);
                 const timeAnalysis = new TimeAnalysis(task, ssaAnalysis, this._statistics, new StaticTimeProfile());
                 const controlAnalysis = new ControlAnalysis(config, task, timeAnalysis, this._statistics);
                 const graphAnalysis = new GraphAnalysis(config, task, controlAnalysis, this._statistics);

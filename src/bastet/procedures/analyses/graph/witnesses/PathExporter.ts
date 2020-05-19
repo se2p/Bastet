@@ -62,7 +62,9 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
 
         while (worklist.length > 0) {
             const work = worklist.pop();
-            for (const succ of pathAr.successorsOf(work)) {
+            const succs = pathAr.successorsOf(work);
+            Preconditions.checkArgument(succs.length <= 1, "The path to export most not contain branchings!");
+            for (const succ of succs) {
                 const ops: ProgramOperation[] = this.getTransitionLabels(work, succ);
                 ops.forEach((o) => pathElements.push(o.ast.accept(new CorePrintVisitor())));
                 worklist.push(succ);
