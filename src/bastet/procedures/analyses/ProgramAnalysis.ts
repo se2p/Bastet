@@ -55,6 +55,19 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
 
 }
 
+export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
+    extends ProgramAnalysis<C, E, F>, LabeledTransferRelation<E>,
+        TransitionLabelProvider<E> {
+
+}
+
+export interface WrappingProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
+    extends ProgramAnalysis<C, E, F> {
+
+    wrappedAnalysis: ProgramAnalysis<any, any, F>;
+
+}
+
 export interface TestificationOperator<E extends AbstractElement, F extends AbstractState> {
 
     testify(accessibility: AccessibilityRelation<E, F>, state: F): AccessibilityRelation<E, F>;
@@ -92,7 +105,8 @@ export interface PartitionOperator<E extends AbstractElement, F extends Abstract
 
 }
 
-export interface TraversalOrderOperator<E extends AbstractElement, F extends AbstractState> extends StateOrderComparator<E> {
+export interface TraversalOrderOperator<E extends AbstractElement, F extends AbstractState>
+    extends StateOrderComparator<E> {
 
     getLexiOrderKey(ofState: E): LexiKey;
 
@@ -142,13 +156,6 @@ export interface WidenOperator<E extends AbstractElement> {
 
 }
 
-export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
-    extends ProgramAnalysis<C, E, F>, LabeledTransferRelation<E> {
-
-    abstractSuccFor(fromState: E, op: ProgramOperation, co: Concern): Iterable<E>;
-
-}
-
 export interface TransitionLabelProvider<E extends AbstractElement> {
 
     getTransitionLabel(from: E, to: E): ProgramOperation[];
@@ -160,20 +167,6 @@ export class UnavailableTransitionLabelProvider<E extends AbstractState> impleme
     getTransitionLabel(from: E, to: E): ProgramOperation[] {
         throw new NotSupportedException();
     }
-
-}
-
-export interface ProgramAnalysisWithLabelProducer<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
-    extends ProgramAnalysisWithLabels<C, E, F>, TransitionLabelProvider<E> {
-
-    getTransitionLabel(from: E, to: E): ProgramOperation[];
-
-}
-
-export interface WrappingProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
-    extends ProgramAnalysis<C, E, F> {
-
-    wrappedAnalysis: ProgramAnalysis<any, any, F>;
 
 }
 
