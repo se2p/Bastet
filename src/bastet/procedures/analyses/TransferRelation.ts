@@ -1,9 +1,13 @@
 /*
  *   BASTET Program Analysis and Verification Framework
  *
- *   Copyright 2019 by University of Passau (uni-passau.de)
+ *   Copyright 2020 by University of Passau (uni-passau.de)
  *
- *   Maintained by Andreas Stahlbauer (firstname@lastname.net)
+ *   See the file CONTRIBUTORS.md for the list of contributors.
+ *
+ *   Please make sure to CITE this work in your publications if you
+ *   build on this work. Some of our maintainers or contributors might
+ *   be interested in actively CONTRIBUTING to your research project.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
