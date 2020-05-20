@@ -26,10 +26,14 @@
 
 import {AbstractElement} from "../../lattices/Lattice";
 import {Preconditions} from "../../utils/Preconditions";
+import {FrontierSet, ReachedSet} from "../algorithms/StateSet";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
 export interface Refiner<E extends AbstractElement> {
 
     checkIsFeasible(e: E, purpose?: string): boolean;
+
+    refinePrecision(frontier: FrontierSet<E>, reached: ReachedSet<E>, infeasibleState: E);
 
 }
 
@@ -58,6 +62,10 @@ export class WrappingRefiner<E extends AbstractElement, W extends AbstractElemen
     checkIsFeasible(e: E, purpose?: string): boolean {
         const w = this._unwrapper.unwrap(e);
         return this._wrapped.checkIsFeasible(w, purpose);
+    }
+
+    refinePrecision(frontier: FrontierSet<E>, reached: ReachedSet<E>, infeasibleState: E) {
+        throw new ImplementMeException();
     }
 
 }

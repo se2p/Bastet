@@ -28,6 +28,8 @@ import {Refiner} from "../Refiner";
 import {DataAbstractState} from "./DataAbstractDomain";
 import {Lattices, LatticeWithComplements} from "../../../lattices/Lattice";
 import {PerfTimer} from "../../../utils/PerfTimer";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {FrontierSet, ReachedSet} from "../../algorithms/StateSet";
 
 export class DataRefiner implements Refiner<DataAbstractState> {
 
@@ -39,6 +41,10 @@ export class DataRefiner implements Refiner<DataAbstractState> {
 
     checkIsFeasible(e: DataAbstractState, purpose: string = null): boolean {
         return Lattices.isFeasible(e, this._lattice, purpose);
+    }
+
+    refinePrecision(frontier: FrontierSet<DataAbstractState>, reached: ReachedSet<DataAbstractState>, infeasibleState: DataAbstractState) {
+        throw new ImplementMeException();
     }
 
 }
