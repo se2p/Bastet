@@ -44,10 +44,10 @@ import {ErrorWitness, ErrorWitnessStep, MousePosition, Target} from "./ErrorWitn
 import {AccessibilityRelation, AccessibilityRelations} from "../../Accessibility";
 import {Property} from "../../../../syntax/Property";
 import {getTheOnlyElement} from "../../../../utils/Collections";
+import {VAR_SCOPING_SPLITTER} from "../../../../syntax/app/controlflow/DataLocation";
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
-    private static readonly IRRELEVANT_TARGETS = [];
     private static readonly IRRELEVANT_USER_DEFINED_ATTRIBUTES = ['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE',
         'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT'];
 
@@ -108,7 +108,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
             if (previousState) {
                 const actionWithArgs = this._tlp.getTransitionLabel(previousState, currentState)
-                    .map(o => o.ast.accept(errorWitnessActionVisitor)).reduce((prev, cur) => {
+                    .map(o => o.ast.accept(errorWitnessActionVisitor))
+                    .reduce((prev, cur) => {
                         if (prev.weight > cur.weight) {
                             return prev;
                         } else {
@@ -119,15 +120,16 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                 step.action = actionWithArgs.action;
 
                 step.actionLabel = this._tlp.getTransitionLabel(previousState, currentState)
-                    .map(o => o.ast.accept(labelPrintVisitor)).join("; ");
+                    .map(o => o.ast.accept(labelPrintVisitor))
+                    .join("; ");
                 const mouseEvent: MouseReadEvent = this._tlp.getTransitionLabel(previousState, currentState)
-                    .map(o => o.ast.accept(mouseReadEventVisitor)).reduce((prev, cur) => prev.combine(cur));
+                    .map(o => o.ast.accept(mouseReadEventVisitor))
+                    .reduce((prev, cur) => prev.combine(cur));
 
                 if (mouseEvent) {
                     const mouseX = mouseEvent.readXFrom ? WitnessExporter.mapToTargetName(WitnessExporter.removeSSAIndex(mouseEvent.readXFrom)).attribute : undefined;
                     const mouseY = mouseEvent.readYFrom ? WitnessExporter.mapToTargetName(WitnessExporter.removeSSAIndex(mouseEvent.readYFrom)).attribute : undefined;
 
-                    console.log({mouseX, mouseY})
                     const x = mouseX ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseX) : mousePosition.x;
                     const y = mouseY ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseY) : mousePosition.y;
                     mousePosition = new MousePosition(x, y);
@@ -174,15 +176,13 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             if (this.isTargetAttribute(attributeWithTarget)) {
                 const {attribute, target} = WitnessExporter.mapToTargetName(attributeWithTarget);
 
-                if (!this.IRRELEVANT_TARGETS.includes(target)) {
-                    let targetMap = targets.get(target);
-                    if (!targetMap) {
-                        targetMap = new Map<string, T>();
-                    }
-
-                    targetMap.set(attribute, value);
-                    targets.set(target, targetMap);
+                let targetMap = targets.get(target);
+                if (!targetMap) {
+                    targetMap = new Map<string, T>();
                 }
+
+                targetMap.set(attribute, value);
+                targets.set(target, targetMap);
             } else {
                 // TODO figure out what to do with other attributes (__op_time_129, ...)
             }
@@ -192,14 +192,14 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     }
 
     private static removeSSAIndex(attributeWithSSA: string): string {
-        const indexLastAt = attributeWithSSA.lastIndexOf("@");
+        const indexLastAt = attributeWithSSA.lastIndexOf(VAR_SCOPING_SPLITTER);
 
         return  attributeWithSSA.substring(0, indexLastAt);
     }
 
     private static mapToTargetName(attributeWithTargetName: string): {attribute: string, target: string} {
-        const indexFirstAt = attributeWithTargetName.indexOf("@");
-        const indexLastAt = attributeWithTargetName.lastIndexOf("@");
+        const indexFirstAt = attributeWithTargetName.indexOf(VAR_SCOPING_SPLITTER);
+        const indexLastAt = attributeWithTargetName.lastIndexOf(VAR_SCOPING_SPLITTER);
 
         if (indexFirstAt < 0 || indexLastAt < 0) {
             throw new IllegalArgumentException("Attribute name didnt contain target name");
@@ -211,7 +211,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     }
 
     private static isTargetAttribute(attribute: string): boolean {
-        return attribute.includes("@");
+        return attribute.includes(VAR_SCOPING_SPLITTER);
     }
 
     private static setMouseInputAction(steps: ErrorWitnessStep[]): void {
