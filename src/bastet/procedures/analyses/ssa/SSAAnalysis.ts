@@ -1,9 +1,13 @@
 /*
  *   BASTET Program Analysis and Verification Framework
  *
- *   Copyright 2019 by University of Passau (uni-passau.de)
+ *   Copyright 2020 by University of Passau (uni-passau.de)
  *
- *   Maintained by Andreas Stahlbauer (firstname@lastname.net)
+ *   See the file CONTRIBUTORS.md for the list of contributors.
+ *
+ *   Please make sure to CITE this work in your publications if you
+ *   build on this work. Some of our maintainers or contributors might
+ *   be interested in actively CONTRIBUTING to your research project.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -19,7 +23,7 @@
  *
  */
 
-import {MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
+import {MergeOperator, ProgramAnalysisWithLabelProducer, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
@@ -50,13 +54,13 @@ export class SSAAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWithLabels<ConcreteElement, SSAState, F>,
+export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWithLabelProducer<ConcreteElement, SSAState, F>,
     LabeledTransferRelation<SSAState>,
     Unwrapper<SSAState, AbstractElement> {
 
     private readonly _abstractDomain: AbstractDomain<ConcreteElement, SSAState>;
 
-    private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, AbstractState, F>;
+    private readonly _wrappedAnalysis: ProgramAnalysisWithLabelProducer<any, AbstractState, F>;
 
     private readonly _transferRelation: SSATransferRelation;
 
@@ -70,17 +74,20 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
 
     private readonly _config: SSAAnalysisConfig;
 
-    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics) {
+    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabelProducer<any, any, F>, statistics: AnalysisStatistics) {
         this._config = new SSAAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new SSAAbstractDomain(wrappedAnalysis.abstractDomain);
 
-        const wrappedTr = LabeledTransferRelationImpl.from(wrappedAnalysis);
-        this._transferRelation = new SSATransferRelation(wrappedTr);
+        this._transferRelation = new SSATransferRelation(wrappedAnalysis);
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = new SSAMergeOperator(this._task, this.wrappedAnalysis, this.wrappedAnalysis);
+    }
+
+    getTransitionLabel(from: SSAState, to: SSAState): ProgramOperation[] {
+        return this._wrappedAnalysis.getTransitionLabel(from.getWrappedState(), to.getWrappedState());
     }
 
     abstractSucc(fromState: SSAState): Iterable<SSAState> {

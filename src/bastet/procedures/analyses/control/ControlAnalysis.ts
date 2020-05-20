@@ -1,9 +1,13 @@
 /*
  *   BASTET Program Analysis and Verification Framework
  *
- *   Copyright 2019 by University of Passau (uni-passau.de)
+ *   Copyright 2020 by University of Passau (uni-passau.de)
  *
- *   Maintained by Andreas Stahlbauer (firstname@lastname.net)
+ *   See the file CONTRIBUTORS.md for the list of contributors.
+ *
+ *   Please make sure to CITE this work in your publications if you
+ *   build on this work. Some of our maintainers or contributors might
+ *   be interested in actively CONTRIBUTING to your research project.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -62,6 +66,8 @@ import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {ReturnStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 import { AccessibilityRelation } from "../Accessibility";
 import {ConcreteElement} from "../../domains/ConcreteElements";
+import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
+import {Concern} from "../../../syntax/Concern";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -83,7 +89,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
 
     private readonly _abstractDomain: AbstractDomain<ControlConcreteState, ControlAbstractState>;
 
-    private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>;
+    private readonly _wrappedAnalysis: ProgramAnalysisWithLabelProducer<any, any, AbstractState>;
 
     private readonly _transferRelation: ControlTransferRelation;
 
@@ -93,7 +99,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
 
     private readonly _statistics: AnalysisStatistics;
 
-    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>, statistics: AnalysisStatistics) {
+    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabelProducer<any, any, AbstractState>, statistics: AnalysisStatistics) {
         this._config = new ControlAnalysisConfig(config);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._task = Preconditions.checkNotUndefined(task);
@@ -232,7 +238,11 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
     }
 
     getTransitionLabel(from: ControlAbstractState, to: ControlAbstractState): ProgramOperation[] {
-        const result: ProgramOperation[] = [];
+        let result: ProgramOperation[] = this._wrappedAnalysis.getTransitionLabel(from.getWrappedState(), to.getWrappedState());
+        if (result.length > 0) {
+            return result;
+        }
+
         for (const threadIdx of to.getSteppedFor().values()) {
             const steppedThread = from.getThreadStates().get(threadIdx);
             const succThread = to.getThreadStates().get(threadIdx);
@@ -353,6 +363,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
 
     testifyConcreteOne(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         return this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
+    }
+
+    abstractSuccFor(fromState: ControlAbstractState, op: ProgramOperation, co: Concern): Iterable<ControlAbstractState> {
+        throw new NotSupportedException();
     }
 
 

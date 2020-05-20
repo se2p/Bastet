@@ -1,9 +1,13 @@
 /*
  *   BASTET Program Analysis and Verification Framework
  *
- *   Copyright 2019 by University of Passau (uni-passau.de)
+ *   Copyright 2020 by University of Passau (uni-passau.de)
  *
- *   Maintained by Andreas Stahlbauer (firstname@lastname.net)
+ *   See the file CONTRIBUTORS.md for the list of contributors.
+ *
+ *   Please make sure to CITE this work in your publications if you
+ *   build on this work. Some of our maintainers or contributors might
+ *   be interested in actively CONTRIBUTING to your research project.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
  *   you may not use this file except in compliance with the License.
@@ -41,6 +45,7 @@ import {StaticTimeProfile} from "../utils/TimeProfile";
 import {ConcreteElement} from "./domains/ConcreteElements";
 import {BastetConfiguration} from "../utils/BastetConfiguration";
 import {StructureStatistics} from "../syntax/app/StructureStatistics";
+import {LabelAnalysis} from "./analyses/label/LabelAnalysis";
 
 export class MainAnalysisConfig extends BastetConfiguration {
 
@@ -86,7 +91,8 @@ export class AnalysisProcedureFactory {
                 const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
                 const dataAnalysis = new DataAnalysis(config, firstOrderLattice, bddlib.lattice, theories, this._statistics);
-                const ssaAnalysis = new SSAAnalysis(config, task, dataAnalysis, this._statistics);
+                const labelAnalysis = new LabelAnalysis(task, dataAnalysis, this._statistics);
+                const ssaAnalysis = new SSAAnalysis(config, task, labelAnalysis, this._statistics);
                 const timeAnalysis = new TimeAnalysis(task, ssaAnalysis, this._statistics, new StaticTimeProfile());
                 const controlAnalysis = new ControlAnalysis(config, task, timeAnalysis, this._statistics);
                 const graphAnalysis = new GraphAnalysis(config, task, controlAnalysis, this._statistics);

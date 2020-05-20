@@ -11,7 +11,10 @@ to propose an update.
 
 - Andreas Stahlbauer (as @ stahlbauer.net)
 
-## Developers
+## Contributing Developers
+
+- Dominik Dinner
+- Christoph Frädrich
 
 ## Funding
 
