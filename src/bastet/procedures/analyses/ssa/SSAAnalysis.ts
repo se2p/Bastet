@@ -23,7 +23,7 @@
  *
  */
 
-import {MergeOperator, ProgramAnalysisWithLabelProducer, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
+import {MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
@@ -54,13 +54,13 @@ export class SSAAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWithLabelProducer<ConcreteElement, SSAState, F>,
+export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWithLabels<ConcreteElement, SSAState, F>,
     LabeledTransferRelation<SSAState>,
     Unwrapper<SSAState, AbstractElement> {
 
     private readonly _abstractDomain: AbstractDomain<ConcreteElement, SSAState>;
 
-    private readonly _wrappedAnalysis: ProgramAnalysisWithLabelProducer<any, AbstractState, F>;
+    private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, AbstractState, F>;
 
     private readonly _transferRelation: SSATransferRelation;
 
@@ -74,7 +74,7 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
 
     private readonly _config: SSAAnalysisConfig;
 
-    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabelProducer<any, any, F>, statistics: AnalysisStatistics) {
+    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics) {
         this._config = new SSAAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
