@@ -100,7 +100,8 @@ export enum Action {
     METHOD_CALL = "METHOD_CALL",
     EPSILON = "EPSILON",
     MOUSE_INPUT = "MOUSE_INPUT",
-    INITIAL_STATE = "INITIAL_STATE"
+    INITIAL_STATE = "INITIAL_STATE",
+    WAIT = "WAIT"
 }
 
 export class ActionWithWeight {

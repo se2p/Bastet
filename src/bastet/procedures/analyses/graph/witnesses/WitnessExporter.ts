@@ -143,6 +143,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         errorWitness.steps = errorWitness.steps.filter(witness => !witness.isEmpty());
         errorWitness.steps = WitnessExporter.removeIrrelevantTransitions(errorWitness.steps);
         WitnessExporter.setMouseInputAction(errorWitness.steps);
+        WitnessExporter.addWaitSteps(errorWitness.steps);
         errorWitness.steps = errorWitness.steps.filter(step => step.action !== Action.DECLARE);
         errorWitness.steps = WitnessExporter.buildInitialStep(errorWitness.steps);
         errorWitness.steps = errorWitness.steps.filter(step => step.action !== Action.DEFINE && step.action !== Action.EPSILON);
@@ -243,6 +244,23 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         }
 
         return filteredArray;
+    }
+
+    private static addWaitSteps(steps: ErrorWitnessStep[]) {
+        let prevStep: ErrorWitnessStep = null;
+
+        for (const step of steps) {
+            if (prevStep) {
+                const timeStampDiff = step.timestamp - prevStep.timestamp;
+
+                if (timeStampDiff > 1000) {
+                    step.action = Action.WAIT;
+                    step.waitMicros = timeStampDiff;
+                }
+            }
+
+            prevStep = step;
+        }
     }
 
     private static buildInitialStep(steps: ErrorWitnessStep[]): ErrorWitnessStep[] {

@@ -71,7 +71,7 @@ export class MousePosition {
 export class ErrorWitnessStep {
     timestamp: number;
     action: Action;
-    actionArgs;
+    waitMicros: number;
     actionLabel: string;
     actionTargetName: string;
     mousePosition: MousePosition;
