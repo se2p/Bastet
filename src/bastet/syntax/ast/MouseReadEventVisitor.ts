@@ -94,6 +94,7 @@ import {CorePrintVisitor} from "./CorePrintVisitor";
 import {BinaryExpression} from "./core/expressions/BinaryExpression";
 import {StringLiteral, StringVariableExpression} from "./core/expressions/StringExpression";
 import {ActorVariableExpression} from "./core/expressions/ActorExpression";
+import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 
 export class MouseReadEvent {
     public readonly readXFrom: string;
@@ -153,8 +154,6 @@ export class MouseReadEventVisitor implements CoreVisitor<MouseReadEvent>, CoreB
             } else if (calledMethod === 'mouseY') {
                 this.mouseYAlias.push(assignResultToName);
                 this.usageToMouseYAlias.set(assignResultToName, assignResultToName);
-            } else {
-                throw new ImplementMeForException("when original variable storing mouse position is overwritten")
             }
         }
         
@@ -361,6 +360,7 @@ export class MouseReadEventVisitor implements CoreVisitor<MouseReadEvent>, CoreB
     }
 
     visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): MouseReadEvent {
+        // define asd as mouseX
         const variableName = node.variable.accept(this.printVisitor);
         const mouseEvent = node.toValue.accept(this);
 
@@ -371,6 +371,7 @@ export class MouseReadEventVisitor implements CoreVisitor<MouseReadEvent>, CoreB
         if (mouseEvent.readXFrom !== undefined) {
             this.usageToMouseXAlias.set(variableName, mouseEvent.readXFrom);
         }
+
         return this.nothingMouseEvent;
     }
 
@@ -399,8 +400,25 @@ export class MouseReadEventVisitor implements CoreVisitor<MouseReadEvent>, CoreB
     }
 
     visitVariableWithDataLocation(node: VariableWithDataLocation): MouseReadEvent {
-        const variableName = node.qualifiedName;
-        return new MouseReadEvent(this.usageToMouseXAlias.get(variableName), this.usageToMouseYAlias.get(variableName));
+        const variableNameParts = node.qualifiedName.split("@");
+
+        if (variableNameParts.length > 1) {
+            const variableName = node.qualifiedName;
+            const script = variableNameParts[1];
+
+            if (script === "mouseX") {
+                console.log(JSON.stringify({ variableName, script }));
+                this.mouseXAlias.push(variableName);
+                this.usageToMouseXAlias.set(variableName, variableName);
+            } else if (script === "mouseY") {
+                this.mouseYAlias.push(variableName);
+                this.usageToMouseYAlias.set(variableName, variableName);
+            }
+
+            return new MouseReadEvent(this.usageToMouseXAlias.get(variableName), this.usageToMouseYAlias.get(variableName));
+        } else {
+            throw new IllegalStateException();
+        }
     }
 
     visitWaitUntilStatement(node: WaitUntilStatement): MouseReadEvent {
