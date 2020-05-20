@@ -28,26 +28,24 @@ import {
     ProgramAnalysis,
     StopOperator,
     TransitionLabelProvider,
-    WrappingProgramAnalysis
+    WrappingProgramAnalysis,
 } from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
-import {
-    GraphAbstractDomain,
-    GraphAbstractState,
-    GraphAbstractStateFactory
-} from "./GraphAbstractDomain";
+import {GraphAbstractDomain, GraphAbstractState, GraphAbstractStateFactory} from "./GraphAbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {GraphTransferRelation} from "./GraphTransferRelation";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {
     CHOOSE_EITHER,
-    CHOOSE_FIRST, CHOOSE_SECOND,
+    CHOOSE_FIRST,
+    CHOOSE_SECOND,
     DefaultFrontierSet,
     FrontierSet,
-    PartitionKey, PriorityFrontierSet,
+    PartitionKey,
+    PriorityFrontierSet,
     ReachedSet,
     StatePartitionOperator,
-    StateSet
+    StateSet,
 } from "../../algorithms/StateSet";
 import {Preconditions} from "../../../utils/Preconditions";
 import {GraphToDot} from "./GraphToDot";
@@ -59,7 +57,7 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {NoMergeIntoOperator, NoStopOperator, StandardMergeIntoOperator} from "../Operators";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {Set as ImmSet} from "immutable"
+import {Set as ImmSet} from "immutable";
 import {GraphContextToDot} from "./GraphContextToDot";
 import {GraphCoverCheckStopOperator} from "./GraphCoverCheckStopOperator";
 import {DummyHandler, WitnessHandler} from "../WitnessHandlers";
@@ -149,7 +147,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         if (this._config.witnessHandler == 'DoNothing') {
             this._witnessHandler = DummyHandler.create();
         } else if (this._config.witnessHandler == 'ExportWitness') {
-            this._witnessHandler = new WitnessExporter(this, this._task);
+            this._witnessHandler = new WitnessExporter(this, this, this._task);
         } else if (this._config.witnessHandler == 'ExportPath') {
             this._witnessHandler = new PathExporter(this, this);
         } else {

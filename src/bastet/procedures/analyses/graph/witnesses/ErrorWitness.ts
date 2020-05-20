@@ -63,7 +63,6 @@ export class MousePosition {
     readonly y: number;
 
     constructor(x: number, y: number) {
-        Preconditions.checkArgument(x !== undefined && y !== undefined);
         this.x = x;
         this.y = y;
     }

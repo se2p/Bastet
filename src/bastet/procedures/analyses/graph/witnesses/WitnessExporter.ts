@@ -29,47 +29,58 @@ import {GraphAbstractState} from "../GraphAbstractDomain";
 import {ReachedSet} from "../../../algorithms/StateSet";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {GraphReachedSetWrapper} from "../GraphStatesSetWrapper";
-import {GraphPath} from "../GraphPath";
-import {GraphSafetyCounterexample} from "./GraphCounterexample";
-import {ProgramAnalysis} from "../../ProgramAnalysis";
-import {DataAnalysis} from "../../data/DataAnalysis";
-import {DataAbstractState} from "../../data/DataAbstractDomain";
-import {ConcreteMemory} from "../../../domains/ConcreteElements";
+import {TransitionLabelProvider, WrappingProgramAnalysis} from "../../ProgramAnalysis";
+import {ConcreteElement, ConcreteMemory} from "../../../domains/ConcreteElements";
 import {IllegalArgumentException} from "../../../../core/exceptions/IllegalArgumentException";
 import {SSAStateVisitor} from "../../StateVisitors";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
-import {GraphAnalysis} from "../GraphAnalysis";
 import {MouseReadEvent, MouseReadEventVisitor} from "../../../../syntax/ast/MouseReadEventVisitor";
 import {App} from "../../../../syntax/app/App";
 import {ControlAbstractState, RelationLocation} from "../../control/ControlAbstractDomain";
 import {ControlLocationExtractor} from "../../control/ControlUtils";
-import {ImplementMeForException} from "../../../../core/exceptions/ImplementMeException";
 import {Action, ErrorWitnessActionVisitor} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
 import {ErrorWitness, ErrorWitnessStep, MousePosition, Target} from "./ErrorWitness";
+import {AccessibilityRelation, AccessibilityRelations} from "../../Accessibility";
+import {Property} from "../../../../syntax/Property";
+import {getTheOnlyElement} from "../../../../utils/Collections";
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
-    private static readonly IRRELEVANT_TARGETS = ['IOActor'];
+    private static readonly IRRELEVANT_TARGETS = [];
     private static readonly IRRELEVANT_USER_DEFINED_ATTRIBUTES = ['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE',
         'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT'];
 
-    private readonly _analysis: GraphAnalysis;
+    private readonly _analysis: WrappingProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>;
+    private readonly _tlp: TransitionLabelProvider<GraphAbstractState>;
     private readonly _task: App;
+    private readonly _controlLocationExtractor: ControlLocationExtractor;
 
-    constructor(analysis: GraphAnalysis, task: App) {
+    constructor(analysis: WrappingProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
+                tlp: TransitionLabelProvider<GraphAbstractState>, task: App) {
         this._analysis = analysis;
+        this._tlp = tlp;
         this._task = task;
+        this._controlLocationExtractor = new ControlLocationExtractor(task);
     }
 
     handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
-        const counterExample = this.extractCounterExample(reached, violating);
+        Preconditions.checkArgument(reached instanceof GraphReachedSetWrapper);
+        const ar: GraphReachedSetWrapper<GraphAbstractState> = reached as GraphReachedSetWrapper<GraphAbstractState>;
+        const testified = this._analysis.testifyOne(ar, violating);
+        this.exportPath(testified, violating);
+    }
 
-        const errorState: ConcreteMemory = this.mapGraphAbstractStateToDataConcreteState(violating);
+    private exportPath(pathAr: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, violating: GraphAbstractState) {
+        const path: GraphAbstractState[] = AccessibilityRelations.mapToArray(pathAr);
+        const violatedProperties: Property[] = this._analysis.target(violating);
+
+        const violatingConcreteElement: ConcreteElement = pathAr.concretizer().concretizeOne(violating);
+        Preconditions.checkArgument(violatingConcreteElement instanceof ConcreteMemory);
+        const errorState: ConcreteMemory = violatingConcreteElement as ConcreteMemory;
+
         const errorWitness = new ErrorWitness();
-        errorWitness.violations = counterExample.violatedProperties
-            .toArray()
-            .map(property => property.getText);
+        errorWitness.violations = violatedProperties.map(property => property.getText);
 
         let previousState: GraphAbstractState = undefined;
         let mousePosition: MousePosition = new MousePosition(0, 0);
@@ -77,11 +88,12 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         const labelPrintVisitor = new CorePrintVisitor();
         const mouseReadEventVisitor = new MouseReadEventVisitor();
         const ssaStateVisitor = new SSAStateVisitor();
-        const controlLocationExtractor = new ControlLocationExtractor(this._task);
 
-        for (const currentState of counterExample.path.states) {
+        for (const currentState of path) {
             const step = new ErrorWitnessStep();
-            step.actionTargetName = WitnessExporter.getActionTargetName(currentState, controlLocationExtractor);
+            const relationLocation = this.getRelationLocationForState(currentState);
+            step.actionTargetName = relationLocation ? relationLocation.getActorId() : undefined;
+
             const ssaState = currentState.accept(ssaStateVisitor);
             const memoryInStep = ssaState.getPrimitiveAttributes(errorState);
             const targetStates = WitnessExporter.groupByTargets(memoryInStep);
@@ -95,21 +107,27 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             })
 
             if (previousState) {
-                const actionWithArgs = this._analysis.getTransitionLabel(previousState, currentState)
-                    .map(o => o.ast.accept(errorWitnessActionVisitor))[0];
+                const actionWithArgs = this._tlp.getTransitionLabel(previousState, currentState)
+                    .map(o => o.ast.accept(errorWitnessActionVisitor)).reduce((prev, cur) => {
+                        if (prev.weight > cur.weight) {
+                            return prev;
+                        } else {
+                            return cur;
+                        }
+                    });
 
                 step.action = actionWithArgs.action;
-                step.actionArgs = actionWithArgs.args;
 
-                step.actionLabel = this._analysis.getTransitionLabel(previousState, currentState)
-                    .map(o => o.ast.accept(labelPrintVisitor))[0];
-                const mouseEvent: MouseReadEvent = this._analysis.getTransitionLabel(previousState, currentState)
-                    .map(o => o.ast.accept(mouseReadEventVisitor))[0];
+                step.actionLabel = this._tlp.getTransitionLabel(previousState, currentState)
+                    .map(o => o.ast.accept(labelPrintVisitor)).join("; ");
+                const mouseEvent: MouseReadEvent = this._tlp.getTransitionLabel(previousState, currentState)
+                    .map(o => o.ast.accept(mouseReadEventVisitor)).reduce((prev, cur) => prev.combine(cur));
 
                 if (mouseEvent) {
-                    const mouseX = mouseEvent.readXFrom;
-                    const mouseY = mouseEvent.readYFrom;
+                    const mouseX = mouseEvent.readXFrom ? WitnessExporter.mapToTargetName(WitnessExporter.removeSSAIndex(mouseEvent.readXFrom)).attribute : undefined;
+                    const mouseY = mouseEvent.readYFrom ? WitnessExporter.mapToTargetName(WitnessExporter.removeSSAIndex(mouseEvent.readYFrom)).attribute : undefined;
 
+                    console.log({mouseX, mouseY})
                     const x = mouseX ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseX) : mousePosition.x;
                     const y = mouseY ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseY) : mousePosition.y;
                     mousePosition = new MousePosition(x, y);
@@ -132,23 +150,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         this.exportErrorWitness(errorWitness);
     }
 
-    private mapGraphAbstractStateToDataConcreteState(graphAbstractState: GraphAbstractState): ConcreteMemory {
-        // TODO get GraphConcreteState and implement ConcreteStateVisitor in order to get DataConcreteState(?)
-        let analysis: ProgramAnalysis<any, any, any> = this._analysis;
-        while (!(analysis instanceof DataAnalysis)) {
-            analysis = analysis['_wrappedAnalysis'];
-        }
-        const dataAnalysis = analysis as DataAnalysis;
-
-        let abstractState = graphAbstractState;
-        while (!(abstractState instanceof DataAbstractState)) {
-            abstractState = abstractState.wrappedState;
-        }
-        const dataAbstractState = abstractState as DataAbstractState;
-
-        return dataAnalysis.abstractDomain.concretizeOne(dataAbstractState);
-    }
-
     private static mapGraphAbstractStateToControlAbstractState(graphAbstractState: GraphAbstractState): ControlAbstractState {
         let abstractState: any = graphAbstractState;
         while (abstractState && !(abstractState instanceof ControlAbstractState)) {
@@ -158,17 +159,11 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return abstractState as ControlAbstractState;
     }
 
-    private static getActionTargetName(graphAbstractState: GraphAbstractState, controlLocationExtractor: ControlLocationExtractor): string {
-        const controlAbstractState = this.mapGraphAbstractStateToControlAbstractState(graphAbstractState);
-        const controlLocations: ImmSet<RelationLocation> = controlLocationExtractor.visitControlAbstractState(controlAbstractState);
+    private getRelationLocationForState(graphAbstractState: GraphAbstractState): RelationLocation {
+        const controlAbstractState = WitnessExporter.mapGraphAbstractStateToControlAbstractState(graphAbstractState);
+        const controlLocations: ImmSet<RelationLocation> = this._controlLocationExtractor.visitControlAbstractState(controlAbstractState);
 
-        if (controlLocations.size === 0) {
-            return undefined;
-        } else if (controlLocations.size === 1) {
-            return controlLocations.toArray()[0].getActorId();
-        } else {
-            throw new ImplementMeForException("when a control abstract state has multiple control locations");
-        }
+        return getTheOnlyElement(controlLocations);
     }
 
     private static groupByTargets<T>(map: ImmMap<string, T>): Map<string, Map<string, T>> {
@@ -193,6 +188,12 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         })
 
         return targets;
+    }
+
+    private static removeSSAIndex(attributeWithSSA: string): string {
+        const indexLastAt = attributeWithSSA.lastIndexOf("@");
+
+        return  attributeWithSSA.substring(0, indexLastAt);
     }
 
     private static mapToTargetName(attributeWithTargetName: string): {attribute: string, target: string} {
@@ -266,16 +267,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         }
 
         return filteredArray;
-    }
-
-    public extractCounterExample(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState): GraphSafetyCounterexample {
-        Preconditions.checkArgument(reached instanceof GraphReachedSetWrapper);
-        const reachedSetWrapper = reached as GraphReachedSetWrapper<GraphAbstractState>;
-
-        const errorWitness: GraphPath = reachedSetWrapper.chooseRandomPathTo(violating);
-
-        const violatedProperties = this._analysis.target(violating);
-        return new GraphSafetyCounterexample(errorWitness, violatedProperties);
     }
 
     private exportErrorWitness(errorWitness: ErrorWitness) {

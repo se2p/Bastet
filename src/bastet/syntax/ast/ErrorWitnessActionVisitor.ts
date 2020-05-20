@@ -28,7 +28,8 @@ import {
     AddElementToStatement,
     DeleteAllFromStatement,
     DeleteIthFromStatement,
-    InsertAtStatement, ReplaceElementAtStatement,
+    InsertAtStatement,
+    ReplaceElementAtStatement,
 } from "./core/statements/ListStatement";
 import {
     AndExpression,
@@ -43,7 +44,8 @@ import {
     OrExpression,
     StrContainsExpression,
     StrEqualsExpression,
-    StrGreaterThanExpression, StrLessThanExpression,
+    StrGreaterThanExpression,
+    StrLessThanExpression,
 } from "./core/expressions/BooleanExpression";
 import {AssumeStatement} from "./core/statements/AssumeStatement";
 import {StringLiteral, StringVariableExpression} from "./core/expressions/StringExpression";
@@ -68,7 +70,9 @@ import {
     MinusExpression,
     ModuloExpression,
     MultiplyExpression,
-    NumberVariableExpression, PlusExpression, TimerExpression,
+    NumberVariableExpression,
+    PlusExpression,
+    TimerExpression,
 } from "./core/expressions/NumberExpression";
 import {EpsilonStatement} from "./core/statements/EpsilonStatement";
 import {ExpressionStatement} from "./core/statements/ExpressionStatement";
@@ -77,20 +81,17 @@ import {
     SignalTargetReachedStatement,
     TerminateProgramStatement,
 } from "./core/statements/InternalStatement";
-import {BinaryExpression} from "./core/expressions/BinaryExpression";
 import {ResetTimerStatement} from "./core/statements/ResetTimerStatement";
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
 import {VariableWithDataLocation} from "./core/Variable";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
-import {MouseReadEvent} from "./MouseReadEventVisitor";
 import {
     CoreBoolExpressionVisitor,
     CoreNonCtrlStatementnVisitor,
     CoreNumberExpressionVisitor,
     CoreVisitor,
 } from "./CoreVisitor";
-import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
 import {CorePrintVisitor} from "./CorePrintVisitor";
 
 export enum Action {
@@ -99,289 +100,267 @@ export enum Action {
     METHOD_CALL = "METHOD_CALL",
     EPSILON = "EPSILON",
     MOUSE_INPUT = "MOUSE_INPUT",
-    INITIAL_STATE = "INITIAL_STATE",
-    WAIT = "WAIT"
+    INITIAL_STATE = "INITIAL_STATE"
 }
 
-export class ActionWithArgs {
-    args: {[key: string]: any};
-    
-    constructor(public action: Action) {
+export class ActionWithWeight {
+    constructor(public action: Action, public weight: number) {
     }
-    
-    public static readonly DEFINE = new ActionWithArgs(Action.DEFINE);
-    public static readonly DECLARE = new ActionWithArgs(Action.DECLARE);
-    public static readonly METHOD_CALL = new ActionWithArgs(Action.METHOD_CALL);
-    public static readonly EPSILON = new ActionWithArgs(Action.EPSILON);
-    public static readonly MOUSE_INPUT = new ActionWithArgs(Action.MOUSE_INPUT);
-    public static readonly INITIAL_STATE = new ActionWithArgs(Action.INITIAL_STATE);
+
+    public static readonly DEFINE = new ActionWithWeight(Action.DEFINE, 1);
+    public static readonly DECLARE = new ActionWithWeight(Action.DECLARE, 0);
+    public static readonly METHOD_CALL = new ActionWithWeight(Action.METHOD_CALL, 2);
+    public static readonly EPSILON = new ActionWithWeight(Action.EPSILON, 0);
+    public static readonly MOUSE_INPUT = new ActionWithWeight(Action.MOUSE_INPUT, 2);
+    public static readonly INITIAL_STATE = new ActionWithWeight(Action.INITIAL_STATE, 2);
 }
 
-export class WaitActionWithArgs extends ActionWithArgs {
-    args: {
-        unit: 'seconds'|'millis',
-        amount: number
-    }
-
-    constructor(unit: 'seconds'|'millis', amount: number) {
-        super(Action.WAIT);
-        this.args = {unit, amount};
-    }
-}
-
-export class ErrorWitnessActionVisitor implements CoreVisitor<ActionWithArgs>, CoreBoolExpressionVisitor<ActionWithArgs>, CoreNumberExpressionVisitor<ActionWithArgs>,
-CoreNonCtrlStatementnVisitor<ActionWithArgs>{
+export class ErrorWitnessActionVisitor implements CoreVisitor<ActionWithWeight>, CoreBoolExpressionVisitor<ActionWithWeight>, CoreNumberExpressionVisitor<ActionWithWeight>,
+CoreNonCtrlStatementnVisitor<ActionWithWeight>{
 
     private readonly printer = new CorePrintVisitor();
 
-    visit(node: AstNode): ActionWithArgs {
+    visit(node: AstNode): ActionWithWeight {
         throw new ImplementMeForException(node.constructor.name);
     }
 
-    visitReturnStatement(node: ReturnStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitReturnStatement(node: ReturnStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitCallStatement(node: CallStatement): ActionWithArgs {
+    visitCallStatement(node: CallStatement): ActionWithWeight {
         if (node.assignResultTo.isPresent()) {
-            return ActionWithArgs.DEFINE;
+            return ActionWithWeight.DEFINE;
         } else {
-            const methodName = node.calledMethod.text;
-            const arg = node.args.accept(this.printer);
-
-            switch (methodName) {
-                case MethodIdentifiers._RUNTIME_waitSeconds: return new WaitActionWithArgs('seconds', Number(arg));
-                case MethodIdentifiers._RUNTIME_waitMillis: return new WaitActionWithArgs('millis', Number(arg));
-                default: return ActionWithArgs.METHOD_CALL;
-            }
+            return ActionWithWeight.METHOD_CALL;
         }
     }
 
-    visitAddElementToStatement(node: AddElementToStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitAddElementToStatement(node: AddElementToStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitAndExpression(node: AndExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitAndExpression(node: AndExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitAssumeStatement(node: AssumeStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitAssumeStatement(node: AssumeStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitBeginAtomicStatement(node: BeginAtomicStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitBeginAtomicStatement(node: BeginAtomicStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitBooleanLiteral(node: BooleanLiteral): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitBooleanLiteral(node: BooleanLiteral): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitBooleanVariableExpression(node: BooleanVariableExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitBooleanVariableExpression(node: BooleanVariableExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitStringVariableExpression(node: StringVariableExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitStringVariableExpression(node: StringVariableExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitActorVariableExpression(node: ActorVariableExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitActorVariableExpression(node: ActorVariableExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitBroadcastMessageStatement(node: BroadcastMessageStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitBroadcastMessageStatement(node: BroadcastMessageStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitCastExpression(node: CastExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitCastExpression(node: CastExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitCreateCloneOfStatement(node: CreateCloneOfStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitCreateCloneOfStatement(node: CreateCloneOfStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitDeclareActorVariableStatement(node: DeclareActorVariableStatement): ActionWithArgs {
-        return ActionWithArgs.DECLARE;
+    visitDeclareActorVariableStatement(node: DeclareActorVariableStatement): ActionWithWeight {
+        return ActionWithWeight.DECLARE;
     }
 
-    visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): ActionWithArgs {
-        return ActionWithArgs.DECLARE;
+    visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): ActionWithWeight {
+        return ActionWithWeight.DECLARE;
     }
 
-    visitDeclareSystemVariableStatement(node: DeclareSystemVariableStatement): ActionWithArgs {
-        return ActionWithArgs.DECLARE;
+    visitDeclareSystemVariableStatement(node: DeclareSystemVariableStatement): ActionWithWeight {
+        return ActionWithWeight.DECLARE;
     }
 
-    visitDeleteFromAllStatement(node: DeleteAllFromStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitDeleteFromAllStatement(node: DeleteAllFromStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitDeleteIthFromStatement(node: DeleteIthFromStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitDeleteIthFromStatement(node: DeleteIthFromStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitDeleteThisCloneStatement(node: DeleteThisCloneStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitDeleteThisCloneStatement(node: DeleteThisCloneStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitDivideExpression(node: DivideExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitDivideExpression(node: DivideExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitEndAtomicStatement(node: EndAtomicStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitEndAtomicStatement(node: EndAtomicStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitEpsilonStatement(node: EpsilonStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitEpsilonStatement(node: EpsilonStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitExpressionStatement(node: ExpressionStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitExpressionStatement(node: ExpressionStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitFloatLiteral(node: FloatLiteral): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitFloatLiteral(node: FloatLiteral): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitStringLiteral(node: StringLiteral): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitStringLiteral(node: StringLiteral): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitIndexOfExpression(node: IndexOfExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitIndexOfExpression(node: IndexOfExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitInsertAtStatement(node: InsertAtStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitInsertAtStatement(node: InsertAtStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitIntegerLiteral(node: IntegerLiteral): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitIntegerLiteral(node: IntegerLiteral): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitLengthOListExpression(node: LengthOfListExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitLengthOListExpression(node: LengthOfListExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitLengthOfStringExpression(node: LengthOfStringExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitLengthOfStringExpression(node: LengthOfStringExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitMinusExpression(node: MinusExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitMinusExpression(node: MinusExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitModuloExpression(node: ModuloExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitModuloExpression(node: ModuloExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitMultiplyExpression(node: MultiplyExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitMultiplyExpression(node: MultiplyExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitNegationExpression(node: NegationExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitNegationExpression(node: NegationExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitNumEqualsExpression(node: NumEqualsExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitNumEqualsExpression(node: NumEqualsExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitNumGreaterEqualExpression(node: NumGreaterEqualExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitNumGreaterEqualExpression(node: NumGreaterEqualExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitNumGreaterThanExpression(node: NumGreaterThanExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitNumGreaterThanExpression(node: NumGreaterThanExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitNumLessEqualExpression(node: NumLessEqualExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitNumLessEqualExpression(node: NumLessEqualExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitNumLessThanExpression(node: NumLessThanExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitNumLessThanExpression(node: NumLessThanExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitNumberVariableExpression(node: NumberVariableExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitNumberVariableExpression(node: NumberVariableExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitOrExpression(node: OrExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitOrExpression(node: OrExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitPlusExpression(node: PlusExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitPlusExpression(node: PlusExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitReplaceElementAtStatement(node: ReplaceElementAtStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitReplaceElementAtStatement(node: ReplaceElementAtStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitResetTimerStatement(node: ResetTimerStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitResetTimerStatement(node: ResetTimerStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitSignalTargetReachedStatement(node: SignalTargetReachedStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitSignalTargetReachedStatement(node: SignalTargetReachedStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitStopAllStatement(node: StopAllStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitStopAllStatement(node: StopAllStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitStopOthersInActorStatement(node: StopOthersInActorStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitStopOthersInActorStatement(node: StopOthersInActorStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitStopThisStatement(node: StopThisStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitStopThisStatement(node: StopThisStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): ActionWithArgs {
-        return ActionWithArgs.DEFINE;
+    visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): ActionWithWeight {
+        return ActionWithWeight.DEFINE;
     }
 
-    visitStrContainsExpression(node: StrContainsExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitStrContainsExpression(node: StrContainsExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitStrEqualsExpression(node: StrEqualsExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitStrEqualsExpression(node: StrEqualsExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitStrGreaterThanExpression(node: StrGreaterThanExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitStrGreaterThanExpression(node: StrGreaterThanExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitStrLessThanExpression(node: StrLessThanExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitStrLessThanExpression(node: StrLessThanExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitTerminateProgramStatement(node: TerminateProgramStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitTerminateProgramStatement(node: TerminateProgramStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitTimerExpression(node: TimerExpression): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitTimerExpression(node: TimerExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitVariableWithDataLocation(node: VariableWithDataLocation): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitVariableWithDataLocation(node: VariableWithDataLocation): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
-    visitWaitUntilStatement(node: WaitUntilStatement): ActionWithArgs {
-        return ActionWithArgs.EPSILON;
+    visitWaitUntilStatement(node: WaitUntilStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 }
