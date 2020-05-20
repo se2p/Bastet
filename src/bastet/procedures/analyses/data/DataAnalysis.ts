@@ -71,6 +71,7 @@ import {LexiKey} from "../../../utils/Lexicographic";
 import { AccessibilityRelation } from "../Accessibility";
 import {DataTestifier} from "./DataTestifier";
 import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
+import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 
 
 export class DataAnalysisConfig extends BastetConfiguration {
@@ -187,6 +188,10 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         this._refiner = new DataRefiner(this._abstractDomain.lattice);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = StandardMergeOperatorFactory.create(this._config.mergeOperator, this._abstractDomain);
+    }
+
+    getTransitionLabel(from: DataAbstractState, to: DataAbstractState): ProgramOperation[] {
+        throw new NotSupportedException();
     }
 
     chooseFinitePathAlong(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): AbstractState[] {

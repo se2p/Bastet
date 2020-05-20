@@ -704,7 +704,10 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             } else {
                 const steppedThread = threadToStep.threadStatus;
                 const calledMethod: Method = steppedActor.getMethod(calledMethodName);
-                const interProcOps: ProgramOperation[] = this.createPassArgumentsOps(calledMethod, stepOp.ast.args);
+
+                // ( we also add the original call statement since it is helpful for some analyses)
+                const interProcOps: ProgramOperation[] = [stepOp].concat(this.createPassArgumentsOps(calledMethod, stepOp.ast.args));
+
                 const succCallStack = steppedThread.getCallStack()
                     .push(new MethodCall(fromLocation, step.succLoc));
 
@@ -739,7 +742,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             const succScopeStack = this.buildScopeStack(steppedActor.ident, succRelation.name);
 
             // Assign the result to the variable that was referenced in the `CallStatement`
-            const interProcOps: ProgramOperation[] = this.createStoreCallResultOps(steppedThread, callInformation, stepOp.ast as ReturnStatement);
+            // (we also add the original call statement since this is helpful for some analyses)
+            const interProcOps: ProgramOperation[] = [stepOp].concat(this.createStoreCallResultOps(steppedThread, callInformation, stepOp.ast as ReturnStatement));
 
             const resultList: [ControlAbstractState, boolean][] = [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
                 ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.actorScopes, predScopeStack, succScopeStack).map(o => o.ident)))

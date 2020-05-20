@@ -23,7 +23,6 @@
  *
  */
 
-
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {AbstractState} from "../../lattices/Lattice";
 import {FrontierSet, ReachedSet} from "./StateSet";
@@ -33,59 +32,14 @@ import {Preconditions} from "../../utils/Preconditions";
 import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
 import {getActiveBudget} from "../../utils/Budgets";
-
-export const STAT_KEY_BMC_ITERATIONS = "iterations";
+import {CEGARAlgorithm} from "./CEGARAlgorithm";
 
 export class FeasibilityAlgorithm<C extends ConcreteElement, E extends AbstractState>
-    implements AnalysisAlgorithm<C, E> {
+    extends CEGARAlgorithm<C, E> {
 
-    private readonly _analysis: ProgramAnalysis<C, E, E>;
-
-    private readonly _wrappedAlgorithm: AnalysisAlgorithm<C, E>;
-
-    private readonly _refiner: Refiner<E>;
-
-    private readonly _statistics: AnalysisStatistics;
-    private readonly _feasibilityCheckStats: AnalysisStatistics;
-
-    constructor(wrappedAlgorithm: AnalysisAlgorithm<C, E>, refiner: Refiner<E>, analysis: ProgramAnalysis<C, E, E>, statistics: AnalysisStatistics) {
-        this._wrappedAlgorithm = Preconditions.checkNotUndefined(wrappedAlgorithm);
-        this._refiner = Preconditions.checkNotUndefined(refiner);
-        this._analysis = Preconditions.checkNotUndefined(analysis);
-
-        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
-        this._feasibilityCheckStats = this._statistics.withContext("FeasibilityCheck");
-    }
-
-    public run(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {
-        do {
-            this._statistics.increment(STAT_KEY_BMC_ITERATIONS);
-            getActiveBudget().raiseIfExhausted();
-            [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);
-            if (!frontier.isEmpty()) {
-                // Target state was found
-                Preconditions.checkState(reached.getAddedLast().length > 0);
-                const targetState = reached.getAddedLast()[0];
-                Preconditions.checkState(this._analysis.target(targetState as E).length > 0);
-
-                const properties = this._analysis.target(targetState);
-
-                // Check the feasibility with the refiner
-                let isFeasible: boolean;
-                this._feasibilityCheckStats.startTimer();
-                try {
-                    isFeasible = this._refiner.checkIsFeasible(targetState as E, `BMC target state feasibility for ${properties.toString()}`);
-                    if (isFeasible) {
-                        return [frontier, reached];
-                    } else {
-                        reached.remove(targetState);
-                    }
-                } finally {
-                    this._feasibilityCheckStats.stopTimer();
-                }
-            }
-        } while (!frontier.isEmpty());
-
+    protected eliminateInfeasibleState(frontier: FrontierSet<E>, reached: ReachedSet<E>, targetState: E): [FrontierSet<E>, ReachedSet<E>] {
+        reached.remove(targetState);
         return [frontier, reached];
     }
+
 }

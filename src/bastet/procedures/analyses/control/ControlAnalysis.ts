@@ -24,7 +24,6 @@
  */
 
 import {
-    ProgramAnalysisWithLabelProducer,
     ProgramAnalysisWithLabels,
     WrappingProgramAnalysis
 } from "../ProgramAnalysis";
@@ -81,7 +80,7 @@ export class ControlAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<ControlConcreteState, ControlAbstractState, AbstractState>,
+export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcreteState, ControlAbstractState, AbstractState>,
     WrappingProgramAnalysis<ControlConcreteState, ControlAbstractState, AbstractState>,
     Unwrapper<ControlAbstractState, AbstractElement> {
 
@@ -89,7 +88,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
 
     private readonly _abstractDomain: AbstractDomain<ControlConcreteState, ControlAbstractState>;
 
-    private readonly _wrappedAnalysis: ProgramAnalysisWithLabelProducer<any, any, AbstractState>;
+    private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>;
 
     private readonly _transferRelation: ControlTransferRelation;
 
@@ -99,7 +98,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabelProducer<Control
 
     private readonly _statistics: AnalysisStatistics;
 
-    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabelProducer<any, any, AbstractState>, statistics: AnalysisStatistics) {
+    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>, statistics: AnalysisStatistics) {
         this._config = new ControlAnalysisConfig(config);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._task = Preconditions.checkNotUndefined(task);

@@ -69,7 +69,7 @@ import {
     BeginAtomicStatement,
     EndAtomicStatement,
     IfStatement,
-    RepeatForeverStatement, UntilQueriedConditionStatement,
+    RepeatForeverStatement, ReturnStatement, UntilQueriedConditionStatement,
     UntilStatement
 } from "./core/statements/ControlStatement";
 import {CallStatement} from "./core/statements/CallStatement";
@@ -284,6 +284,8 @@ export interface CoreCtrlStatementnVisitor<R> extends CoreVisitor<R> {
     visitRepeatForeverStatement(node: RepeatForeverStatement): R;
 
     visitCallStatement(node: CallStatement): R;
+
+    visitReturnStatement(node: ReturnStatement): R;
 
     visitStatementList(node: StatementList): R;
 

@@ -24,7 +24,7 @@
  */
 
 import {
-    ProgramAnalysis, ProgramAnalysisWithLabelProducer,
+    ProgramAnalysis,
     ProgramAnalysisWithLabels,
     WrappingProgramAnalysis
 } from "../ProgramAnalysis";
@@ -52,13 +52,13 @@ import {AccessibilityRelation} from "../Accessibility";
 
 export class TimeAnalysis<F extends AbstractState>
     implements WrappingProgramAnalysis<ConcreteElement, TimeState, F>,
-        ProgramAnalysisWithLabelProducer<ConcreteElement, TimeState, F>,
+        ProgramAnalysisWithLabels<ConcreteElement, TimeState, F>,
         Unwrapper<TimeState, AbstractElement>,
         LabeledTransferRelation<TimeState> {
 
     private readonly _abstractDomain: TimeAbstractDomain;
 
-    private readonly _wrappedAnalysis: ProgramAnalysisWithLabelProducer<any, any, F>;
+    private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>;
 
     private readonly _statistics: AnalysisStatistics;
 
@@ -72,7 +72,7 @@ export class TimeAnalysis<F extends AbstractState>
 
     private readonly _task: App;
 
-    constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabelProducer<any, any, F>, statistics: AnalysisStatistics,
+    constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics,
                 timeProfile: ProgramTimeProfile) {
         this._task = Preconditions.checkNotUndefined(task);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);

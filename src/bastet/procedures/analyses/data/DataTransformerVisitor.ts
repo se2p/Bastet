@@ -136,7 +136,11 @@ import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../domains/Con
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
-import {BeginAtomicStatement, EndAtomicStatement} from "../../../syntax/ast/core/statements/ControlStatement";
+import {
+    BeginAtomicStatement,
+    EndAtomicStatement,
+    ReturnStatement
+} from "../../../syntax/ast/core/statements/ControlStatement";
 import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpression";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {
@@ -506,6 +510,7 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
 
     visitCallStatement(node: CallStatement): B {
         const method = node.calledMethod.text;
+
         if (method == MethodIdentifiers._RUNTIME_signalFailure) {
             return this._mem;
         } else if (method.startsWith("_RUNTIME_")) {
@@ -522,8 +527,6 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
         //                 this.createVisitorByType(ScratchType.fromId(dataLoc.type)))));
         //         return this._theories.boolTheory.and(this._mem, assume);
         //     }
-        } else if (method.startsWith("math")) {
-            throw new ImplementMeForException(method);
         }
 
         return this._mem;
@@ -690,6 +693,10 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
         Preconditions.checkNotUndefined(node);
         const visitor = new DataBoolExpressionVisitor(this._theories);
         return node.accept(visitor);
+    }
+
+    visitReturnStatement(node: ReturnStatement): B {
+       return this._mem;
     }
 
     visit(node: AstNode): B {

@@ -164,6 +164,8 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
                             new StoreEvalResultToVariableStatement(this._task.systemVariables.globalTimeResetMicrosVariable, this._task.systemVariables.globalTimeMicrosVariable))]];
                 }
             }
+
+            return [IntegerLiteral.zero(), IntegerLiteral.zero(), [op]];
         }
 
         const [minTimeExpr, maxTimeExpr] = this.determineMicrosTimeIntervalExpressions(op);

@@ -83,11 +83,6 @@ export class LabelAnalysis<F extends AbstractState>
     }
 
     getTransitionLabel(fromState: LabelState, toState: LabelState): ProgramOperation[] {
-        const transfers = toState.getTransfers();
-        if (transfers.size <= 1) {
-            return Array.from(transfers.map((t) => t.getOp()));
-        }
-
         const worklist: [LabelState, ProgramOperation[]][] = [];
         worklist.push([toState, []]);
 
