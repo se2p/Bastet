@@ -513,20 +513,6 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
 
         if (method == MethodIdentifiers._RUNTIME_signalFailure) {
             return this._mem;
-        } else if (method.startsWith("_RUNTIME_")) {
-            throw new ImplementMeForException(method);
-        // We use our own approximation of matSqrt for now
-        //
-        // } else if (method == "mathSqrt") {
-        //     if (node.assignResultTo.isPresent()) {
-        //         const dataLoc: DataLocation = node.assignResultTo.value().dataloc;
-        //         const theory = this.numberTheoryFor(dataLoc);
-        //         const assignTo = theory.abstractNumberValue(node.assignResultTo.value());
-        //         const assume: B = theory.isNumberEqualTo(assignTo,
-        //             theory.sqrt(getTheOnlyElement(node.args.elements).accept(
-        //                 this.createVisitorByType(ScratchType.fromId(dataLoc.type)))));
-        //         return this._theories.boolTheory.and(this._mem, assume);
-        //     }
         }
 
         return this._mem;

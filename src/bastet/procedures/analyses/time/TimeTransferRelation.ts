@@ -142,25 +142,25 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
                 const assignTo: VariableWithDataLocation = op.ast.assignResultTo.value();
                 if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_seconds) {
                     return [IntegerLiteral.zero(), IntegerLiteral.zero(),
-                        [ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo, this._globalSecondsExpr))]];
+                        [op, ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo, this._globalSecondsExpr))]];
 
                 } else if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_millis) {
                     return [IntegerLiteral.zero(), IntegerLiteral.zero(),
-                        [ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo, this._globalMillisExpr))]];
+                        [op, ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo, this._globalMillisExpr))]];
 
                 } else if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_micros) {
                     return [IntegerLiteral.zero(), IntegerLiteral.zero(),
-                        [ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo, this._globalMicrosExpr))]];
+                        [op, ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo, this._globalMicrosExpr))]];
 
                 } else if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_timerValue) {
                     return [IntegerLiteral.zero(), IntegerLiteral.zero(),
-                        [ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo,
+                        [op, ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo,
                             new MinusExpression(this._task.systemVariables.globalTimeMicrosVariable, this._task.systemVariables.globalTimeResetMicrosVariable)))]];
                 }
             } else {
                 if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_resetTimer) {
                     return [IntegerLiteral.zero(), IntegerLiteral.zero(),
-                        [ProgramOperationFactory.createFor(
+                        [op, ProgramOperationFactory.createFor(
                             new StoreEvalResultToVariableStatement(this._task.systemVariables.globalTimeResetMicrosVariable, this._task.systemVariables.globalTimeMicrosVariable))]];
                 }
             }

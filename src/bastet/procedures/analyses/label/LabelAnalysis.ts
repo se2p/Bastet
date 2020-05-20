@@ -92,11 +92,12 @@ export class LabelAnalysis<F extends AbstractState>
             const [work, workOps] = worklist.pop();
             for (const t of work.getTransfers()) {
                 if (relevantBigSteps.has(t.getBigStep())) {
+                    const workOpsPrime = [t.getOp()].concat(workOps);
                     const from = t.getFrom() as LabelState;
                     if (from == fromState) {
-                        return workOps;
+                        return workOpsPrime;
                     } else {
-                        worklist.push([from, [t.getOp()].concat(workOps)]);
+                        worklist.push([from, workOpsPrime]);
                     }
                 }
             }

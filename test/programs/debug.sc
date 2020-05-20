@@ -1,19 +1,13 @@
-program Mini1Program
+program TestProgram
 
-actor MiniActor is RuntimeEntity begin
-
-    define atomic inc (n: int) begin
-        define result as n + 1
-    end returns result: int
+actor Beetle is ScratchSprite begin
 
     script on startup do begin
-        declare x as int
-        define x as 42
-        define x as inc(x)
-        if (x = 42) then begin
-            _RUNTIME_signalFailure("This must not happen!")
-        end
+        hide()
+        _RUNTIME_signalFailure("Bug revealed!")
     end
 
 end
+
+
 
