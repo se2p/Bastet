@@ -30,7 +30,7 @@ import {CoreCtrlStatementnVisitor, CoreVisitor} from "../../ast/CoreVisitor";
 import {CallStatement} from "../../ast/core/statements/CallStatement";
 import {
     IfStatement,
-    RepeatForeverStatement,
+    RepeatForeverStatement, ReturnStatement,
     UntilQueriedConditionStatement,
     UntilStatement
 } from "../../ast/core/statements/ControlStatement";
@@ -65,6 +65,18 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
 
     visitCallStatement(node: CallStatement): TransitionRelation {
         this._stack.push("visitCallStatement");
+        try {
+            // ATTENTION: The inter-procedural transition relation
+            // is built in a different step.
+            const op: ProgramOperation = ProgramOperationFactory.createFor(node);
+            return TransitionRelations.forOpSeq(op);
+        } finally {
+            this._stack.pop();
+        }
+    }
+
+    visitReturnStatement(node: ReturnStatement): TransitionRelation {
+        this._stack.push("visitReturnStatement");
         try {
             // ATTENTION: The inter-procedural transition relation
             // is built in a different step.

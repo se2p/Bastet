@@ -292,6 +292,7 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
             } else {
                 resultVar = OptionalAstNode.absent();
             }
+
             return new ReturnStatement(resultVar);
         });
     }

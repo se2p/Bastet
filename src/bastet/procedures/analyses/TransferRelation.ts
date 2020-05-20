@@ -55,8 +55,8 @@ export class Transfers {
 
         let toRun: ProgramOperation[] = [];
         for (const stmt of intermediateStmts) {
-            const timeOp: ProgramOperation = ProgramOperationFactory.createFor(stmt);
-            toRun.push(timeOp);
+            const op: ProgramOperation = ProgramOperationFactory.createFor(stmt);
+            toRun.push(op);
         }
         toRun = toRun.concat(ops);
 
@@ -67,10 +67,10 @@ export class Transfers {
         transferRealtion: LabeledTransferRelation<W>, fromState: W, ops: Iterable<ProgramOperation>, co: Concern): W[] {
 
         let result: W[] = [fromState];
-        for (const toExecute of ops) {
+        for (const op of ops) {
             let statelistPrime: W[] = [];
             for (const w of result) {
-                for (const succ of transferRealtion.abstractSuccFor(w, toExecute, co)) {
+                for (const succ of transferRealtion.abstractSuccFor(w, op, co)) {
                     statelistPrime.push(succ);
                 }
             }
