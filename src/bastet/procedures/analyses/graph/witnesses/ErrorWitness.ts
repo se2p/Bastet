@@ -38,6 +38,11 @@ export class Target {
         }
     }
 
+    removeIrrelevantAttributes() {
+        const userAttributes = Object.keys(this.userDefinedAttributes).filter(attribute => attribute.startsWith("__tmp"));
+        this.removeUserDefinedAttributes(userAttributes);
+    }
+
     static fromConcretePrimitives(name: string, attributes: Map<string, ConcretePrimitive<any>>): Target {
         const target = new Target();
         target.name = name;

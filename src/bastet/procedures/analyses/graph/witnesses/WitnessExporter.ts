@@ -150,6 +150,12 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         errorWitness.steps = WitnessExporter.buildInitialStep(errorWitness.steps);
         errorWitness.steps = errorWitness.steps.filter(step => step.action !== Action.DEFINE && step.action !== Action.EPSILON);
 
+        errorWitness.steps.forEach(step => {
+            step.targets.forEach(target => {
+                target.removeIrrelevantAttributes()
+            })
+        })
+
         this.exportErrorWitness(errorWitness);
     }
 

@@ -93,7 +93,7 @@ import {CallStatement} from "./core/statements/CallStatement";
 import {CorePrintVisitor} from "./CorePrintVisitor";
 import {BinaryExpression} from "./core/expressions/BinaryExpression";
 import {StringLiteral, StringVariableExpression} from "./core/expressions/StringExpression";
-import {ActorVariableExpression} from "./core/expressions/ActorExpression";
+import {ActorVariableExpression, LocateActorExpression} from "./core/expressions/ActorExpression";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 
 export class MouseReadEvent {
@@ -135,6 +135,10 @@ export class MouseReadEventVisitor implements CoreVisitor<MouseReadEvent>, CoreB
 
     visit(node: AstNode): MouseReadEvent {
         throw new ImplementMeForException(node.constructor.name);
+    }
+
+    visitLocateActorExpression(node: LocateActorExpression): MouseReadEvent {
+        return this.nothingMouseEvent;
     }
 
     visitReturnStatement(node: ReturnStatement): MouseReadEvent {
