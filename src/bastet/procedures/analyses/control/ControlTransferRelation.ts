@@ -675,7 +675,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     Preconditions.checkArgument(call.args.elements.length == 1);
                     const secondsExpression = call.args.getIth(0);
 
-                    const ops: ProgramOperation[] = [
+                    const ops: ProgramOperation[] = [stepOp.ast, // also include the original statement
                         new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_micros),
                             new ExpressionList([]), OptionalAstNode.with(this._task.systemVariables.threadWaitUntilMicrosVariable)),
                         new StoreEvalResultToVariableStatement(this._task.systemVariables.threadWaitUntilMicrosVariable,
