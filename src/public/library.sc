@@ -1099,6 +1099,14 @@ role ScratchEntity is RuntimeEntity begin
         broadcast "ASK" () to "SYSTEM"
     end
 
+    // @Category "Sensing"
+    // @Block "answer"
+    define atomic answer () begin
+        declare io as actor
+        define io as locate actor "IOActor"
+        define result as attribute "answer" of io
+    end returns result : string
+
 end
 
 role ScratchSprite is ScratchEntity begin
