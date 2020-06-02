@@ -48,6 +48,7 @@ import {LexiKey} from "../../../utils/Lexicographic";
 import {TimeAbstractDomain, TimeState} from "./TimeAbstractDomain";
 import {TimeMergeOperator} from "./TimeMergeOperator";
 import {AccessibilityRelation} from "../Accessibility";
+import {SSAState} from "../ssa/SSAAbstractDomain";
 
 
 export class TimeAnalysis<F extends AbstractState>
@@ -124,7 +125,12 @@ export class TimeAnalysis<F extends AbstractState>
     }
 
     widen(state: TimeState): TimeState {
-        return this._wrappedAnalysis.widen(state.getWrappedState());
+        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState());
+        if (wrappedResult != state.getWrappedState()) {
+            return state.withWrappedState(wrappedResult);
+        } else {
+            return state;
+        }
     }
 
     createStateSets(): [FrontierSet<F>, ReachedSet<F>] {

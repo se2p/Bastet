@@ -79,6 +79,10 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
         return this.get('wrappedState');
     }
 
+    public withWrappedState(wrapped: AbstractState): GraphAbstractState {
+        return this.set('wrappedState', wrapped);
+    }
+
     public getPartitionKeys(): ImmSet<PartitionKey> {
         return this.get('partitionKeys');
     }
