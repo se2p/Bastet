@@ -333,8 +333,6 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
             return true;
         });
 
-        // FIXME: This approach does not yet work with branching variables that are DONT-CARE
-        // (which might be the cause of violating the following invariant:)
         Preconditions.checkState(result.isReachable(targetState), "The target state must be reachable in the strengthened relation!");
         return result;
     }
