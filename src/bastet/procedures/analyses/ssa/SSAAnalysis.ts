@@ -44,6 +44,7 @@ import {SSAMergeOperator} from "./SSAMergeOperator";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {AccessibilityRelation} from "../Accessibility";
+import {ControlAbstractState} from "../control/ControlAbstractDomain";
 
 
 export class SSAAnalysisConfig extends BastetConfiguration {
@@ -119,8 +120,12 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
     }
 
     widen(state: SSAState): SSAState {
-        // TODO: Implement the widening (delegate to wrapped analyses)
-        return state;
+        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState());
+        if (wrappedResult != state.getWrappedState()) {
+            return state.withWrappedState(wrappedResult);
+        } else {
+            return state;
+        }
     }
 
     unwrap(e: SSAState): AbstractElement {

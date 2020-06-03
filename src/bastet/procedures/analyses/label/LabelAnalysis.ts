@@ -47,6 +47,7 @@ import {AccessibilityRelation} from "../Accessibility";
 import {LabelAbstractDomain, LabelState} from "./LabelAbstractDomain";
 import {LabelTransferRelation} from "./LabelTransferRelation";
 import {MergeJoinOperator} from "../Operators";
+import {GraphAbstractState} from "../graph/GraphAbstractDomain";
 
 
 export class LabelAnalysis<F extends AbstractState>
@@ -143,7 +144,13 @@ export class LabelAnalysis<F extends AbstractState>
 
     widen(state: LabelState): LabelState {
         this._bigStepNumber++;
-        return this._wrappedAnalysis.widen(state.getWrappedState());
+
+        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState());
+        if (wrappedResult != state.getWrappedState()) {
+            return state.withWrappedState(wrappedResult);
+        } else {
+            return state;
+        }
     }
 
     createStateSets(): [FrontierSet<F>, ReachedSet<F>] {

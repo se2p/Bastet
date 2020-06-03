@@ -192,8 +192,12 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     widen(state: GraphAbstractState): GraphAbstractState {
-        // TODO: Implement the widening (delegate to wrapped analyses)
-        return state;
+        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState());
+        if (wrappedResult != state.getWrappedState()) {
+            return state.withWrappedState(wrappedResult);
+        } else {
+            return state;
+        }
     }
 
     initialStatesFor(task: App): GraphAbstractState[] {

@@ -783,6 +783,19 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         // NON-DET position
     end returns result: int
 
+    // @Category "Sensing"
+    // @Block "key (int as key) pressed?"
+    define atomic keyPressedByCode (key: int) begin
+    end returns result : boolean
+
+    // @Category "Sensing"
+    // @Block "key (string as key) pressed?"
+    define atomic keyPressedByName (name: string) begin
+        declare key as int
+        define key as stringToKey(name)
+        define result as keyPressedByCode(key)
+    end returns result : boolean
+
 end
 
 role Observer is RuntimeEntity begin
@@ -972,19 +985,6 @@ role Observer is RuntimeEntity begin
         end
     end returns result : boolean
 
-    // @Category "Sensing"
-    // @Block "key (int as key) pressed?"
-    define atomic keyPressedByCode (key: int) begin
-    end returns result : boolean
-
-    // @Category "Sensing"
-    // @Block "key (string as key) pressed?"
-    define atomic keyPressedByName (name: string) begin
-        declare key as int
-        define key as stringToKey(name)
-        define result as keyPressedByCode(key)
-    end returns result : boolean
-
 end
 
 role ScratchEntity is RuntimeEntity begin
@@ -1098,6 +1098,14 @@ role ScratchEntity is RuntimeEntity begin
     define atomic askAndWait (question: string) begin
         broadcast "ASK" () to "SYSTEM"
     end
+
+    // @Category "Sensing"
+    // @Block "answer"
+    define atomic answer () begin
+        declare io as actor
+        define io as locate actor "IOActor"
+        define result as attribute "answer" of io
+    end returns result : string
 
 end
 

@@ -67,6 +67,7 @@ import { AccessibilityRelation } from "../Accessibility";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 import {Concern} from "../../../syntax/Concern";
+import {GraphAbstractState} from "../graph/GraphAbstractDomain";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -211,7 +212,12 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
     }
 
     widen(state: ControlAbstractState): ControlAbstractState {
-        return undefined;
+        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState());
+        if (wrappedResult != state.getWrappedState()) {
+            return state.withWrappedState(wrappedResult);
+        } else {
+            return state;
+        }
     }
 
     unwrap(e: ControlAbstractState): AbstractElement {

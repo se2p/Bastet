@@ -32,6 +32,7 @@ import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow
 import {BooleanFormula, FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {BooleanExpression} from "../../../syntax/ast/core/expressions/BooleanExpression";
+import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AbstractStates, DelegatingStateVisitor} from "../AbstractStates";
 import {
@@ -179,20 +180,25 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         const initialState: AbstractState = getTheOnlyElement(accessibility.initial());
         const worklist: AbstractState[] = [initialState];
         const result: BranchingAlternatives = new BranchingAlternatives();
+        const visited: ImmSet<AbstractState> = ImmSet().asMutable();
 
         while (worklist.length > 0) {
             const work = worklist.pop();
 
-            for (const condBranch of this.getBranchingTo(accessibility, work)) {
-                const branchName: string = this.createBranchName(condBranch.splitState, condBranch.branchStart);
-                const branchCondition: BooleanFormula = this.createBranchCondition(condBranch.branchAssumes);
-                const branchPredicate: BooleanFormula = this.createBranchPredicate(branchName);
-                const branchPredicateEquiv: BooleanFormula = this.createBranchEquivPredicate(branchPredicate, branchCondition);
-                if (condBranch.branchAssumes.length > 0) {
-                    result.push(new BranchingAlternative(work, condBranch.branchStart, branchName, branchCondition, branchPredicate, branchPredicateEquiv));
-                    worklist.push(condBranch.branchEnd);
+            if (!visited.has(work)) {
+                for (const condBranch of this.getBranchingTo(accessibility, work)) {
+                    const branchName: string = this.createBranchName(condBranch.splitState, condBranch.branchStart);
+                    const branchCondition: BooleanFormula = this.createBranchCondition(condBranch.branchAssumes);
+                    const branchPredicate: BooleanFormula = this.createBranchPredicate(branchName);
+                    const branchPredicateEquiv: BooleanFormula = this.createBranchEquivPredicate(branchPredicate, branchCondition);
+                    if (condBranch.branchAssumes.length > 0) {
+                        result.push(new BranchingAlternative(work, condBranch.branchStart, branchName, branchCondition, branchPredicate, branchPredicateEquiv));
+                        worklist.push(condBranch.branchEnd);
+                    }
                 }
             }
+
+            visited.add(work);
         }
 
         return result;
@@ -327,8 +333,6 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
             return true;
         });
 
-        // FIXME: This approach does not yet work with branching variables that are DONT-CARE
-        // (which might be the cause of violating the following invariant:)
         Preconditions.checkState(result.isReachable(targetState), "The target state must be reachable in the strengthened relation!");
         return result;
     }

@@ -44,6 +44,7 @@ import {ActorId} from "../../../syntax/app/Actor";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {TypeInformationStorage} from "../../../syntax/DeclarationScopes";
+import {ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
 
 export const SCOPE_SEPARATOR = VAR_SCOPING_SPLITTER;
 
@@ -161,7 +162,7 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
                 return new CastExpression(readVariable, StringType.instance());
             }
         } else {
-            throw new IllegalArgumentException("Attributes can only be read from variables of type actor!");
+            throw new ImplementMeForException("Attributes can only be read from variables of type actor!");
         }
     }
 
