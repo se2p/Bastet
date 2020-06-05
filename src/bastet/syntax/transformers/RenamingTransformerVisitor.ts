@@ -287,7 +287,9 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
         return this.doForStatement(node, () => {
             let resultVar;
             if (node.resultVariable.isPresent()) {
-                const writeDataLoc = this.renameAssigned(node.resultVariable.value().dataloc);
+                // ATTENTION: We use 'renameRead' here because the actual assignment
+                // should have been done by another, previous statement (created by the ControlAnalysis).
+                const writeDataLoc = this.renameRead(node.resultVariable.value().dataloc);
                 resultVar = OptionalAstNode.with(new VariableWithDataLocation(writeDataLoc));
             } else {
                 resultVar = OptionalAstNode.absent();
