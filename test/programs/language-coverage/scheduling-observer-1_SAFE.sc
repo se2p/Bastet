@@ -5,8 +5,6 @@ actor DirexObserver is Observer begin
     declare direx as actor
     declare last_x as int
 
-    define last_x as (0-1)
-
     define atomic storeRelevantStateInfosForNext () begin
         define last_x as cast attribute "x" of direx to int
     end
@@ -18,6 +16,7 @@ actor DirexObserver is Observer begin
     end returns result: boolean
 
     script on bootstrap finished do begin
+        define last_x as (0-1)
         define direx as locate actor "Direx"
 
         // First specification check (base condition)
