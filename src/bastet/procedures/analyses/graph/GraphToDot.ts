@@ -30,6 +30,8 @@ import {TransitionLabelProvider, TraversalOrderOperator} from "../ProgramAnalysi
 import {PaperLabelVisitor, PenSizeVisitor, StateColorVisitor, StateLabelVisitor} from "../StateVisitors";
 import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 import {App} from "../../../syntax/app/App";
+import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 
 export class GraphToDot  {
 
@@ -64,10 +66,17 @@ export class GraphToDot  {
         this._dot.push(`    ${e.getId()} [label="${stateLabel}" penwidth=${pensize} color="black" fillcolor="${stateColor}"];`);
     }
 
-    private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
+    private opLabel(op: ProgramOperation): string {
         const visitor = new CorePrintVisitor();
+        if (op instanceof AssumeOperation) {
+            return `[ ${op.ast.accept(visitor)} ]`
+        }
+        return op.ast.accept(visitor);
+    }
+
+    private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
         const transLabels = GraphToDot.escapeForDot(this._transLabProvider.getTransitionLabel(from, to)
-            .map(o => o.ast.accept(visitor)).join("\n"));
+            .map(o => this.opLabel(o)).join("\n"));
         this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabels}"];`);
     }
 
