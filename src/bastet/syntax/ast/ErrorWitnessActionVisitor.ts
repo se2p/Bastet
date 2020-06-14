@@ -101,7 +101,11 @@ export enum Action {
     EPSILON = "EPSILON",
     MOUSE_INPUT = "MOUSE_INPUT",
     INITIAL_STATE = "INITIAL_STATE",
-    WAIT = "WAIT"
+    WAIT = "WAIT",
+    ENTER_ATOMIC = "ENTER_ATOMIC",
+    LEAVE_ATOMIC = "LEAVE_ATOMIC",
+    COLLAPSED_ATOMIC = "COLLAPSED_ATOMIC",
+    REACHED_ERROR = "REACHED_ERROR"
 }
 
 export class ActionWithWeight {
@@ -114,6 +118,9 @@ export class ActionWithWeight {
     public static readonly EPSILON = new ActionWithWeight(Action.EPSILON, 0);
     public static readonly MOUSE_INPUT = new ActionWithWeight(Action.MOUSE_INPUT, 2);
     public static readonly INITIAL_STATE = new ActionWithWeight(Action.INITIAL_STATE, 2);
+    public static readonly ENTER_ATOMIC = new ActionWithWeight(Action.ENTER_ATOMIC, 3);
+    public static readonly LEAVE_ATOMIC = new ActionWithWeight(Action.LEAVE_ATOMIC, 3);
+    public static readonly REACHED_ERROR = new ActionWithWeight(Action.REACHED_ERROR, 2);
 }
 
 export class ErrorWitnessActionVisitor implements CoreVisitor<ActionWithWeight>, CoreBoolExpressionVisitor<ActionWithWeight>, CoreNumberExpressionVisitor<ActionWithWeight>,
@@ -150,7 +157,7 @@ CoreNonCtrlStatementnVisitor<ActionWithWeight>{
     }
 
     visitBeginAtomicStatement(node: BeginAtomicStatement): ActionWithWeight {
-        return ActionWithWeight.EPSILON;
+        return ActionWithWeight.ENTER_ATOMIC;
     }
 
     visitBooleanLiteral(node: BooleanLiteral): ActionWithWeight {
@@ -214,7 +221,7 @@ CoreNonCtrlStatementnVisitor<ActionWithWeight>{
     }
 
     visitEndAtomicStatement(node: EndAtomicStatement): ActionWithWeight {
-        return ActionWithWeight.EPSILON;
+        return ActionWithWeight.LEAVE_ATOMIC;
     }
 
     visitEpsilonStatement(node: EpsilonStatement): ActionWithWeight {
@@ -314,7 +321,7 @@ CoreNonCtrlStatementnVisitor<ActionWithWeight>{
     }
 
     visitSignalTargetReachedStatement(node: SignalTargetReachedStatement): ActionWithWeight {
-        return ActionWithWeight.EPSILON;
+        return ActionWithWeight.REACHED_ERROR;
     }
 
     visitStopAllStatement(node: StopAllStatement): ActionWithWeight {

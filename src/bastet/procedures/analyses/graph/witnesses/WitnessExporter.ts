@@ -143,6 +143,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         }
 
         errorWitness.steps = errorWitness.steps.filter(witness => !witness.isEmpty());
+        errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
+
         errorWitness.steps = WitnessExporter.removeIrrelevantTransitions(errorWitness.steps);
         WitnessExporter.setMouseInputAction(errorWitness.steps);
         WitnessExporter.addWaitSteps(errorWitness.steps);
@@ -252,6 +254,44 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return filteredArray;
     }
 
+    private static collapseAtomics(steps: ErrorWitnessStep[]): ErrorWitnessStep[] {
+        const filteredArray = [];
+
+        let openAtomicBrackets = 0;
+        let collapsedActionLabel = undefined;
+
+        for (const step of steps) {
+            if (step.action === Action.LEAVE_ATOMIC) {
+                openAtomicBrackets--;
+
+                Preconditions.checkArgument(openAtomicBrackets >= 0, "Missing opening atomic bracket")
+
+                if (openAtomicBrackets === 0) {
+                    step.action = Action.COLLAPSED_ATOMIC;
+                    step.actionLabel = `${collapsedActionLabel}; ${step.actionLabel}`;
+                    collapsedActionLabel = undefined;
+                }
+            } else if (step.action === Action.ENTER_ATOMIC) {
+                openAtomicBrackets++;
+            } else if (step.action === Action.REACHED_ERROR && openAtomicBrackets > 0) {
+                // Error was reached inside an atomic block
+                openAtomicBrackets--;
+                step.actionLabel = `${collapsedActionLabel}; ${step.actionLabel}`;
+                collapsedActionLabel = undefined;
+            }
+
+            if (openAtomicBrackets === 0) {
+                filteredArray.push(step);
+            } else {
+                collapsedActionLabel = collapsedActionLabel ? `${collapsedActionLabel}; ${step.actionLabel}` : step.actionLabel;
+            }
+        }
+
+        Preconditions.checkArgument(openAtomicBrackets === 0, `Missing ${openAtomicBrackets} closing atomic bracket(s)`);
+
+        return filteredArray;
+    }
+
     private static addWaitSteps(steps: ErrorWitnessStep[]) {
         let prevStep: ErrorWitnessStep = null;
 
@@ -277,7 +317,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         let initialStep: ErrorWitnessStep = undefined;
         for (const step of steps) {
             if (!buildInitialStep) {
-                if (step.action === Action.DEFINE) {
+                if (step.action === Action.DEFINE || !initialStep) {
                     initialStep = step;
                 } else {
                     buildInitialStep = true;
