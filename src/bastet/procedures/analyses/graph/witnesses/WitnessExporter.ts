@@ -150,7 +150,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         WitnessExporter.addWaitSteps(errorWitness.steps);
         errorWitness.steps = errorWitness.steps.filter(step => step.action !== Action.DECLARE);
         errorWitness.steps = WitnessExporter.buildInitialStep(errorWitness.steps);
-        errorWitness.steps = errorWitness.steps.filter(step => step.action !== Action.DEFINE && step.action !== Action.EPSILON);
+        errorWitness.steps = errorWitness.steps.filter(step => step.action !== Action.DEFINE && step.action !== Action.EPSILON && step.action !== Action.COLLAPSED_ATOMIC);
 
         errorWitness.steps.forEach(step => {
             step.targets.forEach(target => {
@@ -273,7 +273,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                 }
             } else if (step.action === Action.ENTER_ATOMIC) {
                 openAtomicBrackets++;
-            } else if (step.action === Action.REACHED_ERROR && openAtomicBrackets > 0) {
+            } else if (step.action === Action.REACHED_VIOLATION && openAtomicBrackets > 0) {
                 // Error was reached inside an atomic block
                 openAtomicBrackets--;
                 step.actionLabel = `${collapsedActionLabel}; ${step.actionLabel}`;

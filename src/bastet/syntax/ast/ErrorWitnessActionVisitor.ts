@@ -105,7 +105,7 @@ export enum Action {
     ENTER_ATOMIC = "ENTER_ATOMIC",
     LEAVE_ATOMIC = "LEAVE_ATOMIC",
     COLLAPSED_ATOMIC = "COLLAPSED_ATOMIC",
-    REACHED_ERROR = "REACHED_ERROR"
+    REACHED_VIOLATION = "REACHED_VIOLATION"
 }
 
 export class ActionWithWeight {
@@ -120,7 +120,7 @@ export class ActionWithWeight {
     public static readonly INITIAL_STATE = new ActionWithWeight(Action.INITIAL_STATE, 2);
     public static readonly ENTER_ATOMIC = new ActionWithWeight(Action.ENTER_ATOMIC, 3);
     public static readonly LEAVE_ATOMIC = new ActionWithWeight(Action.LEAVE_ATOMIC, 3);
-    public static readonly REACHED_ERROR = new ActionWithWeight(Action.REACHED_ERROR, 2);
+    public static readonly REACHED_VIOLATION = new ActionWithWeight(Action.REACHED_VIOLATION, 2);
 }
 
 export class ErrorWitnessActionVisitor implements CoreVisitor<ActionWithWeight>, CoreBoolExpressionVisitor<ActionWithWeight>, CoreNumberExpressionVisitor<ActionWithWeight>,
@@ -321,7 +321,7 @@ CoreNonCtrlStatementnVisitor<ActionWithWeight>{
     }
 
     visitSignalTargetReachedStatement(node: SignalTargetReachedStatement): ActionWithWeight {
-        return ActionWithWeight.REACHED_ERROR;
+        return ActionWithWeight.REACHED_VIOLATION;
     }
 
     visitStopAllStatement(node: StopAllStatement): ActionWithWeight {
