@@ -33,7 +33,6 @@ import {TransitionLabelProvider, WrappingProgramAnalysis} from "../../ProgramAna
 import {ConcreteElement, ConcreteMemory} from "../../../domains/ConcreteElements";
 import {SSAStateVisitor} from "../../StateVisitors";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
-import {MouseReadEvent, MouseReadEventVisitor} from "../../../../syntax/ast/MouseReadEventVisitor";
 import {App} from "../../../../syntax/app/App";
 import {ControlAbstractState, RelationLocation} from "../../control/ControlAbstractDomain";
 import {ControlLocationExtractor} from "../../control/ControlUtils";
@@ -45,7 +44,7 @@ import {Property} from "../../../../syntax/Property";
 import {getTheOnlyElement} from "../../../../utils/Collections";
 import {VAR_SCOPING_SPLITTER} from "../../../../syntax/app/controlflow/DataLocation";
 import {DataLocationScoper} from "../../control/DataLocationScoping";
-import {AttributeReadEventVisitor} from "../../../../syntax/ast/AttributeReadEventVisitor";
+import {AttributeReadEvent, AttributeReadEventVisitor} from "../../../../syntax/ast/AttributeReadEventVisitor";
 
 export interface WitnessExporterConfig {
     export: 'ALL' | 'ONLY_ACTIONS';
@@ -126,7 +125,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         let previousState: GraphAbstractState = undefined;
         const errorWitnessActionVisitor = new ErrorWitnessActionVisitor();
         const labelPrintVisitor = new CorePrintVisitor();
-        const mouseReadEventVisitor = new MouseReadEventVisitor();
+        const mouseXReadEventVisitor = new AttributeReadEventVisitor("mouseX");
+        const mouseYReadEventVisitor = new AttributeReadEventVisitor("mouseY");
         const keyPressedReadEventVisitor = new AttributeReadEventVisitor("keyPressed");
         const ssaStateVisitor = new SSAStateVisitor();
 
@@ -171,16 +171,20 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                     step.action = Action.KEY_PRESSED;
                 }
 
-                const mouseEvent: MouseReadEvent = transitionLabel
-                    .map(o => o.ast.accept(mouseReadEventVisitor))
+                const mouseXRead: AttributeReadEvent = transitionLabel
+                    .map(o => o.ast.accept(mouseXReadEventVisitor))
                     .reduce((prev, cur) => prev.combine(cur));
 
-                if (mouseEvent && (mouseEvent.xReadFrom || mouseEvent.yReadFrom)) {
-                    const mouseX = mouseEvent.xReadFrom ? WitnessExporter.removeSSAIndex(mouseEvent.xReadFrom) : undefined;
-                    const mouseY = mouseEvent.yReadFrom ? WitnessExporter.removeSSAIndex(mouseEvent.yReadFrom) : undefined;
+                const mouseYRead: AttributeReadEvent = transitionLabel
+                    .map(o => o.ast.accept(mouseYReadEventVisitor))
+                    .reduce((prev, cur) => prev.combine(cur));
 
-                    const x = step.getUserDefinedAttributeValue(step.actionTargetName, mouseX);
-                    const y = step.getUserDefinedAttributeValue(step.actionTargetName, mouseY);
+                if ((mouseXRead && mouseXRead.readFrom) || (mouseYRead && mouseYRead.readFrom)) {
+                    const mouseX = mouseXRead.readFrom ? WitnessExporter.removeSSAIndex(mouseXRead.readFrom) : undefined;
+                    const mouseY = mouseYRead.readFrom ? WitnessExporter.removeSSAIndex(mouseYRead.readFrom) : undefined;
+
+                    const x = step.getUserDefinedAttributeValue(step.actionTargetName, mouseX) || 0;
+                    const y = step.getUserDefinedAttributeValue(step.actionTargetName, mouseY) || 0;
 
                     step.action = Action.MOUSE_INPUT;
                     step.mousePosition = new MousePosition(x, y);
