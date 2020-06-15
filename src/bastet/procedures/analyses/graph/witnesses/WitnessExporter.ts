@@ -84,6 +84,38 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     }
 
     private exportPath(pathAr: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, violating: GraphAbstractState) {
+        const errorWitness: ErrorWitness = this.extractErrorWitness(pathAr, violating);
+
+        if (this._config.collapseAtomicBlocks) {
+            errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
+        }
+
+        errorWitness.steps = errorWitness.steps.filter(witness => !witness.isEmpty());
+
+        errorWitness.steps = WitnessExporter.removeIrrelevantTransitions(errorWitness.steps);
+        WitnessExporter.setMouseInputAction(errorWitness.steps);
+        errorWitness.steps = WitnessExporter.buildInitialStep(errorWitness.steps);
+
+        if (this._config.export === 'ONLY_ACTIONS') {
+            errorWitness.steps = errorWitness.steps.filter(step =>
+                step.action !== Action.DEFINE
+                && step.action !== Action.EPSILON
+                && step.action !== Action.COLLAPSED_ATOMIC
+                && step.action !== Action.DECLARE);
+        }
+
+        errorWitness.steps.forEach(step => {
+            step.targets.forEach(target => {
+                target.removeAttributesStartingWith(this._config.removeAttributeStartingWith);
+            })
+        })
+
+        WitnessExporter.addWaitSteps(errorWitness.steps);
+
+        this.exportErrorWitness(errorWitness);
+    }
+
+    private extractErrorWitness(pathAr: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, violating: GraphAbstractState): ErrorWitness {
         const path: GraphAbstractState[] = AccessibilityRelations.mapToArray(pathAr);
         const violatedProperties: Property[] = this._analysis.target(violating);
 
@@ -153,33 +185,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             previousState = currentState;
         }
 
-        if (this._config.collapseAtomicBlocks) {
-            errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
-        }
-
-        errorWitness.steps = errorWitness.steps.filter(witness => !witness.isEmpty());
-
-        errorWitness.steps = WitnessExporter.removeIrrelevantTransitions(errorWitness.steps);
-        WitnessExporter.setMouseInputAction(errorWitness.steps);
-        errorWitness.steps = WitnessExporter.buildInitialStep(errorWitness.steps);
-
-        if (this._config.export === 'ONLY_ACTIONS') {
-            errorWitness.steps = errorWitness.steps.filter(step =>
-                step.action !== Action.DEFINE
-                && step.action !== Action.EPSILON
-                && step.action !== Action.COLLAPSED_ATOMIC
-                && step.action !== Action.DECLARE);
-        }
-
-        errorWitness.steps.forEach(step => {
-            step.targets.forEach(target => {
-                target.removeAttributesStartingWith(this._config.removeAttributeStartingWith);
-            })
-        })
-
-        WitnessExporter.addWaitSteps(errorWitness.steps);
-
-        this.exportErrorWitness(errorWitness);
+        return errorWitness;
     }
 
     private static mapGraphAbstractStateToControlAbstractState(graphAbstractState: GraphAbstractState): ControlAbstractState {
