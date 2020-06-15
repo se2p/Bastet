@@ -45,6 +45,7 @@ import {Property} from "../../../../syntax/Property";
 import {getTheOnlyElement} from "../../../../utils/Collections";
 import {VAR_SCOPING_SPLITTER} from "../../../../syntax/app/controlflow/DataLocation";
 import {DataLocationScoper} from "../../control/DataLocationScoping";
+import {AttributeReadEventVisitor} from "../../../../syntax/ast/AttributeReadEventVisitor";
 
 export interface WitnessExporterConfig {
     export: 'ALL' | 'ONLY_ACTIONS';
@@ -137,6 +138,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         const errorWitnessActionVisitor = new ErrorWitnessActionVisitor();
         const labelPrintVisitor = new CorePrintVisitor();
         const mouseReadEventVisitor = new MouseReadEventVisitor();
+        const keyPressedReadEventVisitor = new AttributeReadEventVisitor("keyPressed");
         const ssaStateVisitor = new SSAStateVisitor();
 
         for (const currentState of path) {
@@ -170,6 +172,16 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                 step.actionLabel = transitionLabel
                     .map(o => o.ast.accept(labelPrintVisitor))
                     .join("; ");
+
+                const keyPressedEvent = transitionLabel
+                    .map(o => o.ast.accept(keyPressedReadEventVisitor))
+                    .reduce((prev, cur) => prev.combine(cur));
+
+                if (keyPressedEvent && keyPressedEvent.readFrom) {
+                    step.keyPressed = Number(step.getUserDefinedAttributeValue(step.actionTargetName, WitnessExporter.removeSSAIndex(keyPressedEvent.readFrom)));
+                    step.action = Action.KEY_PRESSED;
+                }
+
                 const mouseEvent: MouseReadEvent = transitionLabel
                     .map(o => o.ast.accept(mouseReadEventVisitor))
                     .reduce((prev, cur) => prev.combine(cur));
