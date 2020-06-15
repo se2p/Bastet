@@ -38,9 +38,9 @@ export class Target {
         }
     }
 
-    removeIrrelevantAttributes() {
-        const userAttributes = Object.keys(this.userDefinedAttributes).filter(attribute => attribute.startsWith("__tmp"));
-        this.removeUserDefinedAttributes(userAttributes);
+    removeAttributesStartingWith(attributes: string[]) {
+        const attributesToRemove = Object.keys(this.userDefinedAttributes).filter(attribute => attributes.some(prefix => attribute.startsWith(prefix)));
+        this.removeUserDefinedAttributes(attributesToRemove);
     }
 
     static fromConcretePrimitives(name: string, attributes: Map<string, ConcretePrimitive<any>>): Target {

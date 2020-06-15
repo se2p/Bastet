@@ -46,22 +46,34 @@ import {Property} from "../../../../syntax/Property";
 import {getTheOnlyElement} from "../../../../utils/Collections";
 import {VAR_SCOPING_SPLITTER} from "../../../../syntax/app/controlflow/DataLocation";
 
-export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
+export interface WitnessExporterConfig {
+    export: 'ALL' | 'ONLY_ACTIONS';
+    collapseAtomicBlocks: boolean;
+    removeAttributeStartingWith: string[];
+}
 
-    private static readonly IRRELEVANT_USER_DEFINED_ATTRIBUTES = ['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE',
-        'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT'];
+export const DEFAULT_WITNESS_EXPORTER_CONFIG: WitnessExporterConfig = {
+    export: 'ONLY_ACTIONS',
+    collapseAtomicBlocks: true,
+    removeAttributeStartingWith: ['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE',
+        'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT', '__tmp']
+}
+
+export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
     private readonly _analysis: WrappingProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>;
     private readonly _tlp: TransitionLabelProvider<GraphAbstractState>;
     private readonly _task: App;
     private readonly _controlLocationExtractor: ControlLocationExtractor;
+    private readonly _config: WitnessExporterConfig;
 
     constructor(analysis: WrappingProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
-                tlp: TransitionLabelProvider<GraphAbstractState>, task: App) {
+                tlp: TransitionLabelProvider<GraphAbstractState>, task: App, config: WitnessExporterConfig = DEFAULT_WITNESS_EXPORTER_CONFIG) {
         this._analysis = analysis;
         this._tlp = tlp;
         this._task = task;
         this._controlLocationExtractor = new ControlLocationExtractor(task);
+        this._config = config;
     }
 
     handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
@@ -102,7 +114,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
             targetStates.forEach((state, targetName) => {
                 const target = Target.fromConcretePrimitives(targetName, state);
-                target.removeUserDefinedAttributes(WitnessExporter.IRRELEVANT_USER_DEFINED_ATTRIBUTES);
                 step.targets.push(target);
             })
 
@@ -143,18 +154,25 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         }
 
         errorWitness.steps = errorWitness.steps.filter(witness => !witness.isEmpty());
-        errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
+
+        if (this._config.collapseAtomicBlocks) {
+            errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
+        }
 
         errorWitness.steps = WitnessExporter.removeIrrelevantTransitions(errorWitness.steps);
         WitnessExporter.setMouseInputAction(errorWitness.steps);
         WitnessExporter.addWaitSteps(errorWitness.steps);
         errorWitness.steps = errorWitness.steps.filter(step => step.action !== Action.DECLARE);
         errorWitness.steps = WitnessExporter.buildInitialStep(errorWitness.steps);
-        errorWitness.steps = errorWitness.steps.filter(step => step.action !== Action.DEFINE && step.action !== Action.EPSILON && step.action !== Action.COLLAPSED_ATOMIC);
+
+        if (this._config.export === 'ONLY_ACTIONS') {
+            errorWitness.steps = errorWitness.steps.filter(step => step.action !== Action.DEFINE
+                && step.action !== Action.EPSILON && step.action !== Action.COLLAPSED_ATOMIC);
+        }
 
         errorWitness.steps.forEach(step => {
             step.targets.forEach(target => {
-                target.removeIrrelevantAttributes()
+                target.removeAttributesStartingWith(this._config.removeAttributeStartingWith);
             })
         })
 
