@@ -161,13 +161,14 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         errorWitness.steps = WitnessExporter.removeIrrelevantTransitions(errorWitness.steps);
         WitnessExporter.setMouseInputAction(errorWitness.steps);
-        WitnessExporter.addWaitSteps(errorWitness.steps);
-        errorWitness.steps = errorWitness.steps.filter(step => step.action !== Action.DECLARE);
         errorWitness.steps = WitnessExporter.buildInitialStep(errorWitness.steps);
 
         if (this._config.export === 'ONLY_ACTIONS') {
-            errorWitness.steps = errorWitness.steps.filter(step => step.action !== Action.DEFINE
-                && step.action !== Action.EPSILON && step.action !== Action.COLLAPSED_ATOMIC);
+            errorWitness.steps = errorWitness.steps.filter(step =>
+                step.action !== Action.DEFINE
+                && step.action !== Action.EPSILON
+                && step.action !== Action.COLLAPSED_ATOMIC
+                && step.action !== Action.DECLARE);
         }
 
         errorWitness.steps.forEach(step => {
@@ -175,6 +176,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                 target.removeAttributesStartingWith(this._config.removeAttributeStartingWith);
             })
         })
+
+        WitnessExporter.addWaitSteps(errorWitness.steps);
 
         this.exportErrorWitness(errorWitness);
     }
