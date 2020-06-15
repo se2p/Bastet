@@ -152,8 +152,6 @@ export class AttributeReadEventVisitor implements CoreVisitor<AttributeReadEvent
                 // Attribute written to variable --> need to keep track of its new alias
                 this.attributeAlias.push(assignResultToName);
                 this.usageToAttributeAlias.set(assignResultToName, assignResultToName);
-
-                console.log({alias: this.attributeAlias, usageToAlias: this.usageToAttributeAlias})
             }
         }
 
