@@ -97,27 +97,34 @@ import {ActorVariableExpression, LocateActorExpression} from "./core/expressions
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 
 export class MouseReadEvent {
-    public readonly readXFrom: string;
-    public readonly readYFrom: string;
+    /**
+     * The name of the variable where the mouse x position was read from
+     */
+    public readonly xReadFrom: string;
 
-    constructor(readXFrom: string, readYFrom: string) {
-        this.readXFrom = readXFrom;
-        this.readYFrom = readYFrom;
+    /**
+     * The name of the variable where the mouse y position was read from
+     */
+    public readonly yReadFrom: string;
+
+    constructor(xReadFrom: string, yReadFrom: string) {
+        this.xReadFrom = xReadFrom;
+        this.yReadFrom = yReadFrom;
     }
 
     combine(other: MouseReadEvent): MouseReadEvent {
-        if ((this.readYFrom !== undefined && other.readYFrom !== undefined && this.readYFrom !== other.readYFrom)
-        || (this.readXFrom !== undefined && other.readXFrom !== undefined && this.readXFrom !== other.readXFrom)) {
+        if ((this.yReadFrom !== undefined && other.yReadFrom !== undefined && this.yReadFrom !== other.yReadFrom)
+        || (this.xReadFrom !== undefined && other.xReadFrom !== undefined && this.xReadFrom !== other.xReadFrom)) {
             throw new ImplementMeForException("a binary expression using two different mouse alias variables");
         } else {
-            const x = this.readXFrom !== undefined ? this.readXFrom : other.readXFrom;
-            const y = this.readYFrom !== undefined ? this.readYFrom : other.readYFrom;
+            const x = this.xReadFrom !== undefined ? this.xReadFrom : other.xReadFrom;
+            const y = this.yReadFrom !== undefined ? this.yReadFrom : other.yReadFrom;
             return new MouseReadEvent(x, y);
         }
     }
 
     equals(other: MouseReadEvent): boolean {
-        return this.readXFrom === other.readXFrom && this.readYFrom === other.readYFrom;
+        return this.xReadFrom === other.xReadFrom && this.yReadFrom === other.yReadFrom;
     }
 }
 
@@ -368,12 +375,12 @@ export class MouseReadEventVisitor implements CoreVisitor<MouseReadEvent>, CoreB
         const variableName = node.variable.accept(this.printVisitor);
         const mouseEvent = node.toValue.accept(this);
 
-        if (mouseEvent.readYFrom !== undefined) {
-            this.usageToMouseYAlias.set(variableName, mouseEvent.readYFrom);
+        if (mouseEvent.yReadFrom !== undefined) {
+            this.usageToMouseYAlias.set(variableName, mouseEvent.yReadFrom);
         }
 
-        if (mouseEvent.readXFrom !== undefined) {
-            this.usageToMouseXAlias.set(variableName, mouseEvent.readXFrom);
+        if (mouseEvent.xReadFrom !== undefined) {
+            this.usageToMouseXAlias.set(variableName, mouseEvent.xReadFrom);
         }
 
         return this.nothingMouseEvent;

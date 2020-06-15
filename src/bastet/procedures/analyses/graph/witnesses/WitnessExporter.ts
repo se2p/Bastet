@@ -169,8 +169,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                     .reduce((prev, cur) => prev.combine(cur));
 
                 if (mouseEvent) {
-                    const mouseX = mouseEvent.readXFrom ? WitnessExporter.mapToTargetName(WitnessExporter.removeSSAIndex(mouseEvent.readXFrom)).attribute : undefined;
-                    const mouseY = mouseEvent.readYFrom ? WitnessExporter.mapToTargetName(WitnessExporter.removeSSAIndex(mouseEvent.readYFrom)).attribute : undefined;
+                    const mouseX = mouseEvent.xReadFrom ? WitnessExporter.mapToTargetName(WitnessExporter.removeSSAIndex(mouseEvent.xReadFrom)).attribute : undefined;
+                    const mouseY = mouseEvent.yReadFrom ? WitnessExporter.mapToTargetName(WitnessExporter.removeSSAIndex(mouseEvent.yReadFrom)).attribute : undefined;
 
                     const x = mouseX ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseX) : mousePosition.x;
                     const y = mouseY ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseY) : mousePosition.y;
