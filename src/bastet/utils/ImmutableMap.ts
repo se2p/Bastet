@@ -88,6 +88,10 @@ export class ImmutableMap<K, V> implements ReadonlyMap<K, V>, Iterable<[K, V]> {
         return new ImmutableMap(input.entries());
     }
 
+    toString(): string {
+        return this._map.toString();
+    }
+
 }
 
 
