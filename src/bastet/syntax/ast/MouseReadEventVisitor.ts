@@ -418,7 +418,6 @@ export class MouseReadEventVisitor implements CoreVisitor<MouseReadEvent>, CoreB
             const script = variableNameParts[1];
 
             if (script === "mouseX") {
-                console.log(JSON.stringify({ variableName, script }));
                 this.mouseXAlias.push(variableName);
                 this.usageToMouseXAlias.set(variableName, variableName);
             } else if (script === "mouseY") {
