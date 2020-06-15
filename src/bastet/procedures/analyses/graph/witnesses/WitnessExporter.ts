@@ -153,11 +153,11 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             previousState = currentState;
         }
 
-        errorWitness.steps = errorWitness.steps.filter(witness => !witness.isEmpty());
-
         if (this._config.collapseAtomicBlocks) {
             errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
         }
+
+        errorWitness.steps = errorWitness.steps.filter(witness => !witness.isEmpty());
 
         errorWitness.steps = WitnessExporter.removeIrrelevantTransitions(errorWitness.steps);
         WitnessExporter.setMouseInputAction(errorWitness.steps);
