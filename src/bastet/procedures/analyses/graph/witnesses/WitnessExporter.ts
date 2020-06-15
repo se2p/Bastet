@@ -169,8 +169,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                     .reduce((prev, cur) => prev.combine(cur));
 
                 if (mouseEvent) {
-                    const mouseX = mouseEvent.xReadFrom ? WitnessExporter.mapToTargetName(WitnessExporter.removeSSAIndex(mouseEvent.xReadFrom)).attribute : undefined;
-                    const mouseY = mouseEvent.yReadFrom ? WitnessExporter.mapToTargetName(WitnessExporter.removeSSAIndex(mouseEvent.yReadFrom)).attribute : undefined;
+                    const mouseX = mouseEvent.xReadFrom ? WitnessExporter.splitTargetPrefixFromAttribute(WitnessExporter.removeSSAIndex(mouseEvent.xReadFrom)).attribute : undefined;
+                    const mouseY = mouseEvent.yReadFrom ? WitnessExporter.splitTargetPrefixFromAttribute(WitnessExporter.removeSSAIndex(mouseEvent.yReadFrom)).attribute : undefined;
 
                     const x = mouseX ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseX) : mousePosition.x;
                     const y = mouseY ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseY) : mousePosition.y;
@@ -208,7 +208,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         map.forEach((value, attributeWithTarget) => {
             if (this.isTargetAttribute(attributeWithTarget)) {
-                const {attribute, target} = WitnessExporter.mapToTargetName(attributeWithTarget);
+                const {attribute, target} = WitnessExporter.splitTargetPrefixFromAttribute(attributeWithTarget);
 
                 let targetMap = targets.get(target);
                 if (!targetMap) {
@@ -231,7 +231,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return  attributeWithSSA.substring(0, indexLastAt);
     }
 
-    private static mapToTargetName(attributeWithTargetName: string): {attribute: string, target: string} {
+    private static splitTargetPrefixFromAttribute(attributeWithTargetName: string): {attribute: string, target: string} {
         const indexFirstAt = attributeWithTargetName.indexOf(VAR_SCOPING_SPLITTER);
         const indexLastAt = attributeWithTargetName.lastIndexOf(VAR_SCOPING_SPLITTER);
 
