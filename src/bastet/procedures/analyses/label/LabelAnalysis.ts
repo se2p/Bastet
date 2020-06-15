@@ -49,6 +49,11 @@ import {LabelTransferRelation} from "./LabelTransferRelation";
 import {MergeJoinOperator} from "../Operators";
 import {GraphAbstractState} from "../graph/GraphAbstractDomain";
 
+let bigStepNumber: number = 0; // FIXME: THIS IS A HACK
+
+export function incBigStep() {
+    bigStepNumber++;
+}
 
 export class LabelAnalysis<F extends AbstractState>
     implements WrappingProgramAnalysis<ConcreteElement, LabelState, F>,
@@ -70,8 +75,6 @@ export class LabelAnalysis<F extends AbstractState>
 
     private readonly _task: App;
 
-    private _bigStepNumber: number;
-
     constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics) {
         this._task = Preconditions.checkNotUndefined(task);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);
@@ -79,8 +82,7 @@ export class LabelAnalysis<F extends AbstractState>
         this._abstractDomain = new LabelAbstractDomain(wrappedAnalysis.abstractDomain);
         this._mergeOperator = new MergeJoinOperator(this._abstractDomain);
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
-        this._transfer = new LabelTransferRelation(wrappedAnalysis, () => this._bigStepNumber);
-        this._bigStepNumber = 0;
+        this._transfer = new LabelTransferRelation(wrappedAnalysis, () => bigStepNumber);
     }
 
     getTransitionLabel(fromState: LabelState, toState: LabelState): ProgramOperation[] {
@@ -143,8 +145,6 @@ export class LabelAnalysis<F extends AbstractState>
     }
 
     widen(state: LabelState): LabelState {
-        this._bigStepNumber++;
-
         const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState());
         if (wrappedResult != state.getWrappedState()) {
             return state.withWrappedState(wrappedResult);
