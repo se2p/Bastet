@@ -69,12 +69,10 @@ export class DataTransferRelation implements LabeledTransferRelation<DataAbstrac
         let ast: AstNode;
         if (op instanceof AssumeOperation) {
             const assume = op as AssumeOperation;
-            ast = new AssumeStatement(op.expression);
+            ast = new AssumeStatement(assume.expression);
         } else {
             ast = op.ast;
         }
-
-        // console.log(ast.accept(new CorePrintVisitor()));
 
         return this.abstractSuccForAst(fromState, ast);
     }

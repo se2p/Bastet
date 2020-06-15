@@ -133,11 +133,12 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
         }
 
         Preconditions.checkState(frontier.isEmpty());
-        this.algorithmMonitoringHook(frontier, reached);
         return this.takeNoteOfResult(frontier, reached);
     }
 
     private takeNoteOfResult(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {
+        this.algorithmMonitoringHook(frontier, reached);
+
         this._statistics.put(STAT_KEY_REACH_REACHED, reached.getSize());
         this._statistics.put(STAT_KEY_REACH_FRONTIER, frontier.getSize());
 

@@ -124,6 +124,7 @@ import {
 import {freshId} from "../../../utils/Seq";
 import {RelationBuildingVisitor} from "../../../syntax/app/controlflow/RelationBuildingVisitor";
 import {AnalysisStatistics} from "../AnalysisStatistics";
+import {incBigStep, LabelAnalysis} from "../label/LabelAnalysis";
 
 class StepInformation {
 
@@ -332,6 +333,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 "A thread with no leaving ops must NOT be in state THREAD_STATE_RUNNING");
 
             for (const op of leavingOps) { // Multiple leaving ops in case of branchings
+                incBigStep(); // FIXME: <--- this is a hack to get the labeling right
+
                 // Interpret the operation `op` for thread `threadToStep` in state `fromState`
                 this._interpreteStats.startTimer();
                 const succStates0: ControlAbstractState[] = this.interprete(fromState, threadToStep, op);
