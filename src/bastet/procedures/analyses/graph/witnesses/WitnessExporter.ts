@@ -124,7 +124,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         errorWitness.violations = violatedProperties.map(property => property.getText);
 
         let previousState: GraphAbstractState = undefined;
-        let mousePosition: MousePosition = new MousePosition(0, 0);
         const errorWitnessActionVisitor = new ErrorWitnessActionVisitor();
         const labelPrintVisitor = new CorePrintVisitor();
         const mouseReadEventVisitor = new MouseReadEventVisitor();
@@ -180,8 +179,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                     const mouseX = mouseEvent.xReadFrom ? WitnessExporter.removeSSAIndex(mouseEvent.xReadFrom) : undefined;
                     const mouseY = mouseEvent.yReadFrom ? WitnessExporter.removeSSAIndex(mouseEvent.yReadFrom) : undefined;
 
-                    const x = mouseX ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseX) : mousePosition.x;
-                    const y = mouseY ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseY) : mousePosition.y;
+                    const x = step.getUserDefinedAttributeValue(step.actionTargetName, mouseX);
+                    const y = step.getUserDefinedAttributeValue(step.actionTargetName, mouseY);
 
                     step.action = Action.MOUSE_INPUT;
                     step.mousePosition = new MousePosition(x, y);
