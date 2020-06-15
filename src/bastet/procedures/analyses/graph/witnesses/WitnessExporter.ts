@@ -150,7 +150,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             })
 
             if (previousState) {
-                const actionWithArgs = this._tlp.getTransitionLabel(previousState, currentState)
+                const transitionLabel = this._tlp.getTransitionLabel(previousState, currentState);
+                step.action = transitionLabel
                     .map(o => o.ast.accept(errorWitnessActionVisitor))
                     .reduce((prev, cur) => {
                         if (prev.weight > cur.weight) {
@@ -158,14 +159,12 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                         } else {
                             return cur;
                         }
-                    });
+                    }).action;
 
-                step.action = actionWithArgs.action;
-
-                step.actionLabel = this._tlp.getTransitionLabel(previousState, currentState)
+                step.actionLabel = transitionLabel
                     .map(o => o.ast.accept(labelPrintVisitor))
                     .join("; ");
-                const mouseEvent: MouseReadEvent = this._tlp.getTransitionLabel(previousState, currentState)
+                const mouseEvent: MouseReadEvent = transitionLabel
                     .map(o => o.ast.accept(mouseReadEventVisitor))
                     .reduce((prev, cur) => prev.combine(cur));
 
