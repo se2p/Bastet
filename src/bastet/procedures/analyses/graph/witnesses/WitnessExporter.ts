@@ -31,7 +31,6 @@ import {Preconditions} from "../../../../utils/Preconditions";
 import {GraphReachedSetWrapper} from "../GraphStatesSetWrapper";
 import {TransitionLabelProvider, WrappingProgramAnalysis} from "../../ProgramAnalysis";
 import {ConcreteElement, ConcreteMemory} from "../../../domains/ConcreteElements";
-import {IllegalArgumentException} from "../../../../core/exceptions/IllegalArgumentException";
 import {SSAStateVisitor} from "../../StateVisitors";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {MouseReadEvent, MouseReadEventVisitor} from "../../../../syntax/ast/MouseReadEventVisitor";
@@ -45,18 +44,21 @@ import {AccessibilityRelation, AccessibilityRelations} from "../../Accessibility
 import {Property} from "../../../../syntax/Property";
 import {getTheOnlyElement} from "../../../../utils/Collections";
 import {VAR_SCOPING_SPLITTER} from "../../../../syntax/app/controlflow/DataLocation";
+import {DataLocationScoper} from "../../control/DataLocationScoping";
 
 export interface WitnessExporterConfig {
     export: 'ALL' | 'ONLY_ACTIONS';
     collapseAtomicBlocks: boolean;
     removeAttributeStartingWith: string[];
+    removeActorPrefixFromAttributes: boolean
 }
 
 export const DEFAULT_WITNESS_EXPORTER_CONFIG: WitnessExporterConfig = {
     export: 'ONLY_ACTIONS',
     collapseAtomicBlocks: true,
     removeAttributeStartingWith: ['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE',
-        'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT', '__tmp']
+        'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT', '__tmp'],
+    removeActorPrefixFromAttributes: true
 }
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
@@ -106,6 +108,10 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         errorWitness.steps.forEach(step => {
             step.targets.forEach(target => {
+                if (this._config.removeActorPrefixFromAttributes) {
+                    target.removeActorPrefix();
+                }
+
                 target.removeAttributesStartingWith(this._config.removeAttributeStartingWith);
             })
         })
@@ -169,8 +175,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                     .reduce((prev, cur) => prev.combine(cur));
 
                 if (mouseEvent) {
-                    const mouseX = mouseEvent.xReadFrom ? WitnessExporter.splitTargetPrefixFromAttribute(WitnessExporter.removeSSAIndex(mouseEvent.xReadFrom)).attribute : undefined;
-                    const mouseY = mouseEvent.yReadFrom ? WitnessExporter.splitTargetPrefixFromAttribute(WitnessExporter.removeSSAIndex(mouseEvent.yReadFrom)).attribute : undefined;
+                    const mouseX = mouseEvent.xReadFrom ? WitnessExporter.removeSSAIndex(mouseEvent.xReadFrom) : undefined;
+                    const mouseY = mouseEvent.yReadFrom ? WitnessExporter.removeSSAIndex(mouseEvent.yReadFrom) : undefined;
 
                     const x = mouseX ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseX) : mousePosition.x;
                     const y = mouseY ? step.getUserDefinedAttributeValue(step.actionTargetName, mouseY) : mousePosition.y;
@@ -208,14 +214,14 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         map.forEach((value, attributeWithTarget) => {
             if (this.isTargetAttribute(attributeWithTarget)) {
-                const {attribute, target} = WitnessExporter.splitTargetPrefixFromAttribute(attributeWithTarget);
+                const {target} = WitnessExporter.splitTargetPrefixFromAttribute(attributeWithTarget);
 
                 let targetMap = targets.get(target);
                 if (!targetMap) {
                     targetMap = new Map<string, T>();
                 }
 
-                targetMap.set(attribute, value);
+                targetMap.set(attributeWithTarget, value);
                 targets.set(target, targetMap);
             } else {
                 // TODO figure out what to do with other attributes (__op_time_129, ...)
@@ -226,25 +232,16 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     }
 
     private static removeSSAIndex(attributeWithSSA: string): string {
-        const indexLastAt = attributeWithSSA.lastIndexOf(VAR_SCOPING_SPLITTER);
-
-        return  attributeWithSSA.substring(0, indexLastAt);
+        return DataLocationScoper.rightUnwrapScope(attributeWithSSA).prefix;
     }
 
-    private static splitTargetPrefixFromAttribute(attributeWithTargetName: string): {attribute: string, target: string} {
-        const indexFirstAt = attributeWithTargetName.indexOf(VAR_SCOPING_SPLITTER);
-        const indexLastAt = attributeWithTargetName.lastIndexOf(VAR_SCOPING_SPLITTER);
-
-        if (indexFirstAt < 0 || indexLastAt < 0) {
-            throw new IllegalArgumentException("Attribute name didnt contain target name");
-        }
-
-        const target = attributeWithTargetName.substring(0, indexFirstAt);
-        const attribute = attributeWithTargetName.substring(indexLastAt + 1);
+    public static splitTargetPrefixFromAttribute(attributeWithTargetName: string): {attribute: string, target: string} {
+        const target = DataLocationScoper.leftUnwrapScope(attributeWithTargetName).prefix;
+        const attribute = DataLocationScoper.rightUnwrapScope(attributeWithTargetName).suffix;
         return {attribute, target};
     }
 
-    private static isTargetAttribute(attribute: string): boolean {
+    public static isTargetAttribute(attribute: string): boolean {
         return attribute.includes(VAR_SCOPING_SPLITTER);
     }
 

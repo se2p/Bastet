@@ -23,6 +23,7 @@
 import {Action} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {ConcretePrimitive} from "../../../domains/ConcreteElements";
+import {WitnessExporter} from "./WitnessExporter";
 
 export class Target {
     private static readonly SCRATCH_TARGET_ATTRIBUTES = ["x", "y", "direction", "draggable", "rotationStyle", "visible", "size"];
@@ -43,6 +44,21 @@ export class Target {
         this.removeUserDefinedAttributes(attributesToRemove);
     }
 
+    removeActorPrefix(): void {
+        Target.removeAttributesWithTargetPrefix(this.scratchAttributes);
+        Target.removeAttributesWithTargetPrefix(this.userDefinedAttributes);
+    }
+
+    private static removeAttributesWithTargetPrefix(attributes): void {
+        Object.keys(attributes).forEach(attributeWithActorName => {
+            const {attribute} = WitnessExporter.splitTargetPrefixFromAttribute(attributeWithActorName);
+
+            const value = attributes[attributeWithActorName];
+            delete attributes[attributeWithActorName];
+            attributes[attribute] = value;
+        })
+    }
+
     static fromConcretePrimitives(name: string, attributes: Map<string, ConcretePrimitive<any>>): Target {
         const target = new Target();
         target.name = name;
@@ -59,6 +75,10 @@ export class Target {
     }
 
     static isScratchAttribute(name: string): boolean {
+        if (WitnessExporter.isTargetAttribute(name)) {
+            name = WitnessExporter.splitTargetPrefixFromAttribute(name).attribute;
+        }
+
         return this.SCRATCH_TARGET_ATTRIBUTES.includes(name);
     }
 }
