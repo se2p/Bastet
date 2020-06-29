@@ -38,6 +38,8 @@ export interface AnalysisLogger {
 
     potentialIncomplete(str: string);
 
+    log(...data: any);
+
 }
 
 export class ConsoleLogger implements AnalysisLogger {
@@ -54,6 +56,10 @@ export class ConsoleLogger implements AnalysisLogger {
 
     potentialUnsound(str: string) {
         console.warn("UNSOUND: " + str);
+    }
+
+    log(...data: any) {
+        console.log(...data);
     }
 
     setLogLevel(level: LogLevel) {
