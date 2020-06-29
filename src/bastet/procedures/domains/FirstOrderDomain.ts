@@ -40,6 +40,8 @@ import {Preconditions} from "../../utils/Preconditions";
 import {Z3Model} from "../../utils/smt/z3/Z3SMT";
 import {BooleanTheory} from "./MemoryTransformer";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {Logger} from "../../utils/Logger";
+import {PerfTimer} from "../../utils/PerfTimer";
 
 export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
     prover: FirstOrderSolver<F>;
@@ -67,43 +69,57 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
     }
 
     concretizeOne(element: F): ConcreteMemory {
-        this.solver.push();
-        this.solver.assert(element);
+        console.group(`Concretizing in ${this.constructor.name}`);
+        const timer = new PerfTimer(null);
+        timer.start();
+        try {
+            this.solver.push();
+            this.solver.assert(element);
 
-        // TODO: Use a generic FirstOrderModel type instead of Z3Model
-        if (this.solver.isUnsat()) {
-            throw new IllegalArgumentException("Model only available for satisfiable formula!");
-        }
+            // TODO: Use a generic FirstOrderModel type instead of Z3Model
 
-        const model = this.solver.getModel();
-
-        const numbers = new Map<string, ConcreteNumber>();
-        const strings = new Map<string, ConcreteString>();
-        const booleans = new Map<string, ConcreteBoolean>();
-        const lists = new Map<string, ConcreteList<ConcreteString>>();
-
-        model.getConstValues().forEach(constObj => {
-            const value = constObj.getValue();
-            const name = constObj.getName();
-
-            switch (typeof value) {
-                case 'boolean':
-                    booleans.set(name, new ConcreteBoolean(value));
-                    break;
-                case 'number':
-                    numbers.set(name, new ConcreteNumber(value));
-                    break;
-                case 'string':
-                    strings.set(name, new ConcreteString(value));
-                    break;
-                default:
-                    throw new ImplementMeForException("attributes of type " + typeof value);
+            console.log("Checking satisfiability")
+            // (This involves a call to the solver's `check` method, which has
+            // to be called before we are allowed to query a model.)
+            if (!this.solver.isSat()) {
+                throw new IllegalArgumentException("Model only available for satisfiable formula!");
             }
-        });
 
-        this.solver.pop();
+            console.log("Querying model")
+            const model = this.solver.getModel();
 
-        return new ConcreteMemory(numbers, strings, booleans, lists);
+            const numbers = new Map<string, ConcreteNumber>();
+            const strings = new Map<string, ConcreteString>();
+            const booleans = new Map<string, ConcreteBoolean>();
+            const lists = new Map<string, ConcreteList<ConcreteString>>();
+
+            model.getConstValues().forEach(constObj => {
+                const value = constObj.getValue();
+                const name = constObj.getName();
+
+                switch (typeof value) {
+                    case 'boolean':
+                        booleans.set(name, new ConcreteBoolean(value));
+                        break;
+                    case 'number':
+                        numbers.set(name, new ConcreteNumber(value));
+                        break;
+                    case 'string':
+                        strings.set(name, new ConcreteString(value));
+                        break;
+                    default:
+                        throw new ImplementMeForException("attributes of type " + typeof value);
+                }
+            });
+
+            this.solver.pop();
+
+            return new ConcreteMemory(numbers, strings, booleans, lists);
+        } finally {
+            timer.stop();
+            console.log(`Concretized in ${timer.lastIntervalDuration}ms`)
+            console.groupEnd();
+        }
     }
 
     widen(element: F, precision: AbstractionPrecision): F {
@@ -136,6 +152,12 @@ export abstract class FirstOrderSolver<F extends FirstOrderFormula> {
      * Check whether the assertions in a given solver are consistent or not.
      */
     public abstract isUnsat(): boolean;
+
+    /**
+     * Check if the formula is satisfiable.
+     * (not necessarily the negation of isUnsat because there can also be an 'unknown' value.
+     */
+    public abstract isSat(): boolean;
 
     /**
      * Assert a constraint `f` into the solver.

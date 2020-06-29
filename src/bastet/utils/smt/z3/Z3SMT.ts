@@ -116,6 +116,9 @@ const Z3_L_TRUE = 1;
 const Z3_L_UNDEF = 0;
 const Z3_L_FALSE = -1;
 
+const Z3_UNSATISFIABLE = -1;
+const Z3_SATISFIABLE = 1;
+
 export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
 
     private _ctx: LibZ3InContext;
@@ -130,11 +133,19 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
     }
 
     /**
-     * Check whether the assertions in a given solver are consistent or not.
+     * @inheritDoc
      */
     public isUnsat(): boolean {
         const checkResult: Sint32 = this._ctx.solver_check(this._solver);
-        return (checkResult.val() == Z3_L_FALSE);
+        return checkResult.val() == Z3_UNSATISFIABLE;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public isSat(): boolean {
+        const checkResult: Sint32 = this._ctx.solver_check(this._solver);
+        return checkResult.val() == Z3_SATISFIABLE;
     }
 
     /**
