@@ -107,6 +107,11 @@ export class LabelState extends LabelStateRecord implements LabelStateAttributes
         return this.set("wrappedState", wrapped);
     }
 
+    hashCode(): number {
+        // Overwritten to avoid cyclic hashCode computations
+        return this.getWrappedState().hashCode();
+    }
+
     public accept<R>(visitor: AbstractElementVisitor<R>): R {
         const visitMethod: string = `visit${this.constructor.name}`;
         if (visitor[visitMethod]) {
