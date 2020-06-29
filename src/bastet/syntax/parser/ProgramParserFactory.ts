@@ -33,6 +33,10 @@ export class ProgramParserFactory {
 
     private static readonly fileParserMapping: { [ext:string]: () => ProgramParser } = {
         ".sc" : function(): ProgramParser {
+            // Deprecated file extension (use .le instead)
+            return new TextualProgramParser();
+        },
+        ".le" : function(): ProgramParser {
             return new TextualProgramParser();
         },
         ".sb2": function(): ProgramParser {
