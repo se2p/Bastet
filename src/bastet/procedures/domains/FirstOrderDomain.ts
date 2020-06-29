@@ -37,11 +37,12 @@ import {FirstOrderFormula} from "../../utils/ConjunctiveNormalForm";
 import {LatticeWithComplements} from "../../lattices/Lattice";
 import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
-import {Z3Model} from "../../utils/smt/z3/Z3SMT";
+import {Z3Model, Z3Vector} from "../../utils/smt/z3/Z3SMT";
 import {BooleanTheory} from "./MemoryTransformer";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {Logger} from "../../utils/Logger";
 import {PerfTimer} from "../../utils/PerfTimer";
+import {Z3FirstOrderFormula} from "../../utils/smt/z3/Z3Theories";
 
 export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
     prover: FirstOrderSolver<F>;
@@ -82,6 +83,7 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
             // (This involves a call to the solver's `check` method, which has
             // to be called before we are allowed to query a model.)
             if (!this.solver.isSat()) {
+                this.solver.getCores().asArray().forEach((f) => this.lattice.prover.stringRepresentation(f));
                 throw new IllegalArgumentException("Model only available for satisfiable formula!");
             }
 
@@ -174,6 +176,10 @@ export abstract class FirstOrderSolver<F extends FirstOrderFormula> {
     public abstract release();
 
     public abstract getModel(): Z3Model;
+
+    public abstract getCores(): Z3Vector;
+
+    public abstract stringRepresentation(f: FirstOrderFormula): string;
 }
 
 export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>

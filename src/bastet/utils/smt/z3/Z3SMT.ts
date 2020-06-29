@@ -23,7 +23,7 @@
 import {
     LibZ3InContext,
     LibZ3NonContext,
-    Z3_ast,
+    Z3_ast, Z3_ast_vector,
     Z3_func_decl,
     Z3_model,
     Z3_solver, Z3_sort,
@@ -31,12 +31,14 @@ import {
 } from './libz3';
 import {Preconditions} from "../../Preconditions";
 import {WasmJSInstance} from "./WasmInstance";
-import {Z3FirstOrderFormula, Z3FirstOrderLattice, Z3Theories} from "./Z3Theories";
+import {Z3BooleanFormula, Z3FirstOrderFormula, Z3FirstOrderLattice, Z3Formula, Z3Theories} from "./Z3Theories";
 import {FirstOrderSolver} from "../../../procedures/domains/FirstOrderDomain";
 import {Sint32, Uint32} from "./ctypes";
 import {BooleanTheory} from "../../../procedures/domains/MemoryTransformer";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {BastetConfiguration} from "../../BastetConfiguration";
+import {FirstOrderFormula} from "../../ConjunctiveNormalForm";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 
 export var PreModule = {
     print: function(text) {
@@ -132,20 +134,30 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         this._ctx.solver_inc_ref(this._solver);
     }
 
+    private solve(): number {
+        const checkResult: Sint32 = this._ctx.solver_check(this._solver);
+        if (checkResult.val() == Z3_L_UNDEF) {
+            const reason: string = this._ctx.solver_get_reason_unknown(this._solver);
+            throw new IllegalArgumentException(`Solving query failed (UNKNOWN): ${reason}`);
+        }
+
+        return checkResult.val();
+    }
+
     /**
      * @inheritDoc
      */
     public isUnsat(): boolean {
-        const checkResult: Sint32 = this._ctx.solver_check(this._solver);
-        return checkResult.val() == Z3_UNSATISFIABLE;
+        const checkResult: number = this.solve();
+        return checkResult == Z3_UNSATISFIABLE;
     }
 
     /**
      * @inheritDoc
      */
     public isSat(): boolean {
-        const checkResult: Sint32 = this._ctx.solver_check(this._solver);
-        return checkResult.val() == Z3_SATISFIABLE;
+        const checkResult: number = this.solve();
+        return checkResult == Z3_SATISFIABLE;
     }
 
     /**
@@ -194,10 +206,61 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
 
         return this._model;
     }
+
+    public getCores(): Z3Vector {
+       return new Z3Vector(this._ctx, this._ctx.solver_get_unsat_core(this._solver));
+    }
+
+    public stringRepresentation(f: Z3FirstOrderFormula): string {
+        return this._ctx.ast_to_string(f.getAST());
+    }
+
+}
+
+export class Z3Vector {
+
+    private readonly _ctx: LibZ3InContext;
+
+    private readonly _v: Z3_ast_vector;
+
+    constructor(ctx: LibZ3InContext, v: Z3_ast_vector) {
+        this._ctx = Preconditions.checkNotUndefined(ctx);
+        this._v = v;
+        this._ctx.ast_vector_inc_ref(this._v);
+    }
+
+    get vector(): Z3_ast_vector {
+        return this._v;
+    }
+
+    public release(): void {
+        this._ctx.ast_vector_dec_ref(this._v);
+    }
+
+    public get(index: number): FirstOrderFormula {
+        return new Z3BooleanFormula(this._ctx.ast_vector_get(this._v, new Uint32(index)));
+    }
+
+    public size(): number {
+        return this._ctx.ast_vector_size(this._v).val();
+    }
+
+    public asArray(): FirstOrderFormula[] {
+        const result = [];
+        var i = this.size();
+        while (i > 0) {
+            result.push(this.get(i));
+            i--;
+        }
+        return result;
+    }
+
 }
 
 export class Z3Model {
+
     private readonly _ctx: LibZ3InContext;
+
     private readonly _model: Z3_model;
 
     constructor(ctx: LibZ3InContext, model: Z3_model) {
@@ -317,8 +380,8 @@ export class Z3SMT extends LibZ3NonContext {
     public createContext(): LibZ3InContext {
         const cfg = this.mk_config();
         // this.set_param_value(cfg, "timeout", "60000"); // Timeout in milliseconds (the Z3 WASM must be recompiled with PTHREADS enabled)
-        this.set_param_value(cfg, "proof", "false"); // No proof generation (sufficient for BMC)
-        this.set_param_value(cfg, "unsat_core", "false"); // No unsat-core generation (sufficient for BMC)
+        this.set_param_value(cfg, "proof", "true"); // No proof generation (sufficient for BMC)
+        this.set_param_value(cfg, "unsat_core", "true"); // No unsat-core generation (sufficient for BMC)
         this.set_param_value(cfg, "model", "true"); // Create models
 
         const ctx = this.mk_context(cfg);
