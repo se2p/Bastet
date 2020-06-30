@@ -56,6 +56,8 @@ const GraphAbstractStateRecord = ImmRec({
     partitionKeys: ImmSet()
 });
 
+let STATE_ID_SEQ: number = 0;
+
 export class GraphAbstractState extends GraphAbstractStateRecord implements GraphAbstractStateAttribs, AbstractState {
 
     constructor(id: GraphStateId, preds: ImmSet<GraphStateId>, mergeOf: ImmSet<GraphStateId>, wrapped: ImmRec<any>,
@@ -79,8 +81,29 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
         return this.get('wrappedState');
     }
 
+    public withPartitionKeys(keys: ImmSet<PartitionKey>): GraphAbstractState {
+        return this.set('partitionKeys', keys);
+    }
+
+    public withMergeOf(of: ImmSet<GraphStateId>) {
+        return this.set('mergeOf', of);
+    }
+
+    public withPredecessors(preds: ImmSet<GraphStateId>): GraphAbstractState {
+        return this.set('predecessors', preds);
+    }
+
     public withWrappedState(wrapped: AbstractState): GraphAbstractState {
         return this.set('wrappedState', wrapped);
+    }
+
+    public withFreshId(): GraphAbstractState {
+        if (!STATE_ID_SEQ) {
+            STATE_ID_SEQ = 0;
+        }
+        const freshId = STATE_ID_SEQ++;
+
+        return this.set('id', freshId);
     }
 
     public getPartitionKeys(): ImmSet<PartitionKey> {
@@ -97,16 +120,15 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
     }
 }
 
-export class GraphAbstractStateFactory {
 
-    private static STATE_ID_SEQ: number;
+export class GraphAbstractStateFactory {
 
     public static withFreshID(preds: Iterable<GraphStateId>, mergeOf: Iterable<GraphStateId>, wrapped: ImmRec<any>,
                               wrappedKeys: ImmSet<PartitionKey>): GraphAbstractState {
-        if (!GraphAbstractStateFactory.STATE_ID_SEQ) {
-            GraphAbstractStateFactory.STATE_ID_SEQ = 0;
+        if (!STATE_ID_SEQ) {
+            STATE_ID_SEQ = 0;
         }
-        const freshId = GraphAbstractStateFactory.STATE_ID_SEQ++;
+        const freshId = STATE_ID_SEQ++;
         return new GraphAbstractState(freshId, ImmSet(preds), ImmSet(mergeOf).union([freshId]), wrapped, wrappedKeys);
     }
 
