@@ -37,6 +37,11 @@ import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentExc
 
 export interface TransferRelation<E extends AbstractElement> {
 
+    /**
+     * Determine the set of abstract successor states for a given abstract (predecessor) state.
+     *
+     * @param fromState
+     */
     abstractSucc(fromState: E): Iterable<E>;
 
 }

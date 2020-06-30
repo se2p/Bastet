@@ -126,133 +126,6 @@ import {RelationBuildingVisitor} from "../../../syntax/app/controlflow/RelationB
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {incBigStep, LabelAnalysis} from "../label/LabelAnalysis";
 
-class StepInformation {
-
-    private readonly _steppedThread: IndexedThread;
-
-    private readonly _isInnerAtomic: boolean;
-
-    private readonly _ops: ProgramOperation[];
-
-    private readonly _succLoc: RelationLocation;
-
-    private readonly _succCallStack: ImmList<MethodCall>;
-
-    private readonly _succScopeStack: ImmList<string>;
-
-    constructor(steppedThread: IndexedThread, succLoc: RelationLocation, isInnerAtomic: boolean, ops: ProgramOperation[],
-                succReturnCallTo: ImmList<MethodCall>, succScopeStack: ImmList<string>) {
-        this._steppedThread = steppedThread;
-        this._succLoc = succLoc;
-        this._isInnerAtomic = isInnerAtomic;
-        this._ops = Preconditions.checkNotUndefined(ops);
-        this._succCallStack = Preconditions.checkNotUndefined(succReturnCallTo);
-        this._succScopeStack = Preconditions.checkNotUndefined(succScopeStack);
-    }
-
-    get steppedThread(): IndexedThread {
-        return this._steppedThread;
-    }
-
-    get succLoc(): RelationLocation {
-        return this._succLoc;
-    }
-
-    get isInnerAtomic(): boolean {
-        return this._isInnerAtomic;
-    }
-
-    get ops(): ProgramOperation[] {
-        return this._ops;
-    }
-
-    get succCallStack(): ImmList<MethodCall> {
-        return this._succCallStack;
-    }
-
-    get succScopeStack(): ImmList<string> {
-        return this._succScopeStack;
-    }
-}
-
-class AccelInfo {
-
-    private readonly _id: number;
-
-    private readonly _actorId: ActorId;
-
-    private readonly _condition: BooleanExpression;
-
-    private readonly _variantVariable: NumberVariableExpression;
-
-    private readonly _accelerateTo: NumberExpression;
-
-    constructor(actor: ActorId, condition: BooleanExpression, variantVariable: NumberVariableExpression, accelerateTo: NumberExpression) {
-        this._actorId = actor;
-        this._condition = Preconditions.checkNotUndefined(condition);
-        this._variantVariable = Preconditions.checkNotUndefined(variantVariable);
-        this._accelerateTo = Preconditions.checkNotUndefined(accelerateTo);
-        this._id = freshId();
-    }
-
-    get id(): number {
-        return this._id;
-    }
-
-    get actorId(): ActorId {
-        return this._actorId;
-    }
-
-    get condition(): BooleanExpression {
-        return this._condition;
-    }
-
-    get variantVariable(): NumberVariableExpression {
-        return this._variantVariable;
-    }
-
-    get accelerateTo(): NumberExpression {
-        return this._accelerateTo;
-    }
-}
-
-enum LoopActionType {
-    NONE,
-    ENTERING,
-    LEAVING
-}
-
-class LoopAction {
-
-    private readonly _type: LoopActionType;
-
-    private readonly _loop: TransitionLoop;
-
-    private readonly _loopHead: RelationLocation;
-
-    constructor(type: LoopActionType, loop: TransitionLoop, loopHead: RelationLocation) {
-        this._type = type;
-        this._loop = loop;
-        this._loopHead = loopHead;
-    }
-
-    get loopHead(): RelationLocation {
-        return this._loopHead;
-    }
-
-    get type(): LoopActionType {
-        return this._type;
-    }
-
-    get loop(): TransitionLoop {
-        return this._loop;
-    }
-
-    toString(): string {
-        return `${this._type.toString()} ${this._loop.toString()} ${this._loopHead.toString()}`;
-    }
-}
-
 /**
  * Mimics the green-threading of the Scratch VM.
  * Adds special scheduling of some (types of) threads.
@@ -269,6 +142,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
     private readonly _accelInfoMap: Map<ScriptId, AccelInfo>;
 
+    // Statistics
     private readonly _stats: AnalysisStatistics;
     private readonly _resolveOpsStats: AnalysisStatistics;
     private readonly _chooseStats: AnalysisStatistics;
@@ -285,6 +159,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         this._wrappedTransferRelation = Preconditions.checkNotUndefined(wrappedTransferRelation);
         this._wrappedDomain = Preconditions.checkNotUndefined(wrappedDomain);
         this._accelInfoMap = new Map();
+
+        // Initialize some statistic counters
         this._stats = Preconditions.checkNotUndefined(statistics).withContext("Transfer");
         this._resolveOpsStats = this._stats.withContext("ResolveLeavingOps");
         this._chooseStats = this._stats.withContext("Choose");
@@ -294,12 +170,16 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         this._wrappedTransferStats = this._stats.withContext("WrappedTransfer");
     }
 
-    abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
+    /**
+     * @inheritDoc
+     */
+    public abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(fromState.wrappedState);
 
         if (fromState.getIsTargetFor().size > 0) {
             // No successor states after target states
+            // (the state space should split in case a target state is reached)
             return [];
         }
 
@@ -314,6 +194,16 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         }
     }
 
+    /**
+     * Compute the set of abstract successor states based on the control transition
+     * system of the active threads; step one thread only. Several successor
+     * states might get produced, for example, in case the control flow branches.
+     *
+     * We assume that the scheduler behaves deterministically and do not produce
+     * several successor states based on different schedules.
+     *
+     * @param fromState
+     */
     abstractSuccSingleStep(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
         let result: ControlAbstractState[] = [];
 
@@ -1331,4 +1221,131 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return predLoopStack.skipLast(toSkip);
     }
 
+}
+
+class StepInformation {
+
+    private readonly _steppedThread: IndexedThread;
+
+    private readonly _isInnerAtomic: boolean;
+
+    private readonly _ops: ProgramOperation[];
+
+    private readonly _succLoc: RelationLocation;
+
+    private readonly _succCallStack: ImmList<MethodCall>;
+
+    private readonly _succScopeStack: ImmList<string>;
+
+    constructor(steppedThread: IndexedThread, succLoc: RelationLocation, isInnerAtomic: boolean, ops: ProgramOperation[],
+                succReturnCallTo: ImmList<MethodCall>, succScopeStack: ImmList<string>) {
+        this._steppedThread = steppedThread;
+        this._succLoc = succLoc;
+        this._isInnerAtomic = isInnerAtomic;
+        this._ops = Preconditions.checkNotUndefined(ops);
+        this._succCallStack = Preconditions.checkNotUndefined(succReturnCallTo);
+        this._succScopeStack = Preconditions.checkNotUndefined(succScopeStack);
+    }
+
+    get steppedThread(): IndexedThread {
+        return this._steppedThread;
+    }
+
+    get succLoc(): RelationLocation {
+        return this._succLoc;
+    }
+
+    get isInnerAtomic(): boolean {
+        return this._isInnerAtomic;
+    }
+
+    get ops(): ProgramOperation[] {
+        return this._ops;
+    }
+
+    get succCallStack(): ImmList<MethodCall> {
+        return this._succCallStack;
+    }
+
+    get succScopeStack(): ImmList<string> {
+        return this._succScopeStack;
+    }
+}
+
+class AccelInfo {
+
+    private readonly _id: number;
+
+    private readonly _actorId: ActorId;
+
+    private readonly _condition: BooleanExpression;
+
+    private readonly _variantVariable: NumberVariableExpression;
+
+    private readonly _accelerateTo: NumberExpression;
+
+    constructor(actor: ActorId, condition: BooleanExpression, variantVariable: NumberVariableExpression, accelerateTo: NumberExpression) {
+        this._actorId = actor;
+        this._condition = Preconditions.checkNotUndefined(condition);
+        this._variantVariable = Preconditions.checkNotUndefined(variantVariable);
+        this._accelerateTo = Preconditions.checkNotUndefined(accelerateTo);
+        this._id = freshId();
+    }
+
+    get id(): number {
+        return this._id;
+    }
+
+    get actorId(): ActorId {
+        return this._actorId;
+    }
+
+    get condition(): BooleanExpression {
+        return this._condition;
+    }
+
+    get variantVariable(): NumberVariableExpression {
+        return this._variantVariable;
+    }
+
+    get accelerateTo(): NumberExpression {
+        return this._accelerateTo;
+    }
+}
+
+enum LoopActionType {
+    NONE,
+    ENTERING,
+    LEAVING
+}
+
+class LoopAction {
+
+    private readonly _type: LoopActionType;
+
+    private readonly _loop: TransitionLoop;
+
+    private readonly _loopHead: RelationLocation;
+
+    constructor(type: LoopActionType, loop: TransitionLoop, loopHead: RelationLocation) {
+        this._type = type;
+        this._loop = loop;
+        this._loopHead = loopHead;
+    }
+
+    get loopHead(): RelationLocation {
+        return this._loopHead;
+    }
+
+    get type(): LoopActionType {
+        return this._type;
+    }
+
+    get loop(): TransitionLoop {
+        return this._loop;
+    }
+
+    toString(): string {
+        return `${this._type.toString()} ${this._loop.toString()} ${this._loopHead.toString()}`;
+    }
 }
