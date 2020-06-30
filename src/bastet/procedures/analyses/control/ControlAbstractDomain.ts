@@ -260,6 +260,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
     }
 
     public withComputationState(value: ThreadComputationState): ThreadState {
+        if (this.getWaitingForThreads().size > 0) {
+            Preconditions.checkState(value == ThreadComputationState.THREAD_STATE_WAIT,
+                `The computation state has to be WAIT as long it is waiting for threads; clear the list of threads waited for first? (ThreadID: ${this.getThreadId()})`);
+        }
         return this.set('computationState', value);
     }
 
@@ -272,6 +276,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
     }
 
     public withWaitingForThreads(value: ImmSet<ThreadId>): ThreadState {
+        if (value.size > 0) {
+            Preconditions.checkState(this.getComputationState() == ThreadComputationState.THREAD_STATE_WAIT,
+                `Please activate the WAITING-state before assigning a non-empty list of threads to wait for. (Current status: ${this.getComputationState()}, ThreadID: ${this.getThreadId()})`);
+        }
         return this.set('waitingForThreads', value);
     }
 
