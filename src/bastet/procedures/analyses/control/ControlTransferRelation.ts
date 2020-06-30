@@ -588,8 +588,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     const currentScopeStack = this.buildScopeStack(steppedActor.ident, fromRelation.name);
                     return [[result.withAddedConditionState(checkThread)
                         .withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                        ts.withAddedWaitingFor(checkThread)
-                          .withComputationState(ThreadComputationState.THREAD_STATE_WAIT)
+                        ts.withComputationState(ThreadComputationState.THREAD_STATE_WAIT)
+                          .withAddedWaitingFor(checkThread)
                           .withOperations(ImmList(this.scopeOperations(ops, fromState.getActorScopes(),
                             currentScopeStack, currentScopeStack).map(op => op.ident)))), false]];
                 }
@@ -919,8 +919,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     for (const [condCheckedState, checkResult] of wrappedCondStates) {
                         if (checkResult) {
                             succStates = succStates.push(threadState
-                                .withComputationState(ThreadComputationState.THREAD_STATE_YIELD)
-                                .withRemovedWaitingFor(waitingForCondThreadID))
+                                .withRemovedWaitingFor(waitingForCondThreadID)
+                                .withComputationState(ThreadComputationState.THREAD_STATE_YIELD))
                         } else {
                             succStates = succStates.push(threadState);
                         }
@@ -1035,7 +1035,9 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         const nextOps = this.resolveLeavingOps(succState, steppedThread); // Use 'succState' to solve issues with new 'actorScopes' information
 
         // Finish the atomic operations without interruptions by another thread
-        if (nextOps.length > 0 && steppedThread.threadStatus.getInAtomicMode() > 0) {
+        if (nextOps.length > 0
+            && steppedThread.threadStatus.getInAtomicMode() > 0
+            && steppedThread.threadStatus.getWaitingForThreads().size == 0) {
             return [result.withThreadStateUpdate(steppedThread.threadIndex, (ts) =>
                 ts.withComputationState(ThreadComputationState.THREAD_STATE_RUNNING))];
         }
