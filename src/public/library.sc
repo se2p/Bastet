@@ -1096,7 +1096,7 @@ role ScratchEntity is RuntimeEntity begin
     // @Category "Sensing"
     // @Block "ask (question as string) and wait"
     define atomic askAndWait (question: string) begin
-        broadcast "ASK" () to "SYSTEM"
+        broadcast "ASK" () to "SYSTEM" and wait
     end
 
     // @Category "Sensing"
