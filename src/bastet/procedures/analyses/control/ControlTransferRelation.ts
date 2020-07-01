@@ -393,7 +393,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
                           if (stepOp.ast.toValue instanceof VariableWithDataLocation) {
                               const actorIdentifier: ActorId = fromState.getActorScopes().get(stepOp.ast.toValue.dataloc);
-                              setTo = Preconditions.checkNotUndefined(actorIdentifier);
+                              setTo = Preconditions.checkNotUndefined(actorIdentifier, `Actor not identified!: ${stepOp.ast.toTreeString()}`);
 
                           } else if (stepOp.ast.toValue instanceof LocateActorExpression) {
                               const expr = stepOp.ast.toValue as LocateActorExpression;
