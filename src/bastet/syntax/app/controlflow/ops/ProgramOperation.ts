@@ -200,6 +200,11 @@ export class ProgramOperationFactory {
     }
 
     static negatedAssumeOpFrom(boolExpr: BooleanExpression): AssumeOperation {
+        if (boolExpr instanceof NegationExpression) {
+            // resolve a double negation
+            return new AssumeOperation(boolExpr.negate);
+        }
+
         const negation = new NegationExpression(boolExpr);
         return new AssumeOperation(negation);
     }
