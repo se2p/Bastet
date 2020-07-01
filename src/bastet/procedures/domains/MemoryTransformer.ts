@@ -302,6 +302,8 @@ export interface BooleanTheory<B extends AbstractBoolean> {
 
     equal(op1: B, op2: B): B;
 
+    implies(op1: B, op2: B): B;
+
 }
 
 export interface TheoryIndependent<E extends AbstractElement> {
