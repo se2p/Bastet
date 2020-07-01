@@ -131,6 +131,12 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
         reached.addAll(addToReached);
         reached.removeAll(removeFromReached);
 
+        // SOME DEBUGGING CODE:
+        // for (const e of addToReached) {
+        //    Preconditions.checkState(reached.has(e));
+        //    Preconditions.checkState(Array.from(reached.getStateSet(wrapper(state))).filter((x => x == e)).length > 0)
+        // }
+
         return [frontier, reached];
     }
 

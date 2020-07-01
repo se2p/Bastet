@@ -90,6 +90,14 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
     }
 
     public run(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {
+        try {
+            return this.run0(frontier, reached);
+        } finally {
+            this.algorithmMonitoringHook(frontier, reached);
+        }
+    }
+
+    public run0(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {
         while (!frontier.isEmpty()) {
             this._statistics.increment(STAT_KEY_REACH_ITERATIONS);
 

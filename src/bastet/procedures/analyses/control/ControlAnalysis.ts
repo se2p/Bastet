@@ -166,7 +166,9 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
             return false;
         }
 
-        if (this.steppedOnLoophead(state1) || this.steppedOnLoophead(state2)) {
+        if (this.isOnLoophead(state1) || this.isOnLoophead(state2)) {
+            // Do also consider threads that were not stepped!
+            // Needed, for example, if the specification is checked after stepping on a loop head.
             return false;
         }
 
@@ -302,11 +304,8 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         return this.wrappedAnalysis.partitionOf(ofState, reached);
     }
 
-    private steppedOnLoophead(r: ControlAbstractState) {
-        const steppedthreads = r.getSteppedFor().map((i) => r.getIndexedThreadState(i));
-
-        for (const t of steppedthreads) {
-            const ts = t.threadStatus;
+    private isOnLoophead(r: ControlAbstractState) {
+        for (const ts of r.getThreadStates()) {
             const relation = this._task.getTransitionRelationById(ts.getRelationLocation().getRelationId());
             if (relation.isLoopHead(ts.getRelationLocation().getLocationId())) {
                 return true;
