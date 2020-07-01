@@ -115,7 +115,7 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
     public mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
         const removeFromReached: Set<F> = new Set<F>();
         const addToReached: Set<F> = new Set<F>();
-        const relevantReached: Iterable<F> = this._partOp.partitionOf(state, reached);
+        const relevantReached: Iterable<F> = this._partOp.mergePartitionOf(state, reached);
 
         for (let r of relevantReached) {
             if (this._mergeOp.shouldMerge(state, unwrapper(r))) {

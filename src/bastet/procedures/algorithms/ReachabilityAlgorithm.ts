@@ -125,7 +125,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
 
                 // STOP: Check for coverage (fixed point iteration)
                 const checkStopFor: E = ePrimePrime; // TODO: How does this interact with the 'merge' above
-                if (!this._analysis.stop(checkStopFor, reached.getStateSet(checkStopFor), (s) => s)) {
+                if (!this._analysis.stop(checkStopFor, this._analysis.stopPartitionOf(checkStopFor, reached), (s) => s)) {
                     frontier.add(checkStopFor);
                     reached.add(checkStopFor);
 

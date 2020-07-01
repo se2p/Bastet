@@ -261,6 +261,14 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return reached;
     }
 
+    mergePartitionOf(ofState: DataAbstractState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
+        throw new ImplementMeException();
+    }
+
+    stopPartitionOf(ofState: DataAbstractState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
+        throw new ImplementMeException();
+    }
+
     getPartitionKeys(element: DataAbstractState): ImmSet<PartitionKey> {
         return ImmSet([new PartitionKey(ImmList())]);
     }

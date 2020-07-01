@@ -157,8 +157,12 @@ export class TimeAnalysis<F extends AbstractState>
         throw new ImplementMeException();
     }
 
-    partitionOf(ofState: TimeState, reached: ReachedSet<F>): Iterable<F> {
-        return this._wrappedAnalysis.partitionOf(ofState.getWrappedState(), reached);
+    stopPartitionOf(ofState: TimeState, reached: ReachedSet<F>): Iterable<F> {
+        throw new ImplementMeException();
+    }
+
+    mergePartitionOf(ofState: TimeState, reached: ReachedSet<F>): Iterable<F> {
+        throw new ImplementMeException();
     }
 
     getPartitionKeys(element: TimeState): ImmSet<PartitionKey> {

@@ -101,7 +101,9 @@ export interface ResultFinalization<F extends AbstractState> {
 export interface PartitionOperator<E extends AbstractElement, F extends AbstractState>
    extends StatePartitionOperator<E> {
 
-    partitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F>;
+    stopPartitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F>;
+
+    mergePartitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F>;
 
 }
 

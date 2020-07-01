@@ -48,6 +48,7 @@ import {LabelAbstractDomain, LabelState} from "./LabelAbstractDomain";
 import {LabelTransferRelation} from "./LabelTransferRelation";
 import {MergeJoinOperator} from "../Operators";
 import {GraphAbstractState} from "../graph/GraphAbstractDomain";
+import {SSAState} from "../ssa/SSAAbstractDomain";
 
 let bigStepNumber: number = 0; // FIXME: THIS IS A HACK
 
@@ -177,8 +178,12 @@ export class LabelAnalysis<F extends AbstractState>
         throw new ImplementMeException();
     }
 
-    partitionOf(ofState: LabelState, reached: ReachedSet<F>): Iterable<F> {
-        return this._wrappedAnalysis.partitionOf(ofState.getWrappedState(), reached);
+    stopPartitionOf(ofState: LabelState, reached: ReachedSet<F>): Iterable<F> {
+        throw new ImplementMeException();
+    }
+
+    mergePartitionOf(ofState: LabelState, reached: ReachedSet<F>): Iterable<F> {
+        throw new ImplementMeException();
     }
 
     getPartitionKeys(element: LabelState): ImmSet<PartitionKey> {

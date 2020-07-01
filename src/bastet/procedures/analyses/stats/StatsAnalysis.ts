@@ -180,8 +180,12 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         return e;
     }
 
-    partitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F> {
-        return this.wrappedAnalysis.partitionOf(ofState, reached);
+    stopPartitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F> {
+        return this.wrappedAnalysis.stopPartitionOf(ofState, reached);
+    }
+
+    mergePartitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F> {
+        return this.wrappedAnalysis.mergePartitionOf(ofState, reached);
     }
 
     getPartitionKeys(element: E): ImmSet<PartitionKey> {
