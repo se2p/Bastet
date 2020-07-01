@@ -45,6 +45,7 @@ import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {AccessibilityRelation} from "../Accessibility";
 import {ControlAbstractState} from "../control/ControlAbstractDomain";
+import {TimeState} from "../time/TimeAbstractDomain";
 
 
 export class SSAAnalysisConfig extends BastetConfiguration {
@@ -159,8 +160,12 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         throw new ImplementMeException();
     }
 
-    partitionOf(ofState: SSAState, reached: ReachedSet<F>): Iterable<F> {
-        return this.wrappedAnalysis.partitionOf(ofState.getWrappedState(), reached);
+    stopPartitionOf(ofState: SSAState, reached: ReachedSet<F>): Iterable<F> {
+        throw new ImplementMeException();
+    }
+
+    mergePartitionOf(ofState: SSAState, reached: ReachedSet<F>): Iterable<F> {
+        throw new ImplementMeException();
     }
 
     getPartitionKeys(element: SSAState): ImmSet<PartitionKey> {

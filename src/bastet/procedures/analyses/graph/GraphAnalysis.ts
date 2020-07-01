@@ -67,6 +67,7 @@ import {LexiKey} from "../../../utils/Lexicographic";
 import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {PathExporter} from "./witnesses/PathExporter";
+import {LabelState} from "../label/LabelAbstractDomain";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 
@@ -255,7 +256,11 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         return this.wrappedAnalysis['getTransitionLabel'](from.getWrappedState(), to.getWrappedState());
     }
 
-    partitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {
+    stopPartitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {
+        return reached.getStateSet(ofState);
+    }
+
+    mergePartitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {
         return reached.getStateSet(ofState);
     }
 

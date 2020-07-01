@@ -168,6 +168,10 @@ export class FlatBooleanValueTheory implements BooleanTheory<FlatBooleanValue> {
         return this._dom.lattice.join(op1, op2);
     }
 
+    implies(op1: FlatBooleanValue, op2: FlatBooleanValue): FlatBooleanValue {
+        return this.or(this.not(op1), op2);
+    }
+
     topBoolean(): FlatBooleanValue {
         return this._top;
     }

@@ -184,8 +184,16 @@ export class Z3BooleanTheory extends Z3Theory implements BooleanTheory<Z3Boolean
         }
     }
 
+    implies(op1: Z3BooleanFormula, op2: Z3BooleanFormula): Z3BooleanFormula {
+        return new Z3BooleanFormula(this._ctx.mk_implies(op1.getAST(), op2.getAST()));
+
+    }
+
     equal(op1: Z3BooleanFormula, op2: Z3BooleanFormula): Z3BooleanFormula {
-        return new Z3BooleanFormula(this._ctx.mk_eq(op1.getAST(), op2.getAST()));
+        return this.and(this.implies(op1, op2), this.implies(op2, op1));
+
+        // Problem: mk_eq does not work as expected and causes problems in the solver. See issue #73
+        // return new Z3BooleanFormula(this._ctx.mk_eq(op1.getAST(), op2.getAST()));
     }
 
     topBoolean(): Z3BooleanFormula {

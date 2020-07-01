@@ -90,6 +90,14 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
     }
 
     public run(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {
+        try {
+            return this.run0(frontier, reached);
+        } finally {
+            this.algorithmMonitoringHook(frontier, reached);
+        }
+    }
+
+    public run0(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {
         while (!frontier.isEmpty()) {
             this._statistics.increment(STAT_KEY_REACH_ITERATIONS);
 
@@ -117,7 +125,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
 
                 // STOP: Check for coverage (fixed point iteration)
                 const checkStopFor: E = ePrimePrime; // TODO: How does this interact with the 'merge' above
-                if (!this._analysis.stop(checkStopFor, reached.getStateSet(checkStopFor), (s) => s)) {
+                if (!this._analysis.stop(checkStopFor, this._analysis.stopPartitionOf(checkStopFor, reached), (s) => s)) {
                     frontier.add(checkStopFor);
                     reached.add(checkStopFor);
 

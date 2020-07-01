@@ -134,6 +134,13 @@ export type PartitionKeyElement = string|number|boolean;
 
 export interface StatePartitionOperator<E extends AbstractElement> {
 
+    /**
+     * Get the set of partitions (their identifiers) into that a given element
+     * should be mapped (the term partition is misused here since
+     * since partitions are actually disjoint sets).
+     *
+     * @param element
+     */
     getPartitionKeys(element: E): ImmSet<PartitionKey>;
 
 }

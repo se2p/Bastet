@@ -15,6 +15,8 @@ echo "FILTER: $NAME_PREFIX"
 
 cd $BASTET_ROOT
 
+mkdir -p "output/test-results/"
+
 if [ -z $BASTET_NO_BUILD ]
 then
     npm run build

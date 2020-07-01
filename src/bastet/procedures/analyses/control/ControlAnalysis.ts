@@ -127,11 +127,13 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
     }
 
     getPartitionKeys(element: ControlAbstractState): ImmSet<PartitionKey> {
-        const locations: ImmSet<LocationId> = ImmSet(element.getThreadStates().map((ts) =>
-            ts.getRelationLocation().getLocationId()));
-        const callstacks: ImmSet<ImmList<MethodCall>> = ImmSet(element.getThreadStates().map((ts) =>
-            ts.getCallStack()));
-        const controlPartition = new PartitionKey(ImmList([locations, callstacks]));
+        const locations: ImmSet<LocationId> = ImmSet(element.getThreadStates()
+            .map((ts) => ts.getRelationLocation().getLocationId()));
+        const callstacks: ImmSet<ImmList<MethodCall>> = ImmSet(element.getThreadStates()
+            .map((ts) => ts.getCallStack()));
+        const loopstacks: ImmSet<ImmList<RelationLocation>> = ImmSet(element.getThreadStates()
+            .map((ts) => ts.getLoopStack()));
+        const controlPartition = new PartitionKey(ImmList([locations, callstacks, loopstacks]));
 
         let result: ImmSet<PartitionKey> = ImmSet();
         for (const wrappedPartition of this.wrappedAnalysis.getPartitionKeys(element.getWrappedState())) {
@@ -166,7 +168,9 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
             return false;
         }
 
-        if (this.steppedOnLoophead(state1) || this.steppedOnLoophead(state2)) {
+        if (this.isOnLoophead(state1) || this.isOnLoophead(state2)) {
+            // Do also consider threads that were not stepped!
+            // Needed, for example, if the specification is checked after stepping on a loop head.
             return false;
         }
 
@@ -298,15 +302,16 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         throw new ImplementMeException();
     }
 
-    partitionOf(ofState: ControlAbstractState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
-        return this.wrappedAnalysis.partitionOf(ofState, reached);
+    mergePartitionOf(ofState: ControlAbstractState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
+        throw new ImplementMeException();
     }
 
-    private steppedOnLoophead(r: ControlAbstractState) {
-        const steppedthreads = r.getSteppedFor().map((i) => r.getIndexedThreadState(i));
+    stopPartitionOf(ofState: ControlAbstractState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
+        throw new ImplementMeException();
+    }
 
-        for (const t of steppedthreads) {
-            const ts = t.threadStatus;
+    private isOnLoophead(r: ControlAbstractState) {
+        for (const ts of r.getThreadStates()) {
             const relation = this._task.getTransitionRelationById(ts.getRelationLocation().getRelationId());
             if (relation.isLoopHead(ts.getRelationLocation().getLocationId())) {
                 return true;

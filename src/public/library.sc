@@ -531,7 +531,8 @@ role MathActor begin
     // param rad: float - radians number for which the degree value will be calculated
     // return result: float - the calculated degree value
     define atomic radToDeg(rad: float) begin
-        define result as ((rad * 180.0) / PI)
+        // define result as ((rad * 180.0) / PI)
+        define result as rad * 57.2957795131
     end returns result: float
 
     // degToRad calculates the radians value for a given degree value
@@ -539,7 +540,8 @@ role MathActor begin
     // param deg: float - degree number for which the radians value will be calculated
     // return result: float - the calculated radians value
     define atomic degToRad(deg: float) begin
-        define result as (deg * PI) / 180.0
+        // define result as (deg * PI) / 180.0
+        define result as deg * 0.01745329252
     end returns result: float
 
     define atomic nearestPerfectSqrt(num: float) begin
