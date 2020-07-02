@@ -32,7 +32,6 @@ import {AnalysisProcedure, AnalysisResult, NullAnalysisResult} from "./procedure
 import {ProgramParser} from "./syntax/parser/ProgramParser";
 import {Preconditions} from "./utils/Preconditions";
 import {AppBuilder} from "./syntax/app/AppBuilder";
-import {ProgramContext} from "./syntax/parser/grammar/LeilaParser";
 import {RuleNode} from "antlr4ts/tree";
 import {AstNode} from "./syntax/ast/AstNode";
 import {AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";

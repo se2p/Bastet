@@ -23,11 +23,7 @@
  *
  */
 
-import {
-    ProgramAnalysis,
-    ProgramAnalysisWithLabels,
-    WrappingProgramAnalysis
-} from "../ProgramAnalysis";
+import {ProgramAnalysis, ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AnalysisStatistics} from "../AnalysisStatistics";
@@ -39,16 +35,15 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {ProgramTimeProfile} from "../../../utils/TimeProfile";
 import {TimeTransferRelation} from "./TimeTransferRelation";
-import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferRelation";
+import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {Map as ImmMap, List as ImmList, Set as ImmSet} from "immutable";
+import {List as ImmList, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {TimeAbstractDomain, TimeState} from "./TimeAbstractDomain";
 import {TimeMergeOperator} from "./TimeMergeOperator";
 import {AccessibilityRelation} from "../Accessibility";
-import {SSAState} from "../ssa/SSAAbstractDomain";
 
 
 export class TimeAnalysis<F extends AbstractState>

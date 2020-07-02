@@ -26,7 +26,7 @@
 
 import {GraphPath} from "../GraphPath";
 import {Property} from "../../../../syntax/Property";
-import {Record as ImmRec, Set as ImmSet} from "immutable";
+import {Set as ImmSet} from "immutable";
 import {Counterexample} from "../../../../syntax/Counterexample";
 
 

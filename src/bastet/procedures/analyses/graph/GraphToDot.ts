@@ -27,11 +27,10 @@ import {StateSet} from "../../algorithms/StateSet";
 import {GraphAbstractState} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {TransitionLabelProvider, TraversalOrderOperator} from "../ProgramAnalysis";
-import {PaperLabelVisitor, PenSizeVisitor, StateColorVisitor, StateLabelVisitor} from "../StateVisitors";
+import {PaperLabelVisitor, PenSizeVisitor, StateColorVisitor} from "../StateVisitors";
 import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 import {App} from "../../../syntax/app/App";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 
 export class GraphToDot  {
 

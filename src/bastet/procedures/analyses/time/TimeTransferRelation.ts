@@ -31,10 +31,7 @@ import {ProgramOperation, ProgramOperationFactory} from "../../../syntax/app/con
 import {Concern, Concerns} from "../../../syntax/Concern";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ProgramTimeProfile} from "../../../utils/TimeProfile";
-import {
-    DeclareStackVariableStatement,
-    DeclareSystemVariableStatement
-} from "../../../syntax/ast/core/statements/DeclarationStatement";
+import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements/DeclarationStatement";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {Statement} from "../../../syntax/ast/core/statements/Statement";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";

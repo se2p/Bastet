@@ -29,7 +29,7 @@ import {App} from "../../../syntax/app/App";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ConcreteElement} from "../../domains/ConcreteElements";
-import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferRelation";
+import {LabeledTransferRelation} from "../TransferRelation";
 import {SSAAbstractDomain, SSAState} from "./SSAAbstractDomain";
 import {SSATransferRelation} from "./SSATransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
@@ -44,8 +44,6 @@ import {SSAMergeOperator} from "./SSAMergeOperator";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {AccessibilityRelation} from "../Accessibility";
-import {ControlAbstractState} from "../control/ControlAbstractDomain";
-import {TimeState} from "../time/TimeAbstractDomain";
 
 
 export class SSAAnalysisConfig extends BastetConfiguration {

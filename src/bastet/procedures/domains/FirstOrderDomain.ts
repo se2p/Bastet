@@ -28,8 +28,8 @@ import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {
     ConcreteBoolean,
     ConcreteDomain,
-    ConcreteElement,
-    ConcreteList, ConcreteMemory,
+    ConcreteList,
+    ConcreteMemory,
     ConcreteNumber,
     ConcreteString
 } from "./ConcreteElements";
@@ -40,9 +40,7 @@ import {Preconditions} from "../../utils/Preconditions";
 import {Z3Model, Z3Vector} from "../../utils/smt/z3/Z3SMT";
 import {BooleanTheory} from "./MemoryTransformer";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {Logger} from "../../utils/Logger";
 import {PerfTimer} from "../../utils/PerfTimer";
-import {Z3FirstOrderFormula} from "../../utils/smt/z3/Z3Theories";
 
 export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
     prover: FirstOrderSolver<F>;

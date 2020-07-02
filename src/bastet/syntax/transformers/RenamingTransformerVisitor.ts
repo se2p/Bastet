@@ -88,7 +88,7 @@ import {
 import {
     DeleteThisCloneStatement,
     StopAllStatement,
-    StopThisStatement, TerminationStatement
+    StopThisStatement
 } from "../ast/core/statements/TerminationStatement";
 import {StopOthersInActorStatement} from "../ast/core/statements/StopOthersInActorStatement";
 import {ResetTimerStatement} from "../ast/core/statements/ResetTimerStatement";

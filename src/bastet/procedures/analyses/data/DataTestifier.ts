@@ -23,23 +23,24 @@
  *
  */
 
-import {TestificationOperator, TransitionLabelProvider} from "../ProgramAnalysis";
+import {TestificationOperator} from "../ProgramAnalysis";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
 import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {BooleanFormula, FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
+import {BooleanFormula} from "../../../utils/ConjunctiveNormalForm";
 import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
-import {BooleanExpression} from "../../../syntax/ast/core/expressions/BooleanExpression";
-import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable";
+import {Set as ImmSet} from "immutable";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AbstractStates, DelegatingStateVisitor} from "../AbstractStates";
 import {
     AbstractBoolean,
     AbstractFloat,
-    AbstractInteger, AbstractList,
-    AbstractReal, AbstractString,
+    AbstractInteger,
+    AbstractList,
+    AbstractReal,
+    AbstractString,
     TransformerTheories
 } from "../../domains/MemoryTransformer";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
@@ -323,6 +324,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
             const branchName = this.createBranchName(s1, s2);
             const assignement = satAssignement.booleanMem.get(branchName);
             if (assignement !== undefined) {
+                console.log(branchName, assignement.value);
                 if (assignement.value) {
                     return true;
                 } else {

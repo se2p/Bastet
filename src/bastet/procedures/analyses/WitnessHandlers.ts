@@ -25,7 +25,7 @@
 
 
 import {AbstractState} from "../../lattices/Lattice";
-import {FrontierSet, ReachedSet} from "../algorithms/StateSet";
+import {ReachedSet} from "../algorithms/StateSet";
 
 export interface WitnessHandler<E extends AbstractState> {
 

@@ -67,7 +67,6 @@ import {LexiKey} from "../../../utils/Lexicographic";
 import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {PathExporter} from "./witnesses/PathExporter";
-import {LabelState} from "../label/LabelAbstractDomain";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 

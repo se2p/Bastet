@@ -31,7 +31,6 @@ import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperatio
 import {Refiner} from "./Refiner";
 import {Property} from "../../syntax/Property";
 import {FrontierSet, ReachedSet, StateOrderComparator, StatePartitionOperator} from "../algorithms/StateSet";
-import {Concern} from "../../syntax/Concern";
 import {LabeledTransferRelation} from "./TransferRelation";
 import {WitnessHandler} from "./WitnessHandlers";
 import {LexiKey} from "../../utils/Lexicographic";

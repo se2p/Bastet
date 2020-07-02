@@ -68,7 +68,7 @@ import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgument
 import {List as ImmList, Set as ImmSet} from "immutable";
 import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
 import {LexiKey} from "../../../utils/Lexicographic";
-import { AccessibilityRelation } from "../Accessibility";
+import {AccessibilityRelation} from "../Accessibility";
 import {DataTestifier} from "./DataTestifier";
 import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";

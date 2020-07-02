@@ -27,8 +27,7 @@ import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {AbstractString} from "./MemoryTransformer";
 import {Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import { ConcreteBoolean, ConcreteDomain, ConcreteString } from './ConcreteElements'
-import { FlatBooleanValue } from './FlatBooleanValueDomain'
+import {ConcreteDomain, ConcreteString} from './ConcreteElements'
 
 export class FlatStringValueDomain implements AbstractDomain<ConcreteString, AbstractString> {
 

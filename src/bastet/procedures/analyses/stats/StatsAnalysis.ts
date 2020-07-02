@@ -35,7 +35,6 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper} from "../Refiner";
 import {Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AccessibilityRelation} from "../Accessibility";
 
 

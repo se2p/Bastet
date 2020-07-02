@@ -28,7 +28,7 @@ import {LabeledTransferRelation} from "../TransferRelation";
 import {LabeledTransfer, LabelState} from "./LabelAbstractDomain";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
-import {List as ImmList, Record as ImmRec} from "immutable";
+import {List as ImmList} from "immutable";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 

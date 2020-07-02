@@ -23,15 +23,14 @@
  *
  */
 
-import {
-    ProgramAnalysisWithLabels,
-    WrappingProgramAnalysis
-} from "../ProgramAnalysis";
+import {ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
 import {
     ControlAbstractDomain,
     ControlAbstractState,
-    ControlConcreteState, IndexedThread,
-    MethodCall, RelationLocation,
+    ControlConcreteState,
+    IndexedThread,
+    MethodCall,
+    RelationLocation,
     ScheduleAbstractStateFactory
 } from "./ControlAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
@@ -43,14 +42,7 @@ import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOpera
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Property} from "../../../syntax/Property";
-import {
-    CHOOSE_EITHER,
-    CHOOSE_FIRST,
-    CHOOSE_SECOND,
-    FrontierSet,
-    PartitionKey,
-    ReachedSet
-} from "../../algorithms/StateSet";
+import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {List as ImmList, Set as ImmSet} from "immutable";
@@ -63,11 +55,10 @@ import {ControlCoverageExaminer} from "./coverage/ControlCoverage";
 import {ControlLocationExtractor} from "./ControlUtils";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {ReturnStatement} from "../../../syntax/ast/core/statements/ControlStatement";
-import { AccessibilityRelation } from "../Accessibility";
+import {AccessibilityRelation} from "../Accessibility";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 import {Concern} from "../../../syntax/Concern";
-import {GraphAbstractState} from "../graph/GraphAbstractDomain";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 

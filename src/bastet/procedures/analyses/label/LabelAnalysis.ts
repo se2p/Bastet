@@ -25,7 +25,8 @@
 
 import {
     ProgramAnalysis,
-    ProgramAnalysisWithLabels, TransitionLabelProvider,
+    ProgramAnalysisWithLabels,
+    TransitionLabelProvider,
     WrappingProgramAnalysis
 } from "../ProgramAnalysis";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
@@ -37,18 +38,16 @@ import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
-import {LabeledTransferRelation, LabeledTransferRelationImpl} from "../TransferRelation";
+import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {Map as ImmMap, List as ImmList, Set as ImmSet} from "immutable";
+import {List as ImmList, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {AccessibilityRelation} from "../Accessibility";
 import {LabelAbstractDomain, LabelState} from "./LabelAbstractDomain";
 import {LabelTransferRelation} from "./LabelTransferRelation";
 import {MergeJoinOperator} from "../Operators";
-import {GraphAbstractState} from "../graph/GraphAbstractDomain";
-import {SSAState} from "../ssa/SSAAbstractDomain";
 
 let bigStepNumber: number = 0; // FIXME: THIS IS A HACK
 

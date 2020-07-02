@@ -36,7 +36,6 @@ import {CorePrintVisitor} from "../../syntax/ast/CorePrintVisitor";
 import {TimeState} from "./time/TimeAbstractDomain";
 import {ControlLocationExtractor} from "./control/ControlUtils";
 import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
-import {Map as ImmMap} from "immutable";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 export class PaperLabelVisitor extends DelegatingStateVisitor<string> {

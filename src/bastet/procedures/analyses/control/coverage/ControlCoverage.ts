@@ -25,10 +25,10 @@
 
 
 import {ReachedSet} from "../../../algorithms/StateSet";
-import {AbstractElement, AbstractElementVisitor, AbstractState} from "../../../../lattices/Lattice";
+import {AbstractState} from "../../../../lattices/Lattice";
 import {App} from "../../../../syntax/app/App";
-import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
-import {ControlAbstractState, IndexedThread, RelationLocation} from "../ControlAbstractDomain";
+import {Map as ImmMap, Set as ImmSet} from "immutable";
+import {RelationLocation} from "../ControlAbstractDomain";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {TransitionRelation} from "../../../../syntax/app/controlflow/TransitionRelation";
 import {ActorId} from "../../../../syntax/app/Actor";

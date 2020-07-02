@@ -94,7 +94,7 @@ import {Script, ScriptId} from "../../../syntax/app/controlflow/Script";
 import {getTheNextElement, getTheOnlyElement} from "../../../utils/Collections";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {BOOTSTRAP_FINISHED_MESSAGE, SystemMessage} from "../../../syntax/ast/core/Message";
-import {ActorType, BooleanType, IntegerType} from "../../../syntax/ast/core/ScratchType";
+import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {
     LocateActorExpression,
     StartCloneActorExpression,
@@ -124,7 +124,7 @@ import {
 import {freshId} from "../../../utils/Seq";
 import {RelationBuildingVisitor} from "../../../syntax/app/controlflow/RelationBuildingVisitor";
 import {AnalysisStatistics} from "../AnalysisStatistics";
-import {incBigStep, LabelAnalysis} from "../label/LabelAnalysis";
+import {incBigStep} from "../label/LabelAnalysis";
 
 /**
  * Mimics the green-threading of the Scratch VM.

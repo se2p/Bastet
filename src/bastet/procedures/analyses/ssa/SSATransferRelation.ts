@@ -32,7 +32,6 @@ import {IllegalStateException} from "../../../core/exceptions/IllegalStateExcept
 import {SSAssigner, SSATransformerVisitor} from "./SSATransformerVisitor";
 import {BooleanExpression} from "../../../syntax/ast/core/expressions/BooleanExpression";
 import {Concern} from "../../../syntax/Concern";
-import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 
 export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
 

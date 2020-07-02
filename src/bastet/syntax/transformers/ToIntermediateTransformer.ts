@@ -215,9 +215,9 @@ import {Statement, StatementList, StatementLists} from "../ast/core/statements/S
 import {
     ExternMethodDeclaration,
     MethodDefinition,
-    MethodDefinitionList, MethodDefinitions,
+    MethodDefinitionList,
+    MethodDefinitions,
     MethodSignature,
-    MethodSignatureList,
     ResultDeclaration
 } from "../ast/core/MethodDefinition";
 import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
@@ -256,8 +256,7 @@ import {IllegalStateException} from "../../core/exceptions/IllegalStateException
 import {
     IfStatement,
     RepeatForeverStatement,
-    UntilQueriedConditionStatement,
-    UntilStatement
+    UntilQueriedConditionStatement
 } from "../ast/core/statements/ControlStatement";
 import {
     BooleanExpression,

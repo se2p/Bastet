@@ -27,7 +27,6 @@
 import {Refiner} from "../Refiner";
 import {DataAbstractState} from "./DataAbstractDomain";
 import {Lattices, LatticeWithComplements} from "../../../lattices/Lattice";
-import {PerfTimer} from "../../../utils/PerfTimer";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {FrontierSet, ReachedSet} from "../../algorithms/StateSet";
 
