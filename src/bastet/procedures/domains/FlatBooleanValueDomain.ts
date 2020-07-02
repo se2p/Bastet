@@ -25,9 +25,9 @@
 
 
 import {AbstractionPrecision} from "./AbstractDomain";
-import {AbstractBoolean, AbstractBooleanDomain, BooleanTheory} from "./MemoryTransformer";
+import { AbstractBoolean, AbstractBooleanDomain, AbstractNumber, BooleanTheory } from './MemoryTransformer'
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
-import {ConcreteBoolean, ConcreteDomain} from "./ConcreteElements";
+import { ConcreteBoolean, ConcreteDomain, ConcreteNumber } from './ConcreteElements'
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Record as ImmRec} from "immutable";
 import {Variable} from "../../syntax/ast/core/Variable";

@@ -28,7 +28,7 @@ import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from ".
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Map as ImmMap, Record as ImmRec} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
-import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
+import {ConcreteDomain, ConcreteElement, ConcreteMemory, ConcretePrimitive} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
 
 
@@ -86,6 +86,25 @@ export class SSAState extends SSAStateRecord implements SSAStateAttribs, Abstrac
         const newIndex = this.getIndex(assignementTo) + 1;
         const result = this.withIndex(assignementTo, newIndex);
         return [result, newIndex];
+    }
+
+    public getPrimitiveAttributes(memory: ConcreteMemory): ImmMap<string, ConcretePrimitive<any>> {
+        const attributes = new Map<string, ConcretePrimitive<any>>();
+
+        this.ssa.forEach((ssaIndex, attributeName) => {
+            const attributeWithIndex = `${attributeName}@${ssaIndex}`;
+
+            const attribute = memory.getPrimitiveAttributeByName(attributeWithIndex);
+
+            if (!attribute) {
+                // TODO why are attributes in SSAMap but not in memory?
+                // console.log(`${attributeWithIndex} was undefined`);
+            } else {
+                attributes.set(attributeName, attribute);
+            }
+        })
+
+        return ImmMap<string, ConcretePrimitive<any>>(attributes);
     }
 
     public accept<R>(visitor: AbstractElementVisitor<R>): R {

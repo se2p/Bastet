@@ -26,7 +26,7 @@
 import {
     DataLocationMode,
     DataLocationRenamer,
-    RenamingTransformerVisitor
+    RenamingTransformerVisitor,
 } from "../../../syntax/transformers/RenamingTransformerVisitor";
 import {List as ImmList, Map as ImmMap} from "immutable";
 import {DataLocation, TypedDataLocation, VAR_SCOPING_SPLITTER} from "../../../syntax/app/controlflow/DataLocation";
@@ -41,7 +41,6 @@ import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpressio
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {ActorExpression} from "../../../syntax/ast/core/expressions/ActorExpression";
 import {ActorId} from "../../../syntax/app/Actor";
-import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {TypeInformationStorage} from "../../../syntax/DeclarationScopes";
 import {ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
@@ -118,6 +117,32 @@ export class DataLocationScoper implements DataLocationRenamer {
         }
     }
 
+    public static leftUnwrapScope(name: string): {prefix: string, suffix: string} {
+        const scopeSeparatorIndex = name.indexOf(SCOPE_SEPARATOR);
+
+        if (scopeSeparatorIndex > -1) {
+            return this.splitAtSeparator(name, scopeSeparatorIndex);
+        } else {
+            return {prefix: name, suffix: undefined};
+        }
+    }
+
+    public static rightUnwrapScope(name: string): {prefix: string, suffix: string} {
+        const scopeSeparatorIndex = name.lastIndexOf(SCOPE_SEPARATOR);
+
+        if (scopeSeparatorIndex > -1) {
+            return this.splitAtSeparator(name, scopeSeparatorIndex);
+        } else {
+            return {prefix: undefined, suffix: name};
+        }
+    }
+
+    private static splitAtSeparator(name: string, separatorIndex: number): {prefix: string, suffix: string} {
+        return {
+            prefix: name.substring(0, separatorIndex),
+            suffix: name.substring(separatorIndex + SCOPE_SEPARATOR.length)
+        };
+    }
 }
 
 export class ScopeTransformerVisitor extends RenamingTransformerVisitor {

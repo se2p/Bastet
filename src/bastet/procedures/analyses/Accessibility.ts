@@ -25,13 +25,12 @@
 
 import {AbstractElement, AbstractState} from "../../lattices/Lattice";
 import {ConcreteElement} from "../domains/ConcreteElements";
-import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {TransitionLabelProvider} from "./ProgramAnalysis";
 import {Concretizer} from "../domains/AbstractDomain";
-import {Record as ImmRec, Set as ImmSet, Map as ImmMap} from "immutable"
+import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {Preconditions} from "../../utils/Preconditions";
 import {DirectedGraph, DirectedGraphs} from "../../utils/DirectedGraph";
+import {getTheOnlyElement} from "../../utils/Collections";
 
 
 /**
@@ -264,4 +263,16 @@ export class AccessibilityRelations {
         return builder.build();
     }
 
+    public static mapToArray<F extends AbstractState>(ar: AccessibilityRelation<F, F>): F[] {
+        const array: F[] = [];
+        let state: F = getTheOnlyElement(ar.initial());
+
+        while (state != undefined) {
+            array.push(state);
+
+            state = getTheOnlyElement(ar.successorsOf(state));
+        }
+
+        return array;
+    }
 }

@@ -27,15 +27,11 @@
 import {DefaultAnalysisStateSet, FrontierSet, ReachedSet, StatePartitionOperator} from "../../algorithms/StateSet";
 import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {GraphPath, GraphPathSet} from "./GraphPath";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import {Set as ImmSet} from "immutable";
 import {AccessibilityRelation} from "../Accessibility";
 import {TransitionLabelProvider, UnavailableTransitionLabelProvider} from "../ProgramAnalysis";
 import {Concretizer, UnavailableConcretizer} from "../../domains/AbstractDomain";
-import { ConcreteElement } from "../../domains/ConcreteElements";
-import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
+import {ConcreteElement} from "../../domains/ConcreteElements";
 
 export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState>
     implements ReachedSet<GraphAbstractState>, AccessibilityRelation<E, E> {
@@ -178,10 +174,6 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
             const childs: GraphStateId[] = this._children.get(e.getId()) || [];
             childs.map((id) => this._idToStateMap.get(id)).forEach((e) => this.removeState(e, false));
         }
-    }
-
-    public chooseRandomPathTo(element: E): GraphPath {
-        throw new ImplementMeException();
     }
 
     initial(): Iterable<E> {
