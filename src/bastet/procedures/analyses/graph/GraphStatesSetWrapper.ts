@@ -27,15 +27,11 @@
 import {DefaultAnalysisStateSet, FrontierSet, ReachedSet, StatePartitionOperator} from "../../algorithms/StateSet";
 import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {GraphPath, GraphPathSet} from "./GraphPath";
-import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
-import {Set as ImmSet, Stack as ImmStack} from "immutable";
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import {Set as ImmSet} from "immutable";
 import {AccessibilityRelation} from "../Accessibility";
 import {TransitionLabelProvider, UnavailableTransitionLabelProvider} from "../ProgramAnalysis";
 import {Concretizer, UnavailableConcretizer} from "../../domains/AbstractDomain";
-import { ConcreteElement } from "../../domains/ConcreteElements";
-import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
+import {ConcreteElement} from "../../domains/ConcreteElements";
 
 export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState>
     implements ReachedSet<GraphAbstractState>, AccessibilityRelation<E, E> {
@@ -178,39 +174,6 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
             const childs: GraphStateId[] = this._children.get(e.getId()) || [];
             childs.map((id) => this._idToStateMap.get(id)).forEach((e) => this.removeState(e, false));
         }
-    }
-
-    public chooseRandomPathTo(element: E): GraphPath {
-        Preconditions.checkNotUndefined(element);
-        const pathToElement: ImmStack<E> = ImmStack().asMutable();
-        let currentNode = element;
-
-        // In every iteration the currentNode is updated to its predecessor until root is reached.
-        // Its assumed that every node has at most one predecessor.
-        while (currentNode) {
-            pathToElement.push(currentNode);
-
-            const predecessorSet: ImmSet<number> = currentNode.getPredecessors();
-
-            if (predecessorSet.size == 0) {
-                // Root reached
-                currentNode = undefined;
-            } else if (predecessorSet.size > 1) {
-                throw new ImplementMeForException("graph with multiple predecessors");
-            } else {
-                const parentId = predecessorSet.toArray().pop();
-                if (pathToElement.some(node => node.getId() === parentId)) {
-                    throw new ImplementMeForException("cyclic graph");
-                }
-
-                currentNode = this._idToStateMap.get(parentId);
-                if (currentNode === undefined) {
-                    throw new IllegalStateException();
-                }
-            }
-        }
-
-        return new GraphPath(pathToElement);
     }
 
     initial(): Iterable<E> {
