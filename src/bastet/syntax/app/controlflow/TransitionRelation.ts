@@ -993,6 +993,32 @@ export class TransitionRelations {
         return builder.build();
     }
 
+    /**
+     * Ensure that a control location is either a merge location or
+     * a branching location but not both. Add an epsilon transition to fix such scenarios.
+     *
+     * @param tr
+     */
+    public static introduceEpsilonBetweenMergeAndBranchLocs(tr: TransitionRelation): TransitionRelation {
+        const builder = TransitionRelation.builder();
+        builder.addRelation(tr);
+
+        for (const loc of tr.locationSet) {
+            const transTo = tr.transitionsTo(loc);
+            const transFrom = tr.transitionsFrom(loc);
+            if (transTo.length > 1 && transFrom.length > 1) {
+                const intermediateLoc = ControlLocation.fresh();
+                for (const trans of transFrom) {
+                    builder.removeTransition(loc, trans.target, trans.opId);
+                    builder.addTransitionByIDs(loc, intermediateLoc.ident, ProgramOperations.irreducibleEpsilon());
+                    builder.addTransitionByIDs(intermediateLoc.ident, trans.target, ProgramOperation.for(trans.opId));
+                }
+            }
+        }
+
+        return builder.build();
+    }
+
     private static buildEquivalenceClasses(tr: TransitionRelation): Map<LocationId, LocationEquivalence> {
         const result: Map<LocationId, LocationEquivalence> = new Map();
 
@@ -1064,8 +1090,9 @@ export class TransitionRelations {
     }
 
     static establishAnalysisInvariants(tr: TransitionRelation): TransitionRelation {
-        return TransitionRelations.introduceEpsilonToMergeTransitions(
-            TransitionRelations.eliminateEpsilons(tr));
+        return TransitionRelations.introduceEpsilonBetweenMergeAndBranchLocs(
+                TransitionRelations.introduceEpsilonToMergeTransitions(
+                    TransitionRelations.eliminateEpsilons(tr)));
     }
 
     static eliminateEpsilons(tr: TransitionRelation): TransitionRelation {
