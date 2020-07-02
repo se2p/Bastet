@@ -30,7 +30,8 @@ import {CoreCtrlStatementnVisitor, CoreVisitor} from "../../ast/CoreVisitor";
 import {CallStatement} from "../../ast/core/statements/CallStatement";
 import {
     IfStatement,
-    RepeatForeverStatement, ReturnStatement,
+    RepeatForeverStatement,
+    ReturnStatement,
     UntilQueriedConditionStatement,
     UntilStatement
 } from "../../ast/core/statements/ControlStatement";

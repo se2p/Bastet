@@ -24,7 +24,6 @@
  */
 
 import {Actor, ActorMap, Actors} from "./Actor";
-import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable";
 import {App} from "./App";
 import {AppResource, AppResourceMap} from "./AppResource";
 import {Script} from "./controlflow/Script";

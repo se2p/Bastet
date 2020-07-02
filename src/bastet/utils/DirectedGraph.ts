@@ -23,8 +23,6 @@
  *
  */
 
-import {AccessibilityRelation} from "../procedures/analyses/Accessibility";
-
 export interface DirectedGraph<V> {
 
     initial(): Iterable<V>;

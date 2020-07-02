@@ -23,7 +23,7 @@
  *
  */
 
-import {AbstractNode, AstNode} from "../AstNode";
+import {AbstractNode} from "../AstNode";
 import {AstNodeList} from "../AstNodeList";
 import {Identifier} from "./Identifier";
 import {ParameterDeclarationList} from "./ParameterDeclaration";

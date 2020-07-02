@@ -29,7 +29,6 @@ import {AbstractExpression} from "./expressions/AbstractExpression";
 import {DataLocation} from "../../app/controlflow/DataLocation";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AbstractNode} from "../AstNode";
-import {ActorExpression} from "./expressions/ActorExpression";
 
 export interface Variable {
 

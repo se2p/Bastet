@@ -25,7 +25,7 @@
 
 import {BailErrorStrategy, CharStreams, CommonTokenStream, TokenStream} from 'antlr4ts';
 import {LeilaLexer} from "./grammar/LeilaLexer";
-import {ProgramContext, LeilaParser} from "./grammar/LeilaParser";
+import {LeilaParser, ProgramContext} from "./grammar/LeilaParser";
 import fs from "fs";
 import path from "path";
 import {ProgramParser} from "./ProgramParser";

@@ -39,7 +39,6 @@ import * as fs from "fs";
 import {ResourceDefinition} from "../ast/core/ResourceDefinition";
 import * as path from "path";
 import {IntegerLiteral} from "../ast/core/expressions/NumberExpression";
-import {DeclareStackVariableStatement} from "../ast/core/statements/DeclarationStatement";
 import {imageSize} from "image-size";
 import {ScopeTypeInformation} from "../DeclarationScopes";
 

@@ -24,8 +24,8 @@
  */
 
 
-import {AbstractElement, AbstractState} from "../lattices/Lattice";
-import {Record as ImmRec, Set as ImmSet, List as ImmList} from "immutable";
+import {AbstractElement} from "../lattices/Lattice";
+import {List as ImmList, Record as ImmRec} from "immutable";
 import {ImplementMeForException} from "../core/exceptions/ImplementMeException";
 
 export type LexiKeyElement = LexiKey | number | string ;

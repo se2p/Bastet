@@ -23,15 +23,17 @@
 import {
     LibZ3InContext,
     LibZ3NonContext,
-    Z3_ast, Z3_ast_vector,
+    Z3_ast,
+    Z3_ast_vector,
     Z3_func_decl,
     Z3_model,
-    Z3_solver, Z3_sort,
+    Z3_solver,
+    Z3_sort,
     Z3_symbol,
 } from './libz3';
 import {Preconditions} from "../../Preconditions";
 import {WasmJSInstance} from "./WasmInstance";
-import {Z3BooleanFormula, Z3FirstOrderFormula, Z3FirstOrderLattice, Z3Formula, Z3Theories} from "./Z3Theories";
+import {Z3BooleanFormula, Z3FirstOrderFormula, Z3FirstOrderLattice, Z3Theories} from "./Z3Theories";
 import {FirstOrderSolver} from "../../../procedures/domains/FirstOrderDomain";
 import {Sint32, Uint32} from "./ctypes";
 import {BooleanTheory} from "../../../procedures/domains/MemoryTransformer";

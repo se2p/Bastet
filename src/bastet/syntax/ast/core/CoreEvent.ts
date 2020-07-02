@@ -28,7 +28,6 @@ import {StringExpression} from "./expressions/StringExpression";
 import {BooleanExpression} from "./expressions/BooleanExpression";
 import {StatementList} from "./statements/Statement";
 import {BOOTSTRAP_FINISHED_MESSAGE, BOOTSTRAP_MESSAGE, GREENFLAG_MESSAGE, SYSTEM_NAMESPACE} from "./Message";
-import {ExpressionList} from "./expressions/ExpressionList";
 import {ParameterDeclarationList} from "./ParameterDeclaration";
 
 export abstract class CoreEvent extends AbstractNode {

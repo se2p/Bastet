@@ -40,7 +40,8 @@ import {
     NeverEvent,
     RenderedMonitoringEvent,
     SingularityEvent,
-    StartupEvent, TerminationEvent
+    StartupEvent,
+    TerminationEvent
 } from "./core/CoreEvent";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {
@@ -117,12 +118,7 @@ import {
     DeclareStackVariableStatement,
     DeclareSystemVariableStatement
 } from "./core/statements/DeclarationStatement";
-import {
-    DeleteThisCloneStatement,
-    StopAllStatement,
-    StopThisStatement,
-    TerminationStatement
-} from "./core/statements/TerminationStatement";
+import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
 import {EpsilonStatement} from "./core/statements/EpsilonStatement";
 import {ExpressionStatement} from "./core/statements/ExpressionStatement";
 import {ResetTimerStatement} from "./core/statements/ResetTimerStatement";

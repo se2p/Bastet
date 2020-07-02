@@ -39,7 +39,8 @@ import {
     BootstrapEvent,
     NeverEvent,
     RenderedMonitoringEvent,
-    SingularityEvent, TerminationEvent
+    SingularityEvent,
+    TerminationEvent
 } from "../ast/core/CoreEvent";
 import {TransitionRelation, TransitionRelations, TransRelId} from "./controlflow/TransitionRelation";
 import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";

@@ -23,9 +23,8 @@
  *
  */
 
-import {AbstractNode, OptionalAstNode} from "../AstNode";
+import {AbstractNode} from "../AstNode";
 import {extractStringLiteral, StringExpression, StringLiteral} from "./expressions/StringExpression";
-import {Expression} from "./expressions/Expression";
 import {ExpressionList} from "./expressions/ExpressionList";
 
 export interface Message {

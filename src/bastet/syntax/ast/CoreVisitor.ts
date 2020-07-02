@@ -69,7 +69,9 @@ import {
     BeginAtomicStatement,
     EndAtomicStatement,
     IfStatement,
-    RepeatForeverStatement, ReturnStatement, UntilQueriedConditionStatement,
+    RepeatForeverStatement,
+    ReturnStatement,
+    UntilQueriedConditionStatement,
     UntilStatement
 } from "./core/statements/ControlStatement";
 import {CallStatement} from "./core/statements/CallStatement";
@@ -94,12 +96,7 @@ import {
     ReplaceElementAtStatement
 } from "./core/statements/ListStatement";
 import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
-import {
-    DeleteThisCloneStatement,
-    StopAllStatement,
-    StopThisStatement,
-    TerminationStatement
-} from "./core/statements/TerminationStatement";
+import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
 import {AssumeStatement} from "./core/statements/AssumeStatement";
 import {VariableWithDataLocation} from "./core/Variable";
@@ -120,7 +117,8 @@ import {
     NeverEvent,
     RenderedMonitoringEvent,
     SingularityEvent,
-    StartupEvent, TerminationEvent
+    StartupEvent,
+    TerminationEvent
 } from "./core/CoreEvent";
 import {ActorType, BooleanType, FloatType, IntegerType, ListType, ScratchType, StringType} from "./core/ScratchType";
 import {SystemMessage} from "./core/Message";
