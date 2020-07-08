@@ -129,6 +129,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         const mouseXReadEventVisitor = new AttributeReadEventVisitor("mouseX");
         const mouseYReadEventVisitor = new AttributeReadEventVisitor("mouseY");
         const keyPressedReadEventVisitor = new AttributeReadEventVisitor("keyPressed");
+        const answerEventVisitor = new AttributeReadEventVisitor("answer");
         const ssaStateVisitor = new SSAStateVisitor();
 
         for (const currentState of path) {
@@ -168,6 +169,13 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                     step.keyPressed = keyPressed;
                 }
 
+                const answer = this.getAnswer(step, transitionLabel, answerEventVisitor);
+                if (answer !== undefined) {
+                    Preconditions.checkState(step.action === undefined, `Action already set to ${step.action}`);
+                    step.action = Action.ANSWER;
+                    step.answer = answer;
+                }
+
                 if (!step.action) {
                     step.action = this.getDefaultAction(transitionLabel);
                 }
@@ -190,6 +198,18 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                     return cur;
                 }
             }).action;
+    }
+
+    private getAnswer(step: ErrorWitnessStep, transitionLabel: ProgramOperation[], answerReadEventVisitor: AttributeReadEventVisitor): string {
+        const answerEvent = transitionLabel
+            .map(o => o.ast.accept(answerReadEventVisitor))
+            .reduce((prev, cur) => prev.combine(cur));
+
+        if (answerEvent && answerEvent.readFrom) {
+            return step.getUserDefinedAttributeValue(step.actionTargetName, WitnessExporter.removeSSAIndex(answerEvent.readFrom));
+        } else {
+            return undefined;
+        }
     }
 
     private getKeyPressed(step: ErrorWitnessStep, transitionLabel: ProgramOperation[], keyPressedReadEventVisitor: AttributeReadEventVisitor): number {
@@ -251,7 +271,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                     } else {
                         step.actionLabel = `${previousAction.actionLabel}; ${step.actionLabel}`;
                     }
-                } else if (step.action === Action.KEY_PRESSED) {
+                } else if (step.action === Action.KEY_PRESSED || step.action === Action.ANSWER) {
                     filteredArray.push(previousAction);
                 } else if (step.timestamp - previousAction.timestamp > 1000) {
                     if (previousAction.action !== Action.WAIT) {
@@ -264,6 +284,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                 } else {
                     step.action = previousAction.action;
                     step.keyPressed = previousAction.keyPressed;
+                    step.answer = previousAction.answer;
                     step.mousePosition = previousAction.mousePosition;
                     step.actionLabel = `${previousAction.actionLabel}; ${step.actionLabel}`;
                 }

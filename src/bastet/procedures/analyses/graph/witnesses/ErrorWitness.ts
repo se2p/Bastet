@@ -97,7 +97,8 @@ export class ErrorWitnessStep {
     timestamp: number;
     action: Action;
     waitMicros?: number;
-    keyPressed?: number
+    keyPressed?: number;
+    answer?: string;
     actionLabel: string;
     actionTargetName: string;
     mousePosition: MousePosition;
