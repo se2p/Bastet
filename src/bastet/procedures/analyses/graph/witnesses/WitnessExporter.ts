@@ -51,7 +51,8 @@ export interface WitnessExporterConfig {
     export: 'ALL' | 'ONLY_ACTIONS';
     collapseAtomicBlocks: boolean;
     removeAttributeStartingWith: string[];
-    removeActorPrefixFromAttributes: boolean
+    removeActorPrefixFromAttributes: boolean;
+    removeActors: string[];
 }
 
 export const DEFAULT_WITNESS_EXPORTER_CONFIG: WitnessExporterConfig = {
@@ -59,7 +60,8 @@ export const DEFAULT_WITNESS_EXPORTER_CONFIG: WitnessExporterConfig = {
     collapseAtomicBlocks: true,
     removeAttributeStartingWith: ['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE',
         'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT', '__tmp'],
-    removeActorPrefixFromAttributes: true
+    removeActorPrefixFromAttributes: true,
+    removeActors: ['IOActor']
 }
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
@@ -100,6 +102,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         }
 
         errorWitness.steps.forEach(step => {
+            step.targets = step.targets.filter(target => !this._config.removeActors.includes(target.name));
+
             step.targets.forEach(target => {
                 if (this._config.removeActorPrefixFromAttributes) {
                     target.removeActorPrefix();
