@@ -191,8 +191,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         return this._wrappedAnalysis.target(state.wrappedState);
     }
 
-    widen(state: GraphAbstractState): GraphAbstractState {
-        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState());
+    widen(state: GraphAbstractState, reached: Iterable<GraphAbstractState>): GraphAbstractState {
+        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {
             return state.withWrappedState(wrappedResult);
         } else {
@@ -256,6 +256,10 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     stopPartitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {
+        return reached.getStateSet(ofState);
+    }
+
+    widenPartitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {
         return reached.getStateSet(ofState);
     }
 

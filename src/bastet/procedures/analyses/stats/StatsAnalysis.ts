@@ -117,9 +117,9 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         });
     }
 
-    widen(state: E): E {
+    widen(state: E, reached: Iterable<F>): E {
         return this._widenStats.runWithTimer(() => {
-            return this._wrappedAnalysis.widen(state);
+            return this._wrappedAnalysis.widen(state, reached);
         });
     }
 
@@ -177,6 +177,10 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
 
     unwrap(e: E): E {
         return e;
+    }
+
+    widenPartitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F> {
+        return this.wrappedAnalysis.widenPartitionOf(ofState, reached);
     }
 
     stopPartitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F> {

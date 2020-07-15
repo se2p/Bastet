@@ -227,7 +227,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return [];
     }
 
-    widen(state: DataAbstractState): DataAbstractState {
+    widen(state: DataAbstractState, reached: Iterable<AbstractState>): DataAbstractState {
         return state;
     }
 
@@ -259,6 +259,10 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     partitionOf(ofState: DataAbstractState, reached: StateSet<AbstractState>): Iterable<AbstractState> {
         return reached;
+    }
+
+    widenPartitionOf(ofState: DataAbstractState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
+        throw new ImplementMeException();
     }
 
     mergePartitionOf(ofState: DataAbstractState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {

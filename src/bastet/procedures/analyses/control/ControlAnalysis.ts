@@ -206,8 +206,8 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         return result;
     }
 
-    widen(state: ControlAbstractState): ControlAbstractState {
-        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState());
+    widen(state: ControlAbstractState, reached: Iterable<AbstractState>): ControlAbstractState {
+        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {
             return state.withWrappedState(wrappedResult);
         } else {
@@ -290,6 +290,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
     }
 
     createStateSets(): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
+        throw new ImplementMeException();
+    }
+
+    widenPartitionOf(ofState: ControlAbstractState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
         throw new ImplementMeException();
     }
 
