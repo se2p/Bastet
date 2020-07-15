@@ -836,20 +836,20 @@ role Observer is RuntimeEntity begin
         assume y_snd <= 720
         assume y_snd >= 0-720
 
-        declare width_fst as int
-        declare height_fst as int
-        define width_fst as cast attribute "active_graphic_half_width" of fst to int
-        define height_fst as cast attribute "active_graphic_half_height" of fst to int
+        declare half_width_fst as int
+        declare half_height_fst as int
+        define half_width_fst as cast attribute "active_graphic_half_width" of fst to int
+        define half_height_fst as cast attribute "active_graphic_half_height" of fst to int
 
 //        declare size_fst as float
 //        define size_fst as cast (cast attribute "size" of fst to int) to float
 //        assume size_fst > 0.0
 //        assume size_fst < 1000.0
 
-        declare width_snd as int
-        declare height_snd as int
-        define width_snd as cast attribute "active_graphic_half_width" of snd to int
-        define height_snd as cast attribute "active_graphic_half_height" of snd to int
+        declare half_width_snd as int
+        declare half_height_snd as int
+        define half_width_snd as cast attribute "active_graphic_half_width" of snd to int
+        define half_height_snd as cast attribute "active_graphic_half_height" of snd to int
 
 //        declare size_snd as float
 //        define size_snd as cast (cast attribute "size" of snd to int) to float
@@ -864,29 +864,33 @@ role Observer is RuntimeEntity begin
 
         define result as false
 
-        declare condOne as boolean
-        declare condTwo as boolean
-        declare condThree as boolean
-        declare condFour as boolean
-        declare condFive as boolean
+        declare fst_left as int
+        declare fst_right as int
+        declare snd_left as int
+        declare snd_right as int
 
-        assume width_snd <= 720
-        assume width_snd > 0
-        assume width_fst < 720
-        assume width_fst > 0
+        declare fst_top as int
+        declare fst_bottom as int
+        declare snd_top as int
+        declare snd_bottom as int
 
-        assume height_snd <= 720
-        assume height_snd > 0
-        assume height_fst <= 720
-        assume height_fst > 0
+        define fst_left as x_fst - half_width_fst
+        define fst_right as x_fst + half_width_fst
+        define snd_left as x_snd - half_width_snd
+        define snd_right as x_snd + half_width_snd
 
-        define condOne as (x_fst + width_fst > x_snd - width_snd and y_fst + height_fst > y_snd - height_snd)
-        define condTwo as (x_fst - width_fst < x_snd + width_snd and  y_fst + height_fst > y_snd - height_snd)
-        define condThree as (x_snd + width_snd > x_fst - width_fst and y_snd + height_snd > y_fst - height_fst)
-        define condFour as (x_snd - width_snd < x_fst + width_fst and  y_snd + height_snd > y_fst - height_fst)
-        define condFive as (x_fst = x_snd and y_fst = y_snd)
+        define fst_bottom as x_fst - half_height_fst
+        define fst_top as x_fst + half_height_fst
+        define snd_bottom as x_snd - half_height_snd
+        define snd_top as x_snd + half_height_snd
 
-        if (condOne or condTwo or condThree or condFour or condFive) then begin
+        declare xOverlap as boolean
+        declare yOverlap as boolean
+
+        define xOverlap as snd_right >= fst_left and snd_left <= fst_right
+        define yOverlap as snd_bottom <= fst_top and snd_top >= fst_bottom
+
+        if (xOverlap and yOverlap) then begin
             define result as true
         end
 
@@ -894,80 +898,7 @@ role Observer is RuntimeEntity begin
 
     // @Category "Specification"
     define atomic areDisjoint(fst: actor, snd: actor) begin
-        declare x_fst as int
-        define x_fst as cast attribute "x" of fst to int
-        declare y_fst as int
-        define y_fst as cast attribute "y" of fst to int
-
-        assume x_fst < 720
-        assume x_fst > 0-720
-        assume y_fst < 720
-        assume y_fst > 0-720
-
-        declare x_snd as int
-        define x_snd as cast attribute "x" of snd to int
-        declare y_snd as int
-        define y_snd as cast attribute "y" of snd to int
-
-        assume x_snd <= 720
-        assume x_snd >= 0-720
-        assume y_snd <= 720
-        assume y_snd >= 0-720
-
-        declare width_fst as int
-        declare height_fst as int
-        define width_fst as cast attribute "active_graphic_half_width" of fst to int
-        define height_fst as cast attribute "active_graphic_half_height" of fst to int
-
-//        declare size_fst as float
-//        define size_fst as cast (cast attribute "size" of fst to int) to float
-//        assume size_fst > 0.0
-//        assume size_fst < 1000.0
-
-        declare width_snd as int
-        declare height_snd as int
-        define width_snd as cast attribute "active_graphic_half_width" of snd to int
-        define height_snd as cast attribute "active_graphic_half_height" of snd to int
-
-//        declare size_snd as float
-//        define size_snd as cast (cast attribute "size" of snd to int) to float
-//        assume size_snd > 0.0
-//        assume size_snd < 16000.0
-//
-//        define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
-//        define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
-//
-//        define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
-//        define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
-
-        define result as false
-
-        declare condOne as boolean
-        declare condTwo as boolean
-        declare condThree as boolean
-        declare condFour as boolean
-        declare condFive as boolean
-
-        assume width_snd <= 720
-        assume width_snd > 0
-        assume width_fst < 720
-        assume width_fst > 0
-
-        assume height_snd <= 720
-        assume height_snd > 0
-        assume height_fst <= 720
-        assume height_fst > 0
-
-        define condOne as (x_fst + width_fst > x_snd - width_snd and y_fst + height_fst > y_snd - height_snd)
-        define condTwo as (x_fst - width_fst < x_snd + width_snd and  y_fst + height_fst > y_snd - height_snd)
-        define condThree as (x_snd + width_snd > x_fst - width_fst and y_snd + height_snd > y_fst - height_fst)
-        define condFour as (x_snd - width_snd < x_fst + width_fst and  y_snd + height_snd > y_fst - height_fst)
-        define condFive as (x_fst = x_snd and y_fst = y_snd)
-
-        if not (condOne and condTwo and condThree and condFour and condFive) then begin
-            define result as true
-        end
-
+        define result as not touchingObjects(fst, snd)
     end returns result : boolean
 
     // @Category "Specification"
@@ -1260,6 +1191,11 @@ role ScratchSprite is ScratchEntity begin
 
     // @Category "Sensing"
     define atomic touchingObject (snd: actor) begin
+            // To understand this method, it is important to be aware of the fact
+            // that the x and y coordinates of a Sprite represents its center point.
+            //
+            // This method approximates the shape of a sprite based on a rectangle.
+
             declare x_fst as int
             define x_fst as x
             declare y_fst as int
@@ -1280,144 +1216,78 @@ role ScratchSprite is ScratchEntity begin
             assume y_snd <= 720
             assume y_snd >= 0-720
 
-            declare width_fst as int
-            declare height_fst as int
-            define width_fst as active_graphic_half_width
-            define height_fst as active_graphic_half_height
+            declare half_width_fst as int
+            declare half_height_fst as int
+            define half_width_fst as active_graphic_half_width
+            define half_height_fst as active_graphic_half_height
 
 //            declare size_fst as float
 //            define size_fst as cast size to float
 //            assume size_fst > 0.0
 //            assume size_fst < 1000.0
 
-            declare width_snd as int
-            declare height_snd as int
-            define width_snd as cast attribute "active_graphic_half_width" of snd to int
-            define height_snd as cast attribute "active_graphic_half_height" of snd to int
+            declare half_width_snd as int
+            declare half_height_snd as int
+            define half_width_snd as cast attribute "active_graphic_half_width" of snd to int
+            define half_height_snd as cast attribute "active_graphic_half_height" of snd to int
 
 //            declare size_snd as float
 //            define size_snd as cast (cast attribute "size" of snd to int) to float
 //            assume size_snd > 0.0
 //            assume size_snd < 16000.0
 
-//            define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
-//            define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
+//            define half_width_fst as cast (cast half_width_fst to float * (size_fst / 100.0)) to int
+//            define half_height_fst as cast (cast half_height_fst to float * (size_fst / 100.0)) to int
 //
-//            define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
-//            define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
+//            define half_width_snd as cast (cast half_width_snd to float * (size_fst / 100.0)) to int
+//            define half_height_snd as cast (cast half_height_snd to float * (size_fst / 100.0)) to int
 
             define result as false
 
-            declare condOne as boolean
-            declare condTwo as boolean
-            declare condThree as boolean
-            declare condFour as boolean
-            declare condFive as boolean
+            assume half_width_snd <= 720
+            assume half_width_snd > 0
+            assume half_width_fst < 720
+            assume half_width_fst > 0
 
-            assume width_snd <= 720
-            assume width_snd > 0
-            assume width_fst < 720
-            assume width_fst > 0
+            assume half_height_snd <= 720
+            assume half_height_snd > 0
+            assume half_height_fst <= 720
+            assume half_height_fst > 0
 
-            assume height_snd <= 720
-            assume height_snd > 0
-            assume height_fst <= 720
-            assume height_fst > 0
+            declare fst_left as int
+            declare fst_right as int
+            declare snd_left as int
+            declare snd_right as int
 
-            declare a as boolean
-            declare b as boolean
+            declare fst_top as int
+            declare fst_bottom as int
+            declare snd_top as int
+            declare snd_bottom as int
 
+            define fst_left as x_fst - half_width_fst
+            define fst_right as x_fst + half_width_fst
+            define snd_left as x_snd - half_width_snd
+            define snd_right as x_snd + half_width_snd
 
-            define condOne as (x_fst + width_fst > x_snd - width_snd and y_fst + height_fst > y_snd - height_snd)
-            define condTwo as (x_fst - width_fst < x_snd + width_snd and  y_fst + height_fst > y_snd - height_snd)
-            define condThree as (x_snd + width_snd > x_fst - width_fst and y_snd + height_snd > y_fst - height_fst)
-            define condFour as (x_snd - width_snd < x_fst + width_fst and  y_snd + height_snd > y_fst - height_fst)
-            define condFive as (x_fst = x_snd and y_fst = y_snd)
+            define fst_bottom as x_fst - half_height_fst
+            define fst_top as x_fst + half_height_fst
+            define snd_bottom as x_snd - half_height_snd
+            define snd_top as x_snd + half_height_snd
 
-            if (condOne or condTwo or condThree or condFour or condFive) then begin
+            declare xOverlap as boolean
+            declare yOverlap as boolean
+
+            define xOverlap as snd_right >= fst_left and snd_left <= fst_right
+            define yOverlap as snd_bottom <= fst_top and snd_top >= fst_bottom
+
+            if (xOverlap and yOverlap) then begin
                 define result as true
             end
     end returns result : boolean
 
-
     // @Category "Sensing"
     define atomic isDisjointFrom(snd: actor) begin
-            declare x_fst as int
-            define x_fst as x
-            declare y_fst as int
-            define y_fst as y
-
-            assume x_fst < 720
-            assume x_fst > 0-720
-            assume y_fst < 720
-            assume y_fst > 0-720
-
-            declare x_snd as int
-            define x_snd as cast attribute "x" of snd to int
-            declare y_snd as int
-            define y_snd as cast attribute "y" of snd to int
-
-            assume x_snd <= 720
-            assume x_snd >= 0-720
-            assume y_snd <= 720
-            assume y_snd >= 0-720
-
-            declare width_fst as int
-            declare height_fst as int
-            define width_fst as active_graphic_half_width
-            define height_fst as active_graphic_half_height
-
-//            declare size_fst as float
-//            define size_fst as cast size to float
-//            assume size_fst > 0.0
-//            assume size_fst < 1000.0
-
-            declare width_snd as int
-            declare height_snd as int
-            define width_snd as cast attribute "active_graphic_half_width" of snd to int
-            define height_snd as cast attribute "active_graphic_half_height" of snd to int
-
-//            declare size_snd as float
-//            define size_snd as cast (cast attribute "size" of snd to int) to float
-//            assume size_snd > 0.0
-//            assume size_snd < 16000.0
-
-//            define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
-//            define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
-//
-//            define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
-//            define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
-
-            define result as false
-
-            declare condOne as boolean
-            declare condTwo as boolean
-            declare condThree as boolean
-            declare condFour as boolean
-            declare condFive as boolean
-
-            assume width_snd <= 720
-            assume width_snd > 0
-            assume width_fst < 720
-            assume width_fst > 0
-
-            assume height_snd <= 720
-            assume height_snd > 0
-            assume height_fst <= 720
-            assume height_fst > 0
-
-            declare a as boolean
-            declare b as boolean
-
-            define condOne as (x_fst + width_fst > x_snd - width_snd and y_fst + height_fst > y_snd - height_snd)
-            define condTwo as (x_fst - width_fst < x_snd + width_snd and  y_fst + height_fst > y_snd - height_snd)
-            define condThree as (x_snd + width_snd > x_fst - width_fst and y_snd + height_snd > y_fst - height_fst)
-            define condFour as (x_snd - width_snd < x_fst + width_fst and  y_snd + height_snd > y_fst - height_fst)
-            define condFive as (x_fst = x_snd and y_fst = y_snd)
-
-            if not (condOne and condTwo and condThree and condFour and condFive) then begin
-                define result as true
-            end
+        define result as not touchingObject(snd)
     end returns result : boolean
 
     // @Category "Sensing"
