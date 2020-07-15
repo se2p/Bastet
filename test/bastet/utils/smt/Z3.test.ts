@@ -190,9 +190,13 @@ test("Lattice Join 1", () => {
             theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
     const result = lattice.join(f1, lattice.bottom());
     prover.push();
-    prover.assert(result);
-    const isUnsat = prover.isUnsat();
-    expect(isUnsat).toBe(false);
+    try {
+        prover.assert(result);
+        const isUnsat = prover.isUnsat();
+        expect(isUnsat).toBe(false);
+    } finally {
+        prover.pop();
+    }
 });
 
 test("Lattice Meet 1", () => {
@@ -207,22 +211,30 @@ test("Lattice Meet 1", () => {
             theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
     const result = lattice.meet(f1, lattice.bottom());
     prover.push();
-    prover.assert(result);
-    const isUnsat = prover.isUnsat();
-    expect(isUnsat).toBe(true);
+    try {
+        prover.assert(result);
+        const isUnsat = prover.isUnsat();
+        expect(isUnsat).toBe(true);
+    } finally {
+        prover.pop();
+    }
 });
 
 test("Get model for unsat formula", () => {
    const oneGreaterZero = theories.intTheory.isGreaterThan(theories.intTheory.one(), theories.intTheory.zero());
 
    prover.push();
-   prover.assert(oneGreaterZero);
-   const isUnsat = prover.isUnsat();
-   expect(isUnsat).toBe(false);
+   try {
+       prover.assert(oneGreaterZero);
+       const isUnsat = prover.isUnsat();
+       expect(isUnsat).toBe(false);
 
-   const model = prover.getModel();
-   expect(model.getNumConst()).toBe(0);
-   expect(model.getConstValues()).toStrictEqual([]);
+       const model = prover.getModel();
+       expect(model.getNumConst()).toBe(0);
+       expect(model.getConstValues()).toStrictEqual([]);
+   } finally {
+       prover.pop();
+   }
 });
 
 test("Get model for int formula", () => {
@@ -237,13 +249,17 @@ test("Get model for int formula", () => {
     const yEqualsXPlus2 = theories.intTheory.isNumberEqualTo(theories.intTheory.abstractNumberValue(y), xPlus2);
 
     prover.push();
-    prover.assert(theories.boolTheory.and(xGreater1, theories.boolTheory.and(xLessThan3, yEqualsXPlus2)));
-    const isUnsat = prover.isUnsat();
-    expect(isUnsat).toBe(false);
+    try {
+        prover.assert(theories.boolTheory.and(xGreater1, theories.boolTheory.and(xLessThan3, yEqualsXPlus2)));
+        const isUnsat = prover.isUnsat();
+        expect(isUnsat).toBe(false);
 
-    const model: Z3Model = prover.getModel();
-    expect(model.getNumConst()).toBe(2);
-    expect(model.getConstValues()).toStrictEqual([new Z3Const("y", 4), new Z3Const("x", 2)]);
+        const model: Z3Model = prover.getModel();
+        expect(model.getNumConst()).toBe(2);
+        expect(model.getConstValues()).toStrictEqual([new Z3Const("y", 4), new Z3Const("x", 2)]);
+    } finally {
+        prover.pop();
+    }
 });
 
 test('Get model for string formula', () => {
@@ -255,13 +271,17 @@ test('Get model for string formula', () => {
     const xJoinedOtherEqualsBob = theories.stringTheory.stringsEqual(xJoinedOther, theories.stringTheory.fromConcrete(new ConcreteString("Bob")));
 
     prover.push();
-    prover.assert(theories.boolTheory.and(xContainsB, xJoinedOtherEqualsBob));
-    const isUnsat = prover.isUnsat();
-    expect(isUnsat).toBe(false);
+    try {
+        prover.assert(theories.boolTheory.and(xContainsB, xJoinedOtherEqualsBob));
+        const isUnsat = prover.isUnsat();
+        expect(isUnsat).toBe(false);
 
-    const model: Z3Model = prover.getModel();
-    expect(model.getNumConst()).toBe(1);
-    expect(model.getConstValues()).toStrictEqual([new Z3Const("x", "Bo")]);
+        const model: Z3Model = prover.getModel();
+        expect(model.getNumConst()).toBe(1);
+        expect(model.getConstValues()).toStrictEqual([new Z3Const("x", "Bo")]);
+    } finally {
+        prover.pop();
+    }
 });
 
 test('Get model for boolean formula (x && !z)', () => {
@@ -270,16 +290,20 @@ test('Get model for boolean formula (x && !z)', () => {
     const notZ = theories.boolTheory.not(z);
 
     prover.push();
-    prover.assert(theories.boolTheory.and(x, notZ));
-    const isUnsat = prover.isUnsat();
-    expect(isUnsat).toBe(false);
+    try {
+        prover.assert(theories.boolTheory.and(x, notZ));
+        const isUnsat = prover.isUnsat();
+        expect(isUnsat).toBe(false);
 
-    const model: Z3Model = prover.getModel();
-    expect(model.getNumConst()).toBe(2);
+        const model: Z3Model = prover.getModel();
+        expect(model.getNumConst()).toBe(2);
 
-    const constValues = model.getConstValues();
-    const constZ = constValues.find(constV => constV.getName() === "z");
-    expect(constZ.getValue()).toBe(false);
-    const constX = constValues.find(constV => constV.getName() === "x");
-    expect(constX.getValue()).toBe(true);
+        const constValues = model.getConstValues();
+        const constZ = constValues.find(constV => constV.getName() === "z");
+        expect(constZ.getValue()).toBe(false);
+        const constX = constValues.find(constV => constV.getName() === "x");
+        expect(constX.getValue()).toBe(true);
+    } finally {
+        prover.pop();
+    }
 });
