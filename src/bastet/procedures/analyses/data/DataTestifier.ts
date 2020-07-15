@@ -324,7 +324,6 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
             const branchName = this.createBranchName(s1, s2);
             const assignement = satAssignement.booleanMem.get(branchName);
             if (assignement !== undefined) {
-                console.log(branchName, assignement.value);
                 if (assignement.value) {
                     return true;
                 } else {
