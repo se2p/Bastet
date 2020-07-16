@@ -10,6 +10,10 @@ actor IOActor is RuntimeEntity begin
 
     // Key code of the currently pressed key
     declare key_pressed as int
+    declare last_key_pressed as int
+
+    declare mouse_down as boolean
+    declare last_mouse_down as boolean
 
     script on message "ASK" () in "SYSTEM" do begin
         declare nondet_str as string
@@ -19,6 +23,23 @@ actor IOActor is RuntimeEntity begin
         assume inputDurationSecs < 30
         wait inputDurationSecs seconds
         // UNSOUND: might wait arbitrarily long
+    end
+
+    script on dispatch do begin
+        declare nondet_int as int
+        declare nondet_boolean as boolean
+
+        define key_pressed as nondet_int
+        define mouse_down as nondet_boolean
+
+        if mouse_down then begin
+            if not last_mouse_down then begin
+                broadcast "CLICK" () to "SYSTEM"
+            end
+        end
+
+        define last_key_pressed as key_pressed
+        define last_mouse_down as mouse_down
     end
 
 end
@@ -1096,6 +1117,15 @@ role ScratchSprite is ScratchEntity begin
     //      define y as 0
     //
 
+    script on message "CLICK" () in "SYSTEM" do begin
+        if touchingMousePointer() then begin
+            broadcast "SPRITE_CLICK" () to self
+        end
+    end
+
+    script on message "SPRITE_CLICK" () in self do begin
+    end
+
     define atomic pointTowards (s: actor) begin
         declare targetX as int
         declare targetY as int
@@ -1347,6 +1377,22 @@ role ScratchSprite is ScratchEntity begin
         define wrapped as wrapClamp(cast dir to float, 0.0-179.0, 180.0)
         define direction as cast wrapped to int
     end
+
+    define atomic spriteClicked() begin
+        define result as false
+
+        // A 'click' is triggered by a MOUSE_DOWN
+        // The next 'click' is triggered if there was a MOUSE_UP in-between
+        // (use a variable 'last mouse status'?)
+        declare clicked as boolean
+        // TODO: Finish this method
+
+        if clicked then begin
+            if touchingMousePointer() then begin
+                define result as true
+            end
+        end
+    end returns result : boolean
 
 end
 

@@ -99,6 +99,7 @@ event :
   | 'message' stringExpr parameterList messageNamespace # MessageReceivedEvent
   | 'condition' boolExpr # ConditionReachedEvent
   | 'rendered' # RenderedMonitoringEvent
+  | 'dispatch' # UserInputDispatchEvent
   | 'statement' 'finished' # AfterStatementMonitoringEvent
   ;
 
@@ -333,6 +334,7 @@ listExpr :
 
 actorExpr:
   variable # ActorVariableExpression
+  | 'self' # ActorSelfExpression
   | 'locate' 'actor' stringExpr # LocateActorExpression
   | 'start' 'clone' 'of' actorExpr # StartCloneActorExpression
   | 'start' 'actor' stringExpr 'as' ident # UsherActorExpression
