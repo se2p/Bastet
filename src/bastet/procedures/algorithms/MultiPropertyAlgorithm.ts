@@ -120,16 +120,18 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
                         const targetState = reached.getAddedLast()[0];
                         const targetProperties = ImmSet<Property>(this._analysis.target(targetState));
 
-                        // Call the witness handler
-                        this._analysis.handleViolatingState(reached, targetState);
+                        if (targetProperties.size > 0) {
+                            // Call the witness handler
+                            this._analysis.handleViolatingState(reached, targetState);
 
-                        // Adjust the property sets
-                        violated = violated.union(targetProperties);
-                        unknown = unknown.subtract(violated);
+                            // Adjust the property sets
+                            violated = violated.union(targetProperties);
+                            unknown = unknown.subtract(violated);
 
-                        if (this._config.shouldTerminateAfterViolation) {
-                            if (targetProperties.size > 0) {
-                                return [frontier, reached];
+                            if (this._config.shouldTerminateAfterViolation) {
+                                if (targetProperties.size > 0) {
+                                    return [frontier, reached];
+                                }
                             }
                         }
                     }

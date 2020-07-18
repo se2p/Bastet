@@ -27,7 +27,7 @@ xtest("Test Atan2 1 safe", done => {
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test Atan2 2 safe", done => {
+xtest("Test Atan2 2 safe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Atan2-2_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
@@ -37,7 +37,7 @@ xtest("Test Atan2 1 unsafe", done => {
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test Atan2 2 unsafe", done => {
+xtest("Test Atan2 2 unsafe", done => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Atan2-2_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);

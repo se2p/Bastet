@@ -119,8 +119,8 @@ export class TimeAnalysis<F extends AbstractState>
         return this._wrappedAnalysis.target(state.getWrappedState());
     }
 
-    widen(state: TimeState): TimeState {
-        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState());
+    widen(state: TimeState, reached: Iterable<F>): TimeState {
+        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {
             return state.withWrappedState(wrappedResult);
         } else {
@@ -149,6 +149,10 @@ export class TimeAnalysis<F extends AbstractState>
     }
 
     mergeInto(state: TimeState, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => TimeState, wrapper: (TimeState) => F): [FrontierSet<F>, ReachedSet<F>] {
+        throw new ImplementMeException();
+    }
+
+    widenPartitionOf(ofState: TimeState, reached: ReachedSet<F>): Iterable<F> {
         throw new ImplementMeException();
     }
 

@@ -118,8 +118,8 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return this._wrappedAnalysis.target(state.wrappedState);
     }
 
-    widen(state: SSAState): SSAState {
-        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState());
+    widen(state: SSAState, reached: Iterable<F>): SSAState {
+        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {
             return state.withWrappedState(wrappedResult);
         } else {
@@ -155,6 +155,10 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
     }
 
     mergeInto(state: SSAState, frontier: StateSet<F>, reached: ReachedSet<F>, unwrapper: (F) => SSAState, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
+        throw new ImplementMeException();
+    }
+
+    widenPartitionOf(ofState: SSAState, reached: ReachedSet<F>): Iterable<F> {
         throw new ImplementMeException();
     }
 

@@ -113,7 +113,7 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
                 //      precision to use for widening is determined by an
                 //      inner analysis component from the given abstract state `ePrime`.
                 // TODO: Adjust the widening such that it can return a set of states?
-                const ePrimePrime: E = this._analysis.widen(ePrime);
+                const ePrimePrime: E = this._analysis.widen(ePrime, this._analysis.widenPartitionOf(ePrime, reached));
 
                 // MERGE: If desired, merge certain states
                 [frontier, reached] = this._analysis.mergeInto(ePrimePrime, frontier, reached, (s) => s, (s) => s);

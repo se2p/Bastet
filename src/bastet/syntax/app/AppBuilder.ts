@@ -300,8 +300,7 @@ export class AppBuilder {
         //     }
         // }
 
-        // Data locations based on the resources
-        Logger.potentialIncomplete("Add data locations for resources?");
+        // TODO: Data locations based on the resources?
         return result;
     }
 

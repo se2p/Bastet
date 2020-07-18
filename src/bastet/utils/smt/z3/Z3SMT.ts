@@ -152,6 +152,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
     public isUnsat(): boolean {
         const checkResult: number = this.solve();
         return checkResult == Z3_UNSATISFIABLE;
+        this._model = null;
     }
 
     /**
@@ -160,6 +161,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
     public isSat(): boolean {
         const checkResult: number = this.solve();
         return checkResult == Z3_SATISFIABLE;
+        this._model = null;
     }
 
     /**
@@ -172,6 +174,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         //     f.getAST()
         // ));
         this._ctx.solver_assert(this._solver, f.getAST());
+        this._model = null;
     }
 
     /**
@@ -179,6 +182,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
      */
     public reset(): void {
         this._ctx.solver_reset(this._solver);
+        this._model = null;
     }
 
     /**
@@ -186,6 +190,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
      */
     public pop(): void {
         this._ctx.solver_pop(this._solver, new Uint32(1));
+        this._model = null;
     }
 
     /**
@@ -193,12 +198,14 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
      */
     public push(): void {
         this._ctx.solver_push(this._solver);
+        this._model = null;
     }
 
     public release(): void {
         this.reset();
         this._ctx.solver_dec_ref(this._solver);
         this._model.release();
+        this._model = null;
     }
 
     public getModel(): Z3Model {

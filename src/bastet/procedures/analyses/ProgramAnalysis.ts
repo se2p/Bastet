@@ -40,7 +40,7 @@ import {NotSupportedException} from "../../core/exceptions/NotSupportedException
 export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
    extends AbstractSuccOperator<E>,
        JoinOperator<E>, TargetOperator<E>, MergeIntoOperator<E, F>,
-       MergeOperator<E>, StopOperator<E, F>, WidenOperator<E>, PartitionOperator<E, F>,
+       MergeOperator<E>, StopOperator<E, F>, WidenOperator<E, F>, PartitionOperator<E, F>,
        WitnessHandler<F>, TraversalOrderOperator<E, F>, ResultFinalization<F>,
        TestificationOperator<E, F> {
 
@@ -100,6 +100,8 @@ export interface ResultFinalization<F extends AbstractState> {
 export interface PartitionOperator<E extends AbstractElement, F extends AbstractState>
    extends StatePartitionOperator<E> {
 
+    widenPartitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F>;
+
     stopPartitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F>;
 
     mergePartitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F>;
@@ -151,9 +153,9 @@ export interface StopOperator<E extends AbstractElement, F extends AbstractState
 
 }
 
-export interface WidenOperator<E extends AbstractElement> {
+export interface WidenOperator<E extends AbstractElement, F extends AbstractState> {
 
-    widen(state: E): E;
+    widen(state: E, reached: Iterable<F>): E;
 
 }
 

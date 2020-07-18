@@ -144,8 +144,8 @@ export class LabelAnalysis<F extends AbstractState>
         return this._wrappedAnalysis.target(state.getWrappedState());
     }
 
-    widen(state: LabelState): LabelState {
-        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState());
+    widen(state: LabelState, reached: Iterable<F>): LabelState {
+        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {
             return state.withWrappedState(wrappedResult);
         } else {
@@ -174,6 +174,10 @@ export class LabelAnalysis<F extends AbstractState>
     }
 
     mergeInto(state: LabelState, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => LabelState, wrapper: (LabelState) => F): [FrontierSet<F>, ReachedSet<F>] {
+        throw new ImplementMeException();
+    }
+
+    widenPartitionOf(ofState: LabelState, reached: ReachedSet<F>): Iterable<F> {
         throw new ImplementMeException();
     }
 
