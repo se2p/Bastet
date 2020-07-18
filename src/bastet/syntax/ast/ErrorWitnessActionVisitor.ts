@@ -118,8 +118,6 @@ export class ActionWithWeight {
     public static readonly DECLARE = new ActionWithWeight(Action.DECLARE, 0);
     public static readonly METHOD_CALL = new ActionWithWeight(Action.METHOD_CALL, 2);
     public static readonly EPSILON = new ActionWithWeight(Action.EPSILON, 0);
-    public static readonly MOUSE_INPUT = new ActionWithWeight(Action.MOUSE_INPUT, 2);
-    public static readonly INITIAL_STATE = new ActionWithWeight(Action.INITIAL_STATE, 2);
     public static readonly ENTER_ATOMIC = new ActionWithWeight(Action.ENTER_ATOMIC, 3);
     public static readonly LEAVE_ATOMIC = new ActionWithWeight(Action.LEAVE_ATOMIC, 3);
     public static readonly REACHED_VIOLATION = new ActionWithWeight(Action.REACHED_VIOLATION, 2);
