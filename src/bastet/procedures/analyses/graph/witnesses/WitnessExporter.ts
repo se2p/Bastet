@@ -326,7 +326,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         const targets = new Map<string, Map<string, T>>();
 
         map.forEach((value, attributeWithTarget) => {
-            if (this.isTargetAttribute(attributeWithTarget)) {
+            if (attributeWithTarget.includes(VAR_SCOPING_SPLITTER)) {
                 const {target} = WitnessExporter.splitTargetPrefixFromAttribute(attributeWithTarget);
 
                 let targetMap = targets.get(target);
@@ -336,8 +336,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
                 targetMap.set(attributeWithTarget, value);
                 targets.set(target, targetMap);
-            } else {
-                // TODO figure out what to do with other attributes (__op_time_129, ...)
             }
         })
 
@@ -352,10 +350,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         const target = DataLocationScoper.leftUnwrapScope(attributeWithTargetName).prefix;
         const attribute = DataLocationScoper.rightUnwrapScope(attributeWithTargetName).suffix;
         return {attribute, target};
-    }
-
-    public static isTargetAttribute(attribute: string): boolean {
-        return attribute.includes(VAR_SCOPING_SPLITTER);
     }
 
     private static collapseAtomics(steps: ErrorWitnessStep[]): ErrorWitnessStep[] {

@@ -24,6 +24,7 @@ import {Action} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {ConcretePrimitive} from "../../../domains/ConcreteElements";
 import {WitnessExporter} from "./WitnessExporter";
+import {DataLocationScoper} from "../../control/DataLocationScoping";
 
 export class Target {
     private static readonly SCRATCH_TARGET_ATTRIBUTES = ["x", "y", "direction", "draggable", "rotationStyle", "visible", "size"];
@@ -64,7 +65,7 @@ export class Target {
         target.name = name;
 
         attributes.forEach((value, attribute) => {
-            if (this.isScratchAttribute(attribute)) {
+            if (target.isScratchAttribute(attribute)) {
                 target.scratchAttributes[attribute] = value.value;
             } else {
                 target.userDefinedAttributes[attribute] = value.value;
@@ -74,12 +75,16 @@ export class Target {
         return target;
     }
 
-    static isScratchAttribute(name: string): boolean {
-        if (WitnessExporter.isTargetAttribute(name)) {
-            name = WitnessExporter.splitTargetPrefixFromAttribute(name).attribute;
+    isScratchAttribute(scopedAttributeName: string): boolean {
+        const splitScopedAttributeName = DataLocationScoper.rightUnwrapScope(scopedAttributeName);
+        const attributeName = splitScopedAttributeName.suffix;
+        const targetName = splitScopedAttributeName.prefix;
+
+        if (targetName !== this.name) {
+            return false;
         }
 
-        return this.SCRATCH_TARGET_ATTRIBUTES.includes(name);
+        return Target.SCRATCH_TARGET_ATTRIBUTES.includes(attributeName);
     }
 }
 
