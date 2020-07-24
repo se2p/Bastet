@@ -199,7 +199,7 @@ export class AttributeReadEventVisitor implements CoreVisitor<AttributeReadEvent
     }
 
     visitCastExpression(node: CastExpression): AttributeReadEvent {
-        return this.nothingReadEvent;
+        return node.toConvertFrom.accept(this);
     }
 
     visitCreateCloneOfStatement(node: CreateCloneOfStatement): AttributeReadEvent {
