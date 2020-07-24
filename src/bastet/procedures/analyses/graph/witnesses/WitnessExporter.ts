@@ -111,6 +111,9 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             errorWitness.steps = WitnessExporter.collapseEpsilonsToWait(errorWitness.steps);
         }
 
+        WitnessExporter.addWaitTimes(errorWitness.steps);
+        errorWitness.steps = WitnessExporter.removeStepsWithLowWaitTime(errorWitness.steps, this._config.minWaitTime);
+
         errorWitness.steps.forEach(step => {
             step.targets = step.targets.filter(target => !this._config.removeActors.includes(target.name));
 
@@ -128,9 +131,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                 target.removeAttributesStartingWith(this._config.removeAttributeStartingWith);
             })
         })
-
-        WitnessExporter.addWaitTimes(errorWitness.steps);
-        errorWitness.steps = WitnessExporter.removeStepsWithLowWaitTime(errorWitness.steps, this._config.minWaitTime);
 
         this.exportErrorWitness(errorWitness);
     }
