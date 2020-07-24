@@ -55,6 +55,7 @@ export interface WitnessExporterConfig {
     removeActors: string[];
     removeStepsBeforeBootstrap: boolean;
     minWaitTime: number;
+    keepDebuggingAttributes: boolean;
 }
 
 export const DEFAULT_WITNESS_EXPORTER_CONFIG: WitnessExporterConfig = {
@@ -65,7 +66,8 @@ export const DEFAULT_WITNESS_EXPORTER_CONFIG: WitnessExporterConfig = {
     removeActorPrefixFromAttributes: true,
     removeActors: ['IOActor'],
     removeStepsBeforeBootstrap: true,
-    minWaitTime: 1000
+    minWaitTime: 1000,
+    keepDebuggingAttributes: false
 }
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
@@ -111,6 +113,12 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         errorWitness.steps.forEach(step => {
             step.targets = step.targets.filter(target => !this._config.removeActors.includes(target.name));
+
+            if (!this._config.keepDebuggingAttributes) {
+                step.timestamp = undefined;
+                step.actionTargetName = undefined;
+                step.actionLabel = undefined;
+            }
 
             step.targets.forEach(target => {
                 if (this._config.removeActorPrefixFromAttributes) {
