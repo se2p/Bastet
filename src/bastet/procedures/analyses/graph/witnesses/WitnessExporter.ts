@@ -36,7 +36,7 @@ import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {App} from "../../../../syntax/app/App";
 import {ControlAbstractState, RelationLocation} from "../../control/ControlAbstractDomain";
 import {ControlLocationExtractor} from "../../control/ControlUtils";
-import {Action, ErrorWitnessActionVisitor} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
+import {Action, ActionWithWeight, ErrorWitnessActionVisitor} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
 import {ErrorWitness, ErrorWitnessStep, MousePosition, Target} from "./ErrorWitness";
 import {AccessibilityRelation, AccessibilityRelations} from "../../Accessibility";
@@ -53,6 +53,8 @@ export interface WitnessExporterConfig {
     removeAttributeStartingWith: string[];
     removeActorPrefixFromAttributes: boolean;
     removeActors: string[];
+    removeStepsBeforeBootstrap: boolean;
+    minWaitTime: number;
 }
 
 export const DEFAULT_WITNESS_EXPORTER_CONFIG: WitnessExporterConfig = {
@@ -61,7 +63,9 @@ export const DEFAULT_WITNESS_EXPORTER_CONFIG: WitnessExporterConfig = {
     removeAttributeStartingWith: ['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE',
         'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT', '__tmp'],
     removeActorPrefixFromAttributes: true,
-    removeActors: ['IOActor']
+    removeActors: ['IOActor'],
+    removeStepsBeforeBootstrap: true,
+    minWaitTime: 1000
 }
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
@@ -93,12 +97,16 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     private exportPath(pathAr: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, violating: GraphAbstractState) {
         const errorWitness: ErrorWitness = this.extractErrorWitness(pathAr, violating);
 
+        if (this._config.removeStepsBeforeBootstrap) {
+            errorWitness.steps = WitnessExporter.removeAllBeforeAction(errorWitness.steps, Action.INITIAL_STATE);
+        }
+
         if (this._config.collapseAtomicBlocks) {
             errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
         }
 
         if (this._config.export === "ONLY_ACTIONS") {
-            errorWitness.steps = WitnessExporter.collapseActionSegments(errorWitness.steps);
+            errorWitness.steps = WitnessExporter.collapseEpsilonsToWait(errorWitness.steps);
         }
 
         errorWitness.steps.forEach(step => {
@@ -114,6 +122,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         })
 
         WitnessExporter.addWaitTimes(errorWitness.steps);
+        errorWitness.steps = WitnessExporter.removeStepsWithLowWaitTime(errorWitness.steps, this._config.minWaitTime);
 
         this.exportErrorWitness(errorWitness);
     }
@@ -253,54 +262,71 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     }
 
     /**
-     * Combines actions with their non action successors.
-     * E.g. [DEFINE, DECLARE, MOUSE_INPUT, KEY_PRESSED, DEFINE, EPSILON] will result in
-     * [INITIAL_STEP, MOUSE_INPUT, KEY_PRESSED] where the last step contains the state information of the last step
-     * EPSILON and the first two steps are combined in INITIAL_STEP.
+     * Collapses steps between actions into one wait step
      *
-     * @param errorWitnessSteps The steps to reduce to only actions
+     * @param errorWitnessSteps The steps to reduce to only actions and waits
      */
-    private static collapseActionSegments(errorWitnessSteps: ErrorWitnessStep[]): ErrorWitnessStep[] {
+    private static collapseEpsilonsToWait(errorWitnessSteps: ErrorWitnessStep[]): ErrorWitnessStep[] {
         const filteredArray = [];
 
-        let previousAction: ErrorWitnessStep = undefined;
+        let prevStep: ErrorWitnessStep;
 
         for (const step of errorWitnessSteps) {
-            if (previousAction) {
-                if (step.action === Action.MOUSE_INPUT) {
-                    if (previousAction.action !== Action.MOUSE_INPUT
-                        || previousAction.mousePosition.x !== step.mousePosition.x
-                        || previousAction.mousePosition.y !== step.mousePosition.y) {
-                        filteredArray.push(previousAction);
-                    } else {
-                        step.actionLabel = `${previousAction.actionLabel}; ${step.actionLabel}`;
-                    }
-                } else if (step.action === Action.KEY_PRESSED || step.action === Action.ANSWER) {
-                    filteredArray.push(previousAction);
-                } else if (step.timestamp - previousAction.timestamp > 1000) {
-                    if (previousAction.action !== Action.WAIT) {
-                        filteredArray.push(previousAction);
-                    } else {
-                        step.actionLabel = `${previousAction.actionLabel}; ${step.actionLabel}`;
-                    }
-
-                    step.action = Action.WAIT;
-                } else {
-                    step.action = previousAction.action;
-                    step.keyPressed = previousAction.keyPressed;
-                    step.answer = previousAction.answer;
-                    step.mousePosition = previousAction.mousePosition;
-                    step.actionLabel = `${previousAction.actionLabel}; ${step.actionLabel}`;
+            if (!ActionWithWeight.isActionEpsilonLike(step.action)) {
+                if (prevStep) {
+                    prevStep.action = Action.WAIT;
+                    filteredArray.push(prevStep);
+                    prevStep = undefined;
                 }
-            } else {
-                step.action = Action.INITIAL_STATE;
-            }
 
-            previousAction = step;
+                filteredArray.push(step);
+            } else {
+                if (prevStep) {
+                    step.actionLabel = `${prevStep.actionLabel}; ${step.actionLabel}`;
+                }
+
+                prevStep = step;
+            }
         }
 
-        if (!filteredArray.includes(previousAction)) {
-            filteredArray.push(previousAction);
+        if (prevStep) {
+            filteredArray.push(prevStep);
+        }
+
+        return filteredArray;
+    }
+
+    private static removeAllBeforeAction(steps: ErrorWitnessStep[], action: Action): ErrorWitnessStep[] {
+        let index = steps.findIndex(step => step.action === action);
+
+        Preconditions.checkState(index >= 0);
+
+        return steps.slice(index, steps.length);
+    }
+
+    private static removeStepsWithLowWaitTime(steps: ErrorWitnessStep[], timeThreshold: number): ErrorWitnessStep[] {
+        const filteredArray = [];
+
+        let prevStep: ErrorWitnessStep = undefined;
+
+        for (const step of steps) {
+            if (step.action === Action.WAIT && step.waitMicros < timeThreshold && prevStep) {
+                prevStep.targets = step.targets;
+                prevStep.timestamp = step.timestamp;
+                prevStep.actionLabel = `${prevStep.actionLabel}; ${step.actionLabel}`;
+
+                filteredArray.push(prevStep);
+                prevStep = undefined;
+            } else {
+                if (prevStep) {
+                    filteredArray.push(prevStep);
+                }
+                prevStep = step;
+            }
+        }
+
+        if (prevStep) {
+            filteredArray.push(prevStep);
         }
 
         return filteredArray;

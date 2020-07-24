@@ -114,6 +114,7 @@ export class ActionWithWeight {
     constructor(public action: Action, public weight: number) {
     }
 
+    public static readonly INITIAL_STATE = new ActionWithWeight(Action.INITIAL_STATE, 5);
     public static readonly DEFINE = new ActionWithWeight(Action.DEFINE, 1);
     public static readonly DECLARE = new ActionWithWeight(Action.DECLARE, 0);
     public static readonly METHOD_CALL = new ActionWithWeight(Action.METHOD_CALL, 2);
@@ -121,6 +122,17 @@ export class ActionWithWeight {
     public static readonly ENTER_ATOMIC = new ActionWithWeight(Action.ENTER_ATOMIC, 3);
     public static readonly LEAVE_ATOMIC = new ActionWithWeight(Action.LEAVE_ATOMIC, 3);
     public static readonly REACHED_VIOLATION = new ActionWithWeight(Action.REACHED_VIOLATION, 2);
+
+    public static isActionEpsilonLike(action: Action) {
+        return !action || [
+            Action.DEFINE,
+            Action.DECLARE,
+            Action.METHOD_CALL,
+            Action.EPSILON,
+            Action.ENTER_ATOMIC,
+            Action.LEAVE_ATOMIC,
+            Action.COLLAPSED_ATOMIC].includes(action);
+    }
 }
 
 export class ErrorWitnessActionVisitor implements CoreVisitor<ActionWithWeight>, CoreBoolExpressionVisitor<ActionWithWeight>, CoreNumberExpressionVisitor<ActionWithWeight>,
@@ -177,7 +189,9 @@ CoreNonCtrlStatementnVisitor<ActionWithWeight>{
     }
 
     visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): ActionWithWeight {
-        return ActionWithWeight.EPSILON;
+        const broadcast = node.msg.accept(this.printer);
+
+        return broadcast === '\"__BOOTSTRAP_FINISHED\"/\"SYSTEM\"' ? ActionWithWeight.INITIAL_STATE : ActionWithWeight.EPSILON;
     }
 
     visitBroadcastMessageStatement(node: BroadcastMessageStatement): ActionWithWeight {

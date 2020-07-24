@@ -167,7 +167,7 @@ export class AttributeReadEventVisitor implements CoreVisitor<AttributeReadEvent
     }
 
     visitAssumeStatement(node: AssumeStatement): AttributeReadEvent {
-        return this.nothingReadEvent;
+        return node.condition.accept(this);
     }
 
     visitBeginAtomicStatement(node: BeginAtomicStatement): AttributeReadEvent {
