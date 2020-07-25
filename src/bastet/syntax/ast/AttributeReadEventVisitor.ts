@@ -96,8 +96,9 @@ import {ResetTimerStatement} from "./core/statements/ResetTimerStatement";
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
 import {VariableWithDataLocation} from "./core/Variable";
-import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
+import {DataLocationScoper} from "../../procedures/analyses/control/DataLocationScoping";
+import {VAR_SCOPING_SPLITTER} from "../app/controlflow/DataLocation";
 
 export class AttributeReadEvent {
     
@@ -111,10 +112,6 @@ export class AttributeReadEvent {
         } else {
             return new AttributeReadEvent(this.readFrom ? this.readFrom : other.readFrom);
         }
-    }
-
-    equals(other: AttributeReadEvent): boolean {
-        return this.readFrom === other.readFrom;
     }
 }
 
@@ -150,7 +147,13 @@ export class AttributeReadEventVisitor implements CoreVisitor<AttributeReadEvent
 
             if (calledMethod === this.methodName) {
                 // Attribute written to variable --> need to keep track of its new alias
+                const unwrappedVariable = DataLocationScoper.rightUnwrapScope(assignResultToName);
+                // Increase the SSA index by one since the actual value will be saved to the variable with the next index
+                const nextSSAIndex = Number(unwrappedVariable.suffix) + 1;
+                const variableName = `${unwrappedVariable.prefix}${VAR_SCOPING_SPLITTER}${nextSSAIndex}`
+
                 this.attributeAlias.push(assignResultToName);
+                this.usageToAttributeAlias.set(variableName, assignResultToName);
                 this.usageToAttributeAlias.set(assignResultToName, assignResultToName);
             }
         }
@@ -363,7 +366,7 @@ export class AttributeReadEventVisitor implements CoreVisitor<AttributeReadEvent
         const readEvent = node.toValue.accept(this);
 
         if (readEvent.readFrom !== undefined) {
-            this.usageToAttributeAlias.set(variableName, readEvent.readFrom);
+            this.usageToAttributeAlias.set(variableName, this.usageToAttributeAlias.get(readEvent.readFrom));
         }
 
         return this.nothingReadEvent;
@@ -394,21 +397,9 @@ export class AttributeReadEventVisitor implements CoreVisitor<AttributeReadEvent
     }
 
     visitVariableWithDataLocation(node: VariableWithDataLocation): AttributeReadEvent {
-        const variableNameParts = node.qualifiedName.split("@");
+        const variableName = node.qualifiedName;
 
-        if (variableNameParts.length > 1) {
-            const variableName = node.qualifiedName;
-            const script = variableNameParts[1];
-
-            if (script === this.methodName) {
-                this.attributeAlias.push(variableName);
-                this.usageToAttributeAlias.set(variableName, variableName);
-            }
-
-            return new AttributeReadEvent(this.usageToAttributeAlias.get(variableName));
-        } else {
-            throw new IllegalStateException();
-        }
+        return new AttributeReadEvent(this.usageToAttributeAlias.get(variableName));
     }
 
     visitWaitUntilStatement(node: WaitUntilStatement): AttributeReadEvent {

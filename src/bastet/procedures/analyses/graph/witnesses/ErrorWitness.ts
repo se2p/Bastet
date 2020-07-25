@@ -88,14 +88,9 @@ export class Target {
     }
 }
 
-export class MousePosition {
-    readonly x: number;
-    readonly y: number;
-
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
-    }
+export interface MousePosition {
+    x: number;
+    y: number;
 }
 
 export class ErrorWitnessStep {
@@ -108,6 +103,9 @@ export class ErrorWitnessStep {
     actionTargetName: string;
     mousePosition: MousePosition;
     targets: Target[] = [];
+
+    constructor(public id: number) {
+    }
 
     isEmpty(): boolean {
         return !this.action || this.targets.length === 0;
