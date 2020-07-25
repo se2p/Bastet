@@ -25,7 +25,7 @@
 
 import {ProgramOperation} from "../../../../syntax/app/controlflow/ops/ProgramOperation";
 import {ErrorWitnessStep} from "./ErrorWitness";
-import {AttributeReadEventVisitor} from "../../../../syntax/ast/AttributeReadEventVisitor";
+import {MethodValueReadVisitor} from "../../../../syntax/ast/MethodValueReadVisitor";
 import {Assignment, MethodCallAssignmentVisitor} from "../../../../syntax/ast/MethodCallAssignmentVisitor";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {DataLocationScoper} from "../../control/DataLocationScoping";
@@ -33,13 +33,20 @@ import {Action} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 
 export abstract class ActionExtractor {
     private readonly _actionMethodName: string;
-    private readonly _visitor: AttributeReadEventVisitor;
+    private readonly _visitor: MethodValueReadVisitor;
     private readonly _stepToAssignments: Map<number, Assignment[]> = new Map<number, Assignment[]>();
-    private readonly _readEvents: string[] = [];
+    /**
+     * The array includes the names of all variables that were read inside an if statement and assigned a value from an
+     * action method
+     */
+    private readonly _actionMethodReadFrom: string[] = [];
 
+    /**
+     * @param actionMethodName The name of a method in the 'library.sc' that should be tracked with an ActionValueReadVisitor
+     */
     protected constructor(actionMethodName: string) {
         this._actionMethodName = actionMethodName;
-        this._visitor = new AttributeReadEventVisitor(actionMethodName);
+        this._visitor = new MethodValueReadVisitor(actionMethodName);
     }
 
     /**
@@ -53,7 +60,7 @@ export abstract class ActionExtractor {
             .reduce((prev, cur) => prev.combine(cur));
 
         if (readEvent.readFrom) {
-            this._readEvents.push(readEvent.readFrom);
+            this._actionMethodReadFrom.push(readEvent.readFrom);
         }
 
         const assignments = operations
@@ -67,7 +74,7 @@ export abstract class ActionExtractor {
             const assignments = this._stepToAssignments.get(step.id);
             Preconditions.checkNotUndefined(assignments);
 
-            const assignmentWithReadEvent = assignments.find(assignment => assignment.method === this._actionMethodName && this._readEvents.includes(assignment.variable));
+            const assignmentWithReadEvent = assignments.find(assignment => assignment.method === this._actionMethodName && this._actionMethodReadFrom.includes(assignment.variable));
 
             if (assignmentWithReadEvent) {
                 const variableNameWithoutSSA = DataLocationScoper.rightUnwrapScope(assignmentWithReadEvent.variable).prefix;

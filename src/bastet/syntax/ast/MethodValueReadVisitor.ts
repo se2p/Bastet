@@ -100,47 +100,53 @@ import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
 import {DataLocationScoper} from "../../procedures/analyses/control/DataLocationScoping";
 import {VAR_SCOPING_SPLITTER} from "../app/controlflow/DataLocation";
 
-export class AttributeReadEvent {
+export class MethodValueReadEvent {
     
     constructor(public readonly readFrom: string) {
     
     }
 
-    combine(other: AttributeReadEvent): AttributeReadEvent {
+    combine(other: MethodValueReadEvent): MethodValueReadEvent {
         if (this.readFrom !== undefined && other.readFrom !== undefined && this.readFrom !== other.readFrom) {
             throw new ImplementMeForException("a binary expression using two different mouse alias variables");
         } else {
-            return new AttributeReadEvent(this.readFrom ? this.readFrom : other.readFrom);
+            return new MethodValueReadEvent(this.readFrom ? this.readFrom : other.readFrom);
         }
     }
 }
 
-export class AttributeReadEventVisitor implements CoreVisitor<AttributeReadEvent>, CoreBoolExpressionVisitor<AttributeReadEvent>, CoreNumberExpressionVisitor<AttributeReadEvent>,
-    CoreNonCtrlStatementnVisitor<AttributeReadEvent>{
+/**
+ * A visitor for a taint analysis that keeps track of the return value of a method.
+ * If a variable is assigned the return value of the method and read inside an assume statement
+ * then a MethodValueReadEvent is returned.
+ * The event specifies the name of the variable where the return value of the method was initially assigned to.
+ */
+export class MethodValueReadVisitor implements CoreVisitor<MethodValueReadEvent>, CoreBoolExpressionVisitor<MethodValueReadEvent>, CoreNumberExpressionVisitor<MethodValueReadEvent>,
+    CoreNonCtrlStatementnVisitor<MethodValueReadEvent>{
 
     constructor(private readonly methodName: string) {
     }
 
-    private readonly nothingReadEvent = new AttributeReadEvent(undefined);
+    private readonly nothingReadEvent = new MethodValueReadEvent(undefined);
     private readonly printVisitor = new CorePrintVisitor();
 
     private readonly attributeAlias = [];
 
     private readonly usageToAttributeAlias = new Map<string, string>();
 
-    visit(node: AstNode): AttributeReadEvent {
+    visit(node: AstNode): MethodValueReadEvent {
         throw new ImplementMeForException(node.constructor.name);
     }
 
-    visitLocateActorExpression(node: LocateActorExpression): AttributeReadEvent {
+    visitLocateActorExpression(node: LocateActorExpression): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitReturnStatement(node: ReturnStatement): AttributeReadEvent {
+    visitReturnStatement(node: ReturnStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitCallStatement(node: CallStatement): AttributeReadEvent {
+    visitCallStatement(node: CallStatement): MethodValueReadEvent {
         if (node.assignResultTo.isPresent()) {
             const assignResultToName = node.assignResultTo.value().accept(this.printVisitor);
             const calledMethod = node.calledMethod.text;
@@ -148,7 +154,7 @@ export class AttributeReadEventVisitor implements CoreVisitor<AttributeReadEvent
             if (calledMethod === this.methodName) {
                 // Attribute written to variable --> need to keep track of its new alias
                 const unwrappedVariable = DataLocationScoper.rightUnwrapScope(assignResultToName);
-                // Increase the SSA index by one since the actual value will be saved to the variable with the next index
+                // Increase the SSA index by 1 since the actual value will be saved to the variable with the next index
                 const nextSSAIndex = Number(unwrappedVariable.suffix) + 1;
                 const variableName = `${unwrappedVariable.prefix}${VAR_SCOPING_SPLITTER}${nextSSAIndex}`
 
@@ -161,206 +167,206 @@ export class AttributeReadEventVisitor implements CoreVisitor<AttributeReadEvent
         return this.nothingReadEvent;
     }
 
-    visitAddElementToStatement(node: AddElementToStatement): AttributeReadEvent {
+    visitAddElementToStatement(node: AddElementToStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitAndExpression(node: AndExpression): AttributeReadEvent {
+    visitAndExpression(node: AndExpression): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitAssumeStatement(node: AssumeStatement): AttributeReadEvent {
+    visitAssumeStatement(node: AssumeStatement): MethodValueReadEvent {
         return node.condition.accept(this);
     }
 
-    visitBeginAtomicStatement(node: BeginAtomicStatement): AttributeReadEvent {
+    visitBeginAtomicStatement(node: BeginAtomicStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitBooleanLiteral(node: BooleanLiteral): AttributeReadEvent {
+    visitBooleanLiteral(node: BooleanLiteral): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitBooleanVariableExpression(node: BooleanVariableExpression): AttributeReadEvent {
+    visitBooleanVariableExpression(node: BooleanVariableExpression): MethodValueReadEvent {
         return node.variable.accept(this);
     }
 
-    visitStringVariableExpression(node: StringVariableExpression): AttributeReadEvent {
+    visitStringVariableExpression(node: StringVariableExpression): MethodValueReadEvent {
         return node.variable.accept(this);
     }
 
-    visitActorVariableExpression(node: ActorVariableExpression): AttributeReadEvent {
+    visitActorVariableExpression(node: ActorVariableExpression): MethodValueReadEvent {
         return node.variable.accept(this);
     }
 
-    visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): AttributeReadEvent {
+    visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitBroadcastMessageStatement(node: BroadcastMessageStatement): AttributeReadEvent {
+    visitBroadcastMessageStatement(node: BroadcastMessageStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitCastExpression(node: CastExpression): AttributeReadEvent {
+    visitCastExpression(node: CastExpression): MethodValueReadEvent {
         return node.toConvertFrom.accept(this);
     }
 
-    visitCreateCloneOfStatement(node: CreateCloneOfStatement): AttributeReadEvent {
+    visitCreateCloneOfStatement(node: CreateCloneOfStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitDeclareActorVariableStatement(node: DeclareActorVariableStatement): AttributeReadEvent {
+    visitDeclareActorVariableStatement(node: DeclareActorVariableStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): AttributeReadEvent {
+    visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitDeclareSystemVariableStatement(node: DeclareSystemVariableStatement): AttributeReadEvent {
+    visitDeclareSystemVariableStatement(node: DeclareSystemVariableStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitDeleteFromAllStatement(node: DeleteAllFromStatement): AttributeReadEvent {
+    visitDeleteFromAllStatement(node: DeleteAllFromStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitDeleteIthFromStatement(node: DeleteIthFromStatement): AttributeReadEvent {
+    visitDeleteIthFromStatement(node: DeleteIthFromStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitDeleteThisCloneStatement(node: DeleteThisCloneStatement): AttributeReadEvent {
+    visitDeleteThisCloneStatement(node: DeleteThisCloneStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitDivideExpression(node: DivideExpression): AttributeReadEvent {
+    visitDivideExpression(node: DivideExpression): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitEndAtomicStatement(node: EndAtomicStatement): AttributeReadEvent {
+    visitEndAtomicStatement(node: EndAtomicStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitEpsilonStatement(node: EpsilonStatement): AttributeReadEvent {
+    visitEpsilonStatement(node: EpsilonStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitExpressionStatement(node: ExpressionStatement): AttributeReadEvent {
+    visitExpressionStatement(node: ExpressionStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitFloatLiteral(node: FloatLiteral): AttributeReadEvent {
+    visitFloatLiteral(node: FloatLiteral): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitStringLiteral(node: StringLiteral): AttributeReadEvent {
+    visitStringLiteral(node: StringLiteral): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitIndexOfExpression(node: IndexOfExpression): AttributeReadEvent {
+    visitIndexOfExpression(node: IndexOfExpression): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): AttributeReadEvent {
+    visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitInsertAtStatement(node: InsertAtStatement): AttributeReadEvent {
+    visitInsertAtStatement(node: InsertAtStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitIntegerLiteral(node: IntegerLiteral): AttributeReadEvent {
+    visitIntegerLiteral(node: IntegerLiteral): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitLengthOListExpression(node: LengthOfListExpression): AttributeReadEvent {
+    visitLengthOListExpression(node: LengthOfListExpression): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitLengthOfStringExpression(node: LengthOfStringExpression): AttributeReadEvent {
+    visitLengthOfStringExpression(node: LengthOfStringExpression): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitMinusExpression(node: MinusExpression): AttributeReadEvent {
+    visitMinusExpression(node: MinusExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    visitModuloExpression(node: ModuloExpression): AttributeReadEvent {
+    visitModuloExpression(node: ModuloExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    visitMultiplyExpression(node: MultiplyExpression): AttributeReadEvent {
+    visitMultiplyExpression(node: MultiplyExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    visitNegationExpression(node: NegationExpression): AttributeReadEvent {
+    visitNegationExpression(node: NegationExpression): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitNumEqualsExpression(node: NumEqualsExpression): AttributeReadEvent {
+    visitNumEqualsExpression(node: NumEqualsExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    visitNumGreaterEqualExpression(node: NumGreaterEqualExpression): AttributeReadEvent {
+    visitNumGreaterEqualExpression(node: NumGreaterEqualExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    visitNumGreaterThanExpression(node: NumGreaterThanExpression): AttributeReadEvent {
+    visitNumGreaterThanExpression(node: NumGreaterThanExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    visitNumLessEqualExpression(node: NumLessEqualExpression): AttributeReadEvent {
+    visitNumLessEqualExpression(node: NumLessEqualExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    visitNumLessThanExpression(node: NumLessThanExpression): AttributeReadEvent {
+    visitNumLessThanExpression(node: NumLessThanExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    visitNumberVariableExpression(node: NumberVariableExpression): AttributeReadEvent {
+    visitNumberVariableExpression(node: NumberVariableExpression): MethodValueReadEvent {
         return node.variable.accept(this);
     }
 
-    visitOrExpression(node: OrExpression): AttributeReadEvent {
+    visitOrExpression(node: OrExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    visitPlusExpression(node: PlusExpression): AttributeReadEvent {
+    visitPlusExpression(node: PlusExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    private visitBinaryExpression(node: BinaryExpression<any, any>): AttributeReadEvent {
-        const op1Event: AttributeReadEvent = node.operand1.accept(this);
-        const op2Event: AttributeReadEvent = node.operand2.accept(this);
+    private visitBinaryExpression(node: BinaryExpression<any, any>): MethodValueReadEvent {
+        const op1Event: MethodValueReadEvent = node.operand1.accept(this);
+        const op2Event: MethodValueReadEvent = node.operand2.accept(this);
 
         return op1Event.combine(op2Event);
     }
 
-    visitReplaceElementAtStatement(node: ReplaceElementAtStatement): AttributeReadEvent {
+    visitReplaceElementAtStatement(node: ReplaceElementAtStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitResetTimerStatement(node: ResetTimerStatement): AttributeReadEvent {
+    visitResetTimerStatement(node: ResetTimerStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitSignalTargetReachedStatement(node: SignalTargetReachedStatement): AttributeReadEvent {
+    visitSignalTargetReachedStatement(node: SignalTargetReachedStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitStopAllStatement(node: StopAllStatement): AttributeReadEvent {
+    visitStopAllStatement(node: StopAllStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitStopOthersInActorStatement(node: StopOthersInActorStatement): AttributeReadEvent {
+    visitStopOthersInActorStatement(node: StopOthersInActorStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitStopThisStatement(node: StopThisStatement): AttributeReadEvent {
+    visitStopThisStatement(node: StopThisStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): AttributeReadEvent {
+    visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): MethodValueReadEvent {
         // define asd as mouseX
         const variableName = node.variable.accept(this.printVisitor);
         const readEvent = node.toValue.accept(this);
@@ -372,37 +378,37 @@ export class AttributeReadEventVisitor implements CoreVisitor<AttributeReadEvent
         return this.nothingReadEvent;
     }
 
-    visitStrContainsExpression(node: StrContainsExpression): AttributeReadEvent {
+    visitStrContainsExpression(node: StrContainsExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    visitStrEqualsExpression(node: StrEqualsExpression): AttributeReadEvent {
+    visitStrEqualsExpression(node: StrEqualsExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    visitStrGreaterThanExpression(node: StrGreaterThanExpression): AttributeReadEvent {
+    visitStrGreaterThanExpression(node: StrGreaterThanExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    visitStrLessThanExpression(node: StrLessThanExpression): AttributeReadEvent {
+    visitStrLessThanExpression(node: StrLessThanExpression): MethodValueReadEvent {
         return this.visitBinaryExpression(node);
     }
 
-    visitTerminateProgramStatement(node: TerminateProgramStatement): AttributeReadEvent {
+    visitTerminateProgramStatement(node: TerminateProgramStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitTimerExpression(node: TimerExpression): AttributeReadEvent {
+    visitTimerExpression(node: TimerExpression): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
-    visitVariableWithDataLocation(node: VariableWithDataLocation): AttributeReadEvent {
+    visitVariableWithDataLocation(node: VariableWithDataLocation): MethodValueReadEvent {
         const variableName = node.qualifiedName;
 
-        return new AttributeReadEvent(this.usageToAttributeAlias.get(variableName));
+        return new MethodValueReadEvent(this.usageToAttributeAlias.get(variableName));
     }
 
-    visitWaitUntilStatement(node: WaitUntilStatement): AttributeReadEvent {
+    visitWaitUntilStatement(node: WaitUntilStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
