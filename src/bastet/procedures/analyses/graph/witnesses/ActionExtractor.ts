@@ -43,9 +43,9 @@ export abstract class ActionExtractor {
     }
 
     /**
-     * Returns the variable that was assigned the return value from the source method
-     * @param step
+     * Processes new operations that took place before the step.
      * @param operations
+     * @param step
      */
     processOperations(operations: ProgramOperation[], step: ErrorWitnessStep): void {
         const readEvent = operations
