@@ -107,17 +107,6 @@ export class ErrorWitnessStep {
     constructor(public id: number) {
     }
 
-    isEmpty(): boolean {
-        return !this.action || this.targets.length === 0;
-    }
-
-    relevantTransition(prev: ErrorWitnessStep) {
-        this.targets = this.targets.sort((t1, t2) => t1.name.localeCompare(t2.name));
-        return !prev
-            || this.timestamp - prev.timestamp > 1000
-            || JSON.stringify(this.targets) !== JSON.stringify(prev.targets);
-    }
-
     getUserDefinedAttributeValue(targetName: string, attribute: string): any {
         const target = this.targets.find(t => t.name === targetName);
         Preconditions.checkNotUndefined(target);
