@@ -591,8 +591,6 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     private precollectMethodSignatures(actorIdent: Identifier, ctx: MethodDefinitionListContext) {
-
-
         for (let md of ctx.methodDefinition()) {
             if (md instanceof FullMethodDefinitionContext) {
                 const identTr = md.ident().accept(this);
