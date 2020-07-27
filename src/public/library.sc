@@ -25,7 +25,15 @@ actor IOActor is RuntimeEntity begin
         // UNSOUND: might wait arbitrarily long
     end
 
-    script on dispatch do begin
+    script on startup do begin
+        // Hack as long no other dispatch handling is in place
+        repeat forever begin
+            broadcast "DISPATCH" () to "SYSTEM" and wait
+        end
+    end
+
+    // script on dispatch do begin
+    script on message "DISPATCH" () in "SYSTEM" do begin
         declare nondet_int as int
         declare nondet_boolean as boolean
 
