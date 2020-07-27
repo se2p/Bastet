@@ -58,8 +58,6 @@ export class AppToDot {
             const target: string = `output/${subfolder}/actor_${actor.ident}_script_${s.id}.dot`;
             toDotWriter.export(s.transitions, target);
         }
-        const target: string = `output/${subfolder}/actor_${actor.ident}_script_init.dot`;
-        toDotWriter.export(actor.initScript.transitions, target);
     }
 
 }
