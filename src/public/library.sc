@@ -283,271 +283,269 @@ role MathActor begin
         end
     end returns result: float
 
+    define atomic mathSinDegree (input: float) begin
+        declare radians as float
+        define radians as degToRad(input)
+        define result as mathSin(radians)
+    end returns result: float
+
     // mathSin approximates the sin value for a given radians number
     //
     // param alpha : float - radians number for which the sin value will be approximated
     // return result: float - the approximated interval
-    define atomic mathSin  (input: float) begin
-        if input > TWO_PI then begin
-            declare asDeg as int
-            define asDeg as cast (radToDeg(input)) to int
-            define asDeg as asDeg mod 360
-            define input as degToRad(asDeg)
+    define atomic mathSin (input: float) begin
+        if input >= 0.0 and input < 0.3142 then begin
+            assume result > 0.0
+            assume result <= 0.3091
+        end else if input >= 0.3142 and input < 0.4713 then begin
+            assume result > 0.3091
+            assume result <= 0.454
+        end else if input >= 0.4713 and input < 0.6284 then begin
+            assume result > 0.454
+            assume result <= 0.5879
+        end else if input >= 0.6284 and input < 0.7855 then begin
+            assume result > 0.5879
+            assume result <= 0.7072
+        end else if input >= 0.7855 and input < 0.9426 then begin
+            assume result > 0.7072
+            assume result <= 0.8091
+        end else if input >= 0.9426 and input < 1.0997 then begin
+            assume result > 0.8091
+            assume result <= 0.8911
+        end else if input >= 1.0997 and input < 1.2568 then begin
+            assume result > 0.8911
+            assume result <= 0.9511
+        end else if input >= 1.2568 and input < 1.4139 then begin
+            assume result > 0.9511
+            assume result <= 0.9877
+        end else if input >= 1.4139 and input < 1.571 then begin
+            assume result > 0.9877
+            assume result <= 1.0
+        end else if input >= 1.571 and input < 1.7281 then begin
+            assume result > 0.9877
+            assume result <= 1.0
+        end else if input >= 1.7281 and input < 1.8852 then begin
+            assume result > 0.951
+            assume result <= 0.9877
+        end else if input >= 1.8852 and input < 2.0423 then begin
+            assume result > 0.8909
+            assume result <= 0.951
+        end else if input >= 2.0423 and input < 2.1994 then begin
+            assume result > 0.8088
+            assume result <= 0.8909
+        end else if input >= 2.1994 and input < 2.3565 then begin
+            assume result > 0.7069
+            assume result <= 0.8088
+        end else if input >= 2.3565 and input < 2.5136 then begin
+            assume result > 0.5875
+            assume result <= 0.7069
+        end else if input >= 2.5136 and input < 2.6707 then begin
+            assume result > 0.4537
+            assume result <= 0.5875
+        end else if input >= 2.6707 and input < 2.8278 then begin
+            assume result > 0.3087
+            assume result <= 0.4537
+        end else if input >= 2.8278 and input < 2.9849 then begin
+            assume result > 0.1561
+            assume result <= 0.3087
+        end else if input >= 2.9849 and input < 3.142 then begin
+            assume result > 0.0 - 0.0004
+            assume result <= 0.1561
+        end else if input >= 3.142 and input < 3.2991 then begin
+            assume result > 0.0 - 0.1569
+            assume result <= 0.0 - 0.0004
+        end else if input >= 3.2991 and input < 3.4562 then begin
+            assume result > 0.0 - 0.3094
+            assume result <= 0.0 - 0.1569
+        end else if input >= 3.4562 and input < 3.6133 then begin
+            assume result > 0.0 - 0.4544
+            assume result <= 0.0 - 0.3094
+        end else if input >= 3.6133 and input < 3.7704 then begin
+            assume result > 0.0 - 0.5882
+            assume result <= 0.0 - 0.4544
+        end else if input >= 3.7704 and input < 3.9275 then begin
+            assume result > 0.0 - 0.7075
+            assume result <= 0.0 - 0.5882
+        end else if input >= 3.9275 and input < 4.0846 then begin
+            assume result > 0.0 - 0.8093
+            assume result <= 0.0 - 0.7075
+        end else if input >= 4.0846 and input < 4.2417 then begin
+            assume result > 0.0 - 0.8913
+            assume result <= 0.0 - 0.8093
+        end else if input >= 4.2417 and input < 4.3988 then begin
+            assume result > 0.0 - 0.9512
+            assume result <= 0.0 - 0.8913
+        end else if input >= 4.3988 and input < 4.5559 then begin
+            assume result > 0.0 - 0.9878
+            assume result <= 0.0 - 0.9512
+        end else if input >= 4.5559 and input < 4.713 then begin
+            assume result > 0.0 - 1.0
+            assume result <= 0.0 - 0.9878
+        end else if input >= 4.713 and input < 4.8701 then begin
+            assume result > 0.0 - 1.0
+            assume result <= 0.0 - 0.9876
+        end else if input >= 4.8701 and input < 5.0272 then begin
+            assume result > 0.0 - 0.9876
+            assume result <= 0.0 - 0.9509
+        end else if input >= 5.0272 and input < 5.1843 then begin
+            assume result > 0.0 - 0.9509
+            assume result <= 0.0 - 0.8907
+        end else if input >= 5.1843 and input < 5.3414 then begin
+            assume result > 0.0 - 0.8907
+            assume result <= 0.0 - 0.8086
+        end else if input >= 5.3414 and input < 5.4985 then begin
+            assume result > 0.0 - 0.8086
+            assume result <= 0.0 - 0.7066
+        end else if input >= 5.4985 and input < 5.6556 then begin
+            assume result > 0.0 - 0.7066
+            assume result <= 0.0 - 0.5872
+        end else if input >= 5.6556 and input < 5.8127 then begin
+            assume result > 0.0 - 0.5872
+            assume result <= 0.0 - 0.4533
+        end else if input >= 5.8127 and input < 5.9698 then begin
+            assume result > 0.0 - 0.4533
+            assume result <= 0.0 - 0.3083
+        end else if input >= 5.9698 and input < 6.1269 then begin
+            assume result > 0.0 - 0.3083
+            assume result <= 0.0 - 0.1556
+        end else if input >= 6.1269 and input < 6.284 then begin
+            assume result > 0.0 - 0.1556
+            assume result <= 0.0008
         end
+    end returns result: float
 
-        if input >=  0.0  and input <  0.1571 then begin
-            assume result >  0.0
-            assume result <=  0.1565
-        end else if input >=  0.1571  and input <  0.3142 then begin
-            assume result >  0.1565
-            assume result <=  0.3091
-        end else if input >=  0.3142  and input <  0.4712 then begin
-            assume result >  0.3091
-            assume result <=  0.454
-        end else if input >=  0.4712  and input <  0.6283 then begin
-            assume result >  0.454
-            assume result <=  0.5878
-        end else if input >=  0.6283  and input <  0.7854 then begin
-            assume result >  0.5878
-            assume result <=  0.7071
-        end else if input >=  0.7854  and input <  0.9425 then begin
-            assume result >  0.7071
-            assume result <=  0.809
-        end else if input >=  0.9425  and input <  1.0996 then begin
-            assume result >  0.809
-            assume result <=  0.891
-        end else if input >=  1.0996  and input <  1.2566 then begin
-            assume result >  0.891
-            assume result <=  0.951
-        end else if input >=  1.2566  and input <  1.4137 then begin
-            assume result >  0.951
-            assume result <=  0.9877
-        end else if input >=  1.4137  and input <  1.5708 then begin
-            assume result >  0.9877
-            assume result <=  1.0
-        end else if input >=  1.5708  and input <  1.7279 then begin
-            assume result <=  1.0
-            assume result >  0.9877
-        end else if input >=  1.7279  and input <  1.885 then begin
-            assume result <=  0.9877
-            assume result >  0.951
-        end else if input >=  1.885  and input <  2.042 then begin
-            assume result <=  0.951
-            assume result >  0.891
-        end else if input >=  2.042  and input <  2.1991 then begin
-            assume result <=  0.891
-            assume result >  0.809
-        end else if input >=  2.1991  and input <  2.3562 then begin
-            assume result <=  0.809
-            assume result >  0.7071
-        end else if input >=  2.3562  and input <  2.5133 then begin
-            assume result <=  0.7071
-            assume result >  0.5878
-        end else if input >=  2.5133  and input <  2.6704 then begin
-            assume result <=  0.5878
-            assume result >  0.4539
-        end else if input >=  2.6704  and input <  2.8274 then begin
-            assume result <=  0.4539
-            assume result >  0.309
-        end else if input >=  2.8274  and input <  2.9845 then begin
-            assume result <=  0.309
-            assume result >  0.1564
-        end else if input >=  2.9845  and input <  3.1416 then begin
-            assume result <=  0.1564
-            assume result >  0.0
-        end else if input >=  3.1416  and input <  3.2987 then begin
-            assume result <=  0.0
-            assume result >  0.0-0.1565
-        end else if input >=  3.2987  and input <  3.4558 then begin
-            assume result <=  0.0-0.1565
-            assume result >  0.0-0.3091
-        end else if input >=  3.4558  and input <  3.6128 then begin
-            assume result <=  0.0-0.3091
-            assume result >  0.0-0.454
-        end else if input >=  3.6128  and input <  3.7699 then begin
-            assume result <=  0.0-0.454
-            assume result >  0.0-0.5878
-        end else if input >=  3.7699  and input <  3.927 then begin
-            assume result <=  0.0-0.5878
-            assume result >  0.0-0.7071
-        end else if input >=  3.927  and input <  4.0841 then begin
-            assume result <=  0.0-0.7071
-            assume result >  0.0-0.809
-        end else if input >=  4.0841  and input <  4.2412 then begin
-            assume result <=  0.0-0.809
-            assume result >  0.0-0.891
-        end else if input >=  4.2412  and input <  4.3982 then begin
-            assume result <=  0.0-0.891
-            assume result >  0.0-0.951
-        end else if input >=  4.3982  and input <  4.5553 then begin
-            assume result <=  0.0-0.951
-            assume result >  0.0-0.9877
-        end else if input >=  4.5553  and input <  4.7124 then begin
-            assume result <=  0.0-0.9877
-            assume result >  0.0-1.0
-        end else if input >=  4.7124  and input <  4.8695 then begin
-            assume result >  0.0-1.0
-            assume result <=  0.0-0.9877
-        end else if input >=  4.8695  and input <  5.0265 then begin
-            assume result >  0.0-0.9877
-            assume result <=  0.0-0.9511
-        end else if input >=  5.0265  and input <  5.1836 then begin
-            assume result >  0.0-0.9511
-            assume result <=  0.0-0.891
-        end else if input >=  5.1836  and input <  5.3407 then begin
-            assume result >  0.0-0.891
-            assume result <=  0.0-0.809
-        end else if input >=  5.3407  and input <  5.4978 then begin
-            assume result >  0.0-0.809
-            assume result <=  0.0-0.7071
-        end else if input >=  5.4978  and input <  5.6549 then begin
-            assume result >  0.0-0.7071
-            assume result <=  0.0-0.5878
-        end else if input >=  5.6549  and input <  5.8119 then begin
-            assume result >  0.0-0.5878
-            assume result <=  0.0-0.454
-        end else if input >=  5.8119  and input <  5.969 then begin
-            assume result >  0.0-0.454
-            assume result <=  0.0-0.309
-        end else if input >=  5.969  and input <  6.1261 then begin
-            assume result >  0.0-0.309
-            assume result <=  0.0-0.1564
-        end
+    define atomic mathCosDegree (input: float) begin
+        declare radians as float
+        define radians as degToRad(input)
+        define result as mathCos(radians)
     end returns result: float
 
      // mathCos approximates the cos value for a given radians number
      //
      // param alpha : float - radians number for which the cos value will be approximated
      // return result: float - the approximated interval
-    define atomic mathCos  (input: float) begin
-        if input > TWO_PI then begin
-            declare asDeg as int
-            define asDeg as cast (radToDeg(input)) to int
-            define asDeg as asDeg mod 360
-            define input as degToRad(asDeg)
-        end
-
-        if input >=  0.0  and input <  0.1571 then begin
-            assume result <=  1.0
-            assume result >  0.9877
-        end else if input >=  0.1571  and input <  0.3142 then begin
-            assume result <=  0.9877
-            assume result >  0.951
-        end else if input >=  0.3142  and input <  0.4712 then begin
-            assume result <=  0.951
-            assume result >  0.891
-        end else if input >=  0.4712  and input <  0.6283 then begin
-            assume result <=  0.891
-            assume result >  0.809
-        end else if input >=  0.6283  and input <  0.7854 then begin
-            assume result <=  0.809
-            assume result >  0.7071
-        end else if input >=  0.7854  and input <  0.9425 then begin
-            assume result <=  0.7071
-            assume result >  0.5878
-        end else if input >=  0.9425  and input <  1.0996 then begin
-            assume result <=  0.5878
-            assume result >  0.454
-        end else if input >=  1.0996  and input <  1.2566 then begin
-            assume result <=  0.454
-            assume result >  0.3091
-        end else if input >=  1.2566  and input <  1.4137 then begin
-            assume result <=  0.3091
-            assume result >  0.1565
-        end else if input >=  1.4137  and input <  1.5708 then begin
-            assume result <=  0.1565
-            assume result >  0.0
-        end else if input >=  1.5708  and input <  1.7279 then begin
-            assume result <=  0.0
-            assume result >  0.0-0.1565
-        end else if input >=  1.7279  and input <  1.885 then begin
-            assume result <=  0.0-0.1565
-            assume result >  0.0-0.3091
-        end else if input >=  1.885  and input <  2.042 then begin
-            assume result <=  0.0-0.3091
-            assume result >  0.0-0.454
-        end else if input >=  2.042  and input <  2.1991 then begin
-            assume result <=  0.0-0.454
-            assume result >  0.0-0.5878
-        end else if input >=  2.1991  and input <  2.3562 then begin
-            assume result <=  0.0-0.5878
-            assume result >  0.0-0.7071
-        end else if input >=  2.3562  and input <  2.5133 then begin
-            assume result <=  0.0-0.7071
-            assume result >  0.0-0.809
-        end else if input >=  2.5133  and input <  2.6704 then begin
-            assume result <=  0.0-0.809
-            assume result >  0.0-0.891
-        end else if input >=  2.6704  and input <  2.8274 then begin
-            assume result <=  0.0-0.891
-            assume result >  0.0-0.951
-        end else if input >=  2.8274  and input <  2.9845 then begin
-            assume result <=  0.0-0.951
-            assume result >  0.0-0.9877
-        end else if input >=  2.9845  and input <  3.1416 then begin
-            assume result <=  0.0-0.9877
-            assume result >  0.0-1.0
-        end else if input >=  3.1416  and input <  3.2987 then begin
-            assume result <=  0.0-1.0
-            assume result >  0.0-0.9877
-        end else if input >=  3.2987  and input <  3.4558 then begin
-            assume result <=  0.0-0.9877
-            assume result >  0.0-0.951
-        end else if input >=  3.4558  and input <  3.6128 then begin
-            assume result <=  0.0-0.951
-            assume result >  0.0-0.891
-        end else if input >=  3.6128  and input <  3.7699 then begin
-            assume result <=  0.0-0.891
-            assume result >  0.0-0.809
-        end else if input >=  3.7699  and input <  3.927 then begin
-            assume result <=  0.0-0.809
-            assume result >  0.0-0.7071
-        end else if input >=  3.927  and input <  4.0841 then begin
-            assume result <=  0.0-0.7071
-            assume result >  0.0-0.5878
-        end else if input >=  4.0841  and input <  4.2412 then begin
-            assume result <=  0.0-0.5878
-            assume result >  0.0-0.4539
-        end else if input >=  4.2412  and input <  4.3982 then begin
-            assume result <=  0.0-0.4539
-            assume result >  0.0-0.309
-        end else if input >=  4.3982  and input <  4.5553 then begin
-            assume result <=  0.0-0.309
-            assume result >  0.0-0.1564
-        end else if input >=  4.5553  and input <  4.7124 then begin
-            assume result <=  0.0-0.1564
-            assume result >  0.0
-        end else if input >=  4.7124  and input <  4.8695 then begin
-            assume result <=  0.0
-            assume result >  0.1565
-        end else if input >=  4.8695  and input <  5.0265 then begin
-            assume result <=  0.1565
-            assume result >  0.309
-        end else if input >=  5.0265  and input <  5.1836 then begin
-            assume result <=  0.309
-            assume result >  0.454
-        end else if input >=  5.1836  and input <  5.3407 then begin
-            assume result <=  0.454
-            assume result >  0.5878
-        end else if input >=  5.3407  and input <  5.4978 then begin
-            assume result <=  0.5878
-            assume result >  0.7071
-        end else if input >=  5.4978  and input <  5.6549 then begin
-            assume result <=  0.7071
-            assume result >  0.809
-        end else if input >=  5.6549  and input <  5.8119 then begin
-            assume result <=  0.809
-            assume result >  0.891
-        end else if input >=  5.8119  and input <  5.969 then begin
-            assume result <=  0.891
-            assume result >  0.951
-        end else if input >=  5.969  and input <  6.1261 then begin
-            assume result <=  0.951
-            assume result >  0.9877
+    define atomic mathCos (input: float) begin
+        if input >= 0.0 and input < 0.3142 then begin
+            assume result > 0.951
+            assume result <= 1.0
+        end else if input >= 0.3142 and input < 0.4713 then begin
+            assume result > 0.891
+            assume result <= 0.951
+        end else if input >= 0.4713 and input < 0.6284 then begin
+            assume result > 0.809
+            assume result <= 0.891
+        end else if input >= 0.6284 and input < 0.7855 then begin
+            assume result > 0.707
+            assume result <= 0.809
+        end else if input >= 0.7855 and input < 0.9426 then begin
+            assume result > 0.5877
+            assume result <= 0.707
+        end else if input >= 0.9426 and input < 1.0997 then begin
+            assume result > 0.4539
+            assume result <= 0.5877
+        end else if input >= 1.0997 and input < 1.2568 then begin
+            assume result > 0.3089
+            assume result <= 0.4539
+        end else if input >= 1.2568 and input < 1.4139 then begin
+            assume result > 0.1563
+            assume result <= 0.3089
+        end else if input >= 1.4139 and input < 1.571 then begin
+            assume result > 0.0 - 0.0002
+            assume result <= 0.1563
+        end else if input >= 1.571 and input < 1.7281 then begin
+            assume result > 0.0 - 0.1567
+            assume result <= 0.0 - 0.0002
+        end else if input >= 1.7281 and input < 1.8852 then begin
+            assume result > 0.0 - 0.3092
+            assume result <= 0.0 - 0.1567
+        end else if input >= 1.8852 and input < 2.0423 then begin
+            assume result > 0.0 - 0.4542
+            assume result <= 0.0 - 0.3092
+        end else if input >= 2.0423 and input < 2.1994 then begin
+            assume result > 0.0 - 0.588
+            assume result <= 0.0 - 0.4542
+        end else if input >= 2.1994 and input < 2.3565 then begin
+            assume result > 0.0 - 0.7073
+            assume result <= 0.0 - 0.588
+        end else if input >= 2.3565 and input < 2.5136 then begin
+            assume result > 0.0 - 0.8092
+            assume result <= 0.0 - 0.7073
+        end else if input >= 2.5136 and input < 2.6707 then begin
+            assume result > 0.0 - 0.8912
+            assume result <= 0.0 - 0.8092
+        end else if input >= 2.6707 and input < 2.8278 then begin
+            assume result > 0.0 - 0.9512
+            assume result <= 0.0 - 0.8912
+        end else if input >= 2.8278 and input < 2.9849 then begin
+            assume result > 0.0 - 0.9877
+            assume result <= 0.0 - 0.9512
+        end else if input >= 2.9849 and input < 3.142 then begin
+            assume result > 0.0 - 1.0
+            assume result <= 0.0 - 0.9877
+        end else if input >= 3.142 and input < 3.2991 then begin
+            assume result > 0.0 - 1.0
+            assume result <= 0.0 - 0.9876
+        end else if input >= 3.2991 and input < 3.4562 then begin
+            assume result > 0.0 - 0.9876
+            assume result <= 0.0 - 0.9509
+        end else if input >= 3.4562 and input < 3.6133 then begin
+            assume result > 0.0 - 0.9509
+            assume result <= 0.0 - 0.8908
+        end else if input >= 3.6133 and input < 3.7704 then begin
+            assume result > 0.0 - 0.8908
+            assume result <= 0.0 - 0.8087
+        end else if input >= 3.7704 and input < 3.9275 then begin
+            assume result > 0.0 - 0.8087
+            assume result <= 0.0 - 0.7067
+        end else if input >= 3.9275 and input < 4.0846 then begin
+            assume result > 0.0 - 0.7067
+            assume result <= 0.0 - 0.5874
+        end else if input >= 4.0846 and input < 4.2417 then begin
+            assume result > 0.0 - 0.5874
+            assume result <= 0.0 - 0.4535
+        end else if input >= 4.2417 and input < 4.3988 then begin
+            assume result > 0.0 - 0.4535
+            assume result <= 0.0 - 0.3085
+        end else if input >= 4.3988 and input < 4.5559 then begin
+            assume result > 0.0 - 0.3085
+            assume result <= 0.0 - 0.1559
+        end else if input >= 4.5559 and input < 4.713 then begin
+            assume result > 0.0 - 0.1559
+            assume result <= 0.0006
+        end else if input >= 4.713 and input < 4.8701 then begin
+            assume result > 0.0006
+            assume result <= 0.1571
+        end else if input >= 4.8701 and input < 5.0272 then begin
+            assume result > 0.1571
+            assume result <= 0.3096
+        end else if input >= 5.0272 and input < 5.1843 then begin
+            assume result > 0.3096
+            assume result <= 0.4546
+        end else if input >= 5.1843 and input < 5.3414 then begin
+            assume result > 0.4546
+            assume result <= 0.5883
+        end else if input >= 5.3414 and input < 5.4985 then begin
+            assume result > 0.5883
+            assume result <= 0.7076
+        end else if input >= 5.4985 and input < 5.6556 then begin
+            assume result > 0.7076
+            assume result <= 0.8094
+        end else if input >= 5.6556 and input < 5.8127 then begin
+            assume result > 0.8094
+            assume result <= 0.8913
+        end else if input >= 5.8127 and input < 5.9698 then begin
+            assume result > 0.8913
+            assume result <= 0.9513
+        end else if input >= 5.9698 and input < 6.1269 then begin
+            assume result > 0.9513
+            assume result <= 0.9878
+        end else if input >= 6.1269 and input < 6.284 then begin
+            assume result > 0.9878
+            assume result <= 1.0
         end
     end returns result: float
 
-    // radToDeg calculates the degree value for a given radians valuenumber
+    // radToDeg calculates the degree value for a given radians value
     //
     // param rad: float - radians number for which the degree value will be calculated
     // return result: float - the calculated degree value
@@ -559,7 +557,7 @@ role MathActor begin
     // degToRad calculates the radians value for a given degree value
     //
     // param deg: float - degree number for which the radians value will be calculated
-    // return result: float - the calculated radians value
+    // return result: float - the calculated radians value [0..2*pi]
     define atomic degToRad(deg: float) begin
         // define result as (deg * PI) / 180.0
         define result as deg * 0.01745329252
@@ -1160,11 +1158,13 @@ role ScratchSprite is ScratchEntity begin
         declare ndir as float
 
         define nf as cast n to float
-
-//        define radians as degToRad(90.0 - cast direction to float)
         define ndir as cast direction to float
-        define dx as nf * mathCos(90.0 - ndir)
-        define dy as nf * mathSin(90.0 - ndir)
+
+        declare radians as float
+        define radians as degToRad(90.0 - ndir)
+
+        define dx as nf * mathCos(radians)
+        define dy as nf * mathSin(radians)
 
         declare tmpx as int
         declare tmpy as int

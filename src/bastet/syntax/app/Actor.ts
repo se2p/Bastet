@@ -94,9 +94,6 @@ export class Actor {
     /** Set of the actor's data locations (variables) */
     private readonly _datalocs: ImmutableMap<string, TypedDataLocation>;
 
-    /** List of initialization statements. Includes declarations and initializations. */
-    private readonly _initScript: Script;
-
     /** Set of the actor's methods with bodies (not external ones) */
     private readonly _methodDefinitions: ImmutableMap<string, MethodDefinition>;
 
@@ -124,7 +121,7 @@ export class Actor {
     constructor(mode: ActorMode, ident: ActorId, inheritFrom: Actor[],
                 dissolvedFrom: Actor[], concern: Concern,
                 resources: AppResourceMap, datalocs: DataLocationMap,
-                initScript: Script, methodDefs: MethodDefinitionMap,
+                methodDefs: MethodDefinitionMap,
                 externalMethods: MethodSignatureMap,
                 scripts: Script[], methods: Method[]) {
 
@@ -135,7 +132,6 @@ export class Actor {
         this._ident = Preconditions.checkNotUndefined(ident);
         this._inheritFrom = Lists.immutableCopyOf(inheritFrom);
         this._dissolvedFrom = Lists.immutableCopyOf(dissolvedFrom);
-        this._initScript = Preconditions.checkNotUndefined(initScript);
         this._resources = Maps.immutableCopyOf(resources);
         this._datalocs = Maps.immutableCopyOf(datalocs);
         this._methodDefinitions = Maps.immutableCopyOf(methodDefs);
@@ -162,10 +158,6 @@ export class Actor {
         this._methodMap = new ImmutableMap<string, Method>(methodMap.entries());
 
         this._transRelMap = new ImmutableMap<TransRelId, TransitionRelation>(transRelMap.entries());
-
-        Preconditions.checkArgument(initScript.event === BootstrapEvent.instance()
-            || initScript.event === TerminationEvent.instance()
-            || initScript.event === SingularityEvent.instance());
     }
 
     get ident(): string {
@@ -198,10 +190,6 @@ export class Actor {
 
     get concern(): Concern {
         return this._concern;
-    }
-
-    get initScript(): Script {
-        return this._initScript;
     }
 
     get methodDefs(): IterableIterator<MethodDefinition> {
@@ -349,7 +337,7 @@ export class Actors {
                 SingularityEvent.instance(), false, bootstrapTransitions);
             Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [], [],
                 Concerns.highestPriorityConcern(),
-                {}, {}, bootstrapScript, {}, {},
+                {}, {}, {}, {},
                 [bootstrapScript], []);
         }
 
@@ -367,7 +355,7 @@ export class Actors {
                 TerminationEvent.instance(), false, transitions);
             Actors._DEFAULT_TERMINATOR = new Actor(ActorMode.concrete(), "__TERMINATOR", [], [],
                 Concerns.defaultProgramConcern(),
-                {}, {}, script, {}, {},
+                {}, {}, {}, {},
                 [script], []);
         }
 

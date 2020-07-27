@@ -149,7 +149,7 @@ export class AppBuilder {
         }
 
         return new Actor(actorDefinition.mode, actorName, inheritsFromActors, [],
-            concern, resources, datalocs, initScript, methodDefs, externalMethodSigs, scripts, methods);
+            concern, resources, datalocs, methodDefs, externalMethodSigs, scripts, methods);
     }
 
     private determineConcern(actorDef: ActorDefinition): Concern {
@@ -338,10 +338,6 @@ export class AppBuilder {
         //      Rename the basic versions so that they can be referenced by the
         //      inheriting actors?
         const resources = Maps.mergeImmutableMaps(main.resourceMap, secondary.resourceMap);
-        const initScript = Scripts.concat(secondary.initScript, main.initScript);
-        // The init script must not use stack variables (only global or actor scoped).
-        this.ensureNoStackVariables(initScript);
-
 
         const methodDefMap: Map<string, MethodDefinition> = new Map()
         main.methodMap.forEach((v,k) => {
@@ -366,10 +362,7 @@ export class AppBuilder {
         const methods = new ImmutableList(Array.from(methodMap.values()))
         const externalMethods = Maps.mergeImmutableMaps(main.externalMethodMap, secondary.externalMethodMap);
         const datalocs = Maps.mergeImmutableMaps(main.datalocMap, secondary.datalocMap);
-
-        const mainNonInitScripts = new ImmutableList(main.scripts.createMutable().filter(s => s != main.initScript));
-        const secondNonInitScripts = new ImmutableList(secondary.scripts.createMutable().filter(s => s != secondary.initScript));
-        const scripts = Lists.concatImmutableLists(mainNonInitScripts, secondNonInitScripts);
+        const scripts = Lists.concatImmutableLists(main.scripts, secondary.scripts);
 
         // TODO: The way we dedetermine the concern of an actor is somehow hacky.
         //  We could take advantage of the inheritance relation
@@ -380,7 +373,7 @@ export class AppBuilder {
 
         return new Actor(main.actorMode, main.ident, [], [secondary].concat(Array.from(secondary.dissolvedFrom)),
             concern, resources.createMutable(), datalocs.createMutable(),
-            initScript, methodDefinitions.createMutable(), externalMethods.createMutable(),
+            methodDefinitions.createMutable(), externalMethods.createMutable(),
             scripts.createMutable(), methods.createMutable());
     }
 
@@ -458,7 +451,7 @@ export class AppBuilder {
 
             const actorPrime = new Actor(actor.actorMode, actor.ident, actor.inheritFrom.createMutable(),
                 actor.dissolvedFrom.createMutable(), actor.concern, actor.resourceMap.createMutable(),
-                actor.datalocMap.createMutable(), actor.initScript,
+                actor.datalocMap.createMutable(),
                 methodDefsPrime, actor.externalMethodMap.createMutable(), actor.scripts.createMutable(), methodsPrime);
 
             actorMap[actorPrime.ident] = actorPrime;
@@ -467,12 +460,4 @@ export class AppBuilder {
         return new App(taskModel.origin, taskModel.ident, actorMap, taskModel.typeStorage);
     }
 
-    private ensureNoStackVariables(initScript: Script) {
-        for (const [f, o, t] of initScript.transitions.transitions) {
-            const op = ProgramOperation.for(o);
-            if (op instanceof DeclareStackVariableStatement) {
-                throw new IllegalArgumentException();
-            }
-        }
-    }
 }
