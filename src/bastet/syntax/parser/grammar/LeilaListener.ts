@@ -29,8 +29,8 @@ import { ConcreteActorModeContext } from "./LeilaParser";
 import { ActorRoleModeContext } from "./LeilaParser";
 import { ExternFunctionReturnDefinitionContext } from "./LeilaParser";
 import { ExternVoidReturnDefinitionContext } from "./LeilaParser";
-import { MessageNameSpaceContext } from "./LeilaParser";
-import { GlobalNameSpaceContext } from "./LeilaParser";
+import { QualifiedNamespaceContext } from "./LeilaParser";
+import { UnqualifiedNamespaceContext } from "./LeilaParser";
 import { StoreEvalResultStatementContext } from "./LeilaParser";
 import { StoreCallResultStatementContext } from "./LeilaParser";
 import { ListVariableExpressionContext } from "./LeilaParser";
@@ -73,6 +73,8 @@ import { DeleteIthFromStatementContext } from "./LeilaParser";
 import { AddElementToStatementContext } from "./LeilaParser";
 import { InsertAtStatementContext } from "./LeilaParser";
 import { ReplaceElementAtStatementContext } from "./LeilaParser";
+import { NamedMessageDestinationContext } from "./LeilaParser";
+import { ActorMessageDestinationContext } from "./LeilaParser";
 import { FunctionReturnDefinitionContext } from "./LeilaParser";
 import { VoidReturnDefinitionContext } from "./LeilaParser";
 import { WaitSecsStatementContext } from "./LeilaParser";
@@ -196,6 +198,7 @@ import { IdentContext } from "./LeilaParser";
 import { NumberContext } from "./LeilaParser";
 import { ResourceLocatorContext } from "./LeilaParser";
 import { MessageContext } from "./LeilaParser";
+import { MessageDestinationContext } from "./LeilaParser";
 
 
 /**
@@ -542,30 +545,30 @@ export interface LeilaListener extends ParseTreeListener {
 	exitExternVoidReturnDefinition?: (ctx: ExternVoidReturnDefinitionContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `MessageNameSpace`
+	 * Enter a parse tree produced by the `QualifiedNamespace`
 	 * labeled alternative in `LeilaParser.messageNamespace`.
 	 * @param ctx the parse tree
 	 */
-	enterMessageNameSpace?: (ctx: MessageNameSpaceContext) => void;
+	enterQualifiedNamespace?: (ctx: QualifiedNamespaceContext) => void;
 	/**
-	 * Exit a parse tree produced by the `MessageNameSpace`
+	 * Exit a parse tree produced by the `QualifiedNamespace`
 	 * labeled alternative in `LeilaParser.messageNamespace`.
 	 * @param ctx the parse tree
 	 */
-	exitMessageNameSpace?: (ctx: MessageNameSpaceContext) => void;
+	exitQualifiedNamespace?: (ctx: QualifiedNamespaceContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `GlobalNameSpace`
+	 * Enter a parse tree produced by the `UnqualifiedNamespace`
 	 * labeled alternative in `LeilaParser.messageNamespace`.
 	 * @param ctx the parse tree
 	 */
-	enterGlobalNameSpace?: (ctx: GlobalNameSpaceContext) => void;
+	enterUnqualifiedNamespace?: (ctx: UnqualifiedNamespaceContext) => void;
 	/**
-	 * Exit a parse tree produced by the `GlobalNameSpace`
+	 * Exit a parse tree produced by the `UnqualifiedNamespace`
 	 * labeled alternative in `LeilaParser.messageNamespace`.
 	 * @param ctx the parse tree
 	 */
-	exitGlobalNameSpace?: (ctx: GlobalNameSpaceContext) => void;
+	exitUnqualifiedNamespace?: (ctx: UnqualifiedNamespaceContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `StoreEvalResultStatement`
@@ -1112,6 +1115,32 @@ export interface LeilaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitReplaceElementAtStatement?: (ctx: ReplaceElementAtStatementContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NamedMessageDestination`
+	 * labeled alternative in `LeilaParser.messageDestination`.
+	 * @param ctx the parse tree
+	 */
+	enterNamedMessageDestination?: (ctx: NamedMessageDestinationContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NamedMessageDestination`
+	 * labeled alternative in `LeilaParser.messageDestination`.
+	 * @param ctx the parse tree
+	 */
+	exitNamedMessageDestination?: (ctx: NamedMessageDestinationContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `ActorMessageDestination`
+	 * labeled alternative in `LeilaParser.messageDestination`.
+	 * @param ctx the parse tree
+	 */
+	enterActorMessageDestination?: (ctx: ActorMessageDestinationContext) => void;
+	/**
+	 * Exit a parse tree produced by the `ActorMessageDestination`
+	 * labeled alternative in `LeilaParser.messageDestination`.
+	 * @param ctx the parse tree
+	 */
+	exitActorMessageDestination?: (ctx: ActorMessageDestinationContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `FunctionReturnDefinition`
@@ -2581,5 +2610,16 @@ export interface LeilaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitMessage?: (ctx: MessageContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `LeilaParser.messageDestination`.
+	 * @param ctx the parse tree
+	 */
+	enterMessageDestination?: (ctx: MessageDestinationContext) => void;
+	/**
+	 * Exit a parse tree produced by `LeilaParser.messageDestination`.
+	 * @param ctx the parse tree
+	 */
+	exitMessageDestination?: (ctx: MessageDestinationContext) => void;
 }
 

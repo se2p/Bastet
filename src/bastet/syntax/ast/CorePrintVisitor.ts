@@ -37,7 +37,7 @@ import {
     CloneStartEvent,
     ConditionReachedEvent,
     MessageReceivedEvent,
-    NeverEvent,
+    NeverEvent, QualifiedMessageNamespace,
     RenderedMonitoringEvent,
     SingularityEvent,
     StartupEvent,
@@ -85,6 +85,7 @@ import {
     StringVariableExpression
 } from "./core/expressions/StringExpression";
 import {
+    ActorSelfExpression,
     ActorVariableExpression,
     LocateActorExpression,
     StartCloneActorExpression,
@@ -126,7 +127,7 @@ import {ActorType, BooleanType, FloatType, IntegerType, ListType, StringEnumType
 import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
-import {SystemMessage, UserMessage} from "./core/Message";
+import {ActorDestination, NamedDestination, SystemMessage, UserMessage} from "./core/Message";
 import {
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
@@ -143,6 +144,7 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
 
     visitReturnStatement(node: ReturnStatement): string {
         return 'RETURN';
+
     }
 
     visitUserMessage(node: UserMessage): string {
@@ -345,6 +347,10 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
         return node.variable.accept(this);
     }
 
+    visitActorSelfExpression(node: ActorSelfExpression): string {
+        return "self";
+    }
+
     visitActorVariableExpression(node: ActorVariableExpression): string {
         return node.variable.accept(this);
     }
@@ -409,8 +415,16 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
         return `enter atomic`;
     }
 
+    visitNamedDestination(node: NamedDestination): string {
+        return `"${node.namespace.accept(this)}"`
+    }
+
+    visitActorDestination(node: ActorDestination): string {
+        return node.actor.accept(this);
+    }
+
     visitSystemMessage(node: SystemMessage): string {
-        return `${node.messageid.accept(this)}/${node.namespace.accept(this)}`;
+        return `${node.messageid.accept(this)}/${node.destination.accept(this)}`;
     }
 
     visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): string {

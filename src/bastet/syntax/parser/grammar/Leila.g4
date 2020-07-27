@@ -103,7 +103,7 @@ event :
   | 'statement' 'finished' # AfterStatementMonitoringEvent
   ;
 
-messageNamespace : 'in' String # MessageNameSpace | #GlobalNameSpace;
+messageNamespace : 'in' String # QualifiedNamespace | #UnqualifiedNamespace ;
 
 // Scratch allows to define procedures, that is,
 // reusable code blocks (also known as 'custom blocks').
@@ -376,5 +376,9 @@ resourceLocator : String ;
 
 message :
   stringExpr # UserMessage
-  | stringExpr expressionList 'to' String # SystemMessage
+  | stringExpr expressionList 'to' messageDestination # SystemMessage
   ;
+
+messageDestination :
+    String # NamedMessageDestination
+    | actorExpr # ActorMessageDestination ;

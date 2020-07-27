@@ -38,7 +38,7 @@ import {AbstractElement, Lattices} from "../../../lattices/Lattice";
 import {ControlAnalysisConfig} from "./ControlAnalysis";
 import {App} from "../../../syntax/app/App";
 import {Preconditions} from "../../../utils/Preconditions";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
 import {
     TransitionLoop,
     TransitionRelation,
@@ -84,18 +84,24 @@ import {
     StringLiteral
 } from "../../../syntax/ast/core/expressions/StringExpression";
 import {
-    AfterStatementMonitoringEvent,
-    MessageReceivedEvent,
-    TerminationEvent
+    AfterStatementMonitoringEvent, MessageNamespace,
+    MessageReceivedEvent, QualifiedMessageNamespace,
+    TerminationEvent, UnqualifiedMessageNamespace
 } from "../../../syntax/ast/core/CoreEvent";
 import {Concern, Concerns} from "../../../syntax/Concern";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {Script, ScriptId} from "../../../syntax/app/controlflow/Script";
 import {getTheNextElement, getTheOnlyElement} from "../../../utils/Collections";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
-import {BOOTSTRAP_FINISHED_MESSAGE, SystemMessage} from "../../../syntax/ast/core/Message";
+import {
+    ActorDestination,
+    BOOTSTRAP_FINISHED_MESSAGE,
+    isBootstrapFinishedMessage, NamedDestination,
+    SystemMessage
+} from "../../../syntax/ast/core/Message";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {
+    ActorSelfExpression,
     LocateActorExpression,
     StartCloneActorExpression,
     UsherActorExpression
@@ -653,7 +659,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         } else if (stepOp.ast instanceof BroadcastMessageStatement) {
             const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
-            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(result, stmt.msg);
+            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(threadToStep.threadStatus.getActorId(), result, stmt.msg);
 
             // Prepare the waiting threads for running
             for (const waitForThread of waitFor) {
@@ -665,7 +671,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         } else if (stepOp.ast instanceof BroadcastAndWaitStatement) {
             const steppedThread = threadToStep.threadStatus;
             const stmt: BroadcastAndWaitStatement = stepOp.ast as BroadcastAndWaitStatement;
-            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(result, stmt.msg);
+            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(threadToStep.threadStatus.getActorId(), result, stmt.msg);
 
             // Prepare the waiting threads for running
             for (const waitForThread of waitFor) {
@@ -677,7 +683,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     ts.withComputationState(ThreadComputationState.THREAD_STATE_WAIT));
             }
 
-            if (stepOp.ast.msg.isEqualTo(BOOTSTRAP_FINISHED_MESSAGE)) {
+            if (isBootstrapFinishedMessage(stepOp.ast.msg)) {
                 result = this.activateAfterStepMonitoring(result);
             }
 
@@ -1139,7 +1145,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         Preconditions.checkState(running <= 1);
     }
 
-    private getAllMessageReceiverThreadsFrom(abstractState: ControlAbstractState, msg: SystemMessage): IndexedThread[] {
+    private getAllMessageReceiverThreadsFrom(sendingActor: ActorId, abstractState: ControlAbstractState, msg: SystemMessage): IndexedThread[] {
         const result: IndexedThread[] = [];
         let index = 0;
         for (const t of abstractState.getThreadStates()) {
@@ -1150,7 +1156,10 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
             if (script.event instanceof MessageReceivedEvent) {
                 const ev: MessageReceivedEvent = script.event as MessageReceivedEvent;
-                if (this.matchesMessage(ev.message, ev.namespace, msg)) {
+
+                // Check if the message matches
+                const handlingActor = t.getActorId();
+                if (this.isHandlerFor(ev, handlingActor, sendingActor, msg)) {
                     result.push(new IndexedThread(t, index));
                 }
             }
@@ -1159,21 +1168,48 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result;
     }
 
+    private isHandlerFor(ev: MessageReceivedEvent, handlingActor: ActorId, sendingActor: ActorId, msg: SystemMessage) {
+        const receivedMessageId = this.evaluateToConcreteMessage(msg.messageid);
+        const handlingMessageId = this.evaluateToConcreteMessage(ev.message);
+        const handlingMessageNamespace = ev.namespace;
+
+        if (receivedMessageId != handlingMessageId) {
+            return false;
+        }
+
+        if (handlingMessageNamespace instanceof UnqualifiedMessageNamespace) {
+            if (msg.destination instanceof ActorDestination) {
+                if (msg.destination.actor instanceof ActorSelfExpression) {
+                    if (handlingActor == sendingActor) {
+                        return true;
+                    }
+                }
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else if (handlingMessageNamespace instanceof QualifiedMessageNamespace) {
+            const recevedInNamespaceId = this.evaluateToConcreteMessage(handlingMessageNamespace.namespaceName);
+            if (msg.destination instanceof NamedDestination) {
+                const receivedForNamespaceId = this.evaluateToConcreteMessage(msg.destination.namespace);
+                if (recevedInNamespaceId == receivedForNamespaceId) {
+                    return true;
+                }
+            } else {
+                throw new IllegalArgumentException();
+            }
+        } else {
+            throw new ImplementMeForException(handlingMessageNamespace.constructor.name);
+        }
+
+        return false;
+    }
+
     private evaluateToConcreteMessage(msg: StringExpression): string {
         if (msg instanceof StringLiteral) {
             const lit = msg as StringLiteral;
             return lit.text;
         }
         throw new ImplementMeException();
-    }
-
-    private matchesMessage(message: StringExpression, namespace: StringExpression, msg: SystemMessage) {
-        const msg1_namespace: string = this.evaluateToConcreteMessage(msg.namespace);
-        const msg1_message: string = this.evaluateToConcreteMessage(msg.messageid);
-
-        const msg2_message: string = this.evaluateToConcreteMessage(message);
-
-        return msg1_message == msg2_message;
     }
 
     /**

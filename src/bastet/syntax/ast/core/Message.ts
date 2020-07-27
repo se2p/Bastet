@@ -26,29 +26,68 @@
 import {AbstractNode} from "../AstNode";
 import {extractStringLiteral, StringExpression, StringLiteral} from "./expressions/StringExpression";
 import {ExpressionList} from "./expressions/ExpressionList";
+import {Preconditions} from "../../../utils/Preconditions";
+import {ActorExpression} from "./expressions/ActorExpression";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import instantiate = WebAssembly.instantiate;
 
 export interface Message {
 
 }
 
-export const SYSTEM_NAMESPACE = StringLiteral.from("SYSTEM");
-export const USER_NAMESPACE = StringLiteral.from("USER");
+export const SYSTEM_NAMESPACE_NAME = StringLiteral.from("SYSTEM");
+export const USER_NAMESPACE_NAME = StringLiteral.from("USER");
+
+export abstract class MessageDestination extends AbstractNode {
+
+}
+
+export class NamedDestination extends MessageDestination {
+
+    private readonly _namespace: StringLiteral;
+
+    constructor(namespace: StringLiteral) {
+        super([namespace]);
+        this._namespace = Preconditions.checkNotUndefined(namespace);
+    }
+
+    get namespace(): StringLiteral {
+        return this._namespace;
+    }
+}
+
+export class ActorDestination extends MessageDestination {
+
+    private readonly _actor: ActorExpression;
+
+    constructor(actor: ActorExpression) {
+        super([actor]);
+        this._actor = Preconditions.checkNotUndefined(actor);
+    }
+
+    get actor(): ActorExpression {
+        return this._actor;
+    }
+}
+
+export const SYSTEM_NAMESPACE: NamedDestination = new NamedDestination(SYSTEM_NAMESPACE_NAME);
+export const USER_NAMESPACE: NamedDestination = new NamedDestination(USER_NAMESPACE_NAME);
 
 export class SystemMessage extends AbstractNode implements Message {
 
-    private readonly _namespace: StringLiteral;
+    private readonly _destination: MessageDestination;
     private readonly _messageid: StringExpression;
     private readonly _payload: ExpressionList;
 
-    constructor(namespace: StringLiteral, messageid: StringExpression, payload: ExpressionList) {
-        super([namespace, messageid, payload]);
-        this._namespace = namespace;
+    constructor(destination: MessageDestination, messageid: StringExpression, payload: ExpressionList) {
+        super([destination, messageid, payload]);
+        this._destination = destination;
         this._messageid = messageid;
         this._payload = payload;
     }
 
-    get namespace() : StringLiteral {
-        return this._namespace;
+    get destination() : MessageDestination {
+        return this._destination;
     }
 
     get messageid() : StringExpression {
@@ -57,11 +96,6 @@ export class SystemMessage extends AbstractNode implements Message {
 
     get payload() : ExpressionList {
         return this._payload
-    }
-
-    public isEqualTo(msg: SystemMessage): boolean {
-       return extractStringLiteral(msg.messageid) == extractStringLiteral(this.messageid)
-           && extractStringLiteral(msg.namespace) == extractStringLiteral(this.namespace);
     }
 
 }
@@ -74,9 +108,23 @@ export class UserMessage extends SystemMessage implements Message {
 
 }
 
-export const BOOTSTRAP_MESSAGE = new SystemMessage(SYSTEM_NAMESPACE, StringLiteral.from("__BOOTSTRAP"), ExpressionList.empty());
-export const BOOTSTRAP_FINISHED_MESSAGE = new SystemMessage(SYSTEM_NAMESPACE, StringLiteral.from("__BOOTSTRAP_FINISHED"), ExpressionList.empty());
-export const GREENFLAG_MESSAGE = new SystemMessage(SYSTEM_NAMESPACE, StringLiteral.from("__STARTUP"), ExpressionList.empty());
+export function extractNamespaceName(dest: MessageDestination): string {
+    Preconditions.checkArgument(dest instanceof NamedDestination);
+    return extractStringLiteral((dest as NamedDestination).namespace);
+}
+
+export function isBootstrapFinishedMessage(msg: SystemMessage): boolean {
+    return (extractStringLiteral(msg.messageid) == BOOTSTRAP_FINISHED_MESSAGE_MSG)
+        && (extractNamespaceName(msg.destination) == SYSTEM_NAMESPACE_NAME.text);
+}
+
+export const BOOTSTRAP_MESSAGE_MSG = "__BOOTSTRAP";
+export const BOOTSTRAP_FINISHED_MESSAGE_MSG = "__BOOTSTRAP_FINISHED";
+export const GREENFLAG_MESSAGE_MSG = "__STARTUP";
+
+export const BOOTSTRAP_MESSAGE = new SystemMessage(SYSTEM_NAMESPACE, StringLiteral.from(BOOTSTRAP_MESSAGE_MSG), ExpressionList.empty());
+export const BOOTSTRAP_FINISHED_MESSAGE = new SystemMessage(SYSTEM_NAMESPACE, StringLiteral.from(BOOTSTRAP_FINISHED_MESSAGE_MSG), ExpressionList.empty());
+export const GREENFLAG_MESSAGE = new SystemMessage(SYSTEM_NAMESPACE, StringLiteral.from(GREENFLAG_MESSAGE_MSG), ExpressionList.empty());
 export const STARTUP_MESSAGE = GREENFLAG_MESSAGE;
 export const STARTUP_FINISHED_MESSAGE = new SystemMessage(SYSTEM_NAMESPACE, StringLiteral.from("__STARTUP_FINISHED"), ExpressionList.empty());
 

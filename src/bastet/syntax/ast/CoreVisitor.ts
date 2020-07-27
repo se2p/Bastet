@@ -102,6 +102,7 @@ import {AssumeStatement} from "./core/statements/AssumeStatement";
 import {VariableWithDataLocation} from "./core/Variable";
 import {CastExpression} from "./core/expressions/CastExpression";
 import {
+    ActorSelfExpression,
     ActorVariableExpression,
     LocateActorExpression,
     StartCloneActorExpression,
@@ -228,6 +229,8 @@ export interface CoreBoolExpressionVisitor<R> extends CoreVisitor<R> {
 }
 
 export interface CoreActorExpressionVisitor<R> extends CoreVisitor<R> {
+
+    visitActorSelfExpression(node: ActorSelfExpression): R;
 
     visitLocateActorExpression(node: LocateActorExpression): R;
 

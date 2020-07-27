@@ -59,6 +59,14 @@ export class ActorVariableExpression extends AbstractActorExpression implements 
 
 }
 
+export class ActorSelfExpression extends AbstractActorExpression {
+
+    constructor() {
+        super([]);
+    }
+
+}
+
 export class LocateActorExpression extends AbstractActorExpression {
 
     private readonly _actorName: StringExpression;

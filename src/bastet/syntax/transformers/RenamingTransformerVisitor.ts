@@ -125,7 +125,7 @@ import {BeginAtomicStatement, EndAtomicStatement, ReturnStatement} from "../ast/
 import {SystemMessage, UserMessage} from "../ast/core/Message";
 import {CastExpression} from "../ast/core/expressions/CastExpression";
 import {
-    ActorExpression,
+    ActorExpression, ActorSelfExpression,
     ActorVariableExpression,
     LocateActorExpression,
     StartCloneActorExpression,
@@ -556,7 +556,7 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitSystemMessage(node: SystemMessage): AstNode {
-       return new SystemMessage(node.namespace,
+       return new SystemMessage(node.destination,
            node.messageid.accept(this) as StringExpression,
            node.payload.accept(this) as ExpressionList) ;
     }
@@ -566,6 +566,10 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
             return new BroadcastMessageStatement(
                 node.msg.accept(this) as SystemMessage);
         }));
+    }
+
+    visitActorSelfExpression(node: ActorSelfExpression): AstNode {
+        return node;
     }
 
     visitLocateActorExpression(node: LocateActorExpression): AstNode {

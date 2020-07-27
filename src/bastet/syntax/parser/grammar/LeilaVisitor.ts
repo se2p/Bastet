@@ -29,8 +29,8 @@ import { ConcreteActorModeContext } from "./LeilaParser";
 import { ActorRoleModeContext } from "./LeilaParser";
 import { ExternFunctionReturnDefinitionContext } from "./LeilaParser";
 import { ExternVoidReturnDefinitionContext } from "./LeilaParser";
-import { MessageNameSpaceContext } from "./LeilaParser";
-import { GlobalNameSpaceContext } from "./LeilaParser";
+import { QualifiedNamespaceContext } from "./LeilaParser";
+import { UnqualifiedNamespaceContext } from "./LeilaParser";
 import { StoreEvalResultStatementContext } from "./LeilaParser";
 import { StoreCallResultStatementContext } from "./LeilaParser";
 import { ListVariableExpressionContext } from "./LeilaParser";
@@ -73,6 +73,8 @@ import { DeleteIthFromStatementContext } from "./LeilaParser";
 import { AddElementToStatementContext } from "./LeilaParser";
 import { InsertAtStatementContext } from "./LeilaParser";
 import { ReplaceElementAtStatementContext } from "./LeilaParser";
+import { NamedMessageDestinationContext } from "./LeilaParser";
+import { ActorMessageDestinationContext } from "./LeilaParser";
 import { FunctionReturnDefinitionContext } from "./LeilaParser";
 import { VoidReturnDefinitionContext } from "./LeilaParser";
 import { WaitSecsStatementContext } from "./LeilaParser";
@@ -196,6 +198,7 @@ import { IdentContext } from "./LeilaParser";
 import { NumberContext } from "./LeilaParser";
 import { ResourceLocatorContext } from "./LeilaParser";
 import { MessageContext } from "./LeilaParser";
+import { MessageDestinationContext } from "./LeilaParser";
 
 
 /**
@@ -415,20 +418,20 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitExternVoidReturnDefinition?: (ctx: ExternVoidReturnDefinitionContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `MessageNameSpace`
+	 * Visit a parse tree produced by the `QualifiedNamespace`
 	 * labeled alternative in `LeilaParser.messageNamespace`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitMessageNameSpace?: (ctx: MessageNameSpaceContext) => Result;
+	visitQualifiedNamespace?: (ctx: QualifiedNamespaceContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `GlobalNameSpace`
+	 * Visit a parse tree produced by the `UnqualifiedNamespace`
 	 * labeled alternative in `LeilaParser.messageNamespace`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitGlobalNameSpace?: (ctx: GlobalNameSpaceContext) => Result;
+	visitUnqualifiedNamespace?: (ctx: UnqualifiedNamespaceContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `StoreEvalResultStatement`
@@ -765,6 +768,22 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitReplaceElementAtStatement?: (ctx: ReplaceElementAtStatementContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `NamedMessageDestination`
+	 * labeled alternative in `LeilaParser.messageDestination`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitNamedMessageDestination?: (ctx: NamedMessageDestinationContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `ActorMessageDestination`
+	 * labeled alternative in `LeilaParser.messageDestination`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitActorMessageDestination?: (ctx: ActorMessageDestinationContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `FunctionReturnDefinition`
@@ -1684,5 +1703,12 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitMessage?: (ctx: MessageContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LeilaParser.messageDestination`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitMessageDestination?: (ctx: MessageDestinationContext) => Result;
 }
 

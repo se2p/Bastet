@@ -1115,15 +1115,6 @@ role ScratchSprite is ScratchEntity begin
     //      define y as 0
     //
 
-    script on message "CLICK" () in "SYSTEM" do begin
-        if touchingMousePointer() then begin
-            broadcast "SPRITE_CLICK" () to self
-        end
-    end
-
-    script on message "SPRITE_CLICK" () in self do begin
-    end
-
     define atomic pointTowards (s: actor) begin
         declare targetX as int
         declare targetY as int
@@ -1393,6 +1384,12 @@ role ScratchSprite is ScratchEntity begin
             end
         end
     end returns result : boolean
+
+    script on message "CLICK" () in "SYSTEM" do begin
+        if touchingMousePointer() then begin
+            broadcast "SPRITE_CLICK" () to self
+        end
+    end
 
 end
 
