@@ -69,7 +69,7 @@ export abstract class ActionExtractor {
         this._stepToAssignments.set(step.id, assignments);
     }
 
-    setActionForStep(step: ErrorWitnessStep, nextStep: ErrorWitnessStep): void {
+    setActionForStep(step: ErrorWitnessStep, successors: ErrorWitnessStep[]): void {
         if (step) {
             const assignments = this._stepToAssignments.get(step.id);
             Preconditions.checkNotUndefined(assignments);
@@ -79,11 +79,25 @@ export abstract class ActionExtractor {
             if (assignmentWithReadEvent) {
                 const variableNameWithoutSSA = DataLocationScoper.rightUnwrapScope(assignmentWithReadEvent.variable).prefix;
                 // The value is only defined in the next step
-                const variableValue = nextStep.getUserDefinedAttributeValue(step.actionTargetName, variableNameWithoutSSA);
+                const variableValue = this.getFirstDefinedVariableValue(variableNameWithoutSSA, successors, step.actionTargetName);
+
+                Preconditions.checkState(variableValue !== undefined, `Unknown variable '${variableNameWithoutSSA}'`)
 
                 this.setActionForStepInternal(step, variableValue);
             }
         }
+    }
+
+    private getFirstDefinedVariableValue(variableName: string, steps: ErrorWitnessStep[], targetName: string): any {
+        for (const step of steps) {
+            const value = step.getUserDefinedAttributeValue(targetName, variableName);
+
+            if (value !== undefined) {
+                return value;
+            }
+        }
+
+        throw new Error(`Unknown variable '${variableName}' in '${targetName}'`);
     }
 
     protected abstract setActionForStepInternal(step: ErrorWitnessStep, actionValue): void;

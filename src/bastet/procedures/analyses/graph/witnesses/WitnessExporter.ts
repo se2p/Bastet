@@ -36,7 +36,7 @@ import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {App} from "../../../../syntax/app/App";
 import {ControlAbstractState, RelationLocation} from "../../control/ControlAbstractDomain";
 import {ControlLocationExtractor} from "../../control/ControlUtils";
-import {Action, ActionWithWeight, ErrorWitnessActionVisitor} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
+import {Action, ErrorWitnessActionVisitor} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
 import {ErrorWitness, ErrorWitnessStep, Target} from "./ErrorWitness";
 import {AccessibilityRelation, AccessibilityRelations} from "../../Accessibility";
@@ -73,7 +73,7 @@ export const DEFAULT_WITNESS_EXPORTER_CONFIG: WitnessExporterConfig = {
     removeActors: ['IOActor'],
     removeStepsBeforeBootstrap: true,
     minWaitTime: 1000,
-    keepDebuggingAttributes: false
+    keepDebuggingAttributes: true
 }
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
@@ -183,7 +183,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                     actionExtractor.processOperations(transitionLabel, step);
                 }
 
-                step.action = this.getDefaultAction(transitionLabel);
+                step.epsilonType = this.getDefaultAction(transitionLabel);
             }
 
             errorWitness.steps.push(step);
@@ -195,16 +195,21 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             errorWitness.steps = WitnessExporter.removeAllBeforeAction(errorWitness.steps, Action.INITIAL_STATE);
         }
 
-        if (this._config.collapseAtomicBlocks) {
-            errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
+        let alteredSteps = [];
+        const steps = errorWitness.steps.reverse();
+        while (steps.length > 0) {
+            const step = steps.pop();
+            for (const actionExtractor of actionExtractors) {
+                actionExtractor.setActionForStep(step, steps);
+            }
+
+            alteredSteps.push(step);
         }
 
-        let previousStep: ErrorWitnessStep = undefined;
-        for (const step of errorWitness.steps) {
-            for (const actionExtractor of actionExtractors) {
-                actionExtractor.setActionForStep(previousStep, step);
-            }
-            previousStep = step;
+        errorWitness.steps = alteredSteps;
+
+        if (this._config.collapseAtomicBlocks) {
+            errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
         }
 
         return errorWitness;
@@ -233,7 +238,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         let prevStep: ErrorWitnessStep;
 
         for (const step of errorWitnessSteps) {
-            if (!ActionWithWeight.isActionEpsilonLike(step.action)) {
+            if (step.action !== undefined || step.epsilonType === Action.INITIAL_STATE || step.epsilonType === Action.REACHED_VIOLATION) {
                 if (prevStep) {
                     prevStep.action = Action.WAIT;
                     filteredArray.push(prevStep);
@@ -258,7 +263,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     }
 
     private static removeAllBeforeAction(steps: ErrorWitnessStep[], action: Action): ErrorWitnessStep[] {
-        let index = steps.findIndex(step => step.action === action);
+        let index = steps.findIndex(step => step.epsilonType === action);
 
         Preconditions.checkState(index >= 0);
 
@@ -339,43 +344,60 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         const filteredArray = [];
 
         let openAtomicBrackets = 0;
-        let collapsedActionLabel = undefined;
-        let idOfOpeningStep = undefined;
+        let atomicBlock: ErrorWitnessStep[] = [];
 
         for (const step of steps) {
-            if (step.action === Action.LEAVE_ATOMIC) {
+            if (step.epsilonType === Action.LEAVE_ATOMIC
+                    || step.epsilonType === Action.REACHED_VIOLATION && openAtomicBrackets > 0) {
+                atomicBlock.push(step);
                 openAtomicBrackets--;
 
                 Preconditions.checkArgument(openAtomicBrackets >= 0, "Missing opening atomic bracket")
 
                 if (openAtomicBrackets === 0) {
-                    step.id = idOfOpeningStep;
-                    step.action = Action.COLLAPSED_ATOMIC;
-                    step.actionLabel = `${collapsedActionLabel}; ${step.actionLabel}`;
-                    collapsedActionLabel = undefined;
+                    this.collapseOneAtomicBlock(atomicBlock).forEach(step => {
+                        filteredArray.push(step);
+                    });
+                    atomicBlock = [];
                 }
-            } else if (step.action === Action.ENTER_ATOMIC) {
-                if (openAtomicBrackets === 0) {
-                    idOfOpeningStep = step.id;
-                }
+            } else if (step.epsilonType === Action.ENTER_ATOMIC) {
                 openAtomicBrackets++;
-            } else if (step.action === Action.REACHED_VIOLATION && openAtomicBrackets > 0) {
-                // Error was reached inside an atomic block
-                openAtomicBrackets--;
-                step.actionLabel = `${collapsedActionLabel}; ${step.actionLabel}`;
-                collapsedActionLabel = undefined;
-            }
-
-            if (openAtomicBrackets === 0) {
-                filteredArray.push(step);
+                atomicBlock.push(step);
+            } else if (openAtomicBrackets > 0) {
+                atomicBlock.push(step);
             } else {
-                collapsedActionLabel = collapsedActionLabel ? `${collapsedActionLabel}; ${step.actionLabel}` : step.actionLabel;
+                filteredArray.push(step);
             }
         }
 
         Preconditions.checkArgument(openAtomicBrackets === 0, `Missing ${openAtomicBrackets} closing atomic bracket(s)`);
 
         return filteredArray;
+    }
+
+    private static collapseOneAtomicBlock(atomicBlock: ErrorWitnessStep[]): ErrorWitnessStep[] {
+        const lastStep = atomicBlock[atomicBlock.length - 1];
+
+        let collapsedAtomicBlock: ErrorWitnessStep[] = [];
+        let collapsedActionLabel: string = undefined;
+
+        for (const step of atomicBlock) {
+            const isRelevant = step.action !== undefined || step === lastStep;
+
+            if (isRelevant) {
+                step.targets = lastStep.targets;
+                if (collapsedActionLabel) {
+                    step.actionLabel = `${collapsedActionLabel}; ${step.actionLabel}`;
+                    collapsedActionLabel = undefined;
+                }
+
+                collapsedAtomicBlock.push(step);
+            } else {
+                collapsedActionLabel = collapsedActionLabel ? `${collapsedActionLabel}; ${step.actionLabel}` : step.actionLabel;
+            }
+        }
+
+        return collapsedAtomicBlock;
     }
 
     private static addWaitTimes(steps: ErrorWitnessStep[]): void {

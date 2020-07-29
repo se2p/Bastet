@@ -96,6 +96,7 @@ export interface MousePosition {
 export class ErrorWitnessStep {
     timestamp: number;
     action: Action;
+    epsilonType: Action;
     waitMicros?: number;
     keyPressed?: number;
     answer?: string;
