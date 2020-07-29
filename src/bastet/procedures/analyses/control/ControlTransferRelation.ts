@@ -250,6 +250,41 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             }
         }
 
+        return this.trackSteppedThreads(result);
+    }
+
+    /**
+     * Keep track of the last threads that were stepped by concern (program or observer/spec).
+     */
+    private trackSteppedThreads(states: Iterable<ControlAbstractState>): Iterable<ControlAbstractState> {
+        const result: ControlAbstractState[] = [];
+
+        for (const state of states) {
+            const nonobservers: Set<number> = new Set();
+            const observers: Set<number> = new Set();
+
+            // Determine the types of the stepped threads
+            for (const ix of state.getSteppedFor()) {
+                const t: ThreadState = state.getThreadStates().get(ix);
+                if (this.isObserverThread(t)) {
+                    observers.add(ix);
+                } else {
+                    nonobservers.add(ix);
+                }
+            }
+
+            // Conduct the tracking
+            // (if one observer thread is stepped, we assume that all stepped threads are observers).
+            if (observers.size == 0) {
+                Preconditions.checkState(nonobservers.size >= 0);
+                result.push(state.withLastSteppedNonObserverThreadIndices(nonobservers));
+            } else {
+                // Observers where stepped
+                Preconditions.checkState(nonobservers.size == 0);
+                result.push(state)
+            }
+        }
+
         return result;
     }
 
@@ -964,8 +999,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             (op) => {return this.scopeOperations([op], state.getActorScopes(),
                 conditionScopeStack, conditionScopeStack)[0]});
 
-        return wrappedResult.map(([w,t]) => new ControlAbstractState(state.getThreadStates(),
-            state.getConditionStates(), w, state.getIsTargetFor(), state.getSteppedFor(), state.getActorScopes()));
+        return wrappedResult.map(([w,t]) => state.withWrappedState(w));
     }
 
     private filterAcceleratableConditionThreads(conditionStates: ImmList<ThreadState>): AccelInfo[] {
@@ -1085,24 +1119,44 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return [result];
     }
 
+    private getNextYieldThreadFrom(startIndex: number, threads: ImmList<ThreadState>, filter: (t: ThreadState) => boolean): number {
+        let indexToCheck = (startIndex + 1) % threads.size;
+        let checked = 0;
+        while (checked <= threads.size) {
+            indexToCheck = (indexToCheck + 1) % threads.size;
+            const threadAtIndex = threads.get(indexToCheck);
+            if (filter(threadAtIndex)) {
+                if (threadAtIndex.getComputationState() === ThreadComputationState.THREAD_STATE_YIELD) {
+                    return indexToCheck;
+                }
+            }
+            checked++;
+        }
+
+        return -1;
+    }
+
+    /**
+     * Choose the set of threads to step next from the threads that are in the state YIELD.
+     */
     private determineNextThreadToStep(resultBase: ControlAbstractState, steppedThreadIdx: number): number {
         const threads = resultBase.getThreadStates();
 
         let programThreadToRun: number = -1;
 
-        let indexToCheck = (steppedThreadIdx + 1) % threads.size;
-        let checked = 0;
-        while (checked <= threads.size) {
-            indexToCheck = (indexToCheck + 1) % threads.size;
-            const threadAtIndex = threads.get(indexToCheck);
-            if (threadAtIndex.getComputationState() === ThreadComputationState.THREAD_STATE_YIELD) {
-                if (this.isObserverThread(threadAtIndex)) {
-                    return indexToCheck;
-                } else {
-                    programThreadToRun = indexToCheck;
-                }
-            }
-            checked++;
+        const wasObserverStepped: boolean = this.isObserverThread(resultBase.getIndexedThreadState(steppedThreadIdx).threadStatus);
+        const hasObserverInYieldAt: number = this.getNextYieldThreadFrom(steppedThreadIdx, threads, (t) => this.isObserverThread(t));
+
+        if (wasObserverStepped && hasObserverInYieldAt == -1) {
+            // Continue to schedule threads starting from the last stepped non-observer thread
+            const lastSteppedNonObserver = getTheOnlyElement(resultBase.getLastSteppedNonObserverThreadIndices());
+            programThreadToRun = this.getNextYieldThreadFrom(lastSteppedNonObserver, threads, (t) => true);
+
+        } else if (hasObserverInYieldAt > -1) {
+            return hasObserverInYieldAt;
+
+        } else {
+            programThreadToRun = this.getNextYieldThreadFrom(steppedThreadIdx, threads, (t) => true);
         }
 
         if (programThreadToRun > -1) {
