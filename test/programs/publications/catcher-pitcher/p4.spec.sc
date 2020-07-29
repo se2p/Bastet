@@ -9,6 +9,20 @@ actor CatcherObserver is Observer begin
     declare x as int
     declare y as int
 
+    /**
+    * Informal specification: The actor "catcher" should move
+    * from left to right until it is clicked.
+    *
+    * In particular, the specification is violated if
+    * (1) the actor does not move at all (independent of clicks),
+    * (2) if the actor moves from right to left if there was no click to it before.
+    *
+    * Note that a 'move' can be done in different ways and
+    * with different speeds. One step (part of a move) might,
+    * for example, be done only every second.
+    *
+    * Question: What happens if the sprite reaches the border?
+    */
     define atomic checkBehaviorSatisfied () begin
         define y as cast (attribute "y" of catcher) to int
         define x as cast (attribute "x" of catcher) to int

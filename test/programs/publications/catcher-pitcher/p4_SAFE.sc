@@ -4,11 +4,14 @@ actor Catcher is ScratchSprite begin
 
     image waiting "catcher_waiting.svg"
     image caught "catcher_caught.svg"
+
     declare moving as boolean
 
+    script on bootstrap do begin
+        define moving as true
+    end
 
     script on startup do begin
-        define moving as true
         changeCostumeTo("waiting")
 
         until not moving repeat begin

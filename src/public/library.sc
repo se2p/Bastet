@@ -48,6 +48,7 @@ actor IOActor is RuntimeEntity begin
         define mouse_down as nondet_down
 
         define mouse_clicked as mouse_down and not last_mouse_down
+                    _RUNTIME_signalFailure("foooo")
         if mouse_clicked then begin
             broadcast "CLICK" () to "SYSTEM"
         end
