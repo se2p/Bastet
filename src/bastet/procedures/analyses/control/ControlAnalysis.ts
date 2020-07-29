@@ -72,6 +72,10 @@ export class ControlAnalysisConfig extends BastetConfiguration {
 
 }
 
+function getRandomInt(max): number {
+    return Math.floor(Math.random() * Math.floor(max));
+}
+
 export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcreteState, ControlAbstractState, AbstractState>,
     WrappingProgramAnalysis<ControlConcreteState, ControlAbstractState, AbstractState>,
     Unwrapper<ControlAbstractState, AbstractElement> {
@@ -335,8 +339,19 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
             const relA: TransitionRelation = this._task.getTransitionRelationById(relLocA.getRelationId());
             const rpoA: number = relA.getWaitAtMeetOrderOf(relLocA.getLocationId());
 
-            return new LexiKey([rpoA * -1]); // We use a Max-Priority-Queue. Larger elements are prefered but we
+            return new LexiKey([rpoA]); // We use a Max-Priority-Queue. Larger elements are prefered but we
             // what to process elements with the smaller wait-at-meet order first
+        }
+
+        return new LexiKey([]);
+    }
+
+    getLexiDiffKey(ofState: ControlAbstractState): LexiKey {
+        const steppedThreadsA = ofState.getSteppedFor().map((i) => ofState.getIndexedThreadState(i));
+
+        if (steppedThreadsA.size == 1) {
+            const steppedA: IndexedThread = getTheOnlyElement(steppedThreadsA);
+            return new LexiKey([steppedA.threadStatus.getThreadId()]);
         }
 
         return new LexiKey([]);

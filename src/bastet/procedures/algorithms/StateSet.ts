@@ -28,6 +28,8 @@ import {Preconditions} from "../../utils/Preconditions";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {getTheOnlyElement} from "../../utils/Collections";
 import {Heap} from 'heap-js';
+import {LexiKey} from "../../utils/Lexicographic";
+import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 
 export interface PartitionKeyAttribs extends AbstractElement {
 
@@ -145,6 +147,14 @@ export interface StatePartitionOperator<E extends AbstractElement> {
 
 }
 
+export type SinglePartitionKeyOp<E extends AbstractElement> = (E) => LexiKey;
+
+export interface SingleStatePartitionOperator<E extends AbstractElement> {
+
+    getPartitionKey(element: E): LexiKey;
+
+}
+
 export class NoPartitioningOperator<E extends AbstractElement> implements StatePartitionOperator<E> {
 
     getPartitionKeys(element: E): ImmSet<PartitionKey> {
@@ -216,6 +226,124 @@ export class PartitionedOrderedSet<E extends AbstractElement> {
 
     get size(): number {
         return this._size;
+    }
+
+    public [Symbol.iterator](): IterableIterator<E> {
+        return this._elements[Symbol.iterator]();
+    }
+
+}
+
+export class DifferencingFrontierSet<E extends AbstractElement> implements FrontierSet<E> {
+
+    private _size: number;
+
+    private _diffKeyOperator: SinglePartitionKeyOp<E>;
+
+    private _elements: Set<E>;
+
+    private _partitions: ImmMap<LexiKey, PriorityFrontierSet<E>>;
+
+    private readonly _intraPartitionComparator: StateOrderComparator<E>;
+
+    private _lastPartitionIndex: number;
+
+    constructor(partitionOperator: SinglePartitionKeyOp<E>, intraPartitionComparator: StateOrderComparator<E>) {
+        this._diffKeyOperator = Preconditions.checkNotUndefined(partitionOperator);
+        this._intraPartitionComparator = Preconditions.checkNotUndefined(intraPartitionComparator);
+        this._size = 0;
+        this._elements = new Set<E>();
+        this._partitions = ImmMap<LexiKey, PriorityFrontierSet<E>>().asMutable();
+        this._lastPartitionIndex = 0;
+    }
+
+    private getPartitionKey(element: E): LexiKey {
+        return this._diffKeyOperator(element);
+    }
+
+    public getPartitionOf(element: E): PriorityFrontierSet<E> {
+        const key: LexiKey = this.getPartitionKey(element);
+        return this.getPartition(key);
+    }
+
+    private getPartition(key: LexiKey): PriorityFrontierSet<E> {
+        let result = this._partitions.get(key);
+        if (!result) {
+            result = new PriorityFrontierSet(this._intraPartitionComparator);
+            this._partitions.set(key, result);
+        }
+
+        return result;
+    }
+
+    public remove(element: E) {
+        const partitionKey = this.getPartitionKey(element);
+
+        this.getPartition(partitionKey).remove(element);
+        if (this._elements.delete(element)) {
+            this._size--;
+        }
+    }
+
+    public add(element: E) {
+        const partitionKey = this.getPartitionKey(element);
+        this.getPartition(partitionKey).add(element);
+
+        this._elements.add(element);
+        this._size++;
+    }
+
+    public has(element: E): boolean {
+        return this._elements.has(element);
+    }
+
+    public isEmpty(): boolean {
+        return this._size == 0;
+    }
+
+    get size(): number {
+        return this._size;
+    }
+
+    peek(): E {
+        const keys = this._partitions.keySeq().toArray();
+        let checked = 0;
+
+        while (checked < keys.length) {
+            this._lastPartitionIndex = (this._lastPartitionIndex + 1) % keys.length;
+            const key = keys[this._lastPartitionIndex];
+            const set = this._partitions.get(key);
+
+            if (set.getSize() > 0) {
+                const result = set.peek();
+                if (set.getSize() == 0) {
+                    this._partitions.delete(key);
+                }
+
+                return result;
+            } else {
+                this._partitions.delete(key);
+            }
+            checked = checked + 1;
+        }
+
+        throw new IllegalStateException("No elements to peek");
+    }
+
+    removeAll(elements: Iterable<E>) {
+        for (const e of elements) {
+            this.remove(e);
+        }
+    }
+
+    addAll(elements: Iterable<E>) {
+        for (const e of elements) {
+            this.add(e);
+        }
+    }
+
+    getSize(): number {
+        return this.size;
     }
 
     public [Symbol.iterator](): IterableIterator<E> {
