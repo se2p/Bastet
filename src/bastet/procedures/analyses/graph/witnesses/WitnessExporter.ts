@@ -196,9 +196,9 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         }
 
         let alteredSteps = [];
-        const steps = errorWitness.steps.reverse();
+        const steps = errorWitness.steps;
         while (steps.length > 0) {
-            const step = steps.pop();
+            const step = steps.shift();
             for (const actionExtractor of actionExtractors) {
                 actionExtractor.setActionForStep(step, steps);
             }
