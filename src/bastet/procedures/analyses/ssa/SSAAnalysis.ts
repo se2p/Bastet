@@ -186,6 +186,10 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return this._wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
     }
 
+    getLexiDiffKey(ofState: SSAState): LexiKey {
+        return this._wrappedAnalysis.getLexiDiffKey(ofState.getWrappedState());
+    }
+
     finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }

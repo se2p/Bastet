@@ -41,7 +41,7 @@ import {
     RenderedMonitoringEvent,
     SingularityEvent,
     StartupEvent,
-    TerminationEvent
+    TerminationEvent, UnqualifiedMessageNamespace
 } from "./core/CoreEvent";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {
@@ -144,7 +144,14 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
 
     visitReturnStatement(node: ReturnStatement): string {
         return 'RETURN';
+    }
 
+    visitUnqualifiedMessageNamespace(node: UnqualifiedMessageNamespace): string {
+        return "";
+    }
+
+    visitQualifiedMessageNamespace(node: QualifiedMessageNamespace): string {
+        return `in ${node.namespaceName.accept(this)}`;
     }
 
     visitUserMessage(node: UserMessage): string {

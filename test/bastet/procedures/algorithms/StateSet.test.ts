@@ -22,7 +22,7 @@
 
 
 import {Map as ImmMap, List as ImmList, Record as ImmRec} from "immutable"
-import {PartitionKey} from "../../../../src/bastet/procedures/algorithms/StateSet";
+import {DifferencingFrontierSet, PartitionKey} from "../../../../src/bastet/procedures/algorithms/StateSet";
 
 describe('State Sets', function() {
 

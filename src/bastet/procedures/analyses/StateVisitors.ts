@@ -80,7 +80,7 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
         const script = actor.getScript(t.getScriptId());
 
         const astVisitor = new CorePrintVisitor();
-        return `${wasStepped(threadIndex) ? "*" : ""}[${t.getThreadId()} ${t.getActorId()} ${t.getScriptId()} ${script.event.accept(astVisitor)} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()} ${t.getWaitingForThreads().join("+")}]`;
+        return `${wasStepped(threadIndex) ? "*" : ""}[${t.getThreadId()} a${t.getInAtomicMode()} ${t.getActorId()} ${t.getScriptId()} ${script.event.accept(astVisitor)} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()} ${t.getWaitingForThreads().join("+")}]`;
     }
 
     private formatConditionThreadDetails(cs: ControlAbstractState, t: ThreadState, threadIndex: number): string {

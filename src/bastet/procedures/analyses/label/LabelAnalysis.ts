@@ -205,6 +205,10 @@ export class LabelAnalysis<F extends AbstractState>
         return this._wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
     }
 
+    getLexiDiffKey(ofState: LabelState): LexiKey {
+        return this._wrappedAnalysis.getLexiDiffKey(ofState.getWrappedState());
+    }
+
     finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }

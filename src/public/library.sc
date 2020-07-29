@@ -14,6 +14,7 @@ actor IOActor is RuntimeEntity begin
 
     declare mouse_down as boolean
     declare last_mouse_down as boolean
+    declare mouse_clicked as boolean
 
     script on message "ASK" () in "SYSTEM" do begin
         declare nondet_str as string
@@ -34,16 +35,21 @@ actor IOActor is RuntimeEntity begin
 
     // script on dispatch do begin
     script on message "DISPATCH" () in "SYSTEM" do begin
-        declare nondet_int as int
-        declare nondet_boolean as boolean
+        declare nondet_x as int
+        define mouse_x as nondet_x
 
-        define key_pressed as nondet_int
-        define mouse_down as nondet_boolean
+        declare nondet_y as int
+        define mouse_y as nondet_y
 
-        if mouse_down then begin
-            if not last_mouse_down then begin
-                broadcast "CLICK" () to "SYSTEM"
-            end
+        declare nondet_key as int
+        define key_pressed as nondet_key
+
+        declare nondet_down as boolean
+        define mouse_down as nondet_down
+
+        define mouse_clicked as mouse_down and not last_mouse_down
+        if mouse_clicked then begin
+            broadcast "CLICK" () to "SYSTEM"
         end
 
         define last_key_pressed as key_pressed
@@ -803,13 +809,17 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     // @Category "Sensing"
     // @Block "mouse x"
     define atomic mouseX() begin
-        // NON-DET position
+        declare io as actor
+        define io as locate actor "IOActor"
+        define result as cast (attribute "mouse_x" of io) to int
     end returns result: int
 
     // @Category "Sensing"
     // @Block "mouse y"
     define atomic mouseY()  begin
-        // NON-DET position
+        declare io as actor
+        define io as locate actor "IOActor"
+        define result as cast (attribute "mouse_y" of io) to int
     end returns result: int
 
     // @Category "Sensing"
@@ -906,10 +916,10 @@ role Observer is RuntimeEntity begin
         define snd_left as x_snd - half_width_snd
         define snd_right as x_snd + half_width_snd
 
-        define fst_bottom as x_fst - half_height_fst
-        define fst_top as x_fst + half_height_fst
-        define snd_bottom as x_snd - half_height_snd
-        define snd_top as x_snd + half_height_snd
+        define fst_bottom as y_fst - half_height_fst
+        define fst_top as y_fst + half_height_fst
+        define snd_bottom as y_snd - half_height_snd
+        define snd_top as y_snd + half_height_snd
 
         declare xOverlap as boolean
         declare yOverlap as boolean
@@ -1209,13 +1219,27 @@ role ScratchSprite is ScratchEntity begin
 
     // @Category "Sensing"
     define atomic touchingMousePointer () begin
-        if not (mouseX() < x
-                or mouseX() > x + active_graphic_half_width
-                or mouseY() < y
-                or mouseY() > y + active_graphic_half_height) then begin
+        declare obj_left as int
+        define obj_left as x - active_graphic_half_width
+        declare obj_right as int
+        define obj_right as x + active_graphic_half_width
 
-            define result as false
-        end
+        declare obj_top as int
+        define obj_top as y + active_graphic_half_height
+        declare obj_bottom as int
+        define obj_bottom as y - active_graphic_half_height
+
+        declare mx as int
+        define mx as mouseX()
+        declare my as int
+        define my as mouseY()
+
+        declare xOverlap as boolean
+        define xOverlap as mx >= obj_left and mx <= obj_right
+        declare yOverlap as boolean
+        define yOverlap as my >= obj_bottom and my <= obj_top
+
+        define result as xOverlap and yOverlap
     end returns result : boolean
 
     // @Category "Sensing"
@@ -1298,10 +1322,10 @@ role ScratchSprite is ScratchEntity begin
             define snd_left as x_snd - half_width_snd
             define snd_right as x_snd + half_width_snd
 
-            define fst_bottom as x_fst - half_height_fst
-            define fst_top as x_fst + half_height_fst
-            define snd_bottom as x_snd - half_height_snd
-            define snd_top as x_snd + half_height_snd
+            define fst_bottom as y_fst - half_height_fst
+            define fst_top as y_fst + half_height_fst
+            define snd_bottom as y_snd - half_height_snd
+            define snd_top as y_snd + half_height_snd
 
             declare xOverlap as boolean
             declare yOverlap as boolean
@@ -1376,22 +1400,6 @@ role ScratchSprite is ScratchEntity begin
         define wrapped as wrapClamp(cast dir to float, 0.0-179.0, 180.0)
         define direction as cast wrapped to int
     end
-
-    define atomic spriteClicked() begin
-        define result as false
-
-        // A 'click' is triggered by a MOUSE_DOWN
-        // The next 'click' is triggered if there was a MOUSE_UP in-between
-        // (use a variable 'last mouse status'?)
-        declare clicked as boolean
-        // TODO: Finish this method
-
-        if clicked then begin
-            if touchingMousePointer() then begin
-                define result as true
-            end
-        end
-    end returns result : boolean
 
     script on message "CLICK" () in "SYSTEM" do begin
         if touchingMousePointer() then begin

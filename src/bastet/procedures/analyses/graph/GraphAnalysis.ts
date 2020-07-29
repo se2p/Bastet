@@ -39,11 +39,11 @@ import {
     CHOOSE_EITHER,
     CHOOSE_FIRST,
     CHOOSE_SECOND,
-    DefaultFrontierSet,
+    DefaultFrontierSet, DifferencingFrontierSet,
     FrontierSet,
     PartitionKey,
     PriorityFrontierSet,
-    ReachedSet,
+    ReachedSet, SingleStatePartitionOperator,
     StatePartitionOperator,
     StateSet,
 } from "../../algorithms/StateSet";
@@ -242,7 +242,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         if (this._config.graphConstructionOrder == "DepthFirst") {
             frontierSet = new DefaultFrontierSet();
         } else if (this._config.graphConstructionOrder == "WaitAtMeet") {
-            frontierSet = new PriorityFrontierSet<GraphAbstractState>(this);
+            frontierSet = new DifferencingFrontierSet<GraphAbstractState>((e) => this.getLexiDiffKey(e), this);
         } else {
             throw new IllegalArgumentException("Invalid custruction order: " + this._config.graphConstructionOrder);
         }
@@ -294,6 +294,10 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
 
     getLexiOrderKey(ofState: GraphAbstractState): LexiKey {
         return this.wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
+    }
+
+    getLexiDiffKey(ofState: GraphAbstractState): LexiKey {
+        return this.wrappedAnalysis.getLexiDiffKey(ofState.getWrappedState());
     }
 
     finalizeResults(frontier: FrontierSet<GraphAbstractState>, reached: ReachedSet<GraphAbstractState>) {
