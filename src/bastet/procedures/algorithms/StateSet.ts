@@ -147,7 +147,9 @@ export interface StatePartitionOperator<E extends AbstractElement> {
 
 }
 
-export type SinglePartitionKeyOp<E extends AbstractElement> = (E) => LexiKey;
+export type SinglePartitionKeyFunction<E extends AbstractElement> = (E) => LexiKey;
+
+export type StateOrderingFunction<E extends AbstractElement> = (a: E, b: E) => number;
 
 export interface SingleStatePartitionOperator<E extends AbstractElement> {
 
@@ -238,17 +240,17 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
 
     private _size: number;
 
-    private _diffKeyOperator: SinglePartitionKeyOp<E>;
+    private _diffKeyOperator: SinglePartitionKeyFunction<E>;
 
     private _elements: Set<E>;
 
     private _partitions: ImmMap<LexiKey, PriorityFrontierSet<E>>;
 
-    private readonly _intraPartitionComparator: StateOrderComparator<E>;
+    private readonly _intraPartitionComparator: StateOrderingFunction<E>;
 
     private _lastPartitionIndex: number;
 
-    constructor(partitionOperator: SinglePartitionKeyOp<E>, intraPartitionComparator: StateOrderComparator<E>) {
+    constructor(partitionOperator: SinglePartitionKeyFunction<E>, intraPartitionComparator: StateOrderingFunction<E>) {
         this._diffKeyOperator = Preconditions.checkNotUndefined(partitionOperator);
         this._intraPartitionComparator = Preconditions.checkNotUndefined(intraPartitionComparator);
         this._size = 0;
@@ -366,8 +368,8 @@ export class PriorityFrontierSet<E extends AbstractElement> implements FrontierS
 
     private readonly _elements: Heap<E>;
 
-    constructor(comparator: StateOrderComparator<E>) {
-        this._elements = new Heap((a, b) => {return comparator.compareStateOrder(a, b)});
+    constructor(comparator: StateOrderingFunction<E>) {
+        this._elements = new Heap((a, b) => {return comparator(a, b)});
     }
 
     public [Symbol.iterator](): IterableIterator<E> {

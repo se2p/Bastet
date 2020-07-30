@@ -24,6 +24,12 @@
 import {Map as ImmMap, List as ImmList, Record as ImmRec} from "immutable"
 import {DifferencingFrontierSet, PartitionKey} from "../../../../src/bastet/procedures/algorithms/StateSet";
 
+describe('DifferencingFrontierSet', function() {
+    test('Test', function() {
+        const s = new DifferencingFrontierSet()
+    });
+});
+
 describe('State Sets', function() {
 
     test('Partition Keys, Immutable Map', function() {
