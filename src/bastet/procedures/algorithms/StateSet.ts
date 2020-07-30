@@ -25,7 +25,7 @@
 
 import {AbstractElement} from "../../lattices/Lattice";
 import {Preconditions} from "../../utils/Preconditions";
-import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+import {List as ImmList, Map as ImmMap, OrderedSet, Record as ImmRec, Set as ImmSet} from "immutable";
 import {getTheOnlyElement} from "../../utils/Collections";
 import {Heap} from 'heap-js';
 import {LexiKey} from "../../utils/Lexicographic";
@@ -246,6 +246,8 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
 
     private _partitions: ImmMap<LexiKey, PriorityFrontierSet<E>>;
 
+    private readonly _nextPartitions: Heap<LexiKey>;
+
     private readonly _intraPartitionComparator: StateOrderingFunction<E>;
 
     private _lastPartitionIndex: number;
@@ -257,6 +259,7 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
         this._elements = new Set<E>();
         this._partitions = ImmMap<LexiKey, PriorityFrontierSet<E>>().asMutable();
         this._lastPartitionIndex = 0;
+        this._nextPartitions = new Heap<LexiKey>((l1, l2) => l1.compareTo(l2));
     }
 
     private getPartitionKey(element: E): LexiKey {
@@ -285,6 +288,8 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
         if (this._elements.delete(element)) {
             this._size--;
         }
+
+        this.activateNextPeekPartition();
     }
 
     public add(element: E) {
@@ -307,29 +312,63 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
         return this._size;
     }
 
-    peek(): E {
-        const keys = this._partitions.keySeq().toArray();
-        let checked = 0;
+    private hasElements(partition: LexiKey) {
+        const p = this._partitions.get(partition);
+        if (p == null) {
+            return false;
+        } else {
+            return p.getSize() > 0;
+        }
+    }
 
-        while (checked < keys.length) {
-            this._lastPartitionIndex = (this._lastPartitionIndex + 1) % keys.length;
-            const key = keys[this._lastPartitionIndex];
-            const set = this._partitions.get(key);
-
-            if (set.getSize() > 0) {
-                const result = set.peek();
-                if (set.getSize() == 0) {
-                    this._partitions.delete(key);
-                }
-
-                return result;
-            } else {
-                this._partitions.delete(key);
-            }
-            checked = checked + 1;
+    /**
+     * Choose the next non-empty partition to peek (or pop) elements in/from.
+     * Goal: Choose in a round-robin-fashion from the different partitions.
+     */
+    private activateNextPeekPartition(): boolean {
+        // Activate the next partition
+        if (!this._nextPartitions.isEmpty()) {
+            // ... by removing the current from the heap
+            this._nextPartitions.pop();
         }
 
-        throw new IllegalStateException("No elements to peek");
+        if (this._nextPartitions.isEmpty()) {
+            this._nextPartitions.addAll(this._partitions.keySeq().toArray());
+        }
+
+        while (!this._nextPartitions.isEmpty() && !this.hasElements(this._nextPartitions.peek())) {
+            this._nextPartitions.pop();
+        }
+
+        if (!this.isEmpty() && this._nextPartitions.isEmpty()) {
+            return this.activateNextPeekPartition();
+        }
+
+        Preconditions.checkState(this.isEmpty() || !this._nextPartitions.isEmpty());
+
+        return !this._nextPartitions.isEmpty();
+    }
+
+    peek(): E {
+        if (this.isEmpty()) {
+            throw new IllegalStateException("No elements to peek");
+        }
+
+        if (this._nextPartitions.isEmpty()) {
+            this.activateNextPeekPartition();
+        }
+
+        const peekPartition: LexiKey = this._nextPartitions.peek();
+        Preconditions.checkNotUndefined(peekPartition);
+
+        const partition = this._partitions.get(peekPartition);
+        return partition.peek();
+    }
+
+    pop(): E {
+        const result = this.peek();
+        this.remove(result);
+        return result
     }
 
     removeAll(elements: Iterable<E>) {
