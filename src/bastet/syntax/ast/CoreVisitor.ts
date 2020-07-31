@@ -98,7 +98,7 @@ import {
 import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
 import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
-import {AssumeStatement} from "./core/statements/AssumeStatement";
+import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/StrengtheningAssumeStatement";
 import {VariableWithDataLocation} from "./core/Variable";
 import {CastExpression} from "./core/expressions/CastExpression";
 import {
@@ -304,7 +304,9 @@ export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
     visitEndAtomicStatement(node: EndAtomicStatement): R;
 
-    visitAssumeStatement(node: AssumeStatement): R;
+    visitStrengtheningAssumeStatement(node: StrengtheningAssumeStatement): R;
+
+    visitBranchingAssumeStatement(node: BranchingAssumeStatement): R;
 
     visitDeclareSystemVariableStatement(node: DeclareSystemVariableStatement): R;
 

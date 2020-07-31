@@ -117,7 +117,10 @@ import {IllegalStateException} from "../../core/exceptions/IllegalStateException
 import {DataLocation} from "../app/controlflow/DataLocation";
 import {Expression} from "../ast/core/expressions/Expression";
 import {VariableWithDataLocation} from "../ast/core/Variable";
-import {AssumeStatement} from "../ast/core/statements/AssumeStatement";
+import {
+    BranchingAssumeStatement,
+    StrengtheningAssumeStatement
+} from "../ast/core/statements/StrengtheningAssumeStatement";
 import {CallStatement} from "../ast/core/statements/CallStatement";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {Statement} from "../ast/core/statements/Statement";
@@ -319,9 +322,15 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
         }));
     }
 
-    visitAssumeStatement(node: AssumeStatement): AstNode {
+    visitStrengtheningAssumeStatement(node: StrengtheningAssumeStatement): AstNode {
         return this.doForStatement(node, (() => {
-            return new AssumeStatement(node.condition.accept(this) as BooleanExpression);
+            return new StrengtheningAssumeStatement(node.condition.accept(this) as BooleanExpression);
+        }));
+    }
+
+    visitBranchingAssumeStatement(node: BranchingAssumeStatement): AstNode {
+        return this.doForStatement(node, (() => {
+            return new BranchingAssumeStatement(node.condition.accept(this) as BooleanExpression);
         }));
     }
 

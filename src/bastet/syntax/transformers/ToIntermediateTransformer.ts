@@ -313,7 +313,7 @@ import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentExc
 import {App} from "../app/App";
 import {VariableWithDataLocation} from "../ast/core/Variable";
 import {DataLocations} from "../app/controlflow/DataLocation";
-import {AssumeStatement} from "../ast/core/statements/AssumeStatement";
+import {StrengtheningAssumeStatement} from "../ast/core/statements/StrengtheningAssumeStatement";
 import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
 import {BastetConfiguration} from "../../utils/BastetConfiguration";
 import {ParsingException} from "../../core/exceptions/ParsingException";
@@ -1467,7 +1467,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     public visitAssumeStatement(ctx: AssumeStatementContext): TransformerResult {
         const exprTr = ctx.boolExpr().accept(this);
         return new TransformerResult(exprTr.statementsToPrepend,
-            new AssumeStatement(exprTr.node as BooleanExpression));
+            new StrengtheningAssumeStatement(exprTr.node as BooleanExpression));
     }
 
     public visitDefaultBoolExpression(ctx: DefaultBoolExpressionContext) : TransformerResult {

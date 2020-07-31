@@ -38,6 +38,7 @@ import {
 import {StatementList} from "../../ast/core/statements/Statement";
 import {AstNode} from "../../ast/AstNode";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+import {AssumeType} from "../../ast/core/statements/StrengtheningAssumeStatement";
 
 
 export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>, CoreCtrlStatementnVisitor<TransitionRelation> {
@@ -91,8 +92,8 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
     visitIfStatement(node: IfStatement): TransitionRelation {
         this._stack.push("visitIfStatement");
         try {
-            const thenAssumeOp = ProgramOperationFactory.createAssumeOpFrom(node.cond);
-            const elseAssumeOp = ProgramOperationFactory.negatedAssumeOpFrom(node.cond);
+            const thenAssumeOp = ProgramOperationFactory.createAssumeOpFrom(node.cond, AssumeType.BRANCHING);
+            const elseAssumeOp = ProgramOperationFactory.negatedAssumeOpFrom(node.cond, AssumeType.BRANCHING);
             const thenStatements: TransitionRelation = node.thenStmts.accept(this);
             const elseStatements: TransitionRelation = node.elseStmts.accept(this);
 
@@ -134,10 +135,10 @@ export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>,
             const loopBody: TransitionRelation = node.body.accept(this);
 
             const enterLoopBodyGuarded = TransitionRelations.concat(
-                TransitionRelations.forOpSeq(ProgramOperationFactory.negatedAssumeOpFrom(node.untilCondition)), loopBody);
+                TransitionRelations.forOpSeq(ProgramOperationFactory.negatedAssumeOpFrom(node.untilCondition, AssumeType.BRANCHING)), loopBody);
 
             const leaveLoopGuarded = TransitionRelations.forOpSeq(
-                ProgramOperationFactory.createAssumeOpFrom(node.untilCondition));
+                ProgramOperationFactory.createAssumeOpFrom(node.untilCondition, AssumeType.BRANCHING));
 
             const loopHeadToQueryBody = TransitionRelations.concatOpTr(loopHead, ProgramOperations.epsilon(), queryBody);
             const guardedBodyToHead = TransitionRelations.concatTrOpGoto(enterLoopBodyGuarded, ProgramOperations.epsilon(), loopHead);

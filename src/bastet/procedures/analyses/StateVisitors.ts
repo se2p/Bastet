@@ -37,6 +37,7 @@ import {TimeState} from "./time/TimeAbstractDomain";
 import {ControlLocationExtractor} from "./control/ControlUtils";
 import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {DebugState} from "./debug/DebugAbstractDomain";
 
 export class PaperLabelVisitor extends DelegatingStateVisitor<string> {
 
@@ -92,6 +93,10 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
 
     visit(element: AbstractElement): string {
         return "";
+    }
+
+    visitDebugState(element: DebugState): string {
+       return `${element.getWrappedState().accept(this)} ${element.getDebugInfos().toString()}`;
     }
 
     visitControlAbstractState(element: ControlAbstractState): string {

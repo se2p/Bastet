@@ -47,7 +47,7 @@ import {
     StrGreaterThanExpression,
     StrLessThanExpression,
 } from "./core/expressions/BooleanExpression";
-import {AssumeStatement} from "./core/statements/AssumeStatement";
+import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/StrengtheningAssumeStatement";
 import {StringLiteral, StringVariableExpression} from "./core/expressions/StringExpression";
 import {ActorVariableExpression} from "./core/expressions/ActorExpression";
 import {BroadcastAndWaitStatement} from "./core/statements/BroadcastAndWaitStatement";
@@ -153,7 +153,11 @@ CoreNonCtrlStatementnVisitor<ActionWithWeight>{
         return ActionWithWeight.EPSILON;
     }
 
-    visitAssumeStatement(node: AssumeStatement): ActionWithWeight {
+    visitBranchingAssumeStatement(node: BranchingAssumeStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
+    }
+
+    visitStrengtheningAssumeStatement(node: StrengtheningAssumeStatement): ActionWithWeight {
         return ActionWithWeight.EPSILON;
     }
 

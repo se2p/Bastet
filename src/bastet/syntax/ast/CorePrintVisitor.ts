@@ -110,7 +110,7 @@ import {
     InsertAtStatement,
     ReplaceElementAtStatement
 } from "./core/statements/ListStatement";
-import {AssumeStatement} from "./core/statements/AssumeStatement";
+import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/StrengtheningAssumeStatement";
 import {BroadcastAndWaitStatement} from "./core/statements/BroadcastAndWaitStatement";
 import {BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
 import {CreateCloneOfStatement} from "./core/statements/CreateCloneOfStatement";
@@ -414,10 +414,13 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
         return `add ${node.element.accept(this)} to ${node.listVariable.accept(this)}`;
     }
 
-    visitAssumeStatement(node: AssumeStatement): string {
+    visitStrengtheningAssumeStatement(node: StrengtheningAssumeStatement): string {
         return `assume ${node.condition.accept(this)}`;
     }
 
+    visitBranchingAssumeStatement(node: BranchingAssumeStatement): string {
+        return `assume ${node.condition.accept(this)}`;
+    }
     visitBeginAtomicStatement(node: BeginAtomicStatement): string {
         return `enter atomic`;
     }

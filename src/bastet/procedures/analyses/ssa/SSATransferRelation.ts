@@ -25,7 +25,12 @@
 
 import {LabeledTransferRelation} from "../TransferRelation";
 import {SSAState} from "./SSAAbstractDomain";
-import {AssumeOperation, ProgramOperation, RawOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {
+    AssumeOperation,
+    ProgramOperation, ProgramOperationFactory,
+    ProgramOperations,
+    RawOperation
+} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
@@ -51,7 +56,7 @@ export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
 
         let opPrime: ProgramOperation;
         if (op instanceof AssumeOperation) {
-            opPrime = new AssumeOperation(op.ast.accept(visitor) as BooleanExpression);
+            opPrime = ProgramOperationFactory.createAssumeOpFrom(op.ast.accept(visitor) as BooleanExpression, op.assumeType);
         } else {
             opPrime = new RawOperation(op.ast.accept(visitor));
         }
