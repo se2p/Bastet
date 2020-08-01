@@ -69,7 +69,23 @@ See the files [docker-build.sh](./docker-build.sh) and
 
 ## Publications and Citing
 
-The foundations for this work were developed in our FSE'19 paper on "Testing
+The BASTET framework was presented in our ASE'20 paper with the 
+title "Verified from Scratch: Program Analysis for Learners’ Programs":
+
+```
+@inproceedings{VerifiedFromScratch,
+  author    = {Andreas Stahlbauer and
+               Christoph Frädrich and
+               Gordon Fraser},
+  title     = {Verified from Scratch: Program Analysis for Learners’ Programs},
+  booktitle = {{ASE}},
+  publisher = {{IEEE}},
+  year      = {2020}
+}
+
+```
+
+Some foundations for this work were developed in our FSE'19 paper on "Testing
 Scratch Programs Automatically":
 
 ```
