@@ -69,8 +69,8 @@ See the files [docker-build.sh](./docker-build.sh) and
 
 ## Publications and Citing
 
-The BASTET framework was presented in our ASE'20 paper with the 
-title "Verified from Scratch: Program Analysis for Learners’ Programs":
+The BASTET framework was presented in our **ASE'20** paper with the 
+title *"Verified from Scratch: Program Analysis for Learners’ Programs"*:
 
 ```
 @inproceedings{VerifiedFromScratch,
@@ -85,8 +85,8 @@ title "Verified from Scratch: Program Analysis for Learners’ Programs":
 
 ```
 
-Some foundations for this work were developed in our FSE'19 paper on "Testing
-Scratch Programs Automatically":
+Some foundations for this work were developed in our **FSE'19** paper on *"Testing
+Scratch Programs Automatically"*:
 
 ```
 @inproceedings{TestingScratchPrograms,
