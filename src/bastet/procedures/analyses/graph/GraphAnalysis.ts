@@ -172,6 +172,9 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     merge(state1: GraphAbstractState, state2: GraphAbstractState): GraphAbstractState {
+        Preconditions.checkArgument(state1.getMergeOf().size > 0);
+        Preconditions.checkArgument(state2.getMergeOf().size > 0);
+
         return GraphAbstractStateFactory.withFreshID(
             state1.getPredecessors().union(state2.getPredecessors()),
             state1.getMergeOf().union(state2.getMergeOf()),
