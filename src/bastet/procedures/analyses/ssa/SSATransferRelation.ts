@@ -56,7 +56,7 @@ export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
 
         let opPrime: ProgramOperation;
         if (op instanceof AssumeOperation) {
-            opPrime = ProgramOperationFactory.createAssumeOpFrom(op.ast.accept(visitor) as BooleanExpression, op.assumeType);
+            opPrime = ProgramOperationFactory.createAssumeOpFrom(op.expression.accept(visitor) as BooleanExpression, op.assumeType);
         } else {
             opPrime = new RawOperation(op.ast.accept(visitor));
         }
