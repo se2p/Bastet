@@ -136,7 +136,7 @@ import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../domains/Con
 import {
     BranchingAssumeStatement,
     StrengtheningAssumeStatement
-} from "../../../syntax/ast/core/statements/StrengtheningAssumeStatement";
+} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {
