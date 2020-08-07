@@ -36,7 +36,7 @@ import {
     ActorVariableExpressionContext,
     AddElementToStatementContext,
     AfterBootstrapMonitoringEventContext,
-    AfterStatementMonitoringEventContext,
+    AfterStatementMonitoringEventContext, AnonymousScriptIdentContext,
     AssumeStatementContext,
     AtomicMethodContext,
     BoolAndExpressionContext,
@@ -107,7 +107,7 @@ import {
     LocateActorExpressionContext,
     MessageReceivedEventContext,
     MethodDefinitionContext,
-    MethodDefinitionListContext, NamedMessageDestinationContext,
+    MethodDefinitionListContext, NamedMessageDestinationContext, NamedScriptIdentContext,
     NegatedBoolExpressionContext,
     NeverEventContext,
     NumAsBoolExpressionContext,
@@ -313,7 +313,7 @@ import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentExc
 import {App} from "../app/App";
 import {VariableWithDataLocation} from "../ast/core/Variable";
 import {DataLocations} from "../app/controlflow/DataLocation";
-import {StrengtheningAssumeStatement} from "../ast/core/statements/StrengtheningAssumeStatement";
+import {StrengtheningAssumeStatement} from "../ast/core/statements/AssumeStatement";
 import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
 import {BastetConfiguration} from "../../utils/BastetConfiguration";
 import {ParsingException} from "../../core/exceptions/ParsingException";
@@ -334,6 +334,10 @@ export class TransformerConfig extends BastetConfiguration {
 
     get useBusyWaiting(): boolean {
         return this.getBoolProperty('use-busy-waiting', true);
+    }
+
+    get enableMessageDispatcherLoop(): boolean {
+        return this.getBoolProperty('enable-message-dispatcher-loop', true);
     }
 
 }
@@ -878,8 +882,18 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return false;
     }
 
-    public visitScript(ctx: ScriptContext) : TransformerResult {
+    visitAnonymousScriptIdent(ctx: AnonymousScriptIdentContext): TransformerResult {
         const scriptIdent = Identifier.freshWithPrefix("script");
+        return TransformerResult.withNode(scriptIdent);
+    }
+
+    visitNamedScriptIdent(ctx: NamedScriptIdentContext): TransformerResult {
+        const scriptIdent: Identifier = ctx.ident().accept(this).nodeOnly();
+        return TransformerResult.withNode(scriptIdent);
+    }
+
+    public visitScript(ctx: ScriptContext) : TransformerResult {
+        const scriptIdent: Identifier = ctx.scriptIdent().accept(this).nodeOnly<Identifier>();
         this._activeDeclarationScope = this._activeDeclarationScope.beginMethodScope(scriptIdent.text);
         try {
             return TransformerResult.withNode(new ScriptDefinition(scriptIdent,
@@ -893,7 +907,8 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
     public visitScriptList(ctx: ScriptListContext) : TransformerResult {
         const defs = this.buildArrayFrom<ScriptDefinition>(ctx.script());
-        return new TransformerResult(defs.statementsToPrepend, new ScriptDefinitionList(defs.nodeList));
+        return new TransformerResult(defs.statementsToPrepend,
+            new ScriptDefinitionList(defs.nodeList.filter((s) => s.ident.text != "messageDispatcherLoop" || this._config.enableMessageDispatcherLoop)));
     }
 
     public visitExpressionList(ctx: ExpressionListContext) : TransformerResult {

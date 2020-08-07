@@ -8,6 +8,7 @@
     },
 
     "Transformer": {
+        "enable-message-dispatcher-loop": false,
         "use-busy-waiting": false
     },
 

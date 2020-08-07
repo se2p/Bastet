@@ -68,6 +68,8 @@ import { UnspecifiedNumExprContext } from "./LeilaParser";
 import { NumberExpressionContext } from "./LeilaParser";
 import { StringExpressionContext } from "./LeilaParser";
 import { AtomicMethodContext } from "./LeilaParser";
+import { NamedScriptIdentContext } from "./LeilaParser";
+import { AnonymousScriptIdentContext } from "./LeilaParser";
 import { DeleteAllFromStatementContext } from "./LeilaParser";
 import { DeleteIthFromStatementContext } from "./LeilaParser";
 import { AddElementToStatementContext } from "./LeilaParser";
@@ -151,6 +153,7 @@ import { DeclarationStmtListContext } from "./LeilaParser";
 import { TypeContext } from "./LeilaParser";
 import { PrimitiveTypeContext } from "./LeilaParser";
 import { ScriptContext } from "./LeilaParser";
+import { ScriptIdentContext } from "./LeilaParser";
 import { ScriptListContext } from "./LeilaParser";
 import { ScriptAttributeListContext } from "./LeilaParser";
 import { ScriptAttributeContext } from "./LeilaParser";
@@ -728,6 +731,22 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitAtomicMethod?: (ctx: AtomicMethodContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `NamedScriptIdent`
+	 * labeled alternative in `LeilaParser.scriptIdent`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitNamedScriptIdent?: (ctx: NamedScriptIdentContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `AnonymousScriptIdent`
+	 * labeled alternative in `LeilaParser.scriptIdent`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitAnonymousScriptIdent?: (ctx: AnonymousScriptIdentContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `DeleteAllFromStatement`
@@ -1374,6 +1393,13 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitScript?: (ctx: ScriptContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LeilaParser.scriptIdent`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitScriptIdent?: (ctx: ScriptIdentContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LeilaParser.scriptList`.

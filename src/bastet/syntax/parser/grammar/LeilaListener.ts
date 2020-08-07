@@ -68,6 +68,8 @@ import { UnspecifiedNumExprContext } from "./LeilaParser";
 import { NumberExpressionContext } from "./LeilaParser";
 import { StringExpressionContext } from "./LeilaParser";
 import { AtomicMethodContext } from "./LeilaParser";
+import { NamedScriptIdentContext } from "./LeilaParser";
+import { AnonymousScriptIdentContext } from "./LeilaParser";
 import { DeleteAllFromStatementContext } from "./LeilaParser";
 import { DeleteIthFromStatementContext } from "./LeilaParser";
 import { AddElementToStatementContext } from "./LeilaParser";
@@ -151,6 +153,7 @@ import { DeclarationStmtListContext } from "./LeilaParser";
 import { TypeContext } from "./LeilaParser";
 import { PrimitiveTypeContext } from "./LeilaParser";
 import { ScriptContext } from "./LeilaParser";
+import { ScriptIdentContext } from "./LeilaParser";
 import { ScriptListContext } from "./LeilaParser";
 import { ScriptAttributeListContext } from "./LeilaParser";
 import { ScriptAttributeContext } from "./LeilaParser";
@@ -1050,6 +1053,32 @@ export interface LeilaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitAtomicMethod?: (ctx: AtomicMethodContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NamedScriptIdent`
+	 * labeled alternative in `LeilaParser.scriptIdent`.
+	 * @param ctx the parse tree
+	 */
+	enterNamedScriptIdent?: (ctx: NamedScriptIdentContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NamedScriptIdent`
+	 * labeled alternative in `LeilaParser.scriptIdent`.
+	 * @param ctx the parse tree
+	 */
+	exitNamedScriptIdent?: (ctx: NamedScriptIdentContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `AnonymousScriptIdent`
+	 * labeled alternative in `LeilaParser.scriptIdent`.
+	 * @param ctx the parse tree
+	 */
+	enterAnonymousScriptIdent?: (ctx: AnonymousScriptIdentContext) => void;
+	/**
+	 * Exit a parse tree produced by the `AnonymousScriptIdent`
+	 * labeled alternative in `LeilaParser.scriptIdent`.
+	 * @param ctx the parse tree
+	 */
+	exitAnonymousScriptIdent?: (ctx: AnonymousScriptIdentContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `DeleteAllFromStatement`
@@ -2093,6 +2122,17 @@ export interface LeilaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitScript?: (ctx: ScriptContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `LeilaParser.scriptIdent`.
+	 * @param ctx the parse tree
+	 */
+	enterScriptIdent?: (ctx: ScriptIdentContext) => void;
+	/**
+	 * Exit a parse tree produced by `LeilaParser.scriptIdent`.
+	 * @param ctx the parse tree
+	 */
+	exitScriptIdent?: (ctx: ScriptIdentContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `LeilaParser.scriptList`.

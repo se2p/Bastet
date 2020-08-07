@@ -78,7 +78,8 @@ primitiveType:
 
 // A script is the central unit that of a Scratch program that
 // defines the behavior (and with it the control and data flow).
-script : 'script' 'on' event 'do' scriptAttributeList stmtList ;
+script : 'script' scriptIdent 'on' event 'do' scriptAttributeList stmtList ;
+scriptIdent :  ident # NamedScriptIdent | # AnonymousScriptIdent ;
 
 // A list of scripts.
 scriptList : script* ;

@@ -26,35 +26,29 @@ actor IOActor is RuntimeEntity begin
         // UNSOUND: might wait arbitrarily long
     end
 
-    script on startup do begin
+    script messageDispatcherLoop on startup do begin
         // Hack as long no other dispatch handling is in place
         repeat forever begin
-            broadcast "DISPATCH" () to "SYSTEM" and wait
+            declare nondet_x as int
+            define mouse_x as nondet_x
+
+            declare nondet_y as int
+            define mouse_y as nondet_y
+
+            declare nondet_key as int
+            define key_pressed as nondet_key
+
+            declare nondet_down as boolean
+            define mouse_down as nondet_down
+
+            define mouse_clicked as mouse_down and not last_mouse_down
+            if mouse_clicked then begin
+                broadcast "CLICK" () to "SYSTEM"
+            end
+
+            define last_key_pressed as key_pressed
+            define last_mouse_down as mouse_down
         end
-    end
-
-    // script on dispatch do begin
-    script on message "DISPATCH" () in "SYSTEM" do begin
-        declare nondet_x as int
-        define mouse_x as nondet_x
-
-        declare nondet_y as int
-        define mouse_y as nondet_y
-
-        declare nondet_key as int
-        define key_pressed as nondet_key
-
-        declare nondet_down as boolean
-        define mouse_down as nondet_down
-
-        define mouse_clicked as mouse_down and not last_mouse_down
-                    _RUNTIME_signalFailure("foooo")
-        if mouse_clicked then begin
-            broadcast "CLICK" () to "SYSTEM"
-        end
-
-        define last_key_pressed as key_pressed
-        define last_mouse_down as mouse_down
     end
 
 end
@@ -1392,6 +1386,10 @@ role ScratchSprite is ScratchEntity begin
     // @Category "looks"
     define atomic turnRight(degrees: int) begin
         setDirection(direction + degrees)
+    end
+
+    define atomic pointInDirection(dir: int) begin
+        setDirection(dir)
     end
 
     define atomic setDirection(dir: int) begin
