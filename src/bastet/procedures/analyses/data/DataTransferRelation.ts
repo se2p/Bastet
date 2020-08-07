@@ -40,7 +40,7 @@ import {
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {AstNode} from "../../../syntax/ast/AstNode";
-import {StrengtheningAssumeStatement} from "../../../syntax/ast/core/statements/StrengtheningAssumeStatement";
+import {StrengtheningAssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {Concern} from "../../../syntax/Concern";
 
 export class DataTransferRelation implements LabeledTransferRelation<DataAbstractState> {
