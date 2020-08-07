@@ -339,7 +339,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
             const relA: TransitionRelation = this._task.getTransitionRelationById(relLocA.getRelationId());
             const rpoA: number = relA.getWaitAtMeetOrderOf(relLocA.getLocationId());
 
-            return new LexiKey([rpoA]); // We use a Max-Priority-Queue. Larger elements are prefered but we
+            return new LexiKey([-rpoA]); // We use a Max-Priority-Queue. Larger elements are prefered but we
             // what to process elements with the smaller wait-at-meet order first
         }
 
