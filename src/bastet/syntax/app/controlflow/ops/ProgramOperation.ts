@@ -35,7 +35,7 @@ import {
     AssumeType,
     BranchingAssumeStatement,
     StrengtheningAssumeStatement
-} from "../../../ast/core/statements/StrengtheningAssumeStatement";
+} from "../../../ast/core/statements/AssumeStatement";
 
 export type OperationId = number;
 

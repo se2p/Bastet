@@ -34,7 +34,7 @@ import {ProgramTimeProfile} from "../../../utils/TimeProfile";
 import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements/DeclarationStatement";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {Statement} from "../../../syntax/ast/core/statements/Statement";
-import {StrengtheningAssumeStatement} from "../../../syntax/ast/core/statements/StrengtheningAssumeStatement";
+import {StrengtheningAssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
 import {
     DivideExpression,

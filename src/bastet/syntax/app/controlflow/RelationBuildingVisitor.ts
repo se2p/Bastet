@@ -38,7 +38,7 @@ import {
 import {StatementList} from "../../ast/core/statements/Statement";
 import {AstNode} from "../../ast/AstNode";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {AssumeType} from "../../ast/core/statements/StrengtheningAssumeStatement";
+import {AssumeType} from "../../ast/core/statements/AssumeStatement";
 
 
 export class RelationBuildingVisitor implements CoreVisitor<TransitionRelation>, CoreCtrlStatementnVisitor<TransitionRelation> {

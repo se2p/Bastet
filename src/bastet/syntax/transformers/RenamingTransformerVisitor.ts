@@ -120,7 +120,7 @@ import {VariableWithDataLocation} from "../ast/core/Variable";
 import {
     BranchingAssumeStatement,
     StrengtheningAssumeStatement
-} from "../ast/core/statements/StrengtheningAssumeStatement";
+} from "../ast/core/statements/AssumeStatement";
 import {CallStatement} from "../ast/core/statements/CallStatement";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {Statement} from "../ast/core/statements/Statement";
