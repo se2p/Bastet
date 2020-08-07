@@ -33,7 +33,7 @@ import {BooleanFormula} from "../../../utils/ConjunctiveNormalForm";
 import {
     BranchingAssumeStatement,
     StrengtheningAssumeStatement
-} from "../../../syntax/ast/core/statements/StrengtheningAssumeStatement";
+} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {Set as ImmSet} from "immutable";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AbstractStates, DelegatingStateVisitor} from "../AbstractStates";
