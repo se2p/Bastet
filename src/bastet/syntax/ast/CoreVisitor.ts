@@ -98,7 +98,7 @@ import {
 import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
 import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
-import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/StrengtheningAssumeStatement";
+import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/AssumeStatement";
 import {VariableWithDataLocation} from "./core/Variable";
 import {CastExpression} from "./core/expressions/CastExpression";
 import {
