@@ -72,10 +72,6 @@ export class ControlAnalysisConfig extends BastetConfiguration {
 
 }
 
-function getRandomInt(max): number {
-    return Math.floor(Math.random() * Math.floor(max));
-}
-
 export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcreteState, ControlAbstractState, AbstractState>,
     WrappingProgramAnalysis<ControlConcreteState, ControlAbstractState, AbstractState>,
     Unwrapper<ControlAbstractState, AbstractElement> {
@@ -281,16 +277,6 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         }
 
         return result;
-    }
-
-    getStateLabel(state: ControlAbstractState): string {
-        const innerLabelingFn = this.wrappedAnalysis['getStateLabel'];
-        const innerLabel = innerLabelingFn ? innerLabelingFn(state) : "?";
-        const controlLabel = state.getThreadStates()
-            .map((e) => `[${e.getActorId()} ${e.getScriptId()} ${e.getRelationLocation().getLocationId()}]`)
-            .join(", ");
-
-        return `${controlLabel} ${innerLabel}`;
     }
 
     createStateSets(): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
