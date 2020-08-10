@@ -60,9 +60,6 @@ export class DataTransferRelation implements LabeledTransferRelation<DataAbstrac
     }
 
     public abstractSuccFor(fromState: DataAbstractState, op: ProgramOperation, co: Concern): Iterable<DataAbstractState> {
-        Preconditions.checkNotUndefined(fromState);
-        Preconditions.checkNotUndefined(op);
-
         let ast: AstNode;
         if (op instanceof AssumeOperation) {
             const assume = op as AssumeOperation;

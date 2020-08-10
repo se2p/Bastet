@@ -170,7 +170,7 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     private _activeUsageMode: DataLocationMode;
 
     constructor(renamer: DataLocationRenamer) {
-        this._renamer = Preconditions.checkNotUndefined(renamer);
+        this._renamer = renamer;
         this._activeUsageMode = DataLocationMode.READ_FROM;
     }
 
