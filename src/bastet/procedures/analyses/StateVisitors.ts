@@ -38,6 +38,9 @@ import {ControlLocationExtractor} from "./control/ControlUtils";
 import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {DebugState} from "./debug/DebugAbstractDomain";
+import {getTheOnlyElement} from "../../utils/Collections";
+
+const colormap = require('colormap')
 
 export class PaperLabelVisitor extends DelegatingStateVisitor<string> {
 
@@ -143,6 +146,44 @@ export class StateColorVisitor extends DelegatingStateVisitor<string> {
     visitControlAbstractState(element: ControlAbstractState): string {
         if (element.getIsTargetFor().size > 0) {
             return "crimson";
+        } else {
+            return "white";
+        }
+    }
+
+}
+
+export class ColorByActorVisitor extends StateColorVisitor {
+
+    private readonly _task: App;
+    private readonly _colors: any;
+    private readonly _actorToColor: {};
+
+    constructor(task: App) {
+        super();
+        this._task = Preconditions.checkNotUndefined(task);
+        this._colors = colormap({
+            colormap: 'hsv',
+            nshades: Math.max(this._task.actors.length, 16),
+            format: 'hex',
+            alpha: 1
+        });
+
+        this._actorToColor = {};
+        var idx = 0;
+        for (const a of this._task.actors) {
+            this._actorToColor[a.ident] = this._colors[idx];
+            idx++;
+        }
+    }
+
+    visitControlAbstractState(element: ControlAbstractState): string {
+        const steppedForIndices = element.getSteppedFor();
+        const indexedThreads = steppedForIndices.map((i) => element.getIndexedThreadState(i));
+        const steppedActors = indexedThreads.map((it) => it.threadStatus.getActorId()).toSet();
+        if (steppedActors.size == 1) {
+            const actor = getTheOnlyElement(steppedActors);
+            return this._actorToColor[actor];
         } else {
             return "white";
         }
