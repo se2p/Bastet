@@ -28,6 +28,11 @@ import {OperationId, ProgramOperation} from "../syntax/app/controlflow/ops/Progr
 import {ImplementMeException} from "../core/exceptions/ImplementMeException";
 import {ConcreteNumber} from "../procedures/domains/ConcreteElements";
 import {EndAtomicStatement} from "../syntax/ast/core/statements/ControlStatement";
+import {EpsilonStatement} from "../syntax/ast/core/statements/EpsilonStatement";
+import {
+    DeclareActorVariableStatement,
+    DeclareStackVariableStatement, DeclareSystemVariableStatement
+} from "../syntax/ast/core/statements/DeclarationStatement";
 
 /**
  * A STATIC time profile for a given program operation.
@@ -61,6 +66,7 @@ export class StaticTimeProfile implements ProgramTimeProfile {
 
     private readonly _avgOpProfile: OperationTimeProfile;
     private readonly _avgAtomicBlockProfile: OperationTimeProfile;
+    private readonly _noDurationProfile: OperationTimeProfile;
 
     constructor() {
         this._opTimes = new Map();
@@ -72,6 +78,8 @@ export class StaticTimeProfile implements ProgramTimeProfile {
             new NumIntervalValue(
                 new ConcreteNumber(ONE_MICSEC_IN_NSECS * 100),
                 new ConcreteNumber(ONE_MICSEC_IN_NSECS * 10000)));
+        this._noDurationProfile = new OperationTimeProfile(
+            new NumIntervalValue(new ConcreteNumber(0), new ConcreteNumber(0)));
     }
 
     public widen(op: ProgramOperation, minNanos: number, maxNanos: number) {
@@ -81,6 +89,11 @@ export class StaticTimeProfile implements ProgramTimeProfile {
     public getOpProfile(op: ProgramOperation): OperationTimeProfile {
         if (op.ast instanceof EndAtomicStatement) {
             return this._avgAtomicBlockProfile;
+        } else if (op.ast instanceof EpsilonStatement
+            || op.ast instanceof DeclareStackVariableStatement
+            || op.ast instanceof DeclareActorVariableStatement
+            || op.ast instanceof DeclareSystemVariableStatement) {
+            return this._noDurationProfile;
         } else {
             return this._avgOpProfile;
         }

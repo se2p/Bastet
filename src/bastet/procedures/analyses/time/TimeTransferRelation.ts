@@ -60,6 +60,7 @@ import {
 import {IntegerType} from "../../../syntax/ast/core/ScratchType";
 import {TimeState} from "./TimeAbstractDomain";
 import {BeginAtomicStatement, EndAtomicStatement} from "../../../syntax/ast/core/statements/ControlStatement";
+import instantiate = WebAssembly.instantiate;
 
 // TODO: Move these variables to the App on SYSTEM level
 
@@ -181,7 +182,10 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
     }
 
     private isEmptyInterval(minTimeExpr: NumberExpression, maxTimeExpr: NumberExpression) {
-        if (minTimeExpr === IntegerLiteral.zero() && maxTimeExpr === IntegerLiteral.zero()) {
+        Preconditions.checkArgument(minTimeExpr instanceof IntegerLiteral);
+        Preconditions.checkArgument(maxTimeExpr instanceof IntegerLiteral);
+        if ((minTimeExpr as IntegerLiteral).num == 0
+            && (maxTimeExpr as IntegerLiteral).num == 0) {
             return true;
         }
 
