@@ -109,7 +109,7 @@ export class MouseXActionExtractor extends ActionExtractor {
     }
 
     protected setActionForStepInternal(step: ErrorWitnessStep, actionValue): void {
-        step.action = Action.MOUSE_INPUT;
+        step.action = Action.MOUSE_MOVE;
 
         if (!step.mousePosition) {
             step.mousePosition = { x: actionValue, y: 0 };
@@ -125,7 +125,7 @@ export class MouseYActionExtractor extends ActionExtractor {
     }
 
     protected setActionForStepInternal(step: ErrorWitnessStep, actionValue): void {
-        step.action = Action.MOUSE_INPUT;
+        step.action = Action.MOUSE_MOVE;
 
         if (!step.mousePosition) {
             step.mousePosition = { x: 0, y: actionValue };
