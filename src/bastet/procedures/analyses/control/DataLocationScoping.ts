@@ -156,8 +156,8 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
         const scoper = new DataLocationScoper(task.typeStorage, readFromScope, writeToScope);
         super(scoper);
         this._scoper = scoper;
-        this._actorScopes = Preconditions.checkNotUndefined(actorScopes);
-        this._task = Preconditions.checkNotUndefined(task);
+        this._actorScopes = actorScopes;
+        this._task = task;
     }
 
     visitStringAttributeOfExpression(node: StringAttributeOfExpression): AstNode {

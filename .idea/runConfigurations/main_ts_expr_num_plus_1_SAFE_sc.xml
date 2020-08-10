@@ -1,5 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="main.ts expr-num-plus-1_SAFE.sc" type="NodeJSConfigurationType" application-parameters="-P test/programs/language-coverage/expr-num-plus-1_SAFE.sc -S test/programs/empty.sc -I src/public/library.sc" node-parameters="--require ts-node/register --max-old-space-size=8192" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
-    <method v="2" />
-  </configuration>
-</component>

@@ -109,6 +109,15 @@ export class RelationLocation extends RelationLocationRecord implements Relation
         return this.set("location", location);
     }
 
+    public withActorId(value: ActorId): RelationLocation {
+        return this.set("actor", value);
+    }
+
+    public withRelationId(value: TransRelId): RelationLocation {
+        return this.set("relation", value);
+    }
+
+
     public toString() {
         return `${this.getActorId()} ${this.getRelationId()} ${this.getLocationId()}`;
     }
@@ -252,6 +261,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     public withLocation(value: RelationLocation): ThreadState {
         return this.set('location', value);
+    }
+
+    public withActorId(value: ActorId): ThreadState {
+        return this.set('actorId', value);
     }
 
     public getComputationState(): ThreadComputationState {
@@ -584,7 +597,8 @@ export class ControlLattice implements Lattice<ControlAbstractState> {
             return this.top();
         }
 
-        Preconditions.checkArgument(element1.getSteppedFor().equals(element2.getSteppedFor()));
+        // Removed the following to improve performance:
+        //  Preconditions.checkArgument(element1.getSteppedFor().equals(element2.getSteppedFor()));
 
         return element1
             .withWrappedState(this._wrapped.join(element1.getWrappedState(), element2.getWrappedState()))

@@ -154,6 +154,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
     private readonly _resolveOpsStats: AnalysisStatistics;
     private readonly _chooseStats: AnalysisStatistics;
     private readonly _interpreteStats: AnalysisStatistics;
+    private readonly _debugStats: AnalysisStatistics;
     private readonly _checkCondStats: AnalysisStatistics;
     private readonly _scheduleStats: AnalysisStatistics;
     private readonly _wrappedTransferStats: AnalysisStatistics;
@@ -326,11 +327,12 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         const threadActor: Actor = this._task.getActorByName(threadState.getActorId());
 
         let result: StepInformation[] = [];
-        for (const t of fromRelation.transitionsFrom(fromLocation.getLocationId())) {
+        const tx = fromRelation.transitionsFrom(fromLocation.getLocationId());
+        for (const t of tx) {
             const isAtomic = false;
             const op: ProgramOperation = ProgramOperations.withID(t.opId);
-            const statementTarget = new RelationLocation(threadActor.ident, fromRelation.ident, t.target);
-            Preconditions.checkNotUndefined(op);
+            const statementTarget = thread.threadStatus.getRelationLocation()
+                .withLocationId(t.target).withRelationId(fromRelation.ident);
 
             const scopeStack: ImmList<string> = this.buildScopeStack(threadActor.ident, fromRelation.name);
 
@@ -369,9 +371,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             this._wrappedTransferStats.stopTimer();
 
             // Combine the result
-            Preconditions.checkNotUndefined(r);
             for (const w of wrappedAnalysisResults) {
-                Preconditions.checkNotUndefined(w);
                 const properties = this.extractFailedForProperties(r.getThreadStates());
                 result.push(r.withWrappedState(w)
                     .withSteppedFor([step.steppedThread.threadIndex])
@@ -1338,9 +1338,9 @@ class StepInformation {
         this._steppedThread = steppedThread;
         this._succLoc = succLoc;
         this._isInnerAtomic = isInnerAtomic;
-        this._ops = Preconditions.checkNotUndefined(ops);
-        this._succCallStack = Preconditions.checkNotUndefined(succReturnCallTo);
-        this._succScopeStack = Preconditions.checkNotUndefined(succScopeStack);
+        this._ops = ops;
+        this._succCallStack = succReturnCallTo;
+        this._succScopeStack = succScopeStack;
     }
 
     get steppedThread(): IndexedThread {

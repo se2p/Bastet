@@ -333,6 +333,8 @@ export class TransitionRelation {
 
     private _wamNums: Map<LocationId, number>;
 
+    private _transFromCache: Map<LocationId, Array<TransitionTo>>;
+
     constructor(transitions: TransitionTable, locations: ImmSet<LocationId>,
                 entryLocs: ImmSet<LocationId>, exitLocs: ImmSet<LocationId>,
                 loopHeads?: ImmSet<LocationId>, name?: string) {
@@ -349,6 +351,8 @@ export class TransitionRelation {
         this._locations = Preconditions.checkNotUndefined(locations);
         this._entryLocations = Preconditions.checkNotUndefined(entryLocs);
         this._exitLocations = Preconditions.checkNotUndefined(exitLocs);
+
+        this._transFromCache = new Map();
 
         this._loopHeads = loopHeads;
 
@@ -590,16 +594,20 @@ export class TransitionRelation {
     }
 
     public transitionsFrom(from: LocationId): Array<TransitionTo> {
-        let transitionsTo: ImmMap<LocationId, ImmSet<OperationId>> = this.transitionTable.get(from) || ImmMap();
-
-        let result: Array<TransitionTo> = new Array<TransitionTo>();
-        for (let [to, ops] of transitionsTo.entries()) {
-            for (let o of ops) {
-                result.push(new TransitionTo(o, to));
+        let result: Array<TransitionTo> = this._transFromCache.get(from);
+        if (result) {
+            return result;
+        } else {
+            let transitionsTo: ImmMap<LocationId, ImmSet<OperationId>> = this.transitionTable.get(from) || ImmMap();
+            result = new Array<TransitionTo>();
+            for (let [to, ops] of transitionsTo.entries()) {
+                for (let o of ops) {
+                    result.push(new TransitionTo(o, to));
+                }
             }
+            this._transFromCache.set(from, result);
+            return result;
         }
-
-        return result;
     }
 
     public transitionBetween(from: LocationId, to: LocationId): ProgramOperation {

@@ -81,12 +81,12 @@ export class Preconditions {
     }
 
     static checkNotUndefined<E>(obj: E, message?: string): E {
-        if (typeof obj === 'string' || obj instanceof String) {
-            // To deal with the case that obj === ""
-            return obj;
-        }
-
         if (!obj) {
+            if (typeof obj === 'string' || obj instanceof String) {
+                // To deal with the case that obj === ""
+                return obj;
+            }
+
            if (message) {
                throw new IllegalArgumentException(message);
            } else {
