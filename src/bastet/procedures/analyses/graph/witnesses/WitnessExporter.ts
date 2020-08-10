@@ -49,6 +49,7 @@ import {
     ActionExtractor,
     AnswerActionExtractor,
     KeyPressedActionExtractor,
+    MouseDownActionExtractor,
     MouseXActionExtractor,
     MouseYActionExtractor,
 } from "./ActionExtractor";
@@ -72,7 +73,7 @@ export const DEFAULT_WITNESS_EXPORTER_CONFIG: WitnessExporterConfig = {
     removeActorPrefixFromAttributes: true,
     removeActors: ['IOActor'],
     removeStepsBeforeBootstrap: true,
-    minWaitTime: 1000,
+    minWaitTime: 0,
     keepDebuggingAttributes: true
 }
 
@@ -148,6 +149,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         const actionExtractors: ActionExtractor[] = [
             new MouseXActionExtractor(),
             new MouseYActionExtractor(),
+            new MouseDownActionExtractor(),
             new AnswerActionExtractor(),
             new KeyPressedActionExtractor()
         ];

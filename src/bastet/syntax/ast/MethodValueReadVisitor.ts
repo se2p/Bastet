@@ -300,7 +300,7 @@ export class MethodValueReadVisitor implements CoreVisitor<MethodValueReadEvent>
     }
 
     visitNegationExpression(node: NegationExpression): MethodValueReadEvent {
-        return this.nothingReadEvent;
+        return node.negate.accept(this);
     }
 
     visitNumEqualsExpression(node: NumEqualsExpression): MethodValueReadEvent {

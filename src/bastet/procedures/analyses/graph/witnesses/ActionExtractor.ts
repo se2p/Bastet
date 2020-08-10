@@ -135,6 +135,20 @@ export class MouseYActionExtractor extends ActionExtractor {
     }
 }
 
+export class MouseDownActionExtractor extends ActionExtractor {
+    constructor() {
+        super('mouseDown');
+    }
+
+    protected setActionForStepInternal(step: ErrorWitnessStep, actionValue): void {
+        if (actionValue) {
+            step.action = Action.MOUSE_DOWN;
+        } else {
+            step.action = Action.MOUSE_UP;
+        }
+    }
+}
+
 export class AnswerActionExtractor extends ActionExtractor {
     constructor() {
         super('answer');
