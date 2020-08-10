@@ -97,7 +97,7 @@ import {
     ActorDestination,
     BOOTSTRAP_FINISHED_MESSAGE,
     isBootstrapFinishedMessage, NamedDestination,
-    SystemMessage
+    SystemMessage, UserMessage
 } from "../../../syntax/ast/core/Message";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {
@@ -1238,8 +1238,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                         return true;
                     }
                 }
-            } else {
-                throw new IllegalArgumentException();
+            } else if (msg instanceof UserMessage) {
+                return true;
             }
         } else if (handlingMessageNamespace instanceof QualifiedMessageNamespace) {
             const recevedInNamespaceId = this.evaluateToConcreteMessage(handlingMessageNamespace.namespaceName);
