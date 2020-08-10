@@ -289,6 +289,10 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return new LexiKey([]);
     }
 
+    getLexiDiffKey(ofState: DataAbstractState): LexiKey {
+        return new LexiKey([]);
+    }
+
     finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
     }
 

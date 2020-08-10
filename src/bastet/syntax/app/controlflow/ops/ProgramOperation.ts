@@ -30,6 +30,12 @@ import {BooleanExpression, NegationExpression} from "../../../ast/core/expressio
 import {EpsilonStatement} from "../../../ast/core/statements/EpsilonStatement";
 import {BooleanType} from "../../../ast/core/ScratchType";
 import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
+import {
+    AssumeStatement,
+    AssumeType,
+    BranchingAssumeStatement,
+    StrengtheningAssumeStatement
+} from "../../../ast/core/statements/AssumeStatement";
 
 export type OperationId = number;
 
@@ -73,15 +79,29 @@ export class AssignementOperation extends ProgramOperation {
 
 export class AssumeOperation extends ProgramOperation {
 
-    private readonly _expression: BooleanExpression;
+    private readonly _assume: AssumeStatement;
 
-    constructor(ast: BooleanExpression) {
+    constructor(ast: AssumeStatement) {
         super(ast);
-        this._expression = ast;
+        this._assume = ast;
+    }
+
+    get assume(): AssumeStatement {
+        return this._assume;
+    }
+
+    get assumeType(): AssumeType {
+        if (this._assume instanceof StrengtheningAssumeStatement) {
+            return AssumeType.STRENGTHENING;
+        } else if (this._assume instanceof BranchingAssumeStatement) {
+            return AssumeType.BRANCHING;
+        } else {
+            throw new ImplementMeException();
+        }
     }
 
     get expression(): BooleanExpression {
-        return this._expression;
+        return this._assume.condition;
     }
 
     toString(): string {
@@ -186,27 +206,32 @@ export class ProgramOperations {
 
 }
 
+
 export class ProgramOperationFactory {
 
     public static createFor(ast: AstNode): ProgramOperation {
         if (ast['expressionType'] === BooleanType.instance()) {
-            return this.createAssumeOpFrom(ast as BooleanExpression);
+            return this.createAssumeOpFrom(ast as BooleanExpression, AssumeType.UNDEFINED);
         }
         return new RawOperation(ast);
     }
 
-    static createAssumeOpFrom(boolExpr: BooleanExpression): AssumeOperation {
-        return new AssumeOperation(boolExpr);
+    static createAssumeOpFrom(boolExpr: BooleanExpression, assumeType: AssumeType): AssumeOperation {
+        if (assumeType == AssumeType.BRANCHING) {
+            return new AssumeOperation(new BranchingAssumeStatement(boolExpr));
+        } else {
+            return new AssumeOperation(new StrengtheningAssumeStatement(boolExpr));
+        }
     }
 
-    static negatedAssumeOpFrom(boolExpr: BooleanExpression): AssumeOperation {
+    static negatedAssumeOpFrom(boolExpr: BooleanExpression, assumeType: AssumeType): AssumeOperation {
         if (boolExpr instanceof NegationExpression) {
             // resolve a double negation
-            return new AssumeOperation(boolExpr.negate);
+            return this.createAssumeOpFrom(boolExpr.negate, assumeType);
         }
 
         const negation = new NegationExpression(boolExpr);
-        return new AssumeOperation(negation);
+        return this.createAssumeOpFrom(negation, assumeType);
     }
 
     static epsilon(): NoopProgramOperation {

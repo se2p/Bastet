@@ -37,11 +37,11 @@ import {
     CloneStartEvent,
     ConditionReachedEvent,
     MessageReceivedEvent,
-    NeverEvent,
+    NeverEvent, QualifiedMessageNamespace,
     RenderedMonitoringEvent,
     SingularityEvent,
     StartupEvent,
-    TerminationEvent
+    TerminationEvent, UnqualifiedMessageNamespace
 } from "./core/CoreEvent";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {
@@ -85,6 +85,7 @@ import {
     StringVariableExpression
 } from "./core/expressions/StringExpression";
 import {
+    ActorSelfExpression,
     ActorVariableExpression,
     LocateActorExpression,
     StartCloneActorExpression,
@@ -109,7 +110,7 @@ import {
     InsertAtStatement,
     ReplaceElementAtStatement
 } from "./core/statements/ListStatement";
-import {AssumeStatement} from "./core/statements/AssumeStatement";
+import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/AssumeStatement";
 import {BroadcastAndWaitStatement} from "./core/statements/BroadcastAndWaitStatement";
 import {BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
 import {CreateCloneOfStatement} from "./core/statements/CreateCloneOfStatement";
@@ -126,7 +127,7 @@ import {ActorType, BooleanType, FloatType, IntegerType, ListType, StringEnumType
 import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
-import {SystemMessage, UserMessage} from "./core/Message";
+import {ActorDestination, NamedDestination, SystemMessage, UserMessage} from "./core/Message";
 import {
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
@@ -143,6 +144,14 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
 
     visitReturnStatement(node: ReturnStatement): string {
         return 'RETURN';
+    }
+
+    visitUnqualifiedMessageNamespace(node: UnqualifiedMessageNamespace): string {
+        return "";
+    }
+
+    visitQualifiedMessageNamespace(node: QualifiedMessageNamespace): string {
+        return `in ${node.namespaceName.accept(this)}`;
     }
 
     visitUserMessage(node: UserMessage): string {
@@ -345,6 +354,10 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
         return node.variable.accept(this);
     }
 
+    visitActorSelfExpression(node: ActorSelfExpression): string {
+        return "self";
+    }
+
     visitActorVariableExpression(node: ActorVariableExpression): string {
         return node.variable.accept(this);
     }
@@ -401,16 +414,27 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
         return `add ${node.element.accept(this)} to ${node.listVariable.accept(this)}`;
     }
 
-    visitAssumeStatement(node: AssumeStatement): string {
+    visitStrengtheningAssumeStatement(node: StrengtheningAssumeStatement): string {
         return `assume ${node.condition.accept(this)}`;
     }
 
+    visitBranchingAssumeStatement(node: BranchingAssumeStatement): string {
+        return `assume ${node.condition.accept(this)}`;
+    }
     visitBeginAtomicStatement(node: BeginAtomicStatement): string {
         return `enter atomic`;
     }
 
+    visitNamedDestination(node: NamedDestination): string {
+        return `"${node.namespace.accept(this)}"`
+    }
+
+    visitActorDestination(node: ActorDestination): string {
+        return node.actor.accept(this);
+    }
+
     visitSystemMessage(node: SystemMessage): string {
-        return `${node.messageid.accept(this)}/${node.namespace.accept(this)}`;
+        return `${node.messageid.accept(this)}/${node.destination.accept(this)}`;
     }
 
     visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): string {

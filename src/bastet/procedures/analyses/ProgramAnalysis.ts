@@ -38,7 +38,7 @@ import {AccessibilityRelation} from "./Accessibility";
 import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
 
 export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
-   extends AbstractSuccOperator<E>,
+   extends InitOperator<E, F>, AbstractSuccOperator<E>,
        JoinOperator<E>, TargetOperator<E>, MergeIntoOperator<E, F>,
        MergeOperator<E>, StopOperator<E, F>, WidenOperator<E, F>, PartitionOperator<E, F>,
        WitnessHandler<F>, TraversalOrderOperator<E, F>, ResultFinalization<F>,
@@ -47,10 +47,6 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
     abstractDomain: AbstractDomain<C, E>;
 
     refiner: Refiner<E>;
-
-    initialStatesFor(task: App): E[];
-
-    createStateSets(): [FrontierSet<F>, ReachedSet<F>];
 
 }
 
@@ -64,6 +60,14 @@ export interface WrappingProgramAnalysis<C extends ConcreteElement, E extends Ab
     extends ProgramAnalysis<C, E, F> {
 
     wrappedAnalysis: ProgramAnalysis<any, any, F>;
+
+}
+
+export interface InitOperator<E extends AbstractElement, F extends AbstractState> {
+
+    initialStatesFor(task: App): E[];
+
+    createStateSets(): [FrontierSet<F>, ReachedSet<F>];
 
 }
 
@@ -112,6 +116,8 @@ export interface TraversalOrderOperator<E extends AbstractElement, F extends Abs
     extends StateOrderComparator<E> {
 
     getLexiOrderKey(ofState: E): LexiKey;
+
+    getLexiDiffKey(ofState: E): LexiKey;
 
 }
 

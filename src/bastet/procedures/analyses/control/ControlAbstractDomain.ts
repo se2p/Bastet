@@ -347,6 +347,12 @@ export interface ControlAbstractStateAttributes extends AbstractElement, Singlet
     /** The threads that have been stepped to get to this state */
     steppedThreadIndices: ImmSet<number>;
 
+    /**
+     * Threads that are not observers, which been stepped to get to this state;
+     * observer threads might have been stepped meanwhile.
+     */
+    lastSteppedNonObserverThreadIndices: ImmSet<number>;
+
     /** Actor scopes */
     actorScopes: ImmMap<DataLocation, ActorId>;
 
@@ -359,6 +365,8 @@ const ControlAbstractStateRecord = ImmRec({
     conditionStates: ImmList<ThreadState>([]),
 
     steppedThreadIndices: ImmSet<number>(),
+
+    lastSteppedNonObserverThreadIndices: ImmSet<number>(),
 
     wrappedState: null,
 
@@ -396,9 +404,12 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
 
     constructor(threadStates: ImmList<ThreadState>, conditionStates: ImmList<ThreadState>,
                 wrappedState: AbstractElement, isTargetFor: ImmSet<Property>,
-                steppedThreadIndices: ImmSet<number>, actorScopes: ImmMap<DataLocation, ActorId>) {
-        super({threadStates: threadStates, conditionStates: conditionStates, wrappedState: wrappedState, isTargetFor: isTargetFor,
-            steppedThreadIndices: steppedThreadIndices, actorScopes: actorScopes});
+                steppedThreadIndices: ImmSet<number>, lastSteppedNonObserverThreadIndices: ImmSet<number>,
+                actorScopes: ImmMap<DataLocation, ActorId>) {
+        super({threadStates: threadStates, conditionStates: conditionStates, wrappedState: wrappedState,
+            isTargetFor: isTargetFor,
+            steppedThreadIndices: steppedThreadIndices, lastSteppedNonObserverThreadIndices: lastSteppedNonObserverThreadIndices,
+            actorScopes: actorScopes});
     }
 
     public getIndexedThreadState(atIndex: number): IndexedThread {
@@ -435,6 +446,10 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
         return this.get("steppedThreadIndices");
     }
 
+    public getLastSteppedNonObserverThreadIndices(): ImmSet<number> {
+        return this.get("lastSteppedNonObserverThreadIndices");
+    }
+
     public getActorScopes(): ImmMap<DataLocation, ActorId> {
         return this.get('actorScopes');
     }
@@ -451,6 +466,10 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
         return this.set('steppedThreadIndices', ImmSet(steppedFor));
     }
 
+    public withLastSteppedNonObserverThreadIndices(indices: Iterable<number>): ControlAbstractState {
+        return this.set("lastSteppedNonObserverThreadIndices", ImmSet(indices));
+    }
+
     public withIsTargetFor(targetFor: Iterable<Property>): ControlAbstractState {
         return this.set('isTargetFor', ImmSet(targetFor));
     }
@@ -459,7 +478,7 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
        return this.set('threadStates', this.getThreadStates().set(threadIndex, setStateTo));
     }
 
-    withThreadStates(threadList: ImmList<ThreadState>): ControlAbstractState {
+    public withThreadStates(threadList: ImmList<ThreadState>): ControlAbstractState {
         return this.set('threadStates', threadList);
     }
 
@@ -471,7 +490,7 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
         return this.set('conditionStates', this.getConditionStates().set(threadIndex, setStateTo));
     }
 
-    withConditionStates(threadStateList: ImmList<ThreadState>): ControlAbstractState {
+    public withConditionStates(threadStateList: ImmList<ThreadState>): ControlAbstractState {
         return this.set('conditionStates', threadStateList);
     }
 
@@ -536,7 +555,7 @@ export class ScheduleAbstractStateFactory {
             }
         }
 
-        return new ControlAbstractState(threads, conditions, wrappedState, isTarget, ImmSet(), actors);
+        return new ControlAbstractState(threads, conditions, wrappedState, isTarget, ImmSet(), ImmSet(), actors);
     }
 }
 

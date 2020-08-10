@@ -26,7 +26,14 @@
 import {Statement} from "./Statement";
 import {BooleanExpression} from "../expressions/BooleanExpression";
 
-export class AssumeStatement extends Statement {
+
+export enum AssumeType {
+    UNDEFINED,
+    BRANCHING,
+    STRENGTHENING
+}
+
+export abstract class AssumeStatement extends Statement {
 
     private readonly _condition: BooleanExpression;
 
@@ -37,5 +44,20 @@ export class AssumeStatement extends Statement {
 
     get condition(): BooleanExpression {
         return this._condition;
+    }
+
+}
+
+export class StrengtheningAssumeStatement extends AssumeStatement {
+
+    constructor(cond: BooleanExpression) {
+        super(cond);
+    }
+}
+
+export class BranchingAssumeStatement extends AssumeStatement {
+
+    constructor(cond: BooleanExpression) {
+        super(cond);
     }
 }

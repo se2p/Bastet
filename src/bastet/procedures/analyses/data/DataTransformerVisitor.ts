@@ -133,7 +133,10 @@ import {
 } from "../../../syntax/ast/core/ScratchType";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../domains/ConcreteElements";
-import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
+import {
+    BranchingAssumeStatement,
+    StrengtheningAssumeStatement
+} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {
@@ -632,7 +635,12 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
         throw new ImplementMeException();
     }
 
-    visitAssumeStatement(node: AssumeStatement): B {
+    visitStrengtheningAssumeStatement(node: StrengtheningAssumeStatement): B {
+        const assume = this.visitBoolExpression(node.condition);
+        return this._theories.boolTheory.and(this._mem, assume);
+    }
+
+    visitBranchingAssumeStatement(node: BranchingAssumeStatement): B {
         const assume = this.visitBoolExpression(node.condition);
         return this._theories.boolTheory.and(this._mem, assume);
     }

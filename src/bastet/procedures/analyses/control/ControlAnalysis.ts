@@ -279,16 +279,6 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         return result;
     }
 
-    getStateLabel(state: ControlAbstractState): string {
-        const innerLabelingFn = this.wrappedAnalysis['getStateLabel'];
-        const innerLabel = innerLabelingFn ? innerLabelingFn(state) : "?";
-        const controlLabel = state.getThreadStates()
-            .map((e) => `[${e.getActorId()} ${e.getScriptId()} ${e.getRelationLocation().getLocationId()}]`)
-            .join(", ");
-
-        return `${controlLabel} ${innerLabel}`;
-    }
-
     createStateSets(): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         throw new ImplementMeException();
     }
@@ -335,8 +325,19 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
             const relA: TransitionRelation = this._task.getTransitionRelationById(relLocA.getRelationId());
             const rpoA: number = relA.getWaitAtMeetOrderOf(relLocA.getLocationId());
 
-            return new LexiKey([rpoA * -1]); // We use a Max-Priority-Queue. Larger elements are prefered but we
+            return new LexiKey([-rpoA]); // We use a Max-Priority-Queue. Larger elements are prefered but we
             // what to process elements with the smaller wait-at-meet order first
+        }
+
+        return new LexiKey([]);
+    }
+
+    getLexiDiffKey(ofState: ControlAbstractState): LexiKey {
+        const steppedThreadsA = ofState.getSteppedFor().map((i) => ofState.getIndexedThreadState(i));
+
+        if (steppedThreadsA.size == 1) {
+            const steppedA: IndexedThread = getTheOnlyElement(steppedThreadsA);
+            return new LexiKey([steppedA.threadStatus.getThreadId()]);
         }
 
         return new LexiKey([]);

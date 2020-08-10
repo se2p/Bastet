@@ -39,11 +39,11 @@ import {
     CHOOSE_EITHER,
     CHOOSE_FIRST,
     CHOOSE_SECOND,
-    DefaultFrontierSet,
+    DefaultFrontierSet, DifferencingFrontierSet,
     FrontierSet,
     PartitionKey,
     PriorityFrontierSet,
-    ReachedSet,
+    ReachedSet, SingleStatePartitionOperator,
     StatePartitionOperator,
     StateSet,
 } from "../../algorithms/StateSet";
@@ -172,6 +172,9 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     merge(state1: GraphAbstractState, state2: GraphAbstractState): GraphAbstractState {
+        Preconditions.checkArgument(state1.getMergeOf().size > 0);
+        Preconditions.checkArgument(state2.getMergeOf().size > 0);
+
         return GraphAbstractStateFactory.withFreshID(
             state1.getPredecessors().union(state2.getPredecessors()),
             state1.getMergeOf().union(state2.getMergeOf()),
@@ -242,7 +245,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         if (this._config.graphConstructionOrder == "DepthFirst") {
             frontierSet = new DefaultFrontierSet();
         } else if (this._config.graphConstructionOrder == "WaitAtMeet") {
-            frontierSet = new PriorityFrontierSet<GraphAbstractState>(this);
+            frontierSet = new DifferencingFrontierSet<GraphAbstractState>((e) => this.getLexiDiffKey(e), (e, f) => this.compareStateOrder(e, f));
         } else {
             throw new IllegalArgumentException("Invalid custruction order: " + this._config.graphConstructionOrder);
         }
@@ -294,6 +297,10 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
 
     getLexiOrderKey(ofState: GraphAbstractState): LexiKey {
         return this.wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
+    }
+
+    getLexiDiffKey(ofState: GraphAbstractState): LexiKey {
+        return this.wrappedAnalysis.getLexiDiffKey(ofState.getWrappedState());
     }
 
     finalizeResults(frontier: FrontierSet<GraphAbstractState>, reached: ReachedSet<GraphAbstractState>) {

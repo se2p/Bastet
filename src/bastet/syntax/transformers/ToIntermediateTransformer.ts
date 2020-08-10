@@ -29,14 +29,14 @@ import {AbsentAstNode, AstNode, OptionalAstNode, PresentAstNode} from "../ast/As
 import {
     ActorComponentsDefinitionContext,
     ActorDefinitionContext,
-    ActorDefinitionListContext,
+    ActorDefinitionListContext, ActorMessageDestinationContext,
     ActorModeContext,
-    ActorRoleModeContext,
+    ActorRoleModeContext, ActorSelfExpressionContext,
     ActorTypeContext,
     ActorVariableExpressionContext,
     AddElementToStatementContext,
     AfterBootstrapMonitoringEventContext,
-    AfterStatementMonitoringEventContext,
+    AfterStatementMonitoringEventContext, AnonymousScriptIdentContext,
     AssumeStatementContext,
     AtomicMethodContext,
     BoolAndExpressionContext,
@@ -107,7 +107,7 @@ import {
     LocateActorExpressionContext,
     MessageReceivedEventContext,
     MethodDefinitionContext,
-    MethodDefinitionListContext,
+    MethodDefinitionListContext, NamedMessageDestinationContext, NamedScriptIdentContext,
     NegatedBoolExpressionContext,
     NeverEventContext,
     NumAsBoolExpressionContext,
@@ -129,7 +129,7 @@ import {
     ParameterListPlainContext,
     PrimitiveContext,
     ProgramContext,
-    PureElseContext,
+    PureElseContext, QualifiedNamespaceContext,
     QualifiedVariableContext,
     RenderedMonitoringEventContext,
     RepeatForeverStmtContext,
@@ -164,12 +164,12 @@ import {
     StringTypeContext,
     StringVariableExpressionContext,
     SystemMessageContext,
-    TimerExpressionContext,
+    TimerExpressionContext, UnqualifiedNamespaceContext,
     UnspecifiedBoolExpressionContext,
     UnspecifiedExprContext,
     UnspecifiedNumExprContext,
     UnspecifiedStringExpressionContext,
-    UntilStmtContext,
+    UntilStmtContext, UserInputDispatchEventContext,
     UserMessageContext,
     VariableContext,
     VoidReturnDefinitionContext,
@@ -193,7 +193,7 @@ import {
     ConcreteActorMode,
     InheritsFromList
 } from "../ast/core/ActorDefinition";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {
     IthLetterOfStringExpression,
     IthStringItemOfExpression,
@@ -246,11 +246,11 @@ import {
     BootstrapEvent,
     CloneStartEvent,
     ConditionReachedEvent,
-    CoreEvent,
+    CoreEvent, MessageNamespace,
     MessageReceivedEvent,
-    NeverEvent,
+    NeverEvent, QualifiedMessageNamespace,
     RenderedMonitoringEvent,
-    StartupEvent
+    StartupEvent, UnqualifiedMessageNamespace, UserInputDispatchEvent
 } from "../ast/core/CoreEvent";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {
@@ -305,7 +305,7 @@ import {
     StopAllStatement,
     StopThisStatement
 } from "../ast/core/statements/TerminationStatement";
-import {SystemMessage, UserMessage} from "../ast/core/Message";
+import {ActorDestination, NamedDestination, SystemMessage, UserMessage} from "../ast/core/Message";
 import {StopOthersInActorStatement} from "../ast/core/statements/StopOthersInActorStatement";
 import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
@@ -313,13 +313,13 @@ import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentExc
 import {App} from "../app/App";
 import {VariableWithDataLocation} from "../ast/core/Variable";
 import {DataLocations} from "../app/controlflow/DataLocation";
-import {AssumeStatement} from "../ast/core/statements/AssumeStatement";
+import {StrengtheningAssumeStatement} from "../ast/core/statements/AssumeStatement";
 import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
 import {BastetConfiguration} from "../../utils/BastetConfiguration";
 import {ParsingException} from "../../core/exceptions/ParsingException";
 import {ParserRuleContext} from "antlr4ts";
 import {CastExpression} from "../ast/core/expressions/CastExpression";
-import {ActorExpression, LocateActorExpression} from "../ast/core/expressions/ActorExpression";
+import {ActorExpression, ActorSelfExpression, LocateActorExpression} from "../ast/core/expressions/ActorExpression";
 import {ScopeTypeInformation, TypeInformationStorage} from "../DeclarationScopes";
 import {LookupTransformer} from "./LookupTransformer";
 import {SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
@@ -334,6 +334,10 @@ export class TransformerConfig extends BastetConfiguration {
 
     get useBusyWaiting(): boolean {
         return this.getBoolProperty('use-busy-waiting', true);
+    }
+
+    get enableMessageDispatcherLoop(): boolean {
+        return this.getBoolProperty('enable-message-dispatcher-loop', true);
     }
 
 }
@@ -591,8 +595,6 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     private precollectMethodSignatures(actorIdent: Identifier, ctx: MethodDefinitionListContext) {
-
-
         for (let md of ctx.methodDefinition()) {
             if (md instanceof FullMethodDefinitionContext) {
                 const identTr = md.ident().accept(this);
@@ -832,7 +834,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
             } else if (mtr.nodeOnly() instanceof MethodDefinition) {
                 full.push(mtr.nodeOnly());
             } else {
-                throw new ImplementMeException();
+                throw new ImplementMeForException(mtr.nodeOnly().constructor.name);
             }
         }
 
@@ -880,8 +882,18 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return false;
     }
 
-    public visitScript(ctx: ScriptContext) : TransformerResult {
+    visitAnonymousScriptIdent(ctx: AnonymousScriptIdentContext): TransformerResult {
         const scriptIdent = Identifier.freshWithPrefix("script");
+        return TransformerResult.withNode(scriptIdent);
+    }
+
+    visitNamedScriptIdent(ctx: NamedScriptIdentContext): TransformerResult {
+        const scriptIdent: Identifier = ctx.ident().accept(this).nodeOnly();
+        return TransformerResult.withNode(scriptIdent);
+    }
+
+    public visitScript(ctx: ScriptContext) : TransformerResult {
+        const scriptIdent: Identifier = ctx.scriptIdent().accept(this).nodeOnly<Identifier>();
         this._activeDeclarationScope = this._activeDeclarationScope.beginMethodScope(scriptIdent.text);
         try {
             return TransformerResult.withNode(new ScriptDefinition(scriptIdent,
@@ -895,7 +907,8 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
     public visitScriptList(ctx: ScriptListContext) : TransformerResult {
         const defs = this.buildArrayFrom<ScriptDefinition>(ctx.script());
-        return new TransformerResult(defs.statementsToPrepend, new ScriptDefinitionList(defs.nodeList));
+        return new TransformerResult(defs.statementsToPrepend,
+            new ScriptDefinitionList(defs.nodeList.filter((s) => s.ident.text != "messageDispatcherLoop" || this._config.enableMessageDispatcherLoop)));
     }
 
     public visitExpressionList(ctx: ExpressionListContext) : TransformerResult {
@@ -1426,6 +1439,10 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         }
     }
 
+    public visitUserInputDispatchEvent(ctx: UserInputDispatchEventContext): TransformerResult {
+        return TransformerResult.withNode(UserInputDispatchEvent.instance());
+    }
+
     public visitCloneStartEvent(ctx: CloneStartEventContext) : TransformerResult {
         return TransformerResult.withNode(CloneStartEvent.instance());
     }
@@ -1465,7 +1482,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     public visitAssumeStatement(ctx: AssumeStatementContext): TransformerResult {
         const exprTr = ctx.boolExpr().accept(this);
         return new TransformerResult(exprTr.statementsToPrepend,
-            new AssumeStatement(exprTr.node as BooleanExpression));
+            new StrengtheningAssumeStatement(exprTr.node as BooleanExpression));
     }
 
     public visitDefaultBoolExpression(ctx: DefaultBoolExpressionContext) : TransformerResult {
@@ -1562,13 +1579,38 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
             new UserMessage(strTr.node as StringExpression));
     }
 
+    public visitActorSelfExpression(ctx: ActorSelfExpressionContext) : TransformerResult {
+        return new TransformerResult(StatementList.empty(), new ActorSelfExpression());
+    }
+
+    public visitQualifiedNamespace(ctx: QualifiedNamespaceContext): TransformerResult {
+        return new TransformerResult(StatementList.empty(),
+            new QualifiedMessageNamespace(new StringLiteral(ctx.String().text)));
+    }
+
+    public visitUnqualifiedNamespace(ctx: UnqualifiedNamespaceContext): TransformerResult {
+        return new TransformerResult(StatementList.empty(), new UnqualifiedMessageNamespace());
+    }
+
+    public visitNamedMessageDestination(ctx: NamedMessageDestinationContext): TransformerResult {
+        const namespace = new StringLiteral(ctx.String().text);
+        return new TransformerResult(StatementList.empty(),
+            new NamedDestination(namespace as StringLiteral));
+    }
+
+    public visitActorMessageDestination(ctx: ActorMessageDestinationContext): TransformerResult {
+        const actorExprTr = ctx.actorExpr().accept(this);
+        return new TransformerResult(actorExprTr.statementsToPrepend,
+            new ActorDestination(actorExprTr.node as ActorExpression));
+    }
+
     public visitSystemMessage(ctx: SystemMessageContext) : TransformerResult {
         const messageIdTr = ctx.stringExpr().accept(this);
-        const channel = StringLiteral.from(ctx.String().text);
+        const destinationTr = ctx.messageDestination().accept(this);
         const payloadTr = ctx.expressionList().accept(this);
         return new TransformerResult(
-            StatementLists.concat(messageIdTr.statementsToPrepend, payloadTr.statementsToPrepend),
-            new SystemMessage(channel, messageIdTr.node as StringExpression,
+            StatementLists.concat(StatementLists.concat(messageIdTr.statementsToPrepend, payloadTr.statementsToPrepend), destinationTr.statementsToPrepend),
+            new SystemMessage(destinationTr.node as NamedDestination, messageIdTr.node as StringExpression,
                 payloadTr.node as ExpressionList));
     }
 
@@ -1594,13 +1636,15 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     public visitMessageReceivedEvent(ctx: MessageReceivedEventContext) : TransformerResult {
-        const tr = ctx.stringExpr().accept(this);
+        const messageIdTr = ctx.stringExpr().accept(this);
+        const msgNamespaceTr = ctx.messageNamespace().accept(this);
+        const paramsTr = ctx.parameterList().accept(this);
         return new TransformerResult(
-            tr.statementsToPrepend,
+            StatementLists.concat(StatementLists.concat(messageIdTr.statementsToPrepend, msgNamespaceTr.statementsToPrepend), paramsTr.statementsToPrepend),
             new MessageReceivedEvent(
-                StringLiteral.from(ctx.stringExpr().text),
-                tr.node as StringExpression,
-                ctx.parameterList().accept(this).nodeOnly() as ParameterDeclarationList));
+                msgNamespaceTr.node as MessageNamespace,
+                messageIdTr.node as StringExpression,
+                paramsTr.node as ParameterDeclarationList));
     }
 
     public visitNegatedBoolExpression(ctx: NegatedBoolExpressionContext) : TransformerResult {
@@ -1871,7 +1915,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     visit(tree: ParseTree): TransformerResult {
-        throw new ImplementMeException();
+        throw new ImplementMeForException(tree.constructor.name);
     }
 
     private identifyProcedureCall(node: RuleNode) : string|null {
@@ -2084,11 +2128,11 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     visitErrorNode(node: ErrorNode): TransformerResult {
-        throw new ImplementMeException();
+        throw new ImplementMeForException("ErrorNode");
     }
 
     visitTerminal(node: TerminalNode): TransformerResult {
-        throw new ImplementMeException();
+        throw new ImplementMeForException("TerminalNode");
     }
 
     private ensureType0(context: ParserRuleContext, varType: ScratchType, transformerResult: TransformerResult): TransformerResult {

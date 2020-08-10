@@ -10,7 +10,7 @@ end
 actor TestActor is BaseActor begin
 
     script on startup do begin
-        if KEY = 42 then begin
+        if KEY = 47 then begin
             _RUNTIME_signalFailure()
         end
     end

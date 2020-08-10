@@ -4,7 +4,9 @@ actor MiniActor is RuntimeEntity begin
 
     declare x as int
 
-    define x as 0
+    script on bootstrap do begin
+        define x as 0
+    end
 
     script on startup do begin
         broadcast "foo" and wait
@@ -13,7 +15,7 @@ actor MiniActor is RuntimeEntity begin
         end
     end
 
-    script on received message "foo" do begin
+    script on message "foo" () do begin
         define x as 2
     end
 

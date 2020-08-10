@@ -333,14 +333,18 @@ export class AppBuilder {
         return result;
     }
 
-    private concatActors(main: Actor, secondary: Actor): Actor {
+    /**
+     * @param dominating          The actor with the dominating functionality
+     * @param secondary     The actor to inherit from
+     */
+    private concatActors(dominating: Actor, secondary: Actor): Actor {
         // TODO: Handle re-definitions of resources or methods with the same identifier
         //      Rename the basic versions so that they can be referenced by the
         //      inheriting actors?
-        const resources = Maps.mergeImmutableMaps(main.resourceMap, secondary.resourceMap);
+        const resources = Maps.mergeImmutableMaps(dominating.resourceMap, secondary.resourceMap);
 
         const methodDefMap: Map<string, MethodDefinition> = new Map()
-        main.methodMap.forEach((v,k) => {
+        dominating.methodMap.forEach((v,k) => {
            methodDefMap.set(k, v)
         });
         secondary.methodMap.forEach((v,k) => {
@@ -351,7 +355,7 @@ export class AppBuilder {
         const methodDefinitions: ImmutableMap<string, MethodDefinition> = new ImmutableMap<string, MethodDefinition>(methodDefMap.entries())
 
         let methodMap: Map<string, Method> = new Map<string, Method>();
-        for (let method of main.methods) {
+        for (let method of dominating.methods) {
             methodMap.set(method.ident.text, method)
         }
         for (let method of secondary.methods) {
@@ -360,18 +364,18 @@ export class AppBuilder {
             }
         }
         const methods = new ImmutableList(Array.from(methodMap.values()))
-        const externalMethods = Maps.mergeImmutableMaps(main.externalMethodMap, secondary.externalMethodMap);
-        const datalocs = Maps.mergeImmutableMaps(main.datalocMap, secondary.datalocMap);
-        const scripts = Lists.concatImmutableLists(main.scripts, secondary.scripts);
+        const externalMethods = Maps.mergeImmutableMaps(dominating.externalMethodMap, secondary.externalMethodMap);
+        const datalocs = Maps.mergeImmutableMaps(dominating.datalocMap, secondary.datalocMap);
+        const scripts = Lists.concatImmutableLists(secondary.scripts, dominating.scripts); // first execute the old scripts, then the new ones (since the old might contain initializers)
 
         // TODO: The way we dedetermine the concern of an actor is somehow hacky.
         //  We could take advantage of the inheritance relation
-        let concern: Concern = main.concern;
+        let concern: Concern = dominating.concern;
         if (secondary.concern == Concerns.defaultSpecificationConcern()) {
             concern = Concerns.defaultSpecificationConcern();
         }
 
-        return new Actor(main.actorMode, main.ident, [], [secondary].concat(Array.from(secondary.dissolvedFrom)),
+        return new Actor(dominating.actorMode, dominating.ident, [], [secondary].concat(Array.from(secondary.dissolvedFrom)),
             concern, resources.createMutable(), datalocs.createMutable(),
             methodDefinitions.createMutable(), externalMethods.createMutable(),
             scripts.createMutable(), methods.createMutable());

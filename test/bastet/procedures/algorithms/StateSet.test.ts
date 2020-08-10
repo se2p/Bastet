@@ -21,8 +21,90 @@
  */
 
 
-import {Map as ImmMap, List as ImmList, Record as ImmRec} from "immutable"
-import {PartitionKey} from "../../../../src/bastet/procedures/algorithms/StateSet";
+import {Map as ImmMap, List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable"
+import {DifferencingFrontierSet, PartitionKey} from "../../../../src/bastet/procedures/algorithms/StateSet";
+import {LexiKey} from "../../../../src/bastet/utils/Lexicographic";
+import {AbstractElement, AbstractState} from "../../../../src/bastet/lattices/Lattice";
+
+const DummyAbstractElementRecord = ImmRec({
+    id: 0,
+});
+
+export class DummyAbstractElement extends DummyAbstractElementRecord implements AbstractElement {
+
+    constructor(id: number) {
+        super({id: id});
+    }
+
+    public getId(): number {
+        return this.get('id');
+    }
+
+}
+
+describe('DifferencingFrontierSet', function() {
+
+    test('Test One Partition', function() {
+        const s = new DifferencingFrontierSet((e) => new LexiKey([1]), (a, b) => 0);
+
+        const e1 = new DummyAbstractElement(1)
+        s.add(e1);
+        expect(s.getSize()).toEqual(1);
+        s.add(new DummyAbstractElement(2));
+        expect(s.getSize()).toEqual(2);
+        s.add(new DummyAbstractElement(3));
+        expect(s.getSize()).toEqual(3);
+        s.remove(e1);
+        expect(s.getSize()).toEqual(2);
+        s.remove(e1);
+        expect(s.getSize()).toEqual(2);
+    });
+
+    test('Test Two Partitions', function() {
+        const s = new DifferencingFrontierSet<DummyAbstractElement>((e) => new LexiKey([e.getId() % 2]), (a, b) => 0);
+
+        const e1 = new DummyAbstractElement(1);
+        const e2 = new DummyAbstractElement(2);
+        const e3 = new DummyAbstractElement(3);
+        const e4 = new DummyAbstractElement(4);
+        const e5 = new DummyAbstractElement(5);
+
+        s.addAll([e1, e2, e3, e4, e5]);
+        expect(s.getSize()).toEqual(5);
+        s.removeAll([e1, e2, e3, e4]);
+        expect(s.getSize()).toEqual(1);
+        expect(s.peek()).toStrictEqual(e5);
+        expect(s.getSize()).toEqual(1);
+        expect(s.has(e5)).toBeTruthy();
+        s.remove(e5);
+        expect(s.has(e5)).toBeFalsy();
+    });
+
+    test('Test Alternating Pop', function() {
+        const s = new DifferencingFrontierSet<DummyAbstractElement>((e) => new LexiKey([e.getId() % 2]), (a, b) => 0);
+
+        const e1 = new DummyAbstractElement(1);
+        const e2 = new DummyAbstractElement(2);
+        const e3 = new DummyAbstractElement(3);
+        const e4 = new DummyAbstractElement(4);
+        const e5 = new DummyAbstractElement(5);
+
+        function isEven(e: DummyAbstractElement): boolean {
+            return e.getId() % 2 == 0;
+        }
+
+        s.addAll([e1, e2, e3, e4, e5]);
+
+        const first = s.peek();
+        expect(first).toStrictEqual(s.peek());
+
+        const firstEven: boolean = isEven(first);
+        s.remove(s.peek());
+        const next = s.peek();
+        expect(isEven(next)).not.toEqual(firstEven);
+    });
+
+});
 
 describe('State Sets', function() {
 

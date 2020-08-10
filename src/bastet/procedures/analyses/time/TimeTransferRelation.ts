@@ -34,7 +34,7 @@ import {ProgramTimeProfile} from "../../../utils/TimeProfile";
 import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements/DeclarationStatement";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {Statement} from "../../../syntax/ast/core/statements/Statement";
-import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
+import {StrengtheningAssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
 import {
     DivideExpression,
@@ -121,8 +121,8 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
 
                     intermediateStatements = [
                         new DeclareStackVariableStatement(opTimeVariable),
-                        new AssumeStatement(assumeTimeMin),
-                        new AssumeStatement(assumeTimeMax),
+                        new StrengtheningAssumeStatement(assumeTimeMin),
+                        new StrengtheningAssumeStatement(assumeTimeMax),
                         new StoreEvalResultToVariableStatement(this._task.systemVariables.globalTimeMicrosVariable,
                             new PlusExpression(this._task.systemVariables.globalTimeMicrosVariable, opTimeVariableExpr))];
                 }
