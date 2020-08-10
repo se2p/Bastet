@@ -40,7 +40,7 @@ import {
     StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {AstNode} from "../../../syntax/ast/AstNode";
-import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
+import {StrengtheningAssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {Concern} from "../../../syntax/Concern";
 
 export class DataTransferRelation implements LabeledTransferRelation<DataAbstractState> {
@@ -66,7 +66,7 @@ export class DataTransferRelation implements LabeledTransferRelation<DataAbstrac
         let ast: AstNode;
         if (op instanceof AssumeOperation) {
             const assume = op as AssumeOperation;
-            ast = new AssumeStatement(assume.expression);
+            ast = new StrengtheningAssumeStatement(assume.expression);
         } else {
             ast = op.ast;
         }

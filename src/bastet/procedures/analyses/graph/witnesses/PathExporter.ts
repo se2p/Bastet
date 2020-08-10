@@ -30,10 +30,12 @@ import {ReachedSet} from "../../../algorithms/StateSet";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {GraphReachedSetWrapper} from "../GraphStatesSetWrapper";
 import {TransitionLabelProvider, WrappingProgramAnalysis} from "../../ProgramAnalysis";
-import {ConcreteElement} from "../../../domains/ConcreteElements";
+import {ConcreteElement, ConcreteMemory} from "../../../domains/ConcreteElements";
 import {AccessibilityRelation} from "../../Accessibility";
 import {ProgramOperation} from "../../../../syntax/app/controlflow/ops/ProgramOperation";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
+import {SSAStateVisitor} from "../../StateVisitors";
+import {SSAState} from "../../ssa/SSAAbstractDomain";
 
 export class PathExporter implements WitnessHandler<GraphAbstractState> {
 
@@ -51,6 +53,8 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
         const ar: GraphReachedSetWrapper<GraphAbstractState> = reached as GraphReachedSetWrapper<GraphAbstractState>;
         const testified = this._analysis.testifyOne(ar, violating);
         this.exportPath(testified, violating);
+        this.exportConcretePath(testified, violating);
+        this.exportTargetState(testified, violating);
     }
 
     private exportPath(pathAr: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, violating: GraphAbstractState) {
@@ -67,7 +71,7 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
             Preconditions.checkArgument(succs.length <= 1, "The path to export most not contain branchings!");
             for (const succ of succs) {
                 const ops: ProgramOperation[] = this.getTransitionLabels(work, succ);
-                ops.forEach((o) => pathElements.push(o.ast.accept(new CorePrintVisitor())));
+                ops.forEach((o) => pathElements.push(`${work.getId()} -- ${o.ast.accept(new CorePrintVisitor())} --> ${succ.getId()}`));
                 worklist.push(succ);
             }
         }
@@ -78,4 +82,61 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
     private getTransitionLabels(work: GraphAbstractState, succ: GraphAbstractState) {
         return this._tlp.getTransitionLabel(work, succ);
     }
+
+    private exportTargetState(ar: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, violating: GraphAbstractState) {
+        const violatingConcreteElement: ConcreteElement = ar.concretizer().concretizeOne(violating);
+        Preconditions.checkArgument(violatingConcreteElement instanceof ConcreteMemory);
+        const errorState: ConcreteMemory = violatingConcreteElement as ConcreteMemory;
+
+        const filepath = `output/cex_target_${violating.getId()}.json`;
+        const targetJson: {} = {'boolean': {}, 'number': {}, 'string': {}};
+        for (const [k, v] of errorState.numberMem.entries()) {
+            targetJson['number'][k] = v.value;
+        }
+        for (const [k, v] of errorState.stringMem.entries()) {
+            targetJson['string'][k] = v.value;
+        }
+        for (const [k, v] of errorState.booleanMem.entries()) {
+            targetJson['boolean'][k] = v.value;
+        }
+
+        let fs = require('fs');
+        fs.writeFileSync(filepath, JSON.stringify(targetJson, null, 4));
+    }
+
+    private exportConcretePath(pathAr: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, violating: GraphAbstractState) {
+        const pathElements = [];
+
+        const concrete: ConcreteElement = pathAr.concretizer().concretizeOne(violating);
+        Preconditions.checkArgument(concrete instanceof ConcreteMemory);
+        const concreteMem: ConcreteMemory = concrete as ConcreteMemory;
+
+        const worklist: GraphAbstractState[] = [];
+        Array.from(pathAr.initial()).forEach((e) => worklist.push(e));
+
+        while (worklist.length > 0) {
+            const work = worklist.pop();
+
+            const elementJson = {};
+            const ssaState: SSAState = work.accept(new SSAStateVisitor());
+            for (const [k, v] of ssaState.getPrimitiveAttributes(concreteMem)) {
+                if (k.indexOf("__op_time_") == 0) {
+                    continue;
+                }
+                elementJson[k] = v.value;
+            }
+            pathElements.push({'id': work.getId(), 'mem': elementJson});
+
+            const succs = pathAr.successorsOf(work);
+            Preconditions.checkArgument(succs.length <= 1, "The path to export most not contain branchings!");
+            for (const succ of succs) {
+                worklist.push(succ);
+            }
+        }
+
+        let fs = require('fs');
+        const filepath = `output/cex_concrete_path_${violating.getId()}.json`;
+        fs.writeFileSync(filepath, JSON.stringify(pathElements, null, 4));
+    }
+
 }

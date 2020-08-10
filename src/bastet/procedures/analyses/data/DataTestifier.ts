@@ -30,7 +30,10 @@ import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {BooleanFormula} from "../../../utils/ConjunctiveNormalForm";
-import {AssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
+import {
+    BranchingAssumeStatement,
+    StrengtheningAssumeStatement
+} from "../../../syntax/ast/core/statements/AssumeStatement";
 import {Set as ImmSet} from "immutable";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AbstractStates, DelegatingStateVisitor} from "../AbstractStates";
@@ -96,9 +99,9 @@ class ConditionalBranch {
 
     public readonly branchEnd: AbstractState;
 
-    public readonly branchAssumes: AssumeStatement[];
+    public readonly branchAssumes: StrengtheningAssumeStatement[];
 
-    constructor(splitState: AbstractState, branchStart: AbstractState, branchEnd: AbstractState, branchAssumes: AssumeStatement[]) {
+    constructor(splitState: AbstractState, branchStart: AbstractState, branchEnd: AbstractState, branchAssumes: StrengtheningAssumeStatement[]) {
         this.splitState = splitState;
         this.branchStart = branchStart;
         this.branchEnd = branchEnd;
@@ -253,14 +256,14 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
        return null;
     }
 
-    private filterAssumes(ops: ProgramOperation[]): AssumeStatement[] {
-        const result: AssumeStatement[] = [];
+    private filterAssumes(ops: ProgramOperation[]): BranchingAssumeStatement[] {
+        const result: BranchingAssumeStatement[] = [];
 
         // We might transform some of the ops to AssumeOperation here
         for (const op of ops) {
             if (op instanceof AssumeOperation) {
-                result.push(new AssumeStatement((op as AssumeOperation).expression));
-            } else if (op.ast instanceof AssumeStatement) {
+                result.push(new BranchingAssumeStatement((op as AssumeOperation).expression));
+            } else if (op.ast instanceof BranchingAssumeStatement) {
                 result.push(op.ast);
             }
         }
@@ -292,7 +295,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         return `_BRANCH_${stateId}_${branchStartStateId}`;
     }
 
-    private createBranchCondition(assumes: AssumeStatement[]): BooleanFormula {
+    private createBranchCondition(assumes: StrengtheningAssumeStatement[]): BooleanFormula {
         let result: BooleanFormula = this._theories.boolTheory.trueBool();
 
         // TODO: SSA indicies have to be present in the assumes!

@@ -6,7 +6,7 @@ actor MiniActor is RuntimeEntity begin
         broadcast "foo"
     end
 
-    script on received message "bar" do begin
+    script on message "bar" () do begin
         _RUNTIME_signalFailure()
     end
 

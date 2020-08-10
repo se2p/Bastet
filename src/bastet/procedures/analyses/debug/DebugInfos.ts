@@ -23,41 +23,16 @@
  *
  */
 
-import {Statement} from "./Statement";
-import {BooleanExpression} from "../expressions/BooleanExpression";
+let debugInfos: string[] = [];
 
-
-export enum AssumeType {
-    UNDEFINED,
-    BRANCHING,
-    STRENGTHENING
+export function clearDebugInfos() {
+    debugInfos = [];
 }
 
-export abstract class AssumeStatement extends Statement {
-
-    private readonly _condition: BooleanExpression;
-
-    constructor(cond: BooleanExpression) {
-        super([cond]);
-        this._condition = cond;
-    }
-
-    get condition(): BooleanExpression {
-        return this._condition;
-    }
-
+export function pushDebugInfo(str: string) {
+    debugInfos.push(str);
 }
 
-export class StrengtheningAssumeStatement extends AssumeStatement {
-
-    constructor(cond: BooleanExpression) {
-        super(cond);
-    }
-}
-
-export class BranchingAssumeStatement extends AssumeStatement {
-
-    constructor(cond: BooleanExpression) {
-        super(cond);
-    }
+export function getDebugInfos(): string[] {
+    return debugInfos.slice();
 }

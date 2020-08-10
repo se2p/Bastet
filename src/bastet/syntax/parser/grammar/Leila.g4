@@ -78,7 +78,8 @@ primitiveType:
 
 // A script is the central unit that of a Scratch program that
 // defines the behavior (and with it the control and data flow).
-script : 'script' 'on' event 'do' scriptAttributeList stmtList ;
+script : 'script' scriptIdent 'on' event 'do' scriptAttributeList stmtList ;
+scriptIdent :  ident # NamedScriptIdent | # AnonymousScriptIdent ;
 
 // A list of scripts.
 scriptList : script* ;
@@ -99,10 +100,11 @@ event :
   | 'message' stringExpr parameterList messageNamespace # MessageReceivedEvent
   | 'condition' boolExpr # ConditionReachedEvent
   | 'rendered' # RenderedMonitoringEvent
+  | 'dispatch' # UserInputDispatchEvent
   | 'statement' 'finished' # AfterStatementMonitoringEvent
   ;
 
-messageNamespace : 'in' String # MessageNameSpace | #GlobalNameSpace;
+messageNamespace : 'in' String # QualifiedNamespace | #UnqualifiedNamespace ;
 
 // Scratch allows to define procedures, that is,
 // reusable code blocks (also known as 'custom blocks').
@@ -333,6 +335,7 @@ listExpr :
 
 actorExpr:
   variable # ActorVariableExpression
+  | 'self' # ActorSelfExpression
   | 'locate' 'actor' stringExpr # LocateActorExpression
   | 'start' 'clone' 'of' actorExpr # StartCloneActorExpression
   | 'start' 'actor' stringExpr 'as' ident # UsherActorExpression
@@ -374,5 +377,9 @@ resourceLocator : String ;
 
 message :
   stringExpr # UserMessage
-  | stringExpr expressionList 'to' String # SystemMessage
+  | stringExpr expressionList 'to' messageDestination # SystemMessage
   ;
+
+messageDestination :
+    String # NamedMessageDestination
+    | actorExpr # ActorMessageDestination ;

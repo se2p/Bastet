@@ -143,6 +143,19 @@ describe("TransitionRelations", () => {
         });
     });
 
+    describe("loop-structure-invariant", () => {
+        const op = new RawOperation(new StopAllStatement());
+        const tr = TransitionRelation.builder()
+            .addTransitionByIDs(1, 1, op)
+            .addEntryLocationWithID(1)
+            .build();
+
+        const trPrime = TransitionRelations.establishAnalysisInvariants(tr);
+        it ("added intermediate transitions", () => {
+            expect(trPrime.transitions.size).toBeGreaterThan(1);
+        });
+    });
+
     describe("loops", () => {
 
         describe("case: minimal loop", () => {

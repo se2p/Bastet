@@ -23,7 +23,12 @@
  *
  */
 
-import {ProgramAnalysis, ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
+import {
+    ProgramAnalysis,
+    ProgramAnalysisWithLabels,
+    TransitionLabelProvider,
+    WrappingProgramAnalysis
+} from "../ProgramAnalysis";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AnalysisStatistics} from "../AnalysisStatistics";
@@ -33,93 +38,83 @@ import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
 import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
-import {ProgramTimeProfile} from "../../../utils/TimeProfile";
-import {TimeTransferRelation} from "./TimeTransferRelation";
 import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {List as ImmList, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
-import {TimeAbstractDomain, TimeState} from "./TimeAbstractDomain";
-import {TimeMergeOperator} from "./TimeMergeOperator";
 import {AccessibilityRelation} from "../Accessibility";
+import {MergeJoinOperator} from "../Operators";
+import {DebugAbstractDomain, DebugState} from "./DebugAbstractDomain";
+import {DebugTransferRelation} from "./DebugTransferRelation";
 
 
-export class TimeAnalysis<F extends AbstractState>
-    implements WrappingProgramAnalysis<ConcreteElement, TimeState, F>,
-        ProgramAnalysisWithLabels<ConcreteElement, TimeState, F>,
-        Unwrapper<TimeState, AbstractElement>,
-        LabeledTransferRelation<TimeState> {
+export class DebugAnalysis<F extends AbstractState>
+    implements WrappingProgramAnalysis<ConcreteElement, DebugState, F>,
+        TransitionLabelProvider<DebugState>,
+        Unwrapper<DebugState, AbstractElement> {
 
-    private readonly _abstractDomain: TimeAbstractDomain;
+    private readonly _abstractDomain: DebugAbstractDomain;
 
     private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>;
 
     private readonly _statistics: AnalysisStatistics;
 
-    private readonly _timeProfile: ProgramTimeProfile;
+    private readonly _transfer: DebugTransferRelation;
 
-    private readonly _transfer: TimeTransferRelation;
+    private readonly _refiner: WrappingRefiner<DebugState, any>;
 
-    private readonly _mergeOperator: TimeMergeOperator;
-
-    private readonly _refiner: WrappingRefiner<TimeState, any>;
+    private readonly _mergeOperator: MergeJoinOperator<DebugState>;
 
     private readonly _task: App;
 
-    constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics,
-                timeProfile: ProgramTimeProfile) {
+    constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics) {
         this._task = Preconditions.checkNotUndefined(task);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
-        this._timeProfile = Preconditions.checkNotUndefined(timeProfile);
-        this._abstractDomain = new TimeAbstractDomain(wrappedAnalysis.abstractDomain);
-        this._mergeOperator = new TimeMergeOperator(wrappedAnalysis);
+        this._abstractDomain = new DebugAbstractDomain(wrappedAnalysis.abstractDomain);
+        this._mergeOperator = new MergeJoinOperator(this._abstractDomain);
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
-        this._transfer = new TimeTransferRelation(task, timeProfile, wrappedAnalysis);
+        this._transfer = new DebugTransferRelation(wrappedAnalysis);
     }
 
-    getTransitionLabel(from: TimeState, to: TimeState): ProgramOperation[] {
-        return this._wrappedAnalysis.getTransitionLabel(from.getWrappedState(), to.getWrappedState());
+    getTransitionLabel(fromState: DebugState, toState: DebugState): ProgramOperation[] {
+        return this._wrappedAnalysis.getTransitionLabel(fromState.getWrappedState(), toState.getWrappedState());
     }
 
-    abstractSucc(fromState: TimeState): Iterable<TimeState> {
+    abstractSucc(fromState: DebugState): Iterable<DebugState> {
         return this._transfer.abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: TimeState, op: ProgramOperation, co: Concern): Iterable<TimeState> {
-        return this._transfer.abstractSuccFor(fromState, op, co);
-    }
-
-    initialStatesFor(task: App): TimeState[] {
+    initialStatesFor(task: App): DebugState[] {
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            return new TimeState(ImmList([]), w);
+            return new DebugState(ImmList([]), w);
         } );
     }
 
-    join(state1: TimeState, state2: TimeState): TimeState {
+    join(state1: DebugState, state2: DebugState): DebugState {
         return this._abstractDomain.lattice.join(state1, state2);
     }
 
-    merge(state1: TimeState, state2: TimeState): TimeState {
+    merge(state1: DebugState, state2: DebugState): DebugState {
         return this._mergeOperator.merge(state1, state2);
     }
 
-    shouldMerge(state1: TimeState, state2: TimeState): boolean {
-        return this._mergeOperator.shouldMerge(state1, state2);
+    shouldMerge(state1: DebugState, state2: DebugState): boolean {
+        return this._wrappedAnalysis.shouldMerge(state1.getWrappedState(), state2.getWrappedState());
     }
 
-    stop(state: TimeState, reached: Iterable<F>, unwrapper: (e: F) => TimeState): boolean {
-        return this._wrappedAnalysis.stop(state, reached, unwrapper);
+    stop(state: DebugState, reached: Iterable<F>, unwrapper: (e: F) => DebugState): boolean {
+        return this._wrappedAnalysis.stop(state.getWrappedState(), reached, (e) => this.unwrap(unwrapper(e)));
     }
 
-    target(state: TimeState): Property[] {
+    target(state: DebugState): Property[] {
         return this._wrappedAnalysis.target(state.getWrappedState());
     }
 
-    widen(state: TimeState, reached: Iterable<F>): TimeState {
+    widen(state: DebugState, reached: Iterable<F>): DebugState {
         const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {
             return state.withWrappedState(wrappedResult);
@@ -129,58 +124,58 @@ export class TimeAnalysis<F extends AbstractState>
     }
 
     createStateSets(): [FrontierSet<F>, ReachedSet<F>] {
-        return this._wrappedAnalysis.createStateSets();
+        throw new ImplementMeException();
     }
 
-    get abstractDomain(): AbstractDomain<ConcreteElement, TimeState> {
+    get abstractDomain(): AbstractDomain<ConcreteElement, DebugState> {
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<TimeState> {
+    get refiner(): Refiner<DebugState> {
         return this._refiner;
     }
 
-    get wrappedAnalysis(): ProgramAnalysis<any, any, F> {
+    get wrappedAnalysis(): ProgramAnalysisWithLabels<any, any, F> {
         return this._wrappedAnalysis;
     }
 
-    unwrap(e: TimeState): AbstractElement {
+    unwrap(e: DebugState): AbstractElement {
         return e.getWrappedState();
     }
 
-    mergeInto(state: TimeState, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => TimeState, wrapper: (TimeState) => F): [FrontierSet<F>, ReachedSet<F>] {
+    mergeInto(state: DebugState, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => DebugState, wrapper: (DebugState) => F): [FrontierSet<F>, ReachedSet<F>] {
         throw new ImplementMeException();
     }
 
-    widenPartitionOf(ofState: TimeState, reached: ReachedSet<F>): Iterable<F> {
+    widenPartitionOf(ofState: DebugState, reached: ReachedSet<F>): Iterable<F> {
         throw new ImplementMeException();
     }
 
-    stopPartitionOf(ofState: TimeState, reached: ReachedSet<F>): Iterable<F> {
+    stopPartitionOf(ofState: DebugState, reached: ReachedSet<F>): Iterable<F> {
         throw new ImplementMeException();
     }
 
-    mergePartitionOf(ofState: TimeState, reached: ReachedSet<F>): Iterable<F> {
+    mergePartitionOf(ofState: DebugState, reached: ReachedSet<F>): Iterable<F> {
         throw new ImplementMeException();
     }
 
-    getPartitionKeys(element: TimeState): ImmSet<PartitionKey> {
+    getPartitionKeys(element: DebugState): ImmSet<PartitionKey> {
         return this._wrappedAnalysis.getPartitionKeys(element.getWrappedState());
     }
 
     handleViolatingState(reached: ReachedSet<F>, violating: F) {
-        throw new ImplementMeException();
+        return this._wrappedAnalysis.handleViolatingState(reached, violating);
     }
 
-    compareStateOrder(a: TimeState, b: TimeState): number {
-        throw new ImplementMeException();
+    compareStateOrder(a: DebugState, b: DebugState): number {
+        return this._wrappedAnalysis.compareStateOrder(a.getWrappedState(), b.getWrappedState());
     }
 
-    getLexiOrderKey(ofState: TimeState): LexiKey {
+    getLexiOrderKey(ofState: DebugState): LexiKey {
         return this._wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
     }
 
-    getLexiDiffKey(ofState: TimeState): LexiKey {
+    getLexiDiffKey(ofState: DebugState): LexiKey {
         return this._wrappedAnalysis.getLexiDiffKey(ofState.getWrappedState());
     }
 
@@ -188,19 +183,19 @@ export class TimeAnalysis<F extends AbstractState>
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<TimeState, F>, state: F): AccessibilityRelation<TimeState, F> {
+    testify(accessibility: AccessibilityRelation<DebugState, F>, state: F): AccessibilityRelation<DebugState, F> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<TimeState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<DebugState, F>, state: F): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<TimeState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<DebugState, F>, state: F): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<TimeState, F>, state: F): AccessibilityRelation<TimeState, F> {
+    testifyOne(accessibility: AccessibilityRelation<DebugState, F>, state: F): AccessibilityRelation<DebugState, F> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 

@@ -98,10 +98,11 @@ import {
 import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
 import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
-import {AssumeStatement} from "./core/statements/AssumeStatement";
+import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/AssumeStatement";
 import {VariableWithDataLocation} from "./core/Variable";
 import {CastExpression} from "./core/expressions/CastExpression";
 import {
+    ActorSelfExpression,
     ActorVariableExpression,
     LocateActorExpression,
     StartCloneActorExpression,
@@ -229,6 +230,8 @@ export interface CoreBoolExpressionVisitor<R> extends CoreVisitor<R> {
 
 export interface CoreActorExpressionVisitor<R> extends CoreVisitor<R> {
 
+    visitActorSelfExpression(node: ActorSelfExpression): R;
+
     visitLocateActorExpression(node: LocateActorExpression): R;
 
     visitStartCloneActorExpression(node: StartCloneActorExpression): R;
@@ -301,7 +304,9 @@ export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 
     visitEndAtomicStatement(node: EndAtomicStatement): R;
 
-    visitAssumeStatement(node: AssumeStatement): R;
+    visitStrengtheningAssumeStatement(node: StrengtheningAssumeStatement): R;
+
+    visitBranchingAssumeStatement(node: BranchingAssumeStatement): R;
 
     visitDeclareSystemVariableStatement(node: DeclareSystemVariableStatement): R;
 

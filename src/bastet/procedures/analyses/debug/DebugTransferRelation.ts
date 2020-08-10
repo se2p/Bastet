@@ -23,41 +23,33 @@
  *
  */
 
-import {Statement} from "./Statement";
-import {BooleanExpression} from "../expressions/BooleanExpression";
+
+import {LabeledTransferRelation, TransferRelation} from "../TransferRelation";
+import {List as ImmList} from "immutable";
+import {AbstractElement} from "../../../lattices/Lattice";
+import {DebugState} from "./DebugAbstractDomain";
+import {clearDebugInfos, getDebugInfos} from "./DebugInfos";
 
 
-export enum AssumeType {
-    UNDEFINED,
-    BRANCHING,
-    STRENGTHENING
-}
+export class DebugTransferRelation implements TransferRelation<DebugState> {
 
-export abstract class AssumeStatement extends Statement {
+    private readonly _wrappedTransfer: TransferRelation<AbstractElement>;
 
-    private readonly _condition: BooleanExpression;
-
-    constructor(cond: BooleanExpression) {
-        super([cond]);
-        this._condition = cond;
+    constructor(wrappedTransfer: LabeledTransferRelation<AbstractElement>) {
+        this._wrappedTransfer = wrappedTransfer;
     }
 
-    get condition(): BooleanExpression {
-        return this._condition;
+    abstractSucc(fromState: DebugState): Iterable<DebugState> {
+        const result: DebugState[] = [];
+        for (const w of this._wrappedTransfer.abstractSucc(fromState.wrappedState)) {
+            result.push(fromState
+                .withDebugInfos(ImmList(getDebugInfos()))
+                .withWrappedState(w));
+        }
+
+        clearDebugInfos();
+
+        return result;
     }
 
-}
-
-export class StrengtheningAssumeStatement extends AssumeStatement {
-
-    constructor(cond: BooleanExpression) {
-        super(cond);
-    }
-}
-
-export class BranchingAssumeStatement extends AssumeStatement {
-
-    constructor(cond: BooleanExpression) {
-        super(cond);
-    }
 }

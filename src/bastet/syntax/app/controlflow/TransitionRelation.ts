@@ -31,6 +31,8 @@ import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
 import {Preconditions} from "../../../utils/Preconditions";
 import {ControlDominance, DominanceMode} from "./Dominators";
 import {CorePrintVisitor} from "../../ast/CorePrintVisitor";
+import {ReturnStatement} from "../../ast/core/statements/ControlStatement";
+import {EpsilonStatement} from "../../ast/core/statements/EpsilonStatement";
 
 const toposort = require('toposort');
 
@@ -87,6 +89,16 @@ export class TransitionRelationBuilder {
 
     public addExitLocationWithID(id: LocationId): this {
         return this.addExitLocation(ControlLocation.for(id));
+    }
+
+    public removeEntryLocation(loc: ControlLocation): this {
+        this._entryLocations.delete(loc.ident);
+        return this;
+    }
+
+    public removeExitLocation(loc: ControlLocation): this {
+        this._exitLocations.delete(loc.ident);
+        return this;
     }
 
     public addExitLocation(loc: ControlLocation): this {
@@ -976,7 +988,7 @@ export class TransitionRelations {
                 for (const trans of transTo) {
                     // If the predecessor is a fork
                     const predLoc: LocationId = trans.target;
-                    if (tr.transitionsFrom(predLoc).length > 1) {
+                    if (tr.transitionsFrom(predLoc).length > 1 || tr.transitionsTo(predLoc).length > 1) {
                         // Add a dummy transition between `predLoc` and `loc`
                         // - Introduce an intermediate location and add a corresponding transition
                         const intermediateLoc = ControlLocation.fresh();
@@ -987,6 +999,45 @@ export class TransitionRelations {
                         builder.addTransitionByIDs(predLoc, intermediateLoc.ident, ProgramOperation.for(trans.opId));
                     }
                 }
+            }
+        }
+
+        return builder.build();
+    }
+
+    /**
+     * Add an initial epsilon transition.
+     *
+     * Helps, for example, in cases where the initial location could also have been a loop head (a control
+     * location thus takes fewer roles and algorithms might not fail for this case).
+     *
+     * @param tr
+     */
+    public static introduceEntryExitEpsilonTransition(tr: TransitionRelation): TransitionRelation {
+        const builder = TransitionRelation.builder();
+        builder.addRelation(tr);
+
+        // Entry location
+        for (const loc of tr.entryLocations) {
+            builder.removeEntryLocation(loc);
+        }
+
+        const newEntry = ControlLocation.fresh();
+        builder.addEntryLocation(newEntry);
+        for (const loc of tr.entryLocations) {
+            builder.addTransitionByIDs(newEntry.ident, loc.ident, ProgramOperations.irreducibleEpsilon());
+        }
+
+        // Exit location
+        for (const loc of tr.exitLocations) {
+            const entering = tr.transitionsTo(loc.ident).filter((t) =>
+                (!(ProgramOperation.for(t.opId).ast instanceof EpsilonStatement)
+                && !(ProgramOperation.for(t.opId).ast instanceof ReturnStatement)));
+            if (entering.length > 0) {
+                builder.removeExitLocation(loc);
+                const newExit = ControlLocation.fresh();
+                builder.addExitLocation(newExit);
+                builder.addTransitionByIDs(loc.ident, newExit.ident, ProgramOperations.irreducibleEpsilon());
             }
         }
 
@@ -1092,7 +1143,8 @@ export class TransitionRelations {
     static establishAnalysisInvariants(tr: TransitionRelation): TransitionRelation {
         return TransitionRelations.introduceEpsilonBetweenMergeAndBranchLocs(
                 TransitionRelations.introduceEpsilonToMergeTransitions(
-                    TransitionRelations.eliminateEpsilons(tr)));
+                    TransitionRelations.introduceEntryExitEpsilonTransition(
+                      TransitionRelations.eliminateEpsilons(tr))));
     }
 
     static eliminateEpsilons(tr: TransitionRelation): TransitionRelation {

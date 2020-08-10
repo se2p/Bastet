@@ -117,7 +117,10 @@ import {IllegalStateException} from "../../core/exceptions/IllegalStateException
 import {DataLocation} from "../app/controlflow/DataLocation";
 import {Expression} from "../ast/core/expressions/Expression";
 import {VariableWithDataLocation} from "../ast/core/Variable";
-import {AssumeStatement} from "../ast/core/statements/AssumeStatement";
+import {
+    BranchingAssumeStatement,
+    StrengtheningAssumeStatement
+} from "../ast/core/statements/AssumeStatement";
 import {CallStatement} from "../ast/core/statements/CallStatement";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {Statement} from "../ast/core/statements/Statement";
@@ -125,7 +128,7 @@ import {BeginAtomicStatement, EndAtomicStatement, ReturnStatement} from "../ast/
 import {SystemMessage, UserMessage} from "../ast/core/Message";
 import {CastExpression} from "../ast/core/expressions/CastExpression";
 import {
-    ActorExpression,
+    ActorExpression, ActorSelfExpression,
     ActorVariableExpression,
     LocateActorExpression,
     StartCloneActorExpression,
@@ -319,9 +322,15 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
         }));
     }
 
-    visitAssumeStatement(node: AssumeStatement): AstNode {
+    visitStrengtheningAssumeStatement(node: StrengtheningAssumeStatement): AstNode {
         return this.doForStatement(node, (() => {
-            return new AssumeStatement(node.condition.accept(this) as BooleanExpression);
+            return new StrengtheningAssumeStatement(node.condition.accept(this) as BooleanExpression);
+        }));
+    }
+
+    visitBranchingAssumeStatement(node: BranchingAssumeStatement): AstNode {
+        return this.doForStatement(node, (() => {
+            return new BranchingAssumeStatement(node.condition.accept(this) as BooleanExpression);
         }));
     }
 
@@ -556,7 +565,7 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitSystemMessage(node: SystemMessage): AstNode {
-       return new SystemMessage(node.namespace,
+       return new SystemMessage(node.destination,
            node.messageid.accept(this) as StringExpression,
            node.payload.accept(this) as ExpressionList) ;
     }
@@ -566,6 +575,10 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
             return new BroadcastMessageStatement(
                 node.msg.accept(this) as SystemMessage);
         }));
+    }
+
+    visitActorSelfExpression(node: ActorSelfExpression): AstNode {
+        return node;
     }
 
     visitLocateActorExpression(node: LocateActorExpression): AstNode {

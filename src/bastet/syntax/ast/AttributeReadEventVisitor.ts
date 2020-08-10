@@ -58,7 +58,7 @@ import {
     StrGreaterThanExpression,
     StrLessThanExpression,
 } from "./core/expressions/BooleanExpression";
-import {AssumeStatement} from "./core/statements/AssumeStatement";
+import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/AssumeStatement";
 import {StringLiteral, StringVariableExpression} from "./core/expressions/StringExpression";
 import {BroadcastAndWaitStatement} from "./core/statements/BroadcastAndWaitStatement";
 import {BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
@@ -166,7 +166,11 @@ export class AttributeReadEventVisitor implements CoreVisitor<AttributeReadEvent
         return this.nothingReadEvent;
     }
 
-    visitAssumeStatement(node: AssumeStatement): AttributeReadEvent {
+    visitBranchingAssumeStatement(node: BranchingAssumeStatement): AttributeReadEvent {
+        return this.nothingReadEvent;
+    }
+
+    visitStrengtheningAssumeStatement(node: StrengtheningAssumeStatement): AttributeReadEvent {
         return this.nothingReadEvent;
     }
 

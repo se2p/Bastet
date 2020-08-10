@@ -137,7 +137,7 @@ export class LabelAnalysis<F extends AbstractState>
     }
 
     stop(state: LabelState, reached: Iterable<F>, unwrapper: (e: F) => LabelState): boolean {
-        return this._wrappedAnalysis.stop(state, reached, unwrapper);
+        return this._wrappedAnalysis.stop(state.getWrappedState(), reached, (x) => this.unwrap(unwrapper(x)));
     }
 
     target(state: LabelState): Property[] {
@@ -203,6 +203,10 @@ export class LabelAnalysis<F extends AbstractState>
 
     getLexiOrderKey(ofState: LabelState): LexiKey {
         return this._wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
+    }
+
+    getLexiDiffKey(ofState: LabelState): LexiKey {
+        return this._wrappedAnalysis.getLexiDiffKey(ofState.getWrappedState());
     }
 
     finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {

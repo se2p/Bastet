@@ -25,9 +25,11 @@
 
 import {AbstractElement} from "../../lattices/Lattice";
 import {Preconditions} from "../../utils/Preconditions";
-import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
+import {List as ImmList, Map as ImmMap, OrderedSet, Record as ImmRec, Set as ImmSet} from "immutable";
 import {getTheOnlyElement} from "../../utils/Collections";
 import {Heap} from 'heap-js';
+import {LexiKey} from "../../utils/Lexicographic";
+import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 
 export interface PartitionKeyAttribs extends AbstractElement {
 
@@ -145,6 +147,16 @@ export interface StatePartitionOperator<E extends AbstractElement> {
 
 }
 
+export type SinglePartitionKeyFunction<E extends AbstractElement> = (E) => LexiKey;
+
+export type StateOrderingFunction<E extends AbstractElement> = (a: E, b: E) => number;
+
+export interface SingleStatePartitionOperator<E extends AbstractElement> {
+
+    getPartitionKey(element: E): LexiKey;
+
+}
+
 export class NoPartitioningOperator<E extends AbstractElement> implements StatePartitionOperator<E> {
 
     getPartitionKeys(element: E): ImmSet<PartitionKey> {
@@ -224,6 +236,163 @@ export class PartitionedOrderedSet<E extends AbstractElement> {
 
 }
 
+export class DifferencingFrontierSet<E extends AbstractElement> implements FrontierSet<E> {
+
+    private _size: number;
+
+    private _diffKeyOperator: SinglePartitionKeyFunction<E>;
+
+    private _elements: Set<E>;
+
+    private _partitions: ImmMap<LexiKey, PriorityFrontierSet<E>>;
+
+    private readonly _nextPartitions: Heap<LexiKey>;
+
+    private readonly _intraPartitionComparator: StateOrderingFunction<E>;
+
+    private _lastPartitionIndex: number;
+
+    constructor(partitionOperator: SinglePartitionKeyFunction<E>, intraPartitionComparator: StateOrderingFunction<E>) {
+        this._diffKeyOperator = Preconditions.checkNotUndefined(partitionOperator);
+        this._intraPartitionComparator = Preconditions.checkNotUndefined(intraPartitionComparator);
+        this._size = 0;
+        this._elements = new Set<E>();
+        this._partitions = ImmMap<LexiKey, PriorityFrontierSet<E>>().asMutable();
+        this._lastPartitionIndex = 0;
+        this._nextPartitions = new Heap<LexiKey>((l1, l2) => l1.compareTo(l2));
+    }
+
+    private getPartitionKey(element: E): LexiKey {
+        return this._diffKeyOperator(element);
+    }
+
+    public getPartitionOf(element: E): PriorityFrontierSet<E> {
+        const key: LexiKey = this.getPartitionKey(element);
+        return this.getPartition(key);
+    }
+
+    private getPartition(key: LexiKey): PriorityFrontierSet<E> {
+        let result = this._partitions.get(key);
+        if (!result) {
+            result = new PriorityFrontierSet(this._intraPartitionComparator);
+            this._partitions.set(key, result);
+        }
+
+        return result;
+    }
+
+    public remove(element: E) {
+        const partitionKey = this.getPartitionKey(element);
+
+        this.getPartition(partitionKey).remove(element);
+        if (this._elements.delete(element)) {
+            this._size--;
+        }
+
+        this.activateNextPeekPartition();
+    }
+
+    public add(element: E) {
+        const partitionKey = this.getPartitionKey(element);
+        this.getPartition(partitionKey).add(element);
+
+        this._elements.add(element);
+        this._size++;
+    }
+
+    public has(element: E): boolean {
+        return this._elements.has(element);
+    }
+
+    public isEmpty(): boolean {
+        return this._size == 0;
+    }
+
+    get size(): number {
+        return this._size;
+    }
+
+    private hasElements(partition: LexiKey) {
+        const p = this._partitions.get(partition);
+        if (p == null) {
+            return false;
+        } else {
+            return p.getSize() > 0;
+        }
+    }
+
+    /**
+     * Choose the next non-empty partition to peek (or pop) elements in/from.
+     * Goal: Choose in a round-robin-fashion from the different partitions.
+     */
+    private activateNextPeekPartition(): boolean {
+        // Activate the next partition
+        if (!this._nextPartitions.isEmpty()) {
+            // ... by removing the current from the heap
+            this._nextPartitions.pop();
+        }
+
+        if (this._nextPartitions.isEmpty()) {
+            this._nextPartitions.addAll(this._partitions.keySeq().toArray());
+        }
+
+        while (!this._nextPartitions.isEmpty() && !this.hasElements(this._nextPartitions.peek())) {
+            this._nextPartitions.pop();
+        }
+
+        if (!this.isEmpty() && this._nextPartitions.isEmpty()) {
+            return this.activateNextPeekPartition();
+        }
+
+        Preconditions.checkState(this.isEmpty() || !this._nextPartitions.isEmpty());
+
+        return !this._nextPartitions.isEmpty();
+    }
+
+    peek(): E {
+        if (this.isEmpty()) {
+            throw new IllegalStateException("No elements to peek");
+        }
+
+        if (this._nextPartitions.isEmpty()) {
+            this.activateNextPeekPartition();
+        }
+
+        const peekPartition: LexiKey = this._nextPartitions.peek();
+        Preconditions.checkNotUndefined(peekPartition);
+
+        const partition = this._partitions.get(peekPartition);
+        return partition.peek();
+    }
+
+    pop(): E {
+        const result = this.peek();
+        this.remove(result);
+        return result
+    }
+
+    removeAll(elements: Iterable<E>) {
+        for (const e of elements) {
+            this.remove(e);
+        }
+    }
+
+    addAll(elements: Iterable<E>) {
+        for (const e of elements) {
+            this.add(e);
+        }
+    }
+
+    getSize(): number {
+        return this.size;
+    }
+
+    public [Symbol.iterator](): IterableIterator<E> {
+        return this._elements[Symbol.iterator]();
+    }
+
+}
+
 export const CHOOSE_EITHER: number = 0;
 export const CHOOSE_SECOND: number = +1;
 export const CHOOSE_FIRST: number = -1;
@@ -238,8 +407,8 @@ export class PriorityFrontierSet<E extends AbstractElement> implements FrontierS
 
     private readonly _elements: Heap<E>;
 
-    constructor(comparator: StateOrderComparator<E>) {
-        this._elements = new Heap((a, b) => {return comparator.compareStateOrder(a, b)});
+    constructor(comparator: StateOrderingFunction<E>) {
+        this._elements = new Heap((a, b) => {return comparator(a, b)});
     }
 
     public [Symbol.iterator](): IterableIterator<E> {

@@ -5,14 +5,16 @@ actor MiniActor is RuntimeEntity begin
     declare r as int
     declare x as int
 
-    define x as 0
-    define r as 0
+    script on bootstrap do begin
+        define x as 0
+        define r as 0
+    end
 
     script on startup do begin
         broadcast "foo" and wait
     end
 
-    script on received message "foo" do begin
+    script on message "foo" () do begin
         define x as x + 1
         if r < 2 then begin
             define r as r + 1
@@ -20,7 +22,7 @@ actor MiniActor is RuntimeEntity begin
         end
     end
 
-    script on received message "bar" do begin
+    script on message "bar" () do begin
         define x as x + 1
         if x > 4 then begin
             _RUNTIME_signalFailure()
@@ -28,7 +30,7 @@ actor MiniActor is RuntimeEntity begin
         broadcast "wauz"
     end
 
-    script on received message "wauz" do begin
+    script on message "wauz" () do begin
         define x as x + 1
         broadcast "foo"
     end
