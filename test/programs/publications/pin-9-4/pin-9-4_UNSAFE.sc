@@ -13,7 +13,7 @@ actor Bug is ScratchSprite begin
     script on startup do begin
         changeCostumeTo("beetle")
         hide()
-        until not code = 14 repeat begin
+        until not code = 1 repeat begin
         end
         show()
         _RUNTIME_signalFailure("Pin guessed")
