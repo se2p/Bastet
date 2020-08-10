@@ -131,6 +131,7 @@ import {freshId} from "../../../utils/Seq";
 import {RelationBuildingVisitor} from "../../../syntax/app/controlflow/RelationBuildingVisitor";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {incBigStep} from "../label/LabelAnalysis";
+import {EpsilonStatement} from "../../../syntax/ast/core/statements/EpsilonStatement";
 
 /**
  * Mimics the green-threading of the Scratch VM.
@@ -238,7 +239,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
                 // Wake up threads (set status YIELD) that have been waiting for a condition to be reached
                 this._checkCondStats.startTimer();
-                const succStates1: ControlAbstractState[] = mapExpand(succStates0, (e) => this.awaikConditionCheckThreads(e));
+                const succStates1: ControlAbstractState[] = mapExpand(succStates0, (e) => this.awaikConditionCheckThreads(e, op));
                 this._checkCondStats.stopTimer();
 
                 // Schedule the threads to run in the next iterations
@@ -843,22 +844,25 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result;
     }
 
-    private awaikConditionCheckThreads(inState: ControlAbstractState): ControlAbstractState[] {
+    private awaikConditionCheckThreads(inState: ControlAbstractState, step: StepInformation): ControlAbstractState[] {
         let result: ControlAbstractState = inState;
 
         const concern = this.getStepConcern(inState);
+        const isEpsilon = step.ops.filter((o) => o.ast instanceof EpsilonStatement).length == step.ops.length;
 
         //  1. Activate the specification check thread (`after statement finished`)
         //  (if the stepped thread is a program thread)
-        if (this.isProgramConcern(concern)) {
-            for (const [threadIndex, threadState] of inState.getThreadStates().entries()) {
-                const actor: Actor = this._task.getActorByName(threadState.getActorId());
-                const isSpecificationThread = actor.isObserver;
-                const script = actor.getScript(threadState.getScriptId());
+        if (!isEpsilon) {
+            if (this.isProgramConcern(concern)) {
+                for (const [threadIndex, threadState] of inState.getThreadStates().entries()) {
+                    const actor: Actor = this._task.getActorByName(threadState.getActorId());
+                    const isSpecificationThread = actor.isObserver;
+                    const script = actor.getScript(threadState.getScriptId());
 
-                if (script.event instanceof AfterStatementMonitoringEvent) {
-                    if (threadState.getComputationState() != ThreadComputationState.THREAD_STATE_DISABLED) {
-                        result = this.restartThread(inState, threadIndex);
+                    if (script.event instanceof AfterStatementMonitoringEvent) {
+                        if (threadState.getComputationState() != ThreadComputationState.THREAD_STATE_DISABLED) {
+                            result = this.restartThread(inState, threadIndex);
+                        }
                     }
                 }
             }
