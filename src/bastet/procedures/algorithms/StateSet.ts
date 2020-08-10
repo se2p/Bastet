@@ -30,6 +30,7 @@ import {getTheOnlyElement} from "../../utils/Collections";
 import {Heap} from 'heap-js';
 import {LexiKey} from "../../utils/Lexicographic";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
 export interface PartitionKeyAttribs extends AbstractElement {
 
@@ -192,6 +193,7 @@ export class PartitionedOrderedSet<E extends AbstractElement> {
     }
 
     private getPartition(key: PartitionKey): Set<E> {
+        Preconditions.checkNotUndefined(key);
         let result = this._partitions.get(key);
         if (!result) {
             result = new Set();
@@ -259,7 +261,13 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
         this._elements = new Set<E>();
         this._partitions = ImmMap<LexiKey, PriorityFrontierSet<E>>().asMutable();
         this._lastPartitionIndex = 0;
-        this._nextPartitions = new Heap<LexiKey>((l1, l2) => l1.compareTo(l2));
+        this._nextPartitions = new Heap<LexiKey>((l1, l2) => this.compareKeys(l1, l2));
+    }
+
+    private compareKeys(l1: LexiKey, l2: LexiKey): number {
+       Preconditions.checkNotUndefined(l1);
+       Preconditions.checkNotUndefined(l2);
+       return l1.compareTo(l2);
     }
 
     private getPartitionKey(element: E): LexiKey {
@@ -412,7 +420,7 @@ export class PriorityFrontierSet<E extends AbstractElement> implements FrontierS
     }
 
     public [Symbol.iterator](): IterableIterator<E> {
-        return this._elements[Symbol.iterator]();
+        throw new ImplementMeException();
     }
 
     add(element: E) {
