@@ -27,7 +27,13 @@ import {StateSet} from "../../algorithms/StateSet";
 import {GraphAbstractState} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {TransitionLabelProvider, TraversalOrderOperator} from "../ProgramAnalysis";
-import {PaperLabelVisitor, PenSizeVisitor, StateColorVisitor, StateLabelVisitor} from "../StateVisitors";
+import {
+    ColorByActorVisitor,
+    PaperLabelVisitor,
+    PenSizeVisitor,
+    StateColorVisitor,
+    StateLabelVisitor
+} from "../StateVisitors";
 import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 import {App} from "../../../syntax/app/App";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
@@ -59,8 +65,8 @@ export class GraphToDot  {
     }
 
     private writeState(e: GraphAbstractState) {
-        const stateLabel = GraphToDot.escapeForDot(e.accept(new StateLabelVisitor(this._task)));
-        const stateColor = e.accept(new StateColorVisitor());
+        const stateLabel = GraphToDot.escapeForDot(e.accept(new PaperLabelVisitor(this._task)));
+        const stateColor = e.accept(new ColorByActorVisitor(this._task));
         const pensize = e.accept(new PenSizeVisitor());
         this._dot.push(`    ${e.getId()} [label="${stateLabel}" penwidth=${pensize} color="black" fillcolor="${stateColor}"];`);
     }
