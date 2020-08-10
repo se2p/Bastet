@@ -175,15 +175,11 @@ export class MethodValueReadVisitor implements CoreVisitor<MethodValueReadEvent>
         return this.nothingReadEvent;
     }
 
-    visitBranchingAssumeStatement(node: BranchingAssumeStatement): AttributeReadEvent {
-        return this.nothingReadEvent;
+    visitBranchingAssumeStatement(node: BranchingAssumeStatement): MethodValueReadEvent {
+        return node.condition.accept(this);
     }
 
-    visitStrengtheningAssumeStatement(node: StrengtheningAssumeStatement): AttributeReadEvent {
-        return this.nothingReadEvent;
-    }
-
-    visitAssumeStatement(node: AssumeStatement): MethodValueReadEvent {
+    visitStrengtheningAssumeStatement(node: StrengtheningAssumeStatement): MethodValueReadEvent {
         return node.condition.accept(this);
     }
 

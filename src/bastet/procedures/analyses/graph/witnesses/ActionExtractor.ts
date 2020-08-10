@@ -70,7 +70,7 @@ export abstract class ActionExtractor {
     }
 
     setActionForStep(step: ErrorWitnessStep, successors: ErrorWitnessStep[]): void {
-        if (step) {
+        if (step && step.id !== 0) {
             const assignments = this._stepToAssignments.get(step.id);
             Preconditions.checkNotUndefined(assignments);
 

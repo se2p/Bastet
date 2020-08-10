@@ -93,6 +93,7 @@ import {
     CoreVisitor,
 } from "./CoreVisitor";
 import {CorePrintVisitor} from "./CorePrintVisitor";
+import {BOOTSTRAP_FINISHED_MESSAGE_MSG} from "./core/Message";
 
 export enum Action {
     DEFINE = "DEFINE",
@@ -195,9 +196,9 @@ CoreNonCtrlStatementnVisitor<ActionWithWeight>{
     }
 
     visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): ActionWithWeight {
-        const broadcast = node.msg.accept(this.printer);
+        const broadcast = node.msg.messageid.accept(this.printer);
 
-        return broadcast === '\"__BOOTSTRAP_FINISHED\"/\"SYSTEM\"' ? ActionWithWeight.INITIAL_STATE : ActionWithWeight.EPSILON;
+        return broadcast === `"${BOOTSTRAP_FINISHED_MESSAGE_MSG}"` ? ActionWithWeight.INITIAL_STATE : ActionWithWeight.EPSILON;
     }
 
     visitBroadcastMessageStatement(node: BroadcastMessageStatement): ActionWithWeight {
