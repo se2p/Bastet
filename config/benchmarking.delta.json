@@ -7,6 +7,10 @@
 
     "ReachabilityAlgorithm": {
         "dump-graph-after-iteration": false
+    },
+
+    "GraphAnalysis": {
+        "witnessHandler": "DoNothing"
     }
 
 }

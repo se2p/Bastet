@@ -49,6 +49,8 @@ export class GraphToDot  {
     private _traversalKeyProvider: TraversalOrderOperator<GraphAbstractState, GraphAbstractState>;
     private _task: App;
 
+    private _frontierIndicatorSeq: number
+
     constructor(task: App,
                 transLabProvider: TransitionLabelProvider<GraphAbstractState>,
                 traversalKeyProvider: TraversalOrderOperator<GraphAbstractState, GraphAbstractState>,
@@ -62,6 +64,7 @@ export class GraphToDot  {
         this._headerdot = [];
         this._dot = [];
         this._idseq = 0;
+        this._frontierIndicatorSeq = 0;
     }
 
     private writeState(e: GraphAbstractState) {
@@ -93,6 +96,12 @@ export class GraphToDot  {
         for (const e of this._reached) {
             idToStateMap.set(e.getId(), e);
             this.writeState(e);
+            if (this._frontier.has(e)) {
+                this._frontierIndicatorSeq++;
+                const indicatorId = `f${this._frontierIndicatorSeq}`;
+                this._dot.push(`    ${indicatorId} [shape=plaintext, label="frontier"];`);
+                this._dot.push(`    ${e.getId()} -> ${indicatorId} [label=" "];`);
+            }
         }
 
         for (const e of this._reached) {
