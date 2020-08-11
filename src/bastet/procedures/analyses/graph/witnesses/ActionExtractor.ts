@@ -90,7 +90,7 @@ export abstract class ActionExtractor {
 
     private getFirstDefinedVariableValue(variableName: string, steps: ErrorWitnessStep[], targetName: string): any {
         for (const step of steps) {
-            const value = step.getUserDefinedAttributeValue(targetName, variableName);
+            const value = step.getVariableValue(targetName, variableName);
 
             if (value !== undefined) {
                 return value;

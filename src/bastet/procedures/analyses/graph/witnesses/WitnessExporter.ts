@@ -38,7 +38,7 @@ import {ControlAbstractState, RelationLocation} from "../../control/ControlAbstr
 import {ControlLocationExtractor} from "../../control/ControlUtils";
 import {Action, ErrorWitnessActionVisitor} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
-import {ErrorWitness, ErrorWitnessStep, Target} from "./ErrorWitness";
+import {ErrorWitness, ErrorWitnessActor, ErrorWitnessStep} from "./ErrorWitness";
 import {AccessibilityRelation, AccessibilityRelations} from "../../Accessibility";
 import {Property} from "../../../../syntax/Property";
 import {getTheOnlyElement} from "../../../../utils/Collections";
@@ -57,8 +57,9 @@ import {
 export interface WitnessExporterConfig {
     export: 'ALL' | 'ONLY_ACTIONS';
     collapseAtomicBlocks: boolean;
-    removeAttributeStartingWith: string[];
-    removeActorPrefixFromAttributes: boolean;
+    removeEpsilonType: boolean;
+    removeMethodVariables: boolean;
+    removeVariables: string[];
     removeActors: string[];
     removeStepsBeforeBootstrap: boolean;
     minWaitTime: number;
@@ -68,13 +69,14 @@ export interface WitnessExporterConfig {
 export const DEFAULT_WITNESS_EXPORTER_CONFIG: WitnessExporterConfig = {
     export: 'ONLY_ACTIONS',
     collapseAtomicBlocks: true,
-    removeAttributeStartingWith: ['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE',
-        'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT', '__tmp'],
-    removeActorPrefixFromAttributes: true,
-    removeActors: ['IOActor'],
+    removeEpsilonType: true,
+    removeMethodVariables: true,
+    removeVariables: ['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE',
+        'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT'],
+    removeActors: ['IOActor', '.*Observer'],
     removeStepsBeforeBootstrap: true,
     minWaitTime: 0,
-    keepDebuggingAttributes: true
+    keepDebuggingAttributes: false
 }
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
@@ -114,22 +116,37 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         errorWitness.steps = WitnessExporter.removeStepsWithLowWaitTime(errorWitness.steps, this._config.minWaitTime);
 
         errorWitness.steps.forEach(step => {
-            step.targets = step.targets.filter(target => !this._config.removeActors.includes(target.name));
+            step.actors = step.actors.filter(actor => {
+               return !this._config.removeActors.some(actorToRemove => {
+                   const regex = new RegExp(actorToRemove);
+                   return regex.test(actor.name);
+               })
+            });
 
             if (!this._config.keepDebuggingAttributes) {
                 step.timestamp = undefined;
                 step.actionTargetName = undefined;
                 step.actionLabel = undefined;
+                step.id = undefined;
             }
 
-            step.targets.forEach(target => {
-                if (this._config.removeActorPrefixFromAttributes) {
-                    target.removeActorPrefix();
-                }
+            step.actors.forEach(target => {
+                target.removeActorPrefix();
 
-                target.removeAttributesStartingWith(this._config.removeAttributeStartingWith);
+                target.removeVariables(this._config.removeVariables);
+
+                if (this._config.removeMethodVariables) {
+                    delete target.methodVariables;
+                }
             })
+
+            if (this._config.removeEpsilonType) {
+                delete step.epsilonType;
+            }
         })
+
+        errorWitness.steps[0].action = Action.INITIAL_STATE;
+        errorWitness.steps[errorWitness.steps.length - 1].action = Action.REACHED_VIOLATION;
 
         this.exportErrorWitness(errorWitness);
     }
@@ -169,8 +186,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             step.timestamp = globalTime ? globalTime.value : 0;
 
             targetStates.forEach((state, targetName) => {
-                const target = Target.fromConcretePrimitives(targetName, state);
-                step.targets.push(target);
+                const target = ErrorWitnessActor.fromConcretePrimitives(targetName, state);
+                step.actors.push(target);
             })
 
             if (previousState) {
@@ -279,7 +296,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         for (const step of steps) {
             if (step.action === Action.WAIT && step.waitMicros < timeThreshold && prevStep) {
-                prevStep.targets = step.targets;
+                prevStep.actors = step.actors;
                 prevStep.timestamp = step.timestamp;
                 prevStep.actionLabel = `${prevStep.actionLabel}; ${step.actionLabel}`;
 
@@ -387,7 +404,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             const isRelevant = step.action !== undefined || step === lastStep;
 
             if (isRelevant) {
-                step.targets = lastStep.targets;
+                step.actors = lastStep.actors;
                 if (collapsedActionLabel) {
                     step.actionLabel = `${collapsedActionLabel}; ${step.actionLabel}`;
                     collapsedActionLabel = undefined;
