@@ -145,9 +145,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             }
         })
 
-        errorWitness.steps[0].action = Action.INITIAL_STATE;
-        errorWitness.steps[errorWitness.steps.length - 1].action = Action.REACHED_VIOLATION;
-
         this.exportErrorWitness(errorWitness);
     }
 
@@ -257,7 +254,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         let prevStep: ErrorWitnessStep;
 
         for (const step of errorWitnessSteps) {
-            if (step.action !== undefined || step.epsilonType === Action.INITIAL_STATE || step.epsilonType === Action.REACHED_VIOLATION) {
+            if (step.action !== undefined) {
                 if (prevStep) {
                     prevStep.action = Action.WAIT;
                     filteredArray.push(prevStep);
@@ -275,6 +272,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         }
 
         if (prevStep) {
+            prevStep.action = Action.WAIT;
             filteredArray.push(prevStep);
         }
 
@@ -423,8 +421,9 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         let prevStep: ErrorWitnessStep;
 
         for (const step of steps) {
-            if (prevStep && step.action === Action.WAIT) {
-                step.waitMicros = step.timestamp - prevStep.timestamp;
+            if (step.action === Action.WAIT) {
+                const prevTime = prevStep ? prevStep.timestamp : 0;
+                step.waitMicros = step.timestamp - prevTime;
             }
 
             prevStep = step;
