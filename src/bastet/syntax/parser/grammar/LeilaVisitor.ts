@@ -97,7 +97,6 @@ import { StartupEventContext } from "./LeilaParser";
 import { CloneStartEventContext } from "./LeilaParser";
 import { MessageReceivedEventContext } from "./LeilaParser";
 import { ConditionReachedEventContext } from "./LeilaParser";
-import { RenderedMonitoringEventContext } from "./LeilaParser";
 import { UserInputDispatchEventContext } from "./LeilaParser";
 import { AfterStatementMonitoringEventContext } from "./LeilaParser";
 import { IntegerTypeContext } from "./LeilaParser";
@@ -963,14 +962,6 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitConditionReachedEvent?: (ctx: ConditionReachedEventContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `RenderedMonitoringEvent`
-	 * labeled alternative in `LeilaParser.event`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitRenderedMonitoringEvent?: (ctx: RenderedMonitoringEventContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `UserInputDispatchEvent`

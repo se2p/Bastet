@@ -97,7 +97,6 @@ import { StartupEventContext } from "./LeilaParser";
 import { CloneStartEventContext } from "./LeilaParser";
 import { MessageReceivedEventContext } from "./LeilaParser";
 import { ConditionReachedEventContext } from "./LeilaParser";
-import { RenderedMonitoringEventContext } from "./LeilaParser";
 import { UserInputDispatchEventContext } from "./LeilaParser";
 import { AfterStatementMonitoringEventContext } from "./LeilaParser";
 import { IntegerTypeContext } from "./LeilaParser";
@@ -1430,19 +1429,6 @@ export interface LeilaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitConditionReachedEvent?: (ctx: ConditionReachedEventContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `RenderedMonitoringEvent`
-	 * labeled alternative in `LeilaParser.event`.
-	 * @param ctx the parse tree
-	 */
-	enterRenderedMonitoringEvent?: (ctx: RenderedMonitoringEventContext) => void;
-	/**
-	 * Exit a parse tree produced by the `RenderedMonitoringEvent`
-	 * labeled alternative in `LeilaParser.event`.
-	 * @param ctx the parse tree
-	 */
-	exitRenderedMonitoringEvent?: (ctx: RenderedMonitoringEventContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `UserInputDispatchEvent`

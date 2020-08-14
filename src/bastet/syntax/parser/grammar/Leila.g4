@@ -99,7 +99,6 @@ event :
   | 'started' 'as' 'clone' # CloneStartEvent
   | 'message' stringExpr parameterList messageNamespace # MessageReceivedEvent
   | 'condition' boolExpr # ConditionReachedEvent
-  | 'rendered' # RenderedMonitoringEvent
   | 'dispatch' # UserInputDispatchEvent
   | 'statement' 'finished' # AfterStatementMonitoringEvent
   ;
