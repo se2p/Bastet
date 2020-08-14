@@ -1344,7 +1344,7 @@ role ScratchSprite is ScratchEntity begin
     end returns result : boolean
 
     // @Category "Sensing"
-    define colorIsTouchingColor(clr: int, tching: int) begin
+    define atomic colorIsTouchingColor(clr: int, tching: int) begin
         // ...
     end returns result : boolean
 
