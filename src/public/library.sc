@@ -1338,6 +1338,10 @@ role ScratchSprite is ScratchEntity begin
         define result as not touchingObject(snd)
     end returns result : boolean
 
+    define atomic rgb (r: int, g: int, b: int) begin
+        define result as (65536 * r + 256 * g + b)
+    end returns result : int
+
     // @Category "Sensing"
     define atomic touchingColor (clr: int) begin
         // ...
