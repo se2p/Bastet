@@ -962,6 +962,10 @@ role ScratchEntity is RuntimeEntity begin
     declare sound_effect as enum [ "pitch", "pan_left_right" ]
     declare volume as int
 
+    // The current layer of the entity
+    // See https://en.scratch-wiki.info/wiki/Layer_(value)
+    declare layer as int
+
     // 480 * 360 = 172800 pixels
     declare active_graphic_pixels as list of int
     declare active_graphic_index as int
@@ -1092,10 +1096,6 @@ role ScratchSprite is ScratchEntity begin
     // Percent of the original size in [3,54000]
     // See https://en.scratch-wiki.info/wiki/Size_(value)
     declare size as int
-
-    // The current layer of a sprite
-    // See https://en.scratch-wiki.info/wiki/Layer_(value)
-    declare layer as int
 
     // The rotation of the sprite in [-360,+360]
     // See https://en.scratch-wiki.info/wiki/Direction_(value)
