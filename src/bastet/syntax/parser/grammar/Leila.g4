@@ -68,8 +68,9 @@ type :
   | primitiveType # Primitive
   ;
 
+// 'int' is deprecated (use 'integer' instead)
 primitiveType:
-  'int' # IntegerType
+  ('int' | 'integer') # IntegerType
   | 'float' # FloatingPointType
   | 'boolean' # BooleanType
   | 'string' # StringType
