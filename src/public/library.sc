@@ -1157,26 +1157,18 @@ role ScratchSprite is ScratchEntity begin
 
     define atomic moveSteps (n: int) begin
         declare nf as float
-        declare dx as float
-        declare dy as float
-        declare ndir as float
-
         define nf as cast n to float
-        define ndir as cast direction to float
 
         declare radians as float
-        define radians as degToRad(90.0 - ndir)
+        define radians as degToRad(90.0 - (cast direction to float))
 
+        declare dx as float
+        declare dy as float
         define dx as nf * mathCos(radians)
         define dy as nf * mathSin(radians)
 
-        declare tmpx as int
-        declare tmpy as int
-        define tmpx as cast dx to int
-        define tmpy as cast dy to int
-
-        define x as x + tmpx
-        define y as y + tmpy
+        define x as x + (cast dx to int)
+        define y as y + (cast dy to int)
     end
 
     // @Category "Motion"

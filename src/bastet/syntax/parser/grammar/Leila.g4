@@ -68,8 +68,9 @@ type :
   | primitiveType # Primitive
   ;
 
+// 'int' is deprecated (use 'integer' instead)
 primitiveType:
-  'int' # IntegerType
+  ('int' | 'integer') # IntegerType
   | 'float' # FloatingPointType
   | 'boolean' # BooleanType
   | 'string' # StringType
@@ -99,8 +100,6 @@ event :
   | 'started' 'as' 'clone' # CloneStartEvent
   | 'message' stringExpr parameterList messageNamespace # MessageReceivedEvent
   | 'condition' boolExpr # ConditionReachedEvent
-  | 'rendered' # RenderedMonitoringEvent
-  | 'dispatch' # UserInputDispatchEvent
   | 'statement' 'finished' # AfterStatementMonitoringEvent
   ;
 
