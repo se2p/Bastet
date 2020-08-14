@@ -756,7 +756,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     // @Block "wait <Num> seconds"
     define waitSeconds (secs: int) begin
         // A busy-waiting implementation.
-        // The external methode`_RUNTIME_waitSeconds` is intended to
+        // The external method `_RUNTIME_waitSeconds` is intended to
         // not conduct a busy wait.
         declare waitUntil as int
         define waitUntil as _RUNTIME_seconds() + secs

@@ -20,7 +20,7 @@ function tempfile {
     echo "${MY_TEMP_DIR}/${tmp_counter}$postfix"
 }
 
-# Function to convert a given sb2-file to a file
+# Function to convert a given sb3-file to a file
 # with a semantically equivalent program in our
 # own textual programming language.
 function convert_sb3_to_sc {
