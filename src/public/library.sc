@@ -1195,6 +1195,18 @@ role ScratchSprite is ScratchEntity begin
        // set attribute "x" to (attribute "x" + increment)
     end
 
+    define atomic costumeNumber () begin
+        // ...
+    end returns result : integer
+
+    define atomic costumeName () begin
+        // ...
+    end returns result : string
+
+    define atomic nextCostume () begin
+        // ...
+    end
+
     define atomic changeCostumeTo (id: string) begin
         changeActiveGraphicTo(id)
     end
