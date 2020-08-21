@@ -294,8 +294,7 @@ import {
     InsertAtStatement,
     ReplaceElementAtStatement
 } from "../ast/core/statements/ListStatement";
-import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
-import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
+import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {CallStatement} from "../ast/core/statements/CallStatement";
 import {CreateCloneOfStatement} from "../ast/core/statements/CreateCloneOfStatement";
 import {

@@ -109,8 +109,7 @@ import {
     DeclareSystemVariableStatement
 } from "../ast/core/statements/DeclarationStatement";
 import {CreateCloneOfStatement} from "../ast/core/statements/CreateCloneOfStatement";
-import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
-import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
+import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {AbsentAstNode, AstNode, OptionalAstNode, PresentAstNode} from "../ast/AstNode";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
