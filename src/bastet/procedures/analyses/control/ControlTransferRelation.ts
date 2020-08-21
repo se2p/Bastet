@@ -72,7 +72,7 @@ import {WaitSecsStatement} from "../../../syntax/ast/core/statements/WaitSecsSta
 import {Logger} from "../../../utils/Logger";
 import {ExpressionList} from "../../../syntax/ast/core/expressions/ExpressionList";
 import {Statement, StatementList} from "../../../syntax/ast/core/statements/Statement";
-import {ParameterDeclaration} from "../../../syntax/ast/core/ParameterDeclaration";
+import {ParameterDeclaration, ParameterDeclarationList} from "../../../syntax/ast/core/ParameterDeclaration";
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {DataLocation, DataLocations} from "../../../syntax/app/controlflow/DataLocation";
@@ -641,7 +641,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 const calledMethod: Method = steppedActor.getMethod(calledMethodName);
 
                 // ( we also add the original call statement since it is helpful for some analyses)
-                const interProcOps: ProgramOperation[] = [stepOp].concat(this.createPassArgumentsOps(calledMethod, stepOp.ast.args));
+                const interProcOps: ProgramOperation[] = [stepOp].concat(this.createPassArgumentsOps(calledMethod.parameters, stepOp.ast.args));
 
                 const succCallStack = steppedThread.getCallStack()
                     .push(new MethodCall(fromLocation, step.succLoc));
@@ -803,13 +803,13 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result.map((s) => new RawOperation(s));
     }
 
-    private createPassArgumentsOps(calledMethod: Method, args: ExpressionList): ProgramOperation[] {
-        Preconditions.checkArgument(calledMethod.parameters.elements.length == args.elements.length);
+    private createPassArgumentsOps(parameters: ParameterDeclarationList, args: ExpressionList): ProgramOperation[] {
+        Preconditions.checkArgument(parameters.elements.length == args.elements.length);
         const result: Statement[] = [];
 
         let index = 0;
-        while (index < calledMethod.parameters.elements.length) {
-            const p: ParameterDeclaration = calledMethod.parameters.getIth(index);
+        while (index < parameters.elements.length) {
+            const p: ParameterDeclaration = parameters.getIth(index);
             const a: Expression = args.getIth(index);
 
             // 1. Add declarations of the parameter variables (callee scope)
