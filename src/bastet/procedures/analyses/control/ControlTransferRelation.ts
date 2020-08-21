@@ -84,9 +84,11 @@ import {
     StringLiteral
 } from "../../../syntax/ast/core/expressions/StringExpression";
 import {
-    AfterStatementMonitoringEvent, MessageNamespace,
-    MessageReceivedEvent, QualifiedMessageNamespace,
-    TerminationEvent, UnqualifiedMessageNamespace
+    AfterStatementMonitoringEvent,
+    MessageReceivedEvent,
+    QualifiedMessageNamespace,
+    TerminationEvent,
+    UnqualifiedMessageNamespace
 } from "../../../syntax/ast/core/CoreEvent";
 import {Concern, Concerns} from "../../../syntax/Concern";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
@@ -95,9 +97,10 @@ import {getTheNextElement, getTheOnlyElement} from "../../../utils/Collections";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {
     ActorDestination,
-    BOOTSTRAP_FINISHED_MESSAGE,
-    isBootstrapFinishedMessage, NamedDestination,
-    SystemMessage, UserMessage
+    isBootstrapFinishedMessage,
+    NamedDestination,
+    SystemMessage,
+    UserMessage
 } from "../../../syntax/ast/core/Message";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {
@@ -693,42 +696,46 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 return resultList;
             }
 
-        } else if (stepOp.ast instanceof BroadcastMessageStatement) {
-            const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
-            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(threadToStep.threadStatus.getActorId(), result, stmt.msg);
-
-            // Prepare the waiting threads for running
-            for (const waitForThread of waitFor) {
-                result = this.restartThread(result, waitForThread.threadIndex);
-            }
-
-            return [[result, true]]
-
-        } else if (stepOp.ast instanceof BroadcastAndWaitStatement) {
+        } else if (stepOp.ast instanceof BroadcastAndWaitStatement || stepOp.ast instanceof BroadcastMessageStatement) {
             const steppedThread = threadToStep.threadStatus;
             const stmt: BroadcastAndWaitStatement = stepOp.ast as BroadcastAndWaitStatement;
-            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(threadToStep.threadStatus.getActorId(), result, stmt.msg);
+            const receivers: [IndexedThread, Script][] = this.getAllMessageReceiverThreadsFrom(threadToStep.threadStatus.getActorId(), result, stmt.msg);
 
             // Prepare the waiting threads for running
-            for (const waitForThread of waitFor) {
-                result = this.restartThread(result, waitForThread.threadIndex);
+            for (const [receiverThread, script] of receivers) {
+                const tcs = receiverThread.threadStatus.getComputationState();
+                const isActive = tcs == ThreadComputationState.THREAD_STATE_WAIT
+                    || tcs == ThreadComputationState.THREAD_STATE_YIELD
+                    || tcs == ThreadComputationState.THREAD_STATE_RUNNING;
+
+                if (!isActive || script.restartOnTriggered) {
+                    // TODO: Pass arguments using `createPassArgumentsOps` here (see how it is used elsewhere)
+                    result = this.restartThread(result, receiverThread.threadIndex);
+                }
             }
 
-            if (waitFor.length > 0) {
-                result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                    ts.withComputationState(ThreadComputationState.THREAD_STATE_WAIT));
-            }
+            if (stepOp.ast instanceof BroadcastMessageStatement) {
+                return [[result, true]];
 
-            if (isBootstrapFinishedMessage(stepOp.ast.msg)) {
-                result = this.activateAfterStepMonitoring(result);
-            }
+            } else {
+                // If there are receivers to wait for: Change the to the WAIT state.
+                if (receivers.length > 0) {
+                    result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                        ts.withComputationState(ThreadComputationState.THREAD_STATE_WAIT));
+                }
 
-            // Wait for all triggered threads to finish
-            return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                ts.withWaitingForThreads(
+                // Hack: Activate the 'on statement finished' handlers after bootstrapping was finished.
+                if (isBootstrapFinishedMessage(stepOp.ast.msg)) {
+                    result = this.activateAfterStepMonitoring(result);
+                }
+
+                // Wait for all triggered threads to finish (updates the list of threads to wait for)
+                return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                    ts.withWaitingForThreads(
                         steppedThread
                             .getWaitingForThreads()
-                            .union(waitFor.map((t) => t.threadStatus.getThreadId())))), true]];
+                            .union(receivers.map(([t, s]) => t.threadStatus.getThreadId())))), true]];
+            }
 
         } else if (stepOp.ast instanceof WaitUntilStatement) {
             const stmt: WaitUntilStatement = stepOp.ast as WaitUntilStatement;
@@ -1203,8 +1210,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         Preconditions.checkState(running <= 1);
     }
 
-    private getAllMessageReceiverThreadsFrom(sendingActor: ActorId, abstractState: ControlAbstractState, msg: SystemMessage): IndexedThread[] {
-        const result: IndexedThread[] = [];
+    private getAllMessageReceiverThreadsFrom(sendingActor: ActorId, abstractState: ControlAbstractState, msg: SystemMessage): [IndexedThread, Script][] {
+        const result: [IndexedThread, Script][] = [];
         let index = 0;
         for (const t of abstractState.getThreadStates()) {
             const script = this._task.getActorByName(t.getActorId()).getScript(t.getScriptId());
@@ -1218,7 +1225,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 // Check if the message matches
                 const handlingActor = t.getActorId();
                 if (this.isHandlerFor(ev, handlingActor, sendingActor, msg)) {
-                    result.push(new IndexedThread(t, index));
+                    result.push([new IndexedThread(t, index), script]);
                 }
             }
             index++;
