@@ -43,11 +43,10 @@ import {
     TerminationEvent
 } from "../ast/core/CoreEvent";
 import {TransitionRelation, TransitionRelations, TransRelId} from "./controlflow/TransitionRelation";
-import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
 import {BOOTSTRAP_FINISHED_MESSAGE, BOOTSTRAP_MESSAGE, GREENFLAG_MESSAGE} from "../ast/core/Message";
 import {StatementList} from "../ast/core/statements/Statement";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
-import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
+import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {Concern, Concerns} from "../Concern";
 import {ProgramOperation} from "./controlflow/ops/ProgramOperation";

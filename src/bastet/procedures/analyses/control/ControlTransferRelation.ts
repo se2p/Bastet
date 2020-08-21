@@ -65,8 +65,10 @@ import {
     EndAtomicStatement,
     ReturnStatement
 } from "../../../syntax/ast/core/statements/ControlStatement";
-import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
-import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
+import {
+    BroadcastAndWaitStatement,
+    BroadcastMessageStatement
+} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {WaitSecsStatement} from "../../../syntax/ast/core/statements/WaitSecsStatement";
 import {Logger} from "../../../utils/Logger";
@@ -709,8 +711,18 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                     || tcs == ThreadComputationState.THREAD_STATE_RUNNING;
 
                 if (!isActive || script.restartOnTriggered) {
-                    // TODO: Pass arguments using `createPassArgumentsOps` here (see how it is used elsewhere)
+                    // Restart the thread
                     result = this.restartThread(result, receiverThread.threadIndex);
+
+                    // and pass the arguments using `createPassArgumentsOps`
+                    const interProcOps: ProgramOperation[] = [stepOp].concat(
+                        this.createPassArgumentsOps((script.event as MessageReceivedEvent).acceptedPayload, stepOp.ast.msg.payload));
+
+                    const predScopeStack = this.buildScopeStack(steppedActor.ident, fromRelation.name);
+                    const succScopeStack = this.buildScopeStack(steppedActor.ident, script.transitions.name);
+
+                    result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                        ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.getActorScopes(), predScopeStack, succScopeStack).map(op => op.ident))));
                 }
             }
 

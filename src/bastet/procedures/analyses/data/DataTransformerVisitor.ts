@@ -108,8 +108,10 @@ import {
 import {CreateCloneOfStatement} from "../../../syntax/ast/core/statements/CreateCloneOfStatement";
 import {ChangeVarByStatement} from "../../../syntax/ast/core/statements/ChangeVarByStatement";
 import {ChangeAttributeByStatement} from "../../../syntax/ast/core/statements/ChangeAttributeByStatement";
-import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
-import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
+import {
+    BroadcastAndWaitStatement,
+    BroadcastMessageStatement
+} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {Preconditions} from "../../../utils/Preconditions";
 import {
