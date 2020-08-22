@@ -960,6 +960,9 @@ end
 role ScratchEntity is RuntimeEntity begin
 
     declare sound_effect as enum [ "pitch", "pan_left_right" ]
+    declare pitch_effect_value as float
+    declare pan_left_right_value as float
+
     declare volume as int
 
     // The current layer of the entity
