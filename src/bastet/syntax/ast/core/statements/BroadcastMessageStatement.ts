@@ -26,7 +26,7 @@
 import {Statement} from "./Statement";
 import {SystemMessage} from "../Message";
 
-export class BroadcastMessageStatement extends Statement {
+export abstract class AbstractBroadcastMessageStatement extends Statement {
 
     private readonly _msg: SystemMessage;
 
@@ -38,4 +38,22 @@ export class BroadcastMessageStatement extends Statement {
     get msg(): SystemMessage {
         return this._msg;
     }
+
+}
+
+
+export class BroadcastMessageStatement extends AbstractBroadcastMessageStatement {
+
+    constructor(msg: SystemMessage) {
+        super(msg);
+    }
+
+}
+
+export class BroadcastAndWaitStatement extends AbstractBroadcastMessageStatement {
+
+    constructor(msg: SystemMessage) {
+        super(msg);
+    }
+
 }

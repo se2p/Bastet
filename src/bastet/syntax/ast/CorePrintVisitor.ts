@@ -111,8 +111,7 @@ import {
     ReplaceElementAtStatement
 } from "./core/statements/ListStatement";
 import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/AssumeStatement";
-import {BroadcastAndWaitStatement} from "./core/statements/BroadcastAndWaitStatement";
-import {BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
+import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
 import {CreateCloneOfStatement} from "./core/statements/CreateCloneOfStatement";
 import {
     DeclareActorVariableStatement,

@@ -60,8 +60,7 @@ import {
 } from "./core/expressions/BooleanExpression";
 import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/AssumeStatement";
 import {StringLiteral, StringVariableExpression} from "./core/expressions/StringExpression";
-import {BroadcastAndWaitStatement} from "./core/statements/BroadcastAndWaitStatement";
-import {BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
+import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
 import {CastExpression} from "./core/expressions/CastExpression";
 import {CreateCloneOfStatement} from "./core/statements/CreateCloneOfStatement";
 import {
