@@ -817,6 +817,16 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         define result as cast (attribute "mouse_y" of io) to int
     end returns result: int
 
+    define atomic getMouseY()  begin
+        // non-det version of `mouseY`. Deprecated!
+        // needed (with this signature) to get some programs running
+    end returns result: int
+
+    define atomic getMouseX()  begin
+        // non-det version of `mouseY`. Deprecated!
+        // needed (with this signature) to get some programs running
+    end returns result: int
+
     // @Category "Sensing"
     // @Block "key (int as key) pressed?"
     define atomic keyPressedByCode (key: int) begin
