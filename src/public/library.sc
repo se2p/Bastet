@@ -659,6 +659,38 @@ role MathActor begin
         end
     end returns result: float
 
+    define atomic mathMax(n1: int, n2: int) begin
+        if (n1 > n2) then begin
+            define result as n1
+        end else begin
+            define result as n2
+        end
+    end returns result: int
+
+    define atomic mathMin(n1: int, n2: int) begin
+        if (n1 < n2) then begin
+            define result as n1
+        end else begin
+            define result as n2
+        end
+    end returns result: int
+
+    define atomic mathMaxF(n1: float, n2: float) begin
+        if (n1 > n2) then begin
+            define result as n1
+        end else begin
+            define result as n2
+        end
+    end returns result: float
+
+    define atomic mathMinF(n1: float, n2: float) begin
+        if (n1 < n2) then begin
+            define result as n1
+        end else begin
+            define result as n2
+        end
+    end returns result: float
+
 end
 
 role RuntimeEntity is MathActor, KeyboardIO begin
@@ -998,6 +1030,16 @@ role ScratchEntity is RuntimeEntity begin
     declare brightness_effect_value as float
     declare ghost_effect_value as float
 
+    declare STAGE_WIDTH as int
+    declare STAGE_HEIGHT as int
+    declare STAGE_HALF_WIDTH as int
+    declare STAGE_HALF_HEIGHT as int
+
+    define STAGE_WIDTH as 480
+    define STAGE_HEIGHT as 360
+    define STAGE_HALF_WIDTH as 240
+    define STAGE_HALF_HEIGHT as 180
+
     define color_effect_value as 0.0
 
     define atomic simpleReturn(n:float) begin
@@ -1225,9 +1267,165 @@ role ScratchSprite is ScratchEntity begin
     end
 
     // @Category "Sensing"
-    define touchingEdge () begin
-        // ...
+    define atomic touchingEdge () begin
+        define result as false
+
+        declare boundsLeft as int
+        declare boundsRight as int
+        declare boundsTop as int
+        declare boundsBottom as int
+
+        define boundsLeft as x - active_graphic_half_width
+        define boundsRight as x + active_graphic_half_width
+        define boundsTop as y + active_graphic_half_height
+        define boundsBottom as y - active_graphic_half_height
+
+        if (boundsLeft < (0 - STAGE_HALF_WIDTH)) then begin
+            define result as true
+        end
+
+        if (boundsRight > STAGE_HALF_WIDTH) then begin
+            define result as true
+        end
+
+        if (boundsTop > STAGE_HALF_HEIGHT) then begin
+            define result as true
+        end
+
+        if (boundsBottom > (0 - STAGE_HALF_HEIGHT)) then begin
+            define result as true
+        end
     end returns result : boolean
+
+    // @Category "Motion"
+    define atomic ifOnEdgeBounce () begin
+        declare boundsLeft as int
+        declare boundsRight as int
+        declare boundsTop as int
+        declare boundsBottom as int
+
+        define boundsLeft as x - active_graphic_half_width
+        define boundsRight as x + active_graphic_half_width
+        define boundsTop as y + active_graphic_half_height
+        define boundsBottom as y - active_graphic_half_height
+
+        declare distLeft as int
+        declare distRight as int
+        declare distTop as int
+        declare distBottom as int
+
+        define distLeft as mathMax(0, STAGE_HALF_WIDTH + boundsLeft)
+        define distTop as mathMax(0, STAGE_HALF_HEIGHT - boundsTop)
+        define distRight as mathMax(0, STAGE_HALF_WIDTH - boundsRight)
+        define distBottom as mathMax(0, STAGE_HALF_HEIGHT + boundsBottom)
+
+        // 1 = left, 2 = bottom, 3 = right, 4 = top
+        declare nearestEdge as int
+
+        declare minDist as int
+        define minDist as 99999
+
+        if (distLeft < minDist) then begin
+            define minDist as distLeft
+            define nearestEdge as 1
+        end
+        if (distTop < minDist) then begin
+            define minDist as distTop
+            define nearestEdge as 4
+        end
+        if (distRight < minDist) then begin
+            define minDist as distRight
+            define nearestEdge as 3
+        end
+        if (distBottom < minDist) then begin
+            define minDist as distBottom
+            define nearestEdge as 2
+        end
+
+        if (minDist > 0) then begin
+            // Not touching any edge.
+        end else begin
+            // Point away from the nearest edge.
+            declare radians as float
+            define radians as degToRad(90.0 - cast direction to float)
+
+            declare dx as float
+            declare dy as float
+            define dx as mathCos(radians)
+            define dy as 0.0 - mathSin(radians)
+
+            if (nearestEdge = 1) then begin
+                define dx as mathMaxF(0.2, mathAbsF(dx))
+            end else if (nearestEdge = 4) then begin
+                define dy as mathMaxF(0.2, mathAbsF(dy))
+            end else if (nearestEdge = 3) then begin
+                define dx as 0.0 - mathMaxF(0.2, mathAbsF(dx))
+            end else if (nearestEdge = 2) then begin
+                define dy as 0.0 - mathMaxF(0.2, mathAbsF(dy))
+            end
+
+            define direction as (cast radToDeg(mathAtan2(dy, dx)) to int) + 90
+
+            // Keep within the stage.
+            keepInStage()
+        end
+    end
+
+    define atomic keepInStage () begin
+        declare newX as int
+        declare newY as int
+
+        define newX as x
+        define newY as y
+
+        declare fenceLeft as int
+        declare fenceRight as int
+        declare fenceTop as int
+        declare fenceBottom as int
+
+        define fenceLeft as 0 - STAGE_HALF_WIDTH
+        define fenceRight as STAGE_HALF_WIDTH 
+        define fenceTop as STAGE_HALF_HEIGHT
+        define fenceBottom as 0 - STAGE_HALF_HEIGHT
+
+        declare boundsLeft as int
+        declare boundsRight as int
+        declare boundsTop as int
+        declare boundsBottom as int
+
+        define boundsLeft as x - active_graphic_half_width
+        define boundsRight as x + active_graphic_half_width
+        define boundsTop as y + active_graphic_half_height
+        define boundsBottom as y - active_graphic_half_height
+
+        // Adjust the known bounds to the target position.
+        define boundsLeft as boundsLeft + (newX - x)
+        define boundsRight as boundsRight + (newX - x)
+        define boundsTop as boundsTop + (newY - y)
+        define boundsBottom as boundsBottom + (newY - y)
+
+        // Find how far we need to move the target position.
+        declare dx as int
+        declare dy as int
+
+        define dx as 0
+        define dy as 0
+
+        if (boundsLeft < fenceLeft) then begin
+            define dx as dx + (fenceLeft - boundsLeft)
+        end
+        if (boundsRight > fenceRight) then begin
+            define dx as dx + (fenceRight - boundsRight)
+        end
+        if (boundsTop > fenceTop) then begin
+            define dy as dy + (fenceTop - boundsTop)
+        end
+        if (boundsBottom < fenceBottom) then begin
+            define dy as dx + (fenceBottom - boundsBottom)
+        end
+
+        goTo(newX + dx, newY + dy)
+    end
 
     // @Category "Sensing"
     define atomic touchingMousePointer () begin
@@ -1391,6 +1589,20 @@ role ScratchSprite is ScratchEntity begin
         define bubbleStart as _RUNTIME_millis()
         define bubbleType as "say"
         define bubbleDuration as scs
+    end
+
+    define atomic thinkTextFor (msg: string, scs: int) begin
+        // msgBounded = substr(msg, 0, 330)
+        define bubbleText as msg
+        define bubbleStart as _RUNTIME_millis()
+        define bubbleType as "think"
+        define bubbleDuration as scs
+    end
+
+    define atomic thinkText (msg: string) begin
+        define bubbleText as msg
+        define bubbleStart as _RUNTIME_millis()
+        define bubbleType as "think"
     end
 
     define atomic sayText (msg: string) begin
