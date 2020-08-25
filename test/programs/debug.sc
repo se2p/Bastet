@@ -2,7 +2,8 @@ program TestProgram
 
 actor Beetle is ScratchSprite begin
 
-    script on message "SPRITE_CLICK" () do begin
+    script on startup do begin
+        ifOnEdgeBounce()
         _RUNTIME_signalFailure()
     end
 
