@@ -1,6 +1,6 @@
 program Mini1Program
 
-actor MiniActor is RuntimeEntity begin
+actor MiniActor is ScratchSprite begin
 
     script on startup do begin
         ifOnEdgeBounce()
