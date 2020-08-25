@@ -2,6 +2,9 @@ program Mini1Program
 
 actor MiniActor is RuntimeEntity begin
 
+    // ATTENTION: This program is important and illustrates
+    // a recursion based on messages
+
     declare x as int
 
     script on bootstrap do begin

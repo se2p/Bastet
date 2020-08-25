@@ -788,7 +788,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     // @Block "wait <Num> seconds"
     define waitSeconds (secs: int) begin
         // A busy-waiting implementation.
-        // The external methode`_RUNTIME_waitSeconds` is intended to
+        // The external method `_RUNTIME_waitSeconds` is intended to
         // not conduct a busy wait.
         declare waitUntil as int
         define waitUntil as _RUNTIME_seconds() + secs
@@ -992,7 +992,14 @@ end
 role ScratchEntity is RuntimeEntity begin
 
     declare sound_effect as enum [ "pitch", "pan_left_right" ]
+    declare pitch_effect_value as float
+    declare pan_left_right_value as float
+
     declare volume as int
+
+    // The current layer of the entity
+    // See https://en.scratch-wiki.info/wiki/Layer_(value)
+    declare layer as int
 
     // 480 * 360 = 172800 pixels
     declare active_graphic_pixels as list of int
@@ -1135,10 +1142,6 @@ role ScratchSprite is ScratchEntity begin
     // See https://en.scratch-wiki.info/wiki/Size_(value)
     declare size as int
 
-    // The current layer of a sprite
-    // See https://en.scratch-wiki.info/wiki/Layer_(value)
-    declare layer as int
-
     // The rotation of the sprite in [-360,+360]
     // See https://en.scratch-wiki.info/wiki/Direction_(value)
     declare direction as int
@@ -1199,26 +1202,18 @@ role ScratchSprite is ScratchEntity begin
 
     define atomic moveSteps (n: int) begin
         declare nf as float
-        declare dx as float
-        declare dy as float
-        declare ndir as float
-
         define nf as cast n to float
-        define ndir as cast direction to float
 
         declare radians as float
-        define radians as degToRad(90.0 - ndir)
+        define radians as degToRad(90.0 - (cast direction to float))
 
+        declare dx as float
+        declare dy as float
         define dx as nf * mathCos(radians)
         define dy as nf * mathSin(radians)
 
-        declare tmpx as int
-        declare tmpy as int
-        define tmpx as cast dx to int
-        define tmpy as cast dy to int
-
-        define x as x + tmpx
-        define y as y + tmpy
+        define x as x + (cast dx to int)
+        define y as y + (cast dy to int)
     end
 
     // @Category "Motion"
@@ -1243,6 +1238,18 @@ role ScratchSprite is ScratchEntity begin
 
     define atomic changeXBy (increment: int) begin
        // set attribute "x" to (attribute "x" + increment)
+    end
+
+    define atomic costumeNumber () begin
+        // ...
+    end returns result : integer
+
+    define atomic costumeName () begin
+        // ...
+    end returns result : string
+
+    define atomic nextCostume () begin
+        // ...
     end
 
     define atomic changeCostumeTo (id: string) begin
@@ -1536,13 +1543,17 @@ role ScratchSprite is ScratchEntity begin
         define result as not touchingObject(snd)
     end returns result : boolean
 
+    define atomic rgb (r: int, g: int, b: int) begin
+        define result as (65536 * r + 256 * g + b)
+    end returns result : int
+
     // @Category "Sensing"
     define atomic touchingColor (clr: int) begin
         // ...
     end returns result : boolean
 
     // @Category "Sensing"
-    define colorIsTouchingColor(clr: int, tching: int) begin
+    define atomic colorIsTouchingColor(clr: int, tching: int) begin
         // ...
     end returns result : boolean
 

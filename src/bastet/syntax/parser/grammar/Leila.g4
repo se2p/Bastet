@@ -52,7 +52,7 @@ resourceType :
 // A list of resources is separated by whitespaces.
 resourceList : resource* ;
 
-// Decalration of a variable. Depending on the possition of the
+// Declaration of a variable. Depending on the position of the
 // declaration statement, the variable is either local to the actor
 // or local to the current stack of a script execution.
 declarationStmt : 'declare' ident 'as' type # DeclareVariable ;
@@ -68,8 +68,9 @@ type :
   | primitiveType # Primitive
   ;
 
+// 'int' is deprecated (use 'integer' instead)
 primitiveType:
-  'int' # IntegerType
+  ('int' | 'integer') # IntegerType
   | 'float' # FloatingPointType
   | 'boolean' # BooleanType
   | 'string' # StringType
@@ -84,7 +85,7 @@ scriptIdent :  ident # NamedScriptIdent | # AnonymousScriptIdent ;
 // A list of scripts.
 scriptList : script* ;
 
-// Attributes that can be assinged to a script
+// Attributes that can be assigned to a script
 scriptAttributeList : scriptAttribute* ;
 scriptAttribute : 'restart' # RestartScript ;
 
@@ -93,14 +94,12 @@ scriptAttribute : 'restart' # RestartScript ;
 // of a script are defined by the non-terminal `event`.
 event :
   'never' # NeverEvent
-  | 'bootstrap' # BootstapEvent
+  | 'bootstrap' # BootstrapEvent
   | 'bootstrap' 'finished' # AfterBootstrapMonitoringEvent
   | 'startup' # StartupEvent
   | 'started' 'as' 'clone' # CloneStartEvent
   | 'message' stringExpr parameterList messageNamespace # MessageReceivedEvent
   | 'condition' boolExpr # ConditionReachedEvent
-  | 'rendered' # RenderedMonitoringEvent
-  | 'dispatch' # UserInputDispatchEvent
   | 'statement' 'finished' # AfterStatementMonitoringEvent
   ;
 
@@ -126,7 +125,7 @@ externMethodResultDeclaration :
   | # ExternVoidReturnDefinition
   ;
 
-// Attributes that can be assinged to a method
+// Attributes that can be assigned to a method
 methodAttributeList : methodAttribute* ;
 methodAttribute : 'atomic' # AtomicMethod ;
 

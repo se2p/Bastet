@@ -1,6 +1,6 @@
-program TestProgram
+program Mini1Program
 
-actor Beetle is ScratchSprite begin
+actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
         ifOnEdgeBounce()

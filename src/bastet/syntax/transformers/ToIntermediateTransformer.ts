@@ -131,7 +131,6 @@ import {
     ProgramContext,
     PureElseContext, QualifiedNamespaceContext,
     QualifiedVariableContext,
-    RenderedMonitoringEventContext,
     RepeatForeverStmtContext,
     RepeatTimesStmtContext,
     ReplaceElementAtStatementContext,
@@ -169,7 +168,7 @@ import {
     UnspecifiedExprContext,
     UnspecifiedNumExprContext,
     UnspecifiedStringExpressionContext,
-    UntilStmtContext, UserInputDispatchEventContext,
+    UntilStmtContext,
     UserMessageContext,
     VariableContext,
     VoidReturnDefinitionContext,
@@ -249,8 +248,7 @@ import {
     CoreEvent, MessageNamespace,
     MessageReceivedEvent,
     NeverEvent, QualifiedMessageNamespace,
-    RenderedMonitoringEvent,
-    StartupEvent, UnqualifiedMessageNamespace, UserInputDispatchEvent
+    StartupEvent, UnqualifiedMessageNamespace
 } from "../ast/core/CoreEvent";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {
@@ -296,8 +294,7 @@ import {
     InsertAtStatement,
     ReplaceElementAtStatement
 } from "../ast/core/statements/ListStatement";
-import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
-import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
+import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {CallStatement} from "../ast/core/statements/CallStatement";
 import {CreateCloneOfStatement} from "../ast/core/statements/CreateCloneOfStatement";
 import {
@@ -1439,10 +1436,6 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         }
     }
 
-    public visitUserInputDispatchEvent(ctx: UserInputDispatchEventContext): TransformerResult {
-        return TransformerResult.withNode(UserInputDispatchEvent.instance());
-    }
-
     public visitCloneStartEvent(ctx: CloneStartEventContext) : TransformerResult {
         return TransformerResult.withNode(CloneStartEvent.instance());
     }
@@ -1656,10 +1649,6 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
     public visitNeverEvent(ctx: NeverEventContext) : TransformerResult {
         return TransformerResult.withNode(NeverEvent.instance());
-    }
-
-    public visitRenderedMonitoringEvent(ctx: RenderedMonitoringEventContext) : TransformerResult {
-        return TransformerResult.withNode(RenderedMonitoringEvent.instance());
     }
 
     public visitBootstapEvent(ctx: BootstapEventContext) : TransformerResult {
@@ -1878,7 +1867,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     public visitQualifiedVariable(ctx: QualifiedVariableContext): TransformerResult {
-        throw new ImplementMeException();
+        throw new ImplementMeForException("Support for qualified variable access not yet implemented. Implement me!");
     }
 
     private produceVariableFromIdentifier(varIdent: Identifier): TransformerResult {

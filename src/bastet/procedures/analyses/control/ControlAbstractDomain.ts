@@ -540,7 +540,7 @@ export class ScheduleAbstractStateFactory {
                 }
 
                 const threadId = ThreadStateFactory.freshId();
-                let threadState = ThreadComputationState.THREAD_STATE_WAIT;
+                let threadState = ThreadComputationState.THREAD_STATE_DONE; // Also scripts that have not yet been triggered
 
                 if (script.event instanceof SingularityEvent) {
                     Preconditions.checkState(!singular);

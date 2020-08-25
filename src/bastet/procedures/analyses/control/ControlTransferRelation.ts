@@ -65,14 +65,16 @@ import {
     EndAtomicStatement,
     ReturnStatement
 } from "../../../syntax/ast/core/statements/ControlStatement";
-import {BroadcastMessageStatement} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
-import {BroadcastAndWaitStatement} from "../../../syntax/ast/core/statements/BroadcastAndWaitStatement";
+import {
+    BroadcastAndWaitStatement,
+    BroadcastMessageStatement
+} from "../../../syntax/ast/core/statements/BroadcastMessageStatement";
 import {WaitUntilStatement} from "../../../syntax/ast/core/statements/WaitUntilStatement";
 import {WaitSecsStatement} from "../../../syntax/ast/core/statements/WaitSecsStatement";
 import {Logger} from "../../../utils/Logger";
 import {ExpressionList} from "../../../syntax/ast/core/expressions/ExpressionList";
 import {Statement, StatementList} from "../../../syntax/ast/core/statements/Statement";
-import {ParameterDeclaration} from "../../../syntax/ast/core/ParameterDeclaration";
+import {ParameterDeclaration, ParameterDeclarationList} from "../../../syntax/ast/core/ParameterDeclaration";
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {DataLocation, DataLocations} from "../../../syntax/app/controlflow/DataLocation";
@@ -84,9 +86,11 @@ import {
     StringLiteral
 } from "../../../syntax/ast/core/expressions/StringExpression";
 import {
-    AfterStatementMonitoringEvent, MessageNamespace,
-    MessageReceivedEvent, QualifiedMessageNamespace,
-    TerminationEvent, UnqualifiedMessageNamespace
+    AfterStatementMonitoringEvent,
+    MessageReceivedEvent,
+    QualifiedMessageNamespace,
+    TerminationEvent,
+    UnqualifiedMessageNamespace
 } from "../../../syntax/ast/core/CoreEvent";
 import {Concern, Concerns} from "../../../syntax/Concern";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
@@ -95,9 +99,10 @@ import {getTheNextElement, getTheOnlyElement} from "../../../utils/Collections";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {
     ActorDestination,
-    BOOTSTRAP_FINISHED_MESSAGE,
-    isBootstrapFinishedMessage, NamedDestination,
-    SystemMessage, UserMessage
+    isBootstrapFinishedMessage,
+    NamedDestination,
+    SystemMessage,
+    UserMessage
 } from "../../../syntax/ast/core/Message";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {
@@ -641,7 +646,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 const calledMethod: Method = steppedActor.getMethod(calledMethodName);
 
                 // ( we also add the original call statement since it is helpful for some analyses)
-                const interProcOps: ProgramOperation[] = [stepOp].concat(this.createPassArgumentsOps(calledMethod, stepOp.ast.args));
+                const interProcOps: ProgramOperation[] = [stepOp].concat(this.createPassArgumentsOps(calledMethod.parameters, stepOp.ast.args));
 
                 const succCallStack = steppedThread.getCallStack()
                     .push(new MethodCall(fromLocation, step.succLoc));
@@ -693,42 +698,56 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 return resultList;
             }
 
-        } else if (stepOp.ast instanceof BroadcastMessageStatement) {
-            const stmt: BroadcastMessageStatement = stepOp.ast as BroadcastMessageStatement;
-            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(threadToStep.threadStatus.getActorId(), result, stmt.msg);
-
-            // Prepare the waiting threads for running
-            for (const waitForThread of waitFor) {
-                result = this.restartThread(result, waitForThread.threadIndex);
-            }
-
-            return [[result, true]]
-
-        } else if (stepOp.ast instanceof BroadcastAndWaitStatement) {
+        } else if (stepOp.ast instanceof BroadcastAndWaitStatement || stepOp.ast instanceof BroadcastMessageStatement) {
             const steppedThread = threadToStep.threadStatus;
             const stmt: BroadcastAndWaitStatement = stepOp.ast as BroadcastAndWaitStatement;
-            const waitFor: IndexedThread[] = this.getAllMessageReceiverThreadsFrom(threadToStep.threadStatus.getActorId(), result, stmt.msg);
+            const receivers: [IndexedThread, Script][] = this.getAllMessageReceiverThreadsFrom(threadToStep.threadStatus.getActorId(), result, stmt.msg);
 
             // Prepare the waiting threads for running
-            for (const waitForThread of waitFor) {
-                result = this.restartThread(result, waitForThread.threadIndex);
+            for (const [receiverThread, script] of receivers) {
+                const tcs = receiverThread.threadStatus.getComputationState();
+                const isActive = tcs == ThreadComputationState.THREAD_STATE_WAIT
+                    || tcs == ThreadComputationState.THREAD_STATE_YIELD
+                    || tcs == ThreadComputationState.THREAD_STATE_RUNNING;
+
+                if (!isActive || script.restartOnTriggered) {
+                    // Restart the thread
+                    result = this.restartThread(result, receiverThread.threadIndex);
+
+                    // and pass the arguments using `createPassArgumentsOps`
+                    const interProcOps: ProgramOperation[] = [stepOp].concat(
+                        this.createPassArgumentsOps((script.event as MessageReceivedEvent).acceptedPayload, stepOp.ast.msg.payload));
+
+                    const predScopeStack = this.buildScopeStack(steppedActor.ident, fromRelation.name);
+                    const succScopeStack = this.buildScopeStack(steppedActor.ident, script.transitions.name);
+
+                    result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                        ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.getActorScopes(), predScopeStack, succScopeStack).map(op => op.ident))));
+                }
             }
 
-            if (waitFor.length > 0) {
-                result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                    ts.withComputationState(ThreadComputationState.THREAD_STATE_WAIT));
-            }
+            if (stepOp.ast instanceof BroadcastMessageStatement) {
+                return [[result, true]];
 
-            if (isBootstrapFinishedMessage(stepOp.ast.msg)) {
-                result = this.activateAfterStepMonitoring(result);
-            }
+            } else {
+                // If there are receivers to wait for: Change the to the WAIT state.
+                if (receivers.length > 0) {
+                    result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                        ts.withComputationState(ThreadComputationState.THREAD_STATE_WAIT));
+                }
 
-            // Wait for all triggered threads to finish
-            return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                ts.withWaitingForThreads(
+                // Hack: Activate the 'on statement finished' handlers after bootstrapping was finished.
+                if (isBootstrapFinishedMessage(stepOp.ast.msg)) {
+                    result = this.activateAfterStepMonitoring(result);
+                }
+
+                // Wait for all triggered threads to finish (updates the list of threads to wait for)
+                return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
+                    ts.withWaitingForThreads(
                         steppedThread
                             .getWaitingForThreads()
-                            .union(waitFor.map((t) => t.threadStatus.getThreadId())))), true]];
+                            .union(receivers.map(([t, s]) => t.threadStatus.getThreadId())))), true]];
+            }
 
         } else if (stepOp.ast instanceof WaitUntilStatement) {
             const stmt: WaitUntilStatement = stepOp.ast as WaitUntilStatement;
@@ -803,13 +822,13 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result.map((s) => new RawOperation(s));
     }
 
-    private createPassArgumentsOps(calledMethod: Method, args: ExpressionList): ProgramOperation[] {
-        Preconditions.checkArgument(calledMethod.parameters.elements.length == args.elements.length);
+    private createPassArgumentsOps(parameters: ParameterDeclarationList, args: ExpressionList): ProgramOperation[] {
+        Preconditions.checkArgument(parameters.elements.length == args.elements.length);
         const result: Statement[] = [];
 
         let index = 0;
-        while (index < calledMethod.parameters.elements.length) {
-            const p: ParameterDeclaration = calledMethod.parameters.getIth(index);
+        while (index < parameters.elements.length) {
+            const p: ParameterDeclaration = parameters.getIth(index);
             const a: Expression = args.getIth(index);
 
             // 1. Add declarations of the parameter variables (callee scope)
@@ -1203,8 +1222,8 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         Preconditions.checkState(running <= 1);
     }
 
-    private getAllMessageReceiverThreadsFrom(sendingActor: ActorId, abstractState: ControlAbstractState, msg: SystemMessage): IndexedThread[] {
-        const result: IndexedThread[] = [];
+    private getAllMessageReceiverThreadsFrom(sendingActor: ActorId, abstractState: ControlAbstractState, msg: SystemMessage): [IndexedThread, Script][] {
+        const result: [IndexedThread, Script][] = [];
         let index = 0;
         for (const t of abstractState.getThreadStates()) {
             const script = this._task.getActorByName(t.getActorId()).getScript(t.getScriptId());
@@ -1218,7 +1237,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 // Check if the message matches
                 const handlingActor = t.getActorId();
                 if (this.isHandlerFor(ev, handlingActor, sendingActor, msg)) {
-                    result.push(new IndexedThread(t, index));
+                    result.push([new IndexedThread(t, index), script]);
                 }
             }
             index++;
