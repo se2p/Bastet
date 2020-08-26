@@ -1212,6 +1212,18 @@ role ScratchSprite is ScratchEntity begin
     define atomic pointTowardsSelf() begin
     end
 
+    define atomic switchBackdropToNext() begin
+        // Implement me using broadcasts
+    end
+
+    define atomic switchBackdropToPrev() begin
+        // Implement me using broadcasts
+    end
+
+    define atomic switchBackdropToRandom() begin
+        // Implement me using broadcasts
+    end
+
     define atomic moveSteps (n: int) begin
         declare nf as float
         define nf as cast n to float
