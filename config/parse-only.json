@@ -1,3 +1,9 @@
 {
-  "terminate-after-parsing": true
+  "terminate-after-parsing": true,
+
+  "MainAnalysis": {
+    "print-statistics": true,
+    "export-artifacts": false
+  }
+
 }
