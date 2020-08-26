@@ -8,10 +8,11 @@ actor Cat is ScratchSprite begin
         changeCostumeTo("Costume1")
     end
 
-    script on condition spriteClicked() do begin
+    script on message "SPRITE_CLICK" () do begin
         repeat forever begin
             sayTextFor("Hello", 1)
             sayTextFor("world!", 1)
+            _RUNTIME_signalFailure()
         end
     end
 
