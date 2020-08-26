@@ -866,7 +866,9 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     end returns result : boolean
 
     define atomic keyPressed() begin
-        // NON-DET key
+        declare io as actor
+        define io as locate actor "IOActor"
+        define result as cast (attribute "key_pressed" of io) to int
     end returns result : int
 
     // @Category "Sensing"
