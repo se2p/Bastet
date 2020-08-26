@@ -1234,6 +1234,17 @@ role ScratchSprite is ScratchEntity begin
         define y as newY
     end
 
+    define atomic goToSprite (o: actor) begin
+        declare otherX as int
+        define otherX as cast attribute "x" of o to int
+
+        declare otherY as int
+        define otherY as cast attribute "y" of o to int
+
+        define x as otherX
+        define y as otherY
+    end
+
     define atomic hide () begin
         define visible as false
     end

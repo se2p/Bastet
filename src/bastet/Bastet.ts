@@ -70,6 +70,10 @@ class BastetRootConfig extends BastetConfiguration {
         return this.getStringProperty('output-dir', "./output/");
     }
 
+    get terminateAfterParsing(): boolean {
+        return this.getBoolProperty('terminate-after-parsing', false);
+    }
+
 }
 
 /**
@@ -93,6 +97,10 @@ export class Bastet {
             .parse(process.argv);
     }
 
+    private async nullResult(): Promise<AnalysisResult> {
+        return new NullAnalysisResult(new AnalysisStatistics("NULL", {}));
+    }
+
     /**
      * Runs the requested analyses on a given analyses task.
      *
@@ -102,7 +110,7 @@ export class Bastet {
         // Parsing of command line options
         const cmdlineArguments = this.parseProgramArguments();
         if (!cmdlineArguments) {
-            return new NullAnalysisResult(new AnalysisStatistics("NULL", {}));
+            return this.nullResult();
         }
 
         this.registerOnExitNotifiers();
@@ -132,9 +140,15 @@ export class Bastet {
         Preconditions.checkArgument(fs.existsSync(specFilepath), "Spec File does not exists.");
 
         const config: {} = mergeConfigFilesToJson(configFilepath);
+        const rootConfig = new BastetRootConfig(config);
 
         // Build the static task model
         const staticTaskModel: App = this.buildTaskModel(libraryFilepath, programFilepath, specFilepath, config);
+
+        // We might terminate after parsing the input project (to check if the project is parsable by BASTET)
+        if (rootConfig.terminateAfterParsing) {
+            return this.nullResult();
+        }
 
         // Build the analyses procedure as defined by the configuration
         const analysisProcedure = await this.buildAnalysisProcedure(config)
