@@ -308,7 +308,7 @@ import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {App} from "../app/App";
-import {VariableWithDataLocation} from "../ast/core/Variable";
+import {VariableExpression, VariableWithDataLocation} from "../ast/core/Variable";
 import {DataLocations} from "../app/controlflow/DataLocation";
 import {StrengtheningAssumeStatement} from "../ast/core/statements/AssumeStatement";
 import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
@@ -1837,7 +1837,12 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     public visitUnspecifiedBoolExpression(ctx: UnspecifiedBoolExpressionContext) : TransformerResult {
-        throw new ImplementMeException();
+        const counterIdent: Identifier = Identifier.fresh();
+        const nondetVar = new VariableWithDataLocation(DataLocations.createTypedLocation(counterIdent, BooleanType.instance()));
+        const nondetVarExpr = new BooleanVariableExpression(nondetVar);
+        const declarationStmt = new DeclareStackVariableStatement(nondetVar);
+        const prepend: StatementList = StatementList.from([declarationStmt]);
+        return new TransformerResult(prepend, nondetVarExpr);
     }
 
     public visitUnspecifiedExpr(ctx: UnspecifiedExprContext) : TransformerResult {
@@ -1845,11 +1850,21 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     public visitUnspecifiedNumExpr(ctx: UnspecifiedNumExprContext) : TransformerResult {
-        throw new ImplementMeException();
+        const counterIdent: Identifier = Identifier.fresh();
+        const nondetVar = new VariableWithDataLocation(DataLocations.createTypedLocation(counterIdent, IntegerType.instance()));
+        const nondetVarExpr = new VariableExpression(nondetVar);
+        const declarationStmt = new DeclareStackVariableStatement(nondetVar);
+        const prepend: StatementList = StatementList.from([declarationStmt]);
+        return new TransformerResult(prepend, nondetVarExpr);
     }
 
     public visitUnspecifiedStringExpression(ctx: UnspecifiedStringExpressionContext) : TransformerResult {
-        throw new ImplementMeException();
+        const counterIdent: Identifier = Identifier.fresh();
+        const nondetVar = new VariableWithDataLocation(DataLocations.createTypedLocation(counterIdent, StringType.instance()));
+        const nondetVarExpr = new VariableExpression(nondetVar);
+        const declarationStmt = new DeclareStackVariableStatement(nondetVar);
+        const prepend: StatementList = StatementList.from([declarationStmt]);
+        return new TransformerResult(prepend, nondetVarExpr);
     }
 
     public visitVariable(ctx: VariableContext) : TransformerResult {
