@@ -28,10 +28,9 @@ Upcoming versions will support:
 
 ### Development Environment
 
-- IDE: JetBrains WebStorm 2020.x
-- NodeJs 14.2 (Current)
-- TypeScript 3.9 (npm install -g typescript)
-- UMLet UML Editor 14.3
+- JetBrains WebStorm 2020.x
+- NodeJs 14.x (Current)
+- TypeScript 4.x (npm install -g typescript)
 
 
 ### Building BASTET
