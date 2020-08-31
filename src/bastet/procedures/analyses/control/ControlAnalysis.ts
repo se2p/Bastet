@@ -358,6 +358,9 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         covStats.put("coveredLocationsAbs", coverage.coveredControlLocationsAbs);
         covStats.put("uncoveredLocationsAbs", coverage.uncoveredControlLocationsAbs);
         covStats.put("uncoveredPerLocationAbs", coverage.numberOfUncoveredPerRelation);
+
+        const actors = this._statistics.withContext("Actors");
+        actors.put("actorOrder", this._task.actors.map(a => a.ident).toString())
     }
 
     testify(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {

@@ -50,6 +50,7 @@ import {MessageReceivedEvent, QualifiedMessageNamespace} from "./syntax/ast/core
 import {extractStringLiteral} from "./syntax/ast/core/expressions/StringExpression";
 import {SYSTEM_NAMESPACE_NAME} from "./syntax/ast/core/Message";
 import {
+    CallStmtContext,
     MessageReceivedEventContext,
     ScriptContext,
     StringLiteralExpressionContext
@@ -266,6 +267,13 @@ export class Bastet {
                             eventLoopNeeded = true
                         }
                     }
+                }
+            }
+
+            if (work instanceof CallStmtContext) {
+                const call = work as CallStmtContext;
+                if (call.ident().text == "mouseX" || call.ident().text == "mouseY") {
+                    eventLoopNeeded = true
                 }
             }
 
