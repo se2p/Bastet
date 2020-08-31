@@ -52,7 +52,7 @@ actor CatObserver is Observer begin
                 define state as 0
                 define state_enter_time as _RUNTIME_micros()
             end else begin
-                if _RUNTIME_micros() - state_enter_time > 200000 then begin
+                if _RUNTIME_micros() - state_enter_time > 1200000 then begin
                     _RUNTIME_signalFailure("There should be a message if the ball is touched by the cat.")
                 end
             end
