@@ -58,7 +58,7 @@ program and the formal specification has to be translated to LeILa
 as the intermediate language for analysis. 
 The grammar of *LeILa* is defined in the file [Leila.g4](src/bastet/syntax/parser/grammar/Leila.g4).
 
-For now, the trasnlation of *SCRATCH* programs to *LeiLa* is implemented
+For now, the translation of *SCRATCH* programs to *LeiLa* is implemented
 in the tool [LitterBox](https://github.com/se2p/LitterBox). *BASTET* uses
 *LitterBox* as a library to conduct the translation. Invoking
 `bastet.sh` with a `.sb3` *SCRATCH* project file should lead
