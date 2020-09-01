@@ -6,19 +6,19 @@ module ScratchLibrary
  */
 actor IOActor is RuntimeEntity begin
 
+    // The current mouse position
     declare mouse_x as int
-
     declare mouse_y as int
-
-    declare answer as string
+    declare mouse_down as boolean
+    declare last_mouse_down as boolean
+    declare mouse_clicked as boolean
 
     // Key code of the currently pressed key
     declare key_pressed as int
     declare last_key_pressed as int
 
-    declare mouse_down as boolean
-    declare last_mouse_down as boolean
-    declare mouse_clicked as boolean
+    // The last answer given to an `ask` block
+    declare answer as string
 
     script on message "ASK" () in "SYSTEM" do begin
         declare nondet_str as string
@@ -30,6 +30,10 @@ actor IOActor is RuntimeEntity begin
         // UNSOUND: might wait arbitrarily long
     end
 
+    /**
+     * The event-dispatcher loop that models the timing
+     * of keyboard and mouse inputs.
+     */
     script messageDispatcherLoop on startup do begin
         // Hack as long no other dispatch handling is in place
         repeat forever begin
@@ -57,6 +61,11 @@ actor IOActor is RuntimeEntity begin
 
 end
 
+/**
+ * Functionality to deal with keyboard inputs.
+ * In particular the mapping between key codes and the
+ * corresponding Scratch key identifiers.
+ */
 role KeyboardIO begin
 
     declare KEY_ANY as int
@@ -97,7 +106,15 @@ role KeyboardIO begin
 
 end
 
-
+/**
+ * Mathematical functions and their approximations that are available
+ * to model the behavior of Scratch programs.
+ *
+ * Approximations are used whenever sufficient to reason about
+ * particular properties of Scratch programs. In particular
+ * in cases where we would have to deal with undecidable
+ * mathematical theories such as natural numbers with multiplication.
+ */
 role MathActor begin
 
     declare PI as float
@@ -697,6 +714,9 @@ role MathActor begin
 
 end
 
+/**
+ * The base functionality for all runtime entities available in Scratch.
+ */
 role RuntimeEntity is MathActor, KeyboardIO begin
 
     extern _RUNTIME_getInitialActors () returns list of string
@@ -885,6 +905,10 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
 end
 
+/**
+ * Functionality to observe the state and behaviour of (other) actors.
+ * Typically inherited by actors of the specification concern.
+ */
 role Observer is RuntimeEntity begin
 
     // @Category "Specification"
@@ -989,6 +1013,10 @@ role Observer is RuntimeEntity begin
 
 end
 
+/**
+ * The base functionality of all visual Scratch entities such
+ * as the stage and the different sprites.
+ */
 role ScratchEntity is RuntimeEntity begin
 
     declare sound_effect as enum [ "pitch", "pan_left_right" ]
@@ -1128,6 +1156,9 @@ role ScratchEntity is RuntimeEntity begin
 
 end
 
+/**
+ * The base functionality of all Scratch sprites.
+ */
 role ScratchSprite is ScratchEntity begin
 
     // x-coordinate in [-240,+240]
@@ -1182,7 +1213,6 @@ role ScratchSprite is ScratchEntity begin
 
         pointTowardsPos(targetX, targetY)
     end
-
 
     define atomic pointTowardsPos(targetX: int, targetY: int) begin
        declare dx as float
@@ -1397,7 +1427,7 @@ role ScratchSprite is ScratchEntity begin
         declare fenceBottom as int
 
         define fenceLeft as 0 - STAGE_HALF_WIDTH
-        define fenceRight as STAGE_HALF_WIDTH 
+        define fenceRight as STAGE_HALF_WIDTH
         define fenceTop as STAGE_HALF_HEIGHT
         define fenceBottom as 0 - STAGE_HALF_HEIGHT
 
@@ -1638,6 +1668,9 @@ role ScratchSprite is ScratchEntity begin
 
 end
 
+/**
+ * The base functionality of the Scratch stage.
+ */
 role ScratchStage is ScratchEntity begin
 
     declare current_idx as int
@@ -1690,6 +1723,7 @@ role ScratchStage is ScratchEntity begin
 
          changeActiveGraphicTo(id)
     end
+
 end
 
 
