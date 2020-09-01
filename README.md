@@ -31,12 +31,12 @@ See the list of [contributors](./CONTRIBUTORS.md) and `git shortlog -sne` for al
 
 ```
 npm install
-npm build
+npm run build
 ```
 
 ### Running BASTET
 
-We recommend to use the `bastet.sh` wrapper script (can be started from an Unix shell):
+We recommend using the `bastet.sh` wrapper script (can be started from a Unix shell):
 
 ```
 ./scripts/bastet.sh \
@@ -71,7 +71,7 @@ The grammar of *LeILa* is defined in the file [Leila.g4](src/bastet/syntax/parse
 For now, the translation of *SCRATCH* programs to *LeiLa* is implemented
 in the tool [LitterBox](https://github.com/se2p/LitterBox). *BASTET* uses
 *LitterBox* as a library to conduct the translation. Invoking
-`bastet.sh` with a `.sb3` *SCRATCH* project file should lead
+`bastet.sh` with a `.sb3` *SCRATCH* project file leads
 to an automatic translation to *LeILa*.
 
 Note that also the formal specification of *SCRATCH* projects has to be
@@ -84,7 +84,7 @@ in *LeILa*.
 ## Scratch Block Library
 
 The *BASTET* framework includes the [Scratch Block Library](src/public/library.sc).
-Each block that can be visually composed in the Scratch IDE has either a counterpart
+Each block that can be visually composed in the Scratch IDE either has a counterpart
 in the Scratch Block Library—in the form of a corresponding method—or 
 corresponds to a construct of the language *LeILa* itself.
 
@@ -97,7 +97,7 @@ conducting an analysis of *SCRATCH* projects.
 
 ## Publications and Citing
 
-The BASTET framework was presented in our **ASE'20** paper with the 
+The *BASTET* framework was presented in our **ASE'20** paper with the 
 title *"Verified from Scratch: Program Analysis for Learners’ Programs"*:
 
 ```
