@@ -58,7 +58,7 @@ program and the formal specification has to be translated to LeILa
 as the intermediate language for analysis. 
 The grammar of *LeILa* is defined in the file [Leila.g4](src/bastet/syntax/parser/grammar/Leila.g4).
 
-For now, the trasnlation of *SCRATCH* programs to *LeiLa* is implemented
+For now, the translation of *SCRATCH* programs to *LeiLa* is implemented
 in the tool [LitterBox](https://github.com/se2p/LitterBox). *BASTET* uses
 *LitterBox* as a library to conduct the translation. Invoking
 `bastet.sh` with a `.sb3` *SCRATCH* project file should lead
@@ -70,6 +70,20 @@ analysis behaves correctly.
 See the directory [ase20-verified](test/programs/publications/ase20-verified/) for
 examples of *SCRATCH* programs along with their formal specification written
 in *LeILa*.
+
+## Scratch Block Library
+
+The *BASTET* framework includes the [Scratch Block Library](src/public/library.sc).
+Each block that can be visually composed in the Scratch IDE has either a counterpart
+in the Scratch Block Library—in the form of a corresponding method—or 
+corresponds to a construct of the language *LeILa* itself.
+
+The Scratch Block Library is steadily growing and different implementations and 
+approximations of the different *SCRATCH* blocks become available.
+Please see the ASE'20 paper for more details on the approximations.
+Note that the actual implementation of some *SCRATCH* blocks might 
+still be missing: Check the completeness of their implementation before
+conducting an analysis of *SCRATCH* projects.
 
 ## Publications and Citing
 
