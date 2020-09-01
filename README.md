@@ -2,18 +2,15 @@
 
 *BASTET* is a framework for the analysis and verification of *SCRATCH* programs.
 
-*SCRATCH* programs run highly **concurrent** (Green threads) and can be distributed 
-among different machines. **Communication among processes** is implemented both based 
-on message passing but also based on shared memory. Since message passing can
-be implemented based on shared memory and vice versa we could stick
-to one paradigm only. Nevertheless, *BASTET* should (in the long run) support
-to transform a program (for analysis) to do either a purely shared-memory
-based approach, a purely message-passing based approach, or an hybrid approach.
+*SCRATCH* programs run **concurrent**, communication among processes is implemented 
+both based on message passing but also based on shared memory. 
+Since message passing can be implemented based on shared memory and 
+vice versa we could stick to one paradigm only. 
 
 Typically, *SCRATCH* programs make heavily usage of **timers** to control program execution.
-That is, to specify *SCRATCH* programs a specification language with some notion
-of time should be preferred. We operationalize all given specifications as 
-*SCRATCH* programs. 
+That is, a specification language with some notion of time shouldbe preferred 
+to specify *SCRATCH* programs.
+We operationalize all given specifications as *SCRATCH* programs. 
 
 Currently, this framework implements:
 - Abstract interpretation (including its lattice-theoretical foundations)
