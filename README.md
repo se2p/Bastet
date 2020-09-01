@@ -110,7 +110,6 @@ title *"Verified from Scratch: Program Analysis for Learners’ Programs"*:
   publisher = {{IEEE}},
   year      = {2020}
 }
-
 ```
 
 Some foundations for this work were developed in our **FSE'19** paper on *"Testing
