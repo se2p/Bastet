@@ -3,10 +3,10 @@
 BASTET_VERSION=$(git rev-parse --short HEAD)
 TAG="bastet:$BASTET_VERSION"
 
+source ./docker.sh.inc
+
 # Build the docker image
-dockerd-rootless-infosun --data-root /local/$USER/docker -- \
-    docker image build --pull --no-cache -f ./bastet.dockerfile --tag $TAG .
+$DOCKERCMD image build --pull --no-cache -f ./bastet.dockerfile --tag $TAG .
 
 # Export the docker image to a tar.bz2 file
-dockerd-rootless-infosun --data-root /local/$USER/docker -- \
-    docker save $TAG -o bastet-docker-$BASTET_VERSION.tar
+$DOCKERCMD save $TAG -o bastet-docker-$BASTET_VERSION.tar
