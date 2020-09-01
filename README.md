@@ -7,10 +7,6 @@ Currently, this framework implements:
 - Configurable program analysis (a variant of it)
 - Model checking (of software)
 
-Upcoming versions will support:
-- Counterexample-guided abstraction refinement (CEGAR)
-- Predicate abstraction
-
 *BASTET* is developed at the [Chair of Software Engineering II](https://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/)
 of the [University of Passau](https://www.uni-passau.de).
 See the list of [contributors](./CONTRIBUTORS.md) and `git shortlog -sne` for all people that contributed to this project.
@@ -53,6 +49,27 @@ that was loaded to Docker.
 
 See the files [docker-build.sh](./docker-build.sh) and
 [docker-load-run.sh](./docker-load-run.sh) for more details.
+
+## LeILa
+
+*BASTET* operates on *LeILa* programs (Learners Intermediate Language). 
+Before a *SCRATCH* program can be analyzed by *BASTET*, both the given
+program and the formal specification has to be translated to LeILa 
+as the intermediate language for analysis. 
+The grammar of *LeILa* is defined in the file [Leila.g4](src/bastet/syntax/parser/grammar/Leila.g4).
+
+For now, the trasnlation of *SCRATCH* programs to *LeiLa* is implemented
+in the tool [LitterBox](https://github.com/se2p/LitterBox). *BASTET* uses
+*LitterBox* as a library to conduct the translation. Invoking
+`bastet.sh` with a `.sb3` *SCRATCH* project file should lead
+to an automatic translation to *LeILa*.
+
+Note that also the formal specification of *SCRATCH* projects has to be
+provided as *LeILA* a program—which then observes if the program under
+analysis behaves correctly.
+See the directory [ase20-verified](test/programs/publications/ase20-verified/) for
+examples of *SCRATCH* programs along with their formal specification written
+in *LeILa*.
 
 ## Publications and Citing
 
