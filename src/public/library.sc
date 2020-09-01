@@ -1,5 +1,9 @@
 module ScratchLibrary
 
+/**
+ * Actor that models the environment, in particular inputs from the
+ * user using keyboard and mouse and a corresponding event dispatcher loop.
+ */
 actor IOActor is RuntimeEntity begin
 
     declare mouse_x as int
@@ -917,26 +921,10 @@ role Observer is RuntimeEntity begin
         define half_width_fst as cast attribute "active_graphic_half_width" of fst to int
         define half_height_fst as cast attribute "active_graphic_half_height" of fst to int
 
-//        declare size_fst as float
-//        define size_fst as cast (cast attribute "size" of fst to int) to float
-//        assume size_fst > 0.0
-//        assume size_fst < 1000.0
-
         declare half_width_snd as int
         declare half_height_snd as int
         define half_width_snd as cast attribute "active_graphic_half_width" of snd to int
         define half_height_snd as cast attribute "active_graphic_half_height" of snd to int
-
-//        declare size_snd as float
-//        define size_snd as cast (cast attribute "size" of snd to int) to float
-//        assume size_snd > 0.0
-//        assume size_snd < 16000.0
-//
-//        define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
-//        define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
-//
-//        define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
-//        define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
 
         define result as false
 
@@ -1509,26 +1497,10 @@ role ScratchSprite is ScratchEntity begin
             define half_width_fst as active_graphic_half_width
             define half_height_fst as active_graphic_half_height
 
-//            declare size_fst as float
-//            define size_fst as cast size to float
-//            assume size_fst > 0.0
-//            assume size_fst < 1000.0
-
             declare half_width_snd as int
             declare half_height_snd as int
             define half_width_snd as cast attribute "active_graphic_half_width" of snd to int
             define half_height_snd as cast attribute "active_graphic_half_height" of snd to int
-
-//            declare size_snd as float
-//            define size_snd as cast (cast attribute "size" of snd to int) to float
-//            assume size_snd > 0.0
-//            assume size_snd < 16000.0
-
-//            define half_width_fst as cast (cast half_width_fst to float * (size_fst / 100.0)) to int
-//            define half_height_fst as cast (cast half_height_fst to float * (size_fst / 100.0)) to int
-//
-//            define half_width_snd as cast (cast half_width_snd to float * (size_fst / 100.0)) to int
-//            define half_height_snd as cast (cast half_height_snd to float * (size_fst / 100.0)) to int
 
             define result as false
 
