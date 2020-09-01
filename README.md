@@ -1,12 +1,12 @@
 # BASTET Framework
 
 *BASTET* is a program analysis and verification framework.
-It is the first framework of its kind entirely build on Web technologies
+It is the first framework of its kind entirely built on Web technologies
 such as NodeJs, TypeScript, and WebAssembly.
 
-While *BASTET* was designed to analyze *SCRATCH* programs,
+While *BASTET* was designed to analyze Scratch programs,
 it actually operates on an *intermediate language*. **You** should
-consider to use *BASTET* as foundation for your endeavors in context
+consider using *BASTET* as the foundation for your endeavors in context
 of program analysis and verification if you are looking for a well-engineered
 analysis framework entirely written in *TypeScript*.
 You might also be interested in our bindings for the Z3 SMT solver we have
@@ -31,12 +31,12 @@ See the list of [contributors](./CONTRIBUTORS.md) and `git shortlog -sne` for al
 
 ```
 npm install
-npm build
+npm run build
 ```
 
 ### Running BASTET
 
-We recommend to use the `bastet.sh` wrapper script (can be started from an Unix shell):
+We recommend using the `bastet.sh` wrapper script (can be started from a Unix shell):
 
 ```
 ./scripts/bastet.sh \
@@ -45,7 +45,7 @@ We recommend to use the `bastet.sh` wrapper script (can be started from an Unix 
     --intermediateLibrary src/public/library.sc
 ```
 
-BASTET can also be executed from within a Docker container:
+*BASTET* can also be executed from within a Docker container:
 
 ```
 docker run \
@@ -63,7 +63,7 @@ See the files [docker-build.sh](./docker-build.sh) and
 ## LeILa
 
 *BASTET* operates on *LeILa* programs (Learners Intermediate Language). 
-Before a *SCRATCH* program can be analyzed by *BASTET*, both the given
+Before a Scratch program can be analyzed by *BASTET*, both the given
 program and the formal specification has to be translated to LeILa 
 as the intermediate language for analysis. 
 The grammar of *LeILa* is defined in the file [Leila.g4](src/bastet/syntax/parser/grammar/Leila.g4).
@@ -71,33 +71,33 @@ The grammar of *LeILa* is defined in the file [Leila.g4](src/bastet/syntax/parse
 For now, the translation of *SCRATCH* programs to *LeiLa* is implemented
 in the tool [LitterBox](https://github.com/se2p/LitterBox). *BASTET* uses
 *LitterBox* as a library to conduct the translation. Invoking
-`bastet.sh` with a `.sb3` *SCRATCH* project file should lead
+`bastet.sh` with a `.sb3` Scratch project file leads
 to an automatic translation to *LeILa*.
 
-Note that also the formal specification of *SCRATCH* projects has to be
+Note that also the formal specification of Scratch projects has to be
 provided as *LeILA* a program—which then observes if the program under
 analysis behaves correctly.
 See the directory [ase20-verified](test/programs/publications/ase20-verified/) for
-examples of *SCRATCH* programs along with their formal specification written
+examples of Scratch programs along with their formal specification written
 in *LeILa*.
 
 ## Scratch Block Library
 
 The *BASTET* framework includes the [Scratch Block Library](src/public/library.sc).
-Each block that can be visually composed in the Scratch IDE has either a counterpart
+Each block that can be visually composed in the Scratch IDE either has a counterpart
 in the Scratch Block Library—in the form of a corresponding method—or 
 corresponds to a construct of the language *LeILa* itself.
 
 The Scratch Block Library is steadily growing and different implementations and 
-approximations of the different *SCRATCH* blocks become available.
+approximations of the different Scratch blocks become available.
 Please see the ASE'20 paper for more details on the approximations.
-Note that the actual implementation of some *SCRATCH* blocks might 
+Note that the actual implementation of some Scratch blocks might 
 still be missing: Check the completeness of their implementation before
-conducting an analysis of *SCRATCH* projects.
+conducting an analysis of Scratch projects.
 
 ## Publications and Citing
 
-The BASTET framework was presented in our **ASE'20** paper with the 
+The *BASTET* framework was presented in our **ASE'20** paper with the 
 title *"Verified from Scratch: Program Analysis for Learners’ Programs"*:
 
 ```

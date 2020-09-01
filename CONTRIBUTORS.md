@@ -13,7 +13,7 @@ to propose an update.
 
 ## Contributing Developers
 
-- Dominik Dinner
+- Dominik Diner
 - Christoph Frädrich
 - Nina Körber
 
