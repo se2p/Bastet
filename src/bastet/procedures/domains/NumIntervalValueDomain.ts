@@ -51,14 +51,6 @@ export class NumIntervalValue extends NumIntervalValueRecord implements NumInter
         super({minValue: min, maxValue: max});
     }
 
-    get minValue(): ConcreteNumber {
-        return this.get('minValue');
-    }
-
-    get maxValue(): ConcreteNumber {
-        return this.get('maxValue');
-    }
-
     get isEmpty(): boolean {
         return this.minValue.value == 0 && this.maxValue.value == 0;
     }
