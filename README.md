@@ -1,12 +1,12 @@
 # BASTET Framework
 
 *BASTET* is a program analysis and verification framework.
-It is the first framework of its kind entirely build on Web technologies
+It is the first framework of its kind entirely built on Web technologies
 such as NodeJs, TypeScript, and WebAssembly.
 
 While *BASTET* was designed to analyze *SCRATCH* programs,
 it actually operates on an *intermediate language*. **You** should
-consider to use *BASTET* as foundation for your endeavors in context
+consider using *BASTET* as the foundation for your endeavors in context
 of program analysis and verification if you are looking for a well-engineered
 analysis framework entirely written in *TypeScript*.
 You might also be interested in our bindings for the Z3 SMT solver we have
