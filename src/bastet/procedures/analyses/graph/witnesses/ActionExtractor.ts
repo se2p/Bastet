@@ -166,7 +166,7 @@ export class KeyPressedActionExtractor extends ActionExtractor {
     }
 
     protected setActionForStepInternal(step: ErrorWitnessStep, actionValue): void {
-        step.action = Action.KEY_PRESSED;
+        step.action = Action.KEY_DOWN;
         step.keyPressed = actionValue;
     }
 }
