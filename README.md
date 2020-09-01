@@ -2,33 +2,20 @@
 
 *BASTET* is a framework for the analysis and verification of *SCRATCH* programs.
 
-*SCRATCH* programs run **concurrent**, communication among processes is implemented 
-both based on message passing but also based on shared memory. 
-Since message passing can be implemented based on shared memory and 
-vice versa we could stick to one paradigm only. 
-
-Typically, *SCRATCH* programs make heavily usage of **timers** to control program execution.
-That is, a specification language with some notion of time shouldbe preferred 
-to specify *SCRATCH* programs.
-We operationalize all given specifications as *SCRATCH* programs. 
-
 Currently, this framework implements:
 - Abstract interpretation (including its lattice-theoretical foundations)
 - Configurable program analysis (a variant of it)
 - Model checking (of software)
-- Bounded Model Checking
 
 Upcoming versions will support:
 - Counterexample-guided abstraction refinement (CEGAR)
-- Craig interpolation
-
+- Predicate abstraction
 
 ### Development Environment
 
-- JetBrains WebStorm 2020.x
-- NodeJs 14.x (Current)
+- NodeJs 14.x 
 - TypeScript 4.x (npm install -g typescript)
-
+- JetBrains WebStorm 2020.x
 
 ### Building BASTET
 
