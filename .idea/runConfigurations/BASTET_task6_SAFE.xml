@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BASTET task6 SAFE" type="NodeJSConfigurationType" folderName="ASE20" application-parameters="-P test/programs/publications/ase20-verified/task6-monkey/task6program_SAFE.sc -S test/programs/publications/ase20-verified/task6-monkey/task6spec.sc -I src/public/library.sc" node-parameters="--require ts-node/register --max-old-space-size=8192" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>
