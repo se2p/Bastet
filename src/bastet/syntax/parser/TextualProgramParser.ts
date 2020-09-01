@@ -39,10 +39,6 @@ class MyScratchCoreParser extends LeilaParser {
         this._errHandler = new BailErrorStrategy();
     }
 
-    get errorHandler(): BailErrorStrategy {
-        return this._errHandler as BailErrorStrategy;
-    }
-
 }
 
 export class TextualProgramParser implements ProgramParser {

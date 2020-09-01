@@ -114,12 +114,12 @@ export interface BDDAttributes {
      * without incoming edges). One root node is formalized as p*.
      * To each root points a dangling edge with a reduction rule k*.
      */
-    roots: ImmList<BDDEdge>;
+    _roots: ImmList<BDDEdge>;
 }
 
 const BDDRecord = ImmRec({
 
-    roots: ImmList([])
+    _roots: ImmList([])
 
 });
 
@@ -132,7 +132,7 @@ const BDDRecord = ImmRec({
 export class BDD extends BDDRecord implements BDDAttributes {
 
     constructor(roots: ImmList<BDDEdge>) {
-        super({roots: roots});
+        super({_roots: roots});
     }
 
     /**
@@ -146,7 +146,7 @@ export class BDD extends BDDRecord implements BDDAttributes {
     }
 
     get roots(): ImmList<BDDEdge> {
-        return this.get('roots');
+        return this.get('_roots');
     }
 
     get rootNodes(): BDDNode[] {
@@ -183,10 +183,10 @@ export enum ReductionRule {
 export interface BDDEdgeAttributes {
 
     /** Reduction rule */
-    rule: ReductionRule;
+    _rule: ReductionRule;
 
     /** Node to which the edge points to */
-    targetNode: BDDNode;
+    _targetNode: BDDNode;
 
     /** It is a short edge if no levels are skipped */
     isShortEdge(): boolean;
@@ -198,23 +198,24 @@ export interface BDDEdgeAttributes {
 
 const BDDEdgeRecord = ImmRec({
 
-    rule: ReductionRule.UNDEFINED,
-    targetNode: null
+    _rule: ReductionRule.UNDEFINED,
+
+    _targetNode: null
 
 });
 
 export class BDDEdge extends BDDEdgeRecord implements BDDEdgeAttributes {
 
     constructor(rule: ReductionRule, targetNode: BDDNode) {
-        super({rule: rule, targetNode: targetNode});
+        super({_rule: rule, _targetNode: targetNode});
     }
 
     get rule(): ReductionRule {
-        return this.get('rule');
+        return this.get('_rule');
     }
 
     get targetNode(): BDDNode {
-        return this.get('targetNode');
+        return this.get('_targetNode');
     }
 
     isLongeEdge(): boolean {
@@ -228,13 +229,13 @@ export class BDDEdge extends BDDEdgeRecord implements BDDEdgeAttributes {
 
 export interface BDDNodeAttributes {
 
-    level: number;
+    _level: number;
 
-    nodeRole: NodeRole;
+    _nodeRole: NodeRole;
 
-    falseEdge: BDDEdge;
+    _falseEdge: BDDEdge;
 
-    trueEdge: BDDEdge;
+    _trueEdge: BDDEdge;
 
     leavingEdges(): Iterable<BDDEdge>;
 
@@ -257,29 +258,29 @@ export enum NodeRole {
 
 const BDDNodeRecord = ImmRec({
 
-    level: -1,
-    nodeRole: 0,
-    falseEdge: null,
-    trueEdge: null
+    _level: -1,
+    _nodeRole: 0,
+    _falseEdge: null,
+    _trueEdge: null
 
 });
 
 export class BDDNode extends BDDNodeRecord implements BDDNodeAttributes {
 
     constructor(level: ReductionRule, trueEdge: BDDEdge, falseEdge: BDDEdge, nodeRole: NodeRole) {
-        super({level: level, trueEdge: trueEdge, falseEdge: falseEdge, nodeRole: nodeRole});
+        super({_level: level, _trueEdge: trueEdge, _falseEdge: falseEdge, _nodeRole: nodeRole});
     }
 
     get level(): number {
-        return this.get('level');
+        return this.get('_level');
     }
 
     getFalseEdge(): BDDEdge {
-        return this.get('falseEdge');
+        return this.get('_falseEdge');
     }
 
     getTrueEdge(): BDDEdge {
-        return this.get('trueEdge');
+        return this.get('_trueEdge');
     }
 
     isFalseTerminalNode(): boolean {

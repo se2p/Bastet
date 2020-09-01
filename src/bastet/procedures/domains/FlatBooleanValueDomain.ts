@@ -97,13 +97,6 @@ export class FlatBooleanValue extends FlatBooleanValueRecord implements FlatBool
         super({hasTrue: hasTrue, hasFalse: hasFalse});
     }
 
-    get hasTrue(): boolean {
-        return this.get('hasTrue');
-    }
-
-    get hasFalse(): boolean {
-        return this.get('hasFalse');
-    }
 }
 
 export class FlatBooleanValueTheory implements BooleanTheory<FlatBooleanValue> {

@@ -1,4 +1,5 @@
 // Generated from src/bastet/syntax/parser/grammar/Leila.g4 by ANTLR 4.7.3-SNAPSHOT
+// @ts-nocheck
 
 
 import { ATN } from "antlr4ts/atn/ATN";
