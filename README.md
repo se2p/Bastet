@@ -75,7 +75,7 @@ in the tool [LitterBox](https://github.com/se2p/LitterBox). *BASTET* uses
 to an automatic translation to *LeILa*.
 
 Note that also the formal specification of Scratch projects has to be
-provided as *LeILA* a program—which then observes if the program under
+provided as *LeILa* a program—which then observes if the program under
 analysis behaves correctly.
 See the directory [ase20-verified](test/programs/publications/ase20-verified/) for
 examples of Scratch programs along with their formal specification written
