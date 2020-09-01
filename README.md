@@ -71,6 +71,20 @@ See the directory [ase20-verified](test/programs/publications/ase20-verified/) f
 examples of *SCRATCH* programs along with their formal specification written
 in *LeILa*.
 
+## Scratch Block Library
+
+The *BASTET* framework includes the [Scratch Block Library](src/public/library.sc).
+Each block that can be visually composed in the Scratch IDE has either a counterpart
+in the Scratch Block Library—in the form of a corresponding method—or 
+corresponds to a construct of the language *LeILa* itself.
+
+The Scratch Block Library is steadily growing and different implementations and 
+approximations of the different *SCRATCH* blocks become available.
+Please see the ASE'20 paper for more details on the approximations.
+Note that the actual implementation of some *SCRATCH* blocks might 
+still be missing: Check the completeness of their implementation before
+conducting an analysis of *SCRATCH* projects.
+
 ## Publications and Citing
 
 The BASTET framework was presented in our **ASE'20** paper with the 
