@@ -1,6 +1,16 @@
 # BASTET Framework
 
-*BASTET* is a framework for the analysis and verification of *SCRATCH* programs.
+*BASTET* is a program analysis and verification framework.
+It is the first framework of its kind entirely build on Web technologies
+such as NodeJs, TypeScript, and WebAssembly.
+
+While *BASTET* was designed to analyze *SCRATCH* programs,
+it actually operates on an *intermediate language*. **You** should
+consider to use *BASTET* as foundation for your endeavors in context
+of program analysis and verification if you are looking for a well-engineered
+analysis framework entirely written in *TypeScript*.
+You might also be interested in our bindings for the Z3 SMT solver we have
+written for *BASTET*.
 
 Currently, this framework implements:
 - Abstract interpretation (including its lattice-theoretical foundations)
@@ -38,7 +48,7 @@ We recommend to use the `bastet.sh` wrapper script (can be started from an Unix 
 BASTET can also be executed from within a Docker container:
 
 ```
-  docker run \
+docker run \
     --mount type=bind,source=${INPUT_DIR},target=/input \
     --mount type=bind,source=${OUTPUT_DIR},target=/output \
     bastet:9a9e226 \
@@ -122,5 +132,5 @@ Scratch Programs Automatically"*:
 ## Funding
 
 This work is supported by EPSRC project EP/N023978/2 and 
-DFG project FR 2955/3-1 “TENDER-BLOCK: Testing, Debugging, 
-and Repairing Blocks-based Programs”. 
+DFG project FR 2955/3-1 *“TENDER-BLOCK: Testing, Debugging, 
+and Repairing Blocks-based Programs”*. 
