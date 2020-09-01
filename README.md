@@ -11,6 +11,9 @@ Upcoming versions will support:
 - Counterexample-guided abstraction refinement (CEGAR)
 - Predicate abstraction
 
+*BASTET* is developed at the [Chair of Software Engineering II](https://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/)
+of the [University of Passau](https://www.uni-passau.de).
+
 ### Development Environment
 
 - NodeJs 14.x 
