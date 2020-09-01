@@ -1,6 +1,8 @@
 # BASTET Framework
 
 *BASTET* is a program analysis and verification framework.
+It is the first framework of its kind entirely build on Web technologies
+such as NodeJs, TypeScript, and WebAssembly.
 
 While *BASTET* was designed to analyze *SCRATCH* programs,
 it actually operates on an *intermediate language*. **You** should
@@ -130,5 +132,5 @@ Scratch Programs Automatically"*:
 ## Funding
 
 This work is supported by EPSRC project EP/N023978/2 and 
-DFG project FR 2955/3-1 “TENDER-BLOCK: Testing, Debugging, 
-and Repairing Blocks-based Programs”. 
+DFG project FR 2955/3-1 *“TENDER-BLOCK: Testing, Debugging, 
+and Repairing Blocks-based Programs”*. 
