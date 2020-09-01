@@ -84,9 +84,6 @@ export class ConcretePrimitive<T> extends ConcretePrimitiveValueRecord implement
         super(Object.assign({}, args, {}));
     }
 
-    get value(): T {
-        return this.get('value');
-    }
 }
 
 export class ConcreteString extends ConcretePrimitive<string> {
