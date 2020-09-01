@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BASTET task9 SAFE" type="NodeJSConfigurationType" folderName="ASE20" application-parameters="-P test/programs/publications/ase20-verified/task9-horse/task9program_SAFE.sc -S test/programs/publications/ase20-verified/task9-horse/task9spec.sc -I src/public/library.sc" node-parameters="--require ts-node/register" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>

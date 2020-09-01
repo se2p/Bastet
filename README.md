@@ -13,6 +13,7 @@ Upcoming versions will support:
 
 *BASTET* is developed at the [Chair of Software Engineering II](https://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/)
 of the [University of Passau](https://www.uni-passau.de).
+See the list of [contributors](./CONTRIBUTORS.md) and `git shortlog -sne` for all people that contributed to this project.
 
 ### Development Environment
 
@@ -86,3 +87,9 @@ Scratch Programs Automatically"*:
   year      = {2019}
 }
 ```
+
+## Funding
+
+This work is supported by EPSRC project EP/N023978/2 and 
+DFG project FR 2955/3-1 “TENDER-BLOCK: Testing, Debugging, 
+and Repairing Blocks-based Programs”. 

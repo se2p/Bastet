@@ -15,8 +15,5 @@ to propose an update.
 
 - Dominik Dinner
 - Christoph Frädrich
+- Nina Körber
 
-## Funding
-
-- University of Passau, State of Bavaria, Germany
-- Chair of Software Engineering II, Prof. Dr. Gordon Fraser
