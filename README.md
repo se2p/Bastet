@@ -4,7 +4,7 @@
 It is the first framework of its kind entirely built on Web technologies
 such as NodeJs, TypeScript, and WebAssembly.
 
-While *BASTET* was designed to analyze *SCRATCH* programs,
+While *BASTET* was designed to analyze Scratch programs,
 it actually operates on an *intermediate language*. **You** should
 consider using *BASTET* as the foundation for your endeavors in context
 of program analysis and verification if you are looking for a well-engineered
@@ -63,7 +63,7 @@ See the files [docker-build.sh](./docker-build.sh) and
 ## LeILa
 
 *BASTET* operates on *LeILa* programs (Learners Intermediate Language). 
-Before a *SCRATCH* program can be analyzed by *BASTET*, both the given
+Before a Scratch program can be analyzed by *BASTET*, both the given
 program and the formal specification has to be translated to LeILa 
 as the intermediate language for analysis. 
 The grammar of *LeILa* is defined in the file [Leila.g4](src/bastet/syntax/parser/grammar/Leila.g4).
@@ -71,14 +71,14 @@ The grammar of *LeILa* is defined in the file [Leila.g4](src/bastet/syntax/parse
 For now, the translation of *SCRATCH* programs to *LeiLa* is implemented
 in the tool [LitterBox](https://github.com/se2p/LitterBox). *BASTET* uses
 *LitterBox* as a library to conduct the translation. Invoking
-`bastet.sh` with a `.sb3` *SCRATCH* project file leads
+`bastet.sh` with a `.sb3` Scratch project file leads
 to an automatic translation to *LeILa*.
 
-Note that also the formal specification of *SCRATCH* projects has to be
+Note that also the formal specification of Scratch projects has to be
 provided as *LeILA* a program—which then observes if the program under
 analysis behaves correctly.
 See the directory [ase20-verified](test/programs/publications/ase20-verified/) for
-examples of *SCRATCH* programs along with their formal specification written
+examples of Scratch programs along with their formal specification written
 in *LeILa*.
 
 ## Scratch Block Library
@@ -89,11 +89,11 @@ in the Scratch Block Library—in the form of a corresponding method—or
 corresponds to a construct of the language *LeILa* itself.
 
 The Scratch Block Library is steadily growing and different implementations and 
-approximations of the different *SCRATCH* blocks become available.
+approximations of the different Scratch blocks become available.
 Please see the ASE'20 paper for more details on the approximations.
-Note that the actual implementation of some *SCRATCH* blocks might 
+Note that the actual implementation of some Scratch blocks might 
 still be missing: Check the completeness of their implementation before
-conducting an analysis of *SCRATCH* projects.
+conducting an analysis of Scratch projects.
 
 ## Publications and Citing
 
