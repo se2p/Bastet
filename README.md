@@ -45,7 +45,7 @@ We recommend using the `bastet.sh` wrapper script (can be started from a Unix sh
     --intermediateLibrary src/public/library.sc
 ```
 
-BASTET can also be executed from within a Docker container:
+*BASTET* can also be executed from within a Docker container:
 
 ```
 docker run \
