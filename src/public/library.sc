@@ -1654,12 +1654,14 @@ role ScratchSprite is ScratchEntity begin
         define bubbleType as "say"
     end
 
-    // @Category "looks"
+    @ Category "Motion"
+    @ Block "turn left <Num> degrees"
     define atomic turnLeft(degrees: int) begin
         setDirection(direction - degrees)
     end
 
-    // @Category "looks"
+    @ Category "Motion"
+    @ Block "turn right <Num> degrees"
     define atomic turnRight(degrees: int) begin
         setDirection(direction + degrees)
     end
