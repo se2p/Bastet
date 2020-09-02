@@ -1274,20 +1274,20 @@ role ScratchSprite is ScratchEntity begin
 
     @ Category "Motion"
     @ Block "glide <Num> secs to <string as position>"
-    define atomic glideSecondsToRandomPos(secs: int) begin
+    define atomic glideSecondsToRandomPos (secs: int) begin
         // ...
     end
 
     @ Category "Motion"
     @ Block "glide <Num> secs to x: <Num> y: <Num>"
-    define atomic glideSecondsTo(secs: int, targetX: int, targetY: int) begin
+    define atomic glideSecondsTo (secs: int, targetX: int, targetY: int) begin
         // also used for glide to mouse pointer
         // ...
     end
 
     @ Category "Motion"
     @ Block "glide <Num> secs to <string as actor>"
-    define atomic glideSecondsToSprite(secs: int, o: actor) begin
+    define atomic glideSecondsToSprite (secs: int, o: actor) begin
         // ...
     end
 
@@ -1326,14 +1326,14 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Looks"
-    @ Block "go to <string as layer> layer
-    define atomic goToFrontLayer() begin
+    @ Block "go to <string as layer> layer"
+    define atomic goToFrontLayer () begin
         // ...
     end
 
     @ Category "Looks"
-    @ Block "go to <string as layer> layer
-    define atomic goToBackLayer() begin
+    @ Block "go to <string as layer> layer"
+    define atomic goToBackLayer () begin
         // ...
     end
 
