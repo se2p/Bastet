@@ -805,8 +805,8 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         define result as 0
     end returns result: int
 
-    // @Category "Control"
-    // @Block "wait <Num> seconds"
+    @ Category "Control"
+    @ Block "wait <Num> seconds"
     define waitSeconds (secs: int) begin
         // A busy-waiting implementation.
         // The external method `_RUNTIME_waitSeconds` is intended to
@@ -817,8 +817,8 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         end
     end
 
-    // @Category "Control"
-    // @Block "wait <Num> millis"
+    @ Category "Control"
+    @ Block "wait <Num> millis"
     define waitMillis (millis: int) begin
         // A busy-waiting implementation.
         // The external method `_RUNTIME_waitMillis` is intended to
@@ -829,8 +829,8 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         end
     end
 
-    // @Category "Control"
-    // @Block "wait <Num> micros"
+    @ Category "Control"
+    @ Block "wait <Num> micros"
     define waitMicros (micros: int) begin
         // A busy-waiting implementation.
         // The external method `_RUNTIME_waitMicros` is intended to
@@ -849,13 +849,13 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         define result as _RUNTIME_micros()
     end returns result: int
 
-    // @Category "Sensing"
-    // @Block "mouse down?"
+    @ Category "Sensing"
+    @ Block "mouse down?"
     define atomic mouseDown () begin
     end returns result : boolean
 
-    // @Category "Sensing"
-    // @Block "mouse x"
+    @ Category "Sensing"
+    @ Block "mouse x"
     define atomic mouseX() begin
         declare io as actor
         define io as locate actor "IOActor"
@@ -880,8 +880,8 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         // needed (with this signature) to get some programs running
     end returns result: int
 
-    // @Category "Sensing"
-    // @Block "key (int as key) pressed?"
+    @ Category "Sensing"
+    @ Block "key (int as key) pressed?"
     define atomic keyPressedByCode (key: int) begin
          define result as keyPressed() = key
     end returns result : boolean
@@ -892,8 +892,8 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         define result as cast (attribute "key_pressed" of io) to int
     end returns result : int
 
-    // @Category "Sensing"
-    // @Block "key (string as key) pressed?"
+    @ Category "Sensing"
+    @ Block "key (string as key) pressed?"
     define atomic keyPressedByName (name: string) begin
         declare key as int
         define key as stringToKey(name)
@@ -908,14 +908,14 @@ end
  */
 role Observer is RuntimeEntity begin
 
-    // @Category "Specification"
+    @ Category "Specification"
     define atomic assert (cond: boolean) begin
         if not cond then begin
             _RUNTIME_signalFailure("Asserted property must be satisfied!")
         end
     end
 
-    // @Category "Specification"
+    @ Category "Specification"
     define atomic touchingObjects (fst: actor, snd: actor) begin
         declare x_fst as int
         define x_fst as cast attribute "x" of fst to int
@@ -981,12 +981,12 @@ role Observer is RuntimeEntity begin
 
     end returns result : boolean
 
-    // @Category "Specification"
+    @ Category "Specification"
     define atomic areDisjoint(fst: actor, snd: actor) begin
         define result as not touchingObjects(fst, snd)
     end returns result : boolean
 
-    // @Category "Specification"
+    @ Category "Specification"
     define atomic touchingMousePointer (obj: actor) begin
         declare x as int
         declare y as int
@@ -1061,7 +1061,7 @@ role ScratchEntity is RuntimeEntity begin
         define result as n
     end returns result: float
 
-    // @Category "Looks"
+    @ Category "Looks"
     define atomic changeActiveGraphicTo (id: string) begin
         define active_graphic_name as id
         define active_graphic_width as getImageWidth(id)
@@ -1072,79 +1072,79 @@ role ScratchEntity is RuntimeEntity begin
         //FIXME Set graphic pixels, this is currently not done as we do not supports lists yet
     end
 
-    // @Category "Looks"
-    // @Block "change <string as effect> effect by <int as value>
+    @ Category "Looks"
+    @ Block "change <string as effect> effect by <int as value>
     define atomic changeGraphicEffectBy (eff:string, val:int) begin
     end
 
-    // @Category "Looks"
-    // @Block "clear graphic effects"
+    @ Category "Looks"
+    @ Block "clear graphic effects"
     define atomic clearGraphicEffects () begin
     end
 
-    // @Category "Looks"
-    // @Block "backdrop int"
+    @ Category "Looks"
+    @ Block "backdrop int"
     define backdropNumber () begin
     end returns result : int
 
-    // @Category "Looks"
-    // @Block "backdrop name"
+    @ Category "Looks"
+    @ Block "backdrop name"
     define backdropName () begin
     end returns result : string
 
-    // @Category "Sound"
-    // @Block "play sound <sound as snd> until done"
+    @ Category "Sound"
+    @ Block "play sound <sound as snd> until done"
     define atomic playUntilDone (snd: int) begin
     end
 
-    // @Category "Sound"
-    // @Block "start sound <sound as snd>"
+    @ Category "Sound"
+    @ Block "start sound <sound as snd>"
     define startSound (snd: int) begin
     end
 
-    // @Category "Sound"
-    // @Block "stop all sounds"
+    @ Category "Sound"
+    @ Block "stop all sounds"
     define stopAllSounds () begin
     end
 
-    // @Category "Sound"
-    // @Block "change <string as effect> sound effect by <int as num>"
+    @ Category "Sound"
+    @ Block "change <string as effect> sound effect by <int as num>"
     define changeSoundEffectBy (eff: string, val: int) begin
     end
 
-    // @Category "Sound"
-    // @Block "set <string as effect> sound effect to <int as num>"
+    @ Category "Sound"
+    @ Block "set <string as effect> sound effect to <int as num>"
     define setSoundEffectTo (eff: string, val: int) begin
     end
 
-    // @Category "Sound"
-    // @Block "clear sound effects"
+    @ Category "Sound"
+    @ Block "clear sound effects"
     define clearSoundEffects () begin
     end
 
-    // @Category "Sound"
-    // @Block "change volume by <int as delta>"
+    @ Category "Sound"
+    @ Block "change volume by <int as delta>"
     define changeVolumeBy (delta: int) begin
     end
 
-    // @Category "Sound"
-    // @Block "set volume to <int as percent>"
+    @ Category "Sound"
+    @ Block "set volume to <int as percent>"
     define setVolumeTo (perc: int) begin
     end
 
-    // @Category "Sound"
-    // @Block "volume"
+    @ Category "Sound"
+    @ Block "volume"
     define volume () begin
     end returns result : int
 
-    // @Category "Sensing"
-    // @Block "ask (question as string) and wait"
+    @ Category "Sensing"
+    @ Block "ask (question as string) and wait"
     define atomic askAndWait (question: string) begin
         broadcast "ASK" () to "SYSTEM" and wait
     end
 
-    // @Category "Sensing"
-    // @Block "answer"
+    @ Category "Sensing"
+    @ Block "answer"
     define atomic answer () begin
         declare io as actor
         define io as locate actor "IOActor"
@@ -1255,7 +1255,7 @@ role ScratchSprite is ScratchEntity begin
         define y as y + (cast dy to int)
     end
 
-    // @Category "Motion"
+    @ Category "Motion"
     define atomic goTo (newX: int, newY: int) begin
         define x as newX
         define y as newY
@@ -1299,7 +1299,7 @@ role ScratchSprite is ScratchEntity begin
         define visible as true
     end
 
-    // @Category "Motion"
+    @ Category "Motion"
     define atomic goToRandomPosition () begin
         define x as randomIntegerBetween(0-240, 240)
         define y as randomIntegerBetween(0-180, 180)
@@ -1343,7 +1343,7 @@ role ScratchSprite is ScratchEntity begin
         // ...
     end
 
-    // @Category "Sensing"
+    @ Category "Sensing"
     define atomic touchingEdge () begin
         define result as false
 
@@ -1374,7 +1374,7 @@ role ScratchSprite is ScratchEntity begin
         end
     end returns result : boolean
 
-    // @Category "Motion"
+    @ Category "Motion"
     define atomic ifOnEdgeBounce () begin
         declare boundsLeft as int
         declare boundsRight as int
@@ -1504,7 +1504,7 @@ role ScratchSprite is ScratchEntity begin
         goTo(newX + dx, newY + dy)
     end
 
-    // @Category "Sensing"
+    @ Category "Sensing"
     define atomic touchingMousePointer () begin
         declare obj_left as int
         define obj_left as x - active_graphic_half_width
@@ -1529,7 +1529,7 @@ role ScratchSprite is ScratchEntity begin
         define result as xOverlap and yOverlap
     end returns result : boolean
 
-    // @Category "Sensing"
+    @ Category "Sensing"
     define atomic touchingObject (snd: actor) begin
             // To understand this method, it is important to be aware of the fact
             // that the x and y coordinates of a Sprite represents its center point.
@@ -1609,7 +1609,7 @@ role ScratchSprite is ScratchEntity begin
             end
     end returns result : boolean
 
-    // @Category "Sensing"
+    @ Category "Sensing"
     define atomic isDisjointFrom(snd: actor) begin
         define result as not touchingObject(snd)
     end returns result : boolean
@@ -1618,17 +1618,17 @@ role ScratchSprite is ScratchEntity begin
         define result as (65536 * r + 256 * g + b)
     end returns result : int
 
-    // @Category "Sensing"
+    @ Category "Sensing"
     define atomic touchingColor (clr: int) begin
         // ...
     end returns result : boolean
 
-    // @Category "Sensing"
+    @ Category "Sensing"
     define atomic colorIsTouchingColor(clr: int, tching: int) begin
         // ...
     end returns result : boolean
 
-    // @Category "Sensing"
+    @ Category "Sensing"
     define distanceToMousePointer () begin
         define result as distanceTo(mouseX(), mouseY())
     end returns result : int
