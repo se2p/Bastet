@@ -48,7 +48,7 @@ import {
     BoolParanthExpressionContext,
     BoolToIntExpressionContext,
     BoolVariableExpressionContext,
-    BootstapEventContext,
+    BootstrapEventContext,
     BroadcastAndWaitStatementContext,
     BroadcastMessageStatementContext,
     CallStmtContext,
@@ -1651,7 +1651,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return TransformerResult.withNode(NeverEvent.instance());
     }
 
-    public visitBootstapEvent(ctx: BootstapEventContext) : TransformerResult {
+    public visitBootstrapEvent(ctx: BootstrapEventContext) : TransformerResult {
         return TransformerResult.withNode(BootstrapEvent.instance());
     }
 

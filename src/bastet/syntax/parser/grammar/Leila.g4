@@ -143,9 +143,12 @@ parameterListPlain : parameter (',' parameter)* | ;
 // Some statements that terminate the control flow
 // are only allowed at the end of the list to
 // make their semantics clearer for the programmer.
-stmtList : 'begin' stmtListPlain (terminationStmt)? 'end' ;
+stmtList : blockMode 'begin' stmtListPlain (terminationStmt)? 'end' ;
 
-atomicBlock: 'atomic' stmtList ;
+blockMode:
+     'atomic' # AtomicBlock
+    | # NonAtomicBloc
+    ;
 
 // A plain list of program statements.
 // Statements are separated by whitespace.
@@ -205,7 +208,7 @@ expressionStmt : 'evaluate' expression ;
 stmt :
   controlStmt # ControlStatement
   | nonCtrlStmt # NonControlStatement
-  | atomicBlock # AtomicBlockStatement
+  | stmtList # StmtListStatement
   | '@' Identifier expressionList stmt # AttributedStatement
   ;
 

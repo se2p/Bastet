@@ -1,7 +1,6 @@
 // Generated from src/bastet/syntax/parser/grammar/Leila.g4 by ANTLR 4.7.3-SNAPSHOT
 // @ts-nocheck
 
-
 import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 
 import { IdentExpressionContext } from "./LeilaParser";
@@ -46,6 +45,8 @@ import { ActorSelfExpressionContext } from "./LeilaParser";
 import { LocateActorExpressionContext } from "./LeilaParser";
 import { StartCloneActorExpressionContext } from "./LeilaParser";
 import { UsherActorExpressionContext } from "./LeilaParser";
+import { AtomicBlockContext } from "./LeilaParser";
+import { NonAtomicBlocContext } from "./LeilaParser";
 import { NumLiteralExpressionContext } from "./LeilaParser";
 import { NumVariableExpressionContext } from "./LeilaParser";
 import { NumBracketsContext } from "./LeilaParser";
@@ -92,7 +93,7 @@ import { AssumeStatementContext } from "./LeilaParser";
 import { SetStatementContext } from "./LeilaParser";
 import { DeclareVariableContext } from "./LeilaParser";
 import { NeverEventContext } from "./LeilaParser";
-import { BootstapEventContext } from "./LeilaParser";
+import { BootstrapEventContext } from "./LeilaParser";
 import { AfterBootstrapMonitoringEventContext } from "./LeilaParser";
 import { StartupEventContext } from "./LeilaParser";
 import { CloneStartEventContext } from "./LeilaParser";
@@ -130,7 +131,7 @@ import { DefaultBoolExpressionContext } from "./LeilaParser";
 import { UnspecifiedBoolExpressionContext } from "./LeilaParser";
 import { ControlStatementContext } from "./LeilaParser";
 import { NonControlStatementContext } from "./LeilaParser";
-import { AtomicBlockStatementContext } from "./LeilaParser";
+import { StmtListStatementContext } from "./LeilaParser";
 import { AttributedStatementContext } from "./LeilaParser";
 import { ImageResourceContext } from "./LeilaParser";
 import { SoundResourceContext } from "./LeilaParser";
@@ -168,7 +169,7 @@ import { ParameterContext } from "./LeilaParser";
 import { ParameterListContext } from "./LeilaParser";
 import { ParameterListPlainContext } from "./LeilaParser";
 import { StmtListContext } from "./LeilaParser";
-import { AtomicBlockContext } from "./LeilaParser";
+import { BlockModeContext } from "./LeilaParser";
 import { StmtListPlainContext } from "./LeilaParser";
 import { ControlStmtContext } from "./LeilaParser";
 import { IfStmtContext } from "./LeilaParser";
@@ -753,6 +754,32 @@ export interface LeilaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitUsherActorExpression?: (ctx: UsherActorExpressionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `AtomicBlock`
+	 * labeled alternative in `LeilaParser.blockMode`.
+	 * @param ctx the parse tree
+	 */
+	enterAtomicBlock?: (ctx: AtomicBlockContext) => void;
+	/**
+	 * Exit a parse tree produced by the `AtomicBlock`
+	 * labeled alternative in `LeilaParser.blockMode`.
+	 * @param ctx the parse tree
+	 */
+	exitAtomicBlock?: (ctx: AtomicBlockContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `NonAtomicBloc`
+	 * labeled alternative in `LeilaParser.blockMode`.
+	 * @param ctx the parse tree
+	 */
+	enterNonAtomicBloc?: (ctx: NonAtomicBlocContext) => void;
+	/**
+	 * Exit a parse tree produced by the `NonAtomicBloc`
+	 * labeled alternative in `LeilaParser.blockMode`.
+	 * @param ctx the parse tree
+	 */
+	exitNonAtomicBloc?: (ctx: NonAtomicBlocContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `NumLiteralExpression`
@@ -1353,17 +1380,17 @@ export interface LeilaListener extends ParseTreeListener {
 	exitNeverEvent?: (ctx: NeverEventContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `BootstapEvent`
+	 * Enter a parse tree produced by the `BootstrapEvent`
 	 * labeled alternative in `LeilaParser.event`.
 	 * @param ctx the parse tree
 	 */
-	enterBootstapEvent?: (ctx: BootstapEventContext) => void;
+	enterBootstrapEvent?: (ctx: BootstrapEventContext) => void;
 	/**
-	 * Exit a parse tree produced by the `BootstapEvent`
+	 * Exit a parse tree produced by the `BootstrapEvent`
 	 * labeled alternative in `LeilaParser.event`.
 	 * @param ctx the parse tree
 	 */
-	exitBootstapEvent?: (ctx: BootstapEventContext) => void;
+	exitBootstrapEvent?: (ctx: BootstrapEventContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `AfterBootstrapMonitoringEvent`
@@ -1847,17 +1874,17 @@ export interface LeilaListener extends ParseTreeListener {
 	exitNonControlStatement?: (ctx: NonControlStatementContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `AtomicBlockStatement`
+	 * Enter a parse tree produced by the `StmtListStatement`
 	 * labeled alternative in `LeilaParser.stmt`.
 	 * @param ctx the parse tree
 	 */
-	enterAtomicBlockStatement?: (ctx: AtomicBlockStatementContext) => void;
+	enterStmtListStatement?: (ctx: StmtListStatementContext) => void;
 	/**
-	 * Exit a parse tree produced by the `AtomicBlockStatement`
+	 * Exit a parse tree produced by the `StmtListStatement`
 	 * labeled alternative in `LeilaParser.stmt`.
 	 * @param ctx the parse tree
 	 */
-	exitAtomicBlockStatement?: (ctx: AtomicBlockStatementContext) => void;
+	exitStmtListStatement?: (ctx: StmtListStatementContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `AttributedStatement`
@@ -2273,15 +2300,15 @@ export interface LeilaListener extends ParseTreeListener {
 	exitStmtList?: (ctx: StmtListContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `LeilaParser.atomicBlock`.
+	 * Enter a parse tree produced by `LeilaParser.blockMode`.
 	 * @param ctx the parse tree
 	 */
-	enterAtomicBlock?: (ctx: AtomicBlockContext) => void;
+	enterBlockMode?: (ctx: BlockModeContext) => void;
 	/**
-	 * Exit a parse tree produced by `LeilaParser.atomicBlock`.
+	 * Exit a parse tree produced by `LeilaParser.blockMode`.
 	 * @param ctx the parse tree
 	 */
-	exitAtomicBlock?: (ctx: AtomicBlockContext) => void;
+	exitBlockMode?: (ctx: BlockModeContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `LeilaParser.stmtListPlain`.

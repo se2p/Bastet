@@ -1,7 +1,6 @@
 // Generated from src/bastet/syntax/parser/grammar/Leila.g4 by ANTLR 4.7.3-SNAPSHOT
 // @ts-nocheck
 
-
 import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
 
 import { IdentExpressionContext } from "./LeilaParser";
@@ -46,6 +45,8 @@ import { ActorSelfExpressionContext } from "./LeilaParser";
 import { LocateActorExpressionContext } from "./LeilaParser";
 import { StartCloneActorExpressionContext } from "./LeilaParser";
 import { UsherActorExpressionContext } from "./LeilaParser";
+import { AtomicBlockContext } from "./LeilaParser";
+import { NonAtomicBlocContext } from "./LeilaParser";
 import { NumLiteralExpressionContext } from "./LeilaParser";
 import { NumVariableExpressionContext } from "./LeilaParser";
 import { NumBracketsContext } from "./LeilaParser";
@@ -92,7 +93,7 @@ import { AssumeStatementContext } from "./LeilaParser";
 import { SetStatementContext } from "./LeilaParser";
 import { DeclareVariableContext } from "./LeilaParser";
 import { NeverEventContext } from "./LeilaParser";
-import { BootstapEventContext } from "./LeilaParser";
+import { BootstrapEventContext } from "./LeilaParser";
 import { AfterBootstrapMonitoringEventContext } from "./LeilaParser";
 import { StartupEventContext } from "./LeilaParser";
 import { CloneStartEventContext } from "./LeilaParser";
@@ -130,7 +131,7 @@ import { DefaultBoolExpressionContext } from "./LeilaParser";
 import { UnspecifiedBoolExpressionContext } from "./LeilaParser";
 import { ControlStatementContext } from "./LeilaParser";
 import { NonControlStatementContext } from "./LeilaParser";
-import { AtomicBlockStatementContext } from "./LeilaParser";
+import { StmtListStatementContext } from "./LeilaParser";
 import { AttributedStatementContext } from "./LeilaParser";
 import { ImageResourceContext } from "./LeilaParser";
 import { SoundResourceContext } from "./LeilaParser";
@@ -168,7 +169,7 @@ import { ParameterContext } from "./LeilaParser";
 import { ParameterListContext } from "./LeilaParser";
 import { ParameterListPlainContext } from "./LeilaParser";
 import { StmtListContext } from "./LeilaParser";
-import { AtomicBlockContext } from "./LeilaParser";
+import { BlockModeContext } from "./LeilaParser";
 import { StmtListPlainContext } from "./LeilaParser";
 import { ControlStmtContext } from "./LeilaParser";
 import { IfStmtContext } from "./LeilaParser";
@@ -548,6 +549,22 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitUsherActorExpression?: (ctx: UsherActorExpressionContext) => Result;
 
 	/**
+	 * Visit a parse tree produced by the `AtomicBlock`
+	 * labeled alternative in `LeilaParser.blockMode`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitAtomicBlock?: (ctx: AtomicBlockContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `NonAtomicBloc`
+	 * labeled alternative in `LeilaParser.blockMode`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitNonAtomicBloc?: (ctx: NonAtomicBlocContext) => Result;
+
+	/**
 	 * Visit a parse tree produced by the `NumLiteralExpression`
 	 * labeled alternative in `LeilaParser.numExpr`.
 	 * @param ctx the parse tree
@@ -916,12 +933,12 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitNeverEvent?: (ctx: NeverEventContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `BootstapEvent`
+	 * Visit a parse tree produced by the `BootstrapEvent`
 	 * labeled alternative in `LeilaParser.event`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitBootstapEvent?: (ctx: BootstapEventContext) => Result;
+	visitBootstrapEvent?: (ctx: BootstrapEventContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `AfterBootstrapMonitoringEvent`
@@ -1220,12 +1237,12 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitNonControlStatement?: (ctx: NonControlStatementContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `AtomicBlockStatement`
+	 * Visit a parse tree produced by the `StmtListStatement`
 	 * labeled alternative in `LeilaParser.stmt`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitAtomicBlockStatement?: (ctx: AtomicBlockStatementContext) => Result;
+	visitStmtListStatement?: (ctx: StmtListStatementContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `AttributedStatement`
@@ -1490,11 +1507,11 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitStmtList?: (ctx: StmtListContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `LeilaParser.atomicBlock`.
+	 * Visit a parse tree produced by `LeilaParser.blockMode`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitAtomicBlock?: (ctx: AtomicBlockContext) => Result;
+	visitBlockMode?: (ctx: BlockModeContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LeilaParser.stmtListPlain`.
