@@ -1239,6 +1239,7 @@ role ScratchSprite is ScratchEntity begin
         // Implement me using broadcasts
     end
 
+    @ Category "Motion"
     define atomic moveSteps (n: int) begin
         declare nf as float
         define nf as cast n to float
@@ -1261,6 +1262,7 @@ role ScratchSprite is ScratchEntity begin
         define y as newY
     end
 
+    @ Category "Motion"
     define atomic goToSprite (o: actor) begin
         declare otherX as int
         define otherX as cast attribute "x" of o to int
@@ -1291,10 +1293,14 @@ role ScratchSprite is ScratchEntity begin
         // ...
     end
 
+    @ Category "Looks"
+    @ Block "hide"
     define atomic hide () begin
         define visible as false
     end
 
+    @ Category "Looks"
+    @ Block "show"
     define atomic show () begin
         define visible as true
     end
@@ -1317,6 +1323,8 @@ role ScratchSprite is ScratchEntity begin
         // ...
     end returns result : string
 
+    @ Category "Looks"
+    @ Block "next costume"
     define atomic nextCostume () begin
         // ...
     end
@@ -1619,11 +1627,13 @@ role ScratchSprite is ScratchEntity begin
     end returns result : int
 
     @ Category "Sensing"
+    @ Block "touching color <Color> ?"
     define atomic touchingColor (clr: int) begin
         // ...
     end returns result : boolean
 
     @ Category "Sensing"
+    @ Block "color <Color> is touching <Color> ?"
     define atomic colorIsTouchingColor(clr: int, tching: int) begin
         // ...
     end returns result : boolean
@@ -1684,6 +1694,8 @@ role ScratchSprite is ScratchEntity begin
         setDirection(direction + degrees)
     end
 
+    @ Category "Motion"
+    @ Block "point in direction <Num>"
     define atomic pointInDirection(dir: int) begin
         setDirection(dir)
     end
@@ -1727,6 +1739,8 @@ role ScratchStage is ScratchEntity begin
 
     end
 
+    @ Category "Looks"
+    @ Block "next backdrop"
     define atomic nextBackdrop () begin
         declare idx as int
         define idx as getGraphicIndexById(active_graphic_name)
