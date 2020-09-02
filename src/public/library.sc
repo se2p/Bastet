@@ -1073,7 +1073,7 @@ role ScratchEntity is RuntimeEntity begin
     end
 
     @ Category "Looks"
-    @ Block "change <string as effect> effect by <int as value>
+    @ Block "change <string as effect> effect by <int as value>"
     define atomic changeGraphicEffectBy (eff:string, val:int) begin
     end
 
