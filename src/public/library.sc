@@ -1325,6 +1325,24 @@ role ScratchSprite is ScratchEntity begin
         changeActiveGraphicTo(id)
     end
 
+    @ Category "Looks"
+    @ Block "go to <string as layer> layer
+    define atomic goToFrontLayer() begin
+        // ...
+    end
+
+    @ Category "Looks"
+    @ Block "go to <string as layer> layer
+    define atomic goToBackLayer() begin
+        // ...
+    end
+
+    @ Category "Looks"
+    @ Block "go <forward | backward> <Num> layers"
+    define atomic changeLayerBy (number: int) begin
+        // ...
+    end
+
     // @Category "Sensing"
     define atomic touchingEdge () begin
         define result as false
