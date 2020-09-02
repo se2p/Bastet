@@ -132,7 +132,6 @@ import { UnspecifiedBoolExpressionContext } from "./LeilaParser";
 import { ControlStatementContext } from "./LeilaParser";
 import { NonControlStatementContext } from "./LeilaParser";
 import { StmtListStatementContext } from "./LeilaParser";
-import { AttributedStatementContext } from "./LeilaParser";
 import { ImageResourceContext } from "./LeilaParser";
 import { SoundResourceContext } from "./LeilaParser";
 import { ProgramContext } from "./LeilaParser";
@@ -182,6 +181,8 @@ import { ExpressionListContext } from "./LeilaParser";
 import { ExpressionListPlainContext } from "./LeilaParser";
 import { ExpressionStmtContext } from "./LeilaParser";
 import { StmtContext } from "./LeilaParser";
+import { MetaAttributeListContext } from "./LeilaParser";
+import { MetaAttributeContext } from "./LeilaParser";
 import { NonCtrlStmtContext } from "./LeilaParser";
 import { CommonStmtContext } from "./LeilaParser";
 import { ListStmtContext } from "./LeilaParser";
@@ -1245,14 +1246,6 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitStmtListStatement?: (ctx: StmtListStatementContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `AttributedStatement`
-	 * labeled alternative in `LeilaParser.stmt`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitAttributedStatement?: (ctx: AttributedStatementContext) => Result;
-
-	/**
 	 * Visit a parse tree produced by the `ImageResource`
 	 * labeled alternative in `LeilaParser.resourceType`.
 	 * @param ctx the parse tree
@@ -1596,6 +1589,20 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitStmt?: (ctx: StmtContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LeilaParser.metaAttributeList`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitMetaAttributeList?: (ctx: MetaAttributeListContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LeilaParser.metaAttribute`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitMetaAttribute?: (ctx: MetaAttributeContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LeilaParser.nonCtrlStmt`.

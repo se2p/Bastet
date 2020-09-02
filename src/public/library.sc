@@ -152,7 +152,6 @@ role MathActor begin
     // param n : float - the real value for which the Atan value is approximated
     // return result: float - the approximated interval of the Atan value
     define atomic mathAtan (input: float) begin
-
         if input > TWO_PI then begin
             declare asDeg as int
             define asDeg as cast (radToDeg(input)) to int
@@ -863,8 +862,8 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         define result as cast (attribute "mouse_x" of io) to int
     end returns result: int
 
-    // @Category "Sensing"
-    // @Block "mouse y"
+    @ Category "Sensing"
+    @ Block "mouse y"
     define atomic mouseY()  begin
         declare io as actor
         define io as locate actor "IOActor"

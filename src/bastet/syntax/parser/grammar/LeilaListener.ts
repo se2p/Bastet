@@ -132,7 +132,6 @@ import { UnspecifiedBoolExpressionContext } from "./LeilaParser";
 import { ControlStatementContext } from "./LeilaParser";
 import { NonControlStatementContext } from "./LeilaParser";
 import { StmtListStatementContext } from "./LeilaParser";
-import { AttributedStatementContext } from "./LeilaParser";
 import { ImageResourceContext } from "./LeilaParser";
 import { SoundResourceContext } from "./LeilaParser";
 import { ProgramContext } from "./LeilaParser";
@@ -182,6 +181,8 @@ import { ExpressionListContext } from "./LeilaParser";
 import { ExpressionListPlainContext } from "./LeilaParser";
 import { ExpressionStmtContext } from "./LeilaParser";
 import { StmtContext } from "./LeilaParser";
+import { MetaAttributeListContext } from "./LeilaParser";
+import { MetaAttributeContext } from "./LeilaParser";
 import { NonCtrlStmtContext } from "./LeilaParser";
 import { CommonStmtContext } from "./LeilaParser";
 import { ListStmtContext } from "./LeilaParser";
@@ -1887,19 +1888,6 @@ export interface LeilaListener extends ParseTreeListener {
 	exitStmtListStatement?: (ctx: StmtListStatementContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `AttributedStatement`
-	 * labeled alternative in `LeilaParser.stmt`.
-	 * @param ctx the parse tree
-	 */
-	enterAttributedStatement?: (ctx: AttributedStatementContext) => void;
-	/**
-	 * Exit a parse tree produced by the `AttributedStatement`
-	 * labeled alternative in `LeilaParser.stmt`.
-	 * @param ctx the parse tree
-	 */
-	exitAttributedStatement?: (ctx: AttributedStatementContext) => void;
-
-	/**
 	 * Enter a parse tree produced by the `ImageResource`
 	 * labeled alternative in `LeilaParser.resourceType`.
 	 * @param ctx the parse tree
@@ -2441,6 +2429,28 @@ export interface LeilaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitStmt?: (ctx: StmtContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `LeilaParser.metaAttributeList`.
+	 * @param ctx the parse tree
+	 */
+	enterMetaAttributeList?: (ctx: MetaAttributeListContext) => void;
+	/**
+	 * Exit a parse tree produced by `LeilaParser.metaAttributeList`.
+	 * @param ctx the parse tree
+	 */
+	exitMetaAttributeList?: (ctx: MetaAttributeListContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `LeilaParser.metaAttribute`.
+	 * @param ctx the parse tree
+	 */
+	enterMetaAttribute?: (ctx: MetaAttributeContext) => void;
+	/**
+	 * Exit a parse tree produced by `LeilaParser.metaAttribute`.
+	 * @param ctx the parse tree
+	 */
+	exitMetaAttribute?: (ctx: MetaAttributeContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `LeilaParser.nonCtrlStmt`.

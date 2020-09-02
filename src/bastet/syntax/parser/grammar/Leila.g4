@@ -111,8 +111,8 @@ messageNamespace : 'in' String # QualifiedNamespace | #UnqualifiedNamespace ;
 // to take a number of arguments.
 methodDefinitionList : methodDefinition* ;
 methodDefinition :
-  'define' methodAttributeList ident parameterList stmtList methodResultDeclaration # FullMethodDefinition
-  | 'extern' ident parameterList externMethodResultDeclaration # ExternMethodDefinition
+  metaAttributeList 'define' methodAttributeList ident parameterList stmtList methodResultDeclaration # FullMethodDefinition
+  | metaAttributeList 'extern' ident parameterList externMethodResultDeclaration # ExternMethodDefinition
   ;
 
 methodResultDeclaration :
@@ -145,10 +145,7 @@ parameterListPlain : parameter (',' parameter)* | ;
 // make their semantics clearer for the programmer.
 stmtList : blockMode 'begin' stmtListPlain (terminationStmt)? 'end' ;
 
-blockMode:
-     'atomic' # AtomicBlock
-    | # NonAtomicBloc
-    ;
+blockMode: 'atomic' # AtomicBlock | # NonAtomicBloc ;
 
 // A plain list of program statements.
 // Statements are separated by whitespace.
@@ -209,8 +206,10 @@ stmt :
   controlStmt # ControlStatement
   | nonCtrlStmt # NonControlStatement
   | stmtList # StmtListStatement
-  | '@' Identifier expressionList stmt # AttributedStatement
   ;
+
+metaAttributeList : metaAttribute* ;
+metaAttribute : '@' Identifier expression ;
 
 nonCtrlStmt :
   expressionStmt
@@ -273,7 +272,7 @@ stringExpr :
   ;
 
 boolExpr  :
-    Boolean # BoolLiteralExpression
+  Boolean # BoolLiteralExpression
   | variable # BoolVariableExpression
   | '(' boolExpr ')' # BoolParanthExpression
   | callStmt # BoolCallStatementExpression

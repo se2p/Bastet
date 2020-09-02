@@ -191,26 +191,28 @@ export class LeilaParser extends Parser {
 	public static readonly RULE_expressionListPlain = 44;
 	public static readonly RULE_expressionStmt = 45;
 	public static readonly RULE_stmt = 46;
-	public static readonly RULE_nonCtrlStmt = 47;
-	public static readonly RULE_commonStmt = 48;
-	public static readonly RULE_listStmt = 49;
-	public static readonly RULE_setStmt = 50;
-	public static readonly RULE_setStmtList = 51;
-	public static readonly RULE_terminationStmt = 52;
-	public static readonly RULE_stringExpr = 53;
-	public static readonly RULE_boolExpr = 54;
-	public static readonly RULE_numOrStringExpr = 55;
-	public static readonly RULE_numExpr = 56;
-	public static readonly RULE_listExpr = 57;
-	public static readonly RULE_actorExpr = 58;
-	public static readonly RULE_expression = 59;
-	public static readonly RULE_unspecifiedExpr = 60;
-	public static readonly RULE_variable = 61;
-	public static readonly RULE_ident = 62;
-	public static readonly RULE_number = 63;
-	public static readonly RULE_resourceLocator = 64;
-	public static readonly RULE_message = 65;
-	public static readonly RULE_messageDestination = 66;
+	public static readonly RULE_metaAttributeList = 47;
+	public static readonly RULE_metaAttribute = 48;
+	public static readonly RULE_nonCtrlStmt = 49;
+	public static readonly RULE_commonStmt = 50;
+	public static readonly RULE_listStmt = 51;
+	public static readonly RULE_setStmt = 52;
+	public static readonly RULE_setStmtList = 53;
+	public static readonly RULE_terminationStmt = 54;
+	public static readonly RULE_stringExpr = 55;
+	public static readonly RULE_boolExpr = 56;
+	public static readonly RULE_numOrStringExpr = 57;
+	public static readonly RULE_numExpr = 58;
+	public static readonly RULE_listExpr = 59;
+	public static readonly RULE_actorExpr = 60;
+	public static readonly RULE_expression = 61;
+	public static readonly RULE_unspecifiedExpr = 62;
+	public static readonly RULE_variable = 63;
+	public static readonly RULE_ident = 64;
+	public static readonly RULE_number = 65;
+	public static readonly RULE_resourceLocator = 66;
+	public static readonly RULE_message = 67;
+	public static readonly RULE_messageDestination = 68;
 	// tslint:disable:no-trailing-whitespace
 	public static readonly ruleNames: string[] = [
 		"program", "fileType", "importDefinitionList", "importDefinition", "importSelector", 
@@ -223,11 +225,11 @@ export class LeilaParser extends Parser {
 		"methodAttribute", "parameter", "parameterList", "parameterListPlain", 
 		"stmtList", "blockMode", "stmtListPlain", "controlStmt", "ifStmt", "elseCase", 
 		"untilStmt", "repeatTimesStmt", "repeatForeverStmt", "callStmt", "expressionList", 
-		"expressionListPlain", "expressionStmt", "stmt", "nonCtrlStmt", "commonStmt", 
-		"listStmt", "setStmt", "setStmtList", "terminationStmt", "stringExpr", 
-		"boolExpr", "numOrStringExpr", "numExpr", "listExpr", "actorExpr", "expression", 
-		"unspecifiedExpr", "variable", "ident", "number", "resourceLocator", "message", 
-		"messageDestination",
+		"expressionListPlain", "expressionStmt", "stmt", "metaAttributeList", 
+		"metaAttribute", "nonCtrlStmt", "commonStmt", "listStmt", "setStmt", "setStmtList", 
+		"terminationStmt", "stringExpr", "boolExpr", "numOrStringExpr", "numExpr", 
+		"listExpr", "actorExpr", "expression", "unspecifiedExpr", "variable", 
+		"ident", "number", "resourceLocator", "message", "messageDestination",
 	];
 
 	private static readonly _LITERAL_NAMES: Array<string | undefined> = [
@@ -295,15 +297,15 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 134;
-			this.fileType();
-			this.state = 135;
-			this.ident();
-			this.state = 136;
-			this.importDefinitionList();
-			this.state = 137;
-			this.actorDefinitionList();
 			this.state = 138;
+			this.fileType();
+			this.state = 139;
+			this.ident();
+			this.state = 140;
+			this.importDefinitionList();
+			this.state = 141;
+			this.actorDefinitionList();
+			this.state = 142;
 			this.match(LeilaParser.EOF);
 			}
 		}
@@ -329,7 +331,7 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 140;
+			this.state = 144;
 			_la = this._input.LA(1);
 			if (!(_la === LeilaParser.T__0 || _la === LeilaParser.T__1)) {
 			this._errHandler.recoverInline(this);
@@ -365,17 +367,17 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 145;
+			this.state = 149;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la === LeilaParser.T__2) {
 				{
 				{
-				this.state = 142;
+				this.state = 146;
 				this.importDefinition();
 				}
 				}
-				this.state = 147;
+				this.state = 151;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -402,13 +404,13 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 148;
+			this.state = 152;
 			this.match(LeilaParser.T__2);
-			this.state = 149;
+			this.state = 153;
 			this.importSelector();
-			this.state = 150;
+			this.state = 154;
 			this.match(LeilaParser.T__3);
-			this.state = 151;
+			this.state = 155;
 			this.resourceLocator();
 			}
 		}
@@ -431,7 +433,7 @@ export class LeilaParser extends Parser {
 		let _localctx: ImportSelectorContext = new ImportSelectorContext(this._ctx, this.state);
 		this.enterRule(_localctx, 8, LeilaParser.RULE_importSelector);
 		try {
-			this.state = 155;
+			this.state = 159;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__105:
@@ -439,7 +441,7 @@ export class LeilaParser extends Parser {
 				_localctx = new ImportSelectedActorContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 153;
+				this.state = 157;
 				this.ident();
 				}
 				break;
@@ -447,7 +449,7 @@ export class LeilaParser extends Parser {
 				_localctx = new ImportAllActorsContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 154;
+				this.state = 158;
 				this.match(LeilaParser.T__4);
 				}
 				break;
@@ -477,17 +479,17 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 160;
+			this.state = 164;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la === LeilaParser.T__9 || _la === LeilaParser.T__10) {
 				{
 				{
-				this.state = 157;
+				this.state = 161;
 				this.actorDefinition();
 				}
 				}
-				this.state = 162;
+				this.state = 166;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -514,17 +516,17 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 163;
-			this.actorMode();
-			this.state = 164;
-			this.ident();
-			this.state = 165;
-			this.inheritsFrom();
-			this.state = 166;
-			this.match(LeilaParser.T__5);
 			this.state = 167;
-			this.actorComponentsDefinition();
+			this.actorMode();
 			this.state = 168;
+			this.ident();
+			this.state = 169;
+			this.inheritsFrom();
+			this.state = 170;
+			this.match(LeilaParser.T__5);
+			this.state = 171;
+			this.actorComponentsDefinition();
+			this.state = 172;
 			this.match(LeilaParser.T__6);
 			}
 		}
@@ -548,29 +550,29 @@ export class LeilaParser extends Parser {
 		this.enterRule(_localctx, 14, LeilaParser.RULE_inheritsFrom);
 		let _la: number;
 		try {
-			this.state = 180;
+			this.state = 184;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__7:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 170;
+				this.state = 174;
 				this.match(LeilaParser.T__7);
-				this.state = 171;
+				this.state = 175;
 				this.ident();
-				this.state = 176;
+				this.state = 180;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 				while (_la === LeilaParser.T__8) {
 					{
 					{
-					this.state = 172;
+					this.state = 176;
 					this.match(LeilaParser.T__8);
-					this.state = 173;
+					this.state = 177;
 					this.ident();
 					}
 					}
-					this.state = 178;
+					this.state = 182;
 					this._errHandler.sync(this);
 					_la = this._input.LA(1);
 				}
@@ -605,14 +607,14 @@ export class LeilaParser extends Parser {
 		let _localctx: ActorModeContext = new ActorModeContext(this._ctx, this.state);
 		this.enterRule(_localctx, 16, LeilaParser.RULE_actorMode);
 		try {
-			this.state = 184;
+			this.state = 188;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__9:
 				_localctx = new ConcreteActorModeContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 182;
+				this.state = 186;
 				this.match(LeilaParser.T__9);
 				}
 				break;
@@ -620,7 +622,7 @@ export class LeilaParser extends Parser {
 				_localctx = new ActorRoleModeContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 183;
+				this.state = 187;
 				this.match(LeilaParser.T__10);
 				}
 				break;
@@ -649,15 +651,15 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 186;
-			this.resourceList();
-			this.state = 187;
-			this.declarationStmtList();
-			this.state = 188;
-			this.setStmtList();
-			this.state = 189;
-			this.methodDefinitionList();
 			this.state = 190;
+			this.resourceList();
+			this.state = 191;
+			this.declarationStmtList();
+			this.state = 192;
+			this.setStmtList();
+			this.state = 193;
+			this.methodDefinitionList();
+			this.state = 194;
 			this.scriptList();
 			}
 		}
@@ -682,11 +684,11 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 192;
+			this.state = 196;
 			this.resourceType();
-			this.state = 193;
+			this.state = 197;
 			this.ident();
-			this.state = 194;
+			this.state = 198;
 			this.resourceLocator();
 			}
 		}
@@ -709,14 +711,14 @@ export class LeilaParser extends Parser {
 		let _localctx: ResourceTypeContext = new ResourceTypeContext(this._ctx, this.state);
 		this.enterRule(_localctx, 22, LeilaParser.RULE_resourceType);
 		try {
-			this.state = 198;
+			this.state = 202;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__11:
 				_localctx = new ImageResourceContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 196;
+				this.state = 200;
 				this.match(LeilaParser.T__11);
 				}
 				break;
@@ -724,7 +726,7 @@ export class LeilaParser extends Parser {
 				_localctx = new SoundResourceContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 197;
+				this.state = 201;
 				this.match(LeilaParser.T__12);
 				}
 				break;
@@ -754,17 +756,17 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 203;
+			this.state = 207;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la === LeilaParser.T__11 || _la === LeilaParser.T__12) {
 				{
 				{
-				this.state = 200;
+				this.state = 204;
 				this.resource();
 				}
 				}
-				this.state = 205;
+				this.state = 209;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -792,13 +794,13 @@ export class LeilaParser extends Parser {
 			_localctx = new DeclareVariableContext(_localctx);
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 206;
+			this.state = 210;
 			this.match(LeilaParser.T__13);
-			this.state = 207;
+			this.state = 211;
 			this.ident();
-			this.state = 208;
+			this.state = 212;
 			this.match(LeilaParser.T__14);
-			this.state = 209;
+			this.state = 213;
 			this.type();
 			}
 		}
@@ -824,17 +826,17 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 214;
+			this.state = 218;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la === LeilaParser.T__13) {
 				{
 				{
-				this.state = 211;
+				this.state = 215;
 				this.declarationStmt();
 				}
 				}
-				this.state = 216;
+				this.state = 220;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -859,18 +861,18 @@ export class LeilaParser extends Parser {
 		let _localctx: TypeContext = new TypeContext(this._ctx, this.state);
 		this.enterRule(_localctx, 30, LeilaParser.RULE_type);
 		try {
-			this.state = 222;
+			this.state = 226;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__15:
 				_localctx = new ListTypeContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 217;
+				this.state = 221;
 				this.match(LeilaParser.T__15);
-				this.state = 218;
+				this.state = 222;
 				this.match(LeilaParser.T__16);
-				this.state = 219;
+				this.state = 223;
 				this.type();
 				}
 				break;
@@ -878,7 +880,7 @@ export class LeilaParser extends Parser {
 				_localctx = new ActorTypeContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 220;
+				this.state = 224;
 				this.match(LeilaParser.T__9);
 				}
 				break;
@@ -891,7 +893,7 @@ export class LeilaParser extends Parser {
 				_localctx = new PrimitiveContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 221;
+				this.state = 225;
 				this.primitiveType();
 				}
 				break;
@@ -919,7 +921,7 @@ export class LeilaParser extends Parser {
 		this.enterRule(_localctx, 32, LeilaParser.RULE_primitiveType);
 		let _la: number;
 		try {
-			this.state = 233;
+			this.state = 237;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__17:
@@ -927,7 +929,7 @@ export class LeilaParser extends Parser {
 				_localctx = new IntegerTypeContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 224;
+				this.state = 228;
 				_la = this._input.LA(1);
 				if (!(_la === LeilaParser.T__17 || _la === LeilaParser.T__18)) {
 				this._errHandler.recoverInline(this);
@@ -945,7 +947,7 @@ export class LeilaParser extends Parser {
 				_localctx = new FloatingPointTypeContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 225;
+				this.state = 229;
 				this.match(LeilaParser.T__19);
 				}
 				break;
@@ -953,7 +955,7 @@ export class LeilaParser extends Parser {
 				_localctx = new BooleanTypeContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 226;
+				this.state = 230;
 				this.match(LeilaParser.T__20);
 				}
 				break;
@@ -961,7 +963,7 @@ export class LeilaParser extends Parser {
 				_localctx = new StringTypeContext(_localctx);
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 227;
+				this.state = 231;
 				this.match(LeilaParser.T__21);
 				}
 				break;
@@ -969,13 +971,13 @@ export class LeilaParser extends Parser {
 				_localctx = new EnumTypeContext(_localctx);
 				this.enterOuterAlt(_localctx, 5);
 				{
-				this.state = 228;
+				this.state = 232;
 				this.match(LeilaParser.T__22);
-				this.state = 229;
+				this.state = 233;
 				this.match(LeilaParser.T__23);
-				this.state = 230;
+				this.state = 234;
 				this.expressionListPlain();
-				this.state = 231;
+				this.state = 235;
 				this.match(LeilaParser.T__24);
 				}
 				break;
@@ -1004,19 +1006,19 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 235;
-			this.match(LeilaParser.T__25);
-			this.state = 236;
-			this.scriptIdent();
-			this.state = 237;
-			this.match(LeilaParser.T__26);
-			this.state = 238;
-			this.event();
 			this.state = 239;
-			this.match(LeilaParser.T__27);
+			this.match(LeilaParser.T__25);
 			this.state = 240;
-			this.scriptAttributeList();
+			this.scriptIdent();
 			this.state = 241;
+			this.match(LeilaParser.T__26);
+			this.state = 242;
+			this.event();
+			this.state = 243;
+			this.match(LeilaParser.T__27);
+			this.state = 244;
+			this.scriptAttributeList();
+			this.state = 245;
 			this.stmtList();
 			}
 		}
@@ -1039,7 +1041,7 @@ export class LeilaParser extends Parser {
 		let _localctx: ScriptIdentContext = new ScriptIdentContext(this._ctx, this.state);
 		this.enterRule(_localctx, 36, LeilaParser.RULE_scriptIdent);
 		try {
-			this.state = 245;
+			this.state = 249;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__105:
@@ -1047,7 +1049,7 @@ export class LeilaParser extends Parser {
 				_localctx = new NamedScriptIdentContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 243;
+				this.state = 247;
 				this.ident();
 				}
 				break;
@@ -1084,17 +1086,17 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 250;
+			this.state = 254;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la === LeilaParser.T__25) {
 				{
 				{
-				this.state = 247;
+				this.state = 251;
 				this.script();
 				}
 				}
-				this.state = 252;
+				this.state = 256;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1122,17 +1124,17 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 256;
+			this.state = 260;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la === LeilaParser.T__28) {
 				{
 				{
-				this.state = 253;
+				this.state = 257;
 				this.scriptAttribute();
 				}
 				}
-				this.state = 258;
+				this.state = 262;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1160,7 +1162,7 @@ export class LeilaParser extends Parser {
 			_localctx = new RestartScriptContext(_localctx);
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 259;
+			this.state = 263;
 			this.match(LeilaParser.T__28);
 			}
 		}
@@ -1183,14 +1185,14 @@ export class LeilaParser extends Parser {
 		let _localctx: EventContext = new EventContext(this._ctx, this.state);
 		this.enterRule(_localctx, 44, LeilaParser.RULE_event);
 		try {
-			this.state = 278;
+			this.state = 282;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 14, this._ctx) ) {
 			case 1:
 				_localctx = new NeverEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 261;
+				this.state = 265;
 				this.match(LeilaParser.T__29);
 				}
 				break;
@@ -1199,7 +1201,7 @@ export class LeilaParser extends Parser {
 				_localctx = new BootstrapEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 262;
+				this.state = 266;
 				this.match(LeilaParser.T__30);
 				}
 				break;
@@ -1208,9 +1210,9 @@ export class LeilaParser extends Parser {
 				_localctx = new AfterBootstrapMonitoringEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 263;
+				this.state = 267;
 				this.match(LeilaParser.T__30);
-				this.state = 264;
+				this.state = 268;
 				this.match(LeilaParser.T__31);
 				}
 				break;
@@ -1219,7 +1221,7 @@ export class LeilaParser extends Parser {
 				_localctx = new StartupEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 265;
+				this.state = 269;
 				this.match(LeilaParser.T__32);
 				}
 				break;
@@ -1228,11 +1230,11 @@ export class LeilaParser extends Parser {
 				_localctx = new CloneStartEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 5);
 				{
-				this.state = 266;
+				this.state = 270;
 				this.match(LeilaParser.T__33);
-				this.state = 267;
+				this.state = 271;
 				this.match(LeilaParser.T__14);
-				this.state = 268;
+				this.state = 272;
 				this.match(LeilaParser.T__34);
 				}
 				break;
@@ -1241,13 +1243,13 @@ export class LeilaParser extends Parser {
 				_localctx = new MessageReceivedEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 6);
 				{
-				this.state = 269;
+				this.state = 273;
 				this.match(LeilaParser.T__35);
-				this.state = 270;
+				this.state = 274;
 				this.stringExpr();
-				this.state = 271;
+				this.state = 275;
 				this.parameterList();
-				this.state = 272;
+				this.state = 276;
 				this.messageNamespace();
 				}
 				break;
@@ -1256,9 +1258,9 @@ export class LeilaParser extends Parser {
 				_localctx = new ConditionReachedEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 7);
 				{
-				this.state = 274;
+				this.state = 278;
 				this.match(LeilaParser.T__36);
-				this.state = 275;
+				this.state = 279;
 				this.boolExpr(0);
 				}
 				break;
@@ -1267,9 +1269,9 @@ export class LeilaParser extends Parser {
 				_localctx = new AfterStatementMonitoringEventContext(_localctx);
 				this.enterOuterAlt(_localctx, 8);
 				{
-				this.state = 276;
+				this.state = 280;
 				this.match(LeilaParser.T__37);
-				this.state = 277;
+				this.state = 281;
 				this.match(LeilaParser.T__31);
 				}
 				break;
@@ -1294,16 +1296,16 @@ export class LeilaParser extends Parser {
 		let _localctx: MessageNamespaceContext = new MessageNamespaceContext(this._ctx, this.state);
 		this.enterRule(_localctx, 46, LeilaParser.RULE_messageNamespace);
 		try {
-			this.state = 283;
+			this.state = 287;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__38:
 				_localctx = new QualifiedNamespaceContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 280;
+				this.state = 284;
 				this.match(LeilaParser.T__38);
-				this.state = 281;
+				this.state = 285;
 				this.match(LeilaParser.String);
 				}
 				break;
@@ -1340,17 +1342,17 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 288;
+			this.state = 292;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
-			while (_la === LeilaParser.T__39 || _la === LeilaParser.T__40) {
+			while (((((_la - 40)) & ~0x1F) === 0 && ((1 << (_la - 40)) & ((1 << (LeilaParser.T__39 - 40)) | (1 << (LeilaParser.T__40 - 40)) | (1 << (LeilaParser.T__54 - 40)))) !== 0)) {
 				{
 				{
-				this.state = 285;
+				this.state = 289;
 				this.methodDefinition();
 				}
 				}
-				this.state = 290;
+				this.state = 294;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1375,43 +1377,46 @@ export class LeilaParser extends Parser {
 		let _localctx: MethodDefinitionContext = new MethodDefinitionContext(this._ctx, this.state);
 		this.enterRule(_localctx, 50, LeilaParser.RULE_methodDefinition);
 		try {
-			this.state = 303;
+			this.state = 309;
 			this._errHandler.sync(this);
-			switch (this._input.LA(1)) {
-			case LeilaParser.T__39:
+			switch ( this.interpreter.adaptivePredict(this._input, 17, this._ctx) ) {
+			case 1:
 				_localctx = new FullMethodDefinitionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 291;
-				this.match(LeilaParser.T__39);
-				this.state = 292;
-				this.methodAttributeList();
-				this.state = 293;
-				this.ident();
-				this.state = 294;
-				this.parameterList();
 				this.state = 295;
-				this.stmtList();
+				this.metaAttributeList();
 				this.state = 296;
+				this.match(LeilaParser.T__39);
+				this.state = 297;
+				this.methodAttributeList();
+				this.state = 298;
+				this.ident();
+				this.state = 299;
+				this.parameterList();
+				this.state = 300;
+				this.stmtList();
+				this.state = 301;
 				this.methodResultDeclaration();
 				}
 				break;
-			case LeilaParser.T__40:
+
+			case 2:
 				_localctx = new ExternMethodDefinitionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 298;
+				this.state = 303;
+				this.metaAttributeList();
+				this.state = 304;
 				this.match(LeilaParser.T__40);
-				this.state = 299;
+				this.state = 305;
 				this.ident();
-				this.state = 300;
+				this.state = 306;
 				this.parameterList();
-				this.state = 301;
+				this.state = 307;
 				this.externMethodResultDeclaration();
 				}
 				break;
-			default:
-				throw new NoViableAltException(this);
 			}
 		}
 		catch (re) {
@@ -1433,20 +1438,20 @@ export class LeilaParser extends Parser {
 		let _localctx: MethodResultDeclarationContext = new MethodResultDeclarationContext(this._ctx, this.state);
 		this.enterRule(_localctx, 52, LeilaParser.RULE_methodResultDeclaration);
 		try {
-			this.state = 311;
+			this.state = 317;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__41:
 				_localctx = new FunctionReturnDefinitionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 305;
+				this.state = 311;
 				this.match(LeilaParser.T__41);
-				this.state = 306;
+				this.state = 312;
 				this.ident();
-				this.state = 307;
+				this.state = 313;
 				this.match(LeilaParser.T__42);
-				this.state = 308;
+				this.state = 314;
 				this.type();
 				}
 				break;
@@ -1454,6 +1459,7 @@ export class LeilaParser extends Parser {
 			case LeilaParser.T__25:
 			case LeilaParser.T__39:
 			case LeilaParser.T__40:
+			case LeilaParser.T__54:
 				_localctx = new VoidReturnDefinitionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				// tslint:disable-next-line:no-empty
@@ -1483,16 +1489,16 @@ export class LeilaParser extends Parser {
 		let _localctx: ExternMethodResultDeclarationContext = new ExternMethodResultDeclarationContext(this._ctx, this.state);
 		this.enterRule(_localctx, 54, LeilaParser.RULE_externMethodResultDeclaration);
 		try {
-			this.state = 316;
+			this.state = 322;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__41:
 				_localctx = new ExternFunctionReturnDefinitionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 313;
+				this.state = 319;
 				this.match(LeilaParser.T__41);
-				this.state = 314;
+				this.state = 320;
 				this.type();
 				}
 				break;
@@ -1500,6 +1506,7 @@ export class LeilaParser extends Parser {
 			case LeilaParser.T__25:
 			case LeilaParser.T__39:
 			case LeilaParser.T__40:
+			case LeilaParser.T__54:
 				_localctx = new ExternVoidReturnDefinitionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				// tslint:disable-next-line:no-empty
@@ -1532,17 +1539,17 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 321;
+			this.state = 327;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			while (_la === LeilaParser.T__43) {
 				{
 				{
-				this.state = 318;
+				this.state = 324;
 				this.methodAttribute();
 				}
 				}
-				this.state = 323;
+				this.state = 329;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 			}
@@ -1570,7 +1577,7 @@ export class LeilaParser extends Parser {
 			_localctx = new AtomicMethodContext(_localctx);
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 324;
+			this.state = 330;
 			this.match(LeilaParser.T__43);
 			}
 		}
@@ -1595,11 +1602,11 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 326;
+			this.state = 332;
 			this.ident();
-			this.state = 327;
+			this.state = 333;
 			this.match(LeilaParser.T__42);
-			this.state = 328;
+			this.state = 334;
 			this.type();
 			}
 		}
@@ -1624,11 +1631,11 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 330;
+			this.state = 336;
 			this.match(LeilaParser.T__44);
-			this.state = 331;
+			this.state = 337;
 			this.parameterListPlain();
-			this.state = 332;
+			this.state = 338;
 			this.match(LeilaParser.T__45);
 			}
 		}
@@ -1652,28 +1659,28 @@ export class LeilaParser extends Parser {
 		this.enterRule(_localctx, 64, LeilaParser.RULE_parameterListPlain);
 		let _la: number;
 		try {
-			this.state = 343;
+			this.state = 349;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__105:
 			case LeilaParser.Identifier:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 334;
+				this.state = 340;
 				this.parameter();
-				this.state = 339;
+				this.state = 345;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 				while (_la === LeilaParser.T__8) {
 					{
 					{
-					this.state = 335;
+					this.state = 341;
 					this.match(LeilaParser.T__8);
-					this.state = 336;
+					this.state = 342;
 					this.parameter();
 					}
 					}
-					this.state = 341;
+					this.state = 347;
 					this._errHandler.sync(this);
 					_la = this._input.LA(1);
 				}
@@ -1711,23 +1718,23 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 345;
+			this.state = 351;
 			this.blockMode();
-			this.state = 346;
+			this.state = 352;
 			this.match(LeilaParser.T__5);
-			this.state = 347;
+			this.state = 353;
 			this.stmtListPlain();
-			this.state = 349;
+			this.state = 355;
 			this._errHandler.sync(this);
 			_la = this._input.LA(1);
 			if (_la === LeilaParser.T__57 || _la === LeilaParser.T__67) {
 				{
-				this.state = 348;
+				this.state = 354;
 				this.terminationStmt();
 				}
 			}
 
-			this.state = 351;
+			this.state = 357;
 			this.match(LeilaParser.T__6);
 			}
 		}
@@ -1750,14 +1757,14 @@ export class LeilaParser extends Parser {
 		let _localctx: BlockModeContext = new BlockModeContext(this._ctx, this.state);
 		this.enterRule(_localctx, 68, LeilaParser.RULE_blockMode);
 		try {
-			this.state = 355;
+			this.state = 361;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__43:
 				_localctx = new AtomicBlockContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 353;
+				this.state = 359;
 				this.match(LeilaParser.T__43);
 				}
 				break;
@@ -1794,19 +1801,19 @@ export class LeilaParser extends Parser {
 			let _alt: number;
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 360;
+			this.state = 366;
 			this._errHandler.sync(this);
 			_alt = this.interpreter.adaptivePredict(this._input, 25, this._ctx);
 			while (_alt !== 2 && _alt !== ATN.INVALID_ALT_NUMBER) {
 				if (_alt === 1) {
 					{
 					{
-					this.state = 357;
+					this.state = 363;
 					this.stmt();
 					}
 					}
 				}
-				this.state = 362;
+				this.state = 368;
 				this._errHandler.sync(this);
 				_alt = this.interpreter.adaptivePredict(this._input, 25, this._ctx);
 			}
@@ -1831,13 +1838,13 @@ export class LeilaParser extends Parser {
 		let _localctx: ControlStmtContext = new ControlStmtContext(this._ctx, this.state);
 		this.enterRule(_localctx, 72, LeilaParser.RULE_controlStmt);
 		try {
-			this.state = 368;
+			this.state = 374;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 26, this._ctx) ) {
 			case 1:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 363;
+				this.state = 369;
 				this.ifStmt();
 				}
 				break;
@@ -1845,7 +1852,7 @@ export class LeilaParser extends Parser {
 			case 2:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 364;
+				this.state = 370;
 				this.untilStmt();
 				}
 				break;
@@ -1853,7 +1860,7 @@ export class LeilaParser extends Parser {
 			case 3:
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 365;
+				this.state = 371;
 				this.repeatTimesStmt();
 				}
 				break;
@@ -1861,7 +1868,7 @@ export class LeilaParser extends Parser {
 			case 4:
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 366;
+				this.state = 372;
 				this.repeatForeverStmt();
 				}
 				break;
@@ -1869,7 +1876,7 @@ export class LeilaParser extends Parser {
 			case 5:
 				this.enterOuterAlt(_localctx, 5);
 				{
-				this.state = 367;
+				this.state = 373;
 				this.callStmt();
 				}
 				break;
@@ -1896,15 +1903,15 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 370;
+			this.state = 376;
 			this.match(LeilaParser.T__46);
-			this.state = 371;
+			this.state = 377;
 			this.boolExpr(0);
-			this.state = 372;
+			this.state = 378;
 			this.match(LeilaParser.T__47);
-			this.state = 373;
+			this.state = 379;
 			this.stmtList();
-			this.state = 374;
+			this.state = 380;
 			this.elseCase();
 			}
 		}
@@ -1927,16 +1934,16 @@ export class LeilaParser extends Parser {
 		let _localctx: ElseCaseContext = new ElseCaseContext(this._ctx, this.state);
 		this.enterRule(_localctx, 76, LeilaParser.RULE_elseCase);
 		try {
-			this.state = 381;
+			this.state = 387;
 			this._errHandler.sync(this);
 			switch ( this.interpreter.adaptivePredict(this._input, 27, this._ctx) ) {
 			case 1:
 				_localctx = new PureElseContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 376;
+				this.state = 382;
 				this.match(LeilaParser.T__48);
-				this.state = 377;
+				this.state = 383;
 				this.stmtList();
 				}
 				break;
@@ -1945,9 +1952,9 @@ export class LeilaParser extends Parser {
 				_localctx = new ElseIfCaseContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 378;
+				this.state = 384;
 				this.match(LeilaParser.T__48);
-				this.state = 379;
+				this.state = 385;
 				this.ifStmt();
 				}
 				break;
@@ -1982,13 +1989,13 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 383;
+			this.state = 389;
 			this.match(LeilaParser.T__49);
-			this.state = 384;
+			this.state = 390;
 			this.boolExpr(0);
-			this.state = 385;
+			this.state = 391;
 			this.match(LeilaParser.T__50);
-			this.state = 386;
+			this.state = 392;
 			this.stmtList();
 			}
 		}
@@ -2013,13 +2020,13 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 388;
+			this.state = 394;
 			this.match(LeilaParser.T__50);
-			this.state = 389;
+			this.state = 395;
 			this.numExpr(0);
-			this.state = 390;
+			this.state = 396;
 			this.match(LeilaParser.T__51);
-			this.state = 391;
+			this.state = 397;
 			this.stmtList();
 			}
 		}
@@ -2044,11 +2051,11 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 393;
+			this.state = 399;
 			this.match(LeilaParser.T__50);
-			this.state = 394;
+			this.state = 400;
 			this.match(LeilaParser.T__52);
-			this.state = 395;
+			this.state = 401;
 			this.stmtList();
 			}
 		}
@@ -2073,9 +2080,9 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 397;
+			this.state = 403;
 			this.ident();
-			this.state = 398;
+			this.state = 404;
 			this.expressionList();
 			}
 		}
@@ -2100,11 +2107,11 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 400;
+			this.state = 406;
 			this.match(LeilaParser.T__44);
-			this.state = 401;
+			this.state = 407;
 			this.expressionListPlain();
-			this.state = 402;
+			this.state = 408;
 			this.match(LeilaParser.T__45);
 			}
 		}
@@ -2128,7 +2135,7 @@ export class LeilaParser extends Parser {
 		this.enterRule(_localctx, 88, LeilaParser.RULE_expressionListPlain);
 		let _la: number;
 		try {
-			this.state = 413;
+			this.state = 419;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__23:
@@ -2158,21 +2165,21 @@ export class LeilaParser extends Parser {
 			case LeilaParser.DecimalLiteral:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 404;
+				this.state = 410;
 				this.expression();
-				this.state = 409;
+				this.state = 415;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
 				while (_la === LeilaParser.T__8) {
 					{
 					{
-					this.state = 405;
+					this.state = 411;
 					this.match(LeilaParser.T__8);
-					this.state = 406;
+					this.state = 412;
 					this.expression();
 					}
 					}
-					this.state = 411;
+					this.state = 417;
 					this._errHandler.sync(this);
 					_la = this._input.LA(1);
 				}
@@ -2210,9 +2217,9 @@ export class LeilaParser extends Parser {
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 415;
+			this.state = 421;
 			this.match(LeilaParser.T__53);
-			this.state = 416;
+			this.state = 422;
 			this.expression();
 			}
 		}
@@ -2235,7 +2242,7 @@ export class LeilaParser extends Parser {
 		let _localctx: StmtContext = new StmtContext(this._ctx, this.state);
 		this.enterRule(_localctx, 92, LeilaParser.RULE_stmt);
 		try {
-			this.state = 426;
+			this.state = 427;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__46:
@@ -2246,7 +2253,7 @@ export class LeilaParser extends Parser {
 				_localctx = new ControlStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 418;
+				this.state = 424;
 				this.controlStmt();
 				}
 				break;
@@ -2267,7 +2274,7 @@ export class LeilaParser extends Parser {
 				_localctx = new NonControlStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 419;
+				this.state = 425;
 				this.nonCtrlStmt();
 				}
 				break;
@@ -2276,22 +2283,8 @@ export class LeilaParser extends Parser {
 				_localctx = new StmtListStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 420;
+				this.state = 426;
 				this.stmtList();
-				}
-				break;
-			case LeilaParser.T__54:
-				_localctx = new AttributedStatementContext(_localctx);
-				this.enterOuterAlt(_localctx, 4);
-				{
-				this.state = 421;
-				this.match(LeilaParser.T__54);
-				this.state = 422;
-				this.match(LeilaParser.Identifier);
-				this.state = 423;
-				this.expressionList();
-				this.state = 424;
-				this.stmt();
 				}
 				break;
 			default:
@@ -2313,17 +2306,84 @@ export class LeilaParser extends Parser {
 		return _localctx;
 	}
 	// @RuleVersion(0)
+	public metaAttributeList(): MetaAttributeListContext {
+		let _localctx: MetaAttributeListContext = new MetaAttributeListContext(this._ctx, this.state);
+		this.enterRule(_localctx, 94, LeilaParser.RULE_metaAttributeList);
+		let _la: number;
+		try {
+			this.enterOuterAlt(_localctx, 1);
+			{
+			this.state = 432;
+			this._errHandler.sync(this);
+			_la = this._input.LA(1);
+			while (_la === LeilaParser.T__54) {
+				{
+				{
+				this.state = 429;
+				this.metaAttribute();
+				}
+				}
+				this.state = 434;
+				this._errHandler.sync(this);
+				_la = this._input.LA(1);
+			}
+			}
+		}
+		catch (re) {
+			if (re instanceof RecognitionException) {
+				_localctx.exception = re;
+				this._errHandler.reportError(this, re);
+				this._errHandler.recover(this, re);
+			} else {
+				throw re;
+			}
+		}
+		finally {
+			this.exitRule();
+		}
+		return _localctx;
+	}
+	// @RuleVersion(0)
+	public metaAttribute(): MetaAttributeContext {
+		let _localctx: MetaAttributeContext = new MetaAttributeContext(this._ctx, this.state);
+		this.enterRule(_localctx, 96, LeilaParser.RULE_metaAttribute);
+		try {
+			this.enterOuterAlt(_localctx, 1);
+			{
+			this.state = 435;
+			this.match(LeilaParser.T__54);
+			this.state = 436;
+			this.match(LeilaParser.Identifier);
+			this.state = 437;
+			this.expression();
+			}
+		}
+		catch (re) {
+			if (re instanceof RecognitionException) {
+				_localctx.exception = re;
+				this._errHandler.reportError(this, re);
+				this._errHandler.recover(this, re);
+			} else {
+				throw re;
+			}
+		}
+		finally {
+			this.exitRule();
+		}
+		return _localctx;
+	}
+	// @RuleVersion(0)
 	public nonCtrlStmt(): NonCtrlStmtContext {
 		let _localctx: NonCtrlStmtContext = new NonCtrlStmtContext(this._ctx, this.state);
-		this.enterRule(_localctx, 94, LeilaParser.RULE_nonCtrlStmt);
+		this.enterRule(_localctx, 98, LeilaParser.RULE_nonCtrlStmt);
 		try {
-			this.state = 432;
+			this.state = 443;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__53:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 428;
+				this.state = 439;
 				this.expressionStmt();
 				}
 				break;
@@ -2337,7 +2397,7 @@ export class LeilaParser extends Parser {
 			case LeilaParser.T__66:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 429;
+				this.state = 440;
 				this.commonStmt();
 				}
 				break;
@@ -2347,14 +2407,14 @@ export class LeilaParser extends Parser {
 			case LeilaParser.T__73:
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 430;
+				this.state = 441;
 				this.listStmt();
 				}
 				break;
 			case LeilaParser.T__13:
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 431;
+				this.state = 442;
 				this.declarationStmt();
 				}
 				break;
@@ -2379,20 +2439,20 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public commonStmt(): CommonStmtContext {
 		let _localctx: CommonStmtContext = new CommonStmtContext(this._ctx, this.state);
-		this.enterRule(_localctx, 96, LeilaParser.RULE_commonStmt);
+		this.enterRule(_localctx, 100, LeilaParser.RULE_commonStmt);
 		try {
-			this.state = 463;
+			this.state = 474;
 			this._errHandler.sync(this);
-			switch ( this.interpreter.adaptivePredict(this._input, 32, this._ctx) ) {
+			switch ( this.interpreter.adaptivePredict(this._input, 33, this._ctx) ) {
 			case 1:
 				_localctx = new WaitSecsStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 434;
+				this.state = 445;
 				this.match(LeilaParser.T__55);
-				this.state = 435;
+				this.state = 446;
 				this.numExpr(0);
-				this.state = 436;
+				this.state = 447;
 				this.match(LeilaParser.T__56);
 				}
 				break;
@@ -2401,11 +2461,11 @@ export class LeilaParser extends Parser {
 				_localctx = new WaitUntilStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 438;
+				this.state = 449;
 				this.match(LeilaParser.T__55);
-				this.state = 439;
+				this.state = 450;
 				this.match(LeilaParser.T__49);
-				this.state = 440;
+				this.state = 451;
 				this.boolExpr(0);
 				}
 				break;
@@ -2414,15 +2474,15 @@ export class LeilaParser extends Parser {
 				_localctx = new StopOthersInActorStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 441;
+				this.state = 452;
 				this.match(LeilaParser.T__57);
-				this.state = 442;
+				this.state = 453;
 				this.match(LeilaParser.T__58);
-				this.state = 443;
+				this.state = 454;
 				this.match(LeilaParser.T__59);
-				this.state = 444;
+				this.state = 455;
 				this.match(LeilaParser.T__38);
-				this.state = 445;
+				this.state = 456;
 				this.match(LeilaParser.T__9);
 				}
 				break;
@@ -2431,13 +2491,13 @@ export class LeilaParser extends Parser {
 				_localctx = new CreateCloneOfStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 446;
+				this.state = 457;
 				this.match(LeilaParser.T__60);
-				this.state = 447;
+				this.state = 458;
 				this.match(LeilaParser.T__34);
-				this.state = 448;
+				this.state = 459;
 				this.match(LeilaParser.T__16);
-				this.state = 449;
+				this.state = 460;
 				this.stringExpr();
 				}
 				break;
@@ -2446,9 +2506,9 @@ export class LeilaParser extends Parser {
 				_localctx = new BroadcastMessageStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 5);
 				{
-				this.state = 450;
+				this.state = 461;
 				this.match(LeilaParser.T__61);
-				this.state = 451;
+				this.state = 462;
 				this.message();
 				}
 				break;
@@ -2457,13 +2517,13 @@ export class LeilaParser extends Parser {
 				_localctx = new BroadcastAndWaitStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 6);
 				{
-				this.state = 452;
+				this.state = 463;
 				this.match(LeilaParser.T__61);
-				this.state = 453;
+				this.state = 464;
 				this.message();
-				this.state = 454;
+				this.state = 465;
 				this.match(LeilaParser.T__62);
-				this.state = 455;
+				this.state = 466;
 				this.match(LeilaParser.T__55);
 				}
 				break;
@@ -2472,9 +2532,9 @@ export class LeilaParser extends Parser {
 				_localctx = new ResetTimerStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 7);
 				{
-				this.state = 457;
+				this.state = 468;
 				this.match(LeilaParser.T__63);
-				this.state = 458;
+				this.state = 469;
 				this.match(LeilaParser.T__64);
 				}
 				break;
@@ -2483,7 +2543,7 @@ export class LeilaParser extends Parser {
 				_localctx = new EpsilonStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 8);
 				{
-				this.state = 459;
+				this.state = 470;
 				this.match(LeilaParser.T__65);
 				}
 				break;
@@ -2492,9 +2552,9 @@ export class LeilaParser extends Parser {
 				_localctx = new AssumeStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 9);
 				{
-				this.state = 460;
+				this.state = 471;
 				this.match(LeilaParser.T__66);
-				this.state = 461;
+				this.state = 472;
 				this.boolExpr(0);
 				}
 				break;
@@ -2503,7 +2563,7 @@ export class LeilaParser extends Parser {
 				_localctx = new SetStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 10);
 				{
-				this.state = 462;
+				this.state = 473;
 				this.setStmt();
 				}
 				break;
@@ -2526,22 +2586,22 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public listStmt(): ListStmtContext {
 		let _localctx: ListStmtContext = new ListStmtContext(this._ctx, this.state);
-		this.enterRule(_localctx, 98, LeilaParser.RULE_listStmt);
+		this.enterRule(_localctx, 102, LeilaParser.RULE_listStmt);
 		try {
-			this.state = 494;
+			this.state = 505;
 			this._errHandler.sync(this);
-			switch ( this.interpreter.adaptivePredict(this._input, 33, this._ctx) ) {
+			switch ( this.interpreter.adaptivePredict(this._input, 34, this._ctx) ) {
 			case 1:
 				_localctx = new DeleteAllFromStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 465;
+				this.state = 476;
 				this.match(LeilaParser.T__67);
-				this.state = 466;
+				this.state = 477;
 				this.match(LeilaParser.T__68);
-				this.state = 467;
+				this.state = 478;
 				this.match(LeilaParser.T__3);
-				this.state = 468;
+				this.state = 479;
 				this.variable();
 				}
 				break;
@@ -2550,13 +2610,13 @@ export class LeilaParser extends Parser {
 				_localctx = new DeleteIthFromStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 469;
+				this.state = 480;
 				this.match(LeilaParser.T__67);
-				this.state = 470;
+				this.state = 481;
 				this.numExpr(0);
-				this.state = 471;
+				this.state = 482;
 				this.match(LeilaParser.T__16);
-				this.state = 472;
+				this.state = 483;
 				this.variable();
 				}
 				break;
@@ -2565,13 +2625,13 @@ export class LeilaParser extends Parser {
 				_localctx = new AddElementToStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 474;
+				this.state = 485;
 				this.match(LeilaParser.T__69);
-				this.state = 475;
+				this.state = 486;
 				this.stringExpr();
-				this.state = 476;
+				this.state = 487;
 				this.match(LeilaParser.T__70);
-				this.state = 477;
+				this.state = 488;
 				this.variable();
 				}
 				break;
@@ -2580,17 +2640,17 @@ export class LeilaParser extends Parser {
 				_localctx = new InsertAtStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 479;
+				this.state = 490;
 				this.match(LeilaParser.T__71);
-				this.state = 480;
+				this.state = 491;
 				this.stringExpr();
-				this.state = 481;
+				this.state = 492;
 				this.match(LeilaParser.T__72);
-				this.state = 482;
+				this.state = 493;
 				this.numExpr(0);
-				this.state = 483;
+				this.state = 494;
 				this.match(LeilaParser.T__16);
-				this.state = 484;
+				this.state = 495;
 				this.variable();
 				}
 				break;
@@ -2599,19 +2659,19 @@ export class LeilaParser extends Parser {
 				_localctx = new ReplaceElementAtStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 5);
 				{
-				this.state = 486;
+				this.state = 497;
 				this.match(LeilaParser.T__73);
-				this.state = 487;
+				this.state = 498;
 				this.match(LeilaParser.T__74);
-				this.state = 488;
+				this.state = 499;
 				this.numExpr(0);
-				this.state = 489;
+				this.state = 500;
 				this.match(LeilaParser.T__16);
-				this.state = 490;
+				this.state = 501;
 				this.variable();
-				this.state = 491;
+				this.state = 502;
 				this.match(LeilaParser.T__75);
-				this.state = 492;
+				this.state = 503;
 				this.stringExpr();
 				}
 				break;
@@ -2634,22 +2694,22 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public setStmt(): SetStmtContext {
 		let _localctx: SetStmtContext = new SetStmtContext(this._ctx, this.state);
-		this.enterRule(_localctx, 100, LeilaParser.RULE_setStmt);
+		this.enterRule(_localctx, 104, LeilaParser.RULE_setStmt);
 		try {
-			this.state = 506;
+			this.state = 517;
 			this._errHandler.sync(this);
-			switch ( this.interpreter.adaptivePredict(this._input, 34, this._ctx) ) {
+			switch ( this.interpreter.adaptivePredict(this._input, 35, this._ctx) ) {
 			case 1:
 				_localctx = new StoreEvalResultStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 496;
+				this.state = 507;
 				this.match(LeilaParser.T__39);
-				this.state = 497;
+				this.state = 508;
 				this.variable();
-				this.state = 498;
+				this.state = 509;
 				this.match(LeilaParser.T__14);
-				this.state = 499;
+				this.state = 510;
 				this.expression();
 				}
 				break;
@@ -2658,13 +2718,13 @@ export class LeilaParser extends Parser {
 				_localctx = new StoreCallResultStatementContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 501;
+				this.state = 512;
 				this.match(LeilaParser.T__39);
-				this.state = 502;
+				this.state = 513;
 				this.variable();
-				this.state = 503;
+				this.state = 514;
 				this.match(LeilaParser.T__14);
-				this.state = 504;
+				this.state = 515;
 				this.callStmt();
 				}
 				break;
@@ -2687,26 +2747,26 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public setStmtList(): SetStmtListContext {
 		let _localctx: SetStmtListContext = new SetStmtListContext(this._ctx, this.state);
-		this.enterRule(_localctx, 102, LeilaParser.RULE_setStmtList);
+		this.enterRule(_localctx, 106, LeilaParser.RULE_setStmtList);
 		try {
 			let _alt: number;
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 511;
+			this.state = 522;
 			this._errHandler.sync(this);
-			_alt = this.interpreter.adaptivePredict(this._input, 35, this._ctx);
+			_alt = this.interpreter.adaptivePredict(this._input, 36, this._ctx);
 			while (_alt !== 2 && _alt !== ATN.INVALID_ALT_NUMBER) {
 				if (_alt === 1) {
 					{
 					{
-					this.state = 508;
+					this.state = 519;
 					this.setStmt();
 					}
 					}
 				}
-				this.state = 513;
+				this.state = 524;
 				this._errHandler.sync(this);
-				_alt = this.interpreter.adaptivePredict(this._input, 35, this._ctx);
+				_alt = this.interpreter.adaptivePredict(this._input, 36, this._ctx);
 			}
 			}
 		}
@@ -2727,18 +2787,18 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public terminationStmt(): TerminationStmtContext {
 		let _localctx: TerminationStmtContext = new TerminationStmtContext(this._ctx, this.state);
-		this.enterRule(_localctx, 104, LeilaParser.RULE_terminationStmt);
+		this.enterRule(_localctx, 108, LeilaParser.RULE_terminationStmt);
 		try {
-			this.state = 522;
+			this.state = 533;
 			this._errHandler.sync(this);
-			switch ( this.interpreter.adaptivePredict(this._input, 36, this._ctx) ) {
+			switch ( this.interpreter.adaptivePredict(this._input, 37, this._ctx) ) {
 			case 1:
 				_localctx = new StopAllContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 514;
+				this.state = 525;
 				this.match(LeilaParser.T__57);
-				this.state = 515;
+				this.state = 526;
 				this.match(LeilaParser.T__68);
 				}
 				break;
@@ -2747,11 +2807,11 @@ export class LeilaParser extends Parser {
 				_localctx = new StopThisContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 516;
+				this.state = 527;
 				this.match(LeilaParser.T__57);
-				this.state = 517;
+				this.state = 528;
 				this.match(LeilaParser.T__76);
-				this.state = 518;
+				this.state = 529;
 				this.match(LeilaParser.T__25);
 				}
 				break;
@@ -2760,11 +2820,11 @@ export class LeilaParser extends Parser {
 				_localctx = new DeleteThisCloneContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 519;
+				this.state = 530;
 				this.match(LeilaParser.T__67);
-				this.state = 520;
+				this.state = 531;
 				this.match(LeilaParser.T__76);
-				this.state = 521;
+				this.state = 532;
 				this.match(LeilaParser.T__34);
 				}
 				break;
@@ -2787,16 +2847,16 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public stringExpr(): StringExprContext {
 		let _localctx: StringExprContext = new StringExprContext(this._ctx, this.state);
-		this.enterRule(_localctx, 106, LeilaParser.RULE_stringExpr);
+		this.enterRule(_localctx, 110, LeilaParser.RULE_stringExpr);
 		try {
-			this.state = 565;
+			this.state = 576;
 			this._errHandler.sync(this);
-			switch ( this.interpreter.adaptivePredict(this._input, 37, this._ctx) ) {
+			switch ( this.interpreter.adaptivePredict(this._input, 38, this._ctx) ) {
 			case 1:
 				_localctx = new StringLiteralExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 524;
+				this.state = 535;
 				this.match(LeilaParser.String);
 				}
 				break;
@@ -2805,7 +2865,7 @@ export class LeilaParser extends Parser {
 				_localctx = new StringVariableExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 525;
+				this.state = 536;
 				this.variable();
 				}
 				break;
@@ -2814,11 +2874,11 @@ export class LeilaParser extends Parser {
 				_localctx = new StringParanthExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 526;
+				this.state = 537;
 				this.match(LeilaParser.T__44);
-				this.state = 527;
+				this.state = 538;
 				this.stringExpr();
-				this.state = 528;
+				this.state = 539;
 				this.match(LeilaParser.T__45);
 				}
 				break;
@@ -2827,7 +2887,7 @@ export class LeilaParser extends Parser {
 				_localctx = new StringCallStatementExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 530;
+				this.state = 541;
 				this.callStmt();
 				}
 				break;
@@ -2836,13 +2896,13 @@ export class LeilaParser extends Parser {
 				_localctx = new NumAsStringExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 5);
 				{
-				this.state = 531;
+				this.state = 542;
 				this.match(LeilaParser.T__77);
-				this.state = 532;
+				this.state = 543;
 				this.numExpr(0);
-				this.state = 533;
+				this.state = 544;
 				this.match(LeilaParser.T__70);
-				this.state = 534;
+				this.state = 545;
 				this.match(LeilaParser.T__21);
 				}
 				break;
@@ -2851,13 +2911,13 @@ export class LeilaParser extends Parser {
 				_localctx = new BoolAsStringExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 6);
 				{
-				this.state = 536;
+				this.state = 547;
 				this.match(LeilaParser.T__77);
-				this.state = 537;
+				this.state = 548;
 				this.boolExpr(0);
-				this.state = 538;
+				this.state = 549;
 				this.match(LeilaParser.T__70);
-				this.state = 539;
+				this.state = 550;
 				this.match(LeilaParser.T__21);
 				}
 				break;
@@ -2866,13 +2926,13 @@ export class LeilaParser extends Parser {
 				_localctx = new StringAttributeOfExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 7);
 				{
-				this.state = 541;
+				this.state = 552;
 				this.match(LeilaParser.T__78);
-				this.state = 542;
+				this.state = 553;
 				this.stringExpr();
-				this.state = 543;
+				this.state = 554;
 				this.match(LeilaParser.T__16);
-				this.state = 544;
+				this.state = 555;
 				this.actorExpr();
 				}
 				break;
@@ -2881,11 +2941,11 @@ export class LeilaParser extends Parser {
 				_localctx = new JoinStringsExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 8);
 				{
-				this.state = 546;
+				this.state = 557;
 				this.match(LeilaParser.T__79);
-				this.state = 547;
+				this.state = 558;
 				this.stringExpr();
-				this.state = 548;
+				this.state = 559;
 				this.stringExpr();
 				}
 				break;
@@ -2894,13 +2954,13 @@ export class LeilaParser extends Parser {
 				_localctx = new IthLetterOfStringExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 9);
 				{
-				this.state = 550;
+				this.state = 561;
 				this.match(LeilaParser.T__80);
-				this.state = 551;
+				this.state = 562;
 				this.numExpr(0);
-				this.state = 552;
+				this.state = 563;
 				this.match(LeilaParser.T__16);
-				this.state = 553;
+				this.state = 564;
 				this.stringExpr();
 				}
 				break;
@@ -2909,13 +2969,13 @@ export class LeilaParser extends Parser {
 				_localctx = new IthStringItemOfExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 10);
 				{
-				this.state = 555;
+				this.state = 566;
 				this.match(LeilaParser.T__74);
-				this.state = 556;
+				this.state = 567;
 				this.numExpr(0);
-				this.state = 557;
+				this.state = 568;
 				this.match(LeilaParser.T__16);
-				this.state = 558;
+				this.state = 569;
 				this.variable();
 				}
 				break;
@@ -2924,13 +2984,13 @@ export class LeilaParser extends Parser {
 				_localctx = new DefaultStringExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 11);
 				{
-				this.state = 560;
+				this.state = 571;
 				this.match(LeilaParser.T__81);
-				this.state = 561;
+				this.state = 572;
 				this.match(LeilaParser.String);
-				this.state = 562;
+				this.state = 573;
 				this.match(LeilaParser.T__82);
-				this.state = 563;
+				this.state = 574;
 				this.stringExpr();
 				}
 				break;
@@ -2939,7 +2999,7 @@ export class LeilaParser extends Parser {
 				_localctx = new UnspecifiedStringExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 12);
 				{
-				this.state = 564;
+				this.state = 575;
 				this.match(LeilaParser.T__83);
 				}
 				break;
@@ -2972,22 +3032,22 @@ export class LeilaParser extends Parser {
 		let _parentState: number = this.state;
 		let _localctx: BoolExprContext = new BoolExprContext(this._ctx, _parentState);
 		let _prevctx: BoolExprContext = _localctx;
-		let _startState: number = 108;
-		this.enterRecursionRule(_localctx, 108, LeilaParser.RULE_boolExpr, _p);
+		let _startState: number = 112;
+		this.enterRecursionRule(_localctx, 112, LeilaParser.RULE_boolExpr, _p);
 		try {
 			let _alt: number;
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 616;
+			this.state = 627;
 			this._errHandler.sync(this);
-			switch ( this.interpreter.adaptivePredict(this._input, 38, this._ctx) ) {
+			switch ( this.interpreter.adaptivePredict(this._input, 39, this._ctx) ) {
 			case 1:
 				{
 				_localctx = new BoolLiteralExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
 
-				this.state = 568;
+				this.state = 579;
 				this.match(LeilaParser.Boolean);
 				}
 				break;
@@ -2997,7 +3057,7 @@ export class LeilaParser extends Parser {
 				_localctx = new BoolVariableExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 569;
+				this.state = 580;
 				this.variable();
 				}
 				break;
@@ -3007,11 +3067,11 @@ export class LeilaParser extends Parser {
 				_localctx = new BoolParanthExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 570;
+				this.state = 581;
 				this.match(LeilaParser.T__44);
-				this.state = 571;
+				this.state = 582;
 				this.boolExpr(0);
-				this.state = 572;
+				this.state = 583;
 				this.match(LeilaParser.T__45);
 				}
 				break;
@@ -3021,7 +3081,7 @@ export class LeilaParser extends Parser {
 				_localctx = new BoolCallStatementExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 574;
+				this.state = 585;
 				this.callStmt();
 				}
 				break;
@@ -3031,13 +3091,13 @@ export class LeilaParser extends Parser {
 				_localctx = new NumAsBoolExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 575;
+				this.state = 586;
 				this.match(LeilaParser.T__77);
-				this.state = 576;
+				this.state = 587;
 				this.numExpr(0);
-				this.state = 577;
+				this.state = 588;
 				this.match(LeilaParser.T__70);
-				this.state = 578;
+				this.state = 589;
 				this.match(LeilaParser.T__20);
 				}
 				break;
@@ -3047,13 +3107,13 @@ export class LeilaParser extends Parser {
 				_localctx = new StringAsBoolExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 580;
+				this.state = 591;
 				this.match(LeilaParser.T__77);
-				this.state = 581;
+				this.state = 592;
 				this.stringExpr();
-				this.state = 582;
+				this.state = 593;
 				this.match(LeilaParser.T__70);
-				this.state = 583;
+				this.state = 594;
 				this.match(LeilaParser.T__20);
 				}
 				break;
@@ -3063,9 +3123,9 @@ export class LeilaParser extends Parser {
 				_localctx = new NegatedBoolExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 585;
+				this.state = 596;
 				this.match(LeilaParser.T__84);
-				this.state = 586;
+				this.state = 597;
 				this.boolExpr(11);
 				}
 				break;
@@ -3075,11 +3135,11 @@ export class LeilaParser extends Parser {
 				_localctx = new GreaterEqualExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 587;
+				this.state = 598;
 				this.numOrStringExpr();
-				this.state = 588;
+				this.state = 599;
 				this.match(LeilaParser.T__86);
-				this.state = 589;
+				this.state = 600;
 				this.numOrStringExpr();
 				}
 				break;
@@ -3089,11 +3149,11 @@ export class LeilaParser extends Parser {
 				_localctx = new GreaterThanExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 591;
+				this.state = 602;
 				this.numOrStringExpr();
-				this.state = 592;
+				this.state = 603;
 				this.match(LeilaParser.T__87);
-				this.state = 593;
+				this.state = 604;
 				this.numOrStringExpr();
 				}
 				break;
@@ -3103,11 +3163,11 @@ export class LeilaParser extends Parser {
 				_localctx = new LessThanExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 595;
+				this.state = 606;
 				this.numOrStringExpr();
-				this.state = 596;
+				this.state = 607;
 				this.match(LeilaParser.T__88);
-				this.state = 597;
+				this.state = 608;
 				this.numOrStringExpr();
 				}
 				break;
@@ -3117,11 +3177,11 @@ export class LeilaParser extends Parser {
 				_localctx = new LessEqualExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 599;
+				this.state = 610;
 				this.numOrStringExpr();
-				this.state = 600;
+				this.state = 611;
 				this.match(LeilaParser.T__89);
-				this.state = 601;
+				this.state = 612;
 				this.numOrStringExpr();
 				}
 				break;
@@ -3131,11 +3191,11 @@ export class LeilaParser extends Parser {
 				_localctx = new EqualsExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 603;
+				this.state = 614;
 				this.numOrStringExpr();
-				this.state = 604;
+				this.state = 615;
 				this.match(LeilaParser.T__90);
-				this.state = 605;
+				this.state = 616;
 				this.numOrStringExpr();
 				}
 				break;
@@ -3145,11 +3205,11 @@ export class LeilaParser extends Parser {
 				_localctx = new StrContainsExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 607;
+				this.state = 618;
 				this.stringExpr();
-				this.state = 608;
+				this.state = 619;
 				this.match(LeilaParser.T__91);
-				this.state = 609;
+				this.state = 620;
 				this.stringExpr();
 				}
 				break;
@@ -3159,13 +3219,13 @@ export class LeilaParser extends Parser {
 				_localctx = new DefaultBoolExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 611;
+				this.state = 622;
 				this.match(LeilaParser.T__81);
-				this.state = 612;
+				this.state = 623;
 				this.match(LeilaParser.Boolean);
-				this.state = 613;
+				this.state = 624;
 				this.match(LeilaParser.T__82);
-				this.state = 614;
+				this.state = 625;
 				this.boolExpr(2);
 				}
 				break;
@@ -3175,15 +3235,15 @@ export class LeilaParser extends Parser {
 				_localctx = new UnspecifiedBoolExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 615;
+				this.state = 626;
 				this.match(LeilaParser.T__92);
 				}
 				break;
 			}
 			this._ctx._stop = this._input.tryLT(-1);
-			this.state = 626;
+			this.state = 637;
 			this._errHandler.sync(this);
-			_alt = this.interpreter.adaptivePredict(this._input, 40, this._ctx);
+			_alt = this.interpreter.adaptivePredict(this._input, 41, this._ctx);
 			while (_alt !== 2 && _alt !== ATN.INVALID_ALT_NUMBER) {
 				if (_alt === 1) {
 					if (this._parseListeners != null) {
@@ -3191,20 +3251,20 @@ export class LeilaParser extends Parser {
 					}
 					_prevctx = _localctx;
 					{
-					this.state = 624;
+					this.state = 635;
 					this._errHandler.sync(this);
-					switch ( this.interpreter.adaptivePredict(this._input, 39, this._ctx) ) {
+					switch ( this.interpreter.adaptivePredict(this._input, 40, this._ctx) ) {
 					case 1:
 						{
 						_localctx = new BoolAndExpressionContext(new BoolExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, LeilaParser.RULE_boolExpr);
-						this.state = 618;
+						this.state = 629;
 						if (!(this.precpred(this._ctx, 10))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 10)");
 						}
-						this.state = 619;
+						this.state = 630;
 						this.match(LeilaParser.T__62);
-						this.state = 620;
+						this.state = 631;
 						this.boolExpr(11);
 						}
 						break;
@@ -3213,22 +3273,22 @@ export class LeilaParser extends Parser {
 						{
 						_localctx = new BoolOrExpressionContext(new BoolExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, LeilaParser.RULE_boolExpr);
-						this.state = 621;
+						this.state = 632;
 						if (!(this.precpred(this._ctx, 9))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 9)");
 						}
-						this.state = 622;
+						this.state = 633;
 						this.match(LeilaParser.T__85);
-						this.state = 623;
+						this.state = 634;
 						this.boolExpr(10);
 						}
 						break;
 					}
 					}
 				}
-				this.state = 628;
+				this.state = 639;
 				this._errHandler.sync(this);
-				_alt = this.interpreter.adaptivePredict(this._input, 40, this._ctx);
+				_alt = this.interpreter.adaptivePredict(this._input, 41, this._ctx);
 			}
 			}
 		}
@@ -3249,16 +3309,16 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public numOrStringExpr(): NumOrStringExprContext {
 		let _localctx: NumOrStringExprContext = new NumOrStringExprContext(this._ctx, this.state);
-		this.enterRule(_localctx, 110, LeilaParser.RULE_numOrStringExpr);
+		this.enterRule(_localctx, 114, LeilaParser.RULE_numOrStringExpr);
 		try {
-			this.state = 631;
+			this.state = 642;
 			this._errHandler.sync(this);
-			switch ( this.interpreter.adaptivePredict(this._input, 41, this._ctx) ) {
+			switch ( this.interpreter.adaptivePredict(this._input, 42, this._ctx) ) {
 			case 1:
 				_localctx = new NumberExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 629;
+				this.state = 640;
 				this.numExpr(0);
 				}
 				break;
@@ -3267,7 +3327,7 @@ export class LeilaParser extends Parser {
 				_localctx = new StringExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 630;
+				this.state = 641;
 				this.stringExpr();
 				}
 				break;
@@ -3300,22 +3360,22 @@ export class LeilaParser extends Parser {
 		let _parentState: number = this.state;
 		let _localctx: NumExprContext = new NumExprContext(this._ctx, _parentState);
 		let _prevctx: NumExprContext = _localctx;
-		let _startState: number = 112;
-		this.enterRecursionRule(_localctx, 112, LeilaParser.RULE_numExpr, _p);
+		let _startState: number = 116;
+		this.enterRecursionRule(_localctx, 116, LeilaParser.RULE_numExpr, _p);
 		try {
 			let _alt: number;
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 686;
+			this.state = 697;
 			this._errHandler.sync(this);
-			switch ( this.interpreter.adaptivePredict(this._input, 42, this._ctx) ) {
+			switch ( this.interpreter.adaptivePredict(this._input, 43, this._ctx) ) {
 			case 1:
 				{
 				_localctx = new NumLiteralExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
 
-				this.state = 634;
+				this.state = 645;
 				this.number();
 				}
 				break;
@@ -3325,7 +3385,7 @@ export class LeilaParser extends Parser {
 				_localctx = new NumVariableExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 635;
+				this.state = 646;
 				this.variable();
 				}
 				break;
@@ -3335,11 +3395,11 @@ export class LeilaParser extends Parser {
 				_localctx = new NumBracketsContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 636;
+				this.state = 647;
 				this.match(LeilaParser.T__44);
-				this.state = 637;
+				this.state = 648;
 				this.numExpr(0);
-				this.state = 638;
+				this.state = 649;
 				this.match(LeilaParser.T__45);
 				}
 				break;
@@ -3349,7 +3409,7 @@ export class LeilaParser extends Parser {
 				_localctx = new NumCallStatementExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 640;
+				this.state = 651;
 				this.callStmt();
 				}
 				break;
@@ -3359,13 +3419,13 @@ export class LeilaParser extends Parser {
 				_localctx = new StringToFloatExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 641;
+				this.state = 652;
 				this.match(LeilaParser.T__77);
-				this.state = 642;
+				this.state = 653;
 				this.stringExpr();
-				this.state = 643;
+				this.state = 654;
 				this.match(LeilaParser.T__70);
-				this.state = 644;
+				this.state = 655;
 				this.match(LeilaParser.T__19);
 				}
 				break;
@@ -3375,13 +3435,13 @@ export class LeilaParser extends Parser {
 				_localctx = new StringToIntExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 646;
+				this.state = 657;
 				this.match(LeilaParser.T__77);
-				this.state = 647;
+				this.state = 658;
 				this.stringExpr();
-				this.state = 648;
+				this.state = 659;
 				this.match(LeilaParser.T__70);
-				this.state = 649;
+				this.state = 660;
 				this.match(LeilaParser.T__17);
 				}
 				break;
@@ -3391,13 +3451,13 @@ export class LeilaParser extends Parser {
 				_localctx = new BoolToIntExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 651;
+				this.state = 662;
 				this.match(LeilaParser.T__77);
-				this.state = 652;
+				this.state = 663;
 				this.boolExpr(0);
-				this.state = 653;
+				this.state = 664;
 				this.match(LeilaParser.T__70);
-				this.state = 654;
+				this.state = 665;
 				this.match(LeilaParser.T__17);
 				}
 				break;
@@ -3407,13 +3467,13 @@ export class LeilaParser extends Parser {
 				_localctx = new NumToFloatExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 656;
+				this.state = 667;
 				this.match(LeilaParser.T__77);
-				this.state = 657;
+				this.state = 668;
 				this.numExpr(0);
-				this.state = 658;
+				this.state = 669;
 				this.match(LeilaParser.T__70);
-				this.state = 659;
+				this.state = 670;
 				this.match(LeilaParser.T__19);
 				}
 				break;
@@ -3423,13 +3483,13 @@ export class LeilaParser extends Parser {
 				_localctx = new NumToIntExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 661;
+				this.state = 672;
 				this.match(LeilaParser.T__77);
-				this.state = 662;
+				this.state = 673;
 				this.numExpr(0);
-				this.state = 663;
+				this.state = 674;
 				this.match(LeilaParser.T__70);
-				this.state = 664;
+				this.state = 675;
 				this.match(LeilaParser.T__17);
 				}
 				break;
@@ -3439,7 +3499,7 @@ export class LeilaParser extends Parser {
 				_localctx = new TimerExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 666;
+				this.state = 677;
 				this.match(LeilaParser.T__64);
 				}
 				break;
@@ -3449,11 +3509,11 @@ export class LeilaParser extends Parser {
 				_localctx = new LengthOfStringExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 667;
+				this.state = 678;
 				this.match(LeilaParser.T__93);
-				this.state = 668;
+				this.state = 679;
 				this.match(LeilaParser.T__16);
-				this.state = 669;
+				this.state = 680;
 				this.stringExpr();
 				}
 				break;
@@ -3463,13 +3523,13 @@ export class LeilaParser extends Parser {
 				_localctx = new LengthOfListExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 670;
+				this.state = 681;
 				this.match(LeilaParser.T__93);
-				this.state = 671;
+				this.state = 682;
 				this.match(LeilaParser.T__16);
-				this.state = 672;
+				this.state = 683;
 				this.match(LeilaParser.T__15);
-				this.state = 673;
+				this.state = 684;
 				this.variable();
 				}
 				break;
@@ -3479,15 +3539,15 @@ export class LeilaParser extends Parser {
 				_localctx = new IndexOfExpressionContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 674;
+				this.state = 685;
 				this.match(LeilaParser.T__94);
-				this.state = 675;
+				this.state = 686;
 				this.match(LeilaParser.T__16);
-				this.state = 676;
+				this.state = 687;
 				this.expression();
-				this.state = 677;
+				this.state = 688;
 				this.match(LeilaParser.T__38);
-				this.state = 678;
+				this.state = 689;
 				this.variable();
 				}
 				break;
@@ -3497,13 +3557,13 @@ export class LeilaParser extends Parser {
 				_localctx = new DefaultNumExprContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 680;
+				this.state = 691;
 				this.match(LeilaParser.T__81);
-				this.state = 681;
+				this.state = 692;
 				this.number();
-				this.state = 682;
+				this.state = 693;
 				this.match(LeilaParser.T__82);
-				this.state = 683;
+				this.state = 694;
 				this.numExpr(2);
 				}
 				break;
@@ -3513,15 +3573,15 @@ export class LeilaParser extends Parser {
 				_localctx = new UnspecifiedNumExprContext(_localctx);
 				this._ctx = _localctx;
 				_prevctx = _localctx;
-				this.state = 685;
+				this.state = 696;
 				this.match(LeilaParser.T__99);
 				}
 				break;
 			}
 			this._ctx._stop = this._input.tryLT(-1);
-			this.state = 705;
+			this.state = 716;
 			this._errHandler.sync(this);
-			_alt = this.interpreter.adaptivePredict(this._input, 44, this._ctx);
+			_alt = this.interpreter.adaptivePredict(this._input, 45, this._ctx);
 			while (_alt !== 2 && _alt !== ATN.INVALID_ALT_NUMBER) {
 				if (_alt === 1) {
 					if (this._parseListeners != null) {
@@ -3529,20 +3589,20 @@ export class LeilaParser extends Parser {
 					}
 					_prevctx = _localctx;
 					{
-					this.state = 703;
+					this.state = 714;
 					this._errHandler.sync(this);
-					switch ( this.interpreter.adaptivePredict(this._input, 43, this._ctx) ) {
+					switch ( this.interpreter.adaptivePredict(this._input, 44, this._ctx) ) {
 					case 1:
 						{
 						_localctx = new NumMulExpressionContext(new NumExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, LeilaParser.RULE_numExpr);
-						this.state = 688;
+						this.state = 699;
 						if (!(this.precpred(this._ctx, 7))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 7)");
 						}
-						this.state = 689;
+						this.state = 700;
 						this.match(LeilaParser.T__4);
-						this.state = 690;
+						this.state = 701;
 						this.numExpr(8);
 						}
 						break;
@@ -3551,13 +3611,13 @@ export class LeilaParser extends Parser {
 						{
 						_localctx = new NumDivExpressionContext(new NumExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, LeilaParser.RULE_numExpr);
-						this.state = 691;
+						this.state = 702;
 						if (!(this.precpred(this._ctx, 6))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 6)");
 						}
-						this.state = 692;
+						this.state = 703;
 						this.match(LeilaParser.T__95);
-						this.state = 693;
+						this.state = 704;
 						this.numExpr(7);
 						}
 						break;
@@ -3566,13 +3626,13 @@ export class LeilaParser extends Parser {
 						{
 						_localctx = new NumModExpressionContext(new NumExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, LeilaParser.RULE_numExpr);
-						this.state = 694;
+						this.state = 705;
 						if (!(this.precpred(this._ctx, 5))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 5)");
 						}
-						this.state = 695;
+						this.state = 706;
 						this.match(LeilaParser.T__96);
-						this.state = 696;
+						this.state = 707;
 						this.numExpr(6);
 						}
 						break;
@@ -3581,13 +3641,13 @@ export class LeilaParser extends Parser {
 						{
 						_localctx = new NumPlusExpressionContext(new NumExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, LeilaParser.RULE_numExpr);
-						this.state = 697;
+						this.state = 708;
 						if (!(this.precpred(this._ctx, 4))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 4)");
 						}
-						this.state = 698;
+						this.state = 709;
 						this.match(LeilaParser.T__97);
-						this.state = 699;
+						this.state = 710;
 						this.numExpr(5);
 						}
 						break;
@@ -3596,22 +3656,22 @@ export class LeilaParser extends Parser {
 						{
 						_localctx = new NumMinusExpressionContext(new NumExprContext(_parentctx, _parentState));
 						this.pushNewRecursionContext(_localctx, _startState, LeilaParser.RULE_numExpr);
-						this.state = 700;
+						this.state = 711;
 						if (!(this.precpred(this._ctx, 3))) {
 							throw new FailedPredicateException(this, "this.precpred(this._ctx, 3)");
 						}
-						this.state = 701;
+						this.state = 712;
 						this.match(LeilaParser.T__98);
-						this.state = 702;
+						this.state = 713;
 						this.numExpr(4);
 						}
 						break;
 					}
 					}
 				}
-				this.state = 707;
+				this.state = 718;
 				this._errHandler.sync(this);
-				_alt = this.interpreter.adaptivePredict(this._input, 44, this._ctx);
+				_alt = this.interpreter.adaptivePredict(this._input, 45, this._ctx);
 			}
 			}
 		}
@@ -3632,9 +3692,9 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public listExpr(): ListExprContext {
 		let _localctx: ListExprContext = new ListExprContext(this._ctx, this.state);
-		this.enterRule(_localctx, 114, LeilaParser.RULE_listExpr);
+		this.enterRule(_localctx, 118, LeilaParser.RULE_listExpr);
 		try {
-			this.state = 713;
+			this.state = 724;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.T__105:
@@ -3642,7 +3702,7 @@ export class LeilaParser extends Parser {
 				_localctx = new ListVariableExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 708;
+				this.state = 719;
 				this.variable();
 				}
 				break;
@@ -3650,11 +3710,11 @@ export class LeilaParser extends Parser {
 				_localctx = new ListWithElementsExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 709;
+				this.state = 720;
 				this.match(LeilaParser.T__23);
-				this.state = 710;
+				this.state = 721;
 				this.expressionListPlain();
-				this.state = 711;
+				this.state = 722;
 				this.match(LeilaParser.T__24);
 				}
 				break;
@@ -3679,16 +3739,16 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public actorExpr(): ActorExprContext {
 		let _localctx: ActorExprContext = new ActorExprContext(this._ctx, this.state);
-		this.enterRule(_localctx, 116, LeilaParser.RULE_actorExpr);
+		this.enterRule(_localctx, 120, LeilaParser.RULE_actorExpr);
 		try {
-			this.state = 730;
+			this.state = 741;
 			this._errHandler.sync(this);
-			switch ( this.interpreter.adaptivePredict(this._input, 46, this._ctx) ) {
+			switch ( this.interpreter.adaptivePredict(this._input, 47, this._ctx) ) {
 			case 1:
 				_localctx = new ActorVariableExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 715;
+				this.state = 726;
 				this.variable();
 				}
 				break;
@@ -3697,7 +3757,7 @@ export class LeilaParser extends Parser {
 				_localctx = new ActorSelfExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 716;
+				this.state = 727;
 				this.match(LeilaParser.T__100);
 				}
 				break;
@@ -3706,11 +3766,11 @@ export class LeilaParser extends Parser {
 				_localctx = new LocateActorExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 717;
+				this.state = 728;
 				this.match(LeilaParser.T__101);
-				this.state = 718;
+				this.state = 729;
 				this.match(LeilaParser.T__9);
-				this.state = 719;
+				this.state = 730;
 				this.stringExpr();
 				}
 				break;
@@ -3719,13 +3779,13 @@ export class LeilaParser extends Parser {
 				_localctx = new StartCloneActorExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 720;
+				this.state = 731;
 				this.match(LeilaParser.T__102);
-				this.state = 721;
+				this.state = 732;
 				this.match(LeilaParser.T__34);
-				this.state = 722;
+				this.state = 733;
 				this.match(LeilaParser.T__16);
-				this.state = 723;
+				this.state = 734;
 				this.actorExpr();
 				}
 				break;
@@ -3734,15 +3794,15 @@ export class LeilaParser extends Parser {
 				_localctx = new UsherActorExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 5);
 				{
-				this.state = 724;
+				this.state = 735;
 				this.match(LeilaParser.T__102);
-				this.state = 725;
+				this.state = 736;
 				this.match(LeilaParser.T__9);
-				this.state = 726;
+				this.state = 737;
 				this.stringExpr();
-				this.state = 727;
+				this.state = 738;
 				this.match(LeilaParser.T__14);
-				this.state = 728;
+				this.state = 739;
 				this.ident();
 				}
 				break;
@@ -3765,15 +3825,15 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public expression(): ExpressionContext {
 		let _localctx: ExpressionContext = new ExpressionContext(this._ctx, this.state);
-		this.enterRule(_localctx, 118, LeilaParser.RULE_expression);
+		this.enterRule(_localctx, 122, LeilaParser.RULE_expression);
 		try {
-			this.state = 738;
+			this.state = 749;
 			this._errHandler.sync(this);
-			switch ( this.interpreter.adaptivePredict(this._input, 47, this._ctx) ) {
+			switch ( this.interpreter.adaptivePredict(this._input, 48, this._ctx) ) {
 			case 1:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 732;
+				this.state = 743;
 				this.stringExpr();
 				}
 				break;
@@ -3781,7 +3841,7 @@ export class LeilaParser extends Parser {
 			case 2:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 733;
+				this.state = 744;
 				this.numExpr(0);
 				}
 				break;
@@ -3789,7 +3849,7 @@ export class LeilaParser extends Parser {
 			case 3:
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 734;
+				this.state = 745;
 				this.boolExpr(0);
 				}
 				break;
@@ -3797,7 +3857,7 @@ export class LeilaParser extends Parser {
 			case 4:
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 735;
+				this.state = 746;
 				this.listExpr();
 				}
 				break;
@@ -3805,7 +3865,7 @@ export class LeilaParser extends Parser {
 			case 5:
 				this.enterOuterAlt(_localctx, 5);
 				{
-				this.state = 736;
+				this.state = 747;
 				this.actorExpr();
 				}
 				break;
@@ -3813,7 +3873,7 @@ export class LeilaParser extends Parser {
 			case 6:
 				this.enterOuterAlt(_localctx, 6);
 				{
-				this.state = 737;
+				this.state = 748;
 				this.unspecifiedExpr();
 				}
 				break;
@@ -3836,11 +3896,11 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public unspecifiedExpr(): UnspecifiedExprContext {
 		let _localctx: UnspecifiedExprContext = new UnspecifiedExprContext(this._ctx, this.state);
-		this.enterRule(_localctx, 120, LeilaParser.RULE_unspecifiedExpr);
+		this.enterRule(_localctx, 124, LeilaParser.RULE_unspecifiedExpr);
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 740;
+			this.state = 751;
 			this.match(LeilaParser.T__103);
 			}
 		}
@@ -3861,16 +3921,16 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public variable(): VariableContext {
 		let _localctx: VariableContext = new VariableContext(this._ctx, this.state);
-		this.enterRule(_localctx, 122, LeilaParser.RULE_variable);
+		this.enterRule(_localctx, 126, LeilaParser.RULE_variable);
 		try {
-			this.state = 747;
+			this.state = 758;
 			this._errHandler.sync(this);
-			switch ( this.interpreter.adaptivePredict(this._input, 48, this._ctx) ) {
+			switch ( this.interpreter.adaptivePredict(this._input, 49, this._ctx) ) {
 			case 1:
 				_localctx = new FlatVariableContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 742;
+				this.state = 753;
 				this.ident();
 				}
 				break;
@@ -3879,11 +3939,11 @@ export class LeilaParser extends Parser {
 				_localctx = new QualifiedVariableContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 743;
+				this.state = 754;
 				this.ident();
-				this.state = 744;
+				this.state = 755;
 				this.match(LeilaParser.T__104);
-				this.state = 745;
+				this.state = 756;
 				this.ident();
 				}
 				break;
@@ -3906,16 +3966,16 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public ident(): IdentContext {
 		let _localctx: IdentContext = new IdentContext(this._ctx, this.state);
-		this.enterRule(_localctx, 124, LeilaParser.RULE_ident);
+		this.enterRule(_localctx, 128, LeilaParser.RULE_ident);
 		try {
-			this.state = 752;
+			this.state = 763;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.Identifier:
 				_localctx = new IdentExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 749;
+				this.state = 760;
 				this.match(LeilaParser.Identifier);
 				}
 				break;
@@ -3923,9 +3983,9 @@ export class LeilaParser extends Parser {
 				_localctx = new StrIdentExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 750;
+				this.state = 761;
 				this.match(LeilaParser.T__105);
-				this.state = 751;
+				this.state = 762;
 				this.match(LeilaParser.String);
 				}
 				break;
@@ -3950,16 +4010,16 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public number(): NumberContext {
 		let _localctx: NumberContext = new NumberContext(this._ctx, this.state);
-		this.enterRule(_localctx, 126, LeilaParser.RULE_number);
+		this.enterRule(_localctx, 130, LeilaParser.RULE_number);
 		try {
-			this.state = 756;
+			this.state = 767;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.IntegerLiteral:
 				_localctx = new IntegerLiteralExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 754;
+				this.state = 765;
 				this.match(LeilaParser.IntegerLiteral);
 				}
 				break;
@@ -3967,7 +4027,7 @@ export class LeilaParser extends Parser {
 				_localctx = new DecimalLiteralExpressionContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 755;
+				this.state = 766;
 				this.match(LeilaParser.DecimalLiteral);
 				}
 				break;
@@ -3992,11 +4052,11 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public resourceLocator(): ResourceLocatorContext {
 		let _localctx: ResourceLocatorContext = new ResourceLocatorContext(this._ctx, this.state);
-		this.enterRule(_localctx, 128, LeilaParser.RULE_resourceLocator);
+		this.enterRule(_localctx, 132, LeilaParser.RULE_resourceLocator);
 		try {
 			this.enterOuterAlt(_localctx, 1);
 			{
-			this.state = 758;
+			this.state = 769;
 			this.match(LeilaParser.String);
 			}
 		}
@@ -4017,16 +4077,16 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public message(): MessageContext {
 		let _localctx: MessageContext = new MessageContext(this._ctx, this.state);
-		this.enterRule(_localctx, 130, LeilaParser.RULE_message);
+		this.enterRule(_localctx, 134, LeilaParser.RULE_message);
 		try {
-			this.state = 766;
+			this.state = 777;
 			this._errHandler.sync(this);
-			switch ( this.interpreter.adaptivePredict(this._input, 51, this._ctx) ) {
+			switch ( this.interpreter.adaptivePredict(this._input, 52, this._ctx) ) {
 			case 1:
 				_localctx = new UserMessageContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 760;
+				this.state = 771;
 				this.stringExpr();
 				}
 				break;
@@ -4035,13 +4095,13 @@ export class LeilaParser extends Parser {
 				_localctx = new SystemMessageContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 761;
+				this.state = 772;
 				this.stringExpr();
-				this.state = 762;
+				this.state = 773;
 				this.expressionList();
-				this.state = 763;
+				this.state = 774;
 				this.match(LeilaParser.T__70);
-				this.state = 764;
+				this.state = 775;
 				this.messageDestination();
 				}
 				break;
@@ -4064,16 +4124,16 @@ export class LeilaParser extends Parser {
 	// @RuleVersion(0)
 	public messageDestination(): MessageDestinationContext {
 		let _localctx: MessageDestinationContext = new MessageDestinationContext(this._ctx, this.state);
-		this.enterRule(_localctx, 132, LeilaParser.RULE_messageDestination);
+		this.enterRule(_localctx, 136, LeilaParser.RULE_messageDestination);
 		try {
-			this.state = 770;
+			this.state = 781;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case LeilaParser.String:
 				_localctx = new NamedMessageDestinationContext(_localctx);
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 768;
+				this.state = 779;
 				this.match(LeilaParser.String);
 				}
 				break;
@@ -4085,7 +4145,7 @@ export class LeilaParser extends Parser {
 				_localctx = new ActorMessageDestinationContext(_localctx);
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 769;
+				this.state = 780;
 				this.actorExpr();
 				}
 				break;
@@ -4110,10 +4170,10 @@ export class LeilaParser extends Parser {
 
 	public sempred(_localctx: RuleContext, ruleIndex: number, predIndex: number): boolean {
 		switch (ruleIndex) {
-		case 54:
+		case 56:
 			return this.boolExpr_sempred(_localctx as BoolExprContext, predIndex);
 
-		case 56:
+		case 58:
 			return this.numExpr_sempred(_localctx as NumExprContext, predIndex);
 		}
 		return true;
@@ -4150,7 +4210,7 @@ export class LeilaParser extends Parser {
 
 	private static readonly _serializedATNSegments: number = 2;
 	private static readonly _serializedATNSegment0: string =
-		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03v\u0307\x04\x02" +
+		"\x03\uC91D\uCABA\u058D\uAFBA\u4F53\u0607\uEA8B\uC241\x03v\u0312\x04\x02" +
 		"\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07" +
 		"\t\x07\x04\b\t\b\x04\t\t\t\x04\n\t\n\x04\v\t\v\x04\f\t\f\x04\r\t\r\x04" +
 		"\x0E\t\x0E\x04\x0F\t\x0F\x04\x10\t\x10\x04\x11\t\x11\x04\x12\t\x12\x04" +
@@ -4160,367 +4220,374 @@ export class LeilaParser extends Parser {
 		"\t#\x04$\t$\x04%\t%\x04&\t&\x04\'\t\'\x04(\t(\x04)\t)\x04*\t*\x04+\t+" +
 		"\x04,\t,\x04-\t-\x04.\t.\x04/\t/\x040\t0\x041\t1\x042\t2\x043\t3\x044" +
 		"\t4\x045\t5\x046\t6\x047\t7\x048\t8\x049\t9\x04:\t:\x04;\t;\x04<\t<\x04" +
-		"=\t=\x04>\t>\x04?\t?\x04@\t@\x04A\tA\x04B\tB\x04C\tC\x04D\tD\x03\x02\x03" +
-		"\x02\x03\x02\x03\x02\x03\x02\x03\x02\x03\x03\x03\x03\x03\x04\x07\x04\x92" +
-		"\n\x04\f\x04\x0E\x04\x95\v\x04\x03\x05\x03\x05\x03\x05\x03\x05\x03\x05" +
-		"\x03\x06\x03\x06\x05\x06\x9E\n\x06\x03\x07\x07\x07\xA1\n\x07\f\x07\x0E" +
-		"\x07\xA4\v\x07\x03\b\x03\b\x03\b\x03\b\x03\b\x03\b\x03\b\x03\t\x03\t\x03" +
-		"\t\x03\t\x07\t\xB1\n\t\f\t\x0E\t\xB4\v\t\x03\t\x05\t\xB7\n\t\x03\n\x03" +
-		"\n\x05\n\xBB\n\n\x03\v\x03\v\x03\v\x03\v\x03\v\x03\v\x03\f\x03\f\x03\f" +
-		"\x03\f\x03\r\x03\r\x05\r\xC9\n\r\x03\x0E\x07\x0E\xCC\n\x0E\f\x0E\x0E\x0E" +
-		"\xCF\v\x0E\x03\x0F\x03\x0F\x03\x0F\x03\x0F\x03\x0F\x03\x10\x07\x10\xD7" +
-		"\n\x10\f\x10\x0E\x10\xDA\v\x10\x03\x11\x03\x11\x03\x11\x03\x11\x03\x11" +
-		"\x05\x11\xE1\n\x11\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x03" +
-		"\x12\x03\x12\x03\x12\x05\x12\xEC\n\x12\x03\x13\x03\x13\x03\x13\x03\x13" +
-		"\x03\x13\x03\x13\x03\x13\x03\x13\x03\x14\x03\x14\x05\x14\xF8\n\x14\x03" +
-		"\x15\x07\x15\xFB\n\x15\f\x15\x0E\x15\xFE\v\x15\x03\x16\x07\x16\u0101\n" +
-		"\x16\f\x16\x0E\x16\u0104\v\x16\x03\x17\x03\x17\x03\x18\x03\x18\x03\x18" +
-		"\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18" +
-		"\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x05\x18\u0119\n\x18\x03\x19\x03" +
-		"\x19\x03\x19\x05\x19\u011E\n\x19\x03\x1A\x07\x1A\u0121\n\x1A\f\x1A\x0E" +
-		"\x1A\u0124\v\x1A\x03\x1B\x03\x1B\x03\x1B\x03\x1B\x03\x1B\x03\x1B\x03\x1B" +
-		"\x03\x1B\x03\x1B\x03\x1B\x03\x1B\x03\x1B\x05\x1B\u0132\n\x1B\x03\x1C\x03" +
-		"\x1C\x03\x1C\x03\x1C\x03\x1C\x03\x1C\x05\x1C\u013A\n\x1C\x03\x1D\x03\x1D" +
-		"\x03\x1D\x05\x1D\u013F\n\x1D\x03\x1E\x07\x1E\u0142\n\x1E\f\x1E\x0E\x1E" +
-		"\u0145\v\x1E\x03\x1F\x03\x1F\x03 \x03 \x03 \x03 \x03!\x03!\x03!\x03!\x03" +
-		"\"\x03\"\x03\"\x07\"\u0154\n\"\f\"\x0E\"\u0157\v\"\x03\"\x05\"\u015A\n" +
-		"\"\x03#\x03#\x03#\x03#\x05#\u0160\n#\x03#\x03#\x03$\x03$\x05$\u0166\n" +
-		"$\x03%\x07%\u0169\n%\f%\x0E%\u016C\v%\x03&\x03&\x03&\x03&\x03&\x05&\u0173" +
-		"\n&\x03\'\x03\'\x03\'\x03\'\x03\'\x03\'\x03(\x03(\x03(\x03(\x03(\x05(" +
-		"\u0180\n(\x03)\x03)\x03)\x03)\x03)\x03*\x03*\x03*\x03*\x03*\x03+\x03+" +
-		"\x03+\x03+\x03,\x03,\x03,\x03-\x03-\x03-\x03-\x03.\x03.\x03.\x07.\u019A" +
-		"\n.\f.\x0E.\u019D\v.\x03.\x05.\u01A0\n.\x03/\x03/\x03/\x030\x030\x030" +
-		"\x030\x030\x030\x030\x030\x050\u01AD\n0\x031\x031\x031\x031\x051\u01B3" +
-		"\n1\x032\x032\x032\x032\x032\x032\x032\x032\x032\x032\x032\x032\x032\x03" +
-		"2\x032\x032\x032\x032\x032\x032\x032\x032\x032\x032\x032\x032\x032\x03" +
-		"2\x032\x052\u01D2\n2\x033\x033\x033\x033\x033\x033\x033\x033\x033\x03" +
-		"3\x033\x033\x033\x033\x033\x033\x033\x033\x033\x033\x033\x033\x033\x03" +
-		"3\x033\x033\x033\x033\x033\x053\u01F1\n3\x034\x034\x034\x034\x034\x03" +
-		"4\x034\x034\x034\x034\x054\u01FD\n4\x035\x075\u0200\n5\f5\x0E5\u0203\v" +
-		"5\x036\x036\x036\x036\x036\x036\x036\x036\x056\u020D\n6\x037\x037\x03" +
-		"7\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x03" +
-		"7\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x03" +
-		"7\x037\x037\x037\x037\x037\x037\x037\x037\x037\x037\x057\u0238\n7\x03" +
-		"8\x038\x038\x038\x038\x038\x038\x038\x038\x038\x038\x038\x038\x038\x03" +
-		"8\x038\x038\x038\x038\x038\x038\x038\x038\x038\x038\x038\x038\x038\x03" +
-		"8\x038\x038\x038\x038\x038\x038\x038\x038\x038\x038\x038\x038\x038\x03" +
-		"8\x038\x038\x038\x038\x038\x038\x058\u026B\n8\x038\x038\x038\x038\x03" +
-		"8\x038\x078\u0273\n8\f8\x0E8\u0276\v8\x039\x039\x059\u027A\n9\x03:\x03" +
+		"=\t=\x04>\t>\x04?\t?\x04@\t@\x04A\tA\x04B\tB\x04C\tC\x04D\tD\x04E\tE\x04" +
+		"F\tF\x03\x02\x03\x02\x03\x02\x03\x02\x03\x02\x03\x02\x03\x03\x03\x03\x03" +
+		"\x04\x07\x04\x96\n\x04\f\x04\x0E\x04\x99\v\x04\x03\x05\x03\x05\x03\x05" +
+		"\x03\x05\x03\x05\x03\x06\x03\x06\x05\x06\xA2\n\x06\x03\x07\x07\x07\xA5" +
+		"\n\x07\f\x07\x0E\x07\xA8\v\x07\x03\b\x03\b\x03\b\x03\b\x03\b\x03\b\x03" +
+		"\b\x03\t\x03\t\x03\t\x03\t\x07\t\xB5\n\t\f\t\x0E\t\xB8\v\t\x03\t\x05\t" +
+		"\xBB\n\t\x03\n\x03\n\x05\n\xBF\n\n\x03\v\x03\v\x03\v\x03\v\x03\v\x03\v" +
+		"\x03\f\x03\f\x03\f\x03\f\x03\r\x03\r\x05\r\xCD\n\r\x03\x0E\x07\x0E\xD0" +
+		"\n\x0E\f\x0E\x0E\x0E\xD3\v\x0E\x03\x0F\x03\x0F\x03\x0F\x03\x0F\x03\x0F" +
+		"\x03\x10\x07\x10\xDB\n\x10\f\x10\x0E\x10\xDE\v\x10\x03\x11\x03\x11\x03" +
+		"\x11\x03\x11\x03\x11\x05\x11\xE5\n\x11\x03\x12\x03\x12\x03\x12\x03\x12" +
+		"\x03\x12\x03\x12\x03\x12\x03\x12\x03\x12\x05\x12\xF0\n\x12\x03\x13\x03" +
+		"\x13\x03\x13\x03\x13\x03\x13\x03\x13\x03\x13\x03\x13\x03\x14\x03\x14\x05" +
+		"\x14\xFC\n\x14\x03\x15\x07\x15\xFF\n\x15\f\x15\x0E\x15\u0102\v\x15\x03" +
+		"\x16\x07\x16\u0105\n\x16\f\x16\x0E\x16\u0108\v\x16\x03\x17\x03\x17\x03" +
+		"\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03" +
+		"\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x03\x18\x05\x18\u011D" +
+		"\n\x18\x03\x19\x03\x19\x03\x19\x05\x19\u0122\n\x19\x03\x1A\x07\x1A\u0125" +
+		"\n\x1A\f\x1A\x0E\x1A\u0128\v\x1A\x03\x1B\x03\x1B\x03\x1B\x03\x1B\x03\x1B" +
+		"\x03\x1B\x03\x1B\x03\x1B\x03\x1B\x03\x1B\x03\x1B\x03\x1B\x03\x1B\x03\x1B" +
+		"\x05\x1B\u0138\n\x1B\x03\x1C\x03\x1C\x03\x1C\x03\x1C\x03\x1C\x03\x1C\x05" +
+		"\x1C\u0140\n\x1C\x03\x1D\x03\x1D\x03\x1D\x05\x1D\u0145\n\x1D\x03\x1E\x07" +
+		"\x1E\u0148\n\x1E\f\x1E\x0E\x1E\u014B\v\x1E\x03\x1F\x03\x1F\x03 \x03 \x03" +
+		" \x03 \x03!\x03!\x03!\x03!\x03\"\x03\"\x03\"\x07\"\u015A\n\"\f\"\x0E\"" +
+		"\u015D\v\"\x03\"\x05\"\u0160\n\"\x03#\x03#\x03#\x03#\x05#\u0166\n#\x03" +
+		"#\x03#\x03$\x03$\x05$\u016C\n$\x03%\x07%\u016F\n%\f%\x0E%\u0172\v%\x03" +
+		"&\x03&\x03&\x03&\x03&\x05&\u0179\n&\x03\'\x03\'\x03\'\x03\'\x03\'\x03" +
+		"\'\x03(\x03(\x03(\x03(\x03(\x05(\u0186\n(\x03)\x03)\x03)\x03)\x03)\x03" +
+		"*\x03*\x03*\x03*\x03*\x03+\x03+\x03+\x03+\x03,\x03,\x03,\x03-\x03-\x03" +
+		"-\x03-\x03.\x03.\x03.\x07.\u01A0\n.\f.\x0E.\u01A3\v.\x03.\x05.\u01A6\n" +
+		".\x03/\x03/\x03/\x030\x030\x030\x050\u01AE\n0\x031\x071\u01B1\n1\f1\x0E" +
+		"1\u01B4\v1\x032\x032\x032\x032\x033\x033\x033\x033\x053\u01BE\n3\x034" +
+		"\x034\x034\x034\x034\x034\x034\x034\x034\x034\x034\x034\x034\x034\x03" +
+		"4\x034\x034\x034\x034\x034\x034\x034\x034\x034\x034\x034\x034\x034\x03" +
+		"4\x054\u01DD\n4\x035\x035\x035\x035\x035\x035\x035\x035\x035\x035\x03" +
+		"5\x035\x035\x035\x035\x035\x035\x035\x035\x035\x035\x035\x035\x035\x03" +
+		"5\x035\x035\x035\x035\x055\u01FC\n5\x036\x036\x036\x036\x036\x036\x03" +
+		"6\x036\x036\x036\x056\u0208\n6\x037\x077\u020B\n7\f7\x0E7\u020E\v7\x03" +
+		"8\x038\x038\x038\x038\x038\x038\x038\x058\u0218\n8\x039\x039\x039\x03" +
+		"9\x039\x039\x039\x039\x039\x039\x039\x039\x039\x039\x039\x039\x039\x03" +
+		"9\x039\x039\x039\x039\x039\x039\x039\x039\x039\x039\x039\x039\x039\x03" +
+		"9\x039\x039\x039\x039\x039\x039\x039\x039\x039\x059\u0243\n9\x03:\x03" +
 		":\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03" +
 		":\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03" +
 		":\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03" +
-		":\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x05:\u02B1\n:\x03:\x03" +
-		":\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x03:\x07" +
-		":\u02C2\n:\f:\x0E:\u02C5\v:\x03;\x03;\x03;\x03;\x03;\x05;\u02CC\n;\x03" +
+		":\x03:\x03:\x03:\x03:\x03:\x05:\u0276\n:\x03:\x03:\x03:\x03:\x03:\x03" +
+		":\x07:\u027E\n:\f:\x0E:\u0281\v:\x03;\x03;\x05;\u0285\n;\x03<\x03<\x03" +
 		"<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03" +
-		"<\x05<\u02DD\n<\x03=\x03=\x03=\x03=\x03=\x03=\x05=\u02E5\n=\x03>\x03>" +
-		"\x03?\x03?\x03?\x03?\x03?\x05?\u02EE\n?\x03@\x03@\x03@\x05@\u02F3\n@\x03" +
-		"A\x03A\x05A\u02F7\nA\x03B\x03B\x03C\x03C\x03C\x03C\x03C\x03C\x05C\u0301" +
-		"\nC\x03D\x03D\x05D\u0305\nD\x03D\x02\x02\x04nrE\x02\x02\x04\x02\x06\x02" +
-		"\b\x02\n\x02\f\x02\x0E\x02\x10\x02\x12\x02\x14\x02\x16\x02\x18\x02\x1A" +
-		"\x02\x1C\x02\x1E\x02 \x02\"\x02$\x02&\x02(\x02*\x02,\x02.\x020\x022\x02" +
-		"4\x026\x028\x02:\x02<\x02>\x02@\x02B\x02D\x02F\x02H\x02J\x02L\x02N\x02" +
-		"P\x02R\x02T\x02V\x02X\x02Z\x02\\\x02^\x02`\x02b\x02d\x02f\x02h\x02j\x02" +
-		"l\x02n\x02p\x02r\x02t\x02v\x02x\x02z\x02|\x02~\x02\x80\x02\x82\x02\x84" +
-		"\x02\x86\x02\x02\x04\x03\x02\x03\x04\x03\x02\x14\x15\x02\u0344\x02\x88" +
-		"\x03\x02\x02\x02\x04\x8E\x03\x02\x02\x02\x06\x93\x03\x02\x02\x02\b\x96" +
-		"\x03\x02\x02\x02\n\x9D\x03\x02\x02\x02\f\xA2\x03\x02\x02\x02\x0E\xA5\x03" +
-		"\x02\x02\x02\x10\xB6\x03\x02\x02\x02\x12\xBA\x03\x02\x02\x02\x14\xBC\x03" +
-		"\x02\x02\x02\x16\xC2\x03\x02\x02\x02\x18\xC8\x03\x02\x02\x02\x1A\xCD\x03" +
-		"\x02\x02\x02\x1C\xD0\x03\x02\x02\x02\x1E\xD8\x03\x02\x02\x02 \xE0\x03" +
-		"\x02\x02\x02\"\xEB\x03\x02\x02\x02$\xED\x03\x02\x02\x02&\xF7\x03\x02\x02" +
-		"\x02(\xFC\x03\x02\x02\x02*\u0102\x03\x02\x02\x02,\u0105\x03\x02\x02\x02" +
-		".\u0118\x03\x02\x02\x020\u011D\x03\x02\x02\x022\u0122\x03\x02\x02\x02" +
-		"4\u0131\x03\x02\x02\x026\u0139\x03\x02\x02\x028\u013E\x03\x02\x02\x02" +
-		":\u0143\x03\x02\x02\x02<\u0146\x03\x02\x02\x02>\u0148\x03\x02\x02\x02" +
-		"@\u014C\x03\x02\x02\x02B\u0159\x03\x02\x02\x02D\u015B\x03\x02\x02\x02" +
-		"F\u0165\x03\x02\x02\x02H\u016A\x03\x02\x02\x02J\u0172\x03\x02\x02\x02" +
-		"L\u0174\x03\x02\x02\x02N\u017F\x03\x02\x02\x02P\u0181\x03\x02\x02\x02" +
-		"R\u0186\x03\x02\x02\x02T\u018B\x03\x02\x02\x02V\u018F\x03\x02\x02\x02" +
-		"X\u0192\x03\x02\x02\x02Z\u019F\x03\x02\x02\x02\\\u01A1\x03\x02\x02\x02" +
-		"^\u01AC\x03\x02\x02\x02`\u01B2\x03\x02\x02\x02b\u01D1\x03\x02\x02\x02" +
-		"d\u01F0\x03\x02\x02\x02f\u01FC\x03\x02\x02\x02h\u0201\x03\x02\x02\x02" +
-		"j\u020C\x03\x02\x02\x02l\u0237\x03\x02\x02\x02n\u026A\x03\x02\x02\x02" +
-		"p\u0279\x03\x02\x02\x02r\u02B0\x03\x02\x02\x02t\u02CB\x03\x02\x02\x02" +
-		"v\u02DC\x03\x02\x02\x02x\u02E4\x03\x02\x02\x02z\u02E6\x03\x02\x02\x02" +
-		"|\u02ED\x03\x02\x02\x02~\u02F2\x03\x02\x02\x02\x80\u02F6\x03\x02\x02\x02" +
-		"\x82\u02F8\x03\x02\x02\x02\x84\u0300\x03\x02\x02\x02\x86\u0304\x03\x02" +
-		"\x02\x02\x88\x89\x05\x04\x03\x02\x89\x8A\x05~@\x02\x8A\x8B\x05\x06\x04" +
-		"\x02\x8B\x8C\x05\f\x07\x02\x8C\x8D\x07\x02\x02\x03\x8D\x03\x03\x02\x02" +
-		"\x02\x8E\x8F\t\x02\x02\x02\x8F\x05\x03\x02\x02\x02\x90\x92\x05\b\x05\x02" +
-		"\x91\x90\x03\x02\x02\x02\x92\x95\x03\x02\x02\x02\x93\x91\x03\x02\x02\x02" +
-		"\x93\x94\x03\x02\x02\x02\x94\x07\x03\x02\x02\x02\x95\x93\x03\x02\x02\x02" +
-		"\x96\x97\x07\x05\x02\x02\x97\x98\x05\n\x06\x02\x98\x99\x07\x06\x02\x02" +
-		"\x99\x9A\x05\x82B\x02\x9A\t\x03\x02\x02\x02\x9B\x9E\x05~@\x02\x9C\x9E" +
-		"\x07\x07\x02\x02\x9D\x9B\x03\x02\x02\x02\x9D\x9C\x03\x02\x02\x02\x9E\v" +
-		"\x03\x02\x02\x02\x9F\xA1\x05\x0E\b\x02\xA0\x9F\x03\x02\x02\x02\xA1\xA4" +
-		"\x03\x02\x02\x02\xA2\xA0\x03\x02\x02\x02\xA2\xA3\x03\x02\x02\x02\xA3\r" +
-		"\x03\x02\x02\x02\xA4\xA2\x03\x02\x02\x02\xA5\xA6\x05\x12\n\x02\xA6\xA7" +
-		"\x05~@\x02\xA7\xA8\x05\x10\t\x02\xA8\xA9\x07\b\x02\x02\xA9\xAA\x05\x14" +
-		"\v\x02\xAA\xAB\x07\t\x02\x02\xAB\x0F\x03\x02\x02\x02\xAC\xAD\x07\n\x02" +
-		"\x02\xAD\xB2\x05~@\x02\xAE\xAF\x07\v\x02\x02\xAF\xB1\x05~@\x02\xB0\xAE" +
-		"\x03\x02\x02\x02\xB1\xB4\x03\x02\x02\x02\xB2\xB0\x03\x02\x02\x02\xB2\xB3" +
-		"\x03\x02\x02\x02\xB3\xB7\x03\x02\x02\x02\xB4\xB2\x03\x02\x02\x02\xB5\xB7" +
-		"\x03\x02\x02\x02\xB6\xAC\x03\x02\x02\x02\xB6\xB5\x03\x02\x02\x02\xB7\x11" +
-		"\x03\x02\x02\x02\xB8\xBB\x07\f\x02\x02\xB9\xBB\x07\r\x02\x02\xBA\xB8\x03" +
-		"\x02\x02\x02\xBA\xB9\x03\x02\x02\x02\xBB\x13\x03\x02\x02\x02\xBC\xBD\x05" +
-		"\x1A\x0E\x02\xBD\xBE\x05\x1E\x10\x02\xBE\xBF\x05h5\x02\xBF\xC0\x052\x1A" +
-		"\x02\xC0\xC1\x05(\x15\x02\xC1\x15\x03\x02\x02\x02\xC2\xC3\x05\x18\r\x02" +
-		"\xC3\xC4\x05~@\x02\xC4\xC5\x05\x82B\x02\xC5\x17\x03\x02\x02\x02\xC6\xC9" +
-		"\x07\x0E\x02\x02\xC7\xC9\x07\x0F\x02\x02\xC8\xC6\x03\x02\x02\x02\xC8\xC7" +
-		"\x03\x02\x02\x02\xC9\x19\x03\x02\x02\x02\xCA\xCC\x05\x16\f\x02\xCB\xCA" +
-		"\x03\x02\x02\x02\xCC\xCF\x03\x02\x02\x02\xCD\xCB\x03\x02\x02\x02\xCD\xCE" +
-		"\x03\x02\x02\x02\xCE\x1B\x03\x02\x02\x02\xCF\xCD\x03\x02\x02\x02\xD0\xD1" +
-		"\x07\x10\x02\x02\xD1\xD2\x05~@\x02\xD2\xD3\x07\x11\x02\x02\xD3\xD4\x05" +
-		" \x11\x02\xD4\x1D\x03\x02\x02\x02\xD5\xD7\x05\x1C\x0F\x02\xD6\xD5\x03" +
-		"\x02\x02\x02\xD7\xDA\x03\x02\x02\x02\xD8\xD6\x03\x02\x02\x02\xD8\xD9\x03" +
-		"\x02\x02\x02\xD9\x1F\x03\x02\x02\x02\xDA\xD8\x03\x02\x02\x02\xDB\xDC\x07" +
-		"\x12\x02\x02\xDC\xDD\x07\x13\x02\x02\xDD\xE1\x05 \x11\x02\xDE\xE1\x07" +
-		"\f\x02\x02\xDF\xE1\x05\"\x12\x02\xE0\xDB\x03\x02\x02\x02\xE0\xDE\x03\x02" +
-		"\x02\x02\xE0\xDF\x03\x02\x02\x02\xE1!\x03\x02\x02\x02\xE2\xEC\t\x03\x02" +
-		"\x02\xE3\xEC\x07\x16\x02\x02\xE4\xEC\x07\x17\x02\x02\xE5\xEC\x07\x18\x02" +
-		"\x02\xE6\xE7\x07\x19\x02\x02\xE7\xE8\x07\x1A\x02\x02\xE8\xE9\x05Z.\x02" +
-		"\xE9\xEA\x07\x1B\x02\x02\xEA\xEC\x03\x02\x02\x02\xEB\xE2\x03\x02\x02\x02" +
-		"\xEB\xE3\x03\x02\x02\x02\xEB\xE4\x03\x02\x02\x02\xEB\xE5\x03\x02\x02\x02" +
-		"\xEB\xE6\x03\x02\x02\x02\xEC#\x03\x02\x02\x02\xED\xEE\x07\x1C\x02\x02" +
-		"\xEE\xEF\x05&\x14\x02\xEF\xF0\x07\x1D\x02\x02\xF0\xF1\x05.\x18\x02\xF1" +
-		"\xF2\x07\x1E\x02\x02\xF2\xF3\x05*\x16\x02\xF3\xF4\x05D#\x02\xF4%\x03\x02" +
-		"\x02\x02\xF5\xF8\x05~@\x02\xF6\xF8\x03\x02\x02\x02\xF7\xF5\x03\x02\x02" +
-		"\x02\xF7\xF6\x03\x02\x02\x02\xF8\'\x03\x02\x02\x02\xF9\xFB\x05$\x13\x02" +
-		"\xFA\xF9\x03\x02\x02\x02\xFB\xFE\x03\x02\x02\x02\xFC\xFA\x03\x02\x02\x02" +
-		"\xFC\xFD\x03\x02\x02\x02\xFD)\x03\x02\x02\x02\xFE\xFC\x03\x02\x02\x02" +
-		"\xFF\u0101\x05,\x17\x02\u0100\xFF\x03\x02\x02\x02\u0101\u0104\x03\x02" +
-		"\x02\x02\u0102\u0100\x03\x02\x02\x02\u0102\u0103\x03\x02\x02\x02\u0103" +
-		"+\x03\x02\x02\x02\u0104\u0102\x03\x02\x02\x02\u0105\u0106\x07\x1F\x02" +
-		"\x02\u0106-\x03\x02\x02\x02\u0107\u0119\x07 \x02\x02\u0108\u0119\x07!" +
-		"\x02\x02\u0109\u010A\x07!\x02\x02\u010A\u0119\x07\"\x02\x02\u010B\u0119" +
-		"\x07#\x02\x02\u010C\u010D\x07$\x02\x02\u010D\u010E\x07\x11\x02\x02\u010E" +
-		"\u0119\x07%\x02\x02\u010F\u0110\x07&\x02\x02\u0110\u0111\x05l7\x02\u0111" +
-		"\u0112\x05@!\x02\u0112\u0113\x050\x19\x02\u0113\u0119\x03\x02\x02\x02" +
-		"\u0114\u0115\x07\'\x02\x02\u0115\u0119\x05n8\x02\u0116\u0117\x07(\x02" +
-		"\x02\u0117\u0119\x07\"\x02\x02\u0118\u0107\x03\x02\x02\x02\u0118\u0108" +
-		"\x03\x02\x02\x02\u0118\u0109\x03\x02\x02\x02\u0118\u010B\x03\x02\x02\x02" +
-		"\u0118\u010C\x03\x02\x02\x02\u0118\u010F\x03\x02\x02\x02\u0118\u0114\x03" +
-		"\x02\x02\x02\u0118\u0116\x03\x02\x02\x02\u0119/\x03\x02\x02\x02\u011A" +
-		"\u011B\x07)\x02\x02\u011B\u011E\x07o\x02\x02\u011C\u011E\x03\x02\x02\x02" +
-		"\u011D\u011A\x03\x02\x02\x02\u011D\u011C\x03\x02\x02\x02\u011E1\x03\x02" +
-		"\x02\x02\u011F\u0121\x054\x1B\x02\u0120\u011F\x03\x02\x02\x02\u0121\u0124" +
-		"\x03\x02\x02\x02\u0122\u0120\x03\x02\x02\x02\u0122\u0123\x03\x02\x02\x02" +
-		"\u01233\x03\x02\x02\x02\u0124\u0122\x03\x02\x02\x02\u0125\u0126\x07*\x02" +
-		"\x02\u0126\u0127\x05:\x1E\x02\u0127\u0128\x05~@\x02\u0128\u0129\x05@!" +
-		"\x02\u0129\u012A\x05D#\x02\u012A\u012B\x056\x1C\x02\u012B\u0132\x03\x02" +
-		"\x02\x02\u012C\u012D\x07+\x02\x02\u012D\u012E\x05~@\x02\u012E\u012F\x05" +
-		"@!\x02\u012F\u0130\x058\x1D\x02\u0130\u0132\x03\x02\x02\x02\u0131\u0125" +
-		"\x03\x02\x02\x02\u0131\u012C\x03\x02\x02\x02\u01325\x03\x02\x02\x02\u0133" +
-		"\u0134\x07,\x02\x02\u0134\u0135\x05~@\x02\u0135\u0136\x07-\x02\x02\u0136" +
-		"\u0137\x05 \x11\x02\u0137\u013A\x03\x02\x02\x02\u0138\u013A\x03\x02\x02" +
-		"\x02\u0139\u0133\x03\x02\x02\x02\u0139\u0138\x03\x02\x02\x02\u013A7\x03" +
-		"\x02\x02\x02\u013B\u013C\x07,\x02\x02\u013C\u013F\x05 \x11\x02\u013D\u013F" +
-		"\x03\x02\x02\x02\u013E\u013B\x03\x02\x02\x02\u013E\u013D\x03\x02\x02\x02" +
-		"\u013F9\x03\x02\x02\x02\u0140\u0142\x05<\x1F\x02\u0141\u0140\x03\x02\x02" +
-		"\x02\u0142\u0145\x03\x02\x02\x02\u0143\u0141\x03\x02\x02\x02\u0143\u0144" +
-		"\x03\x02\x02\x02\u0144;\x03\x02\x02\x02\u0145\u0143\x03\x02\x02\x02\u0146" +
-		"\u0147\x07.\x02\x02\u0147=\x03\x02\x02\x02\u0148\u0149\x05~@\x02\u0149" +
-		"\u014A\x07-\x02\x02\u014A\u014B\x05 \x11\x02\u014B?\x03\x02\x02\x02\u014C" +
-		"\u014D\x07/\x02\x02\u014D\u014E\x05B\"\x02\u014E\u014F\x070\x02\x02\u014F" +
-		"A\x03\x02\x02\x02\u0150\u0155\x05> \x02\u0151\u0152\x07\v\x02\x02\u0152" +
-		"\u0154\x05> \x02\u0153\u0151\x03\x02\x02\x02\u0154\u0157\x03\x02\x02\x02" +
-		"\u0155\u0153\x03\x02\x02\x02\u0155\u0156\x03\x02\x02\x02\u0156\u015A\x03" +
-		"\x02\x02\x02\u0157\u0155\x03\x02\x02\x02\u0158\u015A\x03\x02\x02\x02\u0159" +
-		"\u0150\x03\x02\x02\x02\u0159\u0158\x03\x02\x02\x02\u015AC\x03\x02\x02" +
-		"\x02\u015B\u015C\x05F$\x02\u015C\u015D\x07\b\x02\x02\u015D\u015F\x05H" +
-		"%\x02\u015E\u0160\x05j6\x02\u015F\u015E\x03\x02\x02\x02\u015F\u0160\x03" +
-		"\x02\x02\x02\u0160\u0161\x03\x02\x02\x02\u0161\u0162\x07\t\x02\x02\u0162" +
-		"E\x03\x02\x02\x02\u0163\u0166\x07.\x02\x02\u0164\u0166\x03\x02\x02\x02" +
-		"\u0165\u0163\x03\x02\x02\x02\u0165\u0164\x03\x02\x02\x02\u0166G\x03\x02" +
-		"\x02\x02\u0167\u0169\x05^0\x02\u0168\u0167\x03\x02\x02\x02\u0169\u016C" +
-		"\x03\x02\x02\x02\u016A\u0168\x03\x02\x02\x02\u016A\u016B\x03\x02\x02\x02" +
-		"\u016BI\x03\x02\x02\x02\u016C\u016A\x03\x02\x02\x02\u016D\u0173\x05L\'" +
-		"\x02\u016E\u0173\x05P)\x02\u016F\u0173\x05R*\x02\u0170\u0173\x05T+\x02" +
-		"\u0171\u0173\x05V,\x02\u0172\u016D\x03\x02\x02\x02\u0172\u016E\x03\x02" +
-		"\x02\x02\u0172\u016F\x03\x02\x02\x02\u0172\u0170\x03\x02\x02\x02\u0172" +
-		"\u0171\x03\x02\x02\x02\u0173K\x03\x02\x02\x02\u0174\u0175\x071\x02\x02" +
-		"\u0175\u0176\x05n8\x02\u0176\u0177\x072\x02\x02\u0177\u0178\x05D#\x02" +
-		"\u0178\u0179\x05N(\x02\u0179M\x03\x02\x02\x02\u017A\u017B\x073\x02\x02" +
-		"\u017B\u0180\x05D#\x02\u017C\u017D\x073\x02\x02\u017D\u0180\x05L\'\x02" +
-		"\u017E\u0180\x03\x02\x02\x02\u017F\u017A\x03\x02\x02\x02\u017F\u017C\x03" +
-		"\x02\x02\x02\u017F\u017E\x03\x02\x02\x02\u0180O\x03\x02\x02\x02\u0181" +
-		"\u0182\x074\x02\x02\u0182\u0183\x05n8\x02\u0183\u0184\x075\x02\x02\u0184" +
-		"\u0185\x05D#\x02\u0185Q\x03\x02\x02\x02\u0186\u0187\x075\x02\x02\u0187" +
-		"\u0188\x05r:\x02\u0188\u0189\x076\x02\x02\u0189\u018A\x05D#\x02\u018A" +
-		"S\x03\x02\x02\x02\u018B\u018C\x075\x02\x02\u018C\u018D\x077\x02\x02\u018D" +
-		"\u018E\x05D#\x02\u018EU\x03\x02\x02\x02\u018F\u0190\x05~@\x02\u0190\u0191" +
-		"\x05X-\x02\u0191W\x03\x02\x02\x02\u0192\u0193\x07/\x02\x02\u0193\u0194" +
-		"\x05Z.\x02\u0194\u0195\x070\x02\x02\u0195Y\x03\x02\x02\x02\u0196\u019B" +
-		"\x05x=\x02\u0197\u0198\x07\v\x02\x02\u0198\u019A\x05x=\x02\u0199\u0197" +
-		"\x03\x02\x02\x02\u019A\u019D\x03\x02\x02\x02\u019B\u0199\x03\x02\x02\x02" +
-		"\u019B\u019C\x03\x02\x02\x02\u019C\u01A0\x03\x02\x02\x02\u019D\u019B\x03" +
-		"\x02\x02\x02\u019E\u01A0\x03\x02\x02\x02\u019F\u0196\x03\x02\x02\x02\u019F" +
-		"\u019E\x03\x02\x02\x02\u01A0[\x03\x02\x02\x02\u01A1\u01A2\x078\x02\x02" +
-		"\u01A2\u01A3\x05x=\x02\u01A3]\x03\x02\x02\x02\u01A4\u01AD\x05J&\x02\u01A5" +
-		"\u01AD\x05`1\x02\u01A6\u01AD\x05D#\x02\u01A7\u01A8\x079\x02\x02\u01A8" +
-		"\u01A9\x07p\x02\x02\u01A9\u01AA\x05X-\x02\u01AA\u01AB\x05^0\x02\u01AB" +
-		"\u01AD\x03\x02\x02\x02\u01AC\u01A4\x03\x02\x02\x02\u01AC\u01A5\x03\x02" +
-		"\x02\x02\u01AC\u01A6\x03\x02\x02\x02\u01AC\u01A7\x03\x02\x02\x02\u01AD" +
-		"_\x03\x02\x02\x02\u01AE\u01B3\x05\\/\x02\u01AF\u01B3\x05b2\x02\u01B0\u01B3" +
-		"\x05d3\x02\u01B1\u01B3\x05\x1C\x0F\x02\u01B2\u01AE\x03\x02\x02\x02\u01B2" +
-		"\u01AF\x03\x02\x02\x02\u01B2\u01B0\x03\x02\x02\x02\u01B2\u01B1\x03\x02" +
-		"\x02\x02\u01B3a\x03\x02\x02\x02\u01B4\u01B5\x07:\x02\x02\u01B5\u01B6\x05" +
-		"r:\x02\u01B6\u01B7\x07;\x02\x02\u01B7\u01D2\x03\x02\x02\x02\u01B8\u01B9" +
-		"\x07:\x02\x02\u01B9\u01BA\x074\x02\x02\u01BA\u01D2\x05n8\x02\u01BB\u01BC" +
-		"\x07<\x02\x02\u01BC\u01BD\x07=\x02\x02\u01BD\u01BE\x07>\x02\x02\u01BE" +
-		"\u01BF\x07)\x02\x02\u01BF\u01D2\x07\f\x02\x02\u01C0\u01C1\x07?\x02\x02" +
-		"\u01C1\u01C2\x07%\x02\x02\u01C2\u01C3\x07\x13\x02\x02\u01C3\u01D2\x05" +
-		"l7\x02\u01C4\u01C5\x07@\x02\x02\u01C5\u01D2\x05\x84C\x02\u01C6\u01C7\x07" +
-		"@\x02\x02\u01C7\u01C8\x05\x84C\x02\u01C8\u01C9\x07A\x02\x02\u01C9\u01CA" +
-		"\x07:\x02\x02\u01CA\u01D2\x03\x02\x02\x02\u01CB\u01CC\x07B\x02\x02\u01CC" +
-		"\u01D2\x07C\x02\x02\u01CD\u01D2\x07D\x02\x02\u01CE\u01CF\x07E\x02\x02" +
-		"\u01CF\u01D2\x05n8\x02\u01D0\u01D2\x05f4\x02\u01D1\u01B4\x03\x02\x02\x02" +
-		"\u01D1\u01B8\x03\x02\x02\x02\u01D1\u01BB\x03\x02\x02\x02\u01D1\u01C0\x03" +
-		"\x02\x02\x02\u01D1\u01C4\x03\x02\x02\x02\u01D1\u01C6\x03\x02\x02\x02\u01D1" +
-		"\u01CB\x03\x02\x02\x02\u01D1\u01CD\x03\x02\x02\x02\u01D1\u01CE\x03\x02" +
-		"\x02\x02\u01D1\u01D0\x03\x02\x02\x02\u01D2c\x03\x02\x02\x02\u01D3\u01D4" +
-		"\x07F\x02\x02\u01D4\u01D5\x07G\x02\x02\u01D5\u01D6\x07\x06\x02\x02\u01D6" +
-		"\u01F1\x05|?\x02\u01D7\u01D8\x07F\x02\x02\u01D8\u01D9\x05r:\x02\u01D9" +
-		"\u01DA\x07\x13\x02\x02\u01DA\u01DB\x05|?\x02\u01DB\u01F1\x03\x02\x02\x02" +
-		"\u01DC\u01DD\x07H\x02\x02\u01DD\u01DE\x05l7\x02\u01DE\u01DF\x07I\x02\x02" +
-		"\u01DF\u01E0\x05|?\x02\u01E0\u01F1\x03\x02\x02\x02\u01E1\u01E2\x07J\x02" +
-		"\x02\u01E2\u01E3\x05l7\x02\u01E3\u01E4\x07K\x02\x02\u01E4\u01E5\x05r:" +
-		"\x02\u01E5\u01E6\x07\x13\x02\x02\u01E6\u01E7\x05|?\x02\u01E7\u01F1\x03" +
-		"\x02\x02\x02\u01E8\u01E9\x07L\x02\x02\u01E9\u01EA\x07M\x02\x02\u01EA\u01EB" +
-		"\x05r:\x02\u01EB\u01EC\x07\x13\x02\x02\u01EC\u01ED\x05|?\x02\u01ED\u01EE" +
-		"\x07N\x02\x02\u01EE\u01EF\x05l7\x02\u01EF\u01F1\x03\x02\x02\x02\u01F0" +
-		"\u01D3\x03\x02\x02\x02\u01F0\u01D7\x03\x02\x02\x02\u01F0\u01DC\x03\x02" +
-		"\x02\x02\u01F0\u01E1\x03\x02\x02\x02\u01F0\u01E8\x03\x02\x02\x02\u01F1" +
-		"e\x03\x02\x02\x02\u01F2\u01F3\x07*\x02\x02\u01F3\u01F4\x05|?\x02\u01F4" +
-		"\u01F5\x07\x11\x02\x02\u01F5\u01F6\x05x=\x02\u01F6\u01FD\x03\x02\x02\x02" +
-		"\u01F7\u01F8\x07*\x02\x02\u01F8\u01F9\x05|?\x02\u01F9\u01FA\x07\x11\x02" +
-		"\x02\u01FA\u01FB\x05V,\x02\u01FB\u01FD\x03\x02\x02\x02\u01FC\u01F2\x03" +
-		"\x02\x02\x02\u01FC\u01F7\x03\x02\x02\x02\u01FDg\x03\x02\x02\x02\u01FE" +
-		"\u0200\x05f4\x02\u01FF\u01FE\x03\x02\x02\x02\u0200\u0203\x03\x02\x02\x02" +
-		"\u0201\u01FF\x03\x02\x02\x02\u0201\u0202\x03\x02\x02\x02\u0202i\x03\x02" +
-		"\x02\x02\u0203\u0201\x03\x02\x02\x02\u0204\u0205\x07<\x02\x02\u0205\u020D" +
-		"\x07G\x02\x02\u0206\u0207\x07<\x02\x02\u0207\u0208\x07O\x02\x02\u0208" +
-		"\u020D\x07\x1C\x02\x02\u0209\u020A\x07F\x02\x02\u020A\u020B\x07O\x02\x02" +
-		"\u020B\u020D\x07%\x02\x02\u020C\u0204\x03\x02\x02\x02\u020C\u0206\x03" +
-		"\x02\x02\x02\u020C\u0209\x03\x02\x02\x02\u020Dk\x03\x02\x02\x02\u020E" +
-		"\u0238\x07o\x02\x02\u020F\u0238\x05|?\x02\u0210\u0211\x07/\x02\x02\u0211" +
-		"\u0212\x05l7\x02\u0212\u0213\x070\x02\x02\u0213\u0238\x03\x02\x02\x02" +
-		"\u0214\u0238\x05V,\x02\u0215\u0216\x07P\x02\x02\u0216\u0217\x05r:\x02" +
-		"\u0217\u0218\x07I\x02\x02\u0218\u0219\x07\x18\x02\x02\u0219\u0238\x03" +
-		"\x02\x02\x02\u021A\u021B\x07P\x02\x02\u021B\u021C";
+		"<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03" +
+		"<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03" +
+		"<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x05<\u02BC\n<\x03<\x03<\x03" +
+		"<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x03<\x07<\u02CD" +
+		"\n<\f<\x0E<\u02D0\v<\x03=\x03=\x03=\x03=\x03=\x05=\u02D7\n=\x03>\x03>" +
+		"\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x03>\x05" +
+		">\u02E8\n>\x03?\x03?\x03?\x03?\x03?\x03?\x05?\u02F0\n?\x03@\x03@\x03A" +
+		"\x03A\x03A\x03A\x03A\x05A\u02F9\nA\x03B\x03B\x03B\x05B\u02FE\nB\x03C\x03" +
+		"C\x05C\u0302\nC\x03D\x03D\x03E\x03E\x03E\x03E\x03E\x03E\x05E\u030C\nE" +
+		"\x03F\x03F\x05F\u0310\nF\x03F\x02\x02\x04rvG\x02\x02\x04\x02\x06\x02\b" +
+		"\x02\n\x02\f\x02\x0E\x02\x10\x02\x12\x02\x14\x02\x16\x02\x18\x02\x1A\x02" +
+		"\x1C\x02\x1E\x02 \x02\"\x02$\x02&\x02(\x02*\x02,\x02.\x020\x022\x024\x02" +
+		"6\x028\x02:\x02<\x02>\x02@\x02B\x02D\x02F\x02H\x02J\x02L\x02N\x02P\x02" +
+		"R\x02T\x02V\x02X\x02Z\x02\\\x02^\x02`\x02b\x02d\x02f\x02h\x02j\x02l\x02" +
+		"n\x02p\x02r\x02t\x02v\x02x\x02z\x02|\x02~\x02\x80\x02\x82\x02\x84\x02" +
+		"\x86\x02\x88\x02\x8A\x02\x02\x04\x03\x02\x03\x04\x03\x02\x14\x15\x02\u034D" +
+		"\x02\x8C\x03\x02\x02\x02\x04\x92\x03\x02\x02\x02\x06\x97\x03\x02\x02\x02" +
+		"\b\x9A\x03\x02\x02\x02\n\xA1\x03\x02\x02\x02\f\xA6\x03\x02\x02\x02\x0E" +
+		"\xA9\x03\x02\x02\x02\x10\xBA\x03\x02\x02\x02\x12\xBE\x03\x02\x02\x02\x14" +
+		"\xC0\x03\x02\x02\x02\x16\xC6\x03\x02\x02\x02\x18\xCC\x03\x02\x02\x02\x1A" +
+		"\xD1\x03\x02\x02\x02\x1C\xD4\x03\x02\x02\x02\x1E\xDC\x03\x02\x02\x02 " +
+		"\xE4\x03\x02\x02\x02\"\xEF\x03\x02\x02\x02$\xF1\x03\x02\x02\x02&\xFB\x03" +
+		"\x02\x02\x02(\u0100\x03\x02\x02\x02*\u0106\x03\x02\x02\x02,\u0109\x03" +
+		"\x02\x02\x02.\u011C\x03\x02\x02\x020\u0121\x03\x02\x02\x022\u0126\x03" +
+		"\x02\x02\x024\u0137\x03\x02\x02\x026\u013F\x03\x02\x02\x028\u0144\x03" +
+		"\x02\x02\x02:\u0149\x03\x02\x02\x02<\u014C\x03\x02\x02\x02>\u014E\x03" +
+		"\x02\x02\x02@\u0152\x03\x02\x02\x02B\u015F\x03\x02\x02\x02D\u0161\x03" +
+		"\x02\x02\x02F\u016B\x03\x02\x02\x02H\u0170\x03\x02\x02\x02J\u0178\x03" +
+		"\x02\x02\x02L\u017A\x03\x02\x02\x02N\u0185\x03\x02\x02\x02P\u0187\x03" +
+		"\x02\x02\x02R\u018C\x03\x02\x02\x02T\u0191\x03\x02\x02\x02V\u0195\x03" +
+		"\x02\x02\x02X\u0198\x03\x02\x02\x02Z\u01A5\x03\x02\x02\x02\\\u01A7\x03" +
+		"\x02\x02\x02^\u01AD\x03\x02\x02\x02`\u01B2\x03\x02\x02\x02b\u01B5\x03" +
+		"\x02\x02\x02d\u01BD\x03\x02\x02\x02f\u01DC\x03\x02\x02\x02h\u01FB\x03" +
+		"\x02\x02\x02j\u0207\x03\x02\x02\x02l\u020C\x03\x02\x02\x02n\u0217\x03" +
+		"\x02\x02\x02p\u0242\x03\x02\x02\x02r\u0275\x03\x02\x02\x02t\u0284\x03" +
+		"\x02\x02\x02v\u02BB\x03\x02\x02\x02x\u02D6\x03\x02\x02\x02z\u02E7\x03" +
+		"\x02\x02\x02|\u02EF\x03\x02\x02\x02~\u02F1\x03\x02\x02\x02\x80\u02F8\x03" +
+		"\x02\x02\x02\x82\u02FD\x03\x02\x02\x02\x84\u0301\x03\x02\x02\x02\x86\u0303" +
+		"\x03\x02\x02\x02\x88\u030B\x03\x02\x02\x02\x8A\u030F\x03\x02\x02\x02\x8C" +
+		"\x8D\x05\x04\x03\x02\x8D\x8E\x05\x82B\x02\x8E\x8F\x05\x06\x04\x02\x8F" +
+		"\x90\x05\f\x07\x02\x90\x91\x07\x02\x02\x03\x91\x03\x03\x02\x02\x02\x92" +
+		"\x93\t\x02\x02\x02\x93\x05\x03\x02\x02\x02\x94\x96\x05\b\x05\x02\x95\x94" +
+		"\x03\x02\x02\x02\x96\x99\x03\x02\x02\x02\x97\x95\x03\x02\x02\x02\x97\x98" +
+		"\x03\x02\x02\x02\x98\x07\x03\x02\x02\x02\x99\x97\x03\x02\x02\x02\x9A\x9B" +
+		"\x07\x05\x02\x02\x9B\x9C\x05\n\x06\x02\x9C\x9D\x07\x06\x02\x02\x9D\x9E" +
+		"\x05\x86D\x02\x9E\t\x03\x02\x02\x02\x9F\xA2\x05\x82B\x02\xA0\xA2\x07\x07" +
+		"\x02\x02\xA1\x9F\x03\x02\x02\x02\xA1\xA0\x03\x02\x02\x02\xA2\v\x03\x02" +
+		"\x02\x02\xA3\xA5\x05\x0E\b\x02\xA4\xA3\x03\x02\x02\x02\xA5\xA8\x03\x02" +
+		"\x02\x02\xA6\xA4\x03\x02\x02\x02\xA6\xA7\x03\x02\x02\x02\xA7\r\x03\x02" +
+		"\x02\x02\xA8\xA6\x03\x02\x02\x02\xA9\xAA\x05\x12\n\x02\xAA\xAB\x05\x82" +
+		"B\x02\xAB\xAC\x05\x10\t\x02\xAC\xAD\x07\b\x02\x02\xAD\xAE\x05\x14\v\x02" +
+		"\xAE\xAF\x07\t\x02\x02\xAF\x0F\x03\x02\x02\x02\xB0\xB1\x07\n\x02\x02\xB1" +
+		"\xB6\x05\x82B\x02\xB2\xB3\x07\v\x02\x02\xB3\xB5\x05\x82B\x02\xB4\xB2\x03" +
+		"\x02\x02\x02\xB5\xB8\x03\x02\x02\x02\xB6\xB4\x03\x02\x02\x02\xB6\xB7\x03" +
+		"\x02\x02\x02\xB7\xBB\x03\x02\x02\x02\xB8\xB6\x03\x02\x02\x02\xB9\xBB\x03" +
+		"\x02\x02\x02\xBA\xB0\x03\x02\x02\x02\xBA\xB9\x03\x02\x02\x02\xBB\x11\x03" +
+		"\x02\x02\x02\xBC\xBF\x07\f\x02\x02\xBD\xBF\x07\r\x02\x02\xBE\xBC\x03\x02" +
+		"\x02\x02\xBE\xBD\x03\x02\x02\x02\xBF\x13\x03\x02\x02\x02\xC0\xC1\x05\x1A" +
+		"\x0E\x02\xC1\xC2\x05\x1E\x10\x02\xC2\xC3\x05l7\x02\xC3\xC4\x052\x1A\x02" +
+		"\xC4\xC5\x05(\x15\x02\xC5\x15\x03\x02\x02\x02\xC6\xC7\x05\x18\r\x02\xC7" +
+		"\xC8\x05\x82B\x02\xC8\xC9\x05\x86D\x02\xC9\x17\x03\x02\x02\x02\xCA\xCD" +
+		"\x07\x0E\x02\x02\xCB\xCD\x07\x0F\x02\x02\xCC\xCA\x03\x02\x02\x02\xCC\xCB" +
+		"\x03\x02\x02\x02\xCD\x19\x03\x02\x02\x02\xCE\xD0\x05\x16\f\x02\xCF\xCE" +
+		"\x03\x02\x02\x02\xD0\xD3\x03\x02\x02\x02\xD1\xCF\x03\x02\x02\x02\xD1\xD2" +
+		"\x03\x02\x02\x02\xD2\x1B\x03\x02\x02\x02\xD3\xD1\x03\x02\x02\x02\xD4\xD5" +
+		"\x07\x10\x02\x02\xD5\xD6\x05\x82B\x02\xD6\xD7\x07\x11\x02\x02\xD7\xD8" +
+		"\x05 \x11\x02\xD8\x1D\x03\x02\x02\x02\xD9\xDB\x05\x1C\x0F\x02\xDA\xD9" +
+		"\x03\x02\x02\x02\xDB\xDE\x03\x02\x02\x02\xDC\xDA\x03\x02\x02\x02\xDC\xDD" +
+		"\x03\x02\x02\x02\xDD\x1F\x03\x02\x02\x02\xDE\xDC\x03\x02\x02\x02\xDF\xE0" +
+		"\x07\x12\x02\x02\xE0\xE1\x07\x13\x02\x02\xE1\xE5\x05 \x11\x02\xE2\xE5" +
+		"\x07\f\x02\x02\xE3\xE5\x05\"\x12\x02\xE4\xDF\x03\x02\x02\x02\xE4\xE2\x03" +
+		"\x02\x02\x02\xE4\xE3\x03\x02\x02\x02\xE5!\x03\x02\x02\x02\xE6\xF0\t\x03" +
+		"\x02\x02\xE7\xF0\x07\x16\x02\x02\xE8\xF0\x07\x17\x02\x02\xE9\xF0\x07\x18" +
+		"\x02\x02\xEA\xEB\x07\x19\x02\x02\xEB\xEC\x07\x1A\x02\x02\xEC\xED\x05Z" +
+		".\x02\xED\xEE\x07\x1B\x02\x02\xEE\xF0\x03\x02\x02\x02\xEF\xE6\x03\x02" +
+		"\x02\x02\xEF\xE7\x03\x02\x02\x02\xEF\xE8\x03\x02\x02\x02\xEF\xE9\x03\x02" +
+		"\x02\x02\xEF\xEA\x03\x02\x02\x02\xF0#\x03\x02\x02\x02\xF1\xF2\x07\x1C" +
+		"\x02\x02\xF2\xF3\x05&\x14\x02\xF3\xF4\x07\x1D\x02\x02\xF4\xF5\x05.\x18" +
+		"\x02\xF5\xF6\x07\x1E\x02\x02\xF6\xF7\x05*\x16\x02\xF7\xF8\x05D#\x02\xF8" +
+		"%\x03\x02\x02\x02\xF9\xFC\x05\x82B\x02\xFA\xFC\x03\x02\x02\x02\xFB\xF9" +
+		"\x03\x02\x02\x02\xFB\xFA\x03\x02\x02\x02\xFC\'\x03\x02\x02\x02\xFD\xFF" +
+		"\x05$\x13\x02\xFE\xFD\x03\x02\x02\x02\xFF\u0102\x03\x02\x02\x02\u0100" +
+		"\xFE\x03\x02\x02\x02\u0100\u0101\x03\x02\x02\x02\u0101)\x03\x02\x02\x02" +
+		"\u0102\u0100\x03\x02\x02\x02\u0103\u0105\x05,\x17\x02\u0104\u0103\x03" +
+		"\x02\x02\x02\u0105\u0108\x03\x02\x02\x02\u0106\u0104\x03\x02\x02\x02\u0106" +
+		"\u0107\x03\x02\x02\x02\u0107+\x03\x02\x02\x02\u0108\u0106\x03\x02\x02" +
+		"\x02\u0109\u010A\x07\x1F\x02\x02\u010A-\x03\x02\x02\x02\u010B\u011D\x07" +
+		" \x02\x02\u010C\u011D\x07!\x02\x02\u010D\u010E\x07!\x02\x02\u010E\u011D" +
+		"\x07\"\x02\x02\u010F\u011D\x07#\x02\x02\u0110\u0111\x07$\x02\x02\u0111" +
+		"\u0112\x07\x11\x02\x02\u0112\u011D\x07%\x02\x02\u0113\u0114\x07&\x02\x02" +
+		"\u0114\u0115\x05p9\x02\u0115\u0116\x05@!\x02\u0116\u0117\x050\x19\x02" +
+		"\u0117\u011D\x03\x02\x02\x02\u0118\u0119\x07\'\x02\x02\u0119\u011D\x05" +
+		"r:\x02\u011A\u011B\x07(\x02\x02\u011B\u011D\x07\"\x02\x02\u011C\u010B" +
+		"\x03\x02\x02\x02\u011C\u010C\x03\x02\x02\x02\u011C\u010D\x03\x02\x02\x02" +
+		"\u011C\u010F\x03\x02\x02\x02\u011C\u0110\x03\x02\x02\x02\u011C\u0113\x03" +
+		"\x02\x02\x02\u011C\u0118\x03\x02\x02\x02\u011C\u011A\x03\x02\x02\x02\u011D" +
+		"/\x03\x02\x02\x02\u011E\u011F\x07)\x02\x02\u011F\u0122\x07o\x02\x02\u0120" +
+		"\u0122\x03\x02\x02\x02\u0121\u011E\x03\x02\x02\x02\u0121\u0120\x03\x02" +
+		"\x02\x02\u01221\x03\x02\x02\x02\u0123\u0125\x054\x1B\x02\u0124\u0123\x03" +
+		"\x02\x02\x02\u0125\u0128\x03\x02\x02\x02\u0126\u0124\x03\x02\x02\x02\u0126" +
+		"\u0127\x03\x02\x02\x02\u01273\x03\x02\x02\x02\u0128\u0126\x03\x02\x02" +
+		"\x02\u0129\u012A\x05`1\x02\u012A\u012B\x07*\x02\x02\u012B\u012C\x05:\x1E" +
+		"\x02\u012C\u012D\x05\x82B\x02\u012D\u012E\x05@!\x02\u012E\u012F\x05D#" +
+		"\x02\u012F\u0130\x056\x1C\x02\u0130\u0138\x03\x02\x02\x02\u0131\u0132" +
+		"\x05`1\x02\u0132\u0133\x07+\x02\x02\u0133\u0134\x05\x82B\x02\u0134\u0135" +
+		"\x05@!\x02\u0135\u0136\x058\x1D\x02\u0136\u0138\x03\x02\x02\x02\u0137" +
+		"\u0129\x03\x02\x02\x02\u0137\u0131\x03\x02\x02\x02\u01385\x03\x02\x02" +
+		"\x02\u0139\u013A\x07,\x02\x02\u013A\u013B\x05\x82B\x02\u013B\u013C\x07" +
+		"-\x02\x02\u013C\u013D\x05 \x11\x02\u013D\u0140\x03\x02\x02\x02\u013E\u0140" +
+		"\x03\x02\x02\x02\u013F\u0139\x03\x02\x02\x02\u013F\u013E\x03\x02\x02\x02" +
+		"\u01407\x03\x02\x02\x02\u0141\u0142\x07,\x02\x02\u0142\u0145\x05 \x11" +
+		"\x02\u0143\u0145\x03\x02\x02\x02\u0144\u0141\x03\x02\x02\x02\u0144\u0143" +
+		"\x03\x02\x02\x02\u01459\x03\x02\x02\x02\u0146\u0148\x05<\x1F\x02\u0147" +
+		"\u0146\x03\x02\x02\x02\u0148\u014B\x03\x02\x02\x02\u0149\u0147\x03\x02" +
+		"\x02\x02\u0149\u014A\x03\x02\x02\x02\u014A;\x03\x02\x02\x02\u014B\u0149" +
+		"\x03\x02\x02\x02\u014C\u014D\x07.\x02\x02\u014D=\x03\x02\x02\x02\u014E" +
+		"\u014F\x05\x82B\x02\u014F\u0150\x07-\x02\x02\u0150\u0151\x05 \x11\x02" +
+		"\u0151?\x03\x02\x02\x02\u0152\u0153\x07/\x02\x02\u0153\u0154\x05B\"\x02" +
+		"\u0154\u0155\x070\x02\x02\u0155A\x03\x02\x02\x02\u0156\u015B\x05> \x02" +
+		"\u0157\u0158\x07\v\x02\x02\u0158\u015A\x05> \x02\u0159\u0157\x03\x02\x02" +
+		"\x02\u015A\u015D\x03\x02\x02\x02\u015B\u0159\x03\x02\x02\x02\u015B\u015C" +
+		"\x03\x02\x02\x02\u015C\u0160\x03\x02\x02\x02\u015D\u015B\x03\x02\x02\x02" +
+		"\u015E\u0160\x03\x02\x02\x02\u015F\u0156\x03\x02\x02\x02\u015F\u015E\x03" +
+		"\x02\x02\x02\u0160C\x03\x02\x02\x02\u0161\u0162\x05F$\x02\u0162\u0163" +
+		"\x07\b\x02\x02\u0163\u0165\x05H%\x02\u0164\u0166\x05n8\x02\u0165\u0164" +
+		"\x03\x02\x02\x02\u0165\u0166\x03\x02\x02\x02\u0166\u0167\x03\x02\x02\x02" +
+		"\u0167\u0168\x07\t\x02\x02\u0168E\x03\x02\x02\x02\u0169\u016C\x07.\x02" +
+		"\x02\u016A\u016C\x03\x02\x02\x02\u016B\u0169\x03\x02\x02\x02\u016B\u016A" +
+		"\x03\x02\x02\x02\u016CG\x03\x02\x02\x02\u016D\u016F\x05^0\x02\u016E\u016D" +
+		"\x03\x02\x02\x02\u016F\u0172\x03\x02\x02\x02\u0170\u016E\x03\x02\x02\x02" +
+		"\u0170\u0171\x03\x02\x02\x02\u0171I\x03\x02\x02\x02\u0172\u0170\x03\x02" +
+		"\x02\x02\u0173\u0179\x05L\'\x02\u0174\u0179\x05P)\x02\u0175\u0179\x05" +
+		"R*\x02\u0176\u0179\x05T+\x02\u0177\u0179\x05V,\x02\u0178\u0173\x03\x02" +
+		"\x02\x02\u0178\u0174\x03\x02\x02\x02\u0178\u0175\x03\x02\x02\x02\u0178" +
+		"\u0176\x03\x02\x02\x02\u0178\u0177\x03\x02\x02\x02\u0179K\x03\x02\x02" +
+		"\x02\u017A\u017B\x071\x02\x02\u017B\u017C\x05r:\x02\u017C\u017D\x072\x02" +
+		"\x02\u017D\u017E\x05D#\x02\u017E\u017F\x05N(\x02\u017FM\x03\x02\x02\x02" +
+		"\u0180\u0181\x073\x02\x02\u0181\u0186\x05D#\x02\u0182\u0183\x073\x02\x02" +
+		"\u0183\u0186\x05L\'\x02\u0184\u0186\x03\x02\x02\x02\u0185\u0180\x03\x02" +
+		"\x02\x02\u0185\u0182\x03\x02\x02\x02\u0185\u0184\x03\x02\x02\x02\u0186" +
+		"O\x03\x02\x02\x02\u0187\u0188\x074\x02\x02\u0188\u0189\x05r:\x02\u0189" +
+		"\u018A\x075\x02\x02\u018A\u018B\x05D#\x02\u018BQ\x03\x02\x02\x02\u018C" +
+		"\u018D\x075\x02\x02\u018D\u018E\x05v<\x02\u018E\u018F\x076\x02\x02\u018F" +
+		"\u0190\x05D#\x02\u0190S\x03\x02\x02\x02\u0191\u0192\x075\x02\x02\u0192" +
+		"\u0193\x077\x02\x02\u0193\u0194\x05D#\x02\u0194U\x03\x02\x02\x02\u0195" +
+		"\u0196\x05\x82B\x02\u0196\u0197\x05X-\x02\u0197W\x03\x02\x02\x02\u0198" +
+		"\u0199\x07/\x02\x02\u0199\u019A\x05Z.\x02\u019A\u019B\x070\x02\x02\u019B" +
+		"Y\x03\x02\x02\x02\u019C\u01A1\x05|?\x02\u019D\u019E\x07\v\x02\x02\u019E" +
+		"\u01A0\x05|?\x02\u019F\u019D\x03\x02\x02\x02\u01A0\u01A3\x03\x02\x02\x02" +
+		"\u01A1\u019F\x03\x02\x02\x02\u01A1\u01A2\x03\x02\x02\x02\u01A2\u01A6\x03" +
+		"\x02\x02\x02\u01A3\u01A1\x03\x02\x02\x02\u01A4\u01A6\x03\x02\x02\x02\u01A5" +
+		"\u019C\x03\x02\x02\x02\u01A5\u01A4\x03\x02\x02\x02\u01A6[\x03\x02\x02" +
+		"\x02\u01A7\u01A8\x078\x02\x02\u01A8\u01A9\x05|?\x02\u01A9]\x03\x02\x02" +
+		"\x02\u01AA\u01AE\x05J&\x02\u01AB\u01AE\x05d3\x02\u01AC\u01AE\x05D#\x02" +
+		"\u01AD\u01AA\x03\x02\x02\x02\u01AD\u01AB\x03\x02\x02\x02\u01AD\u01AC\x03" +
+		"\x02\x02\x02\u01AE_\x03\x02\x02\x02\u01AF\u01B1\x05b2\x02\u01B0\u01AF" +
+		"\x03\x02\x02\x02\u01B1\u01B4\x03\x02\x02\x02\u01B2\u01B0\x03\x02\x02\x02" +
+		"\u01B2\u01B3\x03\x02\x02\x02\u01B3a\x03\x02\x02\x02\u01B4\u01B2\x03\x02" +
+		"\x02\x02\u01B5\u01B6\x079\x02\x02\u01B6\u01B7\x07p\x02\x02\u01B7\u01B8" +
+		"\x05|?\x02\u01B8c\x03\x02\x02\x02\u01B9\u01BE\x05\\/\x02\u01BA\u01BE\x05" +
+		"f4\x02\u01BB\u01BE\x05h5\x02\u01BC\u01BE\x05\x1C\x0F\x02\u01BD\u01B9\x03" +
+		"\x02\x02\x02\u01BD\u01BA\x03\x02\x02\x02\u01BD\u01BB\x03\x02\x02\x02\u01BD" +
+		"\u01BC\x03\x02\x02\x02\u01BEe\x03\x02\x02\x02\u01BF\u01C0\x07:\x02\x02" +
+		"\u01C0\u01C1\x05v<\x02\u01C1\u01C2\x07;\x02\x02\u01C2\u01DD\x03\x02\x02" +
+		"\x02\u01C3\u01C4\x07:\x02\x02\u01C4\u01C5\x074\x02\x02\u01C5\u01DD\x05" +
+		"r:\x02\u01C6\u01C7\x07<\x02\x02\u01C7\u01C8\x07=\x02\x02\u01C8\u01C9\x07" +
+		">\x02\x02\u01C9\u01CA\x07)\x02\x02\u01CA\u01DD\x07\f\x02\x02\u01CB\u01CC" +
+		"\x07?\x02\x02\u01CC\u01CD\x07%\x02\x02\u01CD\u01CE\x07\x13\x02\x02\u01CE" +
+		"\u01DD\x05p9\x02\u01CF\u01D0\x07@\x02\x02\u01D0\u01DD\x05\x88E\x02\u01D1" +
+		"\u01D2\x07@\x02\x02\u01D2\u01D3\x05\x88E\x02\u01D3\u01D4\x07A\x02\x02" +
+		"\u01D4\u01D5\x07:\x02\x02\u01D5\u01DD\x03\x02\x02\x02\u01D6\u01D7\x07" +
+		"B\x02\x02\u01D7\u01DD\x07C\x02\x02\u01D8\u01DD\x07D\x02\x02\u01D9\u01DA" +
+		"\x07E\x02\x02\u01DA\u01DD\x05r:\x02\u01DB\u01DD\x05j6\x02\u01DC\u01BF" +
+		"\x03\x02\x02\x02\u01DC\u01C3\x03\x02\x02\x02\u01DC\u01C6\x03\x02\x02\x02" +
+		"\u01DC\u01CB\x03\x02\x02\x02\u01DC\u01CF\x03\x02\x02\x02\u01DC\u01D1\x03" +
+		"\x02\x02\x02\u01DC\u01D6\x03\x02\x02\x02\u01DC\u01D8\x03\x02\x02\x02\u01DC" +
+		"\u01D9\x03\x02\x02\x02\u01DC\u01DB\x03\x02\x02\x02\u01DDg\x03\x02\x02" +
+		"\x02\u01DE\u01DF\x07F\x02\x02\u01DF\u01E0\x07G\x02\x02\u01E0\u01E1\x07" +
+		"\x06\x02\x02\u01E1\u01FC\x05\x80A\x02\u01E2\u01E3\x07F\x02\x02\u01E3\u01E4" +
+		"\x05v<\x02\u01E4\u01E5\x07\x13\x02\x02\u01E5\u01E6\x05\x80A\x02\u01E6" +
+		"\u01FC\x03\x02\x02\x02\u01E7\u01E8\x07H\x02\x02\u01E8\u01E9\x05p9\x02" +
+		"\u01E9\u01EA\x07I\x02\x02\u01EA\u01EB\x05\x80A\x02\u01EB\u01FC\x03\x02" +
+		"\x02\x02\u01EC\u01ED\x07J\x02\x02\u01ED\u01EE\x05p9\x02\u01EE\u01EF\x07" +
+		"K\x02\x02\u01EF\u01F0\x05v<\x02\u01F0\u01F1\x07\x13\x02\x02\u01F1\u01F2" +
+		"\x05\x80A\x02\u01F2\u01FC\x03\x02\x02\x02\u01F3\u01F4\x07L\x02\x02\u01F4" +
+		"\u01F5\x07M\x02\x02\u01F5\u01F6\x05v<\x02\u01F6\u01F7\x07\x13\x02\x02" +
+		"\u01F7\u01F8\x05\x80A\x02\u01F8\u01F9\x07N\x02\x02\u01F9\u01FA\x05p9\x02" +
+		"\u01FA\u01FC\x03\x02\x02\x02\u01FB\u01DE\x03\x02\x02\x02\u01FB\u01E2\x03" +
+		"\x02\x02\x02\u01FB\u01E7\x03\x02\x02\x02\u01FB\u01EC\x03\x02\x02\x02\u01FB" +
+		"\u01F3\x03\x02\x02\x02\u01FCi\x03\x02\x02\x02\u01FD\u01FE\x07*\x02\x02" +
+		"\u01FE\u01FF\x05\x80A\x02\u01FF\u0200\x07\x11\x02\x02\u0200\u0201\x05" +
+		"|?\x02\u0201\u0208\x03\x02\x02\x02\u0202\u0203\x07*\x02\x02\u0203\u0204" +
+		"\x05\x80A\x02\u0204\u0205\x07\x11\x02\x02\u0205\u0206\x05V,\x02\u0206" +
+		"\u0208\x03\x02\x02\x02\u0207\u01FD\x03\x02\x02\x02\u0207\u0202\x03\x02" +
+		"\x02\x02\u0208k\x03\x02\x02\x02\u0209\u020B\x05j6\x02\u020A\u0209\x03" +
+		"\x02\x02\x02\u020B\u020E\x03\x02\x02\x02\u020C\u020A\x03\x02\x02\x02\u020C" +
+		"\u020D\x03\x02\x02\x02\u020Dm\x03\x02\x02\x02\u020E\u020C\x03\x02\x02" +
+		"\x02\u020F\u0210\x07<\x02\x02\u0210\u0218\x07G\x02\x02\u0211\u0212\x07" +
+		"<\x02\x02\u0212\u0213\x07O\x02\x02\u0213\u0218\x07\x1C\x02\x02\u0214\u0215" +
+		"\x07F\x02\x02\u0215\u0216\x07O\x02\x02\u0216\u0218\x07%\x02\x02\u0217" +
+		"\u020F\x03\x02\x02\x02\u0217\u0211\x03\x02\x02\x02\u0217\u0214\x03\x02" +
+		"\x02\x02\u0218o\x03\x02";
 	private static readonly _serializedATNSegment1: string =
-		"\x05n8\x02\u021C\u021D\x07I\x02\x02\u021D\u021E\x07\x18\x02\x02\u021E" +
-		"\u0238\x03\x02\x02\x02\u021F\u0220\x07Q\x02\x02\u0220\u0221\x05l7\x02" +
-		"\u0221\u0222\x07\x13\x02\x02\u0222\u0223\x05v<\x02\u0223\u0238\x03\x02" +
-		"\x02\x02\u0224\u0225\x07R\x02\x02\u0225\u0226\x05l7\x02\u0226\u0227\x05" +
-		"l7\x02\u0227\u0238\x03\x02\x02\x02\u0228\u0229\x07S\x02\x02\u0229\u022A" +
-		"\x05r:\x02\u022A\u022B\x07\x13\x02\x02\u022B\u022C\x05l7\x02\u022C\u0238" +
-		"\x03\x02\x02\x02\u022D\u022E\x07M\x02\x02\u022E\u022F\x05r:\x02\u022F" +
-		"\u0230\x07\x13\x02\x02\u0230\u0231\x05|?\x02\u0231\u0238\x03\x02\x02\x02" +
-		"\u0232\u0233\x07T\x02\x02\u0233\u0234\x07o\x02\x02\u0234\u0235\x07U\x02" +
-		"\x02\u0235\u0238\x05l7\x02\u0236\u0238\x07V\x02\x02\u0237\u020E\x03\x02" +
-		"\x02\x02\u0237\u020F\x03\x02\x02\x02\u0237\u0210\x03\x02\x02\x02\u0237" +
-		"\u0214\x03\x02\x02\x02\u0237\u0215\x03\x02\x02\x02\u0237\u021A\x03\x02" +
-		"\x02\x02\u0237\u021F\x03\x02\x02\x02\u0237\u0224\x03\x02\x02\x02\u0237" +
-		"\u0228\x03\x02\x02\x02\u0237\u022D\x03\x02\x02\x02\u0237\u0232\x03\x02" +
-		"\x02\x02\u0237\u0236\x03\x02\x02\x02\u0238m\x03\x02\x02\x02\u0239\u023A" +
-		"\b8\x01\x02\u023A\u026B\x07m\x02\x02\u023B\u026B\x05|?\x02\u023C\u023D" +
-		"\x07/\x02\x02\u023D\u023E\x05n8\x02\u023E\u023F\x070\x02\x02\u023F\u026B" +
-		"\x03\x02\x02\x02\u0240\u026B\x05V,\x02\u0241\u0242\x07P\x02\x02\u0242" +
-		"\u0243\x05r:\x02\u0243\u0244\x07I\x02\x02\u0244\u0245\x07\x17\x02\x02" +
-		"\u0245\u026B\x03\x02\x02\x02\u0246\u0247\x07P\x02\x02\u0247\u0248\x05" +
-		"l7\x02\u0248\u0249\x07I\x02\x02\u0249\u024A\x07\x17\x02\x02\u024A\u026B" +
-		"\x03\x02\x02\x02\u024B\u024C\x07W\x02\x02\u024C\u026B\x05n8\r\u024D\u024E" +
-		"\x05p9\x02\u024E\u024F\x07Y\x02\x02\u024F\u0250\x05p9\x02\u0250\u026B" +
-		"\x03\x02\x02\x02\u0251\u0252\x05p9\x02\u0252\u0253\x07Z\x02\x02\u0253" +
-		"\u0254\x05p9\x02\u0254\u026B\x03\x02\x02\x02\u0255\u0256\x05p9\x02\u0256" +
-		"\u0257\x07[\x02\x02\u0257\u0258\x05p9\x02\u0258\u026B\x03\x02\x02\x02" +
-		"\u0259\u025A\x05p9\x02\u025A\u025B\x07\\\x02\x02\u025B\u025C\x05p9\x02" +
-		"\u025C\u026B\x03\x02\x02\x02\u025D\u025E\x05p9\x02\u025E\u025F\x07]\x02" +
-		"\x02\u025F\u0260\x05p9\x02\u0260\u026B\x03\x02\x02\x02\u0261\u0262\x05" +
-		"l7\x02\u0262\u0263\x07^\x02\x02\u0263\u0264\x05l7\x02\u0264\u026B\x03" +
-		"\x02\x02\x02\u0265\u0266\x07T\x02\x02\u0266\u0267\x07m\x02\x02\u0267\u0268" +
-		"\x07U\x02\x02\u0268\u026B\x05n8\x04\u0269\u026B\x07_\x02\x02\u026A\u0239" +
-		"\x03\x02\x02\x02\u026A\u023B\x03\x02\x02\x02\u026A\u023C\x03\x02\x02\x02" +
-		"\u026A\u0240\x03\x02\x02\x02\u026A\u0241\x03\x02\x02\x02\u026A\u0246\x03" +
-		"\x02\x02\x02\u026A\u024B\x03\x02\x02\x02\u026A\u024D\x03\x02\x02\x02\u026A" +
-		"\u0251\x03\x02\x02\x02\u026A\u0255\x03\x02\x02\x02\u026A\u0259\x03\x02" +
-		"\x02\x02\u026A\u025D\x03\x02\x02\x02\u026A\u0261\x03\x02\x02\x02\u026A" +
-		"\u0265\x03\x02\x02\x02\u026A\u0269\x03\x02\x02\x02\u026B\u0274\x03\x02" +
-		"\x02\x02\u026C\u026D\f\f\x02\x02\u026D\u026E\x07A\x02\x02\u026E\u0273" +
-		"\x05n8\r\u026F\u0270\f\v\x02\x02\u0270\u0271\x07X\x02\x02\u0271\u0273" +
-		"\x05n8\f\u0272\u026C\x03\x02\x02\x02\u0272\u026F\x03\x02\x02\x02\u0273" +
-		"\u0276\x03\x02\x02\x02\u0274\u0272\x03\x02\x02\x02\u0274\u0275\x03\x02" +
-		"\x02\x02\u0275o\x03\x02\x02\x02\u0276\u0274\x03\x02\x02\x02\u0277\u027A" +
-		"\x05r:\x02\u0278\u027A\x05l7\x02\u0279\u0277\x03\x02\x02\x02\u0279\u0278" +
-		"\x03\x02\x02\x02\u027Aq\x03\x02\x02\x02\u027B\u027C\b:\x01\x02\u027C\u02B1" +
-		"\x05\x80A\x02\u027D\u02B1\x05|?\x02\u027E\u027F\x07/\x02\x02\u027F\u0280" +
-		"\x05r:\x02\u0280\u0281\x070\x02\x02\u0281\u02B1\x03\x02\x02\x02\u0282" +
-		"\u02B1\x05V,\x02\u0283\u0284\x07P\x02\x02\u0284\u0285\x05l7\x02\u0285" +
-		"\u0286\x07I\x02\x02\u0286\u0287\x07\x16\x02\x02\u0287\u02B1\x03\x02\x02" +
-		"\x02\u0288\u0289\x07P\x02\x02\u0289\u028A\x05l7\x02\u028A\u028B\x07I\x02" +
-		"\x02\u028B\u028C\x07\x14\x02\x02\u028C\u02B1\x03\x02\x02\x02\u028D\u028E" +
-		"\x07P\x02\x02\u028E\u028F\x05n8\x02\u028F\u0290\x07I\x02\x02\u0290\u0291" +
-		"\x07\x14\x02\x02\u0291\u02B1\x03\x02\x02\x02\u0292\u0293\x07P\x02\x02" +
-		"\u0293\u0294\x05r:\x02\u0294\u0295\x07I\x02\x02\u0295\u0296\x07\x16\x02" +
-		"\x02\u0296\u02B1\x03\x02\x02\x02\u0297\u0298\x07P\x02\x02\u0298\u0299" +
-		"\x05r:\x02\u0299\u029A\x07I\x02\x02\u029A\u029B\x07\x14\x02\x02\u029B" +
-		"\u02B1\x03\x02\x02\x02\u029C\u02B1\x07C\x02\x02\u029D\u029E\x07`\x02\x02" +
-		"\u029E\u029F\x07\x13\x02\x02\u029F\u02B1\x05l7\x02\u02A0\u02A1\x07`\x02" +
-		"\x02\u02A1\u02A2\x07\x13\x02\x02\u02A2\u02A3\x07\x12\x02\x02\u02A3\u02B1" +
-		"\x05|?\x02\u02A4\u02A5\x07a\x02\x02\u02A5\u02A6\x07\x13\x02\x02\u02A6" +
-		"\u02A7\x05x=\x02\u02A7\u02A8\x07)\x02\x02\u02A8\u02A9\x05|?\x02\u02A9" +
-		"\u02B1\x03\x02\x02\x02\u02AA\u02AB\x07T\x02\x02\u02AB\u02AC\x05\x80A\x02" +
-		"\u02AC\u02AD\x07U\x02\x02\u02AD\u02AE\x05r:\x04\u02AE\u02B1\x03\x02\x02" +
-		"\x02\u02AF\u02B1\x07f\x02\x02\u02B0\u027B\x03\x02\x02\x02\u02B0\u027D" +
-		"\x03\x02\x02\x02\u02B0\u027E\x03\x02\x02\x02\u02B0\u0282\x03\x02\x02\x02" +
-		"\u02B0\u0283\x03\x02\x02\x02\u02B0\u0288\x03\x02\x02\x02\u02B0\u028D\x03" +
-		"\x02\x02\x02\u02B0\u0292\x03\x02\x02\x02\u02B0\u0297\x03\x02\x02\x02\u02B0" +
-		"\u029C\x03\x02\x02\x02\u02B0\u029D\x03\x02\x02\x02\u02B0\u02A0\x03\x02" +
-		"\x02\x02\u02B0\u02A4\x03\x02\x02\x02\u02B0\u02AA\x03\x02\x02\x02\u02B0" +
-		"\u02AF\x03\x02\x02\x02\u02B1\u02C3\x03\x02\x02\x02\u02B2\u02B3\f\t\x02" +
-		"\x02\u02B3\u02B4\x07\x07\x02\x02\u02B4\u02C2\x05r:\n\u02B5\u02B6\f\b\x02" +
-		"\x02\u02B6\u02B7\x07b\x02\x02\u02B7\u02C2\x05r:\t\u02B8\u02B9\f\x07\x02" +
-		"\x02\u02B9\u02BA\x07c\x02\x02\u02BA\u02C2\x05r:\b\u02BB\u02BC\f\x06\x02" +
-		"\x02\u02BC\u02BD\x07d\x02\x02\u02BD\u02C2\x05r:\x07\u02BE\u02BF\f\x05" +
-		"\x02\x02\u02BF\u02C0\x07e\x02\x02\u02C0\u02C2\x05r:\x06\u02C1\u02B2\x03" +
-		"\x02\x02\x02\u02C1\u02B5\x03\x02\x02\x02\u02C1\u02B8\x03\x02\x02\x02\u02C1" +
-		"\u02BB\x03\x02\x02\x02\u02C1\u02BE\x03\x02\x02\x02\u02C2\u02C5\x03\x02" +
-		"\x02\x02\u02C3\u02C1\x03\x02\x02\x02\u02C3\u02C4\x03\x02\x02\x02\u02C4" +
-		"s\x03\x02\x02\x02\u02C5\u02C3\x03\x02\x02\x02\u02C6\u02CC\x05|?\x02\u02C7" +
-		"\u02C8\x07\x1A\x02\x02\u02C8\u02C9\x05Z.\x02\u02C9\u02CA\x07\x1B\x02\x02" +
-		"\u02CA\u02CC\x03\x02\x02\x02\u02CB\u02C6\x03\x02\x02\x02\u02CB\u02C7\x03" +
-		"\x02\x02\x02\u02CCu\x03\x02\x02\x02\u02CD\u02DD\x05|?\x02\u02CE\u02DD" +
-		"\x07g\x02\x02\u02CF\u02D0\x07h\x02\x02\u02D0\u02D1\x07\f\x02\x02\u02D1" +
-		"\u02DD\x05l7\x02\u02D2\u02D3\x07i\x02\x02\u02D3\u02D4\x07%\x02\x02\u02D4" +
-		"\u02D5\x07\x13\x02\x02\u02D5\u02DD\x05v<\x02\u02D6\u02D7\x07i\x02\x02" +
-		"\u02D7\u02D8\x07\f\x02\x02\u02D8\u02D9\x05l7\x02\u02D9\u02DA\x07\x11\x02" +
-		"\x02\u02DA\u02DB\x05~@\x02\u02DB\u02DD\x03\x02\x02\x02\u02DC\u02CD\x03" +
-		"\x02\x02\x02\u02DC\u02CE\x03\x02\x02\x02\u02DC\u02CF\x03\x02\x02\x02\u02DC" +
-		"\u02D2\x03\x02\x02\x02\u02DC\u02D6\x03\x02\x02\x02\u02DDw\x03\x02\x02" +
-		"\x02\u02DE\u02E5\x05l7\x02\u02DF\u02E5\x05r:\x02\u02E0\u02E5\x05n8\x02" +
-		"\u02E1\u02E5\x05t;\x02\u02E2\u02E5\x05v<\x02\u02E3\u02E5\x05z>\x02\u02E4" +
-		"\u02DE\x03\x02\x02\x02\u02E4\u02DF\x03\x02\x02\x02\u02E4\u02E0\x03\x02" +
-		"\x02\x02\u02E4\u02E1\x03\x02\x02\x02\u02E4\u02E2\x03\x02\x02\x02\u02E4" +
-		"\u02E3\x03\x02\x02\x02\u02E5y\x03\x02\x02\x02\u02E6\u02E7\x07j\x02\x02" +
-		"\u02E7{\x03\x02\x02\x02\u02E8\u02EE\x05~@\x02\u02E9\u02EA\x05~@\x02\u02EA" +
-		"\u02EB\x07k\x02\x02\u02EB\u02EC\x05~@\x02\u02EC\u02EE\x03\x02\x02\x02" +
-		"\u02ED\u02E8\x03\x02\x02\x02\u02ED\u02E9\x03\x02\x02\x02\u02EE}\x03\x02" +
-		"\x02\x02\u02EF\u02F3\x07p\x02\x02\u02F0\u02F1\x07l\x02\x02\u02F1\u02F3" +
-		"\x07o\x02\x02\u02F2\u02EF\x03\x02\x02\x02\u02F2\u02F0\x03\x02\x02\x02" +
-		"\u02F3\x7F\x03\x02\x02\x02\u02F4\u02F7\x07q\x02\x02\u02F5\u02F7\x07r\x02" +
-		"\x02\u02F6\u02F4\x03\x02\x02\x02\u02F6\u02F5\x03\x02\x02\x02\u02F7\x81" +
-		"\x03\x02\x02\x02\u02F8\u02F9\x07o\x02\x02\u02F9\x83\x03\x02\x02\x02\u02FA" +
-		"\u0301\x05l7\x02\u02FB\u02FC\x05l7\x02\u02FC\u02FD\x05X-\x02\u02FD\u02FE" +
-		"\x07I\x02\x02\u02FE\u02FF\x05\x86D\x02\u02FF\u0301\x03\x02\x02\x02\u0300" +
-		"\u02FA\x03\x02\x02\x02\u0300\u02FB\x03\x02\x02\x02\u0301\x85\x03\x02\x02" +
-		"\x02\u0302\u0305\x07o\x02\x02\u0303\u0305\x05v<\x02\u0304\u0302\x03\x02" +
-		"\x02\x02\u0304\u0303\x03\x02\x02\x02\u0305\x87\x03\x02\x02\x027\x93\x9D" +
-		"\xA2\xB2\xB6\xBA\xC8\xCD\xD8\xE0\xEB\xF7\xFC\u0102\u0118\u011D\u0122\u0131" +
-		"\u0139\u013E\u0143\u0155\u0159\u015F\u0165\u016A\u0172\u017F\u019B\u019F" +
-		"\u01AC\u01B2\u01D1\u01F0\u01FC\u0201\u020C\u0237\u026A\u0272\u0274\u0279" +
-		"\u02B0\u02C1\u02C3\u02CB\u02DC\u02E4\u02ED\u02F2\u02F6\u0300\u0304";
+		"\x02\x02\u0219\u0243\x07o\x02\x02\u021A\u0243\x05\x80A\x02\u021B\u021C" +
+		"\x07/\x02\x02\u021C\u021D\x05p9\x02\u021D\u021E\x070\x02\x02\u021E\u0243" +
+		"\x03\x02\x02\x02\u021F\u0243\x05V,\x02\u0220\u0221\x07P\x02\x02\u0221" +
+		"\u0222\x05v<\x02\u0222\u0223\x07I\x02\x02\u0223\u0224\x07\x18\x02\x02" +
+		"\u0224\u0243\x03\x02\x02\x02\u0225\u0226\x07P\x02\x02\u0226\u0227\x05" +
+		"r:\x02\u0227\u0228\x07I\x02\x02\u0228\u0229\x07\x18\x02\x02\u0229\u0243" +
+		"\x03\x02\x02\x02\u022A\u022B\x07Q\x02\x02\u022B\u022C\x05p9\x02\u022C" +
+		"\u022D\x07\x13\x02\x02\u022D\u022E\x05z>\x02\u022E\u0243\x03\x02\x02\x02" +
+		"\u022F\u0230\x07R\x02\x02\u0230\u0231\x05p9\x02\u0231\u0232\x05p9\x02" +
+		"\u0232\u0243\x03\x02\x02\x02\u0233\u0234\x07S\x02\x02\u0234\u0235\x05" +
+		"v<\x02\u0235\u0236\x07\x13\x02\x02\u0236\u0237\x05p9\x02\u0237\u0243\x03" +
+		"\x02\x02\x02\u0238\u0239\x07M\x02\x02\u0239\u023A\x05v<\x02\u023A\u023B" +
+		"\x07\x13\x02\x02\u023B\u023C\x05\x80A\x02\u023C\u0243\x03\x02\x02\x02" +
+		"\u023D\u023E\x07T\x02\x02\u023E\u023F\x07o\x02\x02\u023F\u0240\x07U\x02" +
+		"\x02\u0240\u0243\x05p9\x02\u0241\u0243\x07V\x02\x02\u0242\u0219\x03\x02" +
+		"\x02\x02\u0242\u021A\x03\x02\x02\x02\u0242\u021B\x03\x02\x02\x02\u0242" +
+		"\u021F\x03\x02\x02\x02\u0242\u0220\x03\x02\x02\x02\u0242\u0225\x03\x02" +
+		"\x02\x02\u0242\u022A\x03\x02\x02\x02\u0242\u022F\x03\x02\x02\x02\u0242" +
+		"\u0233\x03\x02\x02\x02\u0242\u0238\x03\x02\x02\x02\u0242\u023D\x03\x02" +
+		"\x02\x02\u0242\u0241\x03\x02\x02\x02\u0243q\x03\x02\x02\x02\u0244\u0245" +
+		"\b:\x01\x02\u0245\u0276\x07m\x02\x02\u0246\u0276\x05\x80A\x02\u0247\u0248" +
+		"\x07/\x02\x02\u0248\u0249\x05r:\x02\u0249\u024A\x070\x02\x02\u024A\u0276" +
+		"\x03\x02\x02\x02\u024B\u0276\x05V,\x02\u024C\u024D\x07P\x02\x02\u024D" +
+		"\u024E\x05v<\x02\u024E\u024F\x07I\x02\x02\u024F\u0250\x07\x17\x02\x02" +
+		"\u0250\u0276\x03\x02\x02\x02\u0251\u0252\x07P\x02\x02\u0252\u0253\x05" +
+		"p9\x02\u0253\u0254\x07I\x02\x02\u0254\u0255\x07\x17\x02\x02\u0255\u0276" +
+		"\x03\x02\x02\x02\u0256\u0257\x07W\x02\x02\u0257\u0276\x05r:\r\u0258\u0259" +
+		"\x05t;\x02\u0259\u025A\x07Y\x02\x02\u025A\u025B\x05t;\x02\u025B\u0276" +
+		"\x03\x02\x02\x02\u025C\u025D\x05t;\x02\u025D\u025E\x07Z\x02\x02\u025E" +
+		"\u025F\x05t;\x02\u025F\u0276\x03\x02\x02\x02\u0260\u0261\x05t;\x02\u0261" +
+		"\u0262\x07[\x02\x02\u0262\u0263\x05t;\x02\u0263\u0276\x03\x02\x02\x02" +
+		"\u0264\u0265\x05t;\x02\u0265\u0266\x07\\\x02\x02\u0266\u0267\x05t;\x02" +
+		"\u0267\u0276\x03\x02\x02\x02\u0268\u0269\x05t;\x02\u0269\u026A\x07]\x02" +
+		"\x02\u026A\u026B\x05t;\x02\u026B\u0276\x03\x02\x02\x02\u026C\u026D\x05" +
+		"p9\x02\u026D\u026E\x07^\x02\x02\u026E\u026F\x05p9\x02\u026F\u0276\x03" +
+		"\x02\x02\x02\u0270\u0271\x07T\x02\x02\u0271\u0272\x07m\x02\x02\u0272\u0273" +
+		"\x07U\x02\x02\u0273\u0276\x05r:\x04\u0274\u0276\x07_\x02\x02\u0275\u0244" +
+		"\x03\x02\x02\x02\u0275\u0246\x03\x02\x02\x02\u0275\u0247\x03\x02\x02\x02" +
+		"\u0275\u024B\x03\x02\x02\x02\u0275\u024C\x03\x02\x02\x02\u0275\u0251\x03" +
+		"\x02\x02\x02\u0275\u0256\x03\x02\x02\x02\u0275\u0258\x03\x02\x02\x02\u0275" +
+		"\u025C\x03\x02\x02\x02\u0275\u0260\x03\x02\x02\x02\u0275\u0264\x03\x02" +
+		"\x02\x02\u0275\u0268\x03\x02\x02\x02\u0275\u026C\x03\x02\x02\x02\u0275" +
+		"\u0270\x03\x02\x02\x02\u0275\u0274\x03\x02\x02\x02\u0276\u027F\x03\x02" +
+		"\x02\x02\u0277\u0278\f\f\x02\x02\u0278\u0279\x07A\x02\x02\u0279\u027E" +
+		"\x05r:\r\u027A\u027B\f\v\x02\x02\u027B\u027C\x07X\x02\x02\u027C\u027E" +
+		"\x05r:\f\u027D\u0277\x03\x02\x02\x02\u027D\u027A\x03\x02\x02\x02\u027E" +
+		"\u0281\x03\x02\x02\x02\u027F\u027D\x03\x02\x02\x02\u027F\u0280\x03\x02" +
+		"\x02\x02\u0280s\x03\x02\x02\x02\u0281\u027F\x03\x02\x02\x02\u0282\u0285" +
+		"\x05v<\x02\u0283\u0285\x05p9\x02\u0284\u0282\x03\x02\x02\x02\u0284\u0283" +
+		"\x03\x02\x02\x02\u0285u\x03\x02\x02\x02\u0286\u0287\b<\x01\x02\u0287\u02BC" +
+		"\x05\x84C\x02\u0288\u02BC\x05\x80A\x02\u0289\u028A\x07/\x02\x02\u028A" +
+		"\u028B\x05v<\x02\u028B\u028C\x070\x02\x02\u028C\u02BC\x03\x02\x02\x02" +
+		"\u028D\u02BC\x05V,\x02\u028E\u028F\x07P\x02\x02\u028F\u0290\x05p9\x02" +
+		"\u0290\u0291\x07I\x02\x02\u0291\u0292\x07\x16\x02\x02\u0292\u02BC\x03" +
+		"\x02\x02\x02\u0293\u0294\x07P\x02\x02\u0294\u0295\x05p9\x02\u0295\u0296" +
+		"\x07I\x02\x02\u0296\u0297\x07\x14\x02\x02\u0297\u02BC\x03\x02\x02\x02" +
+		"\u0298\u0299\x07P\x02\x02\u0299\u029A\x05r:\x02\u029A\u029B\x07I\x02\x02" +
+		"\u029B\u029C\x07\x14\x02\x02\u029C\u02BC\x03\x02\x02\x02\u029D\u029E\x07" +
+		"P\x02\x02\u029E\u029F\x05v<\x02\u029F\u02A0\x07I\x02\x02\u02A0\u02A1\x07" +
+		"\x16\x02\x02\u02A1\u02BC\x03\x02\x02\x02\u02A2\u02A3\x07P\x02\x02\u02A3" +
+		"\u02A4\x05v<\x02\u02A4\u02A5\x07I\x02\x02\u02A5\u02A6\x07\x14\x02\x02" +
+		"\u02A6\u02BC\x03\x02\x02\x02\u02A7\u02BC\x07C\x02\x02\u02A8\u02A9\x07" +
+		"`\x02\x02\u02A9\u02AA\x07\x13\x02\x02\u02AA\u02BC\x05p9\x02\u02AB\u02AC" +
+		"\x07`\x02\x02\u02AC\u02AD\x07\x13\x02\x02\u02AD\u02AE\x07\x12\x02\x02" +
+		"\u02AE\u02BC\x05\x80A\x02\u02AF\u02B0\x07a\x02\x02\u02B0\u02B1\x07\x13" +
+		"\x02\x02\u02B1\u02B2\x05|?\x02\u02B2\u02B3\x07)\x02\x02\u02B3\u02B4\x05" +
+		"\x80A\x02\u02B4\u02BC\x03\x02\x02\x02\u02B5\u02B6\x07T\x02\x02\u02B6\u02B7" +
+		"\x05\x84C\x02\u02B7\u02B8\x07U\x02\x02\u02B8\u02B9\x05v<\x04\u02B9\u02BC" +
+		"\x03\x02\x02\x02\u02BA\u02BC\x07f\x02\x02\u02BB\u0286\x03\x02\x02\x02" +
+		"\u02BB\u0288\x03\x02\x02\x02\u02BB\u0289\x03\x02\x02\x02\u02BB\u028D\x03" +
+		"\x02\x02\x02\u02BB\u028E\x03\x02\x02\x02\u02BB\u0293\x03\x02\x02\x02\u02BB" +
+		"\u0298\x03\x02\x02\x02\u02BB\u029D\x03\x02\x02\x02\u02BB\u02A2\x03\x02" +
+		"\x02\x02\u02BB\u02A7\x03\x02\x02\x02\u02BB\u02A8\x03\x02\x02\x02\u02BB" +
+		"\u02AB\x03\x02\x02\x02\u02BB\u02AF\x03\x02\x02\x02\u02BB\u02B5\x03\x02" +
+		"\x02\x02\u02BB\u02BA\x03\x02\x02\x02\u02BC\u02CE\x03\x02\x02\x02\u02BD" +
+		"\u02BE\f\t\x02\x02\u02BE\u02BF\x07\x07\x02\x02\u02BF\u02CD\x05v<\n\u02C0" +
+		"\u02C1\f\b\x02\x02\u02C1\u02C2\x07b\x02\x02\u02C2\u02CD\x05v<\t\u02C3" +
+		"\u02C4\f\x07\x02\x02\u02C4\u02C5\x07c\x02\x02\u02C5\u02CD\x05v<\b\u02C6" +
+		"\u02C7\f\x06\x02\x02\u02C7\u02C8\x07d\x02\x02\u02C8\u02CD\x05v<\x07\u02C9" +
+		"\u02CA\f\x05\x02\x02\u02CA\u02CB\x07e\x02\x02\u02CB\u02CD\x05v<\x06\u02CC" +
+		"\u02BD\x03\x02\x02\x02\u02CC\u02C0\x03\x02\x02\x02\u02CC\u02C3\x03\x02" +
+		"\x02\x02\u02CC\u02C6\x03\x02\x02\x02\u02CC\u02C9\x03\x02\x02\x02\u02CD" +
+		"\u02D0\x03\x02\x02\x02\u02CE\u02CC\x03\x02\x02\x02\u02CE\u02CF\x03\x02" +
+		"\x02\x02\u02CFw\x03\x02\x02\x02\u02D0\u02CE\x03\x02\x02\x02\u02D1\u02D7" +
+		"\x05\x80A\x02\u02D2\u02D3\x07\x1A\x02\x02\u02D3\u02D4\x05Z.\x02\u02D4" +
+		"\u02D5\x07\x1B\x02\x02\u02D5\u02D7\x03\x02\x02\x02\u02D6\u02D1\x03\x02" +
+		"\x02\x02\u02D6\u02D2\x03\x02\x02\x02\u02D7y\x03\x02\x02\x02\u02D8\u02E8" +
+		"\x05\x80A\x02\u02D9\u02E8\x07g\x02\x02\u02DA\u02DB\x07h\x02\x02\u02DB" +
+		"\u02DC\x07\f\x02\x02\u02DC\u02E8\x05p9\x02\u02DD\u02DE\x07i\x02\x02\u02DE" +
+		"\u02DF\x07%\x02\x02\u02DF\u02E0\x07\x13\x02\x02\u02E0\u02E8\x05z>\x02" +
+		"\u02E1\u02E2\x07i\x02\x02\u02E2\u02E3\x07\f\x02\x02\u02E3\u02E4\x05p9" +
+		"\x02\u02E4\u02E5\x07\x11\x02\x02\u02E5\u02E6\x05\x82B\x02\u02E6\u02E8" +
+		"\x03\x02\x02\x02\u02E7\u02D8\x03\x02\x02\x02\u02E7\u02D9\x03\x02\x02\x02" +
+		"\u02E7\u02DA\x03\x02\x02\x02\u02E7\u02DD\x03\x02\x02\x02\u02E7\u02E1\x03" +
+		"\x02\x02\x02\u02E8{\x03\x02\x02\x02\u02E9\u02F0\x05p9\x02\u02EA\u02F0" +
+		"\x05v<\x02\u02EB\u02F0\x05r:\x02\u02EC\u02F0\x05x=\x02\u02ED\u02F0\x05" +
+		"z>\x02\u02EE\u02F0\x05~@\x02\u02EF\u02E9\x03\x02\x02\x02\u02EF\u02EA\x03" +
+		"\x02\x02\x02\u02EF\u02EB\x03\x02\x02\x02\u02EF\u02EC\x03\x02\x02\x02\u02EF" +
+		"\u02ED\x03\x02\x02\x02\u02EF\u02EE\x03\x02\x02\x02\u02F0}\x03\x02\x02" +
+		"\x02\u02F1\u02F2\x07j\x02\x02\u02F2\x7F\x03\x02\x02\x02\u02F3\u02F9\x05" +
+		"\x82B\x02\u02F4\u02F5\x05\x82B\x02\u02F5\u02F6\x07k\x02\x02\u02F6\u02F7" +
+		"\x05\x82B\x02\u02F7\u02F9\x03\x02\x02\x02\u02F8\u02F3\x03\x02\x02\x02" +
+		"\u02F8\u02F4\x03\x02\x02\x02\u02F9\x81\x03\x02\x02\x02\u02FA\u02FE\x07" +
+		"p\x02\x02\u02FB\u02FC\x07l\x02\x02\u02FC\u02FE\x07o\x02\x02\u02FD\u02FA" +
+		"\x03\x02\x02\x02\u02FD\u02FB\x03\x02\x02\x02\u02FE\x83\x03\x02\x02\x02" +
+		"\u02FF\u0302\x07q\x02\x02\u0300\u0302\x07r\x02\x02\u0301\u02FF\x03\x02" +
+		"\x02\x02\u0301\u0300\x03\x02\x02\x02\u0302\x85\x03\x02\x02\x02\u0303\u0304" +
+		"\x07o\x02\x02\u0304\x87\x03\x02\x02\x02\u0305\u030C\x05p9\x02\u0306\u0307" +
+		"\x05p9\x02\u0307\u0308\x05X-\x02\u0308\u0309\x07I\x02\x02\u0309\u030A" +
+		"\x05\x8AF\x02\u030A\u030C\x03\x02\x02\x02\u030B\u0305\x03\x02\x02\x02" +
+		"\u030B\u0306\x03\x02\x02\x02\u030C\x89\x03\x02\x02\x02\u030D\u0310\x07" +
+		"o\x02\x02\u030E\u0310\x05z>\x02\u030F\u030D\x03\x02\x02\x02\u030F\u030E" +
+		"\x03\x02\x02\x02\u0310\x8B\x03\x02\x02\x028\x97\xA1\xA6\xB6\xBA\xBE\xCC" +
+		"\xD1\xDC\xE4\xEF\xFB\u0100\u0106\u011C\u0121\u0126\u0137\u013F\u0144\u0149" +
+		"\u015B\u015F\u0165\u016B\u0170\u0178\u0185\u01A1\u01A5\u01AD\u01B2\u01BD" +
+		"\u01DC\u01FB\u0207\u020C\u0217\u0242\u0275\u027D\u027F\u0284\u02BB\u02CC" +
+		"\u02CE\u02D6\u02E7\u02EF\u02F8\u02FD\u0301\u030B\u030F";
 	public static readonly _serializedATN: string = Utils.join(
 		[
 			LeilaParser._serializedATNSegment0,
@@ -6006,6 +6073,9 @@ export class MethodDefinitionContext extends ParserRuleContext {
 	}
 }
 export class FullMethodDefinitionContext extends MethodDefinitionContext {
+	public metaAttributeList(): MetaAttributeListContext {
+		return this.getRuleContext(0, MetaAttributeListContext);
+	}
 	public methodAttributeList(): MethodAttributeListContext {
 		return this.getRuleContext(0, MethodAttributeListContext);
 	}
@@ -6047,6 +6117,9 @@ export class FullMethodDefinitionContext extends MethodDefinitionContext {
 	}
 }
 export class ExternMethodDefinitionContext extends MethodDefinitionContext {
+	public metaAttributeList(): MetaAttributeListContext {
+		return this.getRuleContext(0, MetaAttributeListContext);
+	}
 	public ident(): IdentContext {
 		return this.getRuleContext(0, IdentContext);
 	}
@@ -7055,34 +7128,72 @@ export class StmtListStatementContext extends StmtContext {
 		}
 	}
 }
-export class AttributedStatementContext extends StmtContext {
-	public Identifier(): TerminalNode { return this.getToken(LeilaParser.Identifier, 0); }
-	public expressionList(): ExpressionListContext {
-		return this.getRuleContext(0, ExpressionListContext);
+
+
+export class MetaAttributeListContext extends ParserRuleContext {
+	public metaAttribute(): MetaAttributeContext[];
+	public metaAttribute(i: number): MetaAttributeContext;
+	public metaAttribute(i?: number): MetaAttributeContext | MetaAttributeContext[] {
+		if (i === undefined) {
+			return this.getRuleContexts(MetaAttributeContext);
+		} else {
+			return this.getRuleContext(i, MetaAttributeContext);
+		}
 	}
-	public stmt(): StmtContext {
-		return this.getRuleContext(0, StmtContext);
-	}
-	constructor(ctx: StmtContext) {
-		super(ctx.parent, ctx.invokingState);
-		this.copyFrom(ctx);
+	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+		super(parent, invokingState);
 	}
 	// @Override
+	public get ruleIndex(): number { return LeilaParser.RULE_metaAttributeList; }
+	// @Override
 	public enterRule(listener: LeilaListener): void {
-		if (listener.enterAttributedStatement) {
-			listener.enterAttributedStatement(this);
+		if (listener.enterMetaAttributeList) {
+			listener.enterMetaAttributeList(this);
 		}
 	}
 	// @Override
 	public exitRule(listener: LeilaListener): void {
-		if (listener.exitAttributedStatement) {
-			listener.exitAttributedStatement(this);
+		if (listener.exitMetaAttributeList) {
+			listener.exitMetaAttributeList(this);
 		}
 	}
 	// @Override
 	public accept<Result>(visitor: LeilaVisitor<Result>): Result {
-		if (visitor.visitAttributedStatement) {
-			return visitor.visitAttributedStatement(this);
+		if (visitor.visitMetaAttributeList) {
+			return visitor.visitMetaAttributeList(this);
+		} else {
+			return visitor.visitChildren(this);
+		}
+	}
+}
+
+
+export class MetaAttributeContext extends ParserRuleContext {
+	public Identifier(): TerminalNode { return this.getToken(LeilaParser.Identifier, 0); }
+	public expression(): ExpressionContext {
+		return this.getRuleContext(0, ExpressionContext);
+	}
+	constructor(parent: ParserRuleContext | undefined, invokingState: number) {
+		super(parent, invokingState);
+	}
+	// @Override
+	public get ruleIndex(): number { return LeilaParser.RULE_metaAttribute; }
+	// @Override
+	public enterRule(listener: LeilaListener): void {
+		if (listener.enterMetaAttribute) {
+			listener.enterMetaAttribute(this);
+		}
+	}
+	// @Override
+	public exitRule(listener: LeilaListener): void {
+		if (listener.exitMetaAttribute) {
+			listener.exitMetaAttribute(this);
+		}
+	}
+	// @Override
+	public accept<Result>(visitor: LeilaVisitor<Result>): Result {
+		if (visitor.visitMetaAttribute) {
+			return visitor.visitMetaAttribute(this);
 		} else {
 			return visitor.visitChildren(this);
 		}
