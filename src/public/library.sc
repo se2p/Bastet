@@ -1285,7 +1285,7 @@ role ScratchSprite is ScratchEntity begin
         // ...
     end
 
-    @Category "Motion"
+    @ Category "Motion"
     @ Block "glide <Num> secs to <string as actor>"
     define atomic glideSecondsToSprite(secs: int, o: actor) begin
         // ...
