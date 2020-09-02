@@ -20,7 +20,7 @@ actor IOActor is RuntimeEntity begin
     // The last answer given to an `ask` block
     declare answer as string
 
-    script on message "ASK" () in "SYSTEM" do begin
+    script on message "ASK" () in "SYSTEM" do atomic begin
         declare nondet_str as string
         define answer as nondet_str
         declare inputDurationSecs as int
@@ -127,13 +127,12 @@ role MathActor begin
     define PI_HALF as  1.570796326795
     define PI_SQR_TIMES_FIVE as 49.34802200545329
 
-
     // WrampClamp function takes a value and makes sure it is within the given bounds
     // param value: float - the value that will be wrapped
     // param min: float - the lower bound
     // param max: flaot - the upper bound
     // return result: float - the wrapped value
-    define atomic wrapClamp(value: float, min: float, max: float) begin
+    define atomic wrapClamp (value: float, min: float, max: float) begin
         declare range as float
         define range as ((max - min) + 1.0)
         define result as (value - (mathFloor((value - min) / range) * range))
@@ -152,8 +151,7 @@ role MathActor begin
     // mathAtan approximates the Atan value in radians for a given "real" value
     // param n : float - the real value for which the Atan value is approximated
     // return result: float - the approximated interval of the Atan value
-    define atomic mathAtan  (input: float) begin
-
+    define atomic mathAtan (input: float) begin
         if input > TWO_PI then begin
             declare asDeg as int
             define asDeg as cast (radToDeg(input)) to int
@@ -287,11 +285,10 @@ role MathActor begin
     // param x : float - x-coordinate of the target point
     // param y : float - y-coordinate of the target point
     // return result: float - the approximated interval of the Atan2 value
-    define atomic mathAtan2(x: float, y: float) begin
+    define atomic mathAtan2 (x: float, y: float) begin
         if x > 0.0 then begin
             define result as mathAtan((y / x))
         end else if x < 0.0 and y > 0.0 then begin
-            // TODO use constant for pi
             define result as mathAtan((y/x)) +  PI
         end else if x < 0.0 and y = 0.0 then begin
             declare nondet as int
@@ -865,8 +862,8 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         define result as cast (attribute "mouse_x" of io) to int
     end returns result: int
 
-    // @Category "Sensing"
-    // @Block "mouse y"
+    @ Category "Sensing"
+    @ Block "mouse y"
     define atomic mouseY()  begin
         declare io as actor
         define io as locate actor "IOActor"
@@ -1214,7 +1211,7 @@ role ScratchSprite is ScratchEntity begin
         pointTowardsPos(targetX, targetY)
     end
 
-    define atomic pointTowardsPos(targetX: int, targetY: int) begin
+    define atomic pointTowardsPos (targetX: int, targetY: int) begin
        declare dx as float
        declare dy as float
        define dx as cast (targetX - x) to float
@@ -1227,18 +1224,18 @@ role ScratchSprite is ScratchEntity begin
         end
     end
 
-    define atomic pointTowardsSelf() begin
+    define atomic pointTowardsSelf () begin
     end
 
-    define atomic switchBackdropToNext() begin
+    define atomic switchBackdropToNext () begin
         // Implement me using broadcasts
     end
 
-    define atomic switchBackdropToPrev() begin
+    define atomic switchBackdropToPrev () begin
         // Implement me using broadcasts
     end
 
-    define atomic switchBackdropToRandom() begin
+    define atomic switchBackdropToRandom () begin
         // Implement me using broadcasts
     end
 

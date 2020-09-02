@@ -36,8 +36,6 @@ import { StoreEvalResultStatementContext } from "./LeilaParser";
 import { StoreCallResultStatementContext } from "./LeilaParser";
 import { ListVariableExpressionContext } from "./LeilaParser";
 import { ListWithElementsExpressionContext } from "./LeilaParser";
-import { ImportSelectedActorContext } from "./LeilaParser";
-import { ImportAllActorsContext } from "./LeilaParser";
 import { StopAllContext } from "./LeilaParser";
 import { StopThisContext } from "./LeilaParser";
 import { DeleteThisCloneContext } from "./LeilaParser";
@@ -46,6 +44,8 @@ import { ActorSelfExpressionContext } from "./LeilaParser";
 import { LocateActorExpressionContext } from "./LeilaParser";
 import { StartCloneActorExpressionContext } from "./LeilaParser";
 import { UsherActorExpressionContext } from "./LeilaParser";
+import { AtomicBlockContext } from "./LeilaParser";
+import { NonAtomicBlocContext } from "./LeilaParser";
 import { NumLiteralExpressionContext } from "./LeilaParser";
 import { NumVariableExpressionContext } from "./LeilaParser";
 import { NumBracketsContext } from "./LeilaParser";
@@ -92,7 +92,7 @@ import { AssumeStatementContext } from "./LeilaParser";
 import { SetStatementContext } from "./LeilaParser";
 import { DeclareVariableContext } from "./LeilaParser";
 import { NeverEventContext } from "./LeilaParser";
-import { BootstapEventContext } from "./LeilaParser";
+import { BootstrapEventContext } from "./LeilaParser";
 import { AfterBootstrapMonitoringEventContext } from "./LeilaParser";
 import { StartupEventContext } from "./LeilaParser";
 import { CloneStartEventContext } from "./LeilaParser";
@@ -130,15 +130,11 @@ import { DefaultBoolExpressionContext } from "./LeilaParser";
 import { UnspecifiedBoolExpressionContext } from "./LeilaParser";
 import { ControlStatementContext } from "./LeilaParser";
 import { NonControlStatementContext } from "./LeilaParser";
-import { AtomicBlockStatementContext } from "./LeilaParser";
-import { AttributedStatementContext } from "./LeilaParser";
+import { StmtListStatementContext } from "./LeilaParser";
 import { ImageResourceContext } from "./LeilaParser";
 import { SoundResourceContext } from "./LeilaParser";
 import { ProgramContext } from "./LeilaParser";
 import { FileTypeContext } from "./LeilaParser";
-import { ImportDefinitionListContext } from "./LeilaParser";
-import { ImportDefinitionContext } from "./LeilaParser";
-import { ImportSelectorContext } from "./LeilaParser";
 import { ActorDefinitionListContext } from "./LeilaParser";
 import { ActorDefinitionContext } from "./LeilaParser";
 import { InheritsFromContext } from "./LeilaParser";
@@ -168,7 +164,7 @@ import { ParameterContext } from "./LeilaParser";
 import { ParameterListContext } from "./LeilaParser";
 import { ParameterListPlainContext } from "./LeilaParser";
 import { StmtListContext } from "./LeilaParser";
-import { AtomicBlockContext } from "./LeilaParser";
+import { BlockModeContext } from "./LeilaParser";
 import { StmtListPlainContext } from "./LeilaParser";
 import { ControlStmtContext } from "./LeilaParser";
 import { IfStmtContext } from "./LeilaParser";
@@ -181,6 +177,8 @@ import { ExpressionListContext } from "./LeilaParser";
 import { ExpressionListPlainContext } from "./LeilaParser";
 import { ExpressionStmtContext } from "./LeilaParser";
 import { StmtContext } from "./LeilaParser";
+import { MetaAttributeListContext } from "./LeilaParser";
+import { MetaAttributeContext } from "./LeilaParser";
 import { NonCtrlStmtContext } from "./LeilaParser";
 import { CommonStmtContext } from "./LeilaParser";
 import { ListStmtContext } from "./LeilaParser";
@@ -468,22 +466,6 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitListWithElementsExpression?: (ctx: ListWithElementsExpressionContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `ImportSelectedActor`
-	 * labeled alternative in `LeilaParser.importSelector`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitImportSelectedActor?: (ctx: ImportSelectedActorContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `ImportAllActors`
-	 * labeled alternative in `LeilaParser.importSelector`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitImportAllActors?: (ctx: ImportAllActorsContext) => Result;
-
-	/**
 	 * Visit a parse tree produced by the `StopAll`
 	 * labeled alternative in `LeilaParser.terminationStmt`.
 	 * @param ctx the parse tree
@@ -546,6 +528,22 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitUsherActorExpression?: (ctx: UsherActorExpressionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `AtomicBlock`
+	 * labeled alternative in `LeilaParser.blockMode`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitAtomicBlock?: (ctx: AtomicBlockContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `NonAtomicBloc`
+	 * labeled alternative in `LeilaParser.blockMode`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitNonAtomicBloc?: (ctx: NonAtomicBlocContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `NumLiteralExpression`
@@ -916,12 +914,12 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitNeverEvent?: (ctx: NeverEventContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `BootstapEvent`
+	 * Visit a parse tree produced by the `BootstrapEvent`
 	 * labeled alternative in `LeilaParser.event`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitBootstapEvent?: (ctx: BootstapEventContext) => Result;
+	visitBootstrapEvent?: (ctx: BootstrapEventContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `AfterBootstrapMonitoringEvent`
@@ -1220,20 +1218,12 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitNonControlStatement?: (ctx: NonControlStatementContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `AtomicBlockStatement`
+	 * Visit a parse tree produced by the `StmtListStatement`
 	 * labeled alternative in `LeilaParser.stmt`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitAtomicBlockStatement?: (ctx: AtomicBlockStatementContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `AttributedStatement`
-	 * labeled alternative in `LeilaParser.stmt`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitAttributedStatement?: (ctx: AttributedStatementContext) => Result;
+	visitStmtListStatement?: (ctx: StmtListStatementContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `ImageResource`
@@ -1264,27 +1254,6 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitFileType?: (ctx: FileTypeContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LeilaParser.importDefinitionList`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitImportDefinitionList?: (ctx: ImportDefinitionListContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LeilaParser.importDefinition`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitImportDefinition?: (ctx: ImportDefinitionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LeilaParser.importSelector`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitImportSelector?: (ctx: ImportSelectorContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LeilaParser.actorDefinitionList`.
@@ -1490,11 +1459,11 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitStmtList?: (ctx: StmtListContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `LeilaParser.atomicBlock`.
+	 * Visit a parse tree produced by `LeilaParser.blockMode`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitAtomicBlock?: (ctx: AtomicBlockContext) => Result;
+	visitBlockMode?: (ctx: BlockModeContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LeilaParser.stmtListPlain`.
@@ -1579,6 +1548,20 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitStmt?: (ctx: StmtContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LeilaParser.metaAttributeList`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitMetaAttributeList?: (ctx: MetaAttributeListContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `LeilaParser.metaAttribute`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitMetaAttribute?: (ctx: MetaAttributeContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LeilaParser.nonCtrlStmt`.

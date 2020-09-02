@@ -31,22 +31,16 @@ import {ActorDefinitionList} from "./ActorDefinition";
 export class ProgramDefinition extends AbstractNode {
 
     private readonly _ident: Identifier;
-    private readonly _imports: ImportDefinitionList;
     private readonly _actors: ActorDefinitionList;
 
-    constructor(ident: Identifier, imports: ImportDefinitionList, actors: ActorDefinitionList) {
-        super([ident, imports, actors]);
+    constructor(ident: Identifier, actors: ActorDefinitionList) {
+        super([ident, actors]);
         this._ident = ident;
-        this._imports = imports;
         this._actors = actors;
     }
 
     get ident(): Identifier {
         return this._ident;
-    }
-
-    get imports(): ImportDefinitionList {
-        return this._imports;
     }
 
     get actors(): ActorDefinitionList {

@@ -48,7 +48,7 @@ import {
     BoolParanthExpressionContext,
     BoolToIntExpressionContext,
     BoolVariableExpressionContext,
-    BootstapEventContext,
+    BootstrapEventContext,
     BroadcastAndWaitStatementContext,
     BroadcastMessageStatementContext,
     CallStmtContext,
@@ -86,10 +86,6 @@ import {
     IdentContext,
     IdentExpressionContext,
     IfStmtContext,
-    ImportAllActorsContext,
-    ImportDefinitionContext,
-    ImportDefinitionListContext,
-    ImportSelectedActorContext,
     IndexOfExpressionContext,
     InheritsFromContext,
     InsertAtStatementContext,
@@ -474,12 +470,10 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
     public visitProgram(ctx: ProgramContext): TransformerResult {
         const ident: AstNode = ctx.ident().accept(this).node;
-        const imports: AstNode = ctx.importDefinitionList().accept(this).node;
         const actors: AstNode = ctx.actorDefinitionList().accept(this).node;
 
         return TransformerResult.withNode(new ProgramDefinition(
             ident as Identifier,
-            imports as ImportDefinitionList,
             actors as ActorDefinitionList));
     }
 
@@ -522,28 +516,6 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         }
 
         return new TransformerResultList(stmtsToPrepend, results);
-    }
-
-    public visitImportDefinitionList(ctx: ImportDefinitionListContext): TransformerResult {
-        const importDefs = this.buildArrayFrom<ImportDefinition>(ctx.importDefinition());
-        return new TransformerResult(importDefs.statementsToPrepend,
-            new ImportDefinitionList(importDefs.nodeList));
-    }
-
-    public visitImportSelector(ctx: ImportSelectedActorContext): TransformerResult {
-        return TransformerResult.withNode(
-            new ImportSelectedActor(ctx.ident().accept(this).nodeOnly() as Identifier));
-    }
-
-    public visitImportAllActors(ctx: ImportAllActorsContext): TransformerResult {
-        return TransformerResult.withNode(new ImportAllActors());
-    }
-
-    public visitImportDefinition(ctx: ImportDefinitionContext): TransformerResult {
-        const toImportTr = ctx.importSelector().accept(this);
-        const importFrom: AstNode = ctx.resourceLocator().accept(this).node;
-        return TransformerResult.withNode(
-            new ImportDefinition(toImportTr.nodeOnly() as ImportSelector, importFrom as ResourceLocation));
     }
 
     public visitResourceLocator(ctx: ResourceLocatorContext): TransformerResult {
@@ -1651,7 +1623,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return TransformerResult.withNode(NeverEvent.instance());
     }
 
-    public visitBootstapEvent(ctx: BootstapEventContext) : TransformerResult {
+    public visitBootstrapEvent(ctx: BootstrapEventContext) : TransformerResult {
         return TransformerResult.withNode(BootstrapEvent.instance());
     }
 
