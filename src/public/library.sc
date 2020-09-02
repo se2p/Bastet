@@ -1272,6 +1272,25 @@ role ScratchSprite is ScratchEntity begin
         define y as otherY
     end
 
+    @ Category "Motion"
+    @ Block "glide <Num> secs to <string as position>"
+    define atomic glideSecondsToRandomPos(secs: int) begin
+        // ...
+    end
+
+    @ Category "Motion"
+    @ Block "glide <Num> secs to x: <Num> y: <Num>"
+    define atomic glideSecondsTo(secs: int, targetX: int, targetY: int) begin
+        // also used for glide to mouse pointer
+        // ...
+    end
+
+    @Category "Motion"
+    @ Block "glide <Num> secs to <string as actor>"
+    define atomic glideSecondsToSprite(secs: int, o: actor) begin
+        // ...
+    end
+
     define atomic hide () begin
         define visible as false
     end
