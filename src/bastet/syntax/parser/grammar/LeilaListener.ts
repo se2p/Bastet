@@ -1,6 +1,7 @@
 // Generated from src/bastet/syntax/parser/grammar/Leila.g4 by ANTLR 4.7.3-SNAPSHOT
 // @ts-nocheck
 
+
 import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
 
 import { IdentExpressionContext } from "./LeilaParser";
@@ -35,8 +36,6 @@ import { StoreEvalResultStatementContext } from "./LeilaParser";
 import { StoreCallResultStatementContext } from "./LeilaParser";
 import { ListVariableExpressionContext } from "./LeilaParser";
 import { ListWithElementsExpressionContext } from "./LeilaParser";
-import { ImportSelectedActorContext } from "./LeilaParser";
-import { ImportAllActorsContext } from "./LeilaParser";
 import { StopAllContext } from "./LeilaParser";
 import { StopThisContext } from "./LeilaParser";
 import { DeleteThisCloneContext } from "./LeilaParser";
@@ -136,9 +135,6 @@ import { ImageResourceContext } from "./LeilaParser";
 import { SoundResourceContext } from "./LeilaParser";
 import { ProgramContext } from "./LeilaParser";
 import { FileTypeContext } from "./LeilaParser";
-import { ImportDefinitionListContext } from "./LeilaParser";
-import { ImportDefinitionContext } from "./LeilaParser";
-import { ImportSelectorContext } from "./LeilaParser";
 import { ActorDefinitionListContext } from "./LeilaParser";
 import { ActorDefinitionContext } from "./LeilaParser";
 import { InheritsFromContext } from "./LeilaParser";
@@ -625,32 +621,6 @@ export interface LeilaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitListWithElementsExpression?: (ctx: ListWithElementsExpressionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `ImportSelectedActor`
-	 * labeled alternative in `LeilaParser.importSelector`.
-	 * @param ctx the parse tree
-	 */
-	enterImportSelectedActor?: (ctx: ImportSelectedActorContext) => void;
-	/**
-	 * Exit a parse tree produced by the `ImportSelectedActor`
-	 * labeled alternative in `LeilaParser.importSelector`.
-	 * @param ctx the parse tree
-	 */
-	exitImportSelectedActor?: (ctx: ImportSelectedActorContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `ImportAllActors`
-	 * labeled alternative in `LeilaParser.importSelector`.
-	 * @param ctx the parse tree
-	 */
-	enterImportAllActors?: (ctx: ImportAllActorsContext) => void;
-	/**
-	 * Exit a parse tree produced by the `ImportAllActors`
-	 * labeled alternative in `LeilaParser.importSelector`.
-	 * @param ctx the parse tree
-	 */
-	exitImportAllActors?: (ctx: ImportAllActorsContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `StopAll`
@@ -1934,39 +1904,6 @@ export interface LeilaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitFileType?: (ctx: FileTypeContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `LeilaParser.importDefinitionList`.
-	 * @param ctx the parse tree
-	 */
-	enterImportDefinitionList?: (ctx: ImportDefinitionListContext) => void;
-	/**
-	 * Exit a parse tree produced by `LeilaParser.importDefinitionList`.
-	 * @param ctx the parse tree
-	 */
-	exitImportDefinitionList?: (ctx: ImportDefinitionListContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `LeilaParser.importDefinition`.
-	 * @param ctx the parse tree
-	 */
-	enterImportDefinition?: (ctx: ImportDefinitionContext) => void;
-	/**
-	 * Exit a parse tree produced by `LeilaParser.importDefinition`.
-	 * @param ctx the parse tree
-	 */
-	exitImportDefinition?: (ctx: ImportDefinitionContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `LeilaParser.importSelector`.
-	 * @param ctx the parse tree
-	 */
-	enterImportSelector?: (ctx: ImportSelectorContext) => void;
-	/**
-	 * Exit a parse tree produced by `LeilaParser.importSelector`.
-	 * @param ctx the parse tree
-	 */
-	exitImportSelector?: (ctx: ImportSelectorContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `LeilaParser.actorDefinitionList`.

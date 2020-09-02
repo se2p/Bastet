@@ -4,23 +4,16 @@ import LeilaLiterals;
 
 // A program has a name and is composed of a list of actors.
 // The term 'actor' is used to describe one entity in the Scratch world.
-program : fileType ident importDefinitionList actorDefinitionList EOF ;
+program : fileType ident actorDefinitionList EOF ;
 
+// We allow to mark files as either 'program' or program 'module' (typically used for libraries).
+// This has no further semantic implications.
 fileType : 'program' | 'module' ;
-
-importDefinitionList : importDefinition* ;
-
-importDefinition : 'import' importSelector 'from' resourceLocator ;
-
-importSelector :
-  ident # ImportSelectedActor
-  | '*' # ImportAllActors
-  ;
 
 // Actors in a list of actors are separated by whitespace
 actorDefinitionList : actorDefinition* ;
 
-// An actor has a type and an unique identifier.
+// An actor has a mode and an unique identifier.
 // It is composed of a set of resources, a set of variables,
 // a list of variable initializers,  a set of procedure declarations
 // and definitions, and a list of scripts.
@@ -29,10 +22,9 @@ actorDefinitionList : actorDefinition* ;
 actorDefinition : actorMode ident inheritsFrom 'begin' actorComponentsDefinition 'end' ;
 inheritsFrom : 'is' ident (',' ident)* | ;
 
-actorMode :
-  'actor' # ConcreteActorMode
-  | 'role' # ActorRoleMode
-  ;
+// Actors in the mode `role` are abstract: they only provide
+// functionality to inherit and are not instantiated.
+actorMode : 'actor' # ConcreteActorMode | 'role' # ActorRoleMode ;
 
 actorComponentsDefinition : resourceList declarationStmtList setStmtList methodDefinitionList scriptList ;
 
@@ -44,10 +36,8 @@ actorComponentsDefinition : resourceList declarationStmtList setStmtList methodD
 // and for the *costumes* of the sprites.
 resource : resourceType ident resourceLocator ;
 
-resourceType :
-  'image' # ImageResource
-  | 'sound' # SoundResource
-  ;
+// We support image resources and sound resources
+resourceType : 'image' # ImageResource | 'sound' # SoundResource ;
 
 // A list of resources is separated by whitespaces.
 resourceList : resource* ;

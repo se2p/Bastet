@@ -1,6 +1,7 @@
 // Generated from src/bastet/syntax/parser/grammar/Leila.g4 by ANTLR 4.7.3-SNAPSHOT
 // @ts-nocheck
 
+
 import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
 
 import { IdentExpressionContext } from "./LeilaParser";
@@ -35,8 +36,6 @@ import { StoreEvalResultStatementContext } from "./LeilaParser";
 import { StoreCallResultStatementContext } from "./LeilaParser";
 import { ListVariableExpressionContext } from "./LeilaParser";
 import { ListWithElementsExpressionContext } from "./LeilaParser";
-import { ImportSelectedActorContext } from "./LeilaParser";
-import { ImportAllActorsContext } from "./LeilaParser";
 import { StopAllContext } from "./LeilaParser";
 import { StopThisContext } from "./LeilaParser";
 import { DeleteThisCloneContext } from "./LeilaParser";
@@ -136,9 +135,6 @@ import { ImageResourceContext } from "./LeilaParser";
 import { SoundResourceContext } from "./LeilaParser";
 import { ProgramContext } from "./LeilaParser";
 import { FileTypeContext } from "./LeilaParser";
-import { ImportDefinitionListContext } from "./LeilaParser";
-import { ImportDefinitionContext } from "./LeilaParser";
-import { ImportSelectorContext } from "./LeilaParser";
 import { ActorDefinitionListContext } from "./LeilaParser";
 import { ActorDefinitionContext } from "./LeilaParser";
 import { InheritsFromContext } from "./LeilaParser";
@@ -468,22 +464,6 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitListWithElementsExpression?: (ctx: ListWithElementsExpressionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `ImportSelectedActor`
-	 * labeled alternative in `LeilaParser.importSelector`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitImportSelectedActor?: (ctx: ImportSelectedActorContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `ImportAllActors`
-	 * labeled alternative in `LeilaParser.importSelector`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitImportAllActors?: (ctx: ImportAllActorsContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `StopAll`
@@ -1274,27 +1254,6 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitFileType?: (ctx: FileTypeContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LeilaParser.importDefinitionList`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitImportDefinitionList?: (ctx: ImportDefinitionListContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LeilaParser.importDefinition`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitImportDefinition?: (ctx: ImportDefinitionContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `LeilaParser.importSelector`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitImportSelector?: (ctx: ImportSelectorContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `LeilaParser.actorDefinitionList`.
