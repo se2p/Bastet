@@ -28,8 +28,6 @@ import {extractStringLiteral, StringExpression, StringLiteral} from "./expressio
 import {ExpressionList} from "./expressions/ExpressionList";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ActorExpression} from "./expressions/ActorExpression";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import instantiate = WebAssembly.instantiate;
 
 export interface Message {
 

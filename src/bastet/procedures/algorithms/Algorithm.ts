@@ -27,6 +27,12 @@ import {FrontierSet, ReachedSet} from "./StateSet";
 import {ConcreteElement} from "../domains/ConcreteElements";
 import {AbstractState} from "../../lattices/Lattice";
 
+/**
+ * Algorithm that can operate on sets of abstract states (in particular, one
+ * that is based on, or wraps, a work-list algorithm).
+ *
+ * Note that different algorithms can be nested to form a complex analysis procedure.
+ */
 export interface AnalysisAlgorithm<C extends ConcreteElement, F extends AbstractState> {
 
     run(frontier: FrontierSet<F>, reached: ReachedSet<F>): [FrontierSet<F>, ReachedSet<F>];

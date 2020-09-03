@@ -36,7 +36,6 @@ import {Preconditions} from "../../utils/Preconditions";
 import {Method} from "./controlflow/Method";
 import {
     AfterStatementMonitoringEvent,
-    BootstrapEvent,
     NeverEvent,
     RenderedMonitoringEvent,
     SingularityEvent,

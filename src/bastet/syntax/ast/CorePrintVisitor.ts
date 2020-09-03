@@ -37,11 +37,13 @@ import {
     CloneStartEvent,
     ConditionReachedEvent,
     MessageReceivedEvent,
-    NeverEvent, QualifiedMessageNamespace,
+    NeverEvent,
+    QualifiedMessageNamespace,
     RenderedMonitoringEvent,
     SingularityEvent,
     StartupEvent,
-    TerminationEvent, UnqualifiedMessageNamespace
+    TerminationEvent,
+    UnqualifiedMessageNamespace
 } from "./core/CoreEvent";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {

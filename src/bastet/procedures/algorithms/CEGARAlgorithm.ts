@@ -36,6 +36,11 @@ import {getActiveBudget} from "../../utils/Budgets";
 
 export const STAT_KEY_BMC_ITERATIONS = "iterations";
 
+/**
+ * Algorithm that implements Counterexample-guided Abstraction Refinement (CEGAR).
+ *
+ * See the paper by Clarke etal. (2000) on "Counterexample-guided abstraction refinement"
+ */
 export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState>
     implements AnalysisAlgorithm<C, E> {
 
