@@ -1263,6 +1263,7 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Motion"
+    @ Opcode "motion_movesteps"
     define atomic moveSteps (n: int) begin
         declare nf as float
         define nf as cast n to float
@@ -1280,12 +1281,14 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Motion"
+    @ Opcode "motion_gotoxy"
     define atomic goTo (newX: int, newY: int) begin
         define x as newX
         define y as newY
     end
 
     @ Category "Motion"
+    @ Opcode "motion_goto"
     define atomic goToSprite (o: actor) begin
         declare otherX as int
         define otherX as cast attribute "x" of o to int
@@ -1299,12 +1302,14 @@ role ScratchSprite is ScratchEntity begin
 
     @ Category "Motion"
     @ Block "glide <Num> secs to <string as position>"
+    @ Opcode "motion_glideto"
     define atomic glideSecondsToRandomPos (secs: int) begin
         // ...
     end
 
     @ Category "Motion"
     @ Block "glide <Num> secs to x: <Num> y: <Num>"
+    @ Opcode "motion_glideto"
     define atomic glideSecondsTo (secs: int, targetX: int, targetY: int) begin
         // also used for glide to mouse pointer
         // ...
@@ -1312,46 +1317,59 @@ role ScratchSprite is ScratchEntity begin
 
     @ Category "Motion"
     @ Block "glide <Num> secs to <string as actor>"
+    @ Opcode "motion_glideto"
     define atomic glideSecondsToSprite (secs: int, o: actor) begin
         // ...
     end
 
     @ Category "Looks"
     @ Block "hide"
+    @ Opcode "looks_hide"
     define atomic hide () begin
         define visible as false
     end
 
     @ Category "Looks"
     @ Block "show"
+    @ Opcode "looks_show"
     define atomic show () begin
         define visible as true
     end
 
     @ Category "Motion"
+    @ Opcode "motion_goto"
     define atomic goToRandomPosition () begin
         define x as randomIntegerBetween(0-240, 240)
         define y as randomIntegerBetween(0-180, 180)
     end
 
+    @ Category "Motion"
+    @ Opcode "motion_changexby"
     define atomic changeXBy (increment: int) begin
        // set attribute "x" to (attribute "x" + increment)
     end
 
+    @ Category "Looks"
+    @ Opcode "looks_costumenumbername"
     define atomic costumeNumber () begin
         // ...
     end returns result : integer
 
+    @ Category "Looks"
+    @ Opcode "looks_costumenumbername"
     define atomic costumeName () begin
         // ...
     end returns result : string
 
     @ Category "Looks"
     @ Block "next costume"
+    @ Opcode "looks_nextcostume"
     define atomic nextCostume () begin
         // ...
     end
 
+    @ Category "Looks"
+    @ Opcode "looks_switchcostumeto"
     define atomic changeCostumeTo (id: string) begin
         changeActiveGraphicTo(id)
     end
