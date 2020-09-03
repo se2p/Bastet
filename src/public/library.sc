@@ -1,22 +1,26 @@
 module ScratchLibrary
 
+/**
+ * Actor that models the environment, in particular inputs from the
+ * user using keyboard and mouse and a corresponding event dispatcher loop.
+ */
 actor IOActor is RuntimeEntity begin
 
+    // The current mouse position
     declare mouse_x as int
-
     declare mouse_y as int
-
-    declare answer as string
+    declare mouse_down as boolean
+    declare last_mouse_down as boolean
+    declare mouse_clicked as boolean
 
     // Key code of the currently pressed key
     declare key_pressed as int
     declare last_key_pressed as int
 
-    declare mouse_down as boolean
-    declare last_mouse_down as boolean
-    declare mouse_clicked as boolean
+    // The last answer given to an `ask` block
+    declare answer as string
 
-    script on message "ASK" () in "SYSTEM" do begin
+    script on message "ASK" () in "SYSTEM" do atomic begin
         declare nondet_str as string
         define answer as nondet_str
         declare inputDurationSecs as int
@@ -26,6 +30,10 @@ actor IOActor is RuntimeEntity begin
         // UNSOUND: might wait arbitrarily long
     end
 
+    /**
+     * The event-dispatcher loop that models the timing
+     * of keyboard and mouse inputs.
+     */
     script messageDispatcherLoop on startup do begin
         // Hack as long no other dispatch handling is in place
         repeat forever begin
@@ -53,6 +61,11 @@ actor IOActor is RuntimeEntity begin
 
 end
 
+/**
+ * Functionality to deal with keyboard inputs.
+ * In particular the mapping between key codes and the
+ * corresponding Scratch key identifiers.
+ */
 role KeyboardIO begin
 
     declare KEY_ANY as int
@@ -93,7 +106,15 @@ role KeyboardIO begin
 
 end
 
-
+/**
+ * Mathematical functions and their approximations that are available
+ * to model the behavior of Scratch programs.
+ *
+ * Approximations are used whenever sufficient to reason about
+ * particular properties of Scratch programs. In particular
+ * in cases where we would have to deal with undecidable
+ * mathematical theories such as natural numbers with multiplication.
+ */
 role MathActor begin
 
     declare PI as float
@@ -106,13 +127,12 @@ role MathActor begin
     define PI_HALF as  1.570796326795
     define PI_SQR_TIMES_FIVE as 49.34802200545329
 
-
     // WrampClamp function takes a value and makes sure it is within the given bounds
     // param value: float - the value that will be wrapped
     // param min: float - the lower bound
     // param max: flaot - the upper bound
     // return result: float - the wrapped value
-    define atomic wrapClamp(value: float, min: float, max: float) begin
+    define atomic wrapClamp (value: float, min: float, max: float) begin
         declare range as float
         define range as ((max - min) + 1.0)
         define result as (value - (mathFloor((value - min) / range) * range))
@@ -131,8 +151,7 @@ role MathActor begin
     // mathAtan approximates the Atan value in radians for a given "real" value
     // param n : float - the real value for which the Atan value is approximated
     // return result: float - the approximated interval of the Atan value
-    define atomic mathAtan  (input: float) begin
-
+    define atomic mathAtan (input: float) begin
         if input > TWO_PI then begin
             declare asDeg as int
             define asDeg as cast (radToDeg(input)) to int
@@ -266,11 +285,10 @@ role MathActor begin
     // param x : float - x-coordinate of the target point
     // param y : float - y-coordinate of the target point
     // return result: float - the approximated interval of the Atan2 value
-    define atomic mathAtan2(x: float, y: float) begin
+    define atomic mathAtan2 (x: float, y: float) begin
         if x > 0.0 then begin
             define result as mathAtan((y / x))
         end else if x < 0.0 and y > 0.0 then begin
-            // TODO use constant for pi
             define result as mathAtan((y/x)) +  PI
         end else if x < 0.0 and y = 0.0 then begin
             declare nondet as int
@@ -659,8 +677,43 @@ role MathActor begin
         end
     end returns result: float
 
+    define atomic mathMax(n1: int, n2: int) begin
+        if (n1 > n2) then begin
+            define result as n1
+        end else begin
+            define result as n2
+        end
+    end returns result: int
+
+    define atomic mathMin(n1: int, n2: int) begin
+        if (n1 < n2) then begin
+            define result as n1
+        end else begin
+            define result as n2
+        end
+    end returns result: int
+
+    define atomic mathMaxF(n1: float, n2: float) begin
+        if (n1 > n2) then begin
+            define result as n1
+        end else begin
+            define result as n2
+        end
+    end returns result: float
+
+    define atomic mathMinF(n1: float, n2: float) begin
+        if (n1 < n2) then begin
+            define result as n1
+        end else begin
+            define result as n2
+        end
+    end returns result: float
+
 end
 
+/**
+ * The base functionality for all runtime entities available in Scratch.
+ */
 role RuntimeEntity is MathActor, KeyboardIO begin
 
     extern _RUNTIME_getInitialActors () returns list of string
@@ -756,7 +809,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     // @Block "wait <Num> seconds"
     define waitSeconds (secs: int) begin
         // A busy-waiting implementation.
-        // The external methode`_RUNTIME_waitSeconds` is intended to
+        // The external method `_RUNTIME_waitSeconds` is intended to
         // not conduct a busy wait.
         declare waitUntil as int
         define waitUntil as _RUNTIME_seconds() + secs
@@ -809,12 +862,22 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         define result as cast (attribute "mouse_x" of io) to int
     end returns result: int
 
-    // @Category "Sensing"
-    // @Block "mouse y"
+    @ Category "Sensing"
+    @ Block "mouse y"
     define atomic mouseY()  begin
         declare io as actor
         define io as locate actor "IOActor"
         define result as cast (attribute "mouse_y" of io) to int
+    end returns result: int
+
+    define atomic getMouseY()  begin
+        // non-det version of `mouseY`. Deprecated!
+        // needed (with this signature) to get some programs running
+    end returns result: int
+
+    define atomic getMouseX()  begin
+        // non-det version of `mouseY`. Deprecated!
+        // needed (with this signature) to get some programs running
     end returns result: int
 
     // @Category "Sensing"
@@ -824,7 +887,9 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     end returns result : boolean
 
     define atomic keyPressed() begin
-        // NON-DET key
+        declare io as actor
+        define io as locate actor "IOActor"
+        define result as cast (attribute "key_pressed" of io) to int
     end returns result : int
 
     // @Category "Sensing"
@@ -837,6 +902,10 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
 end
 
+/**
+ * Functionality to observe the state and behaviour of (other) actors.
+ * Typically inherited by actors of the specification concern.
+ */
 role Observer is RuntimeEntity begin
 
     // @Category "Specification"
@@ -873,26 +942,10 @@ role Observer is RuntimeEntity begin
         define half_width_fst as cast attribute "active_graphic_half_width" of fst to int
         define half_height_fst as cast attribute "active_graphic_half_height" of fst to int
 
-//        declare size_fst as float
-//        define size_fst as cast (cast attribute "size" of fst to int) to float
-//        assume size_fst > 0.0
-//        assume size_fst < 1000.0
-
         declare half_width_snd as int
         declare half_height_snd as int
         define half_width_snd as cast attribute "active_graphic_half_width" of snd to int
         define half_height_snd as cast attribute "active_graphic_half_height" of snd to int
-
-//        declare size_snd as float
-//        define size_snd as cast (cast attribute "size" of snd to int) to float
-//        assume size_snd > 0.0
-//        assume size_snd < 16000.0
-//
-//        define width_fst as cast (cast width_fst to float * (size_fst / 100.0)) to int
-//        define height_fst as cast (cast height_fst to float * (size_fst / 100.0)) to int
-//
-//        define width_snd as cast (cast width_snd to float * (size_fst / 100.0)) to int
-//        define height_snd as cast (cast height_snd to float * (size_fst / 100.0)) to int
 
         define result as false
 
@@ -957,10 +1010,21 @@ role Observer is RuntimeEntity begin
 
 end
 
+/**
+ * The base functionality of all visual Scratch entities such
+ * as the stage and the different sprites.
+ */
 role ScratchEntity is RuntimeEntity begin
 
     declare sound_effect as enum [ "pitch", "pan_left_right" ]
+    declare pitch_effect_value as float
+    declare pan_left_right_value as float
+
     declare volume as int
+
+    // The current layer of the entity
+    // See https://en.scratch-wiki.info/wiki/Layer_(value)
+    declare layer as int
 
     // 480 * 360 = 172800 pixels
     declare active_graphic_pixels as list of int
@@ -980,6 +1044,16 @@ role ScratchEntity is RuntimeEntity begin
     declare mosaic_effect_value as float
     declare brightness_effect_value as float
     declare ghost_effect_value as float
+
+    declare STAGE_WIDTH as int
+    declare STAGE_HEIGHT as int
+    declare STAGE_HALF_WIDTH as int
+    declare STAGE_HALF_HEIGHT as int
+
+    define STAGE_WIDTH as 480
+    define STAGE_HEIGHT as 360
+    define STAGE_HALF_WIDTH as 240
+    define STAGE_HALF_HEIGHT as 180
 
     define color_effect_value as 0.0
 
@@ -1079,6 +1153,9 @@ role ScratchEntity is RuntimeEntity begin
 
 end
 
+/**
+ * The base functionality of all Scratch sprites.
+ */
 role ScratchSprite is ScratchEntity begin
 
     // x-coordinate in [-240,+240]
@@ -1092,10 +1169,6 @@ role ScratchSprite is ScratchEntity begin
     // Percent of the original size in [3,54000]
     // See https://en.scratch-wiki.info/wiki/Size_(value)
     declare size as int
-
-    // The current layer of a sprite
-    // See https://en.scratch-wiki.info/wiki/Layer_(value)
-    declare layer as int
 
     // The rotation of the sprite in [-360,+360]
     // See https://en.scratch-wiki.info/wiki/Direction_(value)
@@ -1138,8 +1211,7 @@ role ScratchSprite is ScratchEntity begin
         pointTowardsPos(targetX, targetY)
     end
 
-
-    define atomic pointTowardsPos(targetX: int, targetY: int) begin
+    define atomic pointTowardsPos (targetX: int, targetY: int) begin
        declare dx as float
        declare dy as float
        define dx as cast (targetX - x) to float
@@ -1152,37 +1224,52 @@ role ScratchSprite is ScratchEntity begin
         end
     end
 
-    define atomic pointTowardsSelf() begin
+    define atomic pointTowardsSelf () begin
+    end
+
+    define atomic switchBackdropToNext () begin
+        // Implement me using broadcasts
+    end
+
+    define atomic switchBackdropToPrev () begin
+        // Implement me using broadcasts
+    end
+
+    define atomic switchBackdropToRandom () begin
+        // Implement me using broadcasts
     end
 
     define atomic moveSteps (n: int) begin
         declare nf as float
-        declare dx as float
-        declare dy as float
-        declare ndir as float
-
         define nf as cast n to float
-        define ndir as cast direction to float
 
         declare radians as float
-        define radians as degToRad(90.0 - ndir)
+        define radians as degToRad(90.0 - (cast direction to float))
 
+        declare dx as float
+        declare dy as float
         define dx as nf * mathCos(radians)
         define dy as nf * mathSin(radians)
 
-        declare tmpx as int
-        declare tmpy as int
-        define tmpx as cast dx to int
-        define tmpy as cast dy to int
-
-        define x as x + tmpx
-        define y as y + tmpy
+        define x as x + (cast dx to int)
+        define y as y + (cast dy to int)
     end
 
     // @Category "Motion"
     define atomic goTo (newX: int, newY: int) begin
         define x as newX
         define y as newY
+    end
+
+    define atomic goToSprite (o: actor) begin
+        declare otherX as int
+        define otherX as cast attribute "x" of o to int
+
+        declare otherY as int
+        define otherY as cast attribute "y" of o to int
+
+        define x as otherX
+        define y as otherY
     end
 
     define atomic hide () begin
@@ -1203,14 +1290,182 @@ role ScratchSprite is ScratchEntity begin
        // set attribute "x" to (attribute "x" + increment)
     end
 
+    define atomic costumeNumber () begin
+        // ...
+    end returns result : integer
+
+    define atomic costumeName () begin
+        // ...
+    end returns result : string
+
+    define atomic nextCostume () begin
+        // ...
+    end
+
     define atomic changeCostumeTo (id: string) begin
         changeActiveGraphicTo(id)
     end
 
     // @Category "Sensing"
-    define touchingEdge () begin
-        // ...
+    define atomic touchingEdge () begin
+        define result as false
+
+        declare boundsLeft as int
+        declare boundsRight as int
+        declare boundsTop as int
+        declare boundsBottom as int
+
+        define boundsLeft as x - active_graphic_half_width
+        define boundsRight as x + active_graphic_half_width
+        define boundsTop as y + active_graphic_half_height
+        define boundsBottom as y - active_graphic_half_height
+
+        if (boundsLeft < (0 - STAGE_HALF_WIDTH)) then begin
+            define result as true
+        end
+
+        if (boundsRight > STAGE_HALF_WIDTH) then begin
+            define result as true
+        end
+
+        if (boundsTop > STAGE_HALF_HEIGHT) then begin
+            define result as true
+        end
+
+        if (boundsBottom > (0 - STAGE_HALF_HEIGHT)) then begin
+            define result as true
+        end
     end returns result : boolean
+
+    // @Category "Motion"
+    define atomic ifOnEdgeBounce () begin
+        declare boundsLeft as int
+        declare boundsRight as int
+        declare boundsTop as int
+        declare boundsBottom as int
+
+        define boundsLeft as x - active_graphic_half_width
+        define boundsRight as x + active_graphic_half_width
+        define boundsTop as y + active_graphic_half_height
+        define boundsBottom as y - active_graphic_half_height
+
+        declare distLeft as int
+        declare distRight as int
+        declare distTop as int
+        declare distBottom as int
+
+        define distLeft as mathMax(0, STAGE_HALF_WIDTH + boundsLeft)
+        define distTop as mathMax(0, STAGE_HALF_HEIGHT - boundsTop)
+        define distRight as mathMax(0, STAGE_HALF_WIDTH - boundsRight)
+        define distBottom as mathMax(0, STAGE_HALF_HEIGHT + boundsBottom)
+
+        // 1 = left, 2 = bottom, 3 = right, 4 = top
+        declare nearestEdge as int
+
+        declare minDist as int
+        define minDist as 99999
+
+        if (distLeft < minDist) then begin
+            define minDist as distLeft
+            define nearestEdge as 1
+        end
+        if (distTop < minDist) then begin
+            define minDist as distTop
+            define nearestEdge as 4
+        end
+        if (distRight < minDist) then begin
+            define minDist as distRight
+            define nearestEdge as 3
+        end
+        if (distBottom < minDist) then begin
+            define minDist as distBottom
+            define nearestEdge as 2
+        end
+
+        if (minDist > 0) then begin
+            // Not touching any edge.
+        end else begin
+            // Point away from the nearest edge.
+            declare radians as float
+            define radians as degToRad(90.0 - cast direction to float)
+
+            declare dx as float
+            declare dy as float
+            define dx as mathCos(radians)
+            define dy as 0.0 - mathSin(radians)
+
+            if (nearestEdge = 1) then begin
+                define dx as mathMaxF(0.2, mathAbsF(dx))
+            end else if (nearestEdge = 4) then begin
+                define dy as mathMaxF(0.2, mathAbsF(dy))
+            end else if (nearestEdge = 3) then begin
+                define dx as 0.0 - mathMaxF(0.2, mathAbsF(dx))
+            end else if (nearestEdge = 2) then begin
+                define dy as 0.0 - mathMaxF(0.2, mathAbsF(dy))
+            end
+
+            define direction as (cast radToDeg(mathAtan2(dy, dx)) to int) + 90
+
+            // Keep within the stage.
+            keepInStage()
+        end
+    end
+
+    define atomic keepInStage () begin
+        declare newX as int
+        declare newY as int
+
+        define newX as x
+        define newY as y
+
+        declare fenceLeft as int
+        declare fenceRight as int
+        declare fenceTop as int
+        declare fenceBottom as int
+
+        define fenceLeft as 0 - STAGE_HALF_WIDTH
+        define fenceRight as STAGE_HALF_WIDTH
+        define fenceTop as STAGE_HALF_HEIGHT
+        define fenceBottom as 0 - STAGE_HALF_HEIGHT
+
+        declare boundsLeft as int
+        declare boundsRight as int
+        declare boundsTop as int
+        declare boundsBottom as int
+
+        define boundsLeft as x - active_graphic_half_width
+        define boundsRight as x + active_graphic_half_width
+        define boundsTop as y + active_graphic_half_height
+        define boundsBottom as y - active_graphic_half_height
+
+        // Adjust the known bounds to the target position.
+        define boundsLeft as boundsLeft + (newX - x)
+        define boundsRight as boundsRight + (newX - x)
+        define boundsTop as boundsTop + (newY - y)
+        define boundsBottom as boundsBottom + (newY - y)
+
+        // Find how far we need to move the target position.
+        declare dx as int
+        declare dy as int
+
+        define dx as 0
+        define dy as 0
+
+        if (boundsLeft < fenceLeft) then begin
+            define dx as dx + (fenceLeft - boundsLeft)
+        end
+        if (boundsRight > fenceRight) then begin
+            define dx as dx + (fenceRight - boundsRight)
+        end
+        if (boundsTop > fenceTop) then begin
+            define dy as dy + (fenceTop - boundsTop)
+        end
+        if (boundsBottom < fenceBottom) then begin
+            define dy as dx + (fenceBottom - boundsBottom)
+        end
+
+        goTo(newX + dx, newY + dy)
+    end
 
     // @Category "Sensing"
     define atomic touchingMousePointer () begin
@@ -1269,26 +1524,10 @@ role ScratchSprite is ScratchEntity begin
             define half_width_fst as active_graphic_half_width
             define half_height_fst as active_graphic_half_height
 
-//            declare size_fst as float
-//            define size_fst as cast size to float
-//            assume size_fst > 0.0
-//            assume size_fst < 1000.0
-
             declare half_width_snd as int
             declare half_height_snd as int
             define half_width_snd as cast attribute "active_graphic_half_width" of snd to int
             define half_height_snd as cast attribute "active_graphic_half_height" of snd to int
-
-//            declare size_snd as float
-//            define size_snd as cast (cast attribute "size" of snd to int) to float
-//            assume size_snd > 0.0
-//            assume size_snd < 16000.0
-
-//            define half_width_fst as cast (cast half_width_fst to float * (size_fst / 100.0)) to int
-//            define half_height_fst as cast (cast half_height_fst to float * (size_fst / 100.0)) to int
-//
-//            define half_width_snd as cast (cast half_width_snd to float * (size_fst / 100.0)) to int
-//            define half_height_snd as cast (cast half_height_snd to float * (size_fst / 100.0)) to int
 
             define result as false
 
@@ -1338,13 +1577,17 @@ role ScratchSprite is ScratchEntity begin
         define result as not touchingObject(snd)
     end returns result : boolean
 
+    define atomic rgb (r: int, g: int, b: int) begin
+        define result as (65536 * r + 256 * g + b)
+    end returns result : int
+
     // @Category "Sensing"
     define atomic touchingColor (clr: int) begin
         // ...
     end returns result : boolean
 
     // @Category "Sensing"
-    define colorIsTouchingColor(clr: int, tching: int) begin
+    define atomic colorIsTouchingColor(clr: int, tching: int) begin
         // ...
     end returns result : boolean
 
@@ -1370,6 +1613,20 @@ role ScratchSprite is ScratchEntity begin
         define bubbleStart as _RUNTIME_millis()
         define bubbleType as "say"
         define bubbleDuration as scs
+    end
+
+    define atomic thinkTextFor (msg: string, scs: int) begin
+        // msgBounded = substr(msg, 0, 330)
+        define bubbleText as msg
+        define bubbleStart as _RUNTIME_millis()
+        define bubbleType as "think"
+        define bubbleDuration as scs
+    end
+
+    define atomic thinkText (msg: string) begin
+        define bubbleText as msg
+        define bubbleStart as _RUNTIME_millis()
+        define bubbleType as "think"
     end
 
     define atomic sayText (msg: string) begin
@@ -1408,6 +1665,9 @@ role ScratchSprite is ScratchEntity begin
 
 end
 
+/**
+ * The base functionality of the Scratch stage.
+ */
 role ScratchStage is ScratchEntity begin
 
     declare current_idx as int
@@ -1460,6 +1720,7 @@ role ScratchStage is ScratchEntity begin
 
          changeActiveGraphicTo(id)
     end
+
 end
 
 

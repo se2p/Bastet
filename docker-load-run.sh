@@ -9,20 +9,20 @@ INPUT_DIR=$SCRIPT_DIR
 OUTPUT_DIR="$SCRIPT_DIR/output/"
 mkdir -p $OUTPUT_DIR
 
+source ./docker.sh.inc
+
 if [ ! -f $DOCKER_TAR ]
 then
 	./docker-build.sh
 fi
 
 # Load the docker image
-dockerd-rootless-infosun --data-root /local/$USER/docker -- \
-    docker load -i $DOCKER_TAR
+$DOCKERCMD load -i $DOCKER_TAR
 
 # Run the image
-dockerd-rootless-infosun --data-root /local/$USER/docker -- \
-    docker run \
-        --mount type=bind,source=${INPUT_DIR},target=/input \
-        --mount type=bind,source=${OUTPUT_DIR},target=/output \
-        $TAG \
-        /bin/bash ./scripts/bastet.sh "$@"
+$DOCKERCMD run \
+     --mount type=bind,source=${INPUT_DIR},target=/input \
+     --mount type=bind,source=${OUTPUT_DIR},target=/output \
+     $TAG \
+     /bin/bash ./scripts/bastet.sh "$@"
 

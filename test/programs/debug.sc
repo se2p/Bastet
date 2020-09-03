@@ -1,8 +1,9 @@
-program TestProgram
+program Mini1Program
 
-actor Beetle is ScratchSprite begin
+actor MiniActor is ScratchSprite begin
 
-    script on message "SPRITE_CLICK" () do begin
+    script on startup do begin
+        ifOnEdgeBounce()
         _RUNTIME_signalFailure()
     end
 

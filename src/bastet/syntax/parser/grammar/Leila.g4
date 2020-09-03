@@ -4,23 +4,16 @@ import LeilaLiterals;
 
 // A program has a name and is composed of a list of actors.
 // The term 'actor' is used to describe one entity in the Scratch world.
-program : fileType ident importDefinitionList actorDefinitionList EOF ;
+program : fileType ident actorDefinitionList EOF ;
 
+// We allow to mark files as either 'program' or program 'module' (typically used for libraries).
+// This has no further semantic implications.
 fileType : 'program' | 'module' ;
-
-importDefinitionList : importDefinition* ;
-
-importDefinition : 'import' importSelector 'from' resourceLocator ;
-
-importSelector :
-  ident # ImportSelectedActor
-  | '*' # ImportAllActors
-  ;
 
 // Actors in a list of actors are separated by whitespace
 actorDefinitionList : actorDefinition* ;
 
-// An actor has a type and an unique identifier.
+// An actor has a mode and an unique identifier.
 // It is composed of a set of resources, a set of variables,
 // a list of variable initializers,  a set of procedure declarations
 // and definitions, and a list of scripts.
@@ -29,10 +22,9 @@ actorDefinitionList : actorDefinition* ;
 actorDefinition : actorMode ident inheritsFrom 'begin' actorComponentsDefinition 'end' ;
 inheritsFrom : 'is' ident (',' ident)* | ;
 
-actorMode :
-  'actor' # ConcreteActorMode
-  | 'role' # ActorRoleMode
-  ;
+// Actors in the mode `role` are abstract: they only provide
+// functionality to inherit and are not instantiated.
+actorMode : 'actor' # ConcreteActorMode | 'role' # ActorRoleMode ;
 
 actorComponentsDefinition : resourceList declarationStmtList setStmtList methodDefinitionList scriptList ;
 
@@ -44,15 +36,13 @@ actorComponentsDefinition : resourceList declarationStmtList setStmtList methodD
 // and for the *costumes* of the sprites.
 resource : resourceType ident resourceLocator ;
 
-resourceType :
-  'image' # ImageResource
-  | 'sound' # SoundResource
-  ;
+// We support image resources and sound resources
+resourceType : 'image' # ImageResource | 'sound' # SoundResource ;
 
 // A list of resources is separated by whitespaces.
 resourceList : resource* ;
 
-// Decalration of a variable. Depending on the possition of the
+// Declaration of a variable. Depending on the position of the
 // declaration statement, the variable is either local to the actor
 // or local to the current stack of a script execution.
 declarationStmt : 'declare' ident 'as' type # DeclareVariable ;
@@ -68,8 +58,9 @@ type :
   | primitiveType # Primitive
   ;
 
+// 'int' is deprecated (use 'integer' instead)
 primitiveType:
-  'int' # IntegerType
+  ('int' | 'integer') # IntegerType
   | 'float' # FloatingPointType
   | 'boolean' # BooleanType
   | 'string' # StringType
@@ -84,7 +75,7 @@ scriptIdent :  ident # NamedScriptIdent | # AnonymousScriptIdent ;
 // A list of scripts.
 scriptList : script* ;
 
-// Attributes that can be assinged to a script
+// Attributes that can be assigned to a script
 scriptAttributeList : scriptAttribute* ;
 scriptAttribute : 'restart' # RestartScript ;
 
@@ -93,14 +84,12 @@ scriptAttribute : 'restart' # RestartScript ;
 // of a script are defined by the non-terminal `event`.
 event :
   'never' # NeverEvent
-  | 'bootstrap' # BootstapEvent
+  | 'bootstrap' # BootstrapEvent
   | 'bootstrap' 'finished' # AfterBootstrapMonitoringEvent
   | 'startup' # StartupEvent
   | 'started' 'as' 'clone' # CloneStartEvent
   | 'message' stringExpr parameterList messageNamespace # MessageReceivedEvent
   | 'condition' boolExpr # ConditionReachedEvent
-  | 'rendered' # RenderedMonitoringEvent
-  | 'dispatch' # UserInputDispatchEvent
   | 'statement' 'finished' # AfterStatementMonitoringEvent
   ;
 
@@ -112,8 +101,8 @@ messageNamespace : 'in' String # QualifiedNamespace | #UnqualifiedNamespace ;
 // to take a number of arguments.
 methodDefinitionList : methodDefinition* ;
 methodDefinition :
-  'define' methodAttributeList ident parameterList stmtList methodResultDeclaration # FullMethodDefinition
-  | 'extern' ident parameterList externMethodResultDeclaration # ExternMethodDefinition
+  metaAttributeList 'define' methodAttributeList ident parameterList stmtList methodResultDeclaration # FullMethodDefinition
+  | metaAttributeList 'extern' ident parameterList externMethodResultDeclaration # ExternMethodDefinition
   ;
 
 methodResultDeclaration :
@@ -126,7 +115,7 @@ externMethodResultDeclaration :
   | # ExternVoidReturnDefinition
   ;
 
-// Attributes that can be assinged to a method
+// Attributes that can be assigned to a method
 methodAttributeList : methodAttribute* ;
 methodAttribute : 'atomic' # AtomicMethod ;
 
@@ -144,9 +133,9 @@ parameterListPlain : parameter (',' parameter)* | ;
 // Some statements that terminate the control flow
 // are only allowed at the end of the list to
 // make their semantics clearer for the programmer.
-stmtList : 'begin' stmtListPlain (terminationStmt)? 'end' ;
+stmtList : blockMode 'begin' stmtListPlain (terminationStmt)? 'end' ;
 
-atomicBlock: 'atomic' stmtList ;
+blockMode: 'atomic' # AtomicBlock | # NonAtomicBloc ;
 
 // A plain list of program statements.
 // Statements are separated by whitespace.
@@ -206,9 +195,11 @@ expressionStmt : 'evaluate' expression ;
 stmt :
   controlStmt # ControlStatement
   | nonCtrlStmt # NonControlStatement
-  | atomicBlock # AtomicBlockStatement
-  | '@' Identifier expressionList stmt # AttributedStatement
+  | stmtList # StmtListStatement
   ;
+
+metaAttributeList : metaAttribute* ;
+metaAttribute : '@' Identifier expression ;
 
 nonCtrlStmt :
   expressionStmt
@@ -271,7 +262,7 @@ stringExpr :
   ;
 
 boolExpr  :
-    Boolean # BoolLiteralExpression
+  Boolean # BoolLiteralExpression
   | variable # BoolVariableExpression
   | '(' boolExpr ')' # BoolParanthExpression
   | callStmt # BoolCallStatementExpression

@@ -10,13 +10,5 @@ using typedoc: https://typedoc.org/guides/doccomments/
 
 ## Modules
 
--  Do not use namespaces in modules # 
+-  Do not use namespaces in modules 
 
-## File Structure
-
-- Ordering of file namespace contents: 
-    1. Exported constants 
-    2. Exported interfaces
-    3. Exported functions
-    4. Classes
-    5. Functions 

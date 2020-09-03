@@ -84,8 +84,7 @@ import {
 import {ExpressionStatement} from "./core/statements/ExpressionStatement";
 import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
 import {CreateCloneOfStatement} from "./core/statements/CreateCloneOfStatement";
-import {BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
-import {BroadcastAndWaitStatement} from "./core/statements/BroadcastAndWaitStatement";
+import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
 import {ResetTimerStatement} from "./core/statements/ResetTimerStatement";
 import {EpsilonStatement} from "./core/statements/EpsilonStatement";
 import {

@@ -1,5 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="main.ts" type="NodeJSConfigurationType" application-parameters="-P test/programs/debug.sc -S test/specs/empty.sc -I src/public/library.sc" nameIsGenerated="true" node-parameters="--require ts-node/register" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
-    <method v="2" />
-  </configuration>
-</component>

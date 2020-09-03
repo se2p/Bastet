@@ -1,5 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="main.ts task6 UNSAFE" type="NodeJSConfigurationType" application-parameters="-c config/default.json -P test/programs/publications/task6/task6program_UNSAFE.sc -S test/programs/publications/task6/task6spec.sc -I src/public/library.sc" node-parameters="--require ts-node/register --max-old-space-size=8192" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
-    <method v="2" />
-  </configuration>
-</component>

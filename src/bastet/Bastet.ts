@@ -32,7 +32,7 @@ import {AnalysisProcedure, AnalysisResult, NullAnalysisResult} from "./procedure
 import {ProgramParser} from "./syntax/parser/ProgramParser";
 import {Preconditions} from "./utils/Preconditions";
 import {AppBuilder} from "./syntax/app/AppBuilder";
-import {RuleNode} from "antlr4ts/tree";
+import {ParseTree, RuleNode} from "antlr4ts/tree";
 import {AstNode} from "./syntax/ast/AstNode";
 import {AnalysisProcedureFactory} from "./procedures/AnalysisProcedureFactory";
 import {AppToDot} from "./syntax/app/AppToDot";
@@ -44,6 +44,18 @@ import * as fs from "fs";
 import {BastetConfiguration, mergeConfigFilesToJson} from "./utils/BastetConfiguration";
 import {ParsingException} from "./core/exceptions/ParsingException";
 import {NodeSystemLayer} from "./utils/SystemLayer";
+import {ImmutableList} from "./utils/ImmutableList";
+import {Script} from "./syntax/app/controlflow/Script";
+import {MessageReceivedEvent, QualifiedMessageNamespace} from "./syntax/ast/core/CoreEvent";
+import {extractStringLiteral} from "./syntax/ast/core/expressions/StringExpression";
+import {SYSTEM_NAMESPACE_NAME} from "./syntax/ast/core/Message";
+import {
+    CallStmtContext,
+    MessageReceivedEventContext,
+    ScriptContext,
+    StringLiteralExpressionContext
+} from "./syntax/parser/grammar/LeilaParser";
+import {ImplementMeForException} from "./core/exceptions/ImplementMeException";
 
 const process = require('process');
 
@@ -59,6 +71,10 @@ class BastetRootConfig extends BastetConfiguration {
         return this.getStringProperty('output-dir', "./output/");
     }
 
+    get terminateAfterParsing(): boolean {
+        return this.getBoolProperty('terminate-after-parsing', false);
+    }
+
 }
 
 /**
@@ -66,7 +82,7 @@ class BastetRootConfig extends BastetConfiguration {
  */
 export class Bastet {
 
-    private parseProgramArguments() : any {
+    private parseProgramArguments(): any {
         function commaSeparatedList(value, dummy) {
             return value.split(',');
         }
@@ -82,16 +98,20 @@ export class Bastet {
             .parse(process.argv);
     }
 
+    private async nullResult(): Promise<AnalysisResult> {
+        return new NullAnalysisResult(new AnalysisStatistics("NULL", {}));
+    }
+
     /**
      * Runs the requested analyses on a given analyses task.
      *
      * @returns a JSON object with the analyses result.
      */
-    public async run() : Promise<AnalysisResult> {
+    public async run(): Promise<AnalysisResult> {
         // Parsing of command line options
         const cmdlineArguments = this.parseProgramArguments();
         if (!cmdlineArguments) {
-            return new NullAnalysisResult(new AnalysisStatistics("NULL", {}));
+            return this.nullResult();
         }
 
         this.registerOnExitNotifiers();
@@ -99,46 +119,57 @@ export class Bastet {
         const intermLibFilepath: string = cmdlineArguments.intermediateLibrary;
         const programFilepath: string = cmdlineArguments.program;
         const specFilepath: string = cmdlineArguments.specification;
-        const configFilepaths: string[] = cmdlineArguments['configuration'] || [ "./config/default.json" ];
+        const configFilepaths: string[] = cmdlineArguments['configuration'] || ["./config/default.json"];
 
         return this.runFor(configFilepaths, intermLibFilepath, programFilepath, specFilepath);
     }
 
     public registerOnExitNotifiers() {
-        process.on('SIGINT', function() {
+        process.on('SIGINT', function () {
             console.log("Caught SIGINT signal");
             process.exit();
         });
 
-        process.on('beforeExit', function() {
+        process.on('beforeExit', function () {
             console.log("Caught beforeExit signal");
         });
     }
 
-    public async runFor(configFilepath: string[], libraryFilepath: string, programFilepath: string, specFilepath: string) : Promise<AnalysisResult> {
+    public async runFor(configFilepath: string[], libraryFilepath: string, programFilepath: string, specFilepath: string): Promise<AnalysisResult> {
         Preconditions.checkArgument(fs.existsSync(libraryFilepath), "Library File does not exists.");
         Preconditions.checkArgument(fs.existsSync(programFilepath), "Program File does not exists.");
         Preconditions.checkArgument(fs.existsSync(specFilepath), "Spec File does not exists.");
 
         const config: {} = mergeConfigFilesToJson(configFilepath);
+        const rootConfig = new BastetRootConfig(config);
 
         // Build the static task model
         const staticTaskModel: App = this.buildTaskModel(libraryFilepath, programFilepath, specFilepath, config);
 
+        // We might terminate after parsing the input project (to check if the project is parsable by BASTET)
+        if (rootConfig.terminateAfterParsing) {
+            return this.nullResult();
+        }
+
         // Build the analyses procedure as defined by the configuration
         const analysisProcedure = await this.buildAnalysisProcedure(config)
-            .catch((e) => { throw new IllegalArgumentException(e); });
+            .catch((e) => {
+                throw new IllegalArgumentException(e);
+            });
 
         // Run the analyses procedure on the task and return the result
         return this.runAnalysis(staticTaskModel, analysisProcedure);
     }
 
-    private runAnalysis(staticTaskModel: App, analysisProcedure: AnalysisProcedure) : Promise<AnalysisResult> {
+    private runAnalysis(staticTaskModel: App, analysisProcedure: AnalysisProcedure): Promise<AnalysisResult> {
         return analysisProcedure.run(staticTaskModel);
     }
 
     private buildTaskModel(libraryFilepath: string, programFilepath: string, specFilepath: string, config: {}): App {
         const typeStorage = new TypeInformationStorage();
+
+        // Hack: Adjust some configuration parameters based on the features used in the given task
+        this.adjustConfigTaskspecific(programFilepath, config);
 
         // Build the set of methods for translating into the intermediate AST
         const staticLibraryModel: App = this.parseFromIntermediateCode("library", libraryFilepath, typeStorage, config);
@@ -164,7 +195,7 @@ export class Bastet {
         return staticTaskModel;
     }
 
-    private async buildAnalysisProcedure(config: {}) : Promise<AnalysisProcedure> {
+    private async buildAnalysisProcedure(config: {}): Promise<AnalysisProcedure> {
         // TODO: Allow for sequences of analyses procedures that can built on the respective previous results.
         return AnalysisProcedureFactory.createAnalysisProcedure(config);
     }
@@ -211,6 +242,53 @@ export class Bastet {
                                   typeStorage: TypeInformationStorage): App {
         const ab: AppBuilder = new AppBuilder(libraryModule);
         return ab.buildFromSyntaxTree(programOrigin, intermediateSpecAST, typeStorage);
+    }
+
+    private adjustConfigTaskspecific(programFilepath: string, config: {}) {
+        // Parameter 1: Dynamically enable the event loop
+        const scratchParser: ProgramParser = ProgramParserFactory.createParserFor(programFilepath);
+        const rawAST: RuleNode = scratchParser.parseFile(programFilepath);
+
+        var eventLoopNeeded: boolean = false;
+
+        const worklist: ParseTree[] = [];
+        worklist.push(rawAST);
+
+        while (worklist.length > 0) {
+            const work = worklist.pop();
+
+            if (work instanceof ScriptContext) {
+                const script = work as ScriptContext;
+                if (script.event() instanceof MessageReceivedEventContext) {
+                    const msgEvent = script.event() as MessageReceivedEventContext;
+                    if (msgEvent.stringExpr() instanceof StringLiteralExpressionContext) {
+                        const str = (msgEvent.stringExpr() as StringLiteralExpressionContext).text.replace(/['"]+/g, '');
+                        if (str.startsWith("KEY_") || str.startsWith("SPRITE_CLICK")) {
+                            eventLoopNeeded = true
+                        }
+                    }
+                }
+            }
+
+            if (work instanceof CallStmtContext) {
+                const call = work as CallStmtContext;
+                if (call.ident().text == "mouseX" || call.ident().text == "mouseY") {
+                    eventLoopNeeded = true
+                }
+            }
+
+            for (var i = 0; i < work.childCount; i++) {
+                const child = work.getChild(i);
+                worklist.push(child);
+            }
+        }
+
+        if (eventLoopNeeded) {
+            config["Transformer"] = config["Transformer"] || {};
+            config["Transformer"]["enable-message-dispatcher-loop"] = eventLoopNeeded;
+
+            console.log("ATTENTION: Enabled the message dispatcher loop since it is needed by the given program.")
+        }
     }
 
 }

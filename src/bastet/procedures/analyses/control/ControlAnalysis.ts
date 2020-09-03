@@ -105,10 +105,15 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         const result: ControlAbstractState[] = [];
         for (const r of this._transferRelation.abstractSucc(fromState)) {
             const ctrlLocs: ImmSet<RelationLocation> = r.accept(new ControlLocationExtractor(this._task));
-            const loopHeads = ctrlLocs.filter((rl) => {
+
+            var loopHeads = ctrlLocs.filter((rl) => {
                 return this._task.getTransitionRelationById(rl.getRelationId()).isLoopHead(rl.getLocationId())
             });
 
+            // HACK: Filter the event-dispatcher loop
+            loopHeads = loopHeads.filter((lh) => lh.getActorId() != "IOActor");
+
+            //...
             if (loopHeads.isEmpty() || this.refiner.checkIsFeasible(r, `Loop unrolling for ${loopHeads.toString()}`)) {
                 result.push(r);
             }
@@ -353,6 +358,9 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         covStats.put("coveredLocationsAbs", coverage.coveredControlLocationsAbs);
         covStats.put("uncoveredLocationsAbs", coverage.uncoveredControlLocationsAbs);
         covStats.put("uncoveredPerLocationAbs", coverage.numberOfUncoveredPerRelation);
+
+        const actors = this._statistics.withContext("Actors");
+        actors.put("actorOrder", this._task.actors.map(a => a.ident).toString())
     }
 
     testify(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {

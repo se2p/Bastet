@@ -42,3 +42,6 @@ yarn.lock
 
 
 !.idea
+
+test/programs/debug.sc
+

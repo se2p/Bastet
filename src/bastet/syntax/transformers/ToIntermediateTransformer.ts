@@ -48,7 +48,7 @@ import {
     BoolParanthExpressionContext,
     BoolToIntExpressionContext,
     BoolVariableExpressionContext,
-    BootstapEventContext,
+    BootstrapEventContext,
     BroadcastAndWaitStatementContext,
     BroadcastMessageStatementContext,
     CallStmtContext,
@@ -86,10 +86,6 @@ import {
     IdentContext,
     IdentExpressionContext,
     IfStmtContext,
-    ImportAllActorsContext,
-    ImportDefinitionContext,
-    ImportDefinitionListContext,
-    ImportSelectedActorContext,
     IndexOfExpressionContext,
     InheritsFromContext,
     InsertAtStatementContext,
@@ -131,7 +127,6 @@ import {
     ProgramContext,
     PureElseContext, QualifiedNamespaceContext,
     QualifiedVariableContext,
-    RenderedMonitoringEventContext,
     RepeatForeverStmtContext,
     RepeatTimesStmtContext,
     ReplaceElementAtStatementContext,
@@ -169,7 +164,7 @@ import {
     UnspecifiedExprContext,
     UnspecifiedNumExprContext,
     UnspecifiedStringExpressionContext,
-    UntilStmtContext, UserInputDispatchEventContext,
+    UntilStmtContext,
     UserMessageContext,
     VariableContext,
     VoidReturnDefinitionContext,
@@ -249,8 +244,7 @@ import {
     CoreEvent, MessageNamespace,
     MessageReceivedEvent,
     NeverEvent, QualifiedMessageNamespace,
-    RenderedMonitoringEvent,
-    StartupEvent, UnqualifiedMessageNamespace, UserInputDispatchEvent
+    StartupEvent, UnqualifiedMessageNamespace
 } from "../ast/core/CoreEvent";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {
@@ -296,8 +290,7 @@ import {
     InsertAtStatement,
     ReplaceElementAtStatement
 } from "../ast/core/statements/ListStatement";
-import {BroadcastAndWaitStatement} from "../ast/core/statements/BroadcastAndWaitStatement";
-import {BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
+import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {CallStatement} from "../ast/core/statements/CallStatement";
 import {CreateCloneOfStatement} from "../ast/core/statements/CreateCloneOfStatement";
 import {
@@ -311,7 +304,7 @@ import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
 import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {App} from "../app/App";
-import {VariableWithDataLocation} from "../ast/core/Variable";
+import {VariableExpression, VariableWithDataLocation} from "../ast/core/Variable";
 import {DataLocations} from "../app/controlflow/DataLocation";
 import {StrengtheningAssumeStatement} from "../ast/core/statements/AssumeStatement";
 import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
@@ -477,12 +470,10 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
     public visitProgram(ctx: ProgramContext): TransformerResult {
         const ident: AstNode = ctx.ident().accept(this).node;
-        const imports: AstNode = ctx.importDefinitionList().accept(this).node;
         const actors: AstNode = ctx.actorDefinitionList().accept(this).node;
 
         return TransformerResult.withNode(new ProgramDefinition(
             ident as Identifier,
-            imports as ImportDefinitionList,
             actors as ActorDefinitionList));
     }
 
@@ -525,28 +516,6 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         }
 
         return new TransformerResultList(stmtsToPrepend, results);
-    }
-
-    public visitImportDefinitionList(ctx: ImportDefinitionListContext): TransformerResult {
-        const importDefs = this.buildArrayFrom<ImportDefinition>(ctx.importDefinition());
-        return new TransformerResult(importDefs.statementsToPrepend,
-            new ImportDefinitionList(importDefs.nodeList));
-    }
-
-    public visitImportSelector(ctx: ImportSelectedActorContext): TransformerResult {
-        return TransformerResult.withNode(
-            new ImportSelectedActor(ctx.ident().accept(this).nodeOnly() as Identifier));
-    }
-
-    public visitImportAllActors(ctx: ImportAllActorsContext): TransformerResult {
-        return TransformerResult.withNode(new ImportAllActors());
-    }
-
-    public visitImportDefinition(ctx: ImportDefinitionContext): TransformerResult {
-        const toImportTr = ctx.importSelector().accept(this);
-        const importFrom: AstNode = ctx.resourceLocator().accept(this).node;
-        return TransformerResult.withNode(
-            new ImportDefinition(toImportTr.nodeOnly() as ImportSelector, importFrom as ResourceLocation));
     }
 
     public visitResourceLocator(ctx: ResourceLocatorContext): TransformerResult {
@@ -1439,10 +1408,6 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         }
     }
 
-    public visitUserInputDispatchEvent(ctx: UserInputDispatchEventContext): TransformerResult {
-        return TransformerResult.withNode(UserInputDispatchEvent.instance());
-    }
-
     public visitCloneStartEvent(ctx: CloneStartEventContext) : TransformerResult {
         return TransformerResult.withNode(CloneStartEvent.instance());
     }
@@ -1658,11 +1623,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return TransformerResult.withNode(NeverEvent.instance());
     }
 
-    public visitRenderedMonitoringEvent(ctx: RenderedMonitoringEventContext) : TransformerResult {
-        return TransformerResult.withNode(RenderedMonitoringEvent.instance());
-    }
-
-    public visitBootstapEvent(ctx: BootstapEventContext) : TransformerResult {
+    public visitBootstrapEvent(ctx: BootstrapEventContext) : TransformerResult {
         return TransformerResult.withNode(BootstrapEvent.instance());
     }
 
@@ -1848,7 +1809,12 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     public visitUnspecifiedBoolExpression(ctx: UnspecifiedBoolExpressionContext) : TransformerResult {
-        throw new ImplementMeException();
+        const counterIdent: Identifier = Identifier.fresh();
+        const nondetVar = new VariableWithDataLocation(DataLocations.createTypedLocation(counterIdent, BooleanType.instance()));
+        const nondetVarExpr = new BooleanVariableExpression(nondetVar);
+        const declarationStmt = new DeclareStackVariableStatement(nondetVar);
+        const prepend: StatementList = StatementList.from([declarationStmt]);
+        return new TransformerResult(prepend, nondetVarExpr);
     }
 
     public visitUnspecifiedExpr(ctx: UnspecifiedExprContext) : TransformerResult {
@@ -1856,11 +1822,21 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     public visitUnspecifiedNumExpr(ctx: UnspecifiedNumExprContext) : TransformerResult {
-        throw new ImplementMeException();
+        const counterIdent: Identifier = Identifier.fresh();
+        const nondetVar = new VariableWithDataLocation(DataLocations.createTypedLocation(counterIdent, IntegerType.instance()));
+        const nondetVarExpr = new VariableExpression(nondetVar);
+        const declarationStmt = new DeclareStackVariableStatement(nondetVar);
+        const prepend: StatementList = StatementList.from([declarationStmt]);
+        return new TransformerResult(prepend, nondetVarExpr);
     }
 
     public visitUnspecifiedStringExpression(ctx: UnspecifiedStringExpressionContext) : TransformerResult {
-        throw new ImplementMeException();
+        const counterIdent: Identifier = Identifier.fresh();
+        const nondetVar = new VariableWithDataLocation(DataLocations.createTypedLocation(counterIdent, StringType.instance()));
+        const nondetVarExpr = new VariableExpression(nondetVar);
+        const declarationStmt = new DeclareStackVariableStatement(nondetVar);
+        const prepend: StatementList = StatementList.from([declarationStmt]);
+        return new TransformerResult(prepend, nondetVarExpr);
     }
 
     public visitVariable(ctx: VariableContext) : TransformerResult {
@@ -1878,7 +1854,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     public visitQualifiedVariable(ctx: QualifiedVariableContext): TransformerResult {
-        throw new ImplementMeException();
+        throw new ImplementMeForException("Support for qualified variable access not yet implemented. Implement me!");
     }
 
     private produceVariableFromIdentifier(varIdent: Identifier): TransformerResult {

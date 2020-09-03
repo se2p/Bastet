@@ -13,10 +13,7 @@ to propose an update.
 
 ## Contributing Developers
 
-- Dominik Dinner
+- Dominik Diner
 - Christoph Frädrich
+- Nina Körber
 
-## Funding
-
-- University of Passau, State of Bavaria, Germany
-- Chair of Software Engineering II, Prof. Dr. Gordon Fraser
