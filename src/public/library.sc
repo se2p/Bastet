@@ -807,6 +807,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     @ Category "Control"
     @ Block "wait <Num> seconds"
+    @ Opcode "control_wait" // TODO is that correct?
     define waitSeconds (secs: int) begin
         // A busy-waiting implementation.
         // The external method `_RUNTIME_waitSeconds` is intended to
@@ -851,11 +852,13 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     @ Category "Sensing"
     @ Block "mouse down?"
+    @ Opcode "sensing_mousedown"
     define atomic mouseDown () begin
     end returns result : boolean
 
     @ Category "Sensing"
     @ Block "mouse x"
+    @ Opcode "sensing_mousex"
     define atomic mouseX() begin
         declare io as actor
         define io as locate actor "IOActor"
@@ -864,6 +867,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     @ Category "Sensing"
     @ Block "mouse y"
+    @ Opcode "sensing_mousey"
     define atomic mouseY()  begin
         declare io as actor
         define io as locate actor "IOActor"
@@ -882,6 +886,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     @ Category "Sensing"
     @ Block "key (int as key) pressed?"
+    @ Opcode "sensing_keypressed"
     define atomic keyPressedByCode (key: int) begin
          define result as keyPressed() = key
     end returns result : boolean
@@ -894,6 +899,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     @ Category "Sensing"
     @ Block "key (string as key) pressed?"
+    @ Opcode "sensing_keypressed"
     define atomic keyPressedByName (name: string) begin
         declare key as int
         define key as stringToKey(name)
@@ -1062,6 +1068,8 @@ role ScratchEntity is RuntimeEntity begin
     end returns result: float
 
     @ Category "Looks"
+    @ Opcode "looks_switchcostumeto"
+    @ Opcode "looks_switchbackdropto"
     define atomic changeActiveGraphicTo (id: string) begin
         define active_graphic_name as id
         define active_graphic_width as getImageWidth(id)
@@ -1074,77 +1082,92 @@ role ScratchEntity is RuntimeEntity begin
 
     @ Category "Looks"
     @ Block "change <string as effect> effect by <int as value>"
+    @ Opcode "looks_changeeffectby"
     define atomic changeGraphicEffectBy (eff:string, val:int) begin
     end
 
     @ Category "Looks"
     @ Block "clear graphic effects"
+    @ Opcode "looks_cleargraphiceffects"
     define atomic clearGraphicEffects () begin
     end
 
     @ Category "Looks"
     @ Block "backdrop int"
+    @ Opcode "looks_backdropnumbername"
     define backdropNumber () begin
     end returns result : int
 
     @ Category "Looks"
     @ Block "backdrop name"
+    @ Opcode "looks_backdropnumbername"
     define backdropName () begin
     end returns result : string
 
     @ Category "Sound"
     @ Block "play sound <sound as snd> until done"
+    @ Opcode "sound_playuntildone"
     define atomic playUntilDone (snd: int) begin
     end
 
     @ Category "Sound"
     @ Block "start sound <sound as snd>"
+    @ Opcode "sound_play"
     define startSound (snd: int) begin
     end
 
     @ Category "Sound"
     @ Block "stop all sounds"
+    @ Opcode "sound_stopallsounds"
     define stopAllSounds () begin
     end
 
     @ Category "Sound"
     @ Block "change <string as effect> sound effect by <int as num>"
+    @ Opcode "sound_changeeffectby"
     define changeSoundEffectBy (eff: string, val: int) begin
     end
 
     @ Category "Sound"
     @ Block "set <string as effect> sound effect to <int as num>"
+    @ Opcode "sound_seteffectto"
     define setSoundEffectTo (eff: string, val: int) begin
     end
 
     @ Category "Sound"
     @ Block "clear sound effects"
+    @ Opcode "sound_cleareffects"
     define clearSoundEffects () begin
     end
 
     @ Category "Sound"
     @ Block "change volume by <int as delta>"
+    @ Opcode "sound_changevolumeby"
     define changeVolumeBy (delta: int) begin
     end
 
     @ Category "Sound"
     @ Block "set volume to <int as percent>"
+    @ Opcode "sound_setvolumeto"
     define setVolumeTo (perc: int) begin
     end
 
     @ Category "Sound"
     @ Block "volume"
+    @ Opcode "sound_volume"
     define volume () begin
     end returns result : int
 
     @ Category "Sensing"
     @ Block "ask (question as string) and wait"
+    @ Opcode "sensing_askandwait"
     define atomic askAndWait (question: string) begin
         broadcast "ASK" () to "SYSTEM" and wait
     end
 
     @ Category "Sensing"
     @ Block "answer"
+    @ Opcode "sensing_answer"
     define atomic answer () begin
         declare io as actor
         define io as locate actor "IOActor"
