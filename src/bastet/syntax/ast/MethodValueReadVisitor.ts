@@ -123,7 +123,7 @@ export class MethodValueReadEvent {
 export class MethodValueReadVisitor implements CoreVisitor<MethodValueReadEvent>, CoreBoolExpressionVisitor<MethodValueReadEvent>, CoreNumberExpressionVisitor<MethodValueReadEvent>,
     CoreNonCtrlStatementnVisitor<MethodValueReadEvent>{
 
-    constructor(private readonly methodName: string) {
+    constructor(private readonly methodNames: string[]) {
     }
 
     private readonly nothingReadEvent = new MethodValueReadEvent(undefined);
@@ -150,7 +150,7 @@ export class MethodValueReadVisitor implements CoreVisitor<MethodValueReadEvent>
             const assignResultToName = node.assignResultTo.value().accept(this.printVisitor);
             const calledMethod = node.calledMethod.text;
 
-            if (calledMethod === this.methodName) {
+            if (this.methodNames.includes(calledMethod)) {
                 // Attribute written to variable --> need to keep track of its new alias
                 const unwrappedVariable = DataLocationScoper.rightUnwrapScope(assignResultToName);
                 // Increase the SSA index by 1 since the actual value will be saved to the variable with the next index

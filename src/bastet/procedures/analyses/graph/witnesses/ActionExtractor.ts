@@ -32,7 +32,7 @@ import {DataLocationScoper} from "../../control/DataLocationScoping";
 import {Action} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 
 export abstract class ActionExtractor {
-    private readonly _actionMethodName: string;
+    private readonly _actionMethodNames: string[];
     private readonly _visitor: MethodValueReadVisitor;
     private readonly _stepToAssignments: Map<number, Assignment[]> = new Map<number, Assignment[]>();
     /**
@@ -42,11 +42,11 @@ export abstract class ActionExtractor {
     private readonly _actionMethodReadFrom: string[] = [];
 
     /**
-     * @param actionMethodName The name of a method in the 'library.sc' that should be tracked with an ActionValueReadVisitor
+     * @param actionMethodNames The names of methods in the 'library.sc' that should be tracked with an ActionValueReadVisitor
      */
-    protected constructor(actionMethodName: string) {
-        this._actionMethodName = actionMethodName;
-        this._visitor = new MethodValueReadVisitor(actionMethodName);
+    protected constructor(...actionMethodNames: string[]) {
+        this._actionMethodNames = actionMethodNames;
+        this._visitor = new MethodValueReadVisitor(actionMethodNames);
     }
 
     /**
@@ -74,7 +74,7 @@ export abstract class ActionExtractor {
             const assignments = this._stepToAssignments.get(step.id);
             Preconditions.checkNotUndefined(assignments);
 
-            const assignmentWithReadEvent = assignments.find(assignment => assignment.method === this._actionMethodName && this._actionMethodReadFrom.includes(assignment.variable));
+            const assignmentWithReadEvent = assignments.find(assignment => this._actionMethodNames.includes(assignment.method) && this._actionMethodReadFrom.includes(assignment.variable));
 
             if (assignmentWithReadEvent) {
                 const variableNameWithoutSSA = DataLocationScoper.rightUnwrapScope(assignmentWithReadEvent.variable).prefix;
@@ -105,7 +105,7 @@ export abstract class ActionExtractor {
 
 export class MouseXActionExtractor extends ActionExtractor {
     constructor() {
-        super('mouseX');
+        super('mouseX', 'getMouseX');
     }
 
     protected setActionForStepInternal(step: ErrorWitnessStep, actionValue): void {
@@ -121,7 +121,7 @@ export class MouseXActionExtractor extends ActionExtractor {
 
 export class MouseYActionExtractor extends ActionExtractor {
     constructor() {
-        super('mouseY');
+        super('mouseY', 'getMouseY');
     }
 
     protected setActionForStepInternal(step: ErrorWitnessStep, actionValue): void {
