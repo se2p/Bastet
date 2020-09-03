@@ -2,30 +2,26 @@
 // @ts-nocheck
 
 
-import { ATN } from "antlr4ts/atn/ATN";
-import { ATNDeserializer } from "antlr4ts/atn/ATNDeserializer";
-import { FailedPredicateException } from "antlr4ts/FailedPredicateException";
-import { NotNull } from "antlr4ts/Decorators";
-import { NoViableAltException } from "antlr4ts/NoViableAltException";
-import { Override } from "antlr4ts/Decorators";
-import { Parser } from "antlr4ts/Parser";
-import { ParserRuleContext } from "antlr4ts/ParserRuleContext";
-import { ParserATNSimulator } from "antlr4ts/atn/ParserATNSimulator";
-import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
-import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
-import { RecognitionException } from "antlr4ts/RecognitionException";
-import { RuleContext } from "antlr4ts/RuleContext";
+import {ATN} from "antlr4ts/atn/ATN";
+import {ATNDeserializer} from "antlr4ts/atn/ATNDeserializer";
+import {FailedPredicateException} from "antlr4ts/FailedPredicateException";
+import {NoViableAltException} from "antlr4ts/NoViableAltException";
+import {Parser} from "antlr4ts/Parser";
+import {ParserRuleContext} from "antlr4ts/ParserRuleContext";
+import {ParserATNSimulator} from "antlr4ts/atn/ParserATNSimulator";
+import {RecognitionException} from "antlr4ts/RecognitionException";
+import {RuleContext} from "antlr4ts/RuleContext";
 //import { RuleVersion } from "antlr4ts/RuleVersion";
-import { TerminalNode } from "antlr4ts/tree/TerminalNode";
-import { Token } from "antlr4ts/Token";
-import { TokenStream } from "antlr4ts/TokenStream";
-import { Vocabulary } from "antlr4ts/Vocabulary";
-import { VocabularyImpl } from "antlr4ts/VocabularyImpl";
+import {TerminalNode} from "antlr4ts/tree/TerminalNode";
+import {Token} from "antlr4ts/Token";
+import {TokenStream} from "antlr4ts/TokenStream";
+import {Vocabulary} from "antlr4ts/Vocabulary";
+import {VocabularyImpl} from "antlr4ts/VocabularyImpl";
 
 import * as Utils from "antlr4ts/misc/Utils";
 
-import { LeilaListener } from "./LeilaListener";
-import { LeilaVisitor } from "./LeilaVisitor";
+import {LeilaListener} from "./LeilaListener";
+import {LeilaVisitor} from "./LeilaVisitor";
 
 
 export class LeilaParser extends Parser {
@@ -212,56 +208,56 @@ export class LeilaParser extends Parser {
 	public static readonly RULE_messageDestination = 65;
 	// tslint:disable:no-trailing-whitespace
 	public static readonly ruleNames: string[] = [
-		"program", "fileType", "actorDefinitionList", "actorDefinition", "inheritsFrom", 
-		"actorMode", "actorComponentsDefinition", "resource", "resourceType", 
-		"resourceList", "declarationStmt", "declarationStmtList", "type", "primitiveType", 
-		"script", "scriptIdent", "scriptList", "scriptAttributeList", "scriptAttribute", 
-		"event", "messageNamespace", "methodDefinitionList", "methodDefinition", 
-		"methodResultDeclaration", "externMethodResultDeclaration", "methodAttributeList", 
-		"methodAttribute", "parameter", "parameterList", "parameterListPlain", 
-		"stmtList", "blockMode", "stmtListPlain", "controlStmt", "ifStmt", "elseCase", 
-		"untilStmt", "repeatTimesStmt", "repeatForeverStmt", "callStmt", "expressionList", 
-		"expressionListPlain", "expressionStmt", "stmt", "metaAttributeList", 
-		"metaAttribute", "nonCtrlStmt", "commonStmt", "listStmt", "setStmt", "setStmtList", 
-		"terminationStmt", "stringExpr", "boolExpr", "numOrStringExpr", "numExpr", 
-		"listExpr", "actorExpr", "expression", "unspecifiedExpr", "variable", 
+		"program", "fileType", "actorDefinitionList", "actorDefinition", "inheritsFrom",
+		"actorMode", "actorComponentsDefinition", "resource", "resourceType",
+		"resourceList", "declarationStmt", "declarationStmtList", "type", "primitiveType",
+		"script", "scriptIdent", "scriptList", "scriptAttributeList", "scriptAttribute",
+		"event", "messageNamespace", "methodDefinitionList", "methodDefinition",
+		"methodResultDeclaration", "externMethodResultDeclaration", "methodAttributeList",
+		"methodAttribute", "parameter", "parameterList", "parameterListPlain",
+		"stmtList", "blockMode", "stmtListPlain", "controlStmt", "ifStmt", "elseCase",
+		"untilStmt", "repeatTimesStmt", "repeatForeverStmt", "callStmt", "expressionList",
+		"expressionListPlain", "expressionStmt", "stmt", "metaAttributeList",
+		"metaAttribute", "nonCtrlStmt", "commonStmt", "listStmt", "setStmt", "setStmtList",
+		"terminationStmt", "stringExpr", "boolExpr", "numOrStringExpr", "numExpr",
+		"listExpr", "actorExpr", "expression", "unspecifiedExpr", "variable",
 		"ident", "number", "resourceLocator", "message", "messageDestination",
 	];
 
 	private static readonly _LITERAL_NAMES: Array<string | undefined> = [
-		undefined, "'program'", "'module'", "'begin'", "'end'", "'is'", "','", 
-		"'actor'", "'role'", "'image'", "'sound'", "'declare'", "'as'", "'list'", 
-		"'of'", "'int'", "'integer'", "'float'", "'boolean'", "'string'", "'enum'", 
-		"'['", "']'", "'script'", "'on'", "'do'", "'restart'", "'never'", "'bootstrap'", 
-		"'finished'", "'startup'", "'started'", "'clone'", "'message'", "'condition'", 
-		"'statement'", "'in'", "'define'", "'extern'", "'returns'", "':'", "'atomic'", 
-		"'('", "')'", "'if'", "'then'", "'else'", "'until'", "'repeat'", "'times'", 
-		"'forever'", "'evaluate'", "'@'", "'wait'", "'seconds'", "'stop'", "'other'", 
-		"'scripts'", "'create'", "'broadcast'", "'and'", "'reset'", "'timer'", 
-		"'epsilon'", "'assume'", "'delete'", "'all'", "'from'", "'add'", "'to'", 
-		"'insert'", "'at'", "'replace'", "'item'", "'by'", "'this'", "'cast'", 
-		"'attribute'", "'join'", "'letter'", "'default'", "'for'", "'?string'", 
-		"'not'", "'or'", "'>='", "'>'", "'<'", "'<='", "'='", "'contains'", "'?bool'", 
-		"'length'", "'index'", "'*'", "'/'", "'mod'", "'+'", "'-'", "'?number'", 
+		undefined, "'program'", "'module'", "'begin'", "'end'", "'is'", "','",
+		"'actor'", "'role'", "'image'", "'sound'", "'declare'", "'as'", "'list'",
+		"'of'", "'int'", "'integer'", "'float'", "'boolean'", "'string'", "'enum'",
+		"'['", "']'", "'script'", "'on'", "'do'", "'restart'", "'never'", "'bootstrap'",
+		"'finished'", "'startup'", "'started'", "'clone'", "'message'", "'condition'",
+		"'statement'", "'in'", "'define'", "'extern'", "'returns'", "':'", "'atomic'",
+		"'('", "')'", "'if'", "'then'", "'else'", "'until'", "'repeat'", "'times'",
+		"'forever'", "'evaluate'", "'@'", "'wait'", "'seconds'", "'stop'", "'other'",
+		"'scripts'", "'create'", "'broadcast'", "'and'", "'reset'", "'timer'",
+		"'epsilon'", "'assume'", "'delete'", "'all'", "'from'", "'add'", "'to'",
+		"'insert'", "'at'", "'replace'", "'item'", "'by'", "'this'", "'cast'",
+		"'attribute'", "'join'", "'letter'", "'default'", "'for'", "'?string'",
+		"'not'", "'or'", "'>='", "'>'", "'<'", "'<='", "'='", "'contains'", "'?bool'",
+		"'length'", "'index'", "'*'", "'/'", "'mod'", "'+'", "'-'", "'?number'",
 		"'self'", "'locate'", "'start'", "'?expr'", "'.'", "'strid'",
 	];
 	private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, "Boolean", "Bool", "String", "Identifier", "IntegerLiteral", 
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+		undefined, "Boolean", "Bool", "String", "Identifier", "IntegerLiteral",
 		"DecimalLiteral", "Whitespace", "Newline", "BlockComment", "LineComment",
 	];
 	public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(LeilaParser._LITERAL_NAMES, LeilaParser._SYMBOLIC_NAMES, []);

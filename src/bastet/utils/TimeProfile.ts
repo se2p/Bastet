@@ -31,7 +31,8 @@ import {EndAtomicStatement} from "../syntax/ast/core/statements/ControlStatement
 import {EpsilonStatement} from "../syntax/ast/core/statements/EpsilonStatement";
 import {
     DeclareActorVariableStatement,
-    DeclareStackVariableStatement, DeclareSystemVariableStatement
+    DeclareStackVariableStatement,
+    DeclareSystemVariableStatement
 } from "../syntax/ast/core/statements/DeclarationStatement";
 
 /**

@@ -111,15 +111,11 @@ import {
 import {CreateCloneOfStatement} from "../ast/core/statements/CreateCloneOfStatement";
 import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
 import {AbsentAstNode, AstNode, OptionalAstNode, PresentAstNode} from "../ast/AstNode";
-import {Preconditions} from "../../utils/Preconditions";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {DataLocation} from "../app/controlflow/DataLocation";
 import {Expression} from "../ast/core/expressions/Expression";
 import {VariableWithDataLocation} from "../ast/core/Variable";
-import {
-    BranchingAssumeStatement,
-    StrengtheningAssumeStatement
-} from "../ast/core/statements/AssumeStatement";
+import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "../ast/core/statements/AssumeStatement";
 import {CallStatement} from "../ast/core/statements/CallStatement";
 import {ExpressionList} from "../ast/core/expressions/ExpressionList";
 import {Statement} from "../ast/core/statements/Statement";
@@ -127,7 +123,8 @@ import {BeginAtomicStatement, EndAtomicStatement, ReturnStatement} from "../ast/
 import {SystemMessage, UserMessage} from "../ast/core/Message";
 import {CastExpression} from "../ast/core/expressions/CastExpression";
 import {
-    ActorExpression, ActorSelfExpression,
+    ActorExpression,
+    ActorSelfExpression,
     ActorVariableExpression,
     LocateActorExpression,
     StartCloneActorExpression,
