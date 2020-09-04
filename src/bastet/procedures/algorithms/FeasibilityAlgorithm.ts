@@ -28,6 +28,10 @@ import {AbstractState} from "../../lattices/Lattice";
 import {FrontierSet, ReachedSet} from "./StateSet";
 import {CEGARAlgorithm} from "./CEGARAlgorithm";
 
+/**
+ * A simple variant of CEGAR that does assume an analysis that operates at
+ * full precision and does not rely on precision refinement.
+ */
 export class FeasibilityAlgorithm<C extends ConcreteElement, E extends AbstractState>
     extends CEGARAlgorithm<C, E> {
 

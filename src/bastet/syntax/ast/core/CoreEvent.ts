@@ -27,12 +27,7 @@ import {AbstractNode} from "../AstNode";
 import {StringExpression} from "./expressions/StringExpression";
 import {BooleanExpression} from "./expressions/BooleanExpression";
 import {StatementList} from "./statements/Statement";
-import {
-    BOOTSTRAP_FINISHED_MESSAGE,
-    BOOTSTRAP_MESSAGE,
-    GREENFLAG_MESSAGE,
-    SYSTEM_NAMESPACE_NAME
-} from "./Message";
+import {BOOTSTRAP_FINISHED_MESSAGE, BOOTSTRAP_MESSAGE, GREENFLAG_MESSAGE, SYSTEM_NAMESPACE_NAME} from "./Message";
 import {ParameterDeclarationList} from "./ParameterDeclaration";
 
 

@@ -64,6 +64,12 @@ export class MultiPropertyAlgorithmConfig extends BastetConfiguration {
 
 }
 
+/**
+ * Algorithm that manages the set of properties that have to be checked,
+ * and the budget that remains to check properties.
+ *
+ * Inspired by the work by Apel etal. (2016) on "On-The-Fly Decomposition of Specifications in Software Model Checking."
+ */
 export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends AbstractState> implements AnalysisAlgorithm<C, E>{
 
     private readonly _task: App;

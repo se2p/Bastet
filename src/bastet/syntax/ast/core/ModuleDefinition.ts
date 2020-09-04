@@ -25,7 +25,6 @@
 
 import {AbstractNode} from "../AstNode";
 import {Identifier} from "./Identifier";
-import {ImportDefinitionList} from "./ImportDefinition";
 import {ActorDefinitionList} from "./ActorDefinition";
 
 export class ProgramDefinition extends AbstractNode {
