@@ -1081,6 +1081,36 @@ role ScratchEntity is RuntimeEntity begin
     end
 
     @ Category "Looks"
+    @ Block "next backdrop"
+    @ Block "switch backdrop to (next backdrop v)"
+    @ Opcode "looks_nextbackdrop"
+    @ Opcode "looks_switchbackdropto"
+    define atomic switchBackdropToNext () begin
+        // Implement me using broadcasts
+    end
+
+    @ Category "Looks"
+    @ Block "switch backdrop to (previous backdrop v)"
+    @ Opcode "looks_switchbackdropto"
+    define atomic switchBackdropToPrev () begin
+        // Implement me using broadcasts
+    end
+
+    @ Category "Looks"
+    @ Block "switch backdrop to (random backdrop v)"
+    @ Opcode "looks_switchbackdropto"
+    define atomic switchBackdropToRandom () begin
+        // Implement me using broadcasts
+    end
+
+    @ Category "Looks"
+    @ Block "switch backdrop to (backdrop v)"
+    @ Opcode "looks_switchbackdropto"
+    define atomic switchBackdropToId (id: str) begin
+        // Implement me using broadcasts
+    end
+
+    @ Category "Looks"
     @ Block "change <string as effect> effect by <int as value>"
     @ Opcode "looks_changeeffectby"
     define atomic changeGraphicEffectBy (eff:string, val:int) begin
@@ -1248,18 +1278,6 @@ role ScratchSprite is ScratchEntity begin
     end
 
     define atomic pointTowardsSelf () begin
-    end
-
-    define atomic switchBackdropToNext () begin
-        // Implement me using broadcasts
-    end
-
-    define atomic switchBackdropToPrev () begin
-        // Implement me using broadcasts
-    end
-
-    define atomic switchBackdropToRandom () begin
-        // Implement me using broadcasts
     end
 
     @ Category "Motion"
@@ -1808,16 +1826,17 @@ role ScratchStage is ScratchEntity begin
 
     define current_idx as 0
 
-    define atomic switchBackdropTo (id: string) begin
-        changeActiveGraphicTo(id)
-    end
-
+    @ Category "Looks"
+    @ Block "switch backdrop to (backdrop v) and wait"
+    @ Opcode "looks_switchbackdroptoandwait"
     define atomic switchBackdropToAndWait (id: string) begin
 
     end
 
-    @ Category "Looks"
-    @ Block "next backdrop"
+    define atomic switchBackdropTo (id: string) begin
+        changeActiveGraphicTo(id)
+    end
+
     define atomic nextBackdrop () begin
         declare idx as int
         define idx as getGraphicIndexById(active_graphic_name)
