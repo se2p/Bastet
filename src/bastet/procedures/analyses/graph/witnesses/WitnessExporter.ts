@@ -224,6 +224,15 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         errorWitness.steps = alteredSteps;
 
+        let mousePosition = {x: undefined, y: undefined};
+        errorWitness.steps.forEach(step => {
+            if (step.action === Action.MOUSE_MOVE) {
+                step.mousePosition = {x: step.mousePosition.x === undefined ? mousePosition.x : step.mousePosition.x,
+                    y: step.mousePosition.y === undefined ? mousePosition.y : step.mousePosition.y};
+                mousePosition = step.mousePosition;
+            }
+        });
+
         if (this._config.collapseAtomicBlocks) {
             errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
         }

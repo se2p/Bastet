@@ -112,7 +112,7 @@ export class MouseXActionExtractor extends ActionExtractor {
         step.action = Action.MOUSE_MOVE;
 
         if (!step.mousePosition) {
-            step.mousePosition = { x: actionValue, y: 0 };
+            step.mousePosition = { x: actionValue, y: undefined };
         } else {
             step.mousePosition.x = actionValue;
         }
@@ -128,7 +128,7 @@ export class MouseYActionExtractor extends ActionExtractor {
         step.action = Action.MOUSE_MOVE;
 
         if (!step.mousePosition) {
-            step.mousePosition = { x: 0, y: actionValue };
+            step.mousePosition = { x: undefined, y: actionValue };
         } else {
             step.mousePosition.y = actionValue;
         }
