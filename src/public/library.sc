@@ -1288,6 +1288,7 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Motion"
+    @ Block "go to (actor v)"
     @ Opcode "motion_goto"
     define atomic goToSprite (o: actor) begin
         declare otherX as int
@@ -1337,6 +1338,7 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Motion"
+    @ Block "go to (random position v)"
     @ Opcode "motion_goto"
     define atomic goToRandomPosition () begin
         define x as randomIntegerBetween(0-240, 240)
@@ -1344,18 +1346,21 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Motion"
+    @ Block "change x by (Num)"
     @ Opcode "motion_changexby"
     define atomic changeXBy (increment: int) begin
        // set attribute "x" to (attribute "x" + increment)
     end
 
     @ Category "Looks"
+    @ Block "costume (number v)"
     @ Opcode "looks_costumenumbername"
     define atomic costumeNumber () begin
         // ...
     end returns result : integer
 
     @ Category "Looks"
+    @ Block "costume (name v)"
     @ Opcode "looks_costumenumbername"
     define atomic costumeName () begin
         // ...
@@ -1369,6 +1374,7 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Looks"
+    @ Block "switch costume to (costume v)"
     @ Opcode "looks_switchcostumeto"
     define atomic changeCostumeTo (id: string) begin
         changeActiveGraphicTo(id)
@@ -1376,23 +1382,28 @@ role ScratchSprite is ScratchEntity begin
 
     @ Category "Looks"
     @ Block "go to <string as layer> layer"
+    @ Opcode "looks_gotofrontback"
     define atomic goToFrontLayer () begin
         // ...
     end
 
     @ Category "Looks"
     @ Block "go to <string as layer> layer"
+    @ Opcode "looks_gotofrontback"
     define atomic goToBackLayer () begin
         // ...
     end
 
     @ Category "Looks"
     @ Block "go <forward | backward> <Num> layers"
+    @ Opcode "looks_goforwardbackwardlayers"
     define atomic changeLayerBy (number: int) begin
         // ...
     end
 
     @ Category "Sensing"
+    @ Block "touching (edge v) ?"
+    @ Opcode "sensing_touchingobject"
     define atomic touchingEdge () begin
         define result as false
 
@@ -1424,6 +1435,8 @@ role ScratchSprite is ScratchEntity begin
     end returns result : boolean
 
     @ Category "Motion"
+    @ Block "if on edge, bounce"
+    @ Opcode "motion_ifonedgebounce"
     define atomic ifOnEdgeBounce () begin
         declare boundsLeft as int
         declare boundsRight as int
@@ -1554,6 +1567,8 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Sensing"
+    @ Block "touching (mouse pointer v) ?"
+    @ Opcode "sensing_touchingobject"
     define atomic touchingMousePointer () begin
         declare obj_left as int
         define obj_left as x - active_graphic_half_width
@@ -1579,6 +1594,8 @@ role ScratchSprite is ScratchEntity begin
     end returns result : boolean
 
     @ Category "Sensing"
+    @ Block "touching (actor v) ?"
+    @ Opcode "sensing_touchingobject"
     define atomic touchingObject (snd: actor) begin
             // To understand this method, it is important to be aware of the fact
             // that the x and y coordinates of a Sprite represents its center point.
@@ -1669,17 +1686,21 @@ role ScratchSprite is ScratchEntity begin
 
     @ Category "Sensing"
     @ Block "touching color <Color> ?"
+    @ Opcode "sensing_touchingcolor"
     define atomic touchingColor (clr: int) begin
         // ...
     end returns result : boolean
 
     @ Category "Sensing"
     @ Block "color <Color> is touching <Color> ?"
+    @ Opcode "sensing_coloristouchingcolor"
     define atomic colorIsTouchingColor(clr: int, tching: int) begin
         // ...
     end returns result : boolean
 
     @ Category "Sensing"
+    @ Block "distance to (mouse pointer v)"
+    @ Opcode "sensing_distanceto"
     define distanceToMousePointer () begin
         define result as distanceTo(mouseX(), mouseY())
     end returns result : int
@@ -1695,6 +1716,9 @@ role ScratchSprite is ScratchEntity begin
         define result as dx + dy
     end returns result : int
 
+    @ Category "Looks"
+    @ Block "say (string as msg) for (Num) seconds"
+    @ Opcode "looks_sayforsecs"
     define atomic sayTextFor (msg: string, scs: int) begin
         // msgBounded = substr(msg, 0, 330)
         define bubbleText as msg
@@ -1703,6 +1727,9 @@ role ScratchSprite is ScratchEntity begin
         define bubbleDuration as scs
     end
 
+    @ Category "Looks"
+    @ Block "think (string as msg) for (Num) seconds"
+    @ Opcode "looks_thinkforsecs"
     define atomic thinkTextFor (msg: string, scs: int) begin
         // msgBounded = substr(msg, 0, 330)
         define bubbleText as msg
@@ -1711,12 +1738,18 @@ role ScratchSprite is ScratchEntity begin
         define bubbleDuration as scs
     end
 
+    @ Category "Looks"
+    @ Block "think (string as msg)"
+    @ Opcode "looks_think"
     define atomic thinkText (msg: string) begin
         define bubbleText as msg
         define bubbleStart as _RUNTIME_millis()
         define bubbleType as "think"
     end
 
+    @ Category "Looks"
+    @ Block "say (text as msg)"
+    @ Opcode "looks_say"
     define atomic sayText (msg: string) begin
         define bubbleText as msg
         define bubbleStart as _RUNTIME_millis()
@@ -1725,18 +1758,21 @@ role ScratchSprite is ScratchEntity begin
 
     @ Category "Motion"
     @ Block "turn left <Num> degrees"
+    @ Opcode "motion_turnleft"
     define atomic turnLeft(degrees: int) begin
         setDirection(direction - degrees)
     end
 
     @ Category "Motion"
     @ Block "turn right <Num> degrees"
+    @ Opcode "motion_turnright"
     define atomic turnRight(degrees: int) begin
         setDirection(direction + degrees)
     end
 
     @ Category "Motion"
     @ Block "point in direction <Num>"
+    @ Opcode "motion_pointindirection"
     define atomic pointInDirection(dir: int) begin
         setDirection(dir)
     end
