@@ -162,7 +162,7 @@ export class AnswerActionExtractor extends ActionExtractor {
 
 export class KeyPressedActionExtractor extends ActionExtractor {
     constructor() {
-        super('keyPressed');
+        super('keyPressed', 'keyPressedNondet');
     }
 
     protected setActionForStepInternal(step: ErrorWitnessStep, actionValue): void {
