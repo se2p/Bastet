@@ -1106,7 +1106,7 @@ role ScratchEntity is RuntimeEntity begin
     @ Category "Looks"
     @ Block "switch backdrop to (backdrop v)"
     @ Opcode "looks_switchbackdropto"
-    define atomic switchBackdropToId (id: str) begin
+    define atomic switchBackdropToId (id: string) begin
         // Implement me using broadcasts
     end
 
