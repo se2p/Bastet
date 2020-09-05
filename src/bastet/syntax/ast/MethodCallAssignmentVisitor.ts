@@ -31,6 +31,7 @@ import {CorePrintVisitor} from "./CorePrintVisitor";
 export interface Assignment {
     variable: string;
     method: string;
+    methodParameters: string[];
 }
 
 export class MethodCallAssignmentVisitor implements CoreVisitor<Assignment> {
@@ -42,7 +43,8 @@ export class MethodCallAssignmentVisitor implements CoreVisitor<Assignment> {
         if (node.assignResultTo.isPresent()) {
             return {
                 variable: node.assignResultTo.value().accept(new CorePrintVisitor()),
-                method: node.calledMethod.text
+                method: node.calledMethod.text,
+                methodParameters: node.args.elements.map(element => element.accept(new CorePrintVisitor()))
             };
         }
 

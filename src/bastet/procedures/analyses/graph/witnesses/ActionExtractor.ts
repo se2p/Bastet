@@ -83,7 +83,7 @@ export abstract class ActionExtractor {
 
                 Preconditions.checkState(variableValue !== undefined, `Unknown variable '${variableNameWithoutSSA}'`)
 
-                this.setActionForStepInternal(step, variableValue);
+                this.setActionForStepInternal(step, variableValue, assignmentWithReadEvent);
             }
         }
     }
@@ -100,7 +100,7 @@ export abstract class ActionExtractor {
         throw new Error(`Unknown variable '${variableName}' in '${targetName}'`);
     }
 
-    protected abstract setActionForStepInternal(step: ErrorWitnessStep, actionValue): void;
+    protected abstract setActionForStepInternal(step: ErrorWitnessStep, actionValue, assignment: Assignment): void;
 }
 
 export class MouseXActionExtractor extends ActionExtractor {
@@ -162,11 +162,16 @@ export class AnswerActionExtractor extends ActionExtractor {
 
 export class KeyPressedActionExtractor extends ActionExtractor {
     constructor() {
-        super('keyPressed', 'keyPressedNondet');
+        super('keyPressedByCode', 'keyPressedByCodeNondet');
     }
 
-    protected setActionForStepInternal(step: ErrorWitnessStep, actionValue): void {
-        step.action = Action.KEY_DOWN;
-        step.keyPressed = actionValue;
+    protected setActionForStepInternal(step: ErrorWitnessStep, actionValue, assignment: Assignment): void {
+        step.action = actionValue ? Action.KEY_DOWN : Action.KEY_UP;
+
+        const scopedKeyCodeVariableActorAndSSA = assignment.methodParameters[0];
+
+        let unwrapped = DataLocationScoper.rightUnwrapScope(scopedKeyCodeVariableActorAndSSA).prefix;
+
+        step.keyPressed = step.getVariableValue(step.actionTargetName, unwrapped);
     }
 }

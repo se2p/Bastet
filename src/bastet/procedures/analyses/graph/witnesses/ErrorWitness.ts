@@ -51,7 +51,7 @@ export class ErrorWitnessActor {
 
             if (this.isActorVariable(scopedVariableName)) {
                 this.variables[attribute] = value;
-            } else {
+            } else if (this.methodVariables) {
                 this.methodVariables[scopedVariableName] = value;
             }
         });
@@ -99,6 +99,7 @@ export class ErrorWitnessStep {
     getVariableValue(targetName: string, attribute: string): any {
         const target = this.actors.find(t => t.name === targetName);
         Preconditions.checkNotUndefined(target);
+        console.log(target.variables)
         return target.variables[attribute];
     }
 }
