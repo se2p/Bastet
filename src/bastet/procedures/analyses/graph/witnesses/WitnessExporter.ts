@@ -48,11 +48,11 @@ import {ProgramOperation} from "../../../../syntax/app/controlflow/ops/ProgramOp
 import {
     ActionExtractor,
     AnswerActionExtractor,
-    BroadcastActionExtractor,
     KeyPressedActionExtractor,
     MouseDownActionExtractor,
     MouseXActionExtractor,
     MouseYActionExtractor,
+    SpriteClickBroadcastActionExtractor,
 } from "./ActionExtractor";
 
 export interface WitnessExporterConfig {
@@ -165,7 +165,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             new MouseXActionExtractor(),
             new MouseYActionExtractor(),
             new MouseDownActionExtractor(),
-            new BroadcastActionExtractor('SPRITE_CLICK', Action.MOUSE_DOWN),
+            new SpriteClickBroadcastActionExtractor(),
             new AnswerActionExtractor(),
             new KeyPressedActionExtractor()
         ];
@@ -218,7 +218,11 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         while (steps.length > 0) {
             const step = steps.shift();
             for (const actionExtractor of actionExtractors) {
-                actionExtractor.setActionForStep(step, steps);
+                const extraStep = actionExtractor.setActionForStep(step, steps);
+
+                if (extraStep) {
+                    alteredSteps.push(extraStep);
+                }
             }
 
             alteredSteps.push(step);
@@ -415,8 +419,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             if (isRelevant) {
                 step.actors = lastStep.actors.map(actor => {
                     // Clone data to prevent side-effects
-                    const cloneData = JSON.parse(JSON.stringify(actor));
-                    return Object.assign(new ErrorWitnessActor(), cloneData);
+                    return actor.clone();
                 });
                 if (collapsedActionLabel) {
                     step.actionLabel = `${collapsedActionLabel}; ${step.actionLabel}`;

@@ -41,36 +41,46 @@ export interface ActionExtractor {
     processOperations(operations: ProgramOperation[], step: ErrorWitnessStep): void;
 
     /**
-     * Sets an action for the step if necessary.
+     * Sets an action for the step if necessary and can return an extra predecessor to be inserted before the step.
      * @param step
      * @param successors
      */
-    setActionForStep(step: ErrorWitnessStep, successors: ErrorWitnessStep[]): void
+    setActionForStep(step: ErrorWitnessStep, successors: ErrorWitnessStep[]): ErrorWitnessStep|void;
 }
 
-export class BroadcastActionExtractor implements ActionExtractor {
-    private readonly _broadcast: string;
-    private readonly _action: Action;
-    private readonly _stepToBroadcasts: Map<number, Broadcast[]> = new Map<number, Broadcast[]>();
+export abstract class BroadcastActionExtractor implements ActionExtractor {
+    protected readonly _broadcast: string;
+    protected readonly _stepToBroadcasts: Map<number, Broadcast[]> = new Map<number, Broadcast[]>();
     private readonly _broadcastVisitor = new BroadcastVisitor();
 
-    constructor(broadcast: string, actionToSet: Action) {
+    protected constructor(broadcast: string) {
         this._broadcast = broadcast;
-        this._action = actionToSet;
     }
 
     processOperations(operations: ProgramOperation[], step: ErrorWitnessStep): void {
         const broadcasts = operations.map(operation => operation.ast.accept(this._broadcastVisitor))
-            .filter(broadcast => broadcast);
+            .filter(broadcast => broadcast && broadcast.id === this._broadcast);
         this._stepToBroadcasts.set(step.id, broadcasts);
     }
 
-    setActionForStep(step: ErrorWitnessStep, successors: ErrorWitnessStep[]): void {
-        const broadcastsAtStep = this._stepToBroadcasts.get(step.id);
-        const relevantBroadcastIncluded = broadcastsAtStep.some(broadcast => broadcast.id === this._broadcast);
+    abstract setActionForStep(step: ErrorWitnessStep, successors: ErrorWitnessStep[]): ErrorWitnessStep | void;
+}
 
-        if (relevantBroadcastIncluded) {
-            step.action = this._action;
+export class SpriteClickBroadcastActionExtractor extends BroadcastActionExtractor {
+
+    constructor() {
+        super('SPRITE_CLICK');
+    }
+
+    setActionForStep(step: ErrorWitnessStep, successors: ErrorWitnessStep[]): ErrorWitnessStep | void {
+        const broadcastsAtStep = this._stepToBroadcasts.get(step.id);
+
+        if (broadcastsAtStep.length > 0) {
+            step.action = Action.MOUSE_UP;
+            const clone = step.clone();
+            clone.id = clone.id * -1;
+            clone.action = Action.MOUSE_DOWN;
+            return clone;
         }
     }
 }

@@ -74,6 +74,11 @@ export class ErrorWitnessActor {
 
         return actorName === this.name;
     }
+
+    clone(): ErrorWitnessActor {
+        const data = JSON.parse(JSON.stringify(this));
+        return Object.assign(new ErrorWitnessActor(), data);
+    }
 }
 
 export interface MousePosition {
@@ -101,6 +106,14 @@ export class ErrorWitnessStep {
         Preconditions.checkNotUndefined(target);
         console.log(target.variables)
         return target.variables[attribute];
+    }
+
+    clone(): ErrorWitnessStep {
+        const data = JSON.parse(JSON.stringify(this));
+        const clone: ErrorWitnessStep = Object.assign(new ErrorWitnessStep(this.id), data);
+        clone.actors = this.actors.map(actor => actor.clone());
+
+        return clone;
     }
 }
 
