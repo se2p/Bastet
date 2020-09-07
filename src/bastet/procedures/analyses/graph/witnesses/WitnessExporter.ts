@@ -411,7 +411,11 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             const isRelevant = step.action !== undefined || step === lastStep;
 
             if (isRelevant) {
-                step.actors = lastStep.actors;
+                step.actors = lastStep.actors.map(actor => {
+                    // Clone data to prevent side-effects
+                    const cloneData = JSON.parse(JSON.stringify(actor));
+                    return Object.assign(new ErrorWitnessActor(), cloneData);
+                });
                 if (collapsedActionLabel) {
                     step.actionLabel = `${collapsedActionLabel}; ${step.actionLabel}`;
                     collapsedActionLabel = undefined;
