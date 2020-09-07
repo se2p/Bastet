@@ -48,6 +48,7 @@ import {ProgramOperation} from "../../../../syntax/app/controlflow/ops/ProgramOp
 import {
     ActionExtractor,
     AnswerActionExtractor,
+    BroadcastActionExtractor,
     KeyPressedActionExtractor,
     MouseDownActionExtractor,
     MouseXActionExtractor,
@@ -164,6 +165,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             new MouseXActionExtractor(),
             new MouseYActionExtractor(),
             new MouseDownActionExtractor(),
+            new BroadcastActionExtractor('SPRITE_CLICK', Action.MOUSE_DOWN),
             new AnswerActionExtractor(),
             new KeyPressedActionExtractor()
         ];

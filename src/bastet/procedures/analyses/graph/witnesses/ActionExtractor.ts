@@ -30,8 +30,52 @@ import {Assignment, MethodCallAssignmentVisitor} from "../../../../syntax/ast/Me
 import {Preconditions} from "../../../../utils/Preconditions";
 import {DataLocationScoper} from "../../control/DataLocationScoping";
 import {Action} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
+import {Broadcast, BroadcastVisitor} from "../../../../syntax/ast/BroadcastVisitor";
 
-export abstract class ActionExtractor {
+export interface ActionExtractor {
+    /**
+     * Processes new operations that took place before the step.
+     * @param operations
+     * @param step
+     */
+    processOperations(operations: ProgramOperation[], step: ErrorWitnessStep): void;
+
+    /**
+     * Sets an action for the step if necessary.
+     * @param step
+     * @param successors
+     */
+    setActionForStep(step: ErrorWitnessStep, successors: ErrorWitnessStep[]): void
+}
+
+export class BroadcastActionExtractor implements ActionExtractor {
+    private readonly _broadcast: string;
+    private readonly _action: Action;
+    private readonly _stepToBroadcasts: Map<number, Broadcast[]> = new Map<number, Broadcast[]>();
+    private readonly _broadcastVisitor = new BroadcastVisitor();
+
+    constructor(broadcast: string, actionToSet: Action) {
+        this._broadcast = broadcast;
+        this._action = actionToSet;
+    }
+
+    processOperations(operations: ProgramOperation[], step: ErrorWitnessStep): void {
+        const broadcasts = operations.map(operation => operation.ast.accept(this._broadcastVisitor))
+            .filter(broadcast => broadcast);
+        this._stepToBroadcasts.set(step.id, broadcasts);
+    }
+
+    setActionForStep(step: ErrorWitnessStep, successors: ErrorWitnessStep[]): void {
+        const broadcastsAtStep = this._stepToBroadcasts.get(step.id);
+        const relevantBroadcastIncluded = broadcastsAtStep.some(broadcast => broadcast.id === this._broadcast);
+
+        if (relevantBroadcastIncluded) {
+            step.action = this._action;
+        }
+    }
+}
+
+export abstract class QueryMethodActionExtractor implements ActionExtractor {
     private readonly _actionMethodNames: string[];
     private readonly _visitor: MethodValueReadVisitor;
     private readonly _stepToAssignments: Map<number, Assignment[]> = new Map<number, Assignment[]>();
@@ -49,11 +93,6 @@ export abstract class ActionExtractor {
         this._visitor = new MethodValueReadVisitor(actionMethodNames);
     }
 
-    /**
-     * Processes new operations that took place before the step.
-     * @param operations
-     * @param step
-     */
     processOperations(operations: ProgramOperation[], step: ErrorWitnessStep): void {
         const readEvent = operations
             .map(o => o.ast.accept(this._visitor))
@@ -103,7 +142,7 @@ export abstract class ActionExtractor {
     protected abstract setActionForStepInternal(step: ErrorWitnessStep, actionValue, assignment: Assignment): void;
 }
 
-export class MouseXActionExtractor extends ActionExtractor {
+export class MouseXActionExtractor extends QueryMethodActionExtractor {
     constructor() {
         super('mouseX', 'getMouseX');
     }
@@ -119,7 +158,7 @@ export class MouseXActionExtractor extends ActionExtractor {
     }
 }
 
-export class MouseYActionExtractor extends ActionExtractor {
+export class MouseYActionExtractor extends QueryMethodActionExtractor {
     constructor() {
         super('mouseY', 'getMouseY');
     }
@@ -135,7 +174,7 @@ export class MouseYActionExtractor extends ActionExtractor {
     }
 }
 
-export class MouseDownActionExtractor extends ActionExtractor {
+export class MouseDownActionExtractor extends QueryMethodActionExtractor {
     constructor() {
         super('mouseDown');
     }
@@ -149,7 +188,7 @@ export class MouseDownActionExtractor extends ActionExtractor {
     }
 }
 
-export class AnswerActionExtractor extends ActionExtractor {
+export class AnswerActionExtractor extends QueryMethodActionExtractor {
     constructor() {
         super('answer');
     }
@@ -160,7 +199,7 @@ export class AnswerActionExtractor extends ActionExtractor {
     }
 }
 
-export class KeyPressedActionExtractor extends ActionExtractor {
+export class KeyPressedActionExtractor extends QueryMethodActionExtractor {
     constructor() {
         super('keyPressedByCode', 'keyPressedByCodeNondet');
     }
