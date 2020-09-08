@@ -84,7 +84,7 @@ role KeyboardIO begin
     define KEY_RIGHT as 39
     define KEY_DOWN as 40
 
-    define atomic stringToKey(s: string) begin
+    define atomic stringToKey (s: string) begin
         if s = " " then begin
             define result as KEY_SPACE
         end else if s = "ArrowLeft" or s = "Left" then begin
@@ -576,7 +576,7 @@ role MathActor begin
     //
     // param rad: float - radians number for which the degree value will be calculated
     // return result: float - the calculated degree value
-    define atomic radToDeg(rad: float) begin
+    define atomic radToDeg (rad: float) begin
         // define result as ((rad * 180.0) / PI)
         define result as rad * 57.2957795131
     end returns result: float
@@ -585,12 +585,12 @@ role MathActor begin
     //
     // param deg: float - degree number for which the radians value will be calculated
     // return result: float - the calculated radians value [0..2*pi]
-    define atomic degToRad(deg: float) begin
+    define atomic degToRad (deg: float) begin
         // define result as (deg * PI) / 180.0
         define result as deg * 0.01745329252
     end returns result: float
 
-    define atomic nearestPerfectSqrt(num: float) begin
+    define atomic nearestPerfectSqrt (num: float) begin
         if num < 0.0 then begin
             _RUNTIME_signalFailure("Sqrt of negative number not allowed")
           end else if num = 0.0 then begin
@@ -649,7 +649,7 @@ role MathActor begin
     end returns result: float
 
 
-    define atomic mathSqrt(num: float) begin
+    define atomic mathSqrt (num: float) begin
         declare result as float
         define result as nearestPerfectSqrt(num)
 
@@ -661,7 +661,7 @@ role MathActor begin
         end
     end returns result: float
 
-    define atomic mathAbs(n: int) begin
+    define atomic mathAbs (n: int) begin
         if n < 0 then begin
             define result as 0 - n
         end else begin
@@ -669,7 +669,7 @@ role MathActor begin
         end
     end returns result: int
 
-    define atomic mathAbsF(n: float) begin
+    define atomic mathAbsF (n: float) begin
         if n < 0.0 then begin
             define result as 0.0 - n
         end else begin
@@ -677,7 +677,7 @@ role MathActor begin
         end
     end returns result: float
 
-    define atomic mathMax(n1: int, n2: int) begin
+    define atomic mathMax (n1: int, n2: int) begin
         if (n1 > n2) then begin
             define result as n1
         end else begin
@@ -685,7 +685,7 @@ role MathActor begin
         end
     end returns result: int
 
-    define atomic mathMin(n1: int, n2: int) begin
+    define atomic mathMin (n1: int, n2: int) begin
         if (n1 < n2) then begin
             define result as n1
         end else begin
@@ -693,7 +693,7 @@ role MathActor begin
         end
     end returns result: int
 
-    define atomic mathMaxF(n1: float, n2: float) begin
+    define atomic mathMaxF (n1: float, n2: float) begin
         if (n1 > n2) then begin
             define result as n1
         end else begin
@@ -701,7 +701,7 @@ role MathActor begin
         end
     end returns result: float
 
-    define atomic mathMinF(n1: float, n2: float) begin
+    define atomic mathMinF (n1: float, n2: float) begin
         if (n1 < n2) then begin
             define result as n1
         end else begin
@@ -842,11 +842,11 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         end
     end
 
-    define atomic milliseconds() begin
+    define atomic milliseconds () begin
         define result as _RUNTIME_millis()
     end returns result: int
 
-    define atomic microseconds() begin
+    define atomic microseconds () begin
         define result as _RUNTIME_micros()
     end returns result: int
 
@@ -859,7 +859,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     @ Category "Sensing"
     @ Block "mouse x"
     @ Opcode "sensing_mousex"
-    define atomic mouseX() begin
+    define atomic mouseX () begin
         declare io as actor
         define io as locate actor "IOActor"
         define result as cast (attribute "mouse_x" of io) to int
@@ -868,18 +868,18 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     @ Category "Sensing"
     @ Block "mouse y"
     @ Opcode "sensing_mousey"
-    define atomic mouseY()  begin
+    define atomic mouseY ()  begin
         declare io as actor
         define io as locate actor "IOActor"
         define result as cast (attribute "mouse_y" of io) to int
     end returns result: int
 
-    define atomic getMouseY()  begin
+    define atomic getMouseY ()  begin
         // non-det version of `mouseY`. Deprecated!
         // needed (with this signature) to get some programs running
     end returns result: int
 
-    define atomic getMouseX()  begin
+    define atomic getMouseX ()  begin
         // non-det version of `mouseY`. Deprecated!
         // needed (with this signature) to get some programs running
     end returns result: int
@@ -891,7 +891,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
          define result as keyPressed() = key
     end returns result : boolean
 
-    define atomic keyPressed() begin
+    define atomic keyPressed () begin
         declare io as actor
         define io as locate actor "IOActor"
         define result as cast (attribute "key_pressed" of io) to int
@@ -988,7 +988,7 @@ role Observer is RuntimeEntity begin
     end returns result : boolean
 
     @ Category "Specification"
-    define atomic areDisjoint(fst: actor, snd: actor) begin
+    define atomic areDisjoint (fst: actor, snd: actor) begin
         define result as not touchingObjects(fst, snd)
     end returns result : boolean
 
@@ -1063,7 +1063,7 @@ role ScratchEntity is RuntimeEntity begin
 
     define color_effect_value as 0.0
 
-    define atomic simpleReturn(n:float) begin
+    define atomic simpleReturn (n:float) begin
         define result as n
     end returns result: float
 
@@ -1694,7 +1694,7 @@ role ScratchSprite is ScratchEntity begin
     end returns result : boolean
 
     @ Category "Sensing"
-    define atomic isDisjointFrom(snd: actor) begin
+    define atomic isDisjointFrom (snd: actor) begin
         define result as not touchingObject(snd)
     end returns result : boolean
 
@@ -1712,7 +1712,7 @@ role ScratchSprite is ScratchEntity begin
     @ Category "Sensing"
     @ Block "color <Color> is touching <Color> ?"
     @ Opcode "sensing_coloristouchingcolor"
-    define atomic colorIsTouchingColor(clr: int, tching: int) begin
+    define atomic colorIsTouchingColor (clr: int, tching: int) begin
         // ...
     end returns result : boolean
 
@@ -1777,25 +1777,25 @@ role ScratchSprite is ScratchEntity begin
     @ Category "Motion"
     @ Block "turn left <Num> degrees"
     @ Opcode "motion_turnleft"
-    define atomic turnLeft(degrees: int) begin
+    define atomic turnLeft (degrees: int) begin
         setDirection(direction - degrees)
     end
 
     @ Category "Motion"
     @ Block "turn right <Num> degrees"
     @ Opcode "motion_turnright"
-    define atomic turnRight(degrees: int) begin
+    define atomic turnRight (degrees: int) begin
         setDirection(direction + degrees)
     end
 
     @ Category "Motion"
     @ Block "point in direction <Num>"
     @ Opcode "motion_pointindirection"
-    define atomic pointInDirection(dir: int) begin
+    define atomic pointInDirection (dir: int) begin
         setDirection(dir)
     end
 
-    define atomic setDirection(dir: int) begin
+    define atomic setDirection (dir: int) begin
         // TODO do we need to check if we are in the stage
         // Make sure direction is between -179 and 180
         declare wrapped as float
@@ -1848,7 +1848,7 @@ role ScratchStage is ScratchEntity begin
         changeActiveGraphicTo(id)
     end
 
-    define atomic previousBackdrop() begin
+    define atomic previousBackdrop () begin
         declare idx as int
         define idx as getGraphicIndexById(active_graphic_name)
         define idx as (current_idx-1) mod getNumGraphics()
@@ -1859,7 +1859,7 @@ role ScratchStage is ScratchEntity begin
         changeActiveGraphicTo(id)
     end
 
-    define atomic randomBackdrop() begin
+    define atomic randomBackdrop () begin
          declare idx as int
          define idx as getGraphicIndexById(active_graphic_name)
          define idx as randomIntegerBetween(0, getNumGraphics()-1)
