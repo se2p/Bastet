@@ -1267,6 +1267,13 @@ role ScratchEntity is RuntimeEntity begin
         // ...
     end
 
+    @ Category "Sensing"
+    @ Block "username"
+    @ Opcode "sensing_username"
+    define atomic username () begin
+        // ...
+    end
+
 end
 
 /**
