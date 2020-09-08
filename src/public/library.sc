@@ -1274,6 +1274,23 @@ role ScratchEntity is RuntimeEntity begin
         // ...
     end
 
+    @ Category "Data"
+    @ Block "show variable [variable v]"
+    @ Block "show list [list v]"
+    @ Opcode "data_showlist"
+    @ Opcode "data_showvariable"
+    define atomic showVariable (var: string) begin
+        // ...
+    end
+
+    @ Category "Data"
+    @ Block "hide variable [variable v]"
+    @ Block "hide list [list v]"
+    @ Opcode "data_hidelist"
+    @ Opcode "data_hidevariable"
+    define atomic hideVariable (var: string) begin
+        // ...
+    end
 end
 
 /**
