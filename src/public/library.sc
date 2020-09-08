@@ -1211,6 +1211,55 @@ role ScratchEntity is RuntimeEntity begin
         define result as attribute "answer" of io
     end returns result : string
 
+    @ Category "Sensing"
+    @ Block "current [year v]"
+    @ Opcode "sensing_current"
+    define atomic currentYear () begin
+        // ...
+    end
+
+    @ Category "Sensing"
+    @ Block "current [month v]"
+    @ Opcode "sensing_current"
+    define atomic currentMonth () begin
+        // ...
+    end
+
+    @ Category "Sensing"
+    @ Block "current [date v]"
+    @ Opcode "sensing_current"
+    define atomic currentDate () begin
+        // ...
+    end
+
+    @ Category "Sensing"
+    @ Block "current [day of week v]"
+    @ Opcode "sensing_current"
+    define atomic currentDayOfWeek () begin
+        // ...
+    end
+
+    @ Category "Sensing"
+    @ Block "current [hour v]"
+    @ Opcode "sensing_current"
+    define atomic currentHour () begin
+        // ...
+    end
+
+    @ Category "Sensing"
+    @ Block "current [minute v]"
+    @ Opcode "sensing_current"
+    define atomic currentMinute () begin
+        // ...
+    end
+
+    @ Category "Sensing"
+    @ Block "current [second v]"
+    @ Opcode "sensing_current"
+    define atomic currentSecond () begin
+        // ...
+    end
+
 end
 
 /**
