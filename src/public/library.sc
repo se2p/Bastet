@@ -906,6 +906,13 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         define result as keyPressedByCode(key)
     end returns result : boolean
 
+    @ Category "Sensing"
+    @ Block "loudness"
+    @ Opcode "sensing_loudness"
+    define atomic loudness () begin
+        // non-deterministic
+    end
+
 end
 
 /**
