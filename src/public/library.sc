@@ -1260,6 +1260,13 @@ role ScratchEntity is RuntimeEntity begin
         // ...
     end
 
+    @ Category "Sensing"
+    @ Block "days since 2000"
+    @ Opcode "sensing_dayssince2000"
+    define atomic daysSinceMillennium () begin
+        // ...
+    end
+
 end
 
 /**
