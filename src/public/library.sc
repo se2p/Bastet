@@ -1298,32 +1298,44 @@ end
  */
 role ScratchSprite is ScratchEntity begin
 
-    // x-coordinate in [-240,+240]
-    // See https://en.scratch-wiki.info/wiki/Coordinate_System
+    /**
+     * x-coordinate in [-240,+240]
+     * See https://en.scratch-wiki.info/wiki/Coordinate_System
+     */
     declare x as integer
 
-    // y-coordinate in [-180,+180]
-    // See https://en.scratch-wiki.info/wiki/Coordinate_System
+    /**
+     * y-coordinate in [-180,+180]
+     * See https://en.scratch-wiki.info/wiki/Coordinate_System
+     */
     declare y as integer
 
-    // Percent of the original size in [3,54000]
-    // See https://en.scratch-wiki.info/wiki/Size_(value)
+    /**
+     * Percent of the original size in [3,54000]
+     * See https://en.scratch-wiki.info/wiki/Size_(value)
+     */
     declare size as integer
 
-    // The rotation of the sprite in [-360,+360]
-    // See https://en.scratch-wiki.info/wiki/Direction_(value)
+    /**
+     * The rotation of the sprite in [-360,+360]
+     * See https://en.scratch-wiki.info/wiki/Direction_(value)
+     */
     declare direction as integer
 
     declare rotationStyle as string
 
-    // Whether or not the sprite is visible (difference to ghost mode!)
-    // See https://en.scratch-wiki.info/wiki/Hide_(block)
+    /**
+     * Whether or not the sprite is visible (difference to ghost mode!)
+     * See https://en.scratch-wiki.info/wiki/Hide_(block)
+     */
     declare visible as boolean
 
     declare draggable as boolean
 
-    // Bubble above a ScratchSprite for saying or thinking text for a given duration
-    // In Scratch if the bubbleText is empty, the bubble is not visible
+    /**
+     * Bubble above a ScratchSprite for saying or thinking text for a given duration
+     * In Scratch if the bubbleText is empty, the bubble is not visible
+     */
     declare bubbleText as string
     declare bubbleType as string
     declare bubbleStart as integer
@@ -1563,7 +1575,9 @@ role ScratchSprite is ScratchEntity begin
         define distRight as mathMax(0, STAGE_HALF_WIDTH - boundsRight)
         define distBottom as mathMax(0, STAGE_HALF_HEIGHT + boundsBottom)
 
-        // 1 = left, 2 = bottom, 3 = right, 4 = top
+        /**
+          * 1 = left, 2 = bottom, 3 = right, 4 = top
+          */
         declare nearestEdge as integer
 
         declare minDist as integer
