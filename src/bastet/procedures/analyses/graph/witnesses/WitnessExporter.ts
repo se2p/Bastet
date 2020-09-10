@@ -264,11 +264,13 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
      * @param errorWitnessSteps The steps to reduce to only actions and waits
      */
     private static collapseEpsilonsToWait(errorWitnessSteps: ErrorWitnessStep[]): ErrorWitnessStep[] {
-        const filteredArray = [];
+        errorWitnessSteps[0].action = Action.EPSILON;
+        const filteredArray = [errorWitnessSteps[0]];
 
         let prevStep: ErrorWitnessStep;
 
-        for (const step of errorWitnessSteps) {
+        for (let i = 1; i < errorWitnessSteps.length; i++) {
+            const step = errorWitnessSteps[i];
             if (step.action !== undefined) {
                 if (prevStep) {
                     prevStep.action = Action.WAIT;
