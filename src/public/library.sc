@@ -1576,8 +1576,8 @@ role ScratchSprite is ScratchEntity begin
         define distBottom as mathMax(0, STAGE_HALF_HEIGHT + boundsBottom)
 
         /**
-          * 1 = left, 2 = bottom, 3 = right, 4 = top
-          */
+         * 1 = left, 2 = bottom, 3 = right, 4 = top
+         */
         declare nearestEdge as integer
 
         declare minDist as integer
