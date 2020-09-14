@@ -1,9 +1,9 @@
 #!/bin/bash
 
 
-if command -v docker-rootless-infosun &> /dev/null
+if command -v dockerd-rootless-infosun &> /dev/null
 then
-    export DOCKERCMD="docker-rootless-infosun --data-root /local/$USER/docker -- "
+    export DOCKERCMD="dockerd-rootless-infosun --data-root /local/$USER/docker -- "
 else
     if command -v docker &> /dev/null
     then 
