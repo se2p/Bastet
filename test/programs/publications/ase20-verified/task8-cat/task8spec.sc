@@ -29,30 +29,24 @@ program Task8Spec
 
 actor CatObserver is Observer begin
 
-    declare cat_id as actor
-    declare ball_id as actor
+    declare cat as actor
+    declare ball as actor
 
     declare state as int
-    declare state_enter_time as int
+    declare stateEnterTime as int
 
     define atomic checkBehaviorSatisfied () begin
         if state = 0 then begin
-            declare touch as boolean
-            define touch as touchingObjects(cat_id, ball_id)
-
-            if touch then begin
+            if touchingObjects(cat, ball) then begin
                 define state as 1
-                define state_enter_time as _RUNTIME_micros()
+                define stateEnterTime as _RUNTIME_micros()
             end
         end else if state = 1 then begin
-            declare msg as boolean
-            define msg as length of (attribute "bubbleText" of cat_id) > 0
-
-            if msg then begin
+            if length of (attribute "bubbleText" of cat) > 0 then begin
                 define state as 0
-                define state_enter_time as _RUNTIME_micros()
+                define stateEnterTime as _RUNTIME_micros()
             end else begin
-                if _RUNTIME_micros() - state_enter_time > 1200000 then begin
+                if _RUNTIME_micros() - stateEnterTime > 1200000 then begin
                     _RUNTIME_signalFailure("There should be a message if the ball is touched by the cat.")
                 end
             end
@@ -60,11 +54,11 @@ actor CatObserver is Observer begin
     end
 
     script on bootstrap finished do begin
-        define cat_id as locate actor "Katze"
-        define ball_id as locate actor "Ball"
+        define cat as locate actor "Katze"
+        define ball as locate actor "Ball"
 
         define state as 0
-        define state_enter_time as _RUNTIME_micros()
+        define stateEnterTime as _RUNTIME_micros()
 
         checkBehaviorSatisfied()
     end
