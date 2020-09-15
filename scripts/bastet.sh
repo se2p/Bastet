@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# The main script to start the BASTET program 
+# analysis and verification framework in UNIX environments.
+
 readonly LIB_DIR="./dist/lib"
 readonly MY_TEMP_DIR=$(mktemp -d)
 
@@ -40,7 +43,7 @@ function convert_sb3_to_sc {
 }
 
 # Rebuild the argument list by replacing
-# all sb2-files by corresponding sc-files
+# all sb3-files by corresponding sc-files
 # that have been created based on them.
 arguments=()
 for arg in "$@"
@@ -64,7 +67,7 @@ do
     arguments+=" "
 done
 
-# Script to run Bastet in UNIX environments
+# Run BASTET based on NodeJs
 echo "${arguments[*]}"
 exec node --max-old-space-size=10240 dist/src/main.js ${arguments[*]}
 
