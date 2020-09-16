@@ -7,22 +7,22 @@ module ScratchLibrary
 actor IOActor is RuntimeEntity begin
 
     // The current mouse position
-    declare mouse_x as integer
-    declare mouse_y as integer
-    declare mouse_down as boolean
-    declare last_mouse_down as boolean
-    declare mouse_clicked as boolean
+    declare mouseX as integer
+    declare mouseY as integer
+    declare mouseDown as boolean
+    declare lastMouseDown as boolean
+    declare mouseClicked as boolean
 
     // Key code of the currently pressed key
-    declare key_pressed as integer
-    declare last_key_pressed as integer
+    declare keyPressed as integer
+    declare lastKeyPressed as integer
 
     // The last answer given to an `ask` block
     declare answer as string
 
     script on message "ASK" () in "SYSTEM" do atomic begin
-        declare nondet_str as string
-        define answer as nondet_str
+        declare nondetStr as string
+        define answer as nondetStr
         declare inputDurationSecs as integer
         assume inputDurationSecs > 0
         assume inputDurationSecs < 30
@@ -37,25 +37,25 @@ actor IOActor is RuntimeEntity begin
     script messageDispatcherLoop on startup do begin
         // Hack as long no other dispatch handling is in place
         repeat forever begin
-            declare nondet_x as integer
-            define mouse_x as nondet_x
+            declare nondetX as integer
+            define mouseX as nondetX
 
-            declare nondet_y as integer
-            define mouse_y as nondet_y
+            declare nondetY as integer
+            define mouseY as nondetY
 
-            declare nondet_key as integer
-            define key_pressed as nondet_key
+            declare nondetKey as integer
+            define keyPressed as nondetKey
 
-            declare nondet_down as boolean
-            define mouse_down as nondet_down
+            declare nondetDown as boolean
+            define mouseDown as nondetDown
 
-            define mouse_clicked as mouse_down and not last_mouse_down
-            if mouse_clicked then begin
+            define mouseClicked as mouseDown and not lastMouseDown
+            if mouseClicked then begin
                 broadcast "CLICK" () to "SYSTEM"
             end
 
-            define last_key_pressed as key_pressed
-            define last_mouse_down as mouse_down
+            define lastKeyPressed as keyPressed
+            define lastMouseDown as mouseDown
         end
     end
 
@@ -752,9 +752,9 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     extern _RUNTIME_signalFailure ()
 
-    extern _RUNTIME_numberFromInterval (from_num: integer, to_num: integer) returns integer
+    extern _RUNTIME_numberFromInterval (fromNum: integer, toNum: integer) returns integer
 
-    extern _RUNTIME_integerFromInterval (from_num: integer, to_num: integer) returns integer
+    extern _RUNTIME_integerFromInterval (fromNum: integer, toNum: integer) returns integer
 
     // A random integer in the interval [from, to],
     // that is, both end points are included.
@@ -862,7 +862,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     define atomic mouseX () begin
         declare io as actor
         define io as locate actor "IOActor"
-        define result as cast (attribute "mouse_x" of io) to int
+        define result as cast (attribute "mouseX" of io) to int
     end returns result: integer
 
     @ Category "Sensing"
@@ -871,7 +871,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     define atomic mouseY ()  begin
         declare io as actor
         define io as locate actor "IOActor"
-        define result as cast (attribute "mouse_y" of io) to int
+        define result as cast (attribute "mouseY" of io) to int
     end returns result: integer
 
     define atomic getMouseY ()  begin
@@ -894,7 +894,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     define atomic keyPressed () begin
         declare io as actor
         define io as locate actor "IOActor"
-        define result as cast (attribute "key_pressed" of io) to int
+        define result as cast (attribute "keyPressed" of io) to int
     end returns result : integer
 
     @ Category "Sensing"
@@ -930,63 +930,63 @@ role Observer is RuntimeEntity begin
 
     @ Category "Specification"
     define atomic touchingObjects (fst: actor, snd: actor) begin
-        declare x_fst as integer
-        define x_fst as cast attribute "x" of fst to int
-        declare y_fst as integer
-        define y_fst as cast attribute "y" of fst to int
+        declare xFst as integer
+        define xFst as cast attribute "x" of fst to int
+        declare yFst as integer
+        define yFst as cast attribute "y" of fst to int
 
-        assume x_fst < 720
-        assume x_fst > 0-720
-        assume y_fst < 720
-        assume y_fst > 0-720
+        assume xFst < 720
+        assume xFst > 0-720
+        assume yFst < 720
+        assume yFst > 0-720
 
-        declare x_snd as integer
-        define x_snd as cast attribute "x" of snd to int
-        declare y_snd as integer
-        define y_snd as cast attribute "y" of snd to int
+        declare xSnd as integer
+        define xSnd as cast attribute "x" of snd to int
+        declare ySnd as integer
+        define ySnd as cast attribute "y" of snd to int
 
-        assume x_snd <= 720
-        assume x_snd >= 0-720
-        assume y_snd <= 720
-        assume y_snd >= 0-720
+        assume xSnd <= 720
+        assume xSnd >= 0-720
+        assume ySnd <= 720
+        assume ySnd >= 0-720
 
-        declare half_width_fst as integer
-        declare half_height_fst as integer
-        define half_width_fst as cast attribute "active_graphic_half_width" of fst to int
-        define half_height_fst as cast attribute "active_graphic_half_height" of fst to int
+        declare halfWidthFst as integer
+        declare halfHeightFst as integer
+        define halfWidthFst as cast attribute "activeGraphicHalfWidth" of fst to int
+        define halfHeightFst as cast attribute "activeGraphicHalfHeight" of fst to int
 
-        declare half_width_snd as integer
-        declare half_height_snd as integer
-        define half_width_snd as cast attribute "active_graphic_half_width" of snd to int
-        define half_height_snd as cast attribute "active_graphic_half_height" of snd to int
+        declare halfWidthSnd as integer
+        declare halfHeightSnd as integer
+        define halfWidthSnd as cast attribute "activeGraphicHalfWidth" of snd to int
+        define halfHeightSnd as cast attribute "activeGraphicHalfHeight" of snd to int
 
         define result as false
 
-        declare fst_left as integer
-        declare fst_right as integer
-        declare snd_left as integer
-        declare snd_right as integer
+        declare fstLeft as integer
+        declare fstRight as integer
+        declare sndLeft as integer
+        declare sndRight as integer
 
-        declare fst_top as integer
-        declare fst_bottom as integer
-        declare snd_top as integer
-        declare snd_bottom as integer
+        declare fstTop as integer
+        declare fstBottom as integer
+        declare sndTop as integer
+        declare sndBottom as integer
 
-        define fst_left as x_fst - half_width_fst
-        define fst_right as x_fst + half_width_fst
-        define snd_left as x_snd - half_width_snd
-        define snd_right as x_snd + half_width_snd
+        define fstLeft as xFst - halfWidthFst
+        define fstRight as xFst + halfWidthFst
+        define sndLeft as xSnd - halfWidthSnd
+        define sndRight as xSnd + halfWidthSnd
 
-        define fst_bottom as y_fst - half_height_fst
-        define fst_top as y_fst + half_height_fst
-        define snd_bottom as y_snd - half_height_snd
-        define snd_top as y_snd + half_height_snd
+        define fstBottom as yFst - halfHeightFst
+        define fstTop as yFst + halfHeightFst
+        define sndBottom as ySnd - halfHeightSnd
+        define sndTop as ySnd + halfHeightSnd
 
         declare xOverlap as boolean
         declare yOverlap as boolean
 
-        define xOverlap as snd_right >= fst_left and snd_left <= fst_right
-        define yOverlap as snd_bottom <= fst_top and snd_top >= fst_bottom
+        define xOverlap as sndRight >= fstLeft and sndLeft <= fstRight
+        define yOverlap as sndBottom <= fstTop and sndTop >= fstBottom
 
         if (xOverlap and yOverlap) then begin
             define result as true
@@ -1006,16 +1006,16 @@ role Observer is RuntimeEntity begin
         define x as cast attribute "x" of obj to int
         define y as cast attribute "y" of obj to int
 
-        declare half_width as integer
-        declare half_height as integer
-        define half_width as cast attribute "active_graphic_half_width" of obj to int
-        define half_height as cast attribute "active_graphic_half_height" of obj to int
+        declare halfWidth as integer
+        declare halfHeight as integer
+        define halfWidth as cast attribute "activeGraphicHalfWidth" of obj to int
+        define halfHeight as cast attribute "activeGraphicHalfHeight" of obj to int
 
         define result as true
-        if not (mouseX() < x + half_width
-            or mouseX() > x - half_width
-            or mouseY() < y + half_height
-            or mouseY() > y - half_height) then begin
+        if not (mouseX() < x + halfWidth
+            or mouseX() > x - halfWidth
+            or mouseY() < y + halfHeight
+            or mouseY() > y - halfHeight) then begin
 
             define result as false
         end
@@ -1029,9 +1029,9 @@ end
  */
 role ScratchEntity is RuntimeEntity begin
 
-    declare sound_effect as enum [ "pitch", "pan_left_right" ]
-    declare pitch_effect_value as float
-    declare pan_left_right_value as float
+    declare soundEffect as enum [ "pitch", "panLeftRight" ]
+    declare pitchEffectValue as float
+    declare panLeftRightValue as float
 
     declare volume as integer
 
@@ -1040,23 +1040,23 @@ role ScratchEntity is RuntimeEntity begin
     declare layer as integer
 
     // 480 * 360 = 172800 pixels
-    declare active_graphic_pixels as list of integer
-    declare active_graphic_index as integer
-    declare active_graphic_name as string
-    declare active_graphic_width as integer
-    declare active_graphic_height as integer
+    declare activeGraphicPixels as list of integer
+    declare activeGraphicIndex as integer
+    declare activeGraphicName as string
+    declare activeGraphicWidth as integer
+    declare activeGraphicHeight as integer
 
-    declare active_graphic_half_width as integer
-    declare active_graphic_half_height as integer
+    declare activeGraphicHalfWidth as integer
+    declare activeGraphicHalfHeight as integer
 
-    declare graphics_effect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
-    declare color_effect_value as float
-    declare fisheye_effect_value as float
-    declare whirl_effect_value as float
-    declare pixelate_effect_value as float
-    declare mosaic_effect_value as float
-    declare brightness_effect_value as float
-    declare ghost_effect_value as float
+    declare graphicsEffect as enum [ "color", "fisheye", "whirl", "pixelate", "mosaic", "brightness", "ghost" ]
+    declare colorEffectValue as float
+    declare fisheyeEffectValue as float
+    declare whirlEffectValue as float
+    declare pixelateEffectValue as float
+    declare mosaicEffectValue as float
+    declare brightnessEffectValue as float
+    declare ghostEffectValue as float
 
     declare STAGE_WIDTH as integer
     declare STAGE_HEIGHT as integer
@@ -1068,7 +1068,7 @@ role ScratchEntity is RuntimeEntity begin
     define STAGE_HALF_WIDTH as 240
     define STAGE_HALF_HEIGHT as 180
 
-    define color_effect_value as 0.0
+    define colorEffectValue as 0.0
 
     define atomic simpleReturn (n:float) begin
         define result as n
@@ -1078,12 +1078,12 @@ role ScratchEntity is RuntimeEntity begin
     @ Opcode "looks_switchcostumeto"
     @ Opcode "looks_switchbackdropto"
     define atomic changeActiveGraphicTo (id: string) begin
-        define active_graphic_name as id
-        define active_graphic_width as getImageWidth(id)
-        define active_graphic_height as getImageHeight(id)
+        define activeGraphicName as id
+        define activeGraphicWidth as getImageWidth(id)
+        define activeGraphicHeight as getImageHeight(id)
 
-        define active_graphic_half_width as getImageWidth(id) / 2
-        define active_graphic_half_height as getImageHeight(id) / 2
+        define activeGraphicHalfWidth as getImageWidth(id) / 2
+        define activeGraphicHalfHeight as getImageHeight(id) / 2
         //FIXME Set graphic pixels, this is currently not done as we do not supports lists yet
     end
 
@@ -1529,10 +1529,10 @@ role ScratchSprite is ScratchEntity begin
         declare boundsTop as integer
         declare boundsBottom as integer
 
-        define boundsLeft as x - active_graphic_half_width
-        define boundsRight as x + active_graphic_half_width
-        define boundsTop as y + active_graphic_half_height
-        define boundsBottom as y - active_graphic_half_height
+        define boundsLeft as x - activeGraphicHalfWidth
+        define boundsRight as x + activeGraphicHalfWidth
+        define boundsTop as y + activeGraphicHalfHeight
+        define boundsBottom as y - activeGraphicHalfHeight
 
         if (boundsLeft < (0 - STAGE_HALF_WIDTH)) then begin
             define result as true
@@ -1560,10 +1560,10 @@ role ScratchSprite is ScratchEntity begin
         declare boundsTop as integer
         declare boundsBottom as integer
 
-        define boundsLeft as x - active_graphic_half_width
-        define boundsRight as x + active_graphic_half_width
-        define boundsTop as y + active_graphic_half_height
-        define boundsBottom as y - active_graphic_half_height
+        define boundsLeft as x - activeGraphicHalfWidth
+        define boundsRight as x + activeGraphicHalfWidth
+        define boundsTop as y + activeGraphicHalfHeight
+        define boundsBottom as y - activeGraphicHalfHeight
 
         declare distLeft as integer
         declare distRight as integer
@@ -1651,10 +1651,10 @@ role ScratchSprite is ScratchEntity begin
         declare boundsTop as integer
         declare boundsBottom as integer
 
-        define boundsLeft as x - active_graphic_half_width
-        define boundsRight as x + active_graphic_half_width
-        define boundsTop as y + active_graphic_half_height
-        define boundsBottom as y - active_graphic_half_height
+        define boundsLeft as x - activeGraphicHalfWidth
+        define boundsRight as x + activeGraphicHalfWidth
+        define boundsTop as y + activeGraphicHalfHeight
+        define boundsBottom as y - activeGraphicHalfHeight
 
         // Adjust the known bounds to the target position.
         define boundsLeft as boundsLeft + (newX - x)
@@ -1689,15 +1689,15 @@ role ScratchSprite is ScratchEntity begin
     @ Block "touching (mouse pointer v) ?"
     @ Opcode "sensing_touchingobject"
     define atomic touchingMousePointer () begin
-        declare obj_left as integer
-        define obj_left as x - active_graphic_half_width
-        declare obj_right as integer
-        define obj_right as x + active_graphic_half_width
+        declare objLeft as integer
+        define objLeft as x - activeGraphicHalfWidth
+        declare objRight as integer
+        define objRight as x + activeGraphicHalfWidth
 
-        declare obj_top as integer
-        define obj_top as y + active_graphic_half_height
-        declare obj_bottom as integer
-        define obj_bottom as y - active_graphic_half_height
+        declare objTop as integer
+        define objTop as y + activeGraphicHalfHeight
+        declare objBottom as integer
+        define objBottom as y - activeGraphicHalfHeight
 
         declare mx as integer
         define mx as mouseX()
@@ -1705,9 +1705,9 @@ role ScratchSprite is ScratchEntity begin
         define my as mouseY()
 
         declare xOverlap as boolean
-        define xOverlap as mx >= obj_left and mx <= obj_right
+        define xOverlap as mx >= objLeft and mx <= objRight
         declare yOverlap as boolean
-        define yOverlap as my >= obj_bottom and my <= obj_top
+        define yOverlap as my >= objBottom and my <= objTop
 
         define result as xOverlap and yOverlap
     end returns result : boolean
@@ -1721,73 +1721,73 @@ role ScratchSprite is ScratchEntity begin
             //
             // This method approximates the shape of a sprite based on a rectangle.
 
-            declare x_fst as integer
-            define x_fst as x
-            declare y_fst as integer
-            define y_fst as y
+            declare xFst as integer
+            define xFst as x
+            declare yFst as integer
+            define yFst as y
 
-            assume x_fst < 720
-            assume x_fst > 0-720
-            assume y_fst < 720
-            assume y_fst > 0-720
+            assume xFst < 720
+            assume xFst > 0-720
+            assume yFst < 720
+            assume yFst > 0-720
 
-            declare x_snd as integer
-            define x_snd as cast attribute "x" of snd to int
-            declare y_snd as integer
-            define y_snd as cast attribute "y" of snd to int
+            declare xSnd as integer
+            define xSnd as cast attribute "x" of snd to int
+            declare ySnd as integer
+            define ySnd as cast attribute "y" of snd to int
 
-            assume x_snd <= 720
-            assume x_snd >= 0-720
-            assume y_snd <= 720
-            assume y_snd >= 0-720
+            assume xSnd <= 720
+            assume xSnd >= 0-720
+            assume ySnd <= 720
+            assume ySnd >= 0-720
 
-            declare half_width_fst as integer
-            declare half_height_fst as integer
-            define half_width_fst as active_graphic_half_width
-            define half_height_fst as active_graphic_half_height
+            declare halfWidthFst as integer
+            declare halfHeightFst as integer
+            define halfWidthFst as activeGraphicHalfWidth
+            define halfHeightFst as activeGraphicHalfHeight
 
-            declare half_width_snd as integer
-            declare half_height_snd as integer
-            define half_width_snd as cast attribute "active_graphic_half_width" of snd to int
-            define half_height_snd as cast attribute "active_graphic_half_height" of snd to int
+            declare halfWidthSnd as integer
+            declare halfHeightSnd as integer
+            define halfWidthSnd as cast attribute "activeGraphicHalfWidth" of snd to int
+            define halfHeightSnd as cast attribute "activeGraphicHalfHeight" of snd to int
 
             define result as false
 
-            assume half_width_snd <= 720
-            assume half_width_snd > 0
-            assume half_width_fst < 720
-            assume half_width_fst > 0
+            assume halfWidthSnd <= 720
+            assume halfWidthSnd > 0
+            assume halfWidthFst < 720
+            assume halfWidthFst > 0
 
-            assume half_height_snd <= 720
-            assume half_height_snd > 0
-            assume half_height_fst <= 720
-            assume half_height_fst > 0
+            assume halfHeightSnd <= 720
+            assume halfHeightSnd > 0
+            assume halfHeightFst <= 720
+            assume halfHeightFst > 0
 
-            declare fst_left as integer
-            declare fst_right as integer
-            declare snd_left as integer
-            declare snd_right as integer
+            declare fstLeft as integer
+            declare fstRight as integer
+            declare sndLeft as integer
+            declare sndRight as integer
 
-            declare fst_top as integer
-            declare fst_bottom as integer
-            declare snd_top as integer
-            declare snd_bottom as integer
+            declare fstTop as integer
+            declare fstBottom as integer
+            declare sndTop as integer
+            declare sndBottom as integer
 
-            define fst_left as x_fst - half_width_fst
-            define fst_right as x_fst + half_width_fst
-            define snd_left as x_snd - half_width_snd
-            define snd_right as x_snd + half_width_snd
+            define fstLeft as xFst - halfWidthFst
+            define fstRight as xFst + halfWidthFst
+            define sndLeft as xSnd - halfWidthSnd
+            define sndRight as xSnd + halfWidthSnd
 
-            define fst_bottom as y_fst - half_height_fst
-            define fst_top as y_fst + half_height_fst
-            define snd_bottom as y_snd - half_height_snd
-            define snd_top as y_snd + half_height_snd
+            define fstBottom as yFst - halfHeightFst
+            define fstTop as yFst + halfHeightFst
+            define sndBottom as ySnd - halfHeightSnd
+            define sndTop as ySnd + halfHeightSnd
 
             declare xOverlap as boolean
             declare yOverlap as boolean
 
-            define xOverlap as snd_right >= fst_left and snd_left <= fst_right
-            define yOverlap as snd_bottom <= fst_top and snd_top >= fst_bottom
+            define xOverlap as sndRight >= fstLeft and sndLeft <= fstRight
+            define yOverlap as sndBottom <= fstTop and sndTop >= fstBottom
 
             if (xOverlap and yOverlap) then begin
                 define result as true
@@ -1917,7 +1917,7 @@ end
  */
 role ScratchStage is ScratchEntity begin
 
-    declare current_idx as integer
+    declare currentIdx as integer
 
     declare videoTransparency as integer
 
@@ -1925,7 +1925,7 @@ role ScratchStage is ScratchEntity begin
 
     declare tempo as integer
 
-    define current_idx as 0
+    define currentIdx as 0
 
     @ Category "Looks"
     @ Block "switch backdrop to (backdrop v) and wait"
@@ -1940,33 +1940,33 @@ role ScratchStage is ScratchEntity begin
 
     define atomic nextBackdrop () begin
         declare idx as integer
-        define idx as getGraphicIndexById(active_graphic_name)
-        define idx as (current_idx+1) mod getNumGraphics()
+        define idx as getGraphicIndexById(activeGraphicName)
+        define idx as (currentIdx+1) mod getNumGraphics()
 
         declare id as string
-        define id as getGraphicIdByIndex(current_idx)
+        define id as getGraphicIdByIndex(currentIdx)
 
         changeActiveGraphicTo(id)
     end
 
     define atomic previousBackdrop () begin
         declare idx as integer
-        define idx as getGraphicIndexById(active_graphic_name)
-        define idx as (current_idx-1) mod getNumGraphics()
+        define idx as getGraphicIndexById(activeGraphicName)
+        define idx as (currentIdx-1) mod getNumGraphics()
 
         declare id as string
-        define id as getGraphicIdByIndex(current_idx)
+        define id as getGraphicIdByIndex(currentIdx)
 
         changeActiveGraphicTo(id)
     end
 
     define atomic randomBackdrop () begin
          declare idx as integer
-         define idx as getGraphicIndexById(active_graphic_name)
+         define idx as getGraphicIndexById(activeGraphicName)
          define idx as randomIntegerBetween(0, getNumGraphics()-1)
 
          declare id as string
-         define id as getGraphicIdByIndex(current_idx)
+         define id as getGraphicIdByIndex(currentIdx)
 
          changeActiveGraphicTo(id)
     end
