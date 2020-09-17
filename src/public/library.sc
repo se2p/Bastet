@@ -1222,8 +1222,10 @@ role ScratchEntity is RuntimeEntity begin
     @ Block "current [month v]"
     @ Opcode "sensing_current"
     define atomic currentMonth () begin
-        // ...
-    end
+        // non-deterministic
+        assume result >= 1
+        assume result <= 12
+    end returns result : integer
 
     @ Category "Sensing"
     @ Block "current [date v]"
