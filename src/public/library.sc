@@ -1284,8 +1284,8 @@ role ScratchEntity is RuntimeEntity begin
     @ Block "username"
     @ Opcode "sensing_username"
     define atomic username () begin
-        // ...
-    end
+        // non-deterministic
+    end returns result : string
 
     @ Category "Data"
     @ Block "show variable [variable v]"
