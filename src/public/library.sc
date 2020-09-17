@@ -1214,6 +1214,20 @@ role ScratchEntity is RuntimeEntity begin
     end returns result : string
 
     @ Category "Sensing"
+    @ Block "timer"
+    @ Opcode "sensing_timer"
+    define atomic timerValue () begin
+        define result as timer
+    end returns result : integer
+
+    @ Category "Sensing"
+    @ Block "reset timer"
+    @ Opcode "sensing_resettimer"
+    define atomic resetTimer () begin
+        reset timer
+    end
+
+    @ Category "Sensing"
     @ Block "current [year v]"
     @ Opcode "sensing_current"
     define atomic currentYear () begin
@@ -1309,6 +1323,13 @@ role ScratchEntity is RuntimeEntity begin
     end
 
     @ Category "Control"
+    @ Block "wait until <condition>"
+    @ Opcode "control_wait_until"
+    define atomic waitUntil (cond: boolean) begin
+        wait until cond
+    end
+
+    @ Category "Control"
     @ Block "stop [this script v]"
     @ Opcode "control_stop"
     define atomic stopThisScript () begin
@@ -1328,6 +1349,27 @@ role ScratchEntity is RuntimeEntity begin
     define atomic stopOtherScriptsInActor () begin
         stop other scripts in actor
     end
+
+    @ Category "Control"
+    @ Block "create clone of (sprite v)"
+    @ Opcode "control_create_clone_of"
+    define atomic createCloneOf (sprite: string) begin
+        create clone of sprite
+    end
+
+    @ Category "Operator"
+    @ Block "join [first] [second]"
+    @ Opcode "operator_join"
+    define atomic joinStrings (first: string, second: string) begin
+        define result as join first second
+    end returns result : string
+
+    @ Category "Operator"
+    @ Block "letter [num] of [string]"
+    @ Opcode "operator_letter_of"
+    define atomic letterOf (num: integer, str: string) begin
+        define result as letter num of str
+    end returns result : string
 
 end
 
