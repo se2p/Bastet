@@ -1261,14 +1261,16 @@ role ScratchEntity is RuntimeEntity begin
         // non-deterministic
         assume result >= 0
         assume result <= 59
-    end returns result: integer
+    end returns result : integer
 
     @ Category "Sensing"
     @ Block "current [second v]"
     @ Opcode "sensing_current"
     define atomic currentSecond () begin
-        // ...
-    end
+        // non-deterministic
+        assume result >= 0
+        assume result <= 59
+    end returns result : integer
 
     @ Category "Sensing"
     @ Block "days since 2000"
