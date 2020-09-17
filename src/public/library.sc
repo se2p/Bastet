@@ -1501,7 +1501,7 @@ role ScratchSprite is ScratchEntity begin
     @ Block "go to <string as layer> layer"
     @ Opcode "looks_gotofrontback"
     define atomic goToFrontLayer () begin
-        // ...
+        define layer as 1
     end
 
     @ Category "Looks"
