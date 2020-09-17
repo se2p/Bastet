@@ -1258,8 +1258,10 @@ role ScratchEntity is RuntimeEntity begin
     @ Block "current [minute v]"
     @ Opcode "sensing_current"
     define atomic currentMinute () begin
-        // ...
-    end
+        // non-deterministic
+        assume result >= 0
+        assume result <= 59
+    end returns result: integer
 
     @ Category "Sensing"
     @ Block "current [second v]"
