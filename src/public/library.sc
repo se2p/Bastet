@@ -1307,6 +1307,28 @@ role ScratchEntity is RuntimeEntity begin
     define atomic hideVariable (var: string) begin
         // there is no effect that is relevant for BASTET
     end
+
+    @ Category "Control"
+    @ Block "stop [this script v]"
+    @ Opcode "control_stop"
+    define atomic stopThisScript () begin
+        stop this script
+    end
+
+    @ Category "Control"
+    @ Block "stop [all v]"
+    @ Opcode "control_stop"
+    define atomic stopAll () begin
+        stop all
+    end
+
+    @ Category "Control"
+    @ Block "stop [other scripts in sprite v]"
+    @ Opcode "control_stop"
+    define atomic stopOtherScriptsInActor () begin
+        stop other scripts in actor
+    end
+
 end
 
 /**
