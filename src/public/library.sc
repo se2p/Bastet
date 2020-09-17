@@ -1276,8 +1276,9 @@ role ScratchEntity is RuntimeEntity begin
     @ Block "days since 2000"
     @ Opcode "sensing_dayssince2000"
     define atomic daysSinceMillennium () begin
-        // ...
-    end
+        // non-deterministic
+        assume result > 7565.0
+    end returns result : float
 
     @ Category "Sensing"
     @ Block "username"
