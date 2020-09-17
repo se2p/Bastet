@@ -911,7 +911,9 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     @ Opcode "sensing_loudness"
     define atomic loudness () begin
         // non-deterministic
-    end
+        assume result >= 0-1 // reported if permission for microphone is denied
+        assume result <= 100
+    end returns result : integer
 
 end
 
