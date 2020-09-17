@@ -1293,7 +1293,7 @@ role ScratchEntity is RuntimeEntity begin
     @ Opcode "data_showlist"
     @ Opcode "data_showvariable"
     define atomic showVariable (var: string) begin
-        // ...
+        // there is no effect that is relevant for BASTET
     end
 
     @ Category "Data"
@@ -1302,7 +1302,7 @@ role ScratchEntity is RuntimeEntity begin
     @ Opcode "data_hidelist"
     @ Opcode "data_hidevariable"
     define atomic hideVariable (var: string) begin
-        // ...
+        // there is no effect that is relevant for BASTET
     end
 end
 
