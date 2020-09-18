@@ -787,7 +787,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
      */
     extern randomBetween (intervalStart: integer, intervalEnd: integer) returns integer
 
-    extern mathCeiling (n: integer) returns integer
+    extern mathCeiling (n: float) returns integer
 
     extern mathTan (n: integer) returns integer
 
