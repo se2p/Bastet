@@ -6,18 +6,24 @@ module ScratchLibrary
  */
 actor IOActor is RuntimeEntity begin
 
-    // The current mouse position
+    /**
+     * The current mouse position
+     */
     declare mouseX as integer
     declare mouseY as integer
     declare mouseDown as boolean
     declare lastMouseDown as boolean
     declare mouseClicked as boolean
 
-    // Key code of the currently pressed key
+    /**
+     * Key code of the currently pressed key
+     */
     declare keyPressed as integer
     declare lastKeyPressed as integer
 
-    // The last answer given to an `ask` block
+    /**
+     * The last answer given to an `ask` block
+     */
     declare answer as string
 
     script on message "ASK" () in "SYSTEM" do atomic begin
@@ -127,17 +133,22 @@ role MathActor begin
     define PI_HALF as  1.570796326795
     define PI_SQR_TIMES_FIVE as 49.34802200545329
 
-    // WrampClamp function takes a value and makes sure it is within the given bounds
-    // param value: float - the value that will be wrapped
-    // param min: float - the lower bound
-    // param max: flaot - the upper bound
-    // return result: float - the wrapped value
+    /**
+     * WrampClamp function takes a value and makes sure it is within the given bounds
+     * param value: float - the value that will be wrapped
+     * param min: float - the lower bound
+     * param max: flaot - the upper bound
+     * return result: float - the wrapped value
+     */
     define atomic wrapClamp (value: float, min: float, max: float) begin
         declare range as float
         define range as ((max - min) + 1.0)
         define result as (value - (mathFloor((value - min) / range) * range))
     end returns result : float
 
+    @ Category "Operator"
+    @ Block "[floor v] of (num)"
+    @ Opcode "operator_mathop"
     define atomic mathFloor (n: float) begin
         declare num as integer
         define num as cast n to int
@@ -145,12 +156,16 @@ role MathActor begin
         if result > n then begin
             define result as result - 1.0
         end
-
     end returns result : float
 
-    // mathAtan approximates the Atan value in radians for a given "real" value
-    // param n : float - the real value for which the Atan value is approximated
-    // return result: float - the approximated interval of the Atan value
+    /**
+     * mathAtan approximates the Atan value in radians for a given "real" value
+     * param n : float - the real value for which the Atan value is approximated
+     * return result: float - the approximated interval of the Atan value
+     */
+    @ Category "Operator"
+    @ Block "[atan v] of (num)"
+    @ Opcode "operator_mathop"
     define atomic mathAtan (input: float) begin
         if input > TWO_PI then begin
             declare asDeg as integer
@@ -279,12 +294,14 @@ role MathActor begin
         end
     end returns result: float
 
-    // mathAtan2 approximates the Atan2 value in radians for two given "real" numbers.
-    // The result is the angle between the positive x-axis and ray from (0,0) to (x,y)
-    //
-    // param x : float - x-coordinate of the target point
-    // param y : float - y-coordinate of the target point
-    // return result: float - the approximated interval of the Atan2 value
+    /**
+     * mathAtan2 approximates the Atan2 value in radians for two given "real" numbers.
+     * The result is the angle between the positive x-axis and ray from (0,0) to (x,y)
+     *
+     * param x : float - x-coordinate of the target point
+     * param y : float - y-coordinate of the target point
+     * return result: float - the approximated interval of the Atan2 value
+     */
     define atomic mathAtan2 (x: float, y: float) begin
         if x > 0.0 then begin
             define result as mathAtan((y / x))
@@ -310,16 +327,21 @@ role MathActor begin
         end
     end returns result: float
 
+    @ Category "Operator"
+    @ Block "[sin v] of (num)"
+    @ Opcode "operator_mathop"
     define atomic mathSinDegree (input: float) begin
         declare radians as float
         define radians as degToRad(input)
         define result as mathSin(radians)
     end returns result: float
 
-    // mathSin approximates the sin value for a given radians number
-    //
-    // param alpha : float - radians number for which the sin value will be approximated
-    // return result: float - the approximated interval
+    /**
+     * mathSin approximates the sin value for a given radians number
+     *
+     * param alpha : float - radians number for which the sin value will be approximated
+     * return result: float - the approximated interval
+     */
     define atomic mathSin (input: float) begin
         if input >= 0.0 and input < 0.3142 then begin
             assume result > 0.0
@@ -441,16 +463,21 @@ role MathActor begin
         end
     end returns result: float
 
+    @ Category "Operator"
+    @ Block "[cos v] of (num)"
+    @ Opcode "operator_mathop"
     define atomic mathCosDegree (input: float) begin
         declare radians as float
         define radians as degToRad(input)
         define result as mathCos(radians)
     end returns result: float
 
-     // mathCos approximates the cos value for a given radians number
-     //
-     // param alpha : float - radians number for which the cos value will be approximated
-     // return result: float - the approximated interval
+    /**
+     * mathCos approximates the cos value for a given radians number
+     *
+     * param alpha : float - radians number for which the cos value will be approximated
+     * return result: float - the approximated interval
+     */
     define atomic mathCos (input: float) begin
         if input >= 0.0 and input < 0.3142 then begin
             assume result > 0.951
@@ -572,19 +599,23 @@ role MathActor begin
         end
     end returns result: float
 
-    // radToDeg calculates the degree value for a given radians value
-    //
-    // param rad: float - radians number for which the degree value will be calculated
-    // return result: float - the calculated degree value
+    /**
+     * radToDeg calculates the degree value for a given radians value
+     *
+     * param rad: float - radians number for which the degree value will be calculated
+     * return result: float - the calculated degree value
+     */
     define atomic radToDeg (rad: float) begin
         // define result as ((rad * 180.0) / PI)
         define result as rad * 57.2957795131
     end returns result: float
 
-    // degToRad calculates the radians value for a given degree value
-    //
-    // param deg: float - degree number for which the radians value will be calculated
-    // return result: float - the calculated radians value [0..2*pi]
+    /**
+     * degToRad calculates the radians value for a given degree value
+     *
+     * param deg: float - degree number for which the radians value will be calculated
+     * return result: float - the calculated radians value [0..2*pi]
+     */
     define atomic degToRad (deg: float) begin
         // define result as (deg * PI) / 180.0
         define result as deg * 0.01745329252
@@ -593,62 +624,64 @@ role MathActor begin
     define atomic nearestPerfectSqrt (num: float) begin
         if num < 0.0 then begin
             _RUNTIME_signalFailure("Sqrt of negative number not allowed")
-          end else if num = 0.0 then begin
-			 define result as 0.0
-          end else if num <= 1.0 then begin
-			 define result as 1.0
-          end else if num <= 4.0 then begin
-			 define result as 2.0
-          end else if num <= 9.0 then begin
-			 define result as 3.0
-          end else if num <= 16.0 then begin
-			 define result as 4.0
-          end else if num <= 25.0 then begin
-			 define result as 5.0
-          end else if num <= 36.0 then begin
-			 define result as 6.0
-          end else if num <= 49.0 then begin
-			 define result as 7.0
-          end else if num <= 64.0 then begin
-			 define result as 8.0
-          end else if num <= 81.0 then begin
-			 define result as 9.0
-          end else if num <= 100.0 then begin
-			 define result as 10.0
-          end else if num <= 121.0 then begin
-			 define result as 11.0
-          end else if num <= 144.0 then begin
-			 define result as 12.0
-          end else if num <= 169.0 then begin
-			 define result as 13.0
-          end else if num <= 196.0 then begin
-			 define result as 14.0
-          end else if num <= 225.0 then begin
-			 define result as 15.0
-          end else if num <= 256.0 then begin
-			 define result as 16.0
-          end else if num <= 289.0 then begin
-			 define result as 17.0
-          end else if num <= 324.0 then begin
-			 define result as 18.0
-          end else if num <= 361.0 then begin
-			 define result as 19.0
-          end else if num <= 400.0 then begin
-			 define result as 20.0
-          end else if num <= 441.0 then begin
-			 define result as 21.0
-          end else if num <= 484.0 then begin
-			 define result as 22.0
-          end else if num <= 529.0 then begin
-			 define result as 23.0
-          end else if num <= 576.0 then begin
-			 define result as 24.0
-          end else if num <= 625.0 then begin
-			 define result as 25.0
-          end
+        end else if num = 0.0 then begin
+		    define result as 0.0
+        end else if num <= 1.0 then begin
+		    define result as 1.0
+        end else if num <= 4.0 then begin
+		    define result as 2.0
+        end else if num <= 9.0 then begin
+		    define result as 3.0
+        end else if num <= 16.0 then begin
+		    define result as 4.0
+        end else if num <= 25.0 then begin
+		    define result as 5.0
+        end else if num <= 36.0 then begin
+		    define result as 6.0
+        end else if num <= 49.0 then begin
+		    define result as 7.0
+        end else if num <= 64.0 then begin
+		    define result as 8.0
+        end else if num <= 81.0 then begin
+		    define result as 9.0
+        end else if num <= 100.0 then begin
+		    define result as 10.0
+        end else if num <= 121.0 then begin
+		    define result as 11.0
+        end else if num <= 144.0 then begin
+		    define result as 12.0
+        end else if num <= 169.0 then begin
+		    define result as 13.0
+        end else if num <= 196.0 then begin
+		    define result as 14.0
+        end else if num <= 225.0 then begin
+		    define result as 15.0
+        end else if num <= 256.0 then begin
+		    define result as 16.0
+        end else if num <= 289.0 then begin
+		    define result as 17.0
+        end else if num <= 324.0 then begin
+		    define result as 18.0
+        end else if num <= 361.0 then begin
+		    define result as 19.0
+        end else if num <= 400.0 then begin
+		    define result as 20.0
+        end else if num <= 441.0 then begin
+		    define result as 21.0
+        end else if num <= 484.0 then begin
+		    define result as 22.0
+        end else if num <= 529.0 then begin
+		    define result as 23.0
+        end else if num <= 576.0 then begin
+		    define result as 24.0
+        end else if num <= 625.0 then begin
+		    define result as 25.0
+        end
     end returns result: float
 
-
+    @ Category "Operator"
+    @ Block "[sqrt v] of (num)"
+    @ Opcode "operator_mathop"
     define atomic mathSqrt (num: float) begin
         declare result as float
         define result as nearestPerfectSqrt(num)
@@ -669,6 +702,9 @@ role MathActor begin
         end
     end returns result: integer
 
+    @ Category "Operator"
+    @ Block "[abs v] of (num)"
+    @ Opcode "operator_mathop"
     define atomic mathAbsF (n: float) begin
         if n < 0.0 then begin
             define result as 0.0 - n
@@ -726,16 +762,22 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     extern _RUNTIME_restart ()
 
-    // Signal that the current scene should be rendered,
-    //   or: signal a behavior that should be visible to the user.
+    /**
+     * Signal that the current scene should be rendered,
+     *   or: signal a behavior that should be visible to the user.
+     */
     extern _RUNTIME_render ()
 
-    // Returns the integer of milliseconds that
-    // elapsed since the VM started.
+    /**
+     * Returns the integer of milliseconds that
+     * elapsed since the VM started.
+     */
     extern _RUNTIME_millis () returns integer
 
-    // Returns the integer of seconds that
-    // elapsed since the VM started.
+    /**
+     * Returns the integer of seconds that
+     * elapsed since the VM started.
+     */
     extern _RUNTIME_seconds () returns integer
 
     extern _RUNTIME_micros () returns integer
@@ -756,27 +798,55 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     extern _RUNTIME_integerFromInterval (fromNum: integer, toNum: integer) returns integer
 
-    // A random integer in the interval [from, to],
-    // that is, both end points are included.
+    /**
+     * A random integer in the interval [from, to],
+     * that is, both end points are included.
+     */
     extern randomIntegerBetween (intervalStart: integer, intervalEnd: integer) returns integer
 
-    // See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
+    /**
+     * See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
+     */
     extern randomBetween (intervalStart: integer, intervalEnd: integer) returns integer
 
-    extern mathCeiling (n: integer) returns integer
+    @ Category "Operator"
+    @ Block "[ceiling v] of (num)"
+    @ Opcode "operator_mathop"
+    extern mathCeiling (n: float) returns integer
 
+    @ Category "Operator"
+    @ Block "[tan v] of (num)"
+    @ Opcode "operator_mathop"
     extern mathTan (n: integer) returns integer
 
+    @ Category "Operator"
+    @ Block "[asin v] of (num)"
+    @ Opcode "operator_mathop"
     extern mathAsin (n: integer) returns integer
 
+    @ Category "Operator"
+    @ Block "[acos v] of (num)"
+    @ Opcode "operator_mathop"
     extern mathAcos (n: integer) returns integer
 
+    @ Category "Operator"
+    @ Block "[ln v] of (num)"
+    @ Opcode "operator_mathop"
     extern mathLn(n: integer) returns integer
 
+    @ Category "Operator"
+    @ Block "[log v] of (num)"
+    @ Opcode "operator_mathop"
     extern mathLog(n: integer) returns integer
 
+    @ Category "Operator"
+    @ Block "[e ^ v] of (num)"
+    @ Opcode "operator_mathop"
     extern mathPowe(n: integer) returns integer
 
+    @ Category "Operator"
+    @ Block "[10 ^ v] of (num)"
+    @ Opcode "operator_mathop"
     extern mathPowten(n: integer) returns integer
 
     extern label (str: string)
@@ -805,37 +875,43 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         define result as 0
     end returns result: integer
 
+    /**
+     * A busy-waiting implementation.
+     * The external method `_RUNTIME_waitSeconds` is intended to
+     * not conduct a busy wait.
+     */
     @ Category "Control"
-    @ Block "wait <Num> seconds"
-    @ Opcode "control_wait" // TODO is that correct?
+    @ Block "wait (num) seconds"
+    @ Opcode "control_wait"
     define waitSeconds (secs: integer) begin
-        // A busy-waiting implementation.
-        // The external method `_RUNTIME_waitSeconds` is intended to
-        // not conduct a busy wait.
         declare waitUntil as integer
         define waitUntil as _RUNTIME_seconds() + secs
         until (_RUNTIME_seconds() > waitUntil) repeat begin
         end
     end
 
+    /**
+     * A busy-waiting implementation.
+     * The external method `_RUNTIME_waitMillis` is intended to
+     * not conduct a busy wait.
+     */
     @ Category "Control"
-    @ Block "wait <Num> millis"
+    @ Block "wait (num) millis"
     define waitMillis (millis: integer) begin
-        // A busy-waiting implementation.
-        // The external method `_RUNTIME_waitMillis` is intended to
-        // not conduct a busy wait.
         declare waitUntil as integer
         define waitUntil as _RUNTIME_millis() + millis
         until (_RUNTIME_millis() > waitUntil) repeat begin
         end
     end
 
+    /**
+     * A busy-waiting implementation.
+     * The external method `_RUNTIME_waitMicros` is intended to
+     * not conduct a busy wait.
+     */
     @ Category "Control"
-    @ Block "wait <Num> micros"
+    @ Block "wait (num) micros"
     define waitMicros (micros: integer) begin
-        // A busy-waiting implementation.
-        // The external method `_RUNTIME_waitMicros` is intended to
-        // not conduct a busy wait.
         declare waitUntil as integer
         define waitUntil as _RUNTIME_micros() + micros
         until (_RUNTIME_micros() > waitUntil) repeat begin
@@ -874,14 +950,20 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         define result as cast (attribute "mouseY" of io) to int
     end returns result: integer
 
+    /**
+     * Non-deterministic version of `mouseY`. Deprecated!
+     * Needed (with this signature) to get some programs running.
+     */
     define atomic getMouseY ()  begin
-        // non-det version of `mouseY`. Deprecated!
-        // needed (with this signature) to get some programs running
+        // non-deterministic
     end returns result: integer
 
+    /**
+     * Non-deterministic version of `mouseY`. Deprecated!
+     * Needed (with this signature) to get some programs running.
+     */
     define atomic getMouseX ()  begin
-        // non-det version of `mouseY`. Deprecated!
-        // needed (with this signature) to get some programs running
+        // non-deterministic
     end returns result: integer
 
     @ Category "Sensing"
@@ -911,7 +993,9 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     @ Opcode "sensing_loudness"
     define atomic loudness () begin
         // non-deterministic
-    end
+        assume result >= 0-1 // reported if permission for microphone is denied
+        assume result <= 100
+    end returns result : integer
 
 end
 
@@ -1035,11 +1119,15 @@ role ScratchEntity is RuntimeEntity begin
 
     declare volume as integer
 
-    // The current layer of the entity
-    // See https://en.scratch-wiki.info/wiki/Layer_(value)
+    /**
+     * The current layer of the entity
+     * See https://en.scratch-wiki.info/wiki/Layer_(value)
+     */
     declare layer as integer
 
-    // 480 * 360 = 172800 pixels
+    /**
+     * 480 * 360 = 172800 pixels
+     */
     declare activeGraphicPixels as list of integer
     declare activeGraphicIndex as integer
     declare activeGraphicName as string
@@ -1070,7 +1158,7 @@ role ScratchEntity is RuntimeEntity begin
 
     define colorEffectValue as 0.0
 
-    define atomic simpleReturn (n:float) begin
+    define atomic simpleReturn (n: float) begin
         define result as n
     end returns result: float
 
@@ -1118,7 +1206,7 @@ role ScratchEntity is RuntimeEntity begin
     end
 
     @ Category "Looks"
-    @ Block "change <string as effect> effect by <integer as value>"
+    @ Block "change (effect v) effect by (value)"
     @ Opcode "looks_changeeffectby"
     define atomic changeGraphicEffectBy (eff:string, val:integer) begin
     end
@@ -1142,13 +1230,13 @@ role ScratchEntity is RuntimeEntity begin
     end returns result : string
 
     @ Category "Sound"
-    @ Block "play sound <sound as snd> until done"
+    @ Block "play sound (sound v) until done"
     @ Opcode "sound_playuntildone"
     define atomic playUntilDone (snd: integer) begin
     end
 
     @ Category "Sound"
-    @ Block "start sound <sound as snd>"
+    @ Block "start sound (sound v)"
     @ Opcode "sound_play"
     define startSound (snd: integer) begin
     end
@@ -1160,15 +1248,15 @@ role ScratchEntity is RuntimeEntity begin
     end
 
     @ Category "Sound"
-    @ Block "change <string as effect> sound effect by <integer as num>"
+    @ Block "change (effect v) sound effect by (val)"
     @ Opcode "sound_changeeffectby"
-    define changeSoundEffectBy (eff: string, val: integer) begin
+    define changeSoundEffectBy (effect: string, val: integer) begin
     end
 
     @ Category "Sound"
-    @ Block "set <string as effect> sound effect to <integer as num>"
+    @ Block "set (effect v) sound effect to (val)"
     @ Opcode "sound_seteffectto"
-    define setSoundEffectTo (eff: string, val: integer) begin
+    define setSoundEffectTo (effect: string, val: integer) begin
     end
 
     @ Category "Sound"
@@ -1178,21 +1266,24 @@ role ScratchEntity is RuntimeEntity begin
     end
 
     @ Category "Sound"
-    @ Block "change volume by <integer as delta>"
+    @ Block "change volume by (delta)"
     @ Opcode "sound_changevolumeby"
     define changeVolumeBy (delta: integer) begin
+        define volume as volume + delta
     end
 
     @ Category "Sound"
-    @ Block "set volume to <integer as percent>"
+    @ Block "set volume to (percent)"
     @ Opcode "sound_setvolumeto"
     define setVolumeTo (perc: integer) begin
+        define volume as perc
     end
 
     @ Category "Sound"
     @ Block "volume"
     @ Opcode "sound_volume"
     define volume () begin
+        define result as volume
     end returns result : integer
 
     @ Category "Sensing"
@@ -1212,67 +1303,95 @@ role ScratchEntity is RuntimeEntity begin
     end returns result : string
 
     @ Category "Sensing"
+    @ Block "timer"
+    @ Opcode "sensing_timer"
+    define atomic timerValue () begin
+        define result as timer
+    end returns result : integer
+
+    @ Category "Sensing"
+    @ Block "reset timer"
+    @ Opcode "sensing_resettimer"
+    define atomic resetTimer () begin
+        reset timer
+    end
+
+    @ Category "Sensing"
     @ Block "current [year v]"
     @ Opcode "sensing_current"
     define atomic currentYear () begin
-        // ...
-    end
+        // non-deterministic
+        assume result >= 2020
+    end returns result : integer
 
     @ Category "Sensing"
     @ Block "current [month v]"
     @ Opcode "sensing_current"
     define atomic currentMonth () begin
-        // ...
-    end
+        // non-deterministic
+        assume result >= 1
+        assume result <= 12
+    end returns result : integer
 
     @ Category "Sensing"
     @ Block "current [date v]"
     @ Opcode "sensing_current"
     define atomic currentDate () begin
-        // ...
-    end
+        // non-deterministic
+        assume result >= 1
+        assume result <= 31
+    end returns result : integer
 
     @ Category "Sensing"
     @ Block "current [day of week v]"
     @ Opcode "sensing_current"
     define atomic currentDayOfWeek () begin
-        // ...
-    end
+        // non-deterministic
+        assume result >= 1
+        assume result <= 7
+    end returns result : integer
 
     @ Category "Sensing"
     @ Block "current [hour v]"
     @ Opcode "sensing_current"
     define atomic currentHour () begin
-        // ...
-    end
+        // non-deterministic
+        assume result >= 0
+        assume result <= 23
+    end returns result : integer
 
     @ Category "Sensing"
     @ Block "current [minute v]"
     @ Opcode "sensing_current"
     define atomic currentMinute () begin
-        // ...
-    end
+        // non-deterministic
+        assume result >= 0
+        assume result <= 59
+    end returns result : integer
 
     @ Category "Sensing"
     @ Block "current [second v]"
     @ Opcode "sensing_current"
     define atomic currentSecond () begin
-        // ...
-    end
+        // non-deterministic
+        assume result >= 0
+        assume result <= 59
+    end returns result : integer
 
     @ Category "Sensing"
     @ Block "days since 2000"
     @ Opcode "sensing_dayssince2000"
     define atomic daysSinceMillennium () begin
-        // ...
-    end
+        // non-deterministic
+        assume result > 7565.0
+    end returns result : float
 
     @ Category "Sensing"
     @ Block "username"
     @ Opcode "sensing_username"
     define atomic username () begin
-        // ...
-    end
+        // non-deterministic
+    end returns result : string
 
     @ Category "Data"
     @ Block "show variable [variable v]"
@@ -1280,7 +1399,7 @@ role ScratchEntity is RuntimeEntity begin
     @ Opcode "data_showlist"
     @ Opcode "data_showvariable"
     define atomic showVariable (var: string) begin
-        // ...
+        // there is no effect that is relevant for BASTET
     end
 
     @ Category "Data"
@@ -1289,8 +1408,58 @@ role ScratchEntity is RuntimeEntity begin
     @ Opcode "data_hidelist"
     @ Opcode "data_hidevariable"
     define atomic hideVariable (var: string) begin
-        // ...
+        // there is no effect that is relevant for BASTET
     end
+
+    @ Category "Control"
+    @ Block "wait until <condition>"
+    @ Opcode "control_wait_until"
+    define atomic waitUntil (cond: boolean) begin
+        wait until cond
+    end
+
+    @ Category "Control"
+    @ Block "stop [this script v]"
+    @ Opcode "control_stop"
+    define atomic stopThisScript () begin
+        stop this script
+    end
+
+    @ Category "Control"
+    @ Block "stop [all v]"
+    @ Opcode "control_stop"
+    define atomic stopAll () begin
+        stop all
+    end
+
+    @ Category "Control"
+    @ Block "stop [other scripts in sprite v]"
+    @ Opcode "control_stop"
+    define atomic stopOtherScriptsInActor () begin
+        stop other scripts in actor
+    end
+
+    @ Category "Control"
+    @ Block "create clone of (sprite v)"
+    @ Opcode "control_create_clone_of"
+    define atomic createCloneOf (sprite: string) begin
+        create clone of sprite
+    end
+
+    @ Category "Operator"
+    @ Block "join (first) (second)"
+    @ Opcode "operator_join"
+    define atomic joinStrings (first: string, second: string) begin
+        define result as join first second
+    end returns result : string
+
+    @ Category "Operator"
+    @ Block "letter (num) of (string)"
+    @ Opcode "operator_letter_of"
+    define atomic letterOf (num: integer, str: string) begin
+        define result as letter num of str
+    end returns result : string
+
 end
 
 /**
@@ -1347,12 +1516,15 @@ role ScratchSprite is ScratchEntity begin
     define direction as 90
     define visible as true
 
-    //
-    // DO NOT initialize the following and keep them NONDET:
-    //      define x as 0
-    //      define y as 0
-    //
+    /**
+     * DO NOT initialize the following and keep them NONDET:
+     *      define x as 0
+     *      define y as 0
+     */
 
+    @ Category "Motion"
+    @ Block "point towards [actor v]"
+    @ Opcode "motion_pointtowards"
     define atomic pointTowards (s: actor) begin
         declare targetX as integer
         declare targetY as integer
@@ -1363,6 +1535,9 @@ role ScratchSprite is ScratchEntity begin
         pointTowardsPos(targetX, targetY)
     end
 
+    @ Category "Motion"
+    @ Block "point towards [mouse-pointer v]"
+    @ Opcode "motion_pointtowards"
     define atomic pointTowardsPos (targetX: integer, targetY: integer) begin
        declare dx as float
        declare dy as float
@@ -1380,6 +1555,7 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Motion"
+    @ Block "move (num) steps"
     @ Opcode "motion_movesteps"
     define atomic moveSteps (n: integer) begin
         declare nf as float
@@ -1398,6 +1574,7 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Motion"
+    @ Block "go to x: (newX) y: (newY)"
     @ Opcode "motion_gotoxy"
     define atomic goTo (newX: integer, newY: integer) begin
         define x as newX
@@ -1419,14 +1596,14 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Motion"
-    @ Block "glide <Num> secs to <string as position>"
+    @ Block "glide (num) secs to (random pos v)"
     @ Opcode "motion_glideto"
     define atomic glideSecondsToRandomPos (secs: integer) begin
         // ...
     end
 
     @ Category "Motion"
-    @ Block "glide <Num> secs to x: <Num> y: <Num>"
+    @ Block "glide (num) secs to x: (targetX) y: (targetY)"
     @ Opcode "motion_glideto"
     define atomic glideSecondsTo (secs: integer, targetX: integer, targetY: integer) begin
         // also used for glide to mouse pointer
@@ -1434,7 +1611,7 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Motion"
-    @ Block "glide <Num> secs to <string as actor>"
+    @ Block "glide (num) secs to (actor v)"
     @ Opcode "motion_glideto"
     define atomic glideSecondsToSprite (secs: integer, o: actor) begin
         // ...
@@ -1463,10 +1640,17 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Motion"
-    @ Block "change x by (Num)"
+    @ Block "change x by (increment)"
     @ Opcode "motion_changexby"
     define atomic changeXBy (increment: integer) begin
-       // set attribute "x" to (attribute "x" + increment)
+       define x as x + increment
+    end
+
+    @ Category "Motion"
+    @ Block "change y by (increment)"
+    @ Opcode "motion_changeyby"
+    define atomic changeYBy (increment: int) begin
+        define y as y + increment
     end
 
     @ Category "Looks"
@@ -1498,23 +1682,24 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Looks"
-    @ Block "go to <string as layer> layer"
+    @ Block "go to [front v] layer"
     @ Opcode "looks_gotofrontback"
     define atomic goToFrontLayer () begin
         define layer as 1
     end
 
     @ Category "Looks"
-    @ Block "go to <string as layer> layer"
+    @ Block "go to [back v] layer"
     @ Opcode "looks_gotofrontback"
     define atomic goToBackLayer () begin
         // ...
     end
 
     @ Category "Looks"
-    @ Block "go <forward | backward> <Num> layers"
+    @ Block "go [forward v] (num) layers"
+    @ Block "go [backward v] (num) layers"
     @ Opcode "looks_goforwardbackwardlayers"
-    define atomic changeLayerBy (number: integer) begin
+    define atomic changeLayerBy (num: integer) begin
         // ...
     end
 
@@ -1575,9 +1760,8 @@ role ScratchSprite is ScratchEntity begin
         define distRight as mathMax(0, STAGE_HALF_WIDTH - boundsRight)
         define distBottom as mathMax(0, STAGE_HALF_HEIGHT + boundsBottom)
 
-        /**
-         * 1 = left, 2 = bottom, 3 = right, 4 = top
-         */
+
+        // 1 = left, 2 = bottom, 3 = right, 4 = top
         declare nearestEdge as integer
 
         declare minDist as integer
@@ -1712,86 +1896,87 @@ role ScratchSprite is ScratchEntity begin
         define result as xOverlap and yOverlap
     end returns result : boolean
 
+    /**
+     * To understand this method, it is important to be aware of the fact
+     * that the x and y coordinates of a Sprite represents its center point.
+     *
+     * This method approximates the shape of a sprite based on a rectangle.
+     */
     @ Category "Sensing"
     @ Block "touching (actor v) ?"
     @ Opcode "sensing_touchingobject"
     define atomic touchingObject (snd: actor) begin
-            // To understand this method, it is important to be aware of the fact
-            // that the x and y coordinates of a Sprite represents its center point.
-            //
-            // This method approximates the shape of a sprite based on a rectangle.
+        declare xFst as integer
+        define xFst as x
+        declare yFst as integer
+        define yFst as y
 
-            declare xFst as integer
-            define xFst as x
-            declare yFst as integer
-            define yFst as y
+        assume xFst < 720
+        assume xFst > 0-720
+        assume yFst < 720
+        assume yFst > 0-720
 
-            assume xFst < 720
-            assume xFst > 0-720
-            assume yFst < 720
-            assume yFst > 0-720
+        declare xSnd as integer
+        define xSnd as cast attribute "x" of snd to int
+        declare ySnd as integer
+        define ySnd as cast attribute "y" of snd to int
 
-            declare xSnd as integer
-            define xSnd as cast attribute "x" of snd to int
-            declare ySnd as integer
-            define ySnd as cast attribute "y" of snd to int
+        assume xSnd <= 720
+        assume xSnd >= 0-720
+        assume ySnd <= 720
+        assume ySnd >= 0-720
 
-            assume xSnd <= 720
-            assume xSnd >= 0-720
-            assume ySnd <= 720
-            assume ySnd >= 0-720
+        declare halfWidthFst as integer
+        declare halfHeightFst as integer
+        define halfWidthFst as activeGraphicHalfWidth
+        define halfHeightFst as activeGraphicHalfHeight
 
-            declare halfWidthFst as integer
-            declare halfHeightFst as integer
-            define halfWidthFst as activeGraphicHalfWidth
-            define halfHeightFst as activeGraphicHalfHeight
+        declare halfWidthSnd as integer
+        declare halfHeightSnd as integer
+        define halfWidthSnd as cast attribute "activeGraphicHalfWidth" of snd to int
+        define halfHeightSnd as cast attribute "activeGraphicHalfHeight" of snd to int
 
-            declare halfWidthSnd as integer
-            declare halfHeightSnd as integer
-            define halfWidthSnd as cast attribute "activeGraphicHalfWidth" of snd to int
-            define halfHeightSnd as cast attribute "activeGraphicHalfHeight" of snd to int
+        define result as false
 
-            define result as false
+        assume halfWidthSnd <= 720
+        assume halfWidthSnd > 0
+        assume halfWidthFst < 720
+        assume halfWidthFst > 0
 
-            assume halfWidthSnd <= 720
-            assume halfWidthSnd > 0
-            assume halfWidthFst < 720
-            assume halfWidthFst > 0
+        assume halfHeightSnd <= 720
+        assume halfHeightSnd > 0
+        assume halfHeightFst <= 720
+        assume halfHeightFst > 0
 
-            assume halfHeightSnd <= 720
-            assume halfHeightSnd > 0
-            assume halfHeightFst <= 720
-            assume halfHeightFst > 0
+        declare fstLeft as integer
+        declare fstRight as integer
+        declare sndLeft as integer
+        declare sndRight as integer
 
-            declare fstLeft as integer
-            declare fstRight as integer
-            declare sndLeft as integer
-            declare sndRight as integer
+        declare fstTop as integer
+        declare fstBottom as integer
+        declare sndTop as integer
+        declare sndBottom as integer
 
-            declare fstTop as integer
-            declare fstBottom as integer
-            declare sndTop as integer
-            declare sndBottom as integer
+        define fstLeft as xFst - halfWidthFst
+        define fstRight as xFst + halfWidthFst
+        define sndLeft as xSnd - halfWidthSnd
+        define sndRight as xSnd + halfWidthSnd
 
-            define fstLeft as xFst - halfWidthFst
-            define fstRight as xFst + halfWidthFst
-            define sndLeft as xSnd - halfWidthSnd
-            define sndRight as xSnd + halfWidthSnd
+        define fstBottom as yFst - halfHeightFst
+        define fstTop as yFst + halfHeightFst
+        define sndBottom as ySnd - halfHeightSnd
+        define sndTop as ySnd + halfHeightSnd
 
-            define fstBottom as yFst - halfHeightFst
-            define fstTop as yFst + halfHeightFst
-            define sndBottom as ySnd - halfHeightSnd
-            define sndTop as ySnd + halfHeightSnd
+        declare xOverlap as boolean
+        declare yOverlap as boolean
 
-            declare xOverlap as boolean
-            declare yOverlap as boolean
+        define xOverlap as sndRight >= fstLeft and sndLeft <= fstRight
+        define yOverlap as sndBottom <= fstTop and sndTop >= fstBottom
 
-            define xOverlap as sndRight >= fstLeft and sndLeft <= fstRight
-            define yOverlap as sndBottom <= fstTop and sndTop >= fstBottom
-
-            if (xOverlap and yOverlap) then begin
-                define result as true
-            end
+        if (xOverlap and yOverlap) then begin
+            define result as true
+        end
     end returns result : boolean
 
     @ Category "Sensing"
@@ -1804,16 +1989,16 @@ role ScratchSprite is ScratchEntity begin
     end returns result : integer
 
     @ Category "Sensing"
-    @ Block "touching color <Color> ?"
+    @ Block "touching color (color) ?"
     @ Opcode "sensing_touchingcolor"
-    define atomic touchingColor (clr: integer) begin
+    define atomic touchingColor (color: integer) begin
         // ...
     end returns result : boolean
 
     @ Category "Sensing"
-    @ Block "color <Color> is touching <Color> ?"
+    @ Block "color (color) is touching (touching) ?"
     @ Opcode "sensing_coloristouchingcolor"
-    define atomic colorIsTouchingColor (clr: integer, tching: integer) begin
+    define atomic colorIsTouchingColor (color: integer, touching: integer) begin
         // ...
     end returns result : boolean
 
@@ -1824,9 +2009,11 @@ role ScratchSprite is ScratchEntity begin
         define result as distanceTo(mouseX(), mouseY())
     end returns result : integer
 
+    /**
+     * We use a 'TaxiCap' approximation:
+     * https://en.wikibooks.org/wiki/Algorithms/Distance_approximations
+     */
     define distanceTo (targetX: integer, targetY: integer) begin
-        // We use a 'TaxiCap' approximation:
-        //      https://en.wikibooks.org/wiki/Algorithms/Distance_approximations
         // ...
         declare dx as integer
         declare dy as integer
@@ -1836,7 +2023,7 @@ role ScratchSprite is ScratchEntity begin
     end returns result : integer
 
     @ Category "Looks"
-    @ Block "say (string as msg) for (Num) seconds"
+    @ Block "say (msg) for (num) seconds"
     @ Opcode "looks_sayforsecs"
     define atomic sayTextFor (msg: string, scs: integer) begin
         // msgBounded = substr(msg, 0, 330)
@@ -1847,7 +2034,7 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Looks"
-    @ Block "think (string as msg) for (Num) seconds"
+    @ Block "think (msg) for (num) seconds"
     @ Opcode "looks_thinkforsecs"
     define atomic thinkTextFor (msg: string, scs: integer) begin
         // msgBounded = substr(msg, 0, 330)
@@ -1858,7 +2045,7 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Looks"
-    @ Block "think (string as msg)"
+    @ Block "think (msg)"
     @ Opcode "looks_think"
     define atomic thinkText (msg: string) begin
         define bubbleText as msg
@@ -1867,7 +2054,7 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Looks"
-    @ Block "say (text as msg)"
+    @ Block "say (msg)"
     @ Opcode "looks_say"
     define atomic sayText (msg: string) begin
         define bubbleText as msg
@@ -1876,21 +2063,21 @@ role ScratchSprite is ScratchEntity begin
     end
 
     @ Category "Motion"
-    @ Block "turn left <Num> degrees"
+    @ Block "turn left (num) degrees"
     @ Opcode "motion_turnleft"
     define atomic turnLeft (degrees: integer) begin
         setDirection(direction - degrees)
     end
 
     @ Category "Motion"
-    @ Block "turn right <Num> degrees"
+    @ Block "turn right (num) degrees"
     @ Opcode "motion_turnright"
     define atomic turnRight (degrees: integer) begin
         setDirection(direction + degrees)
     end
 
     @ Category "Motion"
-    @ Block "point in direction <Num>"
+    @ Block "point in direction (num)"
     @ Opcode "motion_pointindirection"
     define atomic pointInDirection (dir: integer) begin
         setDirection(dir)
@@ -1928,10 +2115,10 @@ role ScratchStage is ScratchEntity begin
     define currentIdx as 0
 
     @ Category "Looks"
-    @ Block "switch backdrop to (backdrop v) and wait"
+    @ Block "switch backdrop to (id v) and wait"
     @ Opcode "looks_switchbackdroptoandwait"
     define atomic switchBackdropToAndWait (id: string) begin
-
+        // ...
     end
 
     define atomic switchBackdropTo (id: string) begin
@@ -1972,6 +2159,3 @@ role ScratchStage is ScratchEntity begin
     end
 
 end
-
-
-
