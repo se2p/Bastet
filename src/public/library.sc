@@ -127,11 +127,13 @@ role MathActor begin
     define PI_HALF as  1.570796326795
     define PI_SQR_TIMES_FIVE as 49.34802200545329
 
-    // WrampClamp function takes a value and makes sure it is within the given bounds
-    // param value: float - the value that will be wrapped
-    // param min: float - the lower bound
-    // param max: flaot - the upper bound
-    // return result: float - the wrapped value
+    /**
+     * WrampClamp function takes a value and makes sure it is within the given bounds
+     * param value: float - the value that will be wrapped
+     * param min: float - the lower bound
+     * param max: flaot - the upper bound
+     * return result: float - the wrapped value
+     */
     define atomic wrapClamp (value: float, min: float, max: float) begin
         declare range as float
         define range as ((max - min) + 1.0)
@@ -148,9 +150,11 @@ role MathActor begin
 
     end returns result : float
 
-    // mathAtan approximates the Atan value in radians for a given "real" value
-    // param n : float - the real value for which the Atan value is approximated
-    // return result: float - the approximated interval of the Atan value
+    /**
+     * mathAtan approximates the Atan value in radians for a given "real" value
+     * param n : float - the real value for which the Atan value is approximated
+     * return result: float - the approximated interval of the Atan value
+     */
     define atomic mathAtan (input: float) begin
         if input > TWO_PI then begin
             declare asDeg as integer
@@ -279,12 +283,14 @@ role MathActor begin
         end
     end returns result: float
 
-    // mathAtan2 approximates the Atan2 value in radians for two given "real" numbers.
-    // The result is the angle between the positive x-axis and ray from (0,0) to (x,y)
-    //
-    // param x : float - x-coordinate of the target point
-    // param y : float - y-coordinate of the target point
-    // return result: float - the approximated interval of the Atan2 value
+    /**
+     * mathAtan2 approximates the Atan2 value in radians for two given "real" numbers.
+     * The result is the angle between the positive x-axis and ray from (0,0) to (x,y)
+     *
+     * param x : float - x-coordinate of the target point
+     * param y : float - y-coordinate of the target point
+     * return result: float - the approximated interval of the Atan2 value
+     */
     define atomic mathAtan2 (x: float, y: float) begin
         if x > 0.0 then begin
             define result as mathAtan((y / x))
@@ -316,10 +322,12 @@ role MathActor begin
         define result as mathSin(radians)
     end returns result: float
 
-    // mathSin approximates the sin value for a given radians number
-    //
-    // param alpha : float - radians number for which the sin value will be approximated
-    // return result: float - the approximated interval
+    /**
+     * mathSin approximates the sin value for a given radians number
+     *
+     * param alpha : float - radians number for which the sin value will be approximated
+     * return result: float - the approximated interval
+     */
     define atomic mathSin (input: float) begin
         if input >= 0.0 and input < 0.3142 then begin
             assume result > 0.0
@@ -447,10 +455,12 @@ role MathActor begin
         define result as mathCos(radians)
     end returns result: float
 
-     // mathCos approximates the cos value for a given radians number
-     //
-     // param alpha : float - radians number for which the cos value will be approximated
-     // return result: float - the approximated interval
+    /**
+     * mathCos approximates the cos value for a given radians number
+     *
+     * param alpha : float - radians number for which the cos value will be approximated
+     * return result: float - the approximated interval
+     */
     define atomic mathCos (input: float) begin
         if input >= 0.0 and input < 0.3142 then begin
             assume result > 0.951
@@ -572,19 +582,23 @@ role MathActor begin
         end
     end returns result: float
 
-    // radToDeg calculates the degree value for a given radians value
-    //
-    // param rad: float - radians number for which the degree value will be calculated
-    // return result: float - the calculated degree value
+    /**
+     * radToDeg calculates the degree value for a given radians value
+     *
+     * param rad: float - radians number for which the degree value will be calculated
+     * return result: float - the calculated degree value
+     */
     define atomic radToDeg (rad: float) begin
         // define result as ((rad * 180.0) / PI)
         define result as rad * 57.2957795131
     end returns result: float
 
-    // degToRad calculates the radians value for a given degree value
-    //
-    // param deg: float - degree number for which the radians value will be calculated
-    // return result: float - the calculated radians value [0..2*pi]
+    /**
+     * degToRad calculates the radians value for a given degree value
+     *
+     * param deg: float - degree number for which the radians value will be calculated
+     * return result: float - the calculated radians value [0..2*pi]
+     */
     define atomic degToRad (deg: float) begin
         // define result as (deg * PI) / 180.0
         define result as deg * 0.01745329252
@@ -726,16 +740,22 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     extern _RUNTIME_restart ()
 
-    // Signal that the current scene should be rendered,
-    //   or: signal a behavior that should be visible to the user.
+    /**
+     * Signal that the current scene should be rendered,
+     *   or: signal a behavior that should be visible to the user.
+     */
     extern _RUNTIME_render ()
 
-    // Returns the integer of milliseconds that
-    // elapsed since the VM started.
+    /**
+     * Returns the integer of milliseconds that
+     * elapsed since the VM started.
+     */
     extern _RUNTIME_millis () returns integer
 
-    // Returns the integer of seconds that
-    // elapsed since the VM started.
+    /**
+     * Returns the integer of seconds that
+     * elapsed since the VM started.
+     */
     extern _RUNTIME_seconds () returns integer
 
     extern _RUNTIME_micros () returns integer
@@ -756,11 +776,15 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     extern _RUNTIME_integerFromInterval (fromNum: integer, toNum: integer) returns integer
 
-    // A random integer in the interval [from, to],
-    // that is, both end points are included.
+    /**
+     * A random integer in the interval [from, to],
+     * that is, both end points are included.
+     */
     extern randomIntegerBetween (intervalStart: integer, intervalEnd: integer) returns integer
 
-    // See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
+    /**
+     * See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
+     */
     extern randomBetween (intervalStart: integer, intervalEnd: integer) returns integer
 
     extern mathCeiling (n: integer) returns integer
@@ -1037,8 +1061,10 @@ role ScratchEntity is RuntimeEntity begin
 
     declare volume as integer
 
-    // The current layer of the entity
-    // See https://en.scratch-wiki.info/wiki/Layer_(value)
+    /**
+     * The current layer of the entity
+     * See https://en.scratch-wiki.info/wiki/Layer_(value)
+     */
     declare layer as integer
 
     // 480 * 360 = 172800 pixels
