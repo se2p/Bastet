@@ -830,8 +830,8 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     end returns result: integer
 
     @ Category "Control"
-    @ Block "wait <Num> seconds"
-    @ Opcode "control_wait" // TODO is that correct?
+    @ Block "wait (num) seconds"
+    @ Opcode "control_wait"
     define waitSeconds (secs: integer) begin
         // A busy-waiting implementation.
         // The external method `_RUNTIME_waitSeconds` is intended to
@@ -843,7 +843,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     end
 
     @ Category "Control"
-    @ Block "wait <Num> millis"
+    @ Block "wait (num) millis"
     define waitMillis (millis: integer) begin
         // A busy-waiting implementation.
         // The external method `_RUNTIME_waitMillis` is intended to
@@ -855,7 +855,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     end
 
     @ Category "Control"
-    @ Block "wait <Num> micros"
+    @ Block "wait (num) micros"
     define waitMicros (micros: integer) begin
         // A busy-waiting implementation.
         // The external method `_RUNTIME_waitMicros` is intended to
