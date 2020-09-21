@@ -42,6 +42,12 @@ function convert_sb3_to_sc {
     fi
 }
 
+# Make sure that NodeJS is installed
+if ! type "node" > /dev/null; then
+    echo "Please install NodeJS!"
+    exit 1
+fi
+
 # Rebuild the argument list by replacing
 # all sb3-files by corresponding sc-files
 # that have been created based on them.
