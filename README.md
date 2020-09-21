@@ -5,11 +5,11 @@ It is the first framework of its kind entirely built on Web technologies
 such as NodeJs, TypeScript, and WebAssembly.
 
 While *BASTET* was designed to analyze Scratch programs,
-it actually operates on an *intermediate language*. **You** should
+it actually operates on an *intermediate language*. You should
 consider using *BASTET* as the foundation for your endeavors in context
 of program analysis and verification if you are looking for a well-engineered
 analysis framework entirely written in *TypeScript*.
-You might also be interested in our bindings for the Z3 SMT solver we have
+You might also be interested in our bindings for the Z3 SMT solver
 written for *BASTET*.
 
 Currently, this framework implements:
@@ -62,9 +62,9 @@ See the files [docker-build.sh](./docker-build.sh) and
 
 ## LeILa
 
-*BASTET* operates on *LeILa* programs (Learners Intermediate Language). 
+*BASTET* operates on *LeILa* programs (Learners' Intermediate Language). 
 Before a Scratch program can be analyzed by *BASTET*, both the given
-program and the formal specification has to be translated to LeILa 
+program and the formal specification have to be translated to LeILa 
 as the intermediate language for analysis. 
 The grammar of *LeILa* is defined in the file [Leila.g4](src/bastet/syntax/parser/grammar/Leila.g4).
 
@@ -74,11 +74,11 @@ in the tool [LitterBox](https://github.com/se2p/LitterBox). *BASTET* uses
 `bastet.sh` with a `.sb3` Scratch project file leads
 to an automatic translation to *LeILa*.
 
-Note that also the formal specification of Scratch projects has to be
-provided as *LeILa* a program—which then observes if the program under
+Note that the formal specification of Scratch projects also has to be
+provided as a *LeILa* program—which then observes if the program under
 analysis behaves correctly.
 See the directory [ase20-verified](test/programs/publications/ase20-verified/) for
-examples of Scratch programs along with their formal specification written
+examples of Scratch programs along with their formal specifications written
 in *LeILa*.
 
 ## Scratch Block Library
