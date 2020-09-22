@@ -13,10 +13,10 @@ This work is supported by EPSRC project EP/N023978/2 and
 DFG project FR 2955/3-1 *“TENDER-BLOCK: Testing, Debugging, 
 and Repairing Blocks-based Programs”*. 
 
-## Project Leads
+## Maintainers
 
-- Andreas Stahlbauer (initial design and implementation of the framework, maintainer)
-- Gordon Fraser (principal investigator of the funding projects)
+- Andreas Stahlbauer 
+- Gordon Fraser
 
 ## List of Contributors
 
