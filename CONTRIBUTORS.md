@@ -15,8 +15,8 @@ and Repairing Blocks-based Programs”*.
 
 ## Project Leads
 
-- Andreas Stahlbauer (initial design and implementation of the framework)
-- Gordon Fraser (principal investigator of the project TenderBlocks)
+- Andreas Stahlbauer (initial design and implementation of the framework, maintainer)
+- Gordon Fraser (principal investigator of the funding projects)
 
 ## List of Contributors
 
