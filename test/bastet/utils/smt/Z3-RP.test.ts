@@ -60,7 +60,7 @@ test("Bool: Short 2", () => {
     expect(prover.isUnsat()).toBe(false);
 })
 
-test("Bool: Long 2", () => {
+test("Bool: Long 1", () => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const bx = theories.boolTheory.abstractBooleanValue(x);
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
@@ -83,4 +83,28 @@ test("Bool: Long 2", () => {
 
     prover.assert(xor);
     expect(prover.isSat()).toBe(true);
+    const model: Z3Model = prover.getModel();
+    const Z3Const[] = model.getConstValues()
+})
+
+test("Bool: Long 2", () => {
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
+    const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
+    const z = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("z"), BooleanType.instance()));
+    const bx = theories.boolTheory.abstractBooleanValue(x);
+    const by = theories.boolTheory.abstractBooleanValue(y);
+    const bz = theories.boolTheory.abstractBooleanValue(z);
+
+
+    prover.push()
+    const conjecture = theories.boolTheory.implies(
+        theories.boolTheory.and(
+            theories.boolTheory.implies(bx,by),
+            theories.boolTheory.implies(by,bz)),
+        theories.boolTheory.implies(bx,bz));
+
+    const proof = theories.boolTheory.not(conjecture);
+
+    prover.assert(proof);
+    expect(prover.isUnsat()).toBe(true);
 })
