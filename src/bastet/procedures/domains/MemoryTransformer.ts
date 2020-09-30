@@ -90,7 +90,6 @@ export class IdentifiableMemoryCell {
 }
 
 
-
 export class BooleanVariable extends IdentifiableMemoryCell {
 
     constructor(name: string) {
@@ -299,6 +298,8 @@ export interface BooleanTheory<B extends AbstractBoolean> {
     and(op1: B, op2: B): B;
 
     or(op1: B, op2: B): B;
+
+    xor(op1: B, op2: B): B;
 
     equal(op1: B, op2: B): B;
 
