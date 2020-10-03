@@ -60,6 +60,18 @@ test("Bool: Short 2", () => {
     expect(prover.isUnsat()).toBe(false);
 })
 
+test("Bool: Short 3", () => {
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
+    const bx = theories.boolTheory.abstractBooleanValue(x);
+    const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
+    const by = theories.boolTheory.abstractBooleanValue(y);
+
+    const test = theories.boolTheory.xor(bx, by);
+
+    prover.assert(test);
+    expect(prover.isUnsat()).toBe(false);
+})
+
 test("Bool: Long 1", () => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const bx = theories.boolTheory.abstractBooleanValue(x);
@@ -69,10 +81,11 @@ test("Bool: Long 1", () => {
     const xor = theories.boolTheory.and(
         theories.boolTheory.or(bx, by),
         theories.boolTheory.not(
-            theories.boolTheory.and(bx,by)),
+            theories.boolTheory.and(bx, by)),
     );
 
     // There seems to be no 'xor' in boolTheory  :(
+    // Edit: I implemented xor now.
 
     // const f = theories.boolTheory.and(
     //     theories.boolTheory.and(
@@ -84,7 +97,7 @@ test("Bool: Long 1", () => {
     prover.assert(xor);
     expect(prover.isSat()).toBe(true);
     const model: Z3Model = prover.getModel();
-    const Z3Const[] = model.getConstValues()
+    //const Z3Const[] = model.getConstValues();
 })
 
 test("Bool: Long 2", () => {
@@ -99,12 +112,35 @@ test("Bool: Long 2", () => {
     prover.push()
     const conjecture = theories.boolTheory.implies(
         theories.boolTheory.and(
-            theories.boolTheory.implies(bx,by),
-            theories.boolTheory.implies(by,bz)),
-        theories.boolTheory.implies(bx,bz));
+            theories.boolTheory.implies(bx, by),
+            theories.boolTheory.implies(by, bz)),
+        theories.boolTheory.implies(bx, bz));
 
     const proof = theories.boolTheory.not(conjecture);
 
     prover.assert(proof);
+    expect(prover.isUnsat()).toBe(true);
+})
+
+test("Bool: Long 3", () => {
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
+    const bx = theories.boolTheory.abstractBooleanValue(x);
+    const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
+    const by = theories.boolTheory.abstractBooleanValue(y);
+
+    const xor1 = theories.boolTheory.and(
+        theories.boolTheory.or(bx, by),
+        theories.boolTheory.not(
+            theories.boolTheory.and(bx, by)),
+    );
+
+    const test = theories.boolTheory.not(
+        theories.boolTheory.equal(
+        xor1, theories.boolTheory.xor(bx, by)
+        )
+    );
+
+
+    prover.assert(test);
     expect(prover.isUnsat()).toBe(true);
 })
