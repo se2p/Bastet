@@ -113,12 +113,14 @@
  *              }
  *              counter++ ;
  *          }
- *          // "assigning" the declarations of the checkSet to the formula
+ *          // combining formulas of checkSet
  *          setAsFormula : Z3BooleanFormula ;
  *          for ((element:Z3BooleanFormula) : checkSet) {
  *              setAsFormula = theories.boolTheory.and(setAsFormula, element) ;
  *          }
+ *          // "assigning" the declarations of the checkSet to the formula
  *          assignedFormula : Z3BooleanFormula = theories.Theory.and(setAsFormula, formula)
+ *
  *          prover.push() ;
  *          // checks if Satisfiable assignment for given formula
  *          prover.assert(assignedFormula) ;
