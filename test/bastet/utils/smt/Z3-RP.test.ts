@@ -72,6 +72,14 @@ test("Bool: Short 3", () => {
     expect(prover.isUnsat()).toBe(false);
 })
 
+// test("Bool: Short 4", () => {
+//     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
+//     const bx = theories.boolTheory.abstractBooleanValue(x);
+//     const b4 = theories.boolTheory
+//     prover.assert(theories.boolTheory.equal(bx, 4));
+//     expect(prover.isSat()).toBe(true);
+// })
+
 test("Bool: Long 1", () => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const bx = theories.boolTheory.abstractBooleanValue(x);
