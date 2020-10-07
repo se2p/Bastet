@@ -44,6 +44,36 @@ export class DummyAbstractElement extends DummyAbstractElementRecord implements 
 
 describe('DifferencingFrontierSet', function() {
 
+    test('Lexy Key', function() {
+        const k1 = new LexiKey([2, 1]);
+        const k2 = new LexiKey([2, 2]);
+        const k3 = new LexiKey([1, 1]);
+        const k4 = new LexiKey([1, 2]);
+
+        const e1 = new DummyAbstractElement(1);
+        const e2 = new DummyAbstractElement(2);
+        const e3 = new DummyAbstractElement(3);
+        const e4 = new DummyAbstractElement(4);
+
+        const keyMap = { 1: k1, 2: k2, 3: k3, 4: k4 };
+
+        const s = new DifferencingFrontierSet((e) => new LexiKey([1]), (a, b) => {
+            const ka: LexiKey = keyMap[(a as DummyAbstractElement).getId()];
+            const kb: LexiKey = keyMap[(b as DummyAbstractElement).getId()];
+            return ka.compareTo(kb);
+        });
+
+        s.add(e1);
+        s.add(e2);
+        s.add(e3);
+        s.add(e4);
+
+        expect(s.pop()).toStrictEqual(e2);
+        expect(s.pop()).toStrictEqual(e1);
+        expect(s.pop()).toStrictEqual(e4);
+        expect(s.pop()).toStrictEqual(e3);
+    });
+
     test('Test One Partition', function() {
         const s = new DifferencingFrontierSet((e) => new LexiKey([1]), (a, b) => 0);
 

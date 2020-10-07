@@ -329,9 +329,12 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
             const relLocA: RelationLocation = steppedA.threadStatus.getRelationLocation();
             const relA: TransitionRelation = this._task.getTransitionRelationById(relLocA.getRelationId());
             const rpoA: number = relA.getWaitAtMeetOrderOf(relLocA.getLocationId());
+            const callstackKey = steppedA.threadStatus.getCallStack().size;
+            const loopstackKey = steppedA.threadStatus.getLoopStack().size;
 
-            return new LexiKey([-rpoA]); // We use a Max-Priority-Queue. Larger elements are prefered but we
-            // what to process elements with the smaller wait-at-meet order first
+            // We use a Max-Priority-Queue. Larger elements are prefered but we
+            // want to process elements with the smaller wait-at-meet order first:
+            return new LexiKey([-loopstackKey, callstackKey, -rpoA]);
         }
 
         return new LexiKey([]);
