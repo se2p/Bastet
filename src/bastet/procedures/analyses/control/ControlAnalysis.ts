@@ -31,7 +31,7 @@ import {
     IndexedThread,
     MethodCall,
     RelationLocation,
-    ScheduleAbstractStateFactory
+    ScheduleAbstractStateFactory, ThreadState
 } from "./ControlAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
@@ -321,17 +321,41 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         return keyA.compareTo(keyB);
     }
 
+    getThreadLexiOrderKey(threadStatus: ThreadState): LexiKey {
+        const relLocA: RelationLocation = threadStatus.getRelationLocation();
+        const relA: TransitionRelation = this._task.getTransitionRelationById(relLocA.getRelationId());
+        const rpoA: number = relA.getWaitAtMeetOrderOf(relLocA.getLocationId());
+        const callstackKey = threadStatus.getCallStack().size;
+        const loopstackKey = threadStatus.getLoopStack().size;
+
+        // We use a Max-Priority-Queue. Larger elements are prefered but we
+        // want to process elements with the smaller wait-at-meet order first:
+        return new LexiKey([-loopstackKey, callstackKey, -rpoA]);
+    }
+
     getLexiOrderKey(ofState: ControlAbstractState): LexiKey {
         const steppedThreadsA = ofState.getSteppedFor().map((i) => ofState.getIndexedThreadState(i));
 
         if (steppedThreadsA.size == 1) {
             const steppedA: IndexedThread = getTheOnlyElement(steppedThreadsA);
-            const relLocA: RelationLocation = steppedA.threadStatus.getRelationLocation();
-            const relA: TransitionRelation = this._task.getTransitionRelationById(relLocA.getRelationId());
-            const rpoA: number = relA.getWaitAtMeetOrderOf(relLocA.getLocationId());
+            const steppedLexiKey = this.getThreadLexiOrderKey(steppedA.threadStatus);
 
-            return new LexiKey([-rpoA]); // We use a Max-Priority-Queue. Larger elements are prefered but we
-            // what to process elements with the smaller wait-at-meet order first
+            // Also take the activating thread into account.
+            // This is important for the progress of the analysis process (it is
+            // relevant how different threads activate each other).
+            let activationLexiKey: LexiKey;
+            const activatedBy = steppedA.threadStatus.getActivatedByThread();
+            if (activatedBy > -1) {
+                const activatedByThread = getTheOnlyElement(ofState.getThreadStates().filter(
+                    (ts) => ts.getThreadId() == activatedBy));
+                activationLexiKey = this.getThreadLexiOrderKey(activatedByThread);
+            } else {
+                activationLexiKey = new LexiKey([]);
+            }
+
+            // We use a Max-Priority-Queue. Larger elements are prefered but we
+            // want to process elements with the smaller wait-at-meet order first:
+            return new LexiKey([activationLexiKey, steppedLexiKey]);
         }
 
         return new LexiKey([]);

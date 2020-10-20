@@ -200,6 +200,9 @@ export interface ThreadStateAttributes {
     /** In atomic group? */
     inAtomicMode: number;
 
+    /** Activated by broadcast from thread */
+    activatedByThread: ThreadId;
+
 }
 
 const ThreadStateRecord = ImmRec({
@@ -213,7 +216,8 @@ const ThreadStateRecord = ImmRec({
     failedFor: ImmSet<Property>(),
     callStack: ImmList<MethodCall>(),
     loopStack: ImmList<RelationLocation>(),
-    inAtomicMode: 0
+    inAtomicMode: 0,
+    activatedByThread: -1
 });
 
 export class ThreadState extends ThreadStateRecord implements AbstractElement, ThreadStateAttributes {
@@ -221,10 +225,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
     constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, operations: ImmList<OperationId>,
                 location: RelationLocation, compState: ThreadComputationState, waitingForThreads: ImmSet<ThreadId>,
                 failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, loopStack: ImmList<RelationLocation>,
-                actorScopes: ImmMap<TypedDataLocation, string>,  inAtomicMode: number) {
+                actorScopes: ImmMap<TypedDataLocation, string>,  inAtomicMode: number, activatedByThread: ThreadId) {
         super({threadId: threadId, actorId: actorId, scriptId: scriptId, operations: operations, location: location,
             computationState: compState, waitingForThreads: waitingForThreads, failedFor: failedFor,
-            callStack: callStack, loopStack: loopStack, inAtomicMode: inAtomicMode});
+            callStack: callStack, loopStack: loopStack, inAtomicMode: inAtomicMode, activatedByThread: activatedByThread});
     }
 
     public getInAtomicMode(): number {
@@ -233,6 +237,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     public getThreadId(): ThreadId {
         return this.get('threadId');
+    }
+
+    public getActivatedByThread(): ThreadId {
+        return this.get('activatedByThread');
     }
 
     public getActorId(): ActorId {
@@ -265,6 +273,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     public withActorId(value: ActorId): ThreadState {
         return this.set('actorId', value);
+    }
+
+    public withActivatedByThread(by: ThreadId): ThreadState {
+        return this.set('activatedByThread', by);
     }
 
     public getComputationState(): ThreadComputationState {
@@ -563,7 +575,7 @@ export class ScheduleAbstractStateFactory {
                     const loc: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, locId);
                     threads = threads.push(new ThreadState(threadId, actor.ident, script.id, ImmList(),
                         loc, threadState, ImmSet(), ImmSet(), ImmList(), ImmList(),
-                        ImmMap(), 0));
+                        ImmMap(), 0, -1));
                 }
             }
         }

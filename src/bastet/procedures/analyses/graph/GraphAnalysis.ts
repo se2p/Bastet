@@ -296,7 +296,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     getLexiOrderKey(ofState: GraphAbstractState): LexiKey {
-        return this.wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
+        return this.wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState())
+            .concat(new LexiKey([-ofState.getId()])); // Prefer older states
     }
 
     getLexiDiffKey(ofState: GraphAbstractState): LexiKey {
