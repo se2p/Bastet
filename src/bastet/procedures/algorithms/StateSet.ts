@@ -254,8 +254,8 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
 
     private _lastPartitionIndex: number;
 
-    constructor(partitionOperator: SinglePartitionKeyFunction<E>, intraPartitionComparator: StateOrderingFunction<E>) {
-        this._diffKeyOperator = Preconditions.checkNotUndefined(partitionOperator);
+    constructor(diffKeyOperator: SinglePartitionKeyFunction<E>, intraPartitionComparator: StateOrderingFunction<E>) {
+        this._diffKeyOperator = Preconditions.checkNotUndefined(diffKeyOperator);
         this._intraPartitionComparator = Preconditions.checkNotUndefined(intraPartitionComparator);
         this._size = 0;
         this._elements = new Set<E>();

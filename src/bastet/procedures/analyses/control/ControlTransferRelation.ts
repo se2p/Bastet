@@ -488,14 +488,14 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
        return resultPrime;
     }
 
-    private createConditionCheckThread(actorId: ActorId, condition: BooleanExpression): ThreadState {
+    private createConditionCheckThread(actorId: ActorId, condition: BooleanExpression, activatedBy: ThreadId): ThreadState {
         const threadId = ThreadStateFactory.freshId();
         const actor: Actor = this._task.getActorByName(actorId);
         const script: Script = this._task.getConditionCheckScript(actor, condition);
         const entryLocation: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, getTheOnlyElement(script.transitions.entryLocationSet));
 
         return new ThreadState(threadId, actorId, script.id, ImmList(), entryLocation, ThreadComputationState.THREAD_STATE_YIELD,
-            ImmSet(), ImmSet(), ImmList(), ImmList(), ImmMap(), 1);
+            ImmSet(), ImmSet(), ImmList(), ImmList(), ImmMap(), 1, activatedBy);
     }
 
     private getLoopAction(predLoopStack: ImmList<RelationLocation>, predRelLoc: RelationLocation, succRelLoc: RelationLocation): LoopAction {
@@ -629,7 +629,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                         waitUntilCond, new NumberVariableExpression(this._task.systemVariables.globalTimeMicrosVariable),
                         new PlusExpression(this._task.systemVariables.threadWaitUntilMicrosVariable, IntegerLiteral.of(1)));
 
-                    const checkThread: ThreadState = this.createConditionCheckThread(steppedActor.ident, waitUntilCond);
+                    const checkThread: ThreadState = this.createConditionCheckThread(steppedActor.ident, waitUntilCond, threadToStep.threadStatus.getThreadId());
                     this._accelInfoMap.set(checkThread.getScriptId(), accelInfo);
 
                     const currentScopeStack = this.buildScopeStack(steppedActor.ident, fromRelation.name);
@@ -712,17 +712,17 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
                 if (!isActive || script.restartOnTriggered) {
                     // Restart the thread
-                    result = this.restartThread(result, receiverThread.threadIndex);
+                    result = this.restartThread(steppedThread.getThreadId(), result, receiverThread.threadIndex);
 
                     // and pass the arguments using `createPassArgumentsOps`
-                    const interProcOps: ProgramOperation[] = [stepOp].concat(
+                    const messageParamPassOps: ProgramOperation[] = [stepOp].concat(
                         this.createPassArgumentsOps((script.event as MessageReceivedEvent).acceptedPayload, stepOp.ast.msg.payload));
 
                     const predScopeStack = this.buildScopeStack(steppedActor.ident, fromRelation.name);
                     const succScopeStack = this.buildScopeStack(steppedActor.ident, script.transitions.name);
 
                     result = result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
-                        ts.withOperations(ImmList(this.scopeOperations(interProcOps, fromState.getActorScopes(), predScopeStack, succScopeStack).map(op => op.ident))));
+                        ts.withOperations(ImmList(this.scopeOperations(messageParamPassOps, fromState.getActorScopes(), predScopeStack, succScopeStack).map(op => op.ident))));
                 }
             }
 
@@ -880,7 +880,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
                     if (script.event instanceof AfterStatementMonitoringEvent) {
                         if (threadState.getComputationState() != ThreadComputationState.THREAD_STATE_DISABLED) {
-                            result = this.restartThread(inState, threadIndex);
+                            result = this.restartThread(step.steppedThread.threadStatus.getThreadId(), inState, threadIndex);
                         }
                     }
                 }
@@ -1080,13 +1080,14 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return checkResult.filter((([e, t]) => Lattices.isFeasible(e, this._wrappedDomain.lattice, "Condition Check")));
     }
 
-    private restartThread(baseState: ControlAbstractState, threadIndex: number): ControlAbstractState {
+    private restartThread(activatedByThreadId : ThreadId, baseState: ControlAbstractState, threadIndex: number): ControlAbstractState {
         const threadState: ThreadState = baseState.getThreadStates().get(threadIndex);
         const script: Script = this._task.getActorByName(threadState.getActorId()).getScript(threadState.getScriptId());
         const startLocation: LocationId = getTheOnlyElement(script.transitions.entryLocationSet);
 
         return baseState.withThreadStateUpdate(threadIndex,
             (ts) => ts.withComputationState(ThreadComputationState.THREAD_STATE_YIELD)
+                .withActivatedByThread(activatedByThreadId)
                 .withLocation(ts.getRelationLocation().withLocationId(startLocation)));
     }
 
