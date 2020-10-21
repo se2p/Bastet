@@ -327,9 +327,9 @@ listExpr :
 actorExpr:
   variable # ActorVariableExpression
   | 'self' # ActorSelfExpression
-  | 'locate' 'actor' stringExpr # LocateActorExpression
+  | 'locate' ('actor' | ) stringExpr # LocateActorExpression
   | 'start' 'clone' 'of' actorExpr # StartCloneActorExpression
-  | 'start' 'actor' stringExpr 'as' ident # UsherActorExpression
+  | 'start' ('actor' | ) stringExpr 'as' ident # UsherActorExpression
   ;
 
 expression :
