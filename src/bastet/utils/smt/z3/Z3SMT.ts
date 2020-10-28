@@ -41,13 +41,14 @@ import {IllegalStateException} from "../../../core/exceptions/IllegalStateExcept
 import {BastetConfiguration} from "../../BastetConfiguration";
 import {FirstOrderFormula} from "../../ConjunctiveNormalForm";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+import {ConcreteNumber} from "../../../procedures/domains/ConcreteElements";
 
 export var PreModule = {
-    print: function(text) {
+    print: function (text) {
         console.log(text);
     },
 
-    printErr: function(text) {
+    printErr: function (text) {
         console.error(text);
     },
 
@@ -55,10 +56,10 @@ export var PreModule = {
         return "dist/src/lib/z3/libz3.so.wasm";
     },
 
-    postRun: function() {
+    postRun: function () {
     },
 
-    instantiateWasm: function(importObject, callback) {
+    instantiateWasm: function (importObject, callback) {
         const filename = this.locateFile("", "");
 
         const fs = require('fs');
@@ -79,7 +80,7 @@ export var PreModule = {
         return undefined;
     },
 
-    onRuntimeInitialized: function() {
+    onRuntimeInitialized: function () {
         global['Module']['onSolverInitDone']();
     }
 };
@@ -95,22 +96,24 @@ export class SMTFactory {
             throw new IllegalStateException("Initialization of Z3 failed: " + e);
         }
 
-        let solverInitPromise = new Promise( (resolve, reject) => {
+        let solverInitPromise = new Promise((resolve, reject) => {
             global['Module']['onSolverInitDone'] = () => {
                 resolve();
             };
 
         });
 
-        let solverInitTimeout = new Promise( (resolve, reject) => {
+        let solverInitTimeout = new Promise((resolve, reject) => {
             setTimeout(_ => {
                 resolve();
             }, 15000);
         });
 
         await Promise.race([solverInitPromise, solverInitTimeout])
-            .then((value) => { })
-            .catch((reason) => { });
+            .then((value) => {
+            })
+            .catch((reason) => {
+            });
 
         return new Z3SMT(global['Module']);
     }
@@ -169,7 +172,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
      *
      * @param f
      */
-    public assert(f: Z3FirstOrderFormula): void  {
+    public assert(f: Z3FirstOrderFormula): void {
         // console.log(this._ctx.ast_to_string(
         //     f.getAST()
         // ));
@@ -217,11 +220,112 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
     }
 
     public getCores(): Z3Vector {
-       return new Z3Vector(this._ctx, this._ctx.solver_get_unsat_core(this._solver));
+        return new Z3Vector(this._ctx, this._ctx.solver_get_unsat_core(this._solver));
     }
 
     public stringRepresentation(f: Z3FirstOrderFormula): string {
         return this._ctx.ast_to_string(f.getAST());
+    }
+
+    /**
+     * Given a formula in predicate logic, compute all satisfying
+     * assignments for a given list `important` (\overline{v}) of (Boolean) variables.
+     *
+     * @param abstractionProblem. Note that `abstractionProblem` already encodes
+     *      the list of predicates (equivalences with the Boolean variables from the list `important`.
+     * @param important. The list of Boolean variables that correspond to the column names
+     *      of the truth table to construct.
+     *
+     * @returns The truth table.
+     */
+    public async allSat(abstractionProblem: Z3BooleanFormula, important: Z3BooleanFormula[]): Promise<boolean[][]> {
+
+        if (important == null || important.length < 1) {
+            throw new IllegalArgumentException("'important' must NOT be empty!");
+        }
+
+        let smt: Z3SMT;
+        let ctx;
+        let theories;
+        let prover2;
+
+        let result: boolean[][] = [];
+
+        smt = await SMTFactory.createZ3();
+        ctx = smt.createContext();
+        theories = smt.createTheories(ctx);
+        prover2 = smt.createProver(ctx);
+
+        let modelConstMap: Map<string, Z3ConstType>;
+
+        // Start a new formula environment using `push`
+        this.push();
+        this.assert(abstractionProblem);
+
+        // Build the truth-table row-by-row. One row for each satisfying assignment.
+        // Terminate if there is no satisfying assignment left.
+        let i: number = 0;
+        while (this.isSat()) {
+            // Get the model for the satisfying formula
+            let model: Z3Model = this.getModel();
+            model.getConstValues().forEach(constObj => {
+                let value = constObj.getValue();
+                let name = constObj.getName();
+                modelConstMap.set(name, value);
+            });
+
+            // Create the truth-table row and push it to the result
+            // (later a `yield` can
+
+            let newFormula: Z3BooleanFormula;
+            let j: number = 0;
+            important.forEach(formula => {
+                let formConst: Z3Const = this.getFirstConst(formula, prover2);
+                let modelValue: Z3ConstType = modelConstMap.get(formConst.getName());
+                let helpForm
+                if (modelValue == null || typeof modelValue != 'boolean') {
+                    throw new IllegalArgumentException("There's a problem in 'abstractionProblem'");
+                } else {
+                    if (modelValue) {
+                        result[i][j] = <boolean>formConst.getValue();
+                        helpForm = formula;
+                    } else {
+                        result[i][j] = !<boolean>formConst.getValue();
+                        helpForm = theories.boolTheory.not(formula);
+                    }
+                }
+                if (newFormula == null) {
+                    newFormula = helpForm;
+                } else {
+                    newFormula = theories.boolTheory.and(newFormula, helpForm)
+                }
+                j++;
+            })
+            this.assert(theories.boolTheory.not(newFormula));
+            i++;
+        }
+        this.pop();
+        return result;
+    }
+
+    getFirstConst(formula: Z3BooleanFormula, prover: Z3ProverEnvironment): Z3Const {
+        let model: Z3Model
+        let cons;
+        let returnConst: Z3Const;
+        prover.push();
+        prover.assert(formula);
+        try {
+            if (prover.isSat()) {
+                model = prover.getModel();
+                cons = model.getConstValues();
+                returnConst = cons[0];
+            }
+        } catch (e) {
+            console.log(e.getMessages());
+        } finally {
+            prover.pop();
+        }
+        return returnConst;
     }
 
 }
@@ -300,7 +404,7 @@ export class Z3Model {
     }
 }
 
-type Z3ConstType = string|number|boolean;
+type Z3ConstType = string | number | boolean;
 
 export class Z3Const {
     private readonly _name: string;

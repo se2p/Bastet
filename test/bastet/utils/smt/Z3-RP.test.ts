@@ -61,6 +61,7 @@ test("Bool: Short 2", () => {
 })
 
 test("Bool: Short 3", () => {
+    let prover2 = smt.createProver(ctx);
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const bx = theories.boolTheory.abstractBooleanValue(x);
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
@@ -69,6 +70,8 @@ test("Bool: Short 3", () => {
     const test = theories.boolTheory.xor(bx, by);
 
     prover.assert(test);
+    console.log("test");
+    prover.getFirstVarName(bx, prover2);
     expect(prover.isUnsat()).toBe(false);
 })
 
