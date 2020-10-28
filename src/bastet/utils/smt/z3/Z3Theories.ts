@@ -133,6 +133,11 @@ export class Z3BooleanTheory extends Z3Theory implements BooleanTheory<Z3Boolean
         super(ctx);
     }
 
+    /**
+     * Creates a Boolean variable with the given variable name `id`.
+     *
+     * @param id
+     */
     abstractBooleanValue(id: Variable): Z3BooleanFormula {
         return new Z3BooleanFormula(this._ctx.mk_const(this._ctx.mk_string_symbol(id.qualifiedName), this._ctx.mk_bool_sort()));
     }
