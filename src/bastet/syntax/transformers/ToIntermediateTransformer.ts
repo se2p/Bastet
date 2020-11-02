@@ -308,7 +308,7 @@ import {Preconditions} from "../../utils/Preconditions";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {App} from "../app/App";
 import {VariableExpression, VariableWithDataLocation} from "../ast/core/Variable";
-import {DataLocations} from "../app/controlflow/DataLocation";
+import {DataLocations, VAR_SCOPING_SPLITTER} from "../app/controlflow/DataLocation";
 import {StrengtheningAssumeStatement} from "../ast/core/statements/AssumeStatement";
 import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
 import {BastetConfiguration} from "../../utils/BastetConfiguration";
@@ -316,7 +316,7 @@ import {ParsingException} from "../../core/exceptions/ParsingException";
 import {ParserRuleContext} from "antlr4ts";
 import {CastExpression} from "../ast/core/expressions/CastExpression";
 import {ActorExpression, ActorSelfExpression, LocateActorExpression} from "../ast/core/expressions/ActorExpression";
-import {ScopeTypeInformation, TypeInformationStorage} from "../DeclarationScopes";
+import {DeclarationScopeType, ScopeTypeInformation, TypeInformationStorage} from "../DeclarationScopes";
 import {LookupTransformer} from "./LookupTransformer";
 import {SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
 
@@ -735,12 +735,28 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     private orderActorsByInheritance(ctx: ActorDefinitionListContext): ActorDefinitionContext[] {
-        const inheritance = this.buildActorInheritanceRelation(ctx);
-        const sorted = toposort(inheritance).reverse();
+        // Dependencies based on the inheritance relation
+        const dependencies: [string, string][] = this.buildActorInheritanceRelation(ctx);
+
+        // If there are no inheritance dependencies: add dependencies based
+        // on the ordering of the files (ensures that there are no cycles).
+        const noInherit = dependencies.filter(([_, f]) => f == null);
+        if (noInherit.length == 0) {
+            var toOrder = ctx.actorDefinition().map(a => a.ident().text).slice();
+            while (toOrder.length > 1) {
+                // ATTENTION: The right-hand-side of the relation is supposed to be the first one in the ordering
+                dependencies.push([toOrder[1], toOrder[0]]);
+                toOrder = ctx.actorDefinition().map(a => a.ident().text).slice(1);
+            }
+        }
+
+        // Compute the ordering based on toposort
+        const sorted = toposort(dependencies).reverse();
         let nameToActorMap = {};
         for (let acd of ctx.actorDefinition()) {
             nameToActorMap[acd.ident().text] = acd;
         }
+
         return sorted.filter((n) => n != null)
             .filter((name) => nameToActorMap[name])
             .map((name) => nameToActorMap[name]);
@@ -1857,7 +1873,13 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     public visitQualifiedVariable(ctx: QualifiedVariableContext): TransformerResult {
-        throw new ImplementMeForException("Support for qualified variable access not yet implemented. Implement me!");
+        Preconditions.checkArgument(ctx.ident().length == 2);
+        const actorName = ctx.ident()[0].text;
+        const attributeIdent: Identifier = ctx.ident()[1].accept(this).nodeOnly();
+        const attributeType = this._typeStorage.getSystemScope().getChildScope(actorName, DeclarationScopeType.ACTOR).getTypeOf(attributeIdent);
+
+        const qualifiedIdent = new Identifier(`${actorName}${VAR_SCOPING_SPLITTER}${attributeIdent.text}`);
+        return TransformerResult.withNode(new VariableWithDataLocation(DataLocations.createTypedLocation(qualifiedIdent, attributeType)));
     }
 
     private produceVariableFromIdentifier(varIdent: Identifier): TransformerResult {
