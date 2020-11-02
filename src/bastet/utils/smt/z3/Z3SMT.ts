@@ -238,25 +238,19 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
      *
      * @returns The truth table.
      */
-    public async allSat(abstractionProblem: Z3BooleanFormula, important: Z3BooleanFormula[]): Promise<boolean[][]> {
+    public allSat(abstractionProblem: Z3BooleanFormula, important: Z3BooleanFormula[], ctx: LibZ3InContext): boolean[][] {
 
         if (important == null || important.length < 1) {
             throw new IllegalArgumentException("'important' must NOT be empty!");
         }
 
-        let smt: Z3SMT;
-        let ctx;
         let theories;
-        let prover2;
 
         let result: boolean[][] = [];
 
-        smt = await SMTFactory.createZ3();
-        ctx = smt.createContext();
-        theories = smt.createTheories(ctx);
-        prover2 = smt.createProver(ctx);
+        theories = new Z3Theories(ctx);
 
-        let modelConstMap: Map<string, Z3ConstType>;
+        let modelConstMap: Map<string, Z3ConstType> = new Map<string,Z3ConstType>();
 
         // Start a new formula environment using `push`
         this.push();
@@ -277,22 +271,24 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
             // Create the truth-table row and push it to the result
             // (later a `yield` can
 
+            result[i] = [];
             let newFormula: Z3BooleanFormula;
             let j: number = 0;
             important.forEach(formula => {
-                let formConst: Z3Const = this.getFirstConst(formula, prover2);
+                let formConst: Z3Const = this.getFirstConst(formula, ctx);
                 let modelValue: Z3ConstType = modelConstMap.get(formConst.getName());
                 let helpForm
                 if (modelValue == null || typeof modelValue != 'boolean') {
                     throw new IllegalArgumentException("There's a problem in 'abstractionProblem'");
                 } else {
                     if (modelValue) {
-                        result[i][j] = <boolean>formConst.getValue();
+                        // result[i][j] = <boolean>formConst.getValue();
                         helpForm = formula;
                     } else {
-                        result[i][j] = !<boolean>formConst.getValue();
+                        // result[i][j] = !<boolean>formConst.getValue();
                         helpForm = theories.boolTheory.not(formula);
                     }
+                    result[i][j] = modelValue
                 }
                 if (newFormula == null) {
                     newFormula = helpForm;
@@ -308,10 +304,11 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         return result;
     }
 
-    getFirstConst(formula: Z3BooleanFormula, prover: Z3ProverEnvironment): Z3Const {
+    getFirstConst(formula: Z3BooleanFormula, ctx: LibZ3InContext): Z3Const {
         let model: Z3Model
         let cons;
         let returnConst: Z3Const;
+        const prover = new Z3ProverEnvironment(ctx)
         prover.push();
         prover.assert(formula);
         try {
