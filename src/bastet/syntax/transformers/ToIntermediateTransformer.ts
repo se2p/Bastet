@@ -746,7 +746,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
             while (toOrder.length > 1) {
                 // ATTENTION: The right-hand-side of the relation is supposed to be the first one in the ordering
                 dependencies.push([toOrder[1], toOrder[0]]);
-                toOrder = ctx.actorDefinition().map(a => a.ident().text).slice(1);
+                toOrder = ctx.actorDefinition().map(a => a.ident().text).slice(1, toOrder.length);
             }
         }
 
