@@ -332,6 +332,10 @@ export class TransformerConfig extends BastetConfiguration {
         return this.getBoolProperty('use-busy-waiting', true);
     }
 
+    get busyWaitUntilCond(): boolean {
+        return this.getBoolProperty('use-busy-wait-until-cond', true);
+    }
+
     get enableMessageDispatcherLoop(): boolean {
         return this.getBoolProperty('enable-message-dispatcher-loop', true);
     }
@@ -1915,10 +1919,19 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     public visitWaitUntilStatement(ctx: WaitUntilStatementContext) : TransformerResult {
-        const tr = ctx.boolExpr().accept(this);
-        return new TransformerResult(
-            tr.statementsToPrepend,
-            new WaitUntilStatement(tr.node as BooleanExpression));
+        const condTr = ctx.boolExpr().accept(this);
+
+        if (this._config.busyWaitUntilCond) {
+            return new TransformerResult(
+                condTr.statementsToPrepend,
+                new CallStatement(Identifier.of(MethodIdentifiers._BUSY_WAIT_waitUntil),
+                    new ExpressionList([condTr.node as Expression]), OptionalAstNode.absent()));
+
+        } else {
+            return new TransformerResult(
+                condTr.statementsToPrepend,
+                new WaitUntilStatement(condTr.node as BooleanExpression));
+        }
     }
 
     visit(tree: ParseTree): TransformerResult {
