@@ -11,6 +11,12 @@ actor GameObserver is Observer begin
     declare state3 as integer
     declare state3entered as integer
 
+    declare state4 as integer
+    declare state4enteredTime as integer
+    declare state4enteredX as integer
+
+    declare bowl as actor
+
     define atomic checkProperty1 () begin
         // Timer and score start at 30 seconds and 0 points, respectively
         if state1 = 0 then begin
@@ -39,10 +45,71 @@ actor GameObserver is Observer begin
 
     define atomic checkProperty3 () begin
         // Fruits have a size of 50%
+        if state3 = 0 then begin
+            if _RUNTIME_micros() - state2entered > 100000 then begin
+                define state3 as 1
+            end
+        end else if state3 = 1 then begin
+            if not Bananas.size = 50 then begin
+                _RUNTIME_signalFailure("Bananas size must be 50%")
+            end
+            if not Apple.size = 50 then begin
+                _RUNTIME_signalFailure("Apples size must be 50%")
+            end
+        end
     end
 
     define atomic checkProperty4 () begin
-        // Bowl moves left/right when corresponding arrow key is pressed
+        //
+        declare bowlX as integer
+        define bowlX as cast (attribute "x" of bowl) to int
+
+        if state4 = 0 then begin
+            // STAY
+            if keyPressedByCode(KEY_LEFT) then begin
+                define state4enteredX as bowlX
+                define state4enteredTime as _RUNTIME_micros()
+                define state4 as 1
+            end if keyPressedByCode(KEY_RIGHT) then begin
+                define state4enteredX as bowlX
+                define state4enteredTime as _RUNTIME_micros()
+                define state4 as 2
+            end
+        end else if state4 = 1 then begin
+            // MOVE LEFT
+            if _RUNTIME_micros() - state4enteredTime > 100000 then begin
+                if bowlX >= state4enteredX then begin
+                    _RUNTIME_signalFailure("Bowl must move left when corresponding arrow key is pressed")
+                end
+            end
+
+            if keyPressedByCode(KEY_LEFT) then begin
+                define state4enteredX as bowlX
+                define state4enteredTime as _RUNTIME_micros()
+                // Stay in the state
+            end if keyPressedByCode(KEY_RIGHT) then begin
+                define state4enteredX as bowlX
+                define state4enteredTime as _RUNTIME_micros()
+                define state4 as 0
+            end
+        end else if state4 = 2 then begin
+            // MOVE RIGHT
+            if _RUNTIME_micros() - state4enteredTime > 100000 then begin
+                if bowlX <= state4enteredX then begin
+                    _RUNTIME_signalFailure("Bowl must move right when corresponding arrow key is pressed")
+                end
+            end
+
+            if keyPressedByCode(KEY_RIGHT) then begin
+                define state4enteredX as bowlX
+                define state4enteredTime as _RUNTIME_micros()
+                // Stay in the state
+            end if keyPressedByCode(KEY_LEFT) then begin
+                define state4enteredX as bowlX
+                define state4enteredTime as _RUNTIME_micros()
+                define state4 as 0
+            end
+        end
     end
 
     define atomic checkProperty5 () begin
@@ -173,11 +240,20 @@ actor GameObserver is Observer begin
     end
 
     script on bootstrap finished do begin
+        define bowl as locate actor "Bowl"
+
         define state1 as 0
         define state1entered as _RUNTIME_micros()
 
         define state2 as 0
         define state2entered as _RUNTIME_micros()
+
+        define state3 as 0
+        define state3entered as _RUNTIME_micros()
+
+        define state4 as 0
+        define state4enteredTime as _RUNTIME_micros()
+        define state4enteredX as cast (attribute "x" of bowl) to int
 
         checkProperties()
     end
