@@ -743,10 +743,16 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         const noInherit = dependencies.filter(([_, f]) => f == null);
         if (noInherit.length == 0) {
             var toOrder = ctx.actorDefinition().map(a => a.ident().text).slice();
-            while (toOrder.length > 1) {
-                // ATTENTION: The right-hand-side of the relation is supposed to be the first one in the ordering
-                dependencies.push([toOrder[1], toOrder[0]]);
-                toOrder = ctx.actorDefinition().map(a => a.ident().text).slice(1, toOrder.length);
+            if (toOrder.length > 0) {
+                var prev = toOrder[0];
+                toOrder = toOrder.slice(1, toOrder.length);
+                while (toOrder.length > 0) {
+                    // ATTENTION: The right-hand-side of the relation is supposed to be the first one in the ordering
+                    const curr = toOrder[0];
+                    dependencies.push([curr, prev]);
+                    prev = curr;
+                    toOrder = toOrder.slice(1, toOrder.length);
+                }
             }
         }
 
