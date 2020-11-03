@@ -918,6 +918,17 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         end
     end
 
+    /**
+     * A busy-waiting implementation for wait-until-condition.
+     */
+    @ Category "Control"
+    @ Block "wait until <cond>"
+    @ Opcode "wait_until"
+    define waitUntil (cond: boolean) begin
+        until cond repeat begin
+        end
+    end
+
     define atomic milliseconds () begin
         define result as _RUNTIME_millis()
     end returns result: integer
@@ -1010,6 +1021,11 @@ role Observer is RuntimeEntity begin
         if not cond then begin
             _RUNTIME_signalFailure("Asserted property must be satisfied!")
         end
+    end
+
+    @ Category "Specification"
+    define atomic fail(msg: string) begin
+        _RUNTIME_signalFailure(msg)
     end
 
     @ Category "Specification"

@@ -48,7 +48,11 @@ export class ParsingException extends Error {
     }
 
     private static toPositionString(token: Token) {
-        return `(line ${token.line}, pos ${token.charPositionInLine})`;
+        if (token && token.line) {
+            return `(line ${token.line}, pos ${token.charPositionInLine})`;
+        } else {
+            return "(line unknown)";
+        }
     }
 
 }

@@ -298,10 +298,10 @@ numExpr  :
   | callStmt # NumCallStatementExpression
 
   | 'cast' stringExpr 'to' 'float' # StringToFloatExpression
-  | 'cast' stringExpr 'to' 'int' # StringToIntExpression
-  | 'cast' boolExpr 'to' 'int' # BoolToIntExpression
+  | 'cast' stringExpr 'to' ('int' | 'integer') # StringToIntExpression
+  | 'cast' boolExpr 'to' ('int' | 'integer') # BoolToIntExpression
   | 'cast' numExpr 'to' 'float' # NumToFloatExpression
-  | 'cast' numExpr 'to' 'int' # NumToIntExpression
+  | 'cast' numExpr 'to' ('int' | 'integer') # NumToIntExpression
 
   | 'timer' # TimerExpression
 

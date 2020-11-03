@@ -26,10 +26,10 @@ actor Bowl is ScratchSprite begin
         goTo(0, 0-145)
         wait until (Stage.countdown = 30)
         until (Stage.countdown = 0) repeat begin
-            if isKeyPressed(KEY_RIGHT_ARROW) then begin
+            if keyPressedByCode(KEY_RIGHT) then begin
                 moveSteps(10)
             end
-            if isKeyPressed(KEY_LEFT_ARROW) then begin
+            if keyPressedByCode(KEY_LEFT) then begin
                 moveSteps(0-10)
             end
         end
