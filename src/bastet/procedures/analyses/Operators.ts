@@ -31,6 +31,7 @@ import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentExc
 import {Unwrapper} from "./Refiner";
 import {AbstractDomain} from "../domains/AbstractDomain";
 import {ConcreteElement} from "../domains/ConcreteElements";
+import {AnalysisStatistics} from "./AnalysisStatistics";
 
 export class NoStopOperator<E extends AbstractElement, F extends AbstractState> implements StopOperator<E, F> {
 
@@ -106,10 +107,22 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
 
     private readonly _partOp: PartitionOperator<E, F>;
 
-    constructor(partitionOp: PartitionOperator<E, F>, mergeOp: MergeOperator<E>, joinOp: JoinOperator<E>) {
+    private readonly _stats: AnalysisStatistics;
+    private readonly _frontierCosts: AnalysisStatistics;
+    private readonly _reachedCosts: AnalysisStatistics;
+    private readonly _mergeCosts: AnalysisStatistics;
+    private readonly _shouldCosts: AnalysisStatistics;
+
+    constructor(partitionOp: PartitionOperator<E, F>, mergeOp: MergeOperator<E>, joinOp: JoinOperator<E>, statistics: AnalysisStatistics) {
         this._mergeOp = Preconditions.checkNotUndefined(mergeOp);
         this._joinOp = Preconditions.checkNotUndefined(joinOp);
         this._partOp = Preconditions.checkNotUndefined(partitionOp);
+
+        this._stats = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
+        this._frontierCosts = this._stats.withContext("fontier-update");
+        this._reachedCosts = this._stats.withContext("reached-update");
+        this._mergeCosts = this._stats.withContext("merge");
+        this._shouldCosts = this._stats.withContext("should");
     }
 
     public mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
@@ -118,18 +131,29 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
         const relevantReached: Iterable<F> = this._partOp.mergePartitionOf(state, reached);
 
         for (let r of relevantReached) {
-            if (this._mergeOp.shouldMerge(state, unwrapper(r))) {
+            this._shouldCosts.startTimer();
+            const should: boolean = this._mergeOp.shouldMerge(state, unwrapper(r));
+            this._shouldCosts.stopTimer();
+
+            if (should) {
+                this._mergeCosts.startTimer();
                 const ePrimePrimePrime: F = wrapper(this._mergeOp.merge(state, unwrapper(r)));
+                this._mergeCosts.stopTimer();
+
                 removeFromReached.add(r);
                 addToReached.add(ePrimePrimePrime);
             }
         }
 
+        this._frontierCosts.startTimer();
         frontier.addAll(addToReached);
         frontier.removeAll(removeFromReached);
+        this._frontierCosts.stopTimer();
 
+        this._reachedCosts.startTimer();
         reached.addAll(addToReached);
         reached.removeAll(removeFromReached);
+        this._reachedCosts.stopTimer();
 
         // SOME DEBUGGING CODE:
         // for (const e of addToReached) {
