@@ -59,7 +59,7 @@ export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState>
         this._analysis = Preconditions.checkNotUndefined(analysis);
 
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
-        this._feasibilityCheckStats = this._statistics.withContext("CEGAR");
+        this._feasibilityCheckStats = this._statistics.withContext("feasibility-check");
     }
 
     public run(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {

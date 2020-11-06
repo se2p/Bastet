@@ -495,7 +495,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         const entryLocation: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, getTheOnlyElement(script.transitions.entryLocationSet));
 
         return new ThreadState(threadId, actorId, script.id, ImmList(), entryLocation, ThreadComputationState.THREAD_STATE_YIELD,
-            ImmSet(), ImmSet(), ImmList(), ImmList(), ImmMap(), 1, activatedBy);
+            ImmSet(), ImmSet(), ImmList(), ImmList(), 1, activatedBy);
     }
 
     private getLoopAction(predLoopStack: ImmList<RelationLocation>, predRelLoc: RelationLocation, succRelLoc: RelationLocation): LoopAction {

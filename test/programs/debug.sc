@@ -1,4 +1,5 @@
-program Fruits
+program Task7
+
 
 actor Stage is ScratchStage begin
 
@@ -8,10 +9,9 @@ actor Stage is ScratchStage begin
     declare points as int
 
     script on startup do begin
-        define countdown as 30
+        define countdown as 10
         define points as 0
         until (countdown = 0) repeat begin
-            wait 1 seconds
             define countdown as countdown - 1
         end
     end
@@ -24,77 +24,89 @@ actor Bowl is ScratchSprite begin
 
     script on startup do begin
         goTo(0, 0-145)
-        wait until (Stage.countdown = 30)
         until (Stage.countdown = 0) repeat begin
-            if isKeyPressed(KEY_RIGHT_ARROW) then begin
-                moveSteps(10)
+            if keyPressedByCode(KEY_RIGHT) then begin
+                // moveSteps(10)
             end
-            if isKeyPressed(KEY_LEFT_ARROW) then begin
-                moveSteps(0-10)
-            end
-        end
-        sayTextFor("Ende!", 1)
-        stop all
-    end
-
-end
-
-actor Apple is ScratchSprite begin
-
-    image AppleImage "apple.svg"
-
-    script on startup do begin
-        define size as 50
-        goToRandomPosition()
-        define y as 170
-        until (Stage.countdown = 0) repeat begin
-            define y as y - 5
-            if touchingObject(locate actor "Bowl") then begin
-                define Stage.points as Stage.points + 5
-                hide()
-                goToRandomPosition()
-                define y as 170
-                show()
-            end
-            if touchingColor(16711680) then begin
-                sayTextFor("Game over!", 1)
-                stop all
+            if keyPressedByCode(KEY_LEFT) then begin
+                // moveSteps(0-10)
             end
         end
     end
 
 end
 
-actor Bananas is ScratchSprite begin
+actor GameObserver is Observer begin
 
-    image BananasImage "bananas.svg"
+    declare state4 as integer
+    declare state4enteredTime as integer
+    declare state4enteredX as integer
 
-    script on startup do begin
-        hide()
-        define size as 50
-        goToRandomPosition()
-        define y as 170
-        wait 1 seconds
-        until (Stage.countdown = 0) repeat begin
-            show()
-            define y as y - 7
-            if touchingObject(locate actor "Bowl") then begin
-                define Stage.points as Stage.points + 8
-                hide()
-                goToRandomPosition()
-                define y as 170
-                show()
+    declare bowl as actor
+
+    define atomic checkProperty4 () begin
+        //
+        declare bowlX as integer
+        define bowlX as cast (attribute "x" of bowl) to int
+
+        if state4 = 0 then begin
+            // STAY
+            if keyPressedByCode(KEY_LEFT) then begin
+                define state4enteredX as bowlX
+                define state4enteredTime as _RUNTIME_micros()
+                define state4 as 1
+            end if keyPressedByCode(KEY_RIGHT) then begin
+                define state4enteredX as bowlX
+                define state4enteredTime as _RUNTIME_micros()
+                define state4 as 2
             end
-            if touchingColor(16711680) then begin
-                define Stage.points as Stage.points - 8
-                sayTextFor("-8", 1)
-                hide()
-                goToRandomPosition()
-                define y as 170
-                wait 1 seconds
-                show()
+        end else if state4 = 1 then begin
+            // MOVE LEFT
+            if _RUNTIME_micros() - state4enteredTime > 100000 then begin
+                if bowlX >= state4enteredX then begin
+                    _RUNTIME_signalFailure("Bowl must move left when corresponding arrow key is pressed")
+                end
+            end
+
+            if keyPressedByCode(KEY_LEFT) then begin
+                // Stay in the state
+            end if keyPressedByCode(KEY_RIGHT) then begin
+                define state4enteredX as bowlX
+                define state4enteredTime as _RUNTIME_micros()
+                define state4 as 0
+            end
+        end else if state4 = 2 then begin
+            // MOVE RIGHT
+            if _RUNTIME_micros() - state4enteredTime > 100000 then begin
+                if bowlX <= state4enteredX then begin
+                    _RUNTIME_signalFailure("Bowl must move right when corresponding arrow key is pressed")
+                end
+            end
+
+            if keyPressedByCode(KEY_RIGHT) then begin
+                // Stay in the state
+            end if keyPressedByCode(KEY_LEFT) then begin
+                define state4enteredX as bowlX
+                define state4enteredTime as _RUNTIME_micros()
+                define state4 as 0
             end
         end
+        // _RUNTIME_signalFailure("Prop Checked")
+    end
+
+    script on bootstrap finished do begin
+        define bowl as locate actor "Bowl"
+
+        define state4 as 0
+        define state4enteredTime as _RUNTIME_micros()
+        define state4enteredX as cast (attribute "x" of bowl) to int
+
+        checkProperty4()
+    end
+
+    script on statement finished do begin
+        checkProperty4()
     end
 
 end
+

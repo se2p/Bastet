@@ -31,7 +31,7 @@ import {
     IndexedThread,
     MethodCall,
     RelationLocation,
-    ScheduleAbstractStateFactory, ThreadState
+    ScheduleAbstractStateFactory, ThreadId, ThreadState
 } from "./ControlAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
@@ -90,6 +90,8 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
 
     private readonly _statistics: AnalysisStatistics;
 
+    private _seq: number = 0;
+
     constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>, statistics: AnalysisStatistics) {
         this._config = new ControlAnalysisConfig(config);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
@@ -122,14 +124,26 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         return result;
     }
 
+    createUniquePartition(): Object {
+        return {id: this._seq++};
+    }
+
     getPartitionKeys(element: ControlAbstractState): ImmSet<PartitionKey> {
-        const locations: ImmSet<LocationId> = ImmSet(element.getThreadStates()
-            .map((ts) => ts.getRelationLocation().getLocationId()));
-        const callstacks: ImmSet<ImmList<MethodCall>> = ImmSet(element.getThreadStates()
-            .map((ts) => ts.getCallStack()));
-        const loopstacks: ImmSet<ImmList<RelationLocation>> = ImmSet(element.getThreadStates()
-            .map((ts) => ts.getLoopStack()));
-        const controlPartition = new PartitionKey(ImmList([locations, callstacks, loopstacks]));
+        var controlPartition;
+
+        if (this.isOnLoophead(element)) {
+            // Results in a factor 2 performance boost of the merge operation
+            controlPartition = new PartitionKey(ImmList([this.createUniquePartition()]));
+        } else {
+            const steppedFor: ImmSet<ThreadId> = element.getSteppedFor();
+            const locations: ImmSet<LocationId> = ImmSet(element.getThreadStates()
+                .map((ts) => ts.getRelationLocation().getLocationId()));
+            const callstacks: ImmSet<ImmList<MethodCall>> = ImmSet(element.getThreadStates()
+                .map((ts) => ts.getCallStack()));
+            const loopstacks: ImmSet<ImmList<RelationLocation>> = ImmSet(element.getThreadStates()
+                .map((ts) => ts.getLoopStack()));
+            controlPartition = new PartitionKey(ImmList([steppedFor, locations, callstacks, loopstacks]));
+        }
 
         let result: ImmSet<PartitionKey> = ImmSet();
         for (const wrappedPartition of this.wrappedAnalysis.getPartitionKeys(element.getWrappedState())) {
@@ -145,6 +159,15 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
 
     shouldMerge(state1: ControlAbstractState, state2: ControlAbstractState): boolean {
         if (!state1.getSteppedFor().equals(state2.getSteppedFor())) {
+            return false;
+        }
+
+        const steppedLocations1 = state1.getSteppedFor().map((i) =>
+            state1.getIndexedThreadState(i)).map((ts) => ts.threadStatus.getRelationLocation());
+        const steppedLocations2 = state2.getSteppedFor().map((i) =>
+            state2.getIndexedThreadState(i)).map((ts) => ts.threadStatus.getRelationLocation());
+
+        if (!steppedLocations1.equals(steppedLocations2)) {
             return false;
         }
 

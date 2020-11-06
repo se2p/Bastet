@@ -22,7 +22,7 @@
 
     "GraphAnalysis": {
         "mergeIntoOperator": "StandardMergeIntoOperator",
-        "stopOperator": "CheckCoverage",
+        "stopOperator": "IfMerged",
         "witnessHandler": "ExportPath",
         "graphConstructionOrder": "WaitAtMeet"
     },

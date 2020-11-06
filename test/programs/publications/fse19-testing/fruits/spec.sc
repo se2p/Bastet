@@ -46,7 +46,7 @@ actor GameObserver is Observer begin
     define atomic checkProperty3 () begin
         // Fruits have a size of 50%
         if state3 = 0 then begin
-            if _RUNTIME_micros() - state2entered > 100000 then begin
+            if _RUNTIME_micros() - state3entered > 100000 then begin
                 define state3 as 1
             end
         end else if state3 = 1 then begin

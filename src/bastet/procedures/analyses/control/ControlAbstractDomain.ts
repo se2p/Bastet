@@ -225,7 +225,7 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
     constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, operations: ImmList<OperationId>,
                 location: RelationLocation, compState: ThreadComputationState, waitingForThreads: ImmSet<ThreadId>,
                 failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, loopStack: ImmList<RelationLocation>,
-                actorScopes: ImmMap<TypedDataLocation, string>,  inAtomicMode: number, activatedByThread: ThreadId) {
+                inAtomicMode: number, activatedByThread: ThreadId) {
         super({threadId: threadId, actorId: actorId, scriptId: scriptId, operations: operations, location: location,
             computationState: compState, waitingForThreads: waitingForThreads, failedFor: failedFor,
             callStack: callStack, loopStack: loopStack, inAtomicMode: inAtomicMode, activatedByThread: activatedByThread});
@@ -574,8 +574,7 @@ export class ScheduleAbstractStateFactory {
                 for (const locId of script.transitions.entryLocationSet) {
                     const loc: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, locId);
                     threads = threads.push(new ThreadState(threadId, actor.ident, script.id, ImmList(),
-                        loc, threadState, ImmSet(), ImmSet(), ImmList(), ImmList(),
-                        ImmMap(), 0, -1));
+                        loc, threadState, ImmSet(), ImmSet(), ImmList(), ImmList(), 0, -1));
                 }
             }
         }
