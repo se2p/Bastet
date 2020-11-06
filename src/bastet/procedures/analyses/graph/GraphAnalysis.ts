@@ -67,6 +67,7 @@ import {LexiKey} from "../../../utils/Lexicographic";
 import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {PathExporter} from "./witnesses/PathExporter";
+import {IfMergedStopOperator} from "./IfMergedStopOperator";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 
@@ -129,7 +130,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         if (this._config.mergeIntoOperator == 'NoMergeIntoOperator') {
             this._mergeIntoOp = new NoMergeIntoOperator<GraphAbstractState, GraphAbstractState>();
         } else if (this._config.mergeIntoOperator == 'StandardMergeIntoOperator') {
-            this._mergeIntoOp = new StandardMergeIntoOperator(this, this, this);
+            this._mergeIntoOp = new StandardMergeIntoOperator(this, this, this, this._statistics);
         } else {
             throw new IllegalArgumentException("Illegal merge operator configuration");
         }
@@ -140,6 +141,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
             });
         } else if (this._config.stopOperator == 'NoStop') {
             this._stopOp = new NoStopOperator();
+        } else if (this._config.stopOperator == 'IfMerged') {
+            this._stopOp = new IfMergedStopOperator();
         } else {
             throw new IllegalArgumentException("Illegal stop operator configuration");
         }
