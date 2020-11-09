@@ -238,7 +238,7 @@ test("AllSat 2", () => {
                 theories.intTheory.isNumberEqualTo(i_b,
                     theories.intTheory.minus(i_x, theories.intTheory.one())),
                 theories.intTheory.isGreaterThan(i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(128)))),
-                theories.intTheory.isNumberEqualTo(i_i, theories.intTheory.zero()))),
+                theories.intTheory.isNumberEqualTo(i_a, theories.intTheory.zero()))),
             theories.intTheory.isNumberEqualTo(i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(64)))));
 
     const predicates = theories.boolTheory.and(theories.boolTheory.and(
