@@ -215,7 +215,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     exportAnalysisResult(reachedPrime: StateSet<AbstractState>, frontierPrime: StateSet<AbstractState>) {
-        const exporter = new GraphToDot(this._task, this, this, this,
+        const exporter = new GraphToDot(this._task, this, this,
             reachedPrime as StateSet<GraphAbstractState>,
             frontierPrime as StateSet<GraphAbstractState>);
 
