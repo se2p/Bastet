@@ -137,6 +137,7 @@ import {RelationBuildingVisitor} from "../../../syntax/app/controlflow/RelationB
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {incBigStep} from "../label/LabelAnalysis";
 import {EpsilonStatement} from "../../../syntax/ast/core/statements/EpsilonStatement";
+import {StopAllStatement} from "../../../syntax/ast/core/statements/TerminationStatement";
 
 /**
  * Mimics the green-threading of the Scratch VM.
@@ -675,7 +676,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         } else if (stepOp.ast instanceof ReturnStatement) {
             const steppedThread = threadToStep.threadStatus;
-            const callInformation: MethodCall = steppedThread.getCallStack().get(steppedThread.getCallStack().size-1);
+            const callInformation: MethodCall = steppedThread.getCallStack().get(steppedThread.getCallStack().size - 1);
             const succReturnCallsTo: ImmList<MethodCall> = steppedThread.getCallStack().pop();
             const succRelation = this._task.getTransitionRelationById(callInformation.getReturnTo().getRelationId());
             const predScopeStack = this.buildScopeStack(steppedActor.ident, fromRelation.name);
@@ -697,6 +698,17 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             } else {
                 return resultList;
             }
+
+        } else if (stepOp.ast instanceof StopAllStatement) {
+            const fnStopThread = (ts: ThreadState) => {
+                if (!this._task.getActorByName(ts.getActorId()).isTerminator) {
+                    return ts.withComputationState(ThreadComputationState.THREAD_STATE_DONE);
+                }
+                return ts;
+            };
+
+            return [[result.withThreadStateUpdate(threadToStep.threadIndex,
+                (ts) => fnStopThread(ts)), false]];
 
         } else if (stepOp.ast instanceof BroadcastAndWaitStatement || stepOp.ast instanceof BroadcastMessageStatement) {
             const steppedThread = threadToStep.threadStatus;

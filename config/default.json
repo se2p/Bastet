@@ -9,7 +9,8 @@
 
     "Transformer": {
         "enable-message-dispatcher-loop": false,
-        "use-busy-waiting": false
+        "use-busy-waiting": false,
+        "use-busy-wait-until-cond": true
     },
 
     "ReachabilityAlgorithm": {
