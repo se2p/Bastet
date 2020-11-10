@@ -1428,13 +1428,6 @@ role ScratchEntity is RuntimeEntity begin
     end
 
     @ Category "Control"
-    @ Block "wait until <condition>"
-    @ Opcode "control_wait_until"
-    define atomic waitUntil (cond: boolean) begin
-        wait until cond
-    end
-
-    @ Category "Control"
     @ Block "stop [this script v]"
     @ Opcode "control_stop"
     define atomic stopThisScript () begin

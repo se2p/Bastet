@@ -626,7 +626,7 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
     }
 
     visitStopAllStatement(node: StopAllStatement): B {
-        throw new ImplementMeException();
+        return this._mem;
     }
 
     visitStopOthersInActorStatement(node: StopOthersInActorStatement): B {
