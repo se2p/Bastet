@@ -31,6 +31,7 @@ import {SingletonStateWrapper} from "../AbstractStates";
 import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
 import {PartitionKey} from "../../algorithms/StateSet";
+import {LexiKey} from "../../../utils/Lexicographic";
 
 export type GraphStateId = number;
 
@@ -46,6 +47,8 @@ export interface GraphAbstractStateAttribs extends AbstractElement, SingletonSta
 
     partitionKeys: ImmSet<PartitionKey>;
 
+    orderKey: LexiKey;
+
 }
 
 const GraphAbstractStateRecord = ImmRec({
@@ -53,7 +56,8 @@ const GraphAbstractStateRecord = ImmRec({
     predecessors: ImmSet<GraphStateId>([]),
     wrappedState: null,
     mergeOf: ImmSet<GraphStateId>([]),
-    partitionKeys: ImmSet()
+    partitionKeys: ImmSet(),
+    orderKey: new LexiKey([])
 });
 
 let STATE_ID_SEQ: number = 0;
@@ -61,8 +65,8 @@ let STATE_ID_SEQ: number = 0;
 export class GraphAbstractState extends GraphAbstractStateRecord implements GraphAbstractStateAttribs, AbstractState {
 
     constructor(id: GraphStateId, preds: ImmSet<GraphStateId>, mergeOf: ImmSet<GraphStateId>, wrapped: ImmRec<any>,
-                partitionKey: ImmSet<PartitionKey>) {
-        super({id: id, predecessors: preds, wrappedState: wrapped, mergeOf: mergeOf, partitionKeys: partitionKey});
+                partitionKey: ImmSet<PartitionKey>, orderKey: LexiKey) {
+        super({id: id, predecessors: preds, wrappedState: wrapped, mergeOf: mergeOf, partitionKeys: partitionKey, orderKey: orderKey});
     }
 
     public getId(): number {
@@ -83,6 +87,10 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
 
     public withPartitionKeys(keys: ImmSet<PartitionKey>): GraphAbstractState {
         return this.set('partitionKeys', keys);
+    }
+
+    public withOrderKey(orderKey: LexiKey): GraphAbstractState {
+        return this.set('orderKey', orderKey);
     }
 
     public withMergeOf(of: ImmSet<GraphStateId>) {
@@ -110,6 +118,10 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
         return this.get('partitionKeys');
     }
 
+    public getOrderKey(): LexiKey {
+        return this.get('orderKey');
+    }
+
     public accept<R>(visitor: AbstractElementVisitor<R>): R {
         const visitMethod: string = `visit${this.constructor.name}`;
         if (visitor[visitMethod]) {
@@ -124,14 +136,23 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
 export class GraphAbstractStateFactory {
 
     public static withFreshID(preds: Iterable<GraphStateId>, mergeOf: Iterable<GraphStateId>, wrapped: ImmRec<any>,
-                              wrappedKeys: ImmSet<PartitionKey>): GraphAbstractState {
+                              wrappedKeys: ImmSet<PartitionKey>, orderKey: LexiKey): GraphAbstractState {
+        const freshId = this.freshStateID();
+        return this.withID(freshId, preds, mergeOf, wrapped, wrappedKeys, orderKey);
+    }
+
+    public static withID(id: number, preds: Iterable<GraphStateId>, mergeOf: Iterable<GraphStateId>, wrapped: ImmRec<any>,
+                              wrappedKeys: ImmSet<PartitionKey>, orderKey: LexiKey): GraphAbstractState {
+        return new GraphAbstractState(id, ImmSet(preds), ImmSet(mergeOf)
+            .union([id]), wrapped, wrappedKeys, orderKey);
+    }
+
+    public static freshStateID(): number {
         if (!STATE_ID_SEQ) {
             STATE_ID_SEQ = 0;
         }
-        const freshId = STATE_ID_SEQ++;
-        return new GraphAbstractState(freshId, ImmSet(preds), ImmSet(mergeOf).union([freshId]), wrapped, wrappedKeys);
+        return STATE_ID_SEQ++;
     }
-
 }
 
 export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
@@ -155,7 +176,7 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
             element1.getPredecessors().union(element2.getPredecessors()),
             element1.getMergeOf().union(element2.getMergeOf()),
             this._wrappedLattice.join(element1.getWrappedState(), element2.getWrappedState()),
-            element1.getPartitionKeys());
+            element1.getPartitionKeys(), element1.getOrderKey());
     }
 
     meet(element1: GraphAbstractState, element2: GraphAbstractState): GraphAbstractState {
