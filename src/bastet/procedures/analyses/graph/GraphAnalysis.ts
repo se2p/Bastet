@@ -124,7 +124,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new GraphAbstractDomain(wrappedAnalysis.abstractDomain);
-        this._transferRelation = new GraphTransferRelation(this._wrappedAnalysis, this._wrappedAnalysis);
+        this._transferRelation = new GraphTransferRelation(this._wrappedAnalysis, this._wrappedAnalysis, this._wrappedAnalysis, this._statistics);
         this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
 
         if (this._config.mergeIntoOperator == 'NoMergeIntoOperator') {
@@ -182,7 +182,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
             state1.getPredecessors().union(state2.getPredecessors()),
             state1.getMergeOf().union(state2.getMergeOf()),
             this._wrappedAnalysis.merge(state1.getWrappedState(), state2.getWrappedState()),
-            state1.getPartitionKeys());
+            state1.getPartitionKeys(), state1.orderKey);
     }
 
     mergeInto(state: GraphAbstractState, frontier: FrontierSet<GraphAbstractState>, reached: ReachedSet<GraphAbstractState>, unwrapper: (AbstractElement) => GraphAbstractState, wrapper: (E) => AbstractElement): [FrontierSet<GraphAbstractState>, ReachedSet<GraphAbstractState>] {
@@ -210,7 +210,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
             const partitionKeys = this._wrappedAnalysis.getPartitionKeys(w);
-            return GraphAbstractStateFactory.withFreshID([],[],  w, partitionKeys);
+            return GraphAbstractStateFactory.withFreshID([],[],  w, partitionKeys, new LexiKey([]));
         } );
     }
 
@@ -299,8 +299,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     getLexiOrderKey(ofState: GraphAbstractState): LexiKey {
-        return this.wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState())
-            .concat(new LexiKey([-ofState.getId()])); // Prefer older states
+        return ofState.orderKey;
     }
 
     getLexiDiffKey(ofState: GraphAbstractState): LexiKey {

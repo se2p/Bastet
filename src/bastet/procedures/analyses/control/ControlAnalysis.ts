@@ -59,6 +59,7 @@ import {AccessibilityRelation} from "../Accessibility";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 import {Concern} from "../../../syntax/Concern";
+import {AfterStatementMonitoringEvent} from "../../../syntax/ast/core/CoreEvent";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -106,17 +107,12 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
         const result: ControlAbstractState[] = [];
         for (const r of this._transferRelation.abstractSucc(fromState)) {
-            const ctrlLocs: ImmSet<RelationLocation> = r.accept(new ControlLocationExtractor(this._task));
-
-            var loopHeads = ctrlLocs.filter((rl) => {
-                return this._task.getTransitionRelationById(rl.getRelationId()).isLoopHead(rl.getLocationId())
-            });
-
-            // HACK: Filter the event-dispatcher loop
-            loopHeads = loopHeads.filter((lh) => lh.getActorId() != "IOActor");
+            const steppedToLoopHead = r.getSteppedFor().map((i) =>
+                r.getIndexedThreadState(i)).filter((ts) => this.isThreadOnLoophead(ts.threadStatus)
+                && ts.threadStatus.getActorId() != "IOActor").map((ts) => ts.threadStatus.getRelationLocation());  // HACK: Filter the event-dispatcher loop
 
             //...
-            if (loopHeads.isEmpty() || this.refiner.checkIsFeasible(r, `Loop unrolling for ${loopHeads.toString()}`)) {
+            if (steppedToLoopHead.isEmpty() || this.refiner.checkIsFeasible(r, `Loop unrolling for ${steppedToLoopHead.toString()}`)) {
                 result.push(r);
             }
         }
@@ -131,7 +127,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
     getPartitionKeys(element: ControlAbstractState): ImmSet<PartitionKey> {
         var controlPartition;
 
-        if (this.isOnLoophead(element)) {
+        if (this.steppedToLoopHead(element)) {
             // Results in a factor 2 performance boost of the merge operation
             controlPartition = new PartitionKey(ImmList([this.createUniquePartition()]));
         } else {
@@ -187,7 +183,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
             return false;
         }
 
-        if (this.isOnLoophead(state1) || this.isOnLoophead(state2)) {
+        if (this.steppedToLoopHead(state1) || this.steppedToLoopHead(state2)) {
             // Do also consider threads that were not stepped!
             // Needed, for example, if the specification is checked after stepping on a loop head.
             return false;
@@ -323,7 +319,19 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         throw new ImplementMeException();
     }
 
-    private isOnLoophead(r: ControlAbstractState) {
+    private steppedToLoopHead(r: ControlAbstractState) {
+        const steppedThreads = r.getSteppedFor().map((i) =>
+            r.getIndexedThreadState(i)).filter((ts) => this.isThreadOnLoophead(ts.threadStatus));
+
+        return steppedThreads.size > 0;
+    }
+
+    private isThreadOnLoophead(ts: ThreadState) {
+        const relation = this._task.getTransitionRelationById(ts.getRelationLocation().getRelationId());
+        return relation.isLoopHead(ts.getRelationLocation().getLocationId());
+    }
+
+    private isSteppedOrWaitingOnLoophead(r: ControlAbstractState) {
         for (const ts of r.getThreadStates()) {
             const relation = this._task.getTransitionRelationById(ts.getRelationLocation().getRelationId());
             if (relation.isLoopHead(ts.getRelationLocation().getLocationId())) {
@@ -351,9 +359,13 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         const callstackKey = threadStatus.getCallStack().size;
         const loopstackKey = threadStatus.getLoopStack().size;
 
+        const actor = this._task.getActorByName(threadStatus.getActorId());
+        const script = actor.getScript(threadStatus.getScriptId());
+        const isSpec = script.event instanceof AfterStatementMonitoringEvent ? 1 : 0;
+
         // We use a Max-Priority-Queue. Larger elements are prefered but we
         // want to process elements with the smaller wait-at-meet order first:
-        return new LexiKey([-loopstackKey, callstackKey, -rpoA]);
+        return new LexiKey([isSpec, -loopstackKey, callstackKey, -rpoA]);
     }
 
     getLexiOrderKey(ofState: ControlAbstractState): LexiKey {
@@ -369,12 +381,13 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
             let activationLexiKey: LexiKey;
             const activatedBy = steppedA.threadStatus.getActivatedByThread();
             if (activatedBy > -1) {
-                const activatedByThread = getTheOnlyElement(ofState.getThreadStates().filter(
-                    (ts) => ts.getThreadId() == activatedBy));
+                const activatedByThread = getTheOnlyElement(ofState.threadStates.filter(
+                    (ts) => ts.threadId == activatedBy));
                 activationLexiKey = this.getThreadLexiOrderKey(activatedByThread);
             } else {
                 activationLexiKey = new LexiKey([]);
             }
+
 
             // We use a Max-Priority-Queue. Larger elements are prefered but we
             // want to process elements with the smaller wait-at-meet order first:
