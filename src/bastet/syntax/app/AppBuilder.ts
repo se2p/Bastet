@@ -128,7 +128,6 @@ export class AppBuilder {
         const acd = actorDefinition;
 
         const resources = this.buildResources(acd.resourceDefs);
-        const datalocs = this.buildDatalocs(acd.resourceDefs, acd.declarationStmts);
         const initScript = this.buildInitScript(acd.resourceDefs, acd.declarationStmts, acd.initStmts);
         const methodDefs = this.buildMethodDefs(acd.methodDefs);
         const externalMethodSigs = this.buildExternalMethodSigs(acd.externalMethodDecls);
@@ -146,7 +145,7 @@ export class AppBuilder {
         }
 
         return new Actor(actorDefinition.mode, actorName, inheritsFromActors, [],
-            concern, resources, datalocs, methodDefs, externalMethodSigs, scripts, methods);
+            concern, resources, methodDefs, externalMethodSigs, scripts, methods);
     }
 
     private determineConcern(actorDef: ActorDefinition): Concern {
@@ -282,25 +281,6 @@ export class AppBuilder {
         return result;
     }
 
-    private buildDatalocs(resourceListContext: ResourceDefinitionList,
-                                 declarationStmtList: StatementList): DataLocationMap {
-        let result: DataLocationMap = {};
-
-        // Data locations based on the declaration statements
-        // for (let stmt of declarationStmtList) {
-        //     if (stmt instanceof DeclareVariableStatement) {
-        //         const declStmt: DeclareVariableStatement = stmt as DeclareVariableStatement;
-        //         const id: string = declStmt.ident.text;
-        //         result[id] = new DataLocation(declStmt, id, declStmt.type);
-        //     } else {
-        //         throw new ImplementMeException();
-        //     }
-        // }
-
-        // TODO: Data locations based on the resources?
-        return result;
-    }
-
     public dissolveActorInheritance(app: App, actor: Actor): Actor {
         Preconditions.checkNotUndefined(actor);
         Preconditions.checkNotUndefined(app);
@@ -362,7 +342,6 @@ export class AppBuilder {
         }
         const methods = new ImmutableList(Array.from(methodMap.values()))
         const externalMethods = Maps.mergeImmutableMaps(dominating.externalMethodMap, secondary.externalMethodMap);
-        const datalocs = Maps.mergeImmutableMaps(dominating.datalocMap, secondary.datalocMap);
         const scripts = Lists.concatImmutableLists(secondary.scripts, dominating.scripts); // first execute the old scripts, then the new ones (since the old might contain initializers)
 
         // TODO: The way we dedetermine the concern of an actor is somehow hacky.
@@ -373,7 +352,7 @@ export class AppBuilder {
         }
 
         return new Actor(dominating.actorMode, dominating.ident, [], [secondary].concat(Array.from(secondary.dissolvedFrom)),
-            concern, resources.createMutable(), datalocs.createMutable(),
+            concern, resources.createMutable(),
             methodDefinitions.createMutable(), externalMethods.createMutable(),
             scripts.createMutable(), methods.createMutable());
     }
@@ -452,7 +431,6 @@ export class AppBuilder {
 
             const actorPrime = new Actor(actor.actorMode, actor.ident, actor.inheritFrom.createMutable(),
                 actor.dissolvedFrom.createMutable(), actor.concern, actor.resourceMap.createMutable(),
-                actor.datalocMap.createMutable(),
                 methodDefsPrime, actor.externalMethodMap.createMutable(), actor.scripts.createMutable(), methodsPrime);
 
             actorMap[actorPrime.ident] = actorPrime;
