@@ -29,7 +29,6 @@ import {Maps} from "../../utils/Maps";
 import {Lists} from "../../utils/Lists";
 import {ImmutableList} from "../../utils/ImmutableList";
 import {ImmutableMap} from "../../utils/ImmutableMap";
-import {DataLocationMap, TypedDataLocation} from "./controlflow/DataLocation";
 import {MethodDefinition, MethodDefinitionMap, MethodSignature, MethodSignatureMap} from "../ast/core/MethodDefinition";
 import {ActorMode} from "../ast/core/ActorDefinition";
 import {Preconditions} from "../../utils/Preconditions";
@@ -89,9 +88,6 @@ export class Actor {
     /** Set of the actor's resources */
     private readonly _resources: ImmutableMap<string, AppResource>;
 
-    /** Set of the actor's data locations (variables) */
-    private readonly _datalocs: ImmutableMap<string, TypedDataLocation>;
-
     /** Set of the actor's methods with bodies (not external ones) */
     private readonly _methodDefinitions: ImmutableMap<string, MethodDefinition>;
 
@@ -118,7 +114,7 @@ export class Actor {
 
     constructor(mode: ActorMode, ident: ActorId, inheritFrom: Actor[],
                 dissolvedFrom: Actor[], concern: Concern,
-                resources: AppResourceMap, datalocs: DataLocationMap,
+                resources: AppResourceMap,
                 methodDefs: MethodDefinitionMap,
                 externalMethods: MethodSignatureMap,
                 scripts: Script[], methods: Method[]) {
@@ -131,7 +127,6 @@ export class Actor {
         this._inheritFrom = Lists.immutableCopyOf(inheritFrom);
         this._dissolvedFrom = Lists.immutableCopyOf(dissolvedFrom);
         this._resources = Maps.immutableCopyOf(resources);
-        this._datalocs = Maps.immutableCopyOf(datalocs);
         this._methodDefinitions = Maps.immutableCopyOf(methodDefs);
         this._externalMethodSignatures = Maps.immutableCopyOf(externalMethods);
         this._scripts = Lists.immutableCopyOf(scripts);
@@ -168,14 +163,6 @@ export class Actor {
 
     get dissolvedFrom(): ImmutableList<Actor> {
         return this._dissolvedFrom;
-    }
-
-    get datalocs(): IterableIterator<TypedDataLocation> {
-        return this._datalocs.values();
-    }
-
-    get datalocMap(): ImmutableMap<string, TypedDataLocation> {
-        return this._datalocs;
     }
 
     get resources(): IterableIterator<AppResource> {
@@ -335,7 +322,7 @@ export class Actors {
                 SingularityEvent.instance(), false, bootstrapTransitions);
             Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [], [],
                 Concerns.highestPriorityConcern(),
-                {}, {}, {}, {},
+                {},  {}, {},
                 [bootstrapScript], []);
         }
 
@@ -353,7 +340,7 @@ export class Actors {
                 TerminationEvent.instance(), false, transitions);
             Actors._DEFAULT_TERMINATOR = new Actor(ActorMode.concrete(), "__TERMINATOR", [], [],
                 Concerns.defaultProgramConcern(),
-                {}, {}, {}, {},
+                {}, {}, {},
                 [script], []);
         }
 

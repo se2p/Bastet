@@ -62,9 +62,6 @@ import {TimeState} from "./TimeAbstractDomain";
 import {BeginAtomicStatement, EndAtomicStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 import instantiate = WebAssembly.instantiate;
 
-// TODO: Move these variables to the App on SYSTEM level
-
-
 export class TimeTransferRelation implements LabeledTransferRelation<TimeState> {
 
     private readonly _task: App;

@@ -292,7 +292,7 @@ export class ControlDominance {
         }
 
         /**
-         * TODO: Add code there to support Super-CFAs?
+         * TODO: Add code here to support Super-CFAs?
          */
 
         for (let i = 0; i < trans.length; i++) {
