@@ -30,13 +30,20 @@ import {VariableWithDataLocation} from "../../../../src/bastet/syntax/ast/core/V
 import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataLocation";
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
 import {ConcreteNumber, ConcreteString} from "../../../../src/bastet/procedures/domains/ConcreteElements";
-import {Z3BooleanFormula, Z3FirstOrderLattice, Z3NumberFormula} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
+import {
+    Z3BooleanFormula,
+    Z3FirstOrderLattice,
+    Z3NumberFormula,
+    Z3Theories
+} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
 import {BooleanType, IntegerType, StringType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
+import {FirstOrderDomain} from "../../../../src/bastet/procedures/domains/FirstOrderDomain";
 
 let smt: Z3SMT;
 let ctx;
 let theories;
 let prover;
+let builder;
 
 beforeAll(async (done) => {
     smt = await SMTFactory.createZ3();
@@ -44,6 +51,7 @@ beforeAll(async (done) => {
     theories = smt.createTheories(ctx);
     prover = smt.createProver(ctx);
     done();
+    builder = new TestFormulaBuilder(theories);
 });
 
 test("Bool: Short 1", () => {
@@ -157,51 +165,17 @@ test("Bool: Long 3", () => {
 })
 
 test("AllSat 1", () => {
-    const a = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("a"), IntegerType.instance()));
-    const i_a = theories.intTheory.abstractNumberValue(a);
-    const b = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("b"), IntegerType.instance()));
-    const i_b = theories.intTheory.abstractNumberValue(b);
-    const i = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("i"), IntegerType.instance()));
-    const i_i = theories.intTheory.abstractNumberValue(i);
-    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
-    const i_x = theories.intTheory.abstractNumberValue(x);
-    const v1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("v1"), BooleanType.instance()));
-    const b_v1 = theories.boolTheory.abstractBooleanValue(v1);
-    const v2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("v2"), BooleanType.instance()));
-    const b_v2 = theories.boolTheory.abstractBooleanValue(v2);
-    const v3 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("v3"), BooleanType.instance()));
-    const b_v3 = theories.boolTheory.abstractBooleanValue(v3);
+    const basicTerm = builder.basicBoolTerm1();
+    const predicates = builder.predicForBoolTerm1();
 
-    const basicTerm = theories.boolTheory.and(
-        theories.intTheory.isNumberEqualTo(i_x, theories.intTheory.fromConcreteNumber(new ConcreteNumber(2))),
-        theories.boolTheory.or(theories.boolTheory.or(
-            theories.boolTheory.and(theories.boolTheory.and(
-                theories.intTheory.isNumberEqualTo(i_b, i_x),
-                theories.intTheory.isGreaterThan(i_a, theories.intTheory.zero())),
-                theories.intTheory.isNumberEqualTo(i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(64)))),
-            theories.boolTheory.and(theories.boolTheory.and(
-                theories.intTheory.isNumberEqualTo(i_b,
-                    theories.intTheory.minus(i_x, theories.intTheory.one())),
-                theories.intTheory.isGreaterThan(i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(128)))),
-                theories.intTheory.isNumberEqualTo(i_i, theories.intTheory.zero()))),
-            theories.intTheory.isNumberEqualTo(i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(64)))));
-
-    const propVar = theories.boolTheory.and(theories.boolTheory.and(
-        theories.boolTheory.equal(b_v1,
-            theories.intTheory.isNumberEqualTo(i_b, theories.intTheory.one())),
-        theories.boolTheory.equal(b_v2,
-            theories.intTheory.isNumberEqualTo(i_x, theories.intTheory.fromConcreteNumber(new ConcreteNumber(2))))),
-        theories.boolTheory.equal(b_v3,
-            theories.intTheory.isLessEqual(i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(90)))));
-
-    const abstractProblem = theories.boolTheory.and(basicTerm, propVar);
+    const abstractProblem = theories.boolTheory.and(basicTerm, predicates);
 
     prover.push();
     prover.assert(basicTerm);
     expect(prover.isSat()).toBe(true);
     prover.pop();
     prover.push();
-    prover.assert(propVar);
+    prover.assert(predicates);
     expect(prover.isSat()).toBe(true);
     prover.pop();
     prover.push();
@@ -212,50 +186,102 @@ test("AllSat 1", () => {
 })
 
 test("AllSat 2", () => {
-    const a = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("a"), IntegerType.instance()));
-    const i_a = theories.intTheory.abstractNumberValue(a);
-    const b = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("b"), IntegerType.instance()));
-    const i_b = theories.intTheory.abstractNumberValue(b);
-    const i = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("i"), IntegerType.instance()));
-    const i_i = theories.intTheory.abstractNumberValue(i);
-    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
-    const i_x = theories.intTheory.abstractNumberValue(x);
-    const v1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("v1"), BooleanType.instance()));
-    const b_v1 = theories.boolTheory.abstractBooleanValue(v1);
-    const v2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("v2"), BooleanType.instance()));
-    const b_v2 = theories.boolTheory.abstractBooleanValue(v2);
-    const v3 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("v3"), BooleanType.instance()));
-    const b_v3 = theories.boolTheory.abstractBooleanValue(v3);
 
-    const basicTerm = theories.boolTheory.and(
-        theories.intTheory.isNumberEqualTo(i_x, theories.intTheory.fromConcreteNumber(new ConcreteNumber(2))),
-        theories.boolTheory.or(theories.boolTheory.or(
-            theories.boolTheory.and(theories.boolTheory.and(
-                theories.intTheory.isNumberEqualTo(i_b, i_x),
-                theories.intTheory.isGreaterThan(i_a, theories.intTheory.zero())),
-                theories.intTheory.isNumberEqualTo(i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(64)))),
-            theories.boolTheory.and(theories.boolTheory.and(
-                theories.intTheory.isNumberEqualTo(i_b,
-                    theories.intTheory.minus(i_x, theories.intTheory.one())),
-                theories.intTheory.isGreaterThan(i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(128)))),
-                theories.intTheory.isNumberEqualTo(i_a, theories.intTheory.zero()))),
-            theories.intTheory.isNumberEqualTo(i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(64)))));
-
-    const predicates = theories.boolTheory.and(theories.boolTheory.and(
-        theories.boolTheory.equal(b_v1,
-            theories.intTheory.isNumberEqualTo(i_b, theories.intTheory.one())),
-        theories.boolTheory.equal(b_v2,
-            theories.intTheory.isNumberEqualTo(i_x, theories.intTheory.fromConcreteNumber(new ConcreteNumber(2))))),
-        theories.boolTheory.equal(b_v3,
-            theories.intTheory.isLessEqual(i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(90)))));
+    const basicTerm = builder.basicBoolTerm1();
+    const predicates = builder.predicForBoolTerm1();
 
     const abstractProblem = theories.boolTheory.and(basicTerm, predicates);
 
-    let propVar: Z3BooleanFormula[] = [b_v1, b_v2, b_v3];
+    let propVars: Z3BooleanFormula[] = builder.propVarsTerm1();
 
 
     prover.push();
-    console.log(prover.allSat(abstractProblem,propVar,ctx));
+    console.log(prover.allSat(abstractProblem, propVars, ctx));
     prover.pop();
 
 })
+
+test("BPA 1",() => {
+    const basicTerm = builder.basicBoolTerm1();
+    const abstractPrec = builder.abstrPrecForBoolTerm1();
+
+    const fOLattice = smt.createLattice(prover, theories.boolTheory);
+    const fOD = new FirstOrderDomain(fOLattice);
+
+    const endForm = fOD.booleanPredicateAbstraction(basicTerm,abstractPrec,ctx);
+    console.log(endForm);
+})
+
+class TestFormulaBuilder {
+
+    private _theories: Z3Theories;
+    private i_a;
+    private i_b;
+    private i_i;
+    private i_x;
+    private b_v1;
+    private b_v2;
+    private b_v3;
+
+
+    constructor(theories: Z3Theories) {
+        this._theories = theories;
+
+        const a = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("a"), IntegerType.instance()));
+        this.i_a = theories.intTheory.abstractNumberValue(a);
+        const b = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("b"), IntegerType.instance()));
+        this.i_b = theories.intTheory.abstractNumberValue(b);
+        const i = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("i"), IntegerType.instance()));
+        this.i_i = theories.intTheory.abstractNumberValue(i);
+        const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
+        this.i_x = theories.intTheory.abstractNumberValue(x);
+
+        const v1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("v1"), BooleanType.instance()));
+        this.b_v1 = theories.boolTheory.abstractBooleanValue(v1);
+        const v2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("v2"), BooleanType.instance()));
+        this.b_v2 = theories.boolTheory.abstractBooleanValue(v2);
+        const v3 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("v3"), BooleanType.instance()));
+        this.b_v3 = theories.boolTheory.abstractBooleanValue(v3);
+    }
+
+    public basicBoolTerm1(): Z3BooleanFormula {
+
+        const basicTerm = theories.boolTheory.and(
+            theories.intTheory.isNumberEqualTo(this.i_x, theories.intTheory.fromConcreteNumber(new ConcreteNumber(2))),
+            theories.boolTheory.or(theories.boolTheory.or(
+                theories.boolTheory.and(theories.boolTheory.and(
+                    theories.intTheory.isNumberEqualTo(this.i_b, this.i_x),
+                    theories.intTheory.isGreaterThan(this.i_a, theories.intTheory.zero())),
+                    theories.intTheory.isNumberEqualTo(this.i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(64)))),
+                theories.boolTheory.and(theories.boolTheory.and(
+                    theories.intTheory.isNumberEqualTo(this.i_b,
+                        theories.intTheory.minus(this.i_x, theories.intTheory.one())),
+                    theories.intTheory.isGreaterThan(this.i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(128)))),
+                    theories.intTheory.isNumberEqualTo(this.i_a, theories.intTheory.zero()))),
+                theories.intTheory.isNumberEqualTo(this.i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(64)))));
+        return basicTerm;
+    }
+
+    public predicForBoolTerm1(): Z3BooleanFormula {
+        const predicates = theories.boolTheory.and(theories.boolTheory.and(
+            theories.boolTheory.equal(this.b_v1,
+                theories.intTheory.isNumberEqualTo(this.i_b, theories.intTheory.one())),
+            theories.boolTheory.equal(this.b_v2,
+                theories.intTheory.isNumberEqualTo(this.i_x, theories.intTheory.fromConcreteNumber(new ConcreteNumber(2))))),
+            theories.boolTheory.equal(this.b_v3,
+                theories.intTheory.isLessEqual(this.i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(90)))));
+
+        return predicates;
+    }
+
+    public abstrPrecForBoolTerm1(): Z3BooleanFormula[] {
+        return [theories.intTheory.isNumberEqualTo(this.i_b, theories.intTheory.one()),
+            theories.intTheory.isNumberEqualTo(this.i_x, theories.intTheory.fromConcreteNumber(new ConcreteNumber(2))),
+            theories.intTheory.isLessEqual(this.i_i, theories.intTheory.fromConcreteNumber(new ConcreteNumber(90)))];
+    }
+
+    public propVarsTerm1(): Z3BooleanFormula[] {
+        return [this.b_v1, this.b_v2, this.b_v3]
+    }
+
+}
