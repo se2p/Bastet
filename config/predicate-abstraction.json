@@ -5,7 +5,7 @@
     "MainAnalysis": {
         "print-statistics": true,
         "export-artifacts": true,
-        "analysis": "bmc"
+        "analysis": "predicate"
     },
 
     "Transformer": {
@@ -24,7 +24,7 @@
 
     "GraphAnalysis": {
         "mergeIntoOperator": "StandardMergeIntoOperator",
-        "stopOperator": "IfMerged",
+        "stopOperator": "CheckCoverage",
         "witnessHandler": "ExportPath",
         "graphConstructionOrder": "WaitAtMeet"
     },
