@@ -324,7 +324,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
                     }
                     result[i][j] = modelValue
                 }
-                this.boolTermAnd(newFormula, helpForm, theories);
+                newFormula = this.boolTermAnd(newFormula, helpForm, theories);
                 j++;
             })
             this.assert(theories.boolTheory.not(newFormula));
