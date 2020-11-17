@@ -300,9 +300,10 @@ export class Z3Model {
     }
 }
 
-type Z3ConstType = string|number|boolean;
+type Z3ConstType = string | number | boolean;
 
 export class Z3Const {
+
     private readonly _name: string;
     private readonly _value: Z3ConstType;
 
