@@ -46,6 +46,7 @@ import {AbstractionTransferRelation} from "./AbstractionTransferRelation";
 import {AbstractionMergeOperator} from "./AbstractionMergeOperator";
 import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
+import {AbstractionRefiner} from "./AbstractionRefiner";
 
 
 export class AbstractionAnalysisConfig extends BastetConfiguration {
@@ -56,17 +57,17 @@ export class AbstractionAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class AbstractionAnalysis<F extends AbstractState> implements ProgramAnalysisWithLabels<ConcreteElement, AbstractionState, F>,
+export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, AbstractionState, AbstractState>,
     LabeledTransferRelation<AbstractionState>,
     Unwrapper<AbstractionState, AbstractElement> {
 
     private readonly _abstractDomain: AbstractionAbstractDomain;
 
-    private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, AbstractState, F>;
+    private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, AbstractState, AbstractState>;
 
     private readonly _transferRelation: AbstractionTransferRelation;
 
-    private readonly _refiner: Refiner<AbstractionState>;
+    private readonly _refiner: Refiner<AbstractState>;
 
     private readonly _task: App;
 
@@ -78,7 +79,7 @@ export class AbstractionAnalysis<F extends AbstractState> implements ProgramAnal
 
 
     constructor(config: {}, task: App, summaryLattice: FirstOrderLattice<FirstOrderFormula>,
-                wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>,
+                wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>,
                 statistics: AnalysisStatistics) {
         this._config = new AbstractionAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
@@ -87,9 +88,7 @@ export class AbstractionAnalysis<F extends AbstractState> implements ProgramAnal
 
         this._transferRelation = new AbstractionTransferRelation(wrappedAnalysis);
 
-        // FIXME: Refiner for predicate abstraction is needed in the following (not the WrappingRefiner)
-        //      Based on the Craig interpolation theorem.
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
+        this._refiner = new AbstractionRefiner(this, this._abstractDomain.lattice);
 
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = new AbstractionMergeOperator(this._task, this.wrappedAnalysis, this.wrappedAnalysis);
@@ -119,7 +118,7 @@ export class AbstractionAnalysis<F extends AbstractState> implements ProgramAnal
         return this._mergeOp.merge(state1, state2);
     }
 
-    stop(state: AbstractionState, reached: Iterable<F>, unwrapper: (F) => AbstractionState): boolean {
+    stop(state: AbstractionState, reached: Iterable<AbstractState>, unwrapper: (AbstractState) => AbstractionState): boolean {
         throw new ImplementMeForException("Impl. as described in the paper; might also take the wrapped stop op into account.")
     }
 
@@ -127,7 +126,7 @@ export class AbstractionAnalysis<F extends AbstractState> implements ProgramAnal
         return this._wrappedAnalysis.target(state.wrappedState);
     }
 
-    widen(state: AbstractionState, reached: Iterable<F>): AbstractionState {
+    widen(state: AbstractionState, reached: Iterable<AbstractState>): AbstractionState {
         throw new ImplementMeForException("Compute predicate abstractions here, if desired for this point in the state space.");
     }
 
@@ -135,7 +134,7 @@ export class AbstractionAnalysis<F extends AbstractState> implements ProgramAnal
         return e.getWrappedState();
     }
 
-    get refiner(): Refiner<AbstractionState> {
+    get refiner(): Refiner<AbstractState> {
         return this._refiner;
     }
 
@@ -143,7 +142,7 @@ export class AbstractionAnalysis<F extends AbstractState> implements ProgramAnal
         return this._abstractDomain;
     }
 
-    get wrappedAnalysis(): ProgramAnalysisWithLabels<any, any, F> {
+    get wrappedAnalysis(): ProgramAnalysisWithLabels<any, any, AbstractState> {
         return this._wrappedAnalysis;
     }
 
@@ -154,23 +153,23 @@ export class AbstractionAnalysis<F extends AbstractState> implements ProgramAnal
         } );
     }
 
-    createStateSets(): [FrontierSet<F>, ReachedSet<F>] {
+    createStateSets(): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         return this.wrappedAnalysis.createStateSets();
     }
 
-    mergeInto(state: AbstractionState, frontier: StateSet<F>, reached: ReachedSet<F>, unwrapper: (F) => AbstractionState, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
+    mergeInto(state: AbstractionState, frontier: StateSet<AbstractState>, reached: ReachedSet<AbstractState>, unwrapper: (AbstractState) => AbstractionState, wrapper: (E) => AbstractState): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         throw new ImplementMeException();
     }
 
-    widenPartitionOf(ofState: AbstractionState, reached: ReachedSet<F>): Iterable<F> {
+    widenPartitionOf(ofState: AbstractionState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
         throw new ImplementMeException();
     }
 
-    stopPartitionOf(ofState: AbstractionState, reached: ReachedSet<F>): Iterable<F> {
+    stopPartitionOf(ofState: AbstractionState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
         throw new ImplementMeException();
     }
 
-    mergePartitionOf(ofState: AbstractionState, reached: ReachedSet<F>): Iterable<F> {
+    mergePartitionOf(ofState: AbstractionState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
         throw new ImplementMeException();
     }
 
@@ -178,7 +177,7 @@ export class AbstractionAnalysis<F extends AbstractState> implements ProgramAnal
         return this._wrappedAnalysis.getPartitionKeys(element.getWrappedState());
     }
 
-    handleViolatingState(reached: ReachedSet<F>, violating: F) {
+    handleViolatingState(reached: ReachedSet<AbstractState>, violating: AbstractState) {
         throw new ImplementMeException();
     }
 
@@ -194,30 +193,30 @@ export class AbstractionAnalysis<F extends AbstractState> implements ProgramAnal
         return this._wrappedAnalysis.getLexiDiffKey(ofState.getWrappedState());
     }
 
-    finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
+    finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<AbstractionState, F>, state: F): AccessibilityRelation<AbstractionState, F> {
+    testify(accessibility: AccessibilityRelation<AbstractionState, AbstractState>, state: AbstractState): AccessibilityRelation<AbstractionState, AbstractState> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<AbstractionState, F>, state: F): AccessibilityRelation<AbstractionState, F> {
+    testifyOne(accessibility: AccessibilityRelation<AbstractionState, AbstractState>, state: AbstractState): AccessibilityRelation<AbstractionState, AbstractState> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<AbstractionState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<AbstractionState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractionState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractionState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         const resultWithSSA = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
 
         // TODO: Remove the SSA-Indices from the concrete elements along the path
         throw new ImplementMeException();
     }
 
-    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<AbstractionState, F> {
+    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractionState, AbstractState> {
         throw new ImplementMeException();
     }
 

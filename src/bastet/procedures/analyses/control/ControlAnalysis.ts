@@ -117,23 +117,11 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         this._abstractDomain = new ControlAbstractDomain(wrappedAnalysis.abstractDomain);
         this._transferRelation = new ControlTransferRelation(this._config, task, this.wrappedAnalysis,
             this._wrappedAnalysis.abstractDomain, this._statistics);
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
+        this._refiner = this._wrappedAnalysis.refiner;
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
-        const result: ControlAbstractState[] = [];
-        for (const r of this._transferRelation.abstractSucc(fromState)) {
-            const steppedToLoopHead = r.getSteppedFor().map((i) =>
-                r.getIndexedThreadState(i)).filter((ts) => this.isThreadOnLoophead(ts.threadStatus)
-                && ts.threadStatus.getActorId() != "IOActor").map((ts) => ts.threadStatus.getRelationLocation());  // HACK: Filter the event-dispatcher loop
-
-            //...
-            if (steppedToLoopHead.isEmpty() || this.refiner.checkIsFeasible(r, `Loop unrolling for ${steppedToLoopHead.toString()}`)) {
-                result.push(r);
-            }
-        }
-
-        return result;
+        return this._transferRelation.abstractSucc(fromState);
     }
 
     createUniquePartition(): Object {
@@ -470,6 +458,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
 
     abstractSuccFor(fromState: ControlAbstractState, op: ProgramOperation, co: Concern): Iterable<ControlAbstractState> {
         throw new NotSupportedException();
+    }
+
+    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {
+        throw new ImplementMeException();
     }
 
 

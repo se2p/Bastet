@@ -26,31 +26,33 @@
 import {Refiner, Unwrapper} from "../Refiner";
 import {FrontierSet, ReachedSet} from "../../algorithms/StateSet";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {AbstractState} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {AbstractionState, AbstractionStateLattice} from "./AbstractionAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
 
 export class AbstractionRefiner implements Refiner<AbstractState> {
 
-    private readonly _unwrapper: Unwrapper<AbstractState, AbstractionState>;
+    private readonly _unwrapper: Unwrapper<AbstractState, AbstractElement>;
 
     private readonly _lattice: AbstractionStateLattice;
 
-    constructor(unwrapper: Unwrapper<AbstractState, AbstractionState>, lattice: AbstractionStateLattice) {
+    constructor(unwrapper: Unwrapper<AbstractState, AbstractElement>, lattice: AbstractionStateLattice) {
         this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
         this._lattice = Preconditions.checkNotUndefined(lattice);
     }
 
-    public checkIsFeasible(e: AbstractState, purpose?: string): boolean {
-        return false;
+    public checkIsFeasible(e: AbstractState, accessibility: AccessibilityRelation<AbstractState, AbstractState>, purpose?: string): boolean {
+        throw new ImplementMeException();
     }
 
     public refinePrecision(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>,
                            infeasibleState: AbstractState, accessibility: AccessibilityRelation<AbstractionState, AbstractState>): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
-
-        // reached.remove()
-
+        // TODO: welchen Teil vom ReachedSet wegwerfen?
+        //  -> Man wirft den Teil weg, der infeasible ist
+        //  -> Und man wirft den Teil weg, für den die Precision zu niedrig war
+        // TODO: welche Prädikate sollen zur AbstractionPrecision hinzugefügt werden?
+        //  ->
         throw new ImplementMeException();
     }
 

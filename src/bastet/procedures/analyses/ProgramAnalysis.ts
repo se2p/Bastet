@@ -46,7 +46,7 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
 
     abstractDomain: AbstractDomain<C, E>;
 
-    refiner: Refiner<E>;
+    refiner: Refiner<F>;
 
 }
 
