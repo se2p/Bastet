@@ -213,4 +213,8 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         throw new ImplementMeException();
     }
 
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<SSAState, F> {
+        throw new ImplementMeException();
+    }
+
 }

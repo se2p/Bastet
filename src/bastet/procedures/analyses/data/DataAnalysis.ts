@@ -55,7 +55,6 @@ import {
 } from "../../../utils/ConjunctiveNormalForm";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
 import {AbstractElement, AbstractState, LatticeWithComplements} from "../../../lattices/Lattice";
-import {DataRefiner} from "./DataRefiner";
 import {Refiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {FrontierSet, PartitionKey, ReachedSet, StateSet} from "../../algorithms/StateSet";
@@ -164,8 +163,6 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     private readonly _transferRelation: DataTransferRelation;
 
-    private readonly _refiner: DataRefiner;
-
     private readonly _testifier: DataTestifier;
 
     private readonly _statistics: AnalysisStatistics;
@@ -185,7 +182,6 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         this._abstractDomain = new DataAbstractDomain(folLattice, propLattice);
         this._transferRelation = new DataTransferRelation(this._abstractDomain, this._theories);
         this._testifier = new DataTestifier(this._theories, this._abstractDomain);
-        this._refiner = new DataRefiner(this._abstractDomain.lattice);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = StandardMergeOperatorFactory.create(this._config.mergeOperator, this._abstractDomain);
     }
@@ -200,6 +196,10 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     abstractSucc(fromState: DataAbstractState): Iterable<DataAbstractState> {
         return this._transferRelation.abstractSucc(fromState);
+    }
+
+    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<DataAbstractState, AbstractState> {
+        throw new ImplementMeException();
     }
 
     join(state1: DataAbstractState, state2: DataAbstractState): DataAbstractState {
@@ -246,7 +246,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     }
 
     get refiner(): Refiner<DataAbstractState> {
-        return this._refiner;
+        throw new ImplementMeException();
     }
 
     createStateSets(): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {

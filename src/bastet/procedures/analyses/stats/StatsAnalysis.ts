@@ -81,6 +81,10 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         });
     }
 
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<E, F> {
+       return this._wrappedAnalysis.accessibility(reached, state);
+    }
+
     join(state1: E, state2: E): E {
         return this._joinStats.runWithTimer(() => {
             return this._wrappedAnalysis.join(state1, state2);

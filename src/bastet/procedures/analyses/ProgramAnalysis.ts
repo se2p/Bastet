@@ -42,11 +42,17 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
        JoinOperator<E>, TargetOperator<E>, MergeIntoOperator<E, F>,
        MergeOperator<E>, StopOperator<E, F>, WidenOperator<E, F>, PartitionOperator<E, F>,
        WitnessHandler<F>, TraversalOrderOperator<E, F>, ResultFinalization<F>,
-       TestificationOperator<E, F> {
+       TestificationOperator<E, F>, AccessibilityOperator<E, F> {
 
     abstractDomain: AbstractDomain<C, E>;
 
     refiner: Refiner<E>;
+
+}
+
+export interface AccessibilityOperator<E extends AbstractElement, F extends AbstractState> {
+
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<E, F>;
 
 }
 

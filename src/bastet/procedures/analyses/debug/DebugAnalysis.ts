@@ -160,23 +160,23 @@ export class DebugAnalysis<F extends AbstractState>
     }
 
     getPartitionKeys(element: DebugState): ImmSet<PartitionKey> {
-        return this._wrappedAnalysis.getPartitionKeys(element.getWrappedState());
+        return this.wrappedAnalysis.getPartitionKeys(element.getWrappedState());
     }
 
     handleViolatingState(reached: ReachedSet<F>, violating: F) {
-        return this._wrappedAnalysis.handleViolatingState(reached, violating);
+        return this.wrappedAnalysis.handleViolatingState(reached, violating);
     }
 
     compareStateOrder(a: DebugState, b: DebugState): number {
-        return this._wrappedAnalysis.compareStateOrder(a.getWrappedState(), b.getWrappedState());
+        return this.wrappedAnalysis.compareStateOrder(a.getWrappedState(), b.getWrappedState());
     }
 
     getLexiOrderKey(ofState: DebugState): LexiKey {
-        return this._wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
+        return this.wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
     }
 
     getLexiDiffKey(ofState: DebugState): LexiKey {
-        return this._wrappedAnalysis.getLexiDiffKey(ofState.getWrappedState());
+        return this.wrappedAnalysis.getLexiDiffKey(ofState.getWrappedState());
     }
 
     finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
@@ -197,6 +197,10 @@ export class DebugAnalysis<F extends AbstractState>
 
     testifyOne(accessibility: AccessibilityRelation<DebugState, F>, state: F): AccessibilityRelation<DebugState, F> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
+    }
+
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<DebugState, F> {
+        throw new ImplementMeException();
     }
 
 }

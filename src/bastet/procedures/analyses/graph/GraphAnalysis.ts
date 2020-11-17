@@ -327,4 +327,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
+    accessibility(reached: ReachedSet<GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
+        return reached as GraphReachedSetWrapper<GraphAbstractState>;
+    }
+
 }

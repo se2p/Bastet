@@ -99,6 +99,10 @@ export class TimeAnalysis<F extends AbstractState>
         } );
     }
 
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<TimeState, F> {
+        throw new ImplementMeException();
+    }
+
     join(state1: TimeState, state2: TimeState): TimeState {
         return this._abstractDomain.lattice.join(state1, state2);
     }

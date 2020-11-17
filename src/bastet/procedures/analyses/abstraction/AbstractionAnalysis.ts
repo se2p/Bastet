@@ -76,8 +76,10 @@ export class AbstractionAnalysis<F extends AbstractState> implements ProgramAnal
 
     private readonly _config: AbstractionAnalysisConfig;
 
+
     constructor(config: {}, task: App, summaryLattice: FirstOrderLattice<FirstOrderFormula>,
-                wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics) {
+                wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>,
+                statistics: AnalysisStatistics) {
         this._config = new AbstractionAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
@@ -212,6 +214,10 @@ export class AbstractionAnalysis<F extends AbstractState> implements ProgramAnal
         const resultWithSSA = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
 
         // TODO: Remove the SSA-Indices from the concrete elements along the path
+        throw new ImplementMeException();
+    }
+
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<AbstractionState, F> {
         throw new ImplementMeException();
     }
 

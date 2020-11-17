@@ -48,6 +48,7 @@ import {AccessibilityRelation} from "../Accessibility";
 import {LabelAbstractDomain, LabelState} from "./LabelAbstractDomain";
 import {LabelTransferRelation} from "./LabelTransferRelation";
 import {MergeJoinOperator} from "../Operators";
+import {SSAState} from "../ssa/SSAAbstractDomain";
 
 let bigStepNumber: number = 0; // FIXME: THIS IS A HACK
 
@@ -227,6 +228,10 @@ export class LabelAnalysis<F extends AbstractState>
 
     testifyOne(accessibility: AccessibilityRelation<LabelState, F>, state: F): AccessibilityRelation<LabelState, F> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
+    }
+
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<SSAState, F> {
+        throw new ImplementMeException();
     }
 
 }
