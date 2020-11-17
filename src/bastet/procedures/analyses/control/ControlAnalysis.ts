@@ -71,6 +71,22 @@ export class ControlAnalysisConfig extends BastetConfiguration {
         return this.getBoolProperty('aggregate-atomic-transitions', false);
     }
 
+    get widenOnLoopHeads(): boolean {
+        return this.getBoolProperty('widen-on-loop-heads', false);
+    }
+
+    get widenAfterEachStep(): boolean {
+        return this.getBoolProperty('widen-after-each-step', false);
+    }
+
+    get widenAfterFunctionReturn(): boolean {
+        return this.getBoolProperty('widen-after-function-return', false);
+    }
+
+    get widenBeforeFunctionCall(): boolean {
+        return this.getBoolProperty('widen-after-function-call', false);
+    }
+
 }
 
 export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcreteState, ControlAbstractState, AbstractState>,
@@ -224,16 +240,29 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
                 result.push(p);
             }
         }
+
         for (const p of this._wrappedAnalysis.target(state.wrappedState)) {
             result.push(p);
         }
+
         return result;
     }
 
     widen(state: ControlAbstractState, reached: Iterable<AbstractState>): ControlAbstractState {
-        const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
-        if (wrappedResult != state.getWrappedState()) {
-            return state.withWrappedState(wrappedResult);
+        const isWideningState = this._config.widenAfterEachStep
+                || (this._config.widenOnLoopHeads && this.steppedToLoopHead(state));
+
+        if (this._config.widenAfterFunctionReturn || this._config.widenBeforeFunctionCall) {
+            throw new ImplementMeException();
+        }
+
+        if (isWideningState) {
+            const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
+            if (wrappedResult != state.getWrappedState()) {
+                return state.withWrappedState(wrappedResult);
+            } else {
+                return state;
+            }
         } else {
             return state;
         }
