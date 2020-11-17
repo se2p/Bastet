@@ -104,7 +104,7 @@ export class Z3ListFormula extends Z3Formula implements AbstractList {
 
 }
 
-export class Z3Theory {
+class Z3Theory {
 
     protected readonly _ctx: LibZ3InContext;
 
