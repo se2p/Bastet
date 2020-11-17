@@ -31,8 +31,24 @@ import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
 export interface Refiner<E extends AbstractElement> {
 
+    /**
+     * Check if a given state is feasible, that is, if it describes
+     * a concrete state that is also reachable in a concrete program execution.
+     *
+     * @param e: The abstract state to check feasibility for.
+     * @param purpose: An information for logging and performance debugging
+     *      which describes the purpose of the feasibility check.
+     */
     checkIsFeasible(e: E, purpose?: string): boolean;
 
+    /**
+     * Refine the abstraction precision of the analysis to rule
+     * out a spurious (infeasible) counterexample.
+     *
+     * @param frontier: The set of frontier states of the reachability analysis.
+     * @param reached: The set of abstract states that have been reached, including infeasible ones.
+     * @param infeasibleState: The infeasible state that should be eliminated by the refinement.
+     */
     refinePrecision(frontier: FrontierSet<E>, reached: ReachedSet<E>, infeasibleState: E);
 
 }
