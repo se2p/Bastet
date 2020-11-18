@@ -101,7 +101,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
 
     private readonly _transferRelation: ControlTransferRelation;
 
-    private readonly _refiner: Refiner<ControlAbstractState>;
+    private readonly _refiner: Refiner<AbstractState>;
 
     private readonly _task: App;
 
@@ -260,7 +260,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         return e.getWrappedState();
     }
 
-    get refiner(): Refiner<ControlAbstractState> {
+    get refiner(): Refiner<AbstractState> {
         return this._refiner;
     }
 

@@ -135,7 +135,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         return this._wrappedAnalysis.abstractDomain;
     }
 
-    get refiner(): Refiner<E> {
+    get refiner(): Refiner<F> {
         return this._wrappedAnalysis.refiner;
     }
 

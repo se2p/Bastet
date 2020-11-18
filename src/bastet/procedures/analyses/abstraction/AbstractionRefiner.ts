@@ -29,7 +29,7 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {AbstractionState, AbstractionStateLattice} from "./AbstractionAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
+import {AccessibilityOperator} from "../ProgramAnalysis";
 
 export class AbstractionRefiner implements Refiner<AbstractState> {
 
@@ -37,17 +37,22 @@ export class AbstractionRefiner implements Refiner<AbstractState> {
 
     private readonly _lattice: AbstractionStateLattice;
 
-    constructor(unwrapper: Unwrapper<AbstractState, AbstractElement>, lattice: AbstractionStateLattice) {
+    private readonly _accOp: AccessibilityOperator<AbstractionState, AbstractState>;
+
+    constructor(unwrapper: Unwrapper<AbstractState, AbstractElement>, lattice: AbstractionStateLattice,
+                accOp: AccessibilityOperator<AbstractionState, AbstractState>) {
         this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
         this._lattice = Preconditions.checkNotUndefined(lattice);
+        this._accOp = Preconditions.checkNotUndefined(accOp);
     }
 
-    public checkIsFeasible(e: AbstractState, accessibility: AccessibilityRelation<AbstractState, AbstractState>, purpose?: string): boolean {
+    public checkIsFeasible(reached: ReachedSet<AbstractState>, e: AbstractState, purpose?: string): boolean {
+        const ar = this._accOp.accessibility(reached, e);
         throw new ImplementMeException();
     }
 
     public refinePrecision(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>,
-                           infeasibleState: AbstractState, accessibility: AccessibilityRelation<AbstractionState, AbstractState>): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
+                           infeasibleState: AbstractState): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         // TODO: welchen Teil vom ReachedSet wegwerfen?
         //  -> Man wirft den Teil weg, der infeasible ist
         //  -> Und man wirft den Teil weg, für den die Precision zu niedrig war

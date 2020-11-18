@@ -81,7 +81,6 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         this._abstractDomain = new SSAAbstractDomain(wrappedAnalysis.abstractDomain);
 
         this._transferRelation = new SSATransferRelation(wrappedAnalysis);
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = new SSAMergeOperator(this._task, this.wrappedAnalysis, this.wrappedAnalysis);
     }
@@ -131,8 +130,8 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return e.getWrappedState();
     }
 
-    get refiner(): Refiner<SSAState> {
-        return this._refiner;
+    get refiner(): Refiner<F> {
+        return this._wrappedAnalysis.refiner;
     }
 
     get abstractDomain(): AbstractDomain<ConcreteElement, SSAState> {

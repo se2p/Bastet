@@ -76,7 +76,6 @@ export class TimeAnalysis<F extends AbstractState>
         this._timeProfile = Preconditions.checkNotUndefined(timeProfile);
         this._abstractDomain = new TimeAbstractDomain(wrappedAnalysis.abstractDomain);
         this._mergeOperator = new TimeMergeOperator(wrappedAnalysis);
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._transfer = new TimeTransferRelation(task, timeProfile, wrappedAnalysis);
     }
 
@@ -140,8 +139,8 @@ export class TimeAnalysis<F extends AbstractState>
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<TimeState> {
-        return this._refiner;
+    get refiner(): Refiner<F> {
+        return this._wrappedAnalysis.refiner
     }
 
     get wrappedAnalysis(): ProgramAnalysis<any, any, F> {

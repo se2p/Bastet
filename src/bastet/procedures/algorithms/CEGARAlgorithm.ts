@@ -86,7 +86,7 @@ export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState>
                 let isFeasible: boolean;
                 this._feasibilityCheckStats.startTimer();
                 try {
-                    isFeasible = this._refiner.checkIsFeasible(targetState as E, this._analysis.accessibility(reached, targetState), `Target state feasibility for ${properties.toString()}`);
+                    isFeasible = this._refiner.checkIsFeasible(reached, targetState as E, `Target state feasibility for ${properties.toString()}`);
                     if (isFeasible) {
                         return [frontier, reached];
                     } else {
@@ -103,6 +103,6 @@ export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState>
     }
 
     protected eliminateInfeasibleState(frontier: FrontierSet<E>, reached: ReachedSet<E>, targetState: E): [FrontierSet<E>, ReachedSet<E>]{
-        return this._refiner.refinePrecision(frontier, reached, targetState, this._analysis.accessibility(reached, targetState));
+        return this._refiner.refinePrecision(frontier, reached, targetState);
     }
 }

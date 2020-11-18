@@ -63,7 +63,7 @@ export class DebugAnalysis<F extends AbstractState>
 
     private readonly _transfer: DebugTransferRelation;
 
-    private readonly _refiner: WrappingRefiner<DebugState, any>;
+    private readonly _refiner: Refiner<F>;
 
     private readonly _mergeOperator: MergeJoinOperator<DebugState>;
 
@@ -75,7 +75,6 @@ export class DebugAnalysis<F extends AbstractState>
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new DebugAbstractDomain(wrappedAnalysis.abstractDomain);
         this._mergeOperator = new MergeJoinOperator(this._abstractDomain);
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._transfer = new DebugTransferRelation(wrappedAnalysis);
     }
 
@@ -131,8 +130,8 @@ export class DebugAnalysis<F extends AbstractState>
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<DebugState> {
-        return this._refiner;
+    get refiner(): Refiner<F> {
+        return this._wrappedAnalysis.refiner;
     }
 
     get wrappedAnalysis(): ProgramAnalysisWithLabels<any, any, F> {

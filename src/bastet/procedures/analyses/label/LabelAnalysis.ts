@@ -82,7 +82,6 @@ export class LabelAnalysis<F extends AbstractState>
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new LabelAbstractDomain(wrappedAnalysis.abstractDomain);
         this._mergeOperator = new MergeJoinOperator(this._abstractDomain);
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._transfer = new LabelTransferRelation(wrappedAnalysis, () => bigStepNumber);
     }
 
@@ -162,8 +161,8 @@ export class LabelAnalysis<F extends AbstractState>
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<LabelState> {
-        return this._refiner;
+    get refiner(): Refiner<F> {
+        return this._wrappedAnalysis.refiner;
     }
 
     get wrappedAnalysis(): ProgramAnalysis<any, any, F> {
