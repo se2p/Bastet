@@ -30,6 +30,7 @@ import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {AbstractionState, AbstractionStateLattice} from "./AbstractionAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AccessibilityOperator} from "../ProgramAnalysis";
+import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 
 export class AbstractionRefiner implements Refiner<AbstractState> {
 
@@ -47,7 +48,15 @@ export class AbstractionRefiner implements Refiner<AbstractState> {
     }
 
     public checkIsFeasible(reached: ReachedSet<AbstractState>, e: AbstractState, purpose?: string): boolean {
+        // 1. Build the abstract path formula (describes a set of paths)
         const ar = this._accOp.accessibility(reached, e);
+
+        // ATTENTION: We assume that there is only one unique sequence of
+        // abstraction states along the abstract reachability relation.
+
+        // 2. Check the feasibility of the path formula
+        const pathFormula: FirstOrderFormula = null;
+
         throw new ImplementMeException();
     }
 
