@@ -97,14 +97,14 @@ export class SMTFactory {
 
         let solverInitPromise = new Promise( (resolve, reject) => {
             global['Module']['onSolverInitDone'] = () => {
-                resolve();
+                resolve('Success');
             };
 
         });
 
         let solverInitTimeout = new Promise( (resolve, reject) => {
             setTimeout(_ => {
-                resolve();
+                resolve('Success');
             }, 15000);
         });
 
