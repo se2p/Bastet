@@ -24,7 +24,7 @@ See the list of [contributors](./CONTRIBUTORS.md) and `git shortlog -sne` for al
 ### Development Environment
 
 - NodeJs 14.x 
-- TypeScript 4.x (`npm install -g typescript`)
+- TypeScript 4.x (`npm install -g typescript@4.1.2`)
 - JetBrains WebStorm 2020.x
 
 ### Building BASTET

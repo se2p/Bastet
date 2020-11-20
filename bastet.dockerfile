@@ -12,7 +12,7 @@ FROM base AS deploy
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install --production && npm install --global typescript @types/node
+RUN npm install --production && npm install --global typescript@4.1.2 @types/node
 
 # Copy BASTET fully into the image
 COPY . ./
