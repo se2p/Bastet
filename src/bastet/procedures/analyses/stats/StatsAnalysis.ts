@@ -81,12 +81,6 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         });
     }
 
-    join(state1: E, state2: E): E {
-        return this._joinStats.runWithTimer(() => {
-            return this._wrappedAnalysis.join(state1, state2);
-        });
-    }
-
     merge(state1: E, state2: E): E {
         return this._mergeStats.runWithTimer(() => {
             return this._wrappedAnalysis.merge(state1, state2);

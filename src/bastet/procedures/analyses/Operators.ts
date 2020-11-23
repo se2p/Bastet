@@ -23,7 +23,7 @@
  *
  */
 
-import {JoinOperator, MergeIntoOperator, MergeOperator, PartitionOperator, StopOperator} from "./ProgramAnalysis";
+import {MergeIntoOperator, MergeOperator, PartitionOperator, StopOperator} from "./ProgramAnalysis";
 import {FrontierSet, ReachedSet} from "../algorithms/StateSet";
 import {AbstractElement, AbstractState} from "../../lattices/Lattice";
 import {Preconditions} from "../../utils/Preconditions";
@@ -103,8 +103,6 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
 
     private readonly _mergeOp: MergeOperator<E>;
 
-    private readonly _joinOp: JoinOperator<E>;
-
     private readonly _partOp: PartitionOperator<E, F>;
 
     private readonly _stats: AnalysisStatistics;
@@ -113,9 +111,8 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
     private readonly _mergeCosts: AnalysisStatistics;
     private readonly _shouldCosts: AnalysisStatistics;
 
-    constructor(partitionOp: PartitionOperator<E, F>, mergeOp: MergeOperator<E>, joinOp: JoinOperator<E>, statistics: AnalysisStatistics) {
+    constructor(partitionOp: PartitionOperator<E, F>, mergeOp: MergeOperator<E>, statistics: AnalysisStatistics) {
         this._mergeOp = Preconditions.checkNotUndefined(mergeOp);
-        this._joinOp = Preconditions.checkNotUndefined(joinOp);
         this._partOp = Preconditions.checkNotUndefined(partitionOp);
 
         this._stats = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
