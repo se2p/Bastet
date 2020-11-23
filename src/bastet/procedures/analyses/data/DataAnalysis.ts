@@ -202,16 +202,12 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return this._transferRelation.abstractSucc(fromState);
     }
 
-    join(state1: DataAbstractState, state2: DataAbstractState): DataAbstractState {
-        return this._abstractDomain.lattice.join(state1, state2);
-    }
-
     shouldMerge(state1: DataAbstractState, state2: DataAbstractState): boolean {
         return this._mergeOp.shouldMerge(state1, state2);
     }
 
     merge(state1: DataAbstractState, state2: DataAbstractState): DataAbstractState {
-        return this.join(state1, state2);
+        return this._abstractDomain.lattice.join(state1, state2);
     }
 
     stop(state: DataAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => DataAbstractState): boolean {
