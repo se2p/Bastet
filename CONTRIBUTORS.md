@@ -24,5 +24,7 @@ and Repairing Blocks-based Programs”*.
 - Gordon Fraser
 - Christoph Frädrich
 - Nina Körber
+- Robert Pernerstorfer
+- Sebastian Schweickl
 - Andreas Stahlbauer
 
