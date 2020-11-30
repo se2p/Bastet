@@ -1,9 +1,13 @@
 #!/bin/bash
 
+if ! groups "$USER" | grep -q '\bdocker\b'; then
+    echo "User must be in the group 'docker'"
+    exit 1
+fi
 
 if command -v dockerd-rootless-infosun &> /dev/null
 then
-    export DOCKERCMD="dockerd-rootless-infosun --data-root /local/$USER/docker -- "
+    export DOCKERCMD="dockerd-rootless-infosun --data-root /local/$USER/docker -- docker "
 else
     if command -v docker &> /dev/null
     then 
