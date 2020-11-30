@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 BASTET_VERSION=$(git rev-parse --short HEAD)
 TAG="bastet:$BASTET_VERSION"
