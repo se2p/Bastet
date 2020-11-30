@@ -7,7 +7,7 @@ fi
 
 if command -v dockerd-rootless-infosun &> /dev/null
 then
-    export DOCKERCMD="dockerd-rootless-infosun --data-root /local/$USER/docker -- "
+    export DOCKERCMD="dockerd-rootless-infosun --data-root /local/$USER/docker -- docker "
 else
     if command -v docker &> /dev/null
     then 
