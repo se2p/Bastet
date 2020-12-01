@@ -11,7 +11,7 @@ cache:
 install_dependencies:
   stage: build
   script:
-    - npm install -D typescript
+    - npm install -D typescript@4.1.2
     - npm install
     - mkdir -p output/static
   artifacts:
@@ -21,7 +21,7 @@ install_dependencies:
 testing_testing:
   stage: test
   script:
-    - npm install -D typescript
+    - npm install -D typescript@4.1.2
     - npm install
     - npm test
     - mkdir -p output/static

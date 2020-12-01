@@ -130,7 +130,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         if (this._config.mergeIntoOperator == 'NoMergeIntoOperator') {
             this._mergeIntoOp = new NoMergeIntoOperator<GraphAbstractState, GraphAbstractState>();
         } else if (this._config.mergeIntoOperator == 'StandardMergeIntoOperator') {
-            this._mergeIntoOp = new StandardMergeIntoOperator(this, this, this, this._statistics);
+            this._mergeIntoOp = new StandardMergeIntoOperator(this, this, this._statistics);
         } else {
             throw new IllegalArgumentException("Illegal merge operator configuration");
         }

@@ -33,7 +33,7 @@ actor ElephantObserver is Observer begin
 
     define atomic checkBehaviorSatisfied () begin
         // (a) Attributes of the first actor
-        define actor_1_costume as attribute "active_graphic_name" of actor_1_id
+        define actor_1_costume as attribute "activeGraphicName" of actor_1_id
 
         if not (actor_1_costume = actor_1_prev_costume) then begin
            define last_change as _RUNTIME_micros()
