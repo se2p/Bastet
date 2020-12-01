@@ -69,16 +69,16 @@ export interface Wrapper<E extends AbstractElement, W extends AbstractElement> {
 
 export class WrappingRefiner<F extends AbstractState, E extends AbstractElement, W extends AbstractElement> implements Refiner<E, F>{
 
-    private readonly _wrapped: Refiner<E, F>;
+    private readonly _wrapped: Refiner<W, F>;
     private readonly _unwrapper: Unwrapper<E, W>;
 
-    constructor(wrapped: Refiner<E, F>, unwrapper: Unwrapper<E, W>) {
+    constructor(wrapped: Refiner<W, F>, unwrapper: Unwrapper<E, W>) {
         this._wrapped = Preconditions.checkNotUndefined(wrapped);
         this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
     }
 
     checkIsFeasible(reached: ReachedSet<F>, e: E, purpose?: string): boolean {
-        return this._wrapped.checkIsFeasible(reached, e, purpose);
+        return this._wrapped.checkIsFeasible(reached, this._unwrapper.unwrap(e), purpose);
     }
 
     refinePrecision(frontier: FrontierSet<F>, reached: ReachedSet<F>, infeasibleState: E): [FrontierSet<F>, ReachedSet<F>] {

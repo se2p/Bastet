@@ -29,6 +29,7 @@ import {AbstractState, Lattices, LatticeWithComplements} from "../../../lattices
 import {FrontierSet, ReachedSet} from "../../algorithms/StateSet";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {DataAbstractState} from "./DataAbstractDomain";
+import { Preconditions } from "../../../utils/Preconditions";
 
 export class DataRefiner implements Refiner<DataAbstractState, AbstractState> {
 
@@ -39,6 +40,9 @@ export class DataRefiner implements Refiner<DataAbstractState, AbstractState> {
     }
 
     checkIsFeasible(reached: ReachedSet<AbstractState>, e: DataAbstractState, purpose: string = null): boolean {
+        Preconditions.checkNotUndefined(reached);
+        Preconditions.checkNotUndefined(e);
+
         return Lattices.isFeasible(e, this._lattice, purpose);
     }
 

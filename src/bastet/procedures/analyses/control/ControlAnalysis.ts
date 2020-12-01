@@ -101,8 +101,6 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
 
     private readonly _transferRelation: ControlTransferRelation;
 
-    private readonly _refiner: Refiner<ControlAbstractState, AbstractState>;
-
     private readonly _task: App;
 
     private readonly _statistics: AnalysisStatistics;
@@ -117,7 +115,6 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         this._abstractDomain = new ControlAbstractDomain(wrappedAnalysis.abstractDomain);
         this._transferRelation = new ControlTransferRelation(this._config, task, this.wrappedAnalysis,
             this._wrappedAnalysis.abstractDomain, this._statistics);
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
@@ -261,7 +258,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
     }
 
     get refiner(): Refiner<ControlAbstractState, AbstractState> {
-        return new WrappingRefiner(this._refiner, this);
+        return new WrappingRefiner(this.wrappedAnalysis.refiner, this);
     }
 
     get wrappedAnalysis(): ProgramAnalysisWithLabels<any, any, AbstractState> {

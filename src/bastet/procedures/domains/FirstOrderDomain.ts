@@ -196,6 +196,9 @@ export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
     }
 
     isIncluded(element1: F, element2: F): boolean {
+        Preconditions.checkNotUndefined(element1);
+        Preconditions.checkNotUndefined(element2);
+
         this._prover.push();
         try {
             // UNSAT a  <=>  a lessOrEqual ⊥

@@ -99,9 +99,8 @@ export class DataAbstractStateLattice implements LatticeWithComplements<DataAbst
     }
 
     isIncluded(element1: DataAbstractState, element2: DataAbstractState): boolean {
-        //if (!this._propLattice.isIncluded(element1.summaryFormula, element2.summaryFormula)) {
-        //    return false;
-        //}
+        Preconditions.checkNotUndefined(element1);
+        Preconditions.checkNotUndefined(element2);
 
         return this._folLattice.isIncluded(element1.blockFormula, element2.blockFormula);
     }
