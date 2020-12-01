@@ -44,7 +44,7 @@ actor HorseObserver is Observer begin
     declare last_touching_change as int
 
     define atomic checkBehaviorSatisfied () begin
-        define horse_color as cast (attribute "color_effect_value" of horse_id) to float
+        define horse_color as cast (attribute "colorEffectValue" of horse_id) to float
         define horse_direction as cast (attribute "direction" of horse_id) to int
         define mouse_touched as touchingMousePointer(horse_id)
 
