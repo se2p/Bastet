@@ -64,8 +64,6 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
 
     private readonly _transferRelation: SSATransferRelation;
 
-    private readonly _refiner: Refiner<SSAState>;
-
     private readonly _task: App;
 
     private readonly _statistics: AnalysisStatistics;
@@ -130,8 +128,8 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return e.getWrappedState();
     }
 
-    get refiner(): Refiner<F> {
-        return this._wrappedAnalysis.refiner;
+    get refiner(): Refiner<SSAState, F> {
+        return new WrappingRefiner(this._wrappedAnalysis.refiner, this);
     }
 
     get abstractDomain(): AbstractDomain<ConcreteElement, SSAState> {

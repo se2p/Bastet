@@ -49,12 +49,12 @@ export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState>
 
     private readonly _wrappedAlgorithm: AnalysisAlgorithm<C, E>;
 
-    private readonly _refiner: Refiner<E>;
+    private readonly _refiner: Refiner<E, E>;
 
     private readonly _statistics: AnalysisStatistics;
     private readonly _feasibilityCheckStats: AnalysisStatistics;
 
-    constructor(wrappedAlgorithm: AnalysisAlgorithm<C, E>, refiner: Refiner<E>, analysis: ProgramAnalysis<C, E, E>, statistics: AnalysisStatistics) {
+    constructor(wrappedAlgorithm: AnalysisAlgorithm<C, E>, refiner: Refiner<E, E>, analysis: ProgramAnalysis<C, E, E>, statistics: AnalysisStatistics) {
         this._wrappedAlgorithm = Preconditions.checkNotUndefined(wrappedAlgorithm);
         this._refiner = Preconditions.checkNotUndefined(refiner);
         this._analysis = Preconditions.checkNotUndefined(analysis);

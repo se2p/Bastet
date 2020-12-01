@@ -67,7 +67,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
     private readonly _transferRelation: AbstractionTransferRelation;
 
-    private readonly _refiner: Refiner<AbstractState>;
+    private readonly _refiner: Refiner<AbstractionState, AbstractState>;
 
     private readonly _task: App;
 
@@ -134,7 +134,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
         return e.getWrappedState();
     }
 
-    get refiner(): Refiner<AbstractState> {
+    get refiner(): Refiner<AbstractionState, AbstractState> {
         return this._refiner;
     }
 

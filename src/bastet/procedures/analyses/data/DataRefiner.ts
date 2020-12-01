@@ -28,8 +28,9 @@ import {Refiner} from "../Refiner";
 import {AbstractState, Lattices, LatticeWithComplements} from "../../../lattices/Lattice";
 import {FrontierSet, ReachedSet} from "../../algorithms/StateSet";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import {DataAbstractState} from "./DataAbstractDomain";
 
-export class DataRefiner implements Refiner<AbstractState> {
+export class DataRefiner implements Refiner<DataAbstractState, AbstractState> {
 
     private readonly _lattice: LatticeWithComplements<AbstractState>;
 
@@ -37,11 +38,11 @@ export class DataRefiner implements Refiner<AbstractState> {
         this._lattice = lattice;
     }
 
-    checkIsFeasible(reached: ReachedSet<AbstractState>, e: AbstractState, purpose: string = null): boolean {
+    checkIsFeasible(reached: ReachedSet<AbstractState>, e: DataAbstractState, purpose: string = null): boolean {
         return Lattices.isFeasible(e, this._lattice, purpose);
     }
 
-    refinePrecision(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>, infeasibleState: AbstractState): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
+    refinePrecision(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>, infeasibleState: DataAbstractState): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         throw new IllegalStateException("This refiner does not support precision refinement!");
     }
 

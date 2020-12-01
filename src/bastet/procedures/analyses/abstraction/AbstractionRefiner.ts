@@ -32,7 +32,7 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {AccessibilityOperator} from "../ProgramAnalysis";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 
-export class AbstractionRefiner implements Refiner<AbstractState> {
+export class AbstractionRefiner implements Refiner<AbstractionState, AbstractState> {
 
     private readonly _unwrapper: Unwrapper<AbstractState, AbstractElement>;
 
@@ -47,7 +47,7 @@ export class AbstractionRefiner implements Refiner<AbstractState> {
         this._accOp = Preconditions.checkNotUndefined(accOp);
     }
 
-    public checkIsFeasible(reached: ReachedSet<AbstractState>, e: AbstractState, purpose?: string): boolean {
+    public checkIsFeasible(reached: ReachedSet<AbstractState>, e: AbstractionState, purpose?: string): boolean {
         // 1. Build the abstract path formula (describes a set of paths)
         const ar = this._accOp.accessibility(reached, e);
 

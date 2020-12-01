@@ -103,8 +103,6 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
 
     private readonly _transferRelation: GraphTransferRelation;
 
-    private readonly _refiner: Refiner<GraphAbstractState>;
-
     private readonly _task: App;
 
     private readonly _statistics: AnalysisStatistics;
@@ -125,7 +123,6 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new GraphAbstractDomain(wrappedAnalysis.abstractDomain);
         this._transferRelation = new GraphTransferRelation(this._wrappedAnalysis, this._wrappedAnalysis, this._wrappedAnalysis, this._statistics);
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
 
         if (this._config.mergeIntoOperator == 'NoMergeIntoOperator') {
             this._mergeIntoOp = new NoMergeIntoOperator<GraphAbstractState, GraphAbstractState>();
@@ -226,8 +223,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         return e.getWrappedState();
     }
 
-    get refiner(): Refiner<GraphAbstractState> {
-        return this._refiner;
+    get refiner(): Refiner<GraphAbstractState, GraphAbstractState> {
+        return new WrappingRefiner(this._wrappedAnalysis.refiner, this);
     }
 
     get abstractDomain(): AbstractDomain<ConcreteElement, GraphAbstractState> {

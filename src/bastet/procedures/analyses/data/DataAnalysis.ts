@@ -245,7 +245,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<AbstractState> {
+    get refiner(): Refiner<DataAbstractState, AbstractState> {
         return this._refiner;
     }
 

@@ -70,8 +70,6 @@ export class LabelAnalysis<F extends AbstractState>
 
     private readonly _transfer: LabelTransferRelation;
 
-    private readonly _refiner: WrappingRefiner<LabelState, any>;
-
     private readonly _mergeOperator: MergeJoinOperator<LabelState>;
 
     private readonly _task: App;
@@ -161,8 +159,8 @@ export class LabelAnalysis<F extends AbstractState>
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<F> {
-        return this._wrappedAnalysis.refiner;
+    get refiner(): Refiner<LabelState, F> {
+        return new WrappingRefiner(this._wrappedAnalysis.refiner, this);
     }
 
     get wrappedAnalysis(): ProgramAnalysis<any, any, F> {

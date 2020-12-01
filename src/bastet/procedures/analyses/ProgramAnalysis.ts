@@ -60,7 +60,7 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
     /**
      * A refiner component for abstraction precision refinement.
      */
-    refiner: Refiner<F>;
+    refiner: Refiner<E, F>;
 
 }
 

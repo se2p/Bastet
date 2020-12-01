@@ -64,8 +64,6 @@ export class TimeAnalysis<F extends AbstractState>
 
     private readonly _mergeOperator: TimeMergeOperator;
 
-    private readonly _refiner: WrappingRefiner<TimeState, any>;
-
     private readonly _task: App;
 
     constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics,
@@ -139,8 +137,8 @@ export class TimeAnalysis<F extends AbstractState>
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<F> {
-        return this._wrappedAnalysis.refiner
+    get refiner(): Refiner<TimeState, F> {
+        return new WrappingRefiner(this._wrappedAnalysis.refiner, this);
     }
 
     get wrappedAnalysis(): ProgramAnalysis<any, any, F> {
