@@ -71,6 +71,7 @@ import {AccessibilityRelation} from "../Accessibility";
 import {DataTestifier} from "./DataTestifier";
 import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
+import {DataRefiner} from "./DataRefiner";
 
 
 export class DataAnalysisConfig extends BastetConfiguration {
@@ -171,6 +172,8 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     private readonly _mergeOp: MergeOperator<DataAbstractState>;
 
+    private readonly _refiner: DataRefiner;
+
     constructor(config:{}, folLattice: FirstOrderLattice<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
                 theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
                 statistics: AnalysisStatistics) {
@@ -184,6 +187,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         this._testifier = new DataTestifier(this._theories, this._abstractDomain);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = StandardMergeOperatorFactory.create(this._config.mergeOperator, this._abstractDomain);
+        this._refiner = new DataRefiner(this._abstractDomain.lattice);
     }
 
     getTransitionLabel(from: DataAbstractState, to: DataAbstractState): ProgramOperation[] {
@@ -241,8 +245,8 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<DataAbstractState> {
-        throw new ImplementMeException();
+    get refiner(): Refiner<AbstractState> {
+        return this._refiner;
     }
 
     createStateSets(): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {

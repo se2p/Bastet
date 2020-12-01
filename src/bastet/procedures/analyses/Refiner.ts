@@ -86,3 +86,15 @@ export class WrappingRefiner<E extends AbstractState, W extends AbstractElement>
     }
 
 }
+
+export class NotImplementedRefiner<E extends AbstractState> implements Refiner<E> {
+
+    checkIsFeasible(reached: ReachedSet<AbstractState>, e: E, purpose?: string): boolean {
+        throw new ImplementMeException();
+    }
+
+    refinePrecision(frontier: FrontierSet<E>, reached: ReachedSet<E>, infeasibleState: E): [FrontierSet<E>, ReachedSet<E>] {
+        throw new ImplementMeException();
+    }
+
+}
