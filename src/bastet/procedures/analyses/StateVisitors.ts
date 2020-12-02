@@ -39,6 +39,7 @@ import {ImplementMeForException} from "../../core/exceptions/ImplementMeExceptio
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {DebugState} from "./debug/DebugAbstractDomain";
 import {getTheOnlyElement} from "../../utils/Collections";
+import {AbstractionState} from "./abstraction/AbstractionAbstractDomain";
 
 const colormap = require('colormap')
 
@@ -96,6 +97,10 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
 
     visit(element: AbstractElement): string {
         return "";
+    }
+
+    visitAbstractionState(element: AbstractionState): string {
+        return `${element.getAbstraction().toString()} ${element.getWrappedState().accept(this)}\n`;
     }
 
     visitDebugState(element: DebugState): string {
