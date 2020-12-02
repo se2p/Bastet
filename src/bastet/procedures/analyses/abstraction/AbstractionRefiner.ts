@@ -31,8 +31,10 @@ import {AbstractionState, AbstractionStateLattice} from "./AbstractionAbstractDo
 import {Preconditions} from "../../../utils/Preconditions";
 import {AccessibilityOperator} from "../ProgramAnalysis";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
+import {PrecisionOperator} from "./AbstractionComputation";
+import {PredicatePrecision} from "../../AbstractionPrecision";
 
-export class AbstractionRefiner implements Refiner<AbstractionState, AbstractState> {
+export class AbstractionRefiner implements Refiner<AbstractionState, AbstractState>, PrecisionOperator<AbstractionState, PredicatePrecision> {
 
     private readonly _unwrapper: Unwrapper<AbstractState, AbstractElement>;
 
@@ -78,6 +80,10 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
      */
     private isWideningState(state: AbstractionState) {
         return state.getWrappedState() === this._lattice.wrappedStateLattice.top();
+    }
+
+    precisionFor(state: AbstractionState): PredicatePrecision {
+        throw new ImplementMeException();
     }
 
 }

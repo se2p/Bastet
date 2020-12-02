@@ -23,7 +23,7 @@
  *
  */
 
-import {MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
+import {MergeOperator, ProgramAnalysisWithLabels, WidenOperator} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
@@ -47,6 +47,12 @@ import {AbstractionMergeOperator} from "./AbstractionMergeOperator";
 import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 import {AbstractionRefiner} from "./AbstractionRefiner";
+import {AbstractionWideningOperator} from "./AbstractionWideningOperator";
+import {
+    BooleanPredicateAbstraction,
+    CartesianPredicateAbstraction,
+    PredicateAbstraction
+} from "./AbstractionComputation";
 
 
 export class AbstractionAnalysisConfig extends BastetConfiguration {
@@ -55,6 +61,9 @@ export class AbstractionAnalysisConfig extends BastetConfiguration {
         super(dict, ['AbstractionAnalysis']);
     }
 
+    get abstractionType(): string {
+        return this.getStringProperty('abstraction-type', "boolean").toLowerCase();
+    }
 }
 
 export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, AbstractionState, AbstractState>,
@@ -67,7 +76,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
     private readonly _transferRelation: AbstractionTransferRelation;
 
-    private readonly _refiner: Refiner<AbstractionState, AbstractState>;
+    private readonly _refiner: AbstractionRefiner;
 
     private readonly _task: App;
 
@@ -77,6 +86,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
     private readonly _config: AbstractionAnalysisConfig;
 
+    private readonly _widen: WidenOperator<AbstractionState, AbstractState>;
 
     constructor(config: {}, task: App, summaryLattice: FirstOrderLattice<FirstOrderFormula>,
                 wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>,
@@ -92,6 +102,17 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = new AbstractionMergeOperator(this._task, this.wrappedAnalysis, this.wrappedAnalysis);
+
+        let abstractionComp: PredicateAbstraction;
+        if (this._config.abstractionType == "boolean") {
+            abstractionComp = new BooleanPredicateAbstraction(summaryLattice);
+        } else if (this._config.abstractionType == "cartesian") {
+            abstractionComp = new CartesianPredicateAbstraction(summaryLattice);
+        } else {
+            throw new ImplementMeException();
+        }
+
+        this._widen = new AbstractionWideningOperator(abstractionComp, this._refiner);
     }
 
     getTransitionLabel(from: AbstractionState, to: AbstractionState): ProgramOperation[] {
@@ -127,7 +148,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     }
 
     widen(state: AbstractionState, reached: Iterable<AbstractState>): AbstractionState {
-        throw new ImplementMeForException("Compute predicate abstractions here, if desired for this point in the state space.");
+        return this._widen.widen(state, reached);
     }
 
     unwrap(e: AbstractionState): AbstractElement {

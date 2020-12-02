@@ -73,7 +73,7 @@ const PredicatePrecisionRecord = ImmRec({
 
 });
 
-export class PredicatePrecision extends PredicatePrecisionRecord implements AbstractionPrecision, AbstractionPrecision, DataAbstractStateAttributes {
+export class PredicatePrecision extends PredicatePrecisionRecord implements AbstractionPrecision, DataAbstractStateAttributes {
 
     constructor(predicates: Iterable<FirstOrderFormula>, role: PrecisionRole) {
         super({'predicates': ImmSet(predicates), 'role': role });
