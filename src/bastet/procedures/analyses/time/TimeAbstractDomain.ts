@@ -23,7 +23,7 @@
  *
  */
 
-import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
+import {AbstractDomain} from "../../domains/AbstractDomain";
 import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {List as ImmList, Record as ImmRec} from "immutable"
@@ -31,6 +31,7 @@ import {SingletonStateWrapper} from "../AbstractStates";
 import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
 import {BlockId} from "../../../syntax/ast/core/statements/ControlStatement";
+import {AbstractionPrecision} from "../../AbstractionPrecision";
 
 
 export interface TimeStateAttribs extends AbstractElement, SingletonStateWrapper {

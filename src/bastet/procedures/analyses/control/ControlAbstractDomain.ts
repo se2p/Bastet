@@ -24,7 +24,7 @@
  */
 
 import {SingletonStateWrapper} from "../AbstractStates";
-import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
+import {AbstractDomain} from "../../domains/AbstractDomain";
 import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {ActorId} from "../../../syntax/app/Actor";
@@ -41,6 +41,7 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {DataLocation, DataLocations, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
+import {AbstractionPrecision} from "../../AbstractionPrecision";
 
 /**
  * Current thread state that is active or becomes active if...

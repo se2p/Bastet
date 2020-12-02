@@ -23,7 +23,6 @@
  *
  */
 
-import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
 import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Record as ImmRec, Set as ImmSet} from "immutable"
@@ -32,6 +31,8 @@ import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
 import {PartitionKey} from "../../algorithms/StateSet";
 import {LexiKey} from "../../../utils/Lexicographic";
+import {AbstractionPrecision} from "../../AbstractionPrecision";
+import {AbstractDomain} from "../../domains/AbstractDomain";
 
 export type GraphStateId = number;
 

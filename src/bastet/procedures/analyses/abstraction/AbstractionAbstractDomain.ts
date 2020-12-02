@@ -23,7 +23,6 @@
  *
  */
 
-import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
 import {
     AbstractElement,
     AbstractElementVisitor,
@@ -39,10 +38,13 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
 import {
+    AbstractionPrecision,
     PredicatePrecision,
     PredicatePrecisionLattice, PredicatePrecisionStack,
     PredicatePrecisionStackLattice
 } from "../../AbstractionPrecision";
+import {AbstractionComputation} from "./AbstractionComputation";
+import {AbstractDomain} from "../../domains/AbstractDomain";
 
 
 export interface AbstractionStateAttribs extends AbstractElement, SingletonStateWrapper {
@@ -171,10 +173,14 @@ export class AbstractionAbstractDomain implements AbstractDomain<ConcreteElement
 
     private readonly _wrapped: AbstractDomain<ConcreteElement, AbstractElement>;
 
-    constructor(wrapped: AbstractDomain<ConcreteElement, AbstractElement>, summaryLattice: FirstOrderLattice<FirstOrderFormula>) {
+    private readonly _abstractionFunction: AbstractionComputation<AbstractionState, AbstractionPrecision>;
+
+    constructor(wrapped: AbstractDomain<ConcreteElement, AbstractElement>, summaryLattice: FirstOrderLattice<FirstOrderFormula>,
+                abstractionFunction: AbstractionComputation<AbstractionState, AbstractionPrecision>) {
         Preconditions.checkNotUndefined(wrapped);
         this._lattice = new AbstractionStateLattice(summaryLattice, wrapped.lattice);
-        this._wrapped = wrapped;
+        this._wrapped = Preconditions.checkNotUndefined(wrapped);
+        this._abstractionFunction = Preconditions.checkNotUndefined(abstractionFunction);
     }
 
     get lattice(): AbstractionStateLattice {

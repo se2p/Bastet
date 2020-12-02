@@ -53,7 +53,6 @@ import {
     RealFormula, StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {AbstractionRefiner} from "./AbstractionRefiner";
-import {AbstractionWideningOperator} from "./AbstractionWideningOperator";
 import {
     BooleanPredicateAbstraction,
     CartesianPredicateAbstraction,
@@ -94,22 +93,12 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
     private readonly _config: AbstractionAnalysisConfig;
 
-    private readonly _widen: WidenOperator<AbstractionState, AbstractState>;
-
     constructor(config: {}, task: App, summaryLattice: FirstOrderLattice<FirstOrderFormula>,
                 wrappedAnalysis: DataAnalysis,
                 statistics: AnalysisStatistics) {
         this._config = new AbstractionAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
-        this._abstractDomain = new AbstractionAbstractDomain(wrappedAnalysis.abstractDomain, summaryLattice);
-
-        this._transferRelation = new AbstractionTransferRelation(wrappedAnalysis, this._abstractDomain, wrappedAnalysis.theories);
-
-        this._refiner = new AbstractionRefiner(this, this._abstractDomain.lattice, this);
-
-        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
-        this._mergeOp = new AbstractionMergeOperator(this._task, this.wrappedAnalysis, this._abstractDomain.lattice);
 
         let abstractionComp: PredicateAbstraction;
         if (this._config.abstractionType == "boolean") {
@@ -119,8 +108,15 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
         } else {
             throw new ImplementMeException();
         }
+        this._abstractDomain = new AbstractionAbstractDomain(wrappedAnalysis.abstractDomain, summaryLattice, abstractionComp);
 
-        this._widen = new AbstractionWideningOperator(abstractionComp, this._refiner);
+        this._transferRelation = new AbstractionTransferRelation(wrappedAnalysis, this._abstractDomain, wrappedAnalysis.theories);
+
+        this._refiner = new AbstractionRefiner(this, this._abstractDomain.lattice, this);
+
+        this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
+        this._mergeOp = new AbstractionMergeOperator(this._task, this.wrappedAnalysis, this._abstractDomain.lattice);
+
     }
 
     getTransitionLabel(from: AbstractionState, to: AbstractionState): ProgramOperation[] {
@@ -156,7 +152,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     }
 
     widen(state: AbstractionState, reached: Iterable<AbstractState>): AbstractionState {
-        return this._widen.widen(state, reached);
+        return this._abstractDomain.widen(state, this._refiner.precisionFor(state));
     }
 
     unwrap(e: AbstractionState): AbstractElement {

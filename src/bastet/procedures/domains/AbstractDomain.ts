@@ -26,6 +26,7 @@
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {ConcreteDomain, ConcreteElement} from "./ConcreteElements";
 import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
+import {AbstractionPrecision} from "../AbstractionPrecision";
 
 export class ConcreteNumberElement implements ConcreteElement {
 
@@ -44,10 +45,6 @@ export class ConcreteListElement implements ConcreteElement {
 }
 
 export class ConcreteMapElement implements ConcreteElement {
-
-}
-
-export interface AbstractionPrecision {
 
 }
 

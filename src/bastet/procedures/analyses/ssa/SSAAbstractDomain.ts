@@ -23,13 +23,14 @@
  *
  */
 
-import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
+import {AbstractDomain} from "../../domains/AbstractDomain";
 import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {Map as ImmMap, Record as ImmRec} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
 import {ConcreteDomain, ConcreteElement, ConcreteMemory, ConcretePrimitive} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
+import {AbstractionPrecision} from "../../AbstractionPrecision";
 
 
 export interface SSAStateAttribs extends AbstractElement, SingletonStateWrapper {

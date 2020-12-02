@@ -24,7 +24,6 @@
  */
 
 
-import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {
     ConcreteBoolean,
     ConcreteDomain,
@@ -43,6 +42,9 @@ import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentExc
 import {PerfTimer} from "../../utils/PerfTimer";
 import {Z3BooleanFormula} from "../../utils/smt/z3/Z3Theories";
 import {LibZ3InContext} from "../../utils/smt/z3/libz3";
+import {BastetConfiguration} from "../../utils/BastetConfiguration";
+import {AbstractDomain} from "./AbstractDomain";
+import {AbstractionPrecision} from "../AbstractionPrecision";
 
 export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
     prover: FirstOrderSolver<F>;
