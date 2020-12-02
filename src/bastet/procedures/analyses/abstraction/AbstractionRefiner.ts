@@ -82,8 +82,9 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
         return state.getWrappedState() === this._lattice.wrappedStateLattice.top();
     }
 
-    precisionFor(state: AbstractionState): PredicatePrecision {
-        throw new ImplementMeException();
+    public precisionFor(state: AbstractionState): PredicatePrecision {
+        return state.getPrecision().stack.reduce((pi: PredicatePrecision, result: PredicatePrecision) =>
+                this._lattice.precStacLattice.lattice.join(pi, result), this._lattice.precStacLattice.lattice.bottom());
     }
 
 }

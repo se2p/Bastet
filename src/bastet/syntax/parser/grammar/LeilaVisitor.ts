@@ -1,6 +1,6 @@
 // Generated from src/bastet/syntax/parser/grammar/Leila.g4 by ANTLR 4.7.3-SNAPSHOT
-// @ts-nocheck
 
+// @ts-nocheck
 
 import { ParseTreeVisitor } from "antlr4ts/tree/ParseTreeVisitor";
 
@@ -89,6 +89,8 @@ import { BroadcastAndWaitStatementContext } from "./LeilaParser";
 import { ResetTimerStatementContext } from "./LeilaParser";
 import { EpsilonStatementContext } from "./LeilaParser";
 import { AssumeStatementContext } from "./LeilaParser";
+import { PrecisionPushStatementContext } from "./LeilaParser";
+import { PrecisionPopStatementContext } from "./LeilaParser";
 import { SetStatementContext } from "./LeilaParser";
 import { DeclareVariableContext } from "./LeilaParser";
 import { NeverEventContext } from "./LeilaParser";
@@ -888,6 +890,22 @@ export interface LeilaVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitAssumeStatement?: (ctx: AssumeStatementContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `PrecisionPushStatement`
+	 * labeled alternative in `LeilaParser.commonStmt`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPrecisionPushStatement?: (ctx: PrecisionPushStatementContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by the `PrecisionPopStatement`
+	 * labeled alternative in `LeilaParser.commonStmt`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitPrecisionPopStatement?: (ctx: PrecisionPopStatementContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by the `SetStatement`

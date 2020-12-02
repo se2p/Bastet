@@ -1,4 +1,5 @@
 // Generated from src/bastet/syntax/parser/grammar/Leila.g4 by ANTLR 4.7.3-SNAPSHOT
+
 // @ts-nocheck
 
 import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
@@ -88,6 +89,8 @@ import { BroadcastAndWaitStatementContext } from "./LeilaParser";
 import { ResetTimerStatementContext } from "./LeilaParser";
 import { EpsilonStatementContext } from "./LeilaParser";
 import { AssumeStatementContext } from "./LeilaParser";
+import { PrecisionPushStatementContext } from "./LeilaParser";
+import { PrecisionPopStatementContext } from "./LeilaParser";
 import { SetStatementContext } from "./LeilaParser";
 import { DeclareVariableContext } from "./LeilaParser";
 import { NeverEventContext } from "./LeilaParser";
@@ -1309,6 +1312,32 @@ export interface LeilaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitAssumeStatement?: (ctx: AssumeStatementContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `PrecisionPushStatement`
+	 * labeled alternative in `LeilaParser.commonStmt`.
+	 * @param ctx the parse tree
+	 */
+	enterPrecisionPushStatement?: (ctx: PrecisionPushStatementContext) => void;
+	/**
+	 * Exit a parse tree produced by the `PrecisionPushStatement`
+	 * labeled alternative in `LeilaParser.commonStmt`.
+	 * @param ctx the parse tree
+	 */
+	exitPrecisionPushStatement?: (ctx: PrecisionPushStatementContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `PrecisionPopStatement`
+	 * labeled alternative in `LeilaParser.commonStmt`.
+	 * @param ctx the parse tree
+	 */
+	enterPrecisionPopStatement?: (ctx: PrecisionPopStatementContext) => void;
+	/**
+	 * Exit a parse tree produced by the `PrecisionPopStatement`
+	 * labeled alternative in `LeilaParser.commonStmt`.
+	 * @param ctx the parse tree
+	 */
+	exitPrecisionPopStatement?: (ctx: PrecisionPopStatementContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `SetStatement`

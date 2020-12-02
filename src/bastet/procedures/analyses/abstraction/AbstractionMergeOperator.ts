@@ -29,7 +29,7 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {App} from "../../../syntax/app/App";
 import {LabeledTransferRelation} from "../TransferRelation";
 import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
-import {AbstractionState} from "./AbstractionAbstractDomain";
+import {AbstractionState, AbstractionStateLattice} from "./AbstractionAbstractDomain";
 
 export class AbstractionMergeOperator implements MergeOperator<AbstractionState> {
 
@@ -37,21 +37,24 @@ export class AbstractionMergeOperator implements MergeOperator<AbstractionState>
 
     private readonly _wrappedMergeOp: MergeOperator<AbstractState>;
 
-    private readonly _wrappedAbstractSuccOp: LabeledTransferRelation<any>;
+    private readonly _lattice: AbstractionStateLattice;
 
-    constructor(task: App, wrappedMergeOp: MergeOperator<AbstractState>, wrappedAbstractSuccOp: LabeledTransferRelation<any>) {
+    constructor(task: App, wrappedMergeOp: MergeOperator<AbstractState>, lattice: AbstractionStateLattice) {
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedMergeOp = Preconditions.checkNotUndefined(wrappedMergeOp);
-        this._wrappedAbstractSuccOp = Preconditions.checkNotUndefined(wrappedAbstractSuccOp);
+        this._lattice = Preconditions.checkNotUndefined(lattice);
     }
 
     merge(state1: AbstractionState, state2: AbstractionState): AbstractionState {
-        throw new ImplementMeForException("Implement the strategy as implemented in the paper on Predicate Abstraction with Adjustable-block Encoding");
+        return this._lattice.join(state1, state2);
     }
 
     shouldMerge(state1: AbstractionState, state2: AbstractionState): boolean {
-        // Using the JOIN of the lattice might be sufficient here (but check the paper)
-        throw new ImplementMeForException("Implement the strategy as implemented in the paper on Predicate Abstraction with Adjustable-block Encoding");
+        if (!state1.getPrecision().equals(state2.getPrecision())) {
+            return false;
+        }
+
+        return state1.getAbstraction() == state2.getAbstraction();
     }
 
 }

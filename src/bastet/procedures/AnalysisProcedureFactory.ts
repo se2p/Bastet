@@ -30,7 +30,7 @@ import {ControlAnalysis} from "./analyses/control/ControlAnalysis";
 import {GraphAbstractState} from "./analyses/graph/GraphAbstractDomain";
 import {ReachabilityAlgorithm} from "./algorithms/ReachabilityAlgorithm";
 import {SMTFactory} from "../utils/smt/z3/Z3SMT";
-import {DataAnalysis} from "./analyses/data/DataAnalysis";
+import {DataAnalysis, Theories} from "./analyses/data/DataAnalysis";
 import {BDDLibraryFactory} from "../utils/bdd/BDD";
 import {Z3Theories} from "../utils/smt/z3/Z3Theories";
 import {SSAAnalysis} from "./analyses/ssa/SSAAnalysis";
@@ -107,10 +107,10 @@ export class AnalysisProcedureFactory {
                 const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
                 const dataAnalysis = new DataAnalysis(config, firstOrderLattice, bddlib.lattice, theories, this._statistics);
-                const labelAnalysis = new LabelAnalysis(task, dataAnalysis, this._statistics);
+                const abstractionAnalysis = new AbstractionAnalysis(config, task, firstOrderLattice, dataAnalysis, this._statistics);
+                const labelAnalysis = new LabelAnalysis(task, abstractionAnalysis, this._statistics);
                 const ssaAnalysis = new SSAAnalysis(config, task, labelAnalysis, this._statistics);
-                const abstractionAnalysis = new AbstractionAnalysis(config, task, firstOrderLattice, ssaAnalysis, this._statistics);
-                const timeAnalysis = new TimeAnalysis(task, abstractionAnalysis, this._statistics, new StaticTimeProfile());
+                const timeAnalysis = new TimeAnalysis(task, ssaAnalysis, this._statistics, new StaticTimeProfile());
                 const controlAnalysis = new ControlAnalysis(config, task, timeAnalysis, this._statistics);
                 const graphAnalysis = new GraphAnalysis(config, task, controlAnalysis, this._statistics);
                 const outerAnalysis = new StatsAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>(graphAnalysis, this._statistics);

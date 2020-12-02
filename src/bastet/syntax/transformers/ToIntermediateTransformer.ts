@@ -127,7 +127,7 @@ import {
     NumVariableExpressionContext,
     ParameterContext,
     ParameterListContext,
-    ParameterListPlainContext,
+    ParameterListPlainContext, PrecisionPopStatementContext, PrecisionPushStatementContext,
     PrimitiveContext,
     ProgramContext,
     PureElseContext,
@@ -319,6 +319,7 @@ import {ActorExpression, ActorSelfExpression, LocateActorExpression} from "../as
 import {DeclarationScopeType, ScopeTypeInformation, TypeInformationStorage} from "../DeclarationScopes";
 import {LookupTransformer} from "./LookupTransformer";
 import {SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
+import {PrecisionPopStatement, PrecisionPushStatement} from "../ast/core/Precisions";
 
 const toposort = require('toposort');
 
@@ -2099,6 +2100,15 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
     visitBoolCallStatementExpression(ctx: BoolCallStatementExpressionContext): TransformerResult {
         return this.transformCallStatementToVariable(ctx.callStmt());
+    }
+
+    visitPrecisionPushStatement(ctx: PrecisionPushStatementContext): TransformerResult {
+        const exprTr = ctx.boolExpr().accept(this);
+        return new TransformerResult(exprTr.statementsToPrepend, new PrecisionPushStatement(exprTr.node as BooleanExpression));
+    }
+
+    visitPrecisionPopStatement(ctx: PrecisionPopStatementContext): TransformerResult {
+        return TransformerResult.withNode(new PrecisionPopStatement());
     }
 
     visitChildren(node: RuleNode): TransformerResult {

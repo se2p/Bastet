@@ -136,6 +136,7 @@ import {
     SignalTargetReachedStatement,
     TerminateProgramStatement
 } from "../ast/core/statements/InternalStatement";
+import {PrecisionPopStatement, PrecisionPushStatement} from "../ast/core/Precisions";
 
 export enum DataLocationMode {
 
@@ -184,6 +185,14 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     visitSignalTargetReachedStatement(node: SignalTargetReachedStatement): AstNode {
         return new SignalTargetReachedStatement(node.targetCharacteristics.accept(this) as ExpressionList);
+    }
+
+    visitPrecisionPushStatement(node: PrecisionPushStatement): AstNode {
+        return new PrecisionPushStatement(node.predicate.accept(this) as BooleanExpression);
+    }
+
+    visitPrecisionPopStatement(node: PrecisionPopStatement): AstNode {
+        return node;
     }
 
     visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): AstNode {

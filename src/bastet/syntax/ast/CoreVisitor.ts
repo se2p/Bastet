@@ -127,6 +127,7 @@ import {
     SignalTargetReachedStatement,
     TerminateProgramStatement
 } from "./core/statements/InternalStatement";
+import { PrecisionPopStatement, PrecisionPushStatement } from "./core/Precisions";
 
 export interface CoreVisitor<R> {
 
@@ -346,6 +347,10 @@ export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
     visitStopThisStatement(node: StopThisStatement): R;
 
     visitDeleteThisCloneStatement(node: DeleteThisCloneStatement): R;
+
+    visitPrecisionPushStatement(node: PrecisionPushStatement): R;
+
+    visitPrecisionPopStatement(node: PrecisionPopStatement): R;
 
 }
 

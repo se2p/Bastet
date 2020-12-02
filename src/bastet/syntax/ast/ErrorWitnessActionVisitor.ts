@@ -92,6 +92,7 @@ import {
     CoreVisitor,
 } from "./CoreVisitor";
 import {CorePrintVisitor} from "./CorePrintVisitor";
+import {PrecisionPopStatement, PrecisionPushStatement} from "./core/Precisions";
 
 export enum Action {
     DEFINE = "DEFINE",
@@ -149,6 +150,14 @@ CoreNonCtrlStatementnVisitor<ActionWithWeight>{
     }
 
     visitAndExpression(node: AndExpression): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
+    }
+
+    visitPrecisionPopStatement(node: PrecisionPopStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
+    }
+
+    visitPrecisionPushStatement(node: PrecisionPushStatement): ActionWithWeight {
         return ActionWithWeight.EPSILON;
     }
 

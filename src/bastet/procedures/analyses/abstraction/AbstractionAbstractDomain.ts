@@ -32,17 +32,24 @@ import {
     LatticeWithComplements
 } from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {Map as ImmMap, Record as ImmRec} from "immutable"
+import {List as ImmList, Map as ImmMap, Record as ImmRec} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
 import {ConcreteDomain, ConcreteElement, ConcreteMemory, ConcretePrimitive} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
+import {
+    PredicatePrecision,
+    PredicatePrecisionLattice, PredicatePrecisionStack,
+    PredicatePrecisionStackLattice
+} from "../../AbstractionPrecision";
 
 
 export interface AbstractionStateAttribs extends AbstractElement, SingletonStateWrapper {
 
     abstraction: FirstOrderFormula;
+
+    precision: PredicatePrecisionStack;
 
     wrappedState: AbstractState;
 
@@ -52,18 +59,24 @@ const AbstractionStateRecord = ImmRec({
 
     abstraction: null,
 
+    precision: null,
+
     wrappedState: null
 
 });
 
 export class AbstractionState extends AbstractionStateRecord implements AbstractionStateAttribs, AbstractState {
 
-    constructor(abstraction: FirstOrderFormula, wrapped: AbstractElement) {
-        super({abstraction: abstraction, wrappedState: wrapped});
+    constructor(abstraction: FirstOrderFormula, precision: PredicatePrecisionStack, wrapped: AbstractElement) {
+        super({abstraction: abstraction, precision: precision, wrappedState: wrapped});
     }
 
     public getAbstraction(): FirstOrderFormula {
         return this.get("abstraction");
+    }
+
+    public getPrecision(): PredicatePrecisionStack {
+        return this.get("precision");
     }
 
     public getWrappedState(): AbstractState {
@@ -76,6 +89,10 @@ export class AbstractionState extends AbstractionStateRecord implements Abstract
 
     public withWrappedState(wrapped: AbstractElement): AbstractionState {
         return this.set("wrappedState", wrapped);
+    }
+
+    public withPrecision(prec: PredicatePrecisionStack): AbstractionState {
+        return this.set("precision", prec);
     }
 
     public accept<R>(visitor: AbstractElementVisitor<R>): R {
@@ -99,11 +116,14 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
 
     private readonly _top: AbstractionState;
 
-    constructor(summaryLattice: LatticeWithComplements<FirstOrderFormula>, wrappedStateLattice: Lattice<AbstractElement>) {
+    private readonly _precStacLattice: PredicatePrecisionStackLattice;
+
+    constructor(summaryLattice: FirstOrderLattice<FirstOrderFormula>, wrappedStateLattice: Lattice<AbstractElement>) {
         this._wrappedStateLattice = Preconditions.checkNotUndefined(wrappedStateLattice);
         this._summaryLattice = Preconditions.checkNotUndefined(summaryLattice);
-        this._bottom = new AbstractionState(this._summaryLattice.bottom(), wrappedStateLattice.bottom());
-        this._top = new AbstractionState(this._summaryLattice.top(), wrappedStateLattice.top());
+        this._precStacLattice = new PredicatePrecisionStackLattice(new PredicatePrecisionLattice(summaryLattice));
+        this._bottom = new AbstractionState(this._summaryLattice.bottom(), this._precStacLattice.bottom(), wrappedStateLattice.bottom());
+        this._top = new AbstractionState(this._summaryLattice.top(), this._precStacLattice.top(), wrappedStateLattice.top());
     }
 
     bottom(): AbstractionState {
@@ -138,6 +158,10 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
 
     get summaryLattice(): LatticeWithComplements<FirstOrderFormula> {
         return this._summaryLattice;
+    }
+
+    get precStacLattice(): PredicatePrecisionStackLattice {
+        return this._precStacLattice;
     }
 }
 

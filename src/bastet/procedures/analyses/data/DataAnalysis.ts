@@ -312,4 +312,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return this._testifier.testifyOne(accessibility, state);
     }
 
+    get theories(): TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula> {
+        return this._theories;
+    }
 }

@@ -45,7 +45,13 @@ import {AbstractionAbstractDomain, AbstractionState} from "./AbstractionAbstract
 import {AbstractionTransferRelation} from "./AbstractionTransferRelation";
 import {AbstractionMergeOperator} from "./AbstractionMergeOperator";
 import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
-import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
+import {
+    BooleanFormula,
+    FirstOrderFormula,
+    FloatFormula,
+    IntegerFormula, ListFormula,
+    RealFormula, StringFormula
+} from "../../../utils/ConjunctiveNormalForm";
 import {AbstractionRefiner} from "./AbstractionRefiner";
 import {AbstractionWideningOperator} from "./AbstractionWideningOperator";
 import {
@@ -53,6 +59,8 @@ import {
     CartesianPredicateAbstraction,
     PredicateAbstraction
 } from "./AbstractionComputation";
+import {AbstractTheories} from "../../domains/MemoryTransformer";
+import {DataAnalysis, Theories} from "../data/DataAnalysis";
 
 
 export class AbstractionAnalysisConfig extends BastetConfiguration {
@@ -89,19 +97,19 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     private readonly _widen: WidenOperator<AbstractionState, AbstractState>;
 
     constructor(config: {}, task: App, summaryLattice: FirstOrderLattice<FirstOrderFormula>,
-                wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>,
+                wrappedAnalysis: DataAnalysis,
                 statistics: AnalysisStatistics) {
         this._config = new AbstractionAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new AbstractionAbstractDomain(wrappedAnalysis.abstractDomain, summaryLattice);
 
-        this._transferRelation = new AbstractionTransferRelation(wrappedAnalysis);
+        this._transferRelation = new AbstractionTransferRelation(wrappedAnalysis, this._abstractDomain, wrappedAnalysis.theories);
 
         this._refiner = new AbstractionRefiner(this, this._abstractDomain.lattice, this);
 
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
-        this._mergeOp = new AbstractionMergeOperator(this._task, this.wrappedAnalysis, this.wrappedAnalysis);
+        this._mergeOp = new AbstractionMergeOperator(this._task, this.wrappedAnalysis, this._abstractDomain.lattice);
 
         let abstractionComp: PredicateAbstraction;
         if (this._config.abstractionType == "boolean") {
@@ -170,7 +178,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     initialStatesFor(task: App): AbstractionState[] {
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            return new AbstractionState(this._abstractDomain.lattice.summaryLattice.top(), w);
+            return new AbstractionState(this._abstractDomain.lattice.summaryLattice.top(), this._abstractDomain.lattice.precStacLattice.bottom(), w);
         } );
     }
 
