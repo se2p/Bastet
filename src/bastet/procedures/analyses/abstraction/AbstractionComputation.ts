@@ -58,6 +58,7 @@ export abstract class PredicateAbstraction implements AbstractionComputation<Abs
 export class BooleanPredicateAbstraction extends PredicateAbstraction {
 
     computeAbstraction(of: AbstractionState, withPrecision: PredicatePrecision): AbstractionState {
+        this._lattice.folLattice.prover.getCores()
         throw new ImplementMeException();
     }
 

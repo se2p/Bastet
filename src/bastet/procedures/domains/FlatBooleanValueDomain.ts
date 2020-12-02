@@ -180,6 +180,15 @@ export class FlatBooleanValueTheory implements BooleanTheory<FlatBooleanValue> {
             return this.falseBool();
         }
     }
+    /**
+     * Logical XOR operator for FlatBooleanValue. Returns if either op1 or op2 is true and not both.
+     */
+    xor(op1: FlatBooleanValue, op2: FlatBooleanValue): FlatBooleanValue {
+        return this.and(
+            this.or(op1, op2),
+            this.not(this.and(op1, op2))
+        );
+    }
 
 }
 

@@ -60,7 +60,7 @@ const Z3FormulaRecord = ImmRec({
 
 });
 
-export class Z3Formula extends Z3FormulaRecord implements FirstOrderFormula  {
+export class Z3Formula extends Z3FormulaRecord implements FirstOrderFormula {
 
     constructor(ast: Z3_ast) {
         super({ast_pointer: ast.val()});
@@ -112,11 +112,11 @@ class Z3Theory {
         this._ctx = Preconditions.checkNotUndefined(ctx);
     }
 
-    protected freeArray(heapBytes){
+    protected freeArray(heapBytes) {
         this._ctx.wasmInstance._free(heapBytes.byteOffset);
     }
 
-    protected arrayToHeap(typedArray){
+    protected arrayToHeap(typedArray) {
         const wasmInstance = this._ctx.wasmInstance;
         var numBytes = typedArray.length * typedArray.BYTES_PER_ELEMENT;
         var ptr = wasmInstance._malloc(numBytes);
@@ -133,6 +133,11 @@ export class Z3BooleanTheory extends Z3Theory implements BooleanTheory<Z3Boolean
         super(ctx);
     }
 
+    /**
+     * Creates a Boolean variable with the given variable name `id`.
+     *
+     * @param id
+     */
     abstractBooleanValue(id: Variable): Z3BooleanFormula {
         return new Z3BooleanFormula(this._ctx.mk_const(this._ctx.mk_string_symbol(id.qualifiedName), this._ctx.mk_bool_sort()));
     }
@@ -202,6 +207,16 @@ export class Z3BooleanTheory extends Z3Theory implements BooleanTheory<Z3Boolean
 
     trueBool(): Z3BooleanFormula {
         return new Z3BooleanFormula(this._ctx.mk_true());
+    }
+
+    /**
+     * Logical XOR operator for Z3BooleanFormula. Returns if either op1 or op2 is true and not both.
+     */
+    xor(op1: Z3BooleanFormula, op2: Z3BooleanFormula): Z3BooleanFormula {
+        return this.and(
+            this.or(op1, op2),
+            this.not(this.and(op1, op2))
+        );
     }
 
 }
