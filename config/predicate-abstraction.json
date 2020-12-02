@@ -22,6 +22,10 @@
         "encode-floats-as": "Reals"
     },
 
+    "ControlAnalysis": {
+        "widen-on-loop-heads": true
+    },
+
     "GraphAnalysis": {
         "mergeIntoOperator": "StandardMergeIntoOperator",
         "stopOperator": "CheckCoverage",
