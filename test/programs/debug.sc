@@ -7,9 +7,11 @@ actor MiniActor is RuntimeEntity begin
        declare y as int
        define x as 7
        define y as 0
+
        precision push x + y = 7
        precision push y >= 0
        precision push x <= 7
+
        until x = 0 repeat begin
            define x as x - 1
            define y as y + 1

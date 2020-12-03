@@ -200,7 +200,7 @@ export class AbstractionAbstractDomain implements AbstractDomain<ConcreteElement
     }
 
     widen(element: AbstractionState, precision: AbstractionPrecision): AbstractionState {
-        throw new ImplementMeException();
+        return this._abstractionFunction.computeAbstraction(element, precision);
     }
 
     get concreteDomain(): ConcreteDomain<ConcreteElement> {
