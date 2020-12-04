@@ -25,6 +25,6 @@ and Repairing Blocks-based Programs”*.
 - Christoph Frädrich
 - Nina Körber
 - Robert Pernerstorfer
-- Sebastian Schweickl
+- Sebastian Schweikl
 - Andreas Stahlbauer
 
