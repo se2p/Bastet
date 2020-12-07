@@ -33,6 +33,7 @@ import {AccessibilityOperator} from "../ProgramAnalysis";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 import {PrecisionOperator} from "./AbstractionComputation";
 import {PredicatePrecision} from "../../AbstractionPrecision";
+import {DataAbstractStates} from "../data/DataAbstractStates";
 
 export class AbstractionRefiner implements Refiner<AbstractionState, AbstractState>, PrecisionOperator<AbstractionState, PredicatePrecision> {
 
@@ -52,6 +53,10 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
     public checkIsFeasible(reached: ReachedSet<AbstractState>, e: AbstractionState, purpose?: string): boolean {
         // 1. Build the abstract path formula (describes a set of paths)
         const ar = this._accOp.accessibility(reached, e);
+
+        // Use:
+        //      isWideningState operator (from the CPA)
+        //      DataAbstractStates.extractFrom(...)
 
         // ATTENTION: We assume that there is only one unique sequence of
         // abstraction states along the abstract reachability relation.
