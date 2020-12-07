@@ -33,7 +33,6 @@ import {AccessibilityOperator} from "../ProgramAnalysis";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 import {PrecisionOperator} from "./AbstractionComputation";
 import {PredicatePrecision} from "../../AbstractionPrecision";
-import {DataAbstractStates} from "../data/DataAbstractStates";
 
 export class AbstractionRefiner implements Refiner<AbstractionState, AbstractState>, PrecisionOperator<AbstractionState, PredicatePrecision> {
 
