@@ -5,18 +5,22 @@ actor MiniActor is RuntimeEntity begin
     script on startup do begin
        declare x as int
        declare y as int
-       define x as 7
+       declare z as int
+       define x as 3
        define y as 0
+       define z as 4
 
-       precision push x + y = 7
+       precision push x + y = 3
        precision push y >= 0
-       precision push x <= 7
+       precision push x <= 3
+       precision push z > 2
 
        until x = 0 repeat begin
            define x as x - 1
            define y as y + 1
        end
-       if not y = 7 then begin
+
+       if z = 4 then begin
             _RUNTIME_signalFailure()
         end
     end

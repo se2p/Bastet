@@ -34,7 +34,7 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {GraphAbstractDomain, GraphAbstractState, GraphAbstractStateFactory} from "./GraphAbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {GraphTransferRelation} from "./GraphTransferRelation";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractState, Lattices} from "../../../lattices/Lattice";
 import {
     CHOOSE_EITHER,
     CHOOSE_FIRST,
@@ -160,7 +160,18 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
-        return this._transferRelation.abstractSucc(fromState);
+        const result: GraphAbstractState[] = [];
+        for (const succ of this._transferRelation.abstractSucc(fromState)) {
+            if (this.target(succ).length > 0) {
+                // Only add feasible states
+                if (!Lattices.isFeasible(succ, this._abstractDomain.lattice)) {
+                    continue;
+                }
+            }
+            result.push(succ);
+        }
+
+        return result;
     }
 
     join(state1: GraphAbstractState, state2: GraphAbstractState): GraphAbstractState {
@@ -259,7 +270,9 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     stopPartitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {
-        return reached.getStateSet(ofState);
+        return reached;
+        // FIXME: Re-add sime sort of partitioning for the stop operator!
+        // return reached.getStateSet(ofState);
     }
 
     widenPartitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {

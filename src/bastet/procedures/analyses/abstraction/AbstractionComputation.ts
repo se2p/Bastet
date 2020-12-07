@@ -42,6 +42,7 @@ import {DataAbstractStates} from "../data/DataAbstractStates";
 import {from} from "immutable/contrib/cursor";
 import {getTheOnlyElement} from "../../../utils/Collections";
 import {SSAAbstractStates} from "../ssa/SSAAbstractStates";
+import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
 
 export interface AbstractionComputation<E extends AbstractState, P extends AbstractionPrecision> {
 
@@ -78,9 +79,9 @@ export abstract class PredicateAbstraction implements AbstractionComputation<Abs
         return getTheOnlyElement(DataAbstractStates.extractFrom(fromState)).blockFormula;
     }
 
-    protected instantiatePred(predicate: FirstOrderFormula, ssaMap: SSAMap) : FirstOrderFormula {
+    protected instantiatePred(predicate: FirstOrderFormula, ssa: SSAState) : FirstOrderFormula {
         const fnGetIndex = (name: string) => {
-            return ssaMap.get(name);
+            return ssa.getIndex(name);
         };
 
         return this._theories.instantiate(predicate, fnGetIndex);
@@ -88,7 +89,17 @@ export abstract class PredicateAbstraction implements AbstractionComputation<Abs
 
     protected instantiatePrecisionFor(forState: AbstractState, predicates: FirstOrderFormula[]): FirstOrderFormula[] {
         const ssaState: SSAState = getTheOnlyElement(SSAAbstractStates.extractFrom(forState));
-        return predicates.map((pred: FirstOrderFormula) => this.instantiatePred(pred, ssaState.getSSA()));
+        return predicates.map((pred: FirstOrderFormula) => this.instantiatePred(pred, ssaState));
+    }
+
+    /**
+     * Create a summary formula with all SSA indices at 0.
+     *
+     * @param formula
+     * @protected
+     */
+    protected instantiateAsSummary(formula: FirstOrderFormula) : FirstOrderFormula {
+        return this._theories.instantiate(formula, (v) => 0);
     }
 
     /**
@@ -110,15 +121,18 @@ export class BooleanPredicateAbstraction extends PredicateAbstraction {
 
     computeAbstraction(of: AbstractionState, withPrecision: PredicatePrecision): AbstractionState {
         const abstractionProblem: FirstOrderFormula = this.constructAbstractionProblem(of);
-        const predicates: FirstOrderFormula[] = this.instantiatePrecisionFor(of, withPrecision.predicates.toArray());
+        const instantiatedPredicates: FirstOrderFormula[] = this.instantiatePrecisionFor(of, withPrecision.predicates.toArray());
+        const newSummary: FirstOrderFormula = this.instantiateAsSummary(this._prover.booleanAbstraction(abstractionProblem, instantiatedPredicates));
 
-        console.log("-----------");
+/*
+        console.log("-ABST-PROB----------");
         console.log(this._prover.stringRepresentation(abstractionProblem));
-        predicates.forEach((p) => console.log(this._prover.stringRepresentation(p)));
+        console.log("-INST-PI-----");
+        instantiatedPredicates.forEach((p) => console.log(this._prover.stringRepresentation(p)));
 
         console.log(">>>");
-        const newSummary: FirstOrderFormula = this._prover.booleanAbstraction(abstractionProblem, predicates);
         console.log(this._prover.stringRepresentation(newSummary));
+*/
 
         return of.withAbstraction(newSummary)
             .withWrappedState(this._stateToSummarizeLattice.top());

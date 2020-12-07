@@ -45,6 +45,8 @@ import {
 } from "../../AbstractionPrecision";
 import {AbstractionComputation} from "./AbstractionComputation";
 import {AbstractDomain} from "../../domains/AbstractDomain";
+import {DataAbstractStates} from "../data/DataAbstractStates";
+import {getTheOnlyElement} from "../../../utils/Collections";
 
 
 export interface AbstractionStateAttribs extends AbstractElement, SingletonStateWrapper {
@@ -133,8 +135,16 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
     }
 
     isIncluded(element1: AbstractionState, element2: AbstractionState): boolean {
-        return this._summaryLattice.isIncluded(element1.getAbstraction(), element2.getAbstraction())
-            && this._wrappedStateLattice.isIncluded(element1.getWrappedState(), element2.getWrappedState());
+        const formula1: FirstOrderFormula = this.summaryLattice.meet(element1.getAbstraction(),
+            getTheOnlyElement(DataAbstractStates.extractFrom(element1)).blockFormula);
+        const formula2: FirstOrderFormula = this.summaryLattice.meet(element2.getAbstraction(),
+            getTheOnlyElement(DataAbstractStates.extractFrom(element2)).blockFormula);
+
+        console.log("IMPL-----------");
+        console.log(this.summaryLattice.prover.stringRepresentation(formula1));
+        console.log(this.summaryLattice.prover.stringRepresentation(formula2));
+
+        return this._summaryLattice.isIncluded(formula1, formula2);
     }
 
     join(element1: AbstractionState, element2: AbstractionState): AbstractionState {

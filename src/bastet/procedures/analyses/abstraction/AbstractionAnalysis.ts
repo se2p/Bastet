@@ -145,7 +145,12 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     }
 
     stop(state: AbstractionState, reached: Iterable<AbstractState>, unwrapper: (AbstractState) => AbstractionState): boolean {
-        throw new ImplementMeForException("Impl. as described in the paper; might also take the wrapped stop op into account.")
+        for (let r of reached) {
+            if (this._abstractDomain.lattice.isIncluded(state, unwrapper(r))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     target(state: AbstractionState): Property[] {

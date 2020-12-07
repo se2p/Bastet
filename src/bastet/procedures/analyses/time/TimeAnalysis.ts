@@ -113,7 +113,7 @@ export class TimeAnalysis<F extends AbstractState>
     }
 
     stop(state: TimeState, reached: Iterable<F>, unwrapper: (e: F) => TimeState): boolean {
-        return this._wrappedAnalysis.stop(state, reached, unwrapper);
+        return this._wrappedAnalysis.stop(state.getWrappedState(), reached, unwrapper);
     }
 
     target(state: TimeState): Property[] {

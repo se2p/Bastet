@@ -244,7 +244,12 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         if (isWideningState) {
             const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
             if (wrappedResult != state.getWrappedState()) {
-                return state.withWrappedState(wrappedResult);
+                // Also the control state has to be widened (get rid of loop stacks)
+                let result = state
+                for (let steppedIx of state.getSteppedFor()) {
+                   result = result.withThreadStateUpdate(steppedIx, (ts) => ts.withLoopStack(ImmList()));
+                }
+                return result.withWrappedState(wrappedResult);
             } else {
                 return state;
             }

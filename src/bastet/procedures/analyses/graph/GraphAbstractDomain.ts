@@ -160,16 +160,20 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
 
     private readonly _wrappedLattice: Lattice<AbstractElement>;
 
+    private readonly _bottom: GraphAbstractState;
+
     constructor(wrappedLattice: Lattice<AbstractElement>) {
         this._wrappedLattice = Preconditions.checkNotUndefined(wrappedLattice);
+        this._bottom = GraphAbstractStateFactory.withID(-1, [], [],
+            this._wrappedLattice.bottom(), ImmSet(), new LexiKey([]));
     }
 
     bottom(): GraphAbstractState {
-        throw new ImplementMeException();
+        return this._bottom;
     }
 
     isIncluded(element1: GraphAbstractState, element2: GraphAbstractState): boolean {
-        throw new ImplementMeException();
+        return this._wrappedLattice.isIncluded(element1.getWrappedState(), element2.getWrappedState());
     }
 
     join(element1: GraphAbstractState, element2: GraphAbstractState): GraphAbstractState {
