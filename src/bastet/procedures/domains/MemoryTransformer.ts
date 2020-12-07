@@ -313,6 +313,10 @@ export interface TheoryIndependent<E extends AbstractElement> {
 
     stringRepresentation(element: E): string;
 
+    uninstantiate(formula: E): E;
+
+    instantiate(formula: E, indexFn: (name: string) => number): E;
+
 }
 
 export interface AbstractTheories<M extends AbstractMemory, B extends AbstractBoolean,

@@ -49,7 +49,8 @@ export class AbstractionTransferRelation implements LabeledTransferRelation<Abst
     private readonly _theories: any;
     private readonly _domain: AbstractionAbstractDomain;
 
-    constructor(wrappedTr: LabeledTransferRelation<AbstractElement>, abstractDomain: AbstractionAbstractDomain, theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
+    constructor(wrappedTr: LabeledTransferRelation<AbstractElement>, abstractDomain: AbstractionAbstractDomain,
+                theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
         this._wrapped = Preconditions.checkNotUndefined(wrappedTr);
         this._domain = Preconditions.checkNotUndefined(abstractDomain);
         this._theories = Preconditions.checkNotUndefined(theories);

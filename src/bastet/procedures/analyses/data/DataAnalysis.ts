@@ -63,15 +63,14 @@ import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {StandardMergeOperatorFactory} from "../Operators";
-import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {List as ImmList, Set as ImmSet} from "immutable";
-import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {AccessibilityRelation} from "../Accessibility";
 import {DataTestifier} from "./DataTestifier";
 import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 import {DataRefiner} from "./DataRefiner";
+import {Theories} from "./DataTransformerTheories";
 
 
 export class DataAnalysisConfig extends BastetConfiguration {
@@ -86,71 +85,6 @@ export class DataAnalysisConfig extends BastetConfiguration {
 
     get encodeFloatsAs(): string {
         return this.getStringProperty('encode-floats-as', "Reals");
-    }
-
-}
-
-export class Theories implements TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula> {
-
-    private readonly _wrapped: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
-
-    private readonly _encodeFloatsAs: RealTheory<AbstractNumber, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula>;
-
-    constructor(encodeFloatsAs: string, wrapped: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
-        this._wrapped = Preconditions.checkNotUndefined(wrapped);
-        if (encodeFloatsAs.toUpperCase() == "REALS") {
-            this._encodeFloatsAs = this._wrapped.realTheory;
-        } else if (encodeFloatsAs.toUpperCase() == "FLOATS") {
-            this._encodeFloatsAs = this._wrapped.floatTheory;
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    get boolTheory(): BooleanTheory<BooleanFormula> {
-        return this._wrapped.boolTheory;
-    }
-
-    get floatTheory(): FloatTheory<FloatFormula, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
-        return this._wrapped.floatTheory;
-    }
-
-    get intTheory(): IntegerTheory<IntegerFormula, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
-        return this._wrapped.intTheory;
-    }
-
-    get listTheory(): ListTheory<ListFormula> {
-        return this._wrapped.listTheory;
-    }
-
-    get realTheory(): RealTheory<RealFormula, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
-        return this._wrapped.realTheory;
-    }
-
-    get stringTheory(): StringTheory<StringFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula> {
-        return this._wrapped.stringTheory;
-    }
-
-    getNumberTheoryFor(t: ScratchType): NumberTheory<AbstractNumber, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
-        if (t == IntegerType.instance()) {
-            return this.intTheory;
-        } else if (t == FloatType.instance()) {
-            return this._encodeFloatsAs;
-        }
-
-        throw new IllegalArgumentException("Unknown number type to map theory to");
-    }
-
-    getNumberTheoryOf(e: AbstractNumber): NumberTheory<AbstractNumber, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
-        return this._wrapped.getNumberTheoryOf(e);
-    }
-
-    simplify(element: FirstOrderFormula): FirstOrderFormula {
-        return this._wrapped.simplify(element);
-    }
-
-    stringRepresentation(element: FirstOrderFormula): string {
-        return this._wrapped.stringRepresentation(element);
     }
 
 }

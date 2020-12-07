@@ -23,15 +23,25 @@
  *
  */
 
-import {AbstractState} from "../../../lattices/Lattice";
+import {AbstractState, Lattice} from "../../../lattices/Lattice";
 import {AbstractionPrecision, PredicatePrecision, PredicatePrecisionLattice} from "../../AbstractionPrecision";
-import {AbstractionState} from "./AbstractionAbstractDomain";
-import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
+import {AbstractionState, AbstractionStateLattice} from "./AbstractionAbstractDomain";
+import {
+    BooleanFormula,
+    FirstOrderFormula,
+    FloatFormula,
+    IntegerFormula, ListFormula,
+    RealFormula, StringFormula
+} from "../../../utils/ConjunctiveNormalForm";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
-import {AbstractionStateLattice} from "../../../../../../../../../../Users/stahlbau/uni/develop/bastet-framework/src/bastet/procedures/analyses/abstraction/AbstractionAbstractDomain";
-import {doc} from "prettier";
+import {FirstOrderSolver} from "../../domains/FirstOrderDomain";
+import {AbstractTheories} from "../../domains/MemoryTransformer";
+import {SSAMap, SSAState, SSAStateLattice} from "../ssa/SSAAbstractDomain";
+import {DataAbstractStates} from "../data/DataAbstractStates";
+import {from} from "immutable/contrib/cursor";
+import {getTheOnlyElement} from "../../../utils/Collections";
+import {SSAAbstractStates} from "../ssa/SSAAbstractStates";
 
 export interface AbstractionComputation<E extends AbstractState, P extends AbstractionPrecision> {
 
@@ -48,18 +58,48 @@ export abstract class PredicateAbstraction implements AbstractionComputation<Abs
 
     protected readonly _precLattice: PredicatePrecisionLattice<FirstOrderFormula>;
 
-    protected readonly _stateLattice: AbstractionStateLattice;
+    protected readonly _stateToSummarizeLattice: Lattice<SSAState>;
 
-    constructor(precLattice: PredicatePrecisionLattice<FirstOrderFormula>, stateLattice: AbstractionStateLattice) {
+    protected readonly _prover: FirstOrderSolver<FirstOrderFormula>
+
+    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
+
+    constructor(
+        theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
+        prover: FirstOrderSolver<FirstOrderFormula>,
+        precLattice: PredicatePrecisionLattice<FirstOrderFormula>, stateToSummarizeLattice: Lattice<SSAState>) {
         this._precLattice = Preconditions.checkNotUndefined(precLattice);
-        this._stateLattice = Preconditions.checkNotUndefined(stateLattice);
+        this._stateToSummarizeLattice = Preconditions.checkNotUndefined(stateToSummarizeLattice);
+        this._theories = Preconditions.checkNotUndefined(theories);
+        this._prover = Preconditions.checkNotUndefined(prover);
     }
 
-    protected constructAbstractionProblem(of: AbstractionState): FirstOrderFormula {
-        // 1. Instantiate the summary formula with SSA indices (should be zeros)
+    protected extractBlockFormula(fromState: AbstractionState): FirstOrderFormula {
+        return getTheOnlyElement(DataAbstractStates.extractFrom(fromState)).blockFormula;
+    }
 
-        // 2. Conjunct the instantiated summary to the block formula and provide it as result.
-        throw new ImplementMeException();
+    protected instantiatePred(predicate: FirstOrderFormula, ssaMap: SSAMap) : FirstOrderFormula {
+        const fnGetIndex = (name: string) => {
+            return ssaMap.get(name);
+        };
+
+        return this._theories.instantiate(predicate, fnGetIndex);
+    }
+
+    protected instantiatePrecisionFor(forState: AbstractState, predicates: FirstOrderFormula[]): FirstOrderFormula[] {
+        const ssaState: SSAState = getTheOnlyElement(SSAAbstractStates.extractFrom(forState));
+        return predicates.map((pred: FirstOrderFormula) => this.instantiatePred(pred, ssaState.getSSA()));
+    }
+
+    /**
+     * Conjunct the instantiated summary to the block formula and provide it as result.
+     * PRECONDITION: The summary formulas are instantiated with the SSA index zero
+     *
+     * @param of
+     * @protected
+     */
+    protected constructAbstractionProblem(of: AbstractionState): FirstOrderFormula {
+        return this._theories.boolTheory.and(of.getAbstraction(), this.extractBlockFormula(of));
     }
 
     abstract computeAbstraction(of: AbstractionState, withPrecision: PredicatePrecision): AbstractionState;
@@ -70,13 +110,18 @@ export class BooleanPredicateAbstraction extends PredicateAbstraction {
 
     computeAbstraction(of: AbstractionState, withPrecision: PredicatePrecision): AbstractionState {
         const abstractionProblem: FirstOrderFormula = this.constructAbstractionProblem(of);
-        const predicates: FirstOrderFormula[] = withPrecision.predicates.toArray();
+        const predicates: FirstOrderFormula[] = this.instantiatePrecisionFor(of, withPrecision.predicates.toArray());
 
-        const newSummary: FirstOrderFormula = this._stateLattice.summaryLattice.prover
-            .booleanAbstraction(abstractionProblem, predicates);
+        console.log("-----------");
+        console.log(this._prover.stringRepresentation(abstractionProblem));
+        predicates.forEach((p) => console.log(this._prover.stringRepresentation(p)));
+
+        console.log(">>>");
+        const newSummary: FirstOrderFormula = this._prover.booleanAbstraction(abstractionProblem, predicates);
+        console.log(this._prover.stringRepresentation(newSummary));
 
         return of.withAbstraction(newSummary)
-            .withWrappedState(this._stateLattice.wrappedStateLattice.top());
+            .withWrappedState(this._stateToSummarizeLattice.top());
     }
 
 }

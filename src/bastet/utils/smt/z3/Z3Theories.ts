@@ -47,7 +47,6 @@ import {Variable} from "../../../syntax/ast/core/Variable";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {VariableCollectingVisitor} from "./Z3AST";
 import {SCOPE_SEPARATOR} from "../../../procedures/analyses/control/DataLocationScoping";
-import {from} from "immutable/contrib/cursor";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;
 

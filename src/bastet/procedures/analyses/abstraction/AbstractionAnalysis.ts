@@ -58,8 +58,9 @@ import {
     CartesianPredicateAbstraction,
     PredicateAbstraction
 } from "./AbstractionComputation";
-import {AbstractTheories} from "../../domains/MemoryTransformer";
-import {DataAnalysis, Theories} from "../data/DataAnalysis";
+import {AbstractTheories, TransformerTheories} from "../../domains/MemoryTransformer";
+import {SSAAnalysis} from "../ssa/SSAAnalysis";
+import {PredicatePrecisionLattice} from "../../AbstractionPrecision";
 
 
 export class AbstractionAnalysisConfig extends BastetConfiguration {
@@ -94,7 +95,8 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     private readonly _config: AbstractionAnalysisConfig;
 
     constructor(config: {}, task: App, summaryLattice: FirstOrderLattice<FirstOrderFormula>,
-                wrappedAnalysis: DataAnalysis,
+                theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
+                wrappedAnalysis: SSAAnalysis,
                 statistics: AnalysisStatistics) {
         this._config = new AbstractionAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
@@ -102,21 +104,20 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
         let abstractionComp: PredicateAbstraction;
         if (this._config.abstractionType == "boolean") {
-            abstractionComp = new BooleanPredicateAbstraction(summaryLattice);
+            abstractionComp = new BooleanPredicateAbstraction(theories, summaryLattice.prover,
+                new PredicatePrecisionLattice<FirstOrderFormula>(summaryLattice), wrappedAnalysis.abstractDomain.lattice);
         } else if (this._config.abstractionType == "cartesian") {
-            abstractionComp = new CartesianPredicateAbstraction(summaryLattice);
+            throw new ImplementMeException();
         } else {
             throw new ImplementMeException();
         }
+
         this._abstractDomain = new AbstractionAbstractDomain(wrappedAnalysis.abstractDomain, summaryLattice, abstractionComp);
-
-        this._transferRelation = new AbstractionTransferRelation(wrappedAnalysis, this._abstractDomain, wrappedAnalysis.theories);
-
+        this._transferRelation = new AbstractionTransferRelation(wrappedAnalysis, this._abstractDomain, theories);
         this._refiner = new AbstractionRefiner(this, this._abstractDomain.lattice, this);
 
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = new AbstractionMergeOperator(this._task, this.wrappedAnalysis, this._abstractDomain.lattice);
-
     }
 
     getTransitionLabel(from: AbstractionState, to: AbstractionState): ProgramOperation[] {
