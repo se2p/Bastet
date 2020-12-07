@@ -112,7 +112,7 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
 
     private readonly _wrappedStateLattice: Lattice<AbstractElement>;
 
-    private readonly _summaryLattice: LatticeWithComplements<FirstOrderFormula>;
+    private readonly _summaryLattice: FirstOrderLattice<FirstOrderFormula>;
 
     private readonly _bottom: AbstractionState;
 
@@ -158,7 +158,7 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
         return this._wrappedStateLattice;
     }
 
-    get summaryLattice(): LatticeWithComplements<FirstOrderFormula> {
+    get summaryLattice(): FirstOrderLattice<FirstOrderFormula> {
         return this._summaryLattice;
     }
 

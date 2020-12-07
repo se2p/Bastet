@@ -41,6 +41,8 @@ export interface SSAStateAttribs extends AbstractElement, SingletonStateWrapper 
 
 }
 
+export type SSAMap = ImmMap<string, number>;
+
 const SSAStateRecord = ImmRec({
 
     ssa: ImmMap<string, number>(),

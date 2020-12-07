@@ -30,6 +30,8 @@ import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
+import {AbstractionStateLattice} from "../../../../../../../../../../Users/stahlbau/uni/develop/bastet-framework/src/bastet/procedures/analyses/abstraction/AbstractionAbstractDomain";
+import {doc} from "prettier";
 
 export interface AbstractionComputation<E extends AbstractState, P extends AbstractionPrecision> {
 
@@ -44,11 +46,20 @@ export interface PrecisionOperator<E extends AbstractState, P extends Abstractio
 
 export abstract class PredicateAbstraction implements AbstractionComputation<AbstractionState, PredicatePrecision> {
 
-    protected readonly _lattice: PredicatePrecisionLattice<FirstOrderFormula>;
+    protected readonly _precLattice: PredicatePrecisionLattice<FirstOrderFormula>;
 
-    constructor(folLattice: FirstOrderLattice<FirstOrderFormula>) {
-        Preconditions.checkNotUndefined(folLattice);
-        this._lattice = new PredicatePrecisionLattice<FirstOrderFormula>(folLattice);
+    protected readonly _stateLattice: AbstractionStateLattice;
+
+    constructor(precLattice: PredicatePrecisionLattice<FirstOrderFormula>, stateLattice: AbstractionStateLattice) {
+        this._precLattice = Preconditions.checkNotUndefined(precLattice);
+        this._stateLattice = Preconditions.checkNotUndefined(stateLattice);
+    }
+
+    protected constructAbstractionProblem(of: AbstractionState): FirstOrderFormula {
+        // 1. Instantiate the summary formula with SSA indices (should be zeros)
+
+        // 2. Conjunct the instantiated summary to the block formula and provide it as result.
+        throw new ImplementMeException();
     }
 
     abstract computeAbstraction(of: AbstractionState, withPrecision: PredicatePrecision): AbstractionState;
@@ -58,8 +69,14 @@ export abstract class PredicateAbstraction implements AbstractionComputation<Abs
 export class BooleanPredicateAbstraction extends PredicateAbstraction {
 
     computeAbstraction(of: AbstractionState, withPrecision: PredicatePrecision): AbstractionState {
-        this._lattice.folLattice.prover.getCores()
-        throw new ImplementMeException();
+        const abstractionProblem: FirstOrderFormula = this.constructAbstractionProblem(of);
+        const predicates: FirstOrderFormula[] = withPrecision.predicates.toArray();
+
+        const newSummary: FirstOrderFormula = this._stateLattice.summaryLattice.prover
+            .booleanAbstraction(abstractionProblem, predicates);
+
+        return of.withAbstraction(newSummary)
+            .withWrappedState(this._stateLattice.wrappedStateLattice.top());
     }
 
 }

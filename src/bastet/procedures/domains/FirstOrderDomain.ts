@@ -36,15 +36,12 @@ import {FirstOrderFormula} from "../../utils/ConjunctiveNormalForm";
 import {LatticeWithComplements} from "../../lattices/Lattice";
 import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
-import {Z3Model, Z3ProverEnvironment, Z3Vector} from "../../utils/smt/z3/Z3SMT";
 import {BooleanTheory} from "./MemoryTransformer";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {PerfTimer} from "../../utils/PerfTimer";
-import {Z3BooleanFormula} from "../../utils/smt/z3/Z3Theories";
-import {LibZ3InContext} from "../../utils/smt/z3/libz3";
-import {BastetConfiguration} from "../../utils/BastetConfiguration";
 import {AbstractDomain} from "./AbstractDomain";
 import {AbstractionPrecision} from "../AbstractionPrecision";
+import {Z3Model, Z3Vector} from "../../utils/smt/z3/Z3SMT";
 
 export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
     prover: FirstOrderSolver<F>;
@@ -85,7 +82,6 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
             // (This involves a call to the solver's `check` method, which has
             // to be called before we are allowed to query a model.)
             if (!this.solver.isSat()) {
-                this.solver.getCores().asArray().forEach((f) => this.lattice.prover.stringRepresentation(f));
                 throw new IllegalArgumentException("Model only available for satisfiable formula!");
             }
 
@@ -128,15 +124,6 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
 
     widen(element: F, precision: AbstractionPrecision): F {
         throw new ImplementMeException();
-    }
-
-    booleanPredicateAbstraction(formula: Z3BooleanFormula, abstrPrec: Z3BooleanFormula[], ctx: LibZ3InContext): Z3BooleanFormula {
-        const prover = new Z3ProverEnvironment(ctx);
-        const varMap: Map<Z3BooleanFormula, Z3BooleanFormula> = prover.createVarMap(abstrPrec, ctx);
-        const newForm: Z3BooleanFormula = prover.formWithVariable(formula, varMap, ctx);
-        const propVars: Z3BooleanFormula[] = prover.propVarsFromMap(varMap);
-        const retTable = prover.allSat(newForm, propVars, ctx);
-        return prover.boolTableToForm(retTable,varMap, ctx);
     }
 
     get concreteDomain(): ConcreteDomain<ConcreteMemory> {
@@ -190,7 +177,14 @@ export abstract class FirstOrderSolver<F extends FirstOrderFormula> {
 
     public abstract getCores(): Z3Vector;
 
-    public abstract stringRepresentation(f: FirstOrderFormula): string;
+    public abstract stringRepresentation(f: F): string;
+
+    public abstract allSat(abstractionProblem: F, predicates: F[]): boolean[][];
+
+    public abstract booleanAbstraction(abstractionProblem: F, predicates: F[]): F;
+
+    public abstract cartesianAbstraction(abstractionProblem: F, predicates: F[]): F;
+
 }
 
 export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
