@@ -306,7 +306,7 @@ export interface WidenOperator<E extends AbstractElement, F extends AbstractStat
     widen(state: E, reached: Iterable<F>): E;
 
     /**
-     * Determine if a widening was computed for a given
+     * Determine if a widening should be or was computed for a given
      * abstract state---note that the widening might have been computed but
      * no information might have been lost.
      */
