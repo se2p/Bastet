@@ -20,7 +20,7 @@ actor MiniActor is RuntimeEntity begin
            define y as y + 1
        end
 
-       if z = 4 then begin
+       if y = 3 then begin
             _RUNTIME_signalFailure()
         end
     end
