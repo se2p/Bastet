@@ -305,6 +305,13 @@ export interface WidenOperator<E extends AbstractElement, F extends AbstractStat
      */
     widen(state: E, reached: Iterable<F>): E;
 
+    /**
+     * Determine if a widening was computed for a given
+     * abstract state---note that the widening might have been computed but
+     * no information might have been lost.
+     */
+    isWideningState(state: E): boolean;
+
 }
 
 export interface TransitionLabelProvider<E extends AbstractElement> {

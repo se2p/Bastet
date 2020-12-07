@@ -233,15 +233,19 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         return result;
     }
 
-    widen(state: ControlAbstractState, reached: Iterable<AbstractState>): ControlAbstractState {
+    isWideningState(state: ControlAbstractState): boolean {
         const isWideningState = this._config.widenAfterEachStep
-                || (this._config.widenOnLoopHeads && this.steppedToLoopHead(state));
+            || (this._config.widenOnLoopHeads && this.steppedToLoopHead(state));
 
         if (this._config.widenAfterFunctionReturn || this._config.widenBeforeFunctionCall) {
             throw new ImplementMeException();
         }
 
-        if (isWideningState) {
+        return isWideningState;
+    }
+
+    widen(state: ControlAbstractState, reached: Iterable<AbstractState>): ControlAbstractState {
+        if (this.isWideningState(state)) {
             const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
             if (wrappedResult != state.getWrappedState()) {
                 // Also the control state has to be widened (get rid of loop stacks)

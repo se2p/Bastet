@@ -113,6 +113,10 @@ export class DebugAnalysis<F extends AbstractState>
         return this._wrappedAnalysis.target(state.getWrappedState());
     }
 
+    isWideningState(state: DebugState): boolean {
+        return this._wrappedAnalysis.isWideningState(state.getWrappedState());
+    }
+
     widen(state: DebugState, reached: Iterable<F>): DebugState {
         const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {

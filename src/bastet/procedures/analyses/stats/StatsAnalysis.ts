@@ -115,6 +115,10 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         });
     }
 
+    isWideningState(state: E): boolean {
+        return this._wrappedAnalysis.isWideningState(state);
+    }
+
     widen(state: E, reached: Iterable<F>): E {
         return this._widenStats.runWithTimer(() => {
             return this._wrappedAnalysis.widen(state, reached);

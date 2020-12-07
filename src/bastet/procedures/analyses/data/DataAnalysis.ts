@@ -161,6 +161,10 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return [];
     }
 
+    isWideningState(state: DataAbstractState): boolean {
+        return false;
+    }
+
     widen(state: DataAbstractState, reached: Iterable<AbstractState>): DataAbstractState {
         return state;
     }

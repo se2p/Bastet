@@ -115,6 +115,10 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return this._wrappedAnalysis.target(state.wrappedState);
     }
 
+    isWideningState(state: SSAState): boolean {
+        return this.isWideningState(state);
+    }
+
     widen(state: SSAState, reached: Iterable<AbstractState>): SSAState {
         const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {

@@ -159,6 +159,10 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
         return this._abstractDomain.widen(state, this._refiner.precisionFor(state));
     }
 
+    isWideningState(state: AbstractionState): boolean {
+        return true; // This analysis would always compute a widening
+    }
+
     unwrap(e: AbstractionState): AbstractElement {
         return e.getWrappedState();
     }

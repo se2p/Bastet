@@ -142,6 +142,10 @@ export class LabelAnalysis<F extends AbstractState>
         return this._wrappedAnalysis.target(state.getWrappedState());
     }
 
+    isWideningState(state: LabelState): boolean {
+        return this._wrappedAnalysis.isWideningState(state.getWrappedState());
+    }
+
     widen(state: LabelState, reached: Iterable<F>): LabelState {
         const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {
