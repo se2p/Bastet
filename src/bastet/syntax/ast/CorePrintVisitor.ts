@@ -134,7 +134,7 @@ import {
     SignalTargetReachedStatement,
     TerminateProgramStatement
 } from "./core/statements/InternalStatement";
-import { PrecisionPushStatement, PrecisionPopStatement } from "./core/Precisions";
+import {PrecisionPopStatement, PrecisionPushStatement} from "./core/Precisions";
 
 export class CorePrintVisitor implements CoreEventVisitor<string>,
     CoreBoolExpressionVisitor<string>, CoreNumberExpressionVisitor<string>,

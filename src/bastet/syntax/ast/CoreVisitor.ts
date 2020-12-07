@@ -127,7 +127,7 @@ import {
     SignalTargetReachedStatement,
     TerminateProgramStatement
 } from "./core/statements/InternalStatement";
-import { PrecisionPopStatement, PrecisionPushStatement } from "./core/Precisions";
+import {PrecisionPopStatement, PrecisionPushStatement} from "./core/Precisions";
 
 export interface CoreVisitor<R> {
 

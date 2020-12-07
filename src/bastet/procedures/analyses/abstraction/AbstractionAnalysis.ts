@@ -23,7 +23,7 @@
  *
  */
 
-import {MergeOperator, ProgramAnalysisWithLabels, WidenOperator} from "../ProgramAnalysis";
+import {MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
@@ -31,14 +31,14 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {LabeledTransferRelation} from "../TransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
+import {Refiner, Unwrapper} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {FrontierSet, PartitionKey, ReachedSet, StateSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {Concern} from "../../../syntax/Concern";
-import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
-import {Map as ImmMap, Set as ImmSet} from "immutable";
+import {Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {AccessibilityRelation} from "../Accessibility";
 import {AbstractionAbstractDomain, AbstractionState} from "./AbstractionAbstractDomain";
@@ -49,16 +49,14 @@ import {
     BooleanFormula,
     FirstOrderFormula,
     FloatFormula,
-    IntegerFormula, ListFormula,
-    RealFormula, StringFormula
+    IntegerFormula,
+    ListFormula,
+    RealFormula,
+    StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {AbstractionRefiner} from "./AbstractionRefiner";
-import {
-    BooleanPredicateAbstraction,
-    CartesianPredicateAbstraction,
-    PredicateAbstraction
-} from "./AbstractionComputation";
-import {AbstractTheories, TransformerTheories} from "../../domains/MemoryTransformer";
+import {BooleanPredicateAbstraction, PredicateAbstraction} from "./AbstractionComputation";
+import {TransformerTheories} from "../../domains/MemoryTransformer";
 import {SSAAnalysis} from "../ssa/SSAAnalysis";
 import {PredicatePrecisionLattice} from "../../AbstractionPrecision";
 

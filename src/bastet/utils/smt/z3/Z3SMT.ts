@@ -41,12 +41,10 @@ import {IllegalStateException} from "../../../core/exceptions/IllegalStateExcept
 import {BastetConfiguration} from "../../BastetConfiguration";
 import {FirstOrderFormula} from "../../ConjunctiveNormalForm";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {ConcreteNumber} from "../../../procedures/domains/ConcreteElements";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {BooleanType} from "../../../syntax/ast/core/ScratchType";
-import {isNull} from "util";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export var PreModule = {

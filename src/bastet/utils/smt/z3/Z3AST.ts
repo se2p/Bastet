@@ -28,7 +28,7 @@ import {Preconditions} from "../../Preconditions";
 import {Uint32} from "./ctypes";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {Set as ImmSet, Map as ImmMap} from "immutable";
+import {Map as ImmMap} from "immutable";
 import {Z3Formula} from "./Z3Theories";
 
 export enum Z3AstKind {

@@ -27,7 +27,7 @@ import {Actor, ActorMap, Actors} from "./Actor";
 import {App} from "./App";
 import {AppResource, AppResourceMap} from "./AppResource";
 import {Script} from "./controlflow/Script";
-import {DataLocationMap, DataLocations} from "./controlflow/DataLocation";
+import {DataLocations} from "./controlflow/DataLocation";
 import {ScratchType} from "../ast/core/ScratchType";
 import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
 import {TransitionRelation, TransitionRelations} from "./controlflow/TransitionRelation";
