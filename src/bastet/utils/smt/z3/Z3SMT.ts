@@ -47,6 +47,7 @@ import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {BooleanType} from "../../../syntax/ast/core/ScratchType";
 import {isNull} from "util";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export var PreModule = {
     print: function (text) {
@@ -232,9 +233,9 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         return this._ctx.ast_to_string(f.getAST());
     }
 
-    createVarMap(abstrPrec: Z3BooleanFormula[], ctx: LibZ3InContext): Map<Z3BooleanFormula, Z3BooleanFormula> {
+    createVarMap(abstrPrec: Z3BooleanFormula[]): Map<Z3BooleanFormula, Z3BooleanFormula> {
         //TODO
-        const theories = new Z3Theories(ctx);
+        const theories = new Z3Theories(this._ctx);
 
         const varMap = new Map<Z3BooleanFormula, Z3BooleanFormula>();
         for (let i = 0; i < abstrPrec.length; i++) {
@@ -245,9 +246,9 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         return varMap;
     }
 
-    formWithVariable(formula: Z3BooleanFormula, varMap: Map<Z3BooleanFormula, Z3BooleanFormula>, ctx: LibZ3InContext): Z3BooleanFormula {
+    formWithVariable(formula: Z3BooleanFormula, varMap: Map<Z3BooleanFormula, Z3BooleanFormula>): Z3BooleanFormula {
         //TODO
-        const theories = new Z3Theories(ctx);
+        const theories = new Z3Theories(this._ctx);
 
         let newForm = formula;
         varMap.forEach((precision, variable) => {
@@ -278,16 +279,14 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
      * @param ctx. The context in which the abstraction Problem was created.
      * @returns The truth table.
      */
-    public allSat(abstractionProblem: Z3BooleanFormula, important: Z3BooleanFormula[], ctx: LibZ3InContext): boolean[][] {
-
+    public allSat(abstractionProblem: Z3BooleanFormula, important: Z3BooleanFormula[]): boolean[][] {
         if (important == null || important.length < 1) {
             throw new IllegalArgumentException("'important' must NOT be empty!");
         }
 
-
         let result: boolean[][] = [];
 
-        const theories = new Z3Theories(ctx);
+        const theories = new Z3Theories(this._ctx);
 
         // Start a new formula environment using `push`
         this.push();
@@ -313,7 +312,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
             let newFormula: Z3BooleanFormula;
             let j: number = 0;
             important.forEach(formula => {
-                let formConst: Z3Const = this.getFirstConst(formula, ctx);
+                let formConst: Z3Const = this.getFirstConst(formula, this._ctx);
                 let modelValue: Z3ConstType = modelConstMap.get(formConst.getName());
                 let helpForm = formula;
                 if (modelValue == null || typeof modelValue != 'boolean') {
@@ -334,9 +333,21 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         return result;
     }
 
-    boolTableToForm(retTable: boolean[][], varMap: Map<Z3BooleanFormula, Z3BooleanFormula>, ctx: LibZ3InContext): Z3BooleanFormula {
+    booleanAbstraction(abstractionProblem: Z3FirstOrderFormula, predicates: Z3FirstOrderFormula[]): Z3FirstOrderFormula {
+        const varMap: Map<Z3BooleanFormula, Z3BooleanFormula> = this.createVarMap(predicates);
+        const newForm: Z3BooleanFormula = this.formWithVariable(abstractionProblem, varMap);
+        const propVars: Z3BooleanFormula[] = this.propVarsFromMap(varMap);
+        const retTable = this.allSat(newForm, propVars);
+        return this.boolTableToForm(retTable, varMap);
+    }
+
+    cartesianAbstraction(abstractionProblem: Z3FirstOrderFormula, predicates: Z3FirstOrderFormula[]): Z3FirstOrderFormula {
+        throw new ImplementMeException();
+    }
+
+    boolTableToForm(retTable: boolean[][], varMap: Map<Z3BooleanFormula, Z3BooleanFormula>): Z3BooleanFormula {
         //TODO
-        const theories = new Z3Theories(ctx);
+        const theories = new Z3Theories(this._ctx);
         const propVars = this.propVarsFromMap(varMap);
         let retForm;
         retTable.forEach(row => {

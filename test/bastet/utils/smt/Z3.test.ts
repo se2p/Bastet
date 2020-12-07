@@ -25,12 +25,12 @@ import {VariableWithDataLocation} from "../../../../src/bastet/syntax/ast/core/V
 import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataLocation";
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
 import {ConcreteNumber, ConcreteString} from "../../../../src/bastet/procedures/domains/ConcreteElements";
-import {Z3FirstOrderLattice, Z3NumberFormula} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
+import {Z3FirstOrderLattice, Z3NumberFormula, Z3Theories} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
 import {BooleanType, IntegerType, StringType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
 
 let smt: Z3SMT;
 let ctx;
-let theories;
+let theories: Z3Theories;
 let prover;
 
 beforeAll( async (done) => {
@@ -58,6 +58,24 @@ test ("Case: True", () => {
     const isUnsat: boolean = prover.isUnsat();
     expect(isUnsat).toBe(false);
     prover.pop();
+});
+
+test ("Substitute", () => {
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
+    const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), IntegerType.instance()));
+    const xvar = theories.intTheory.abstractNumberValue(x);
+    const yvar = theories.intTheory.abstractNumberValue(y);
+
+    const fx = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const fy = theories.substitute(fx, [xvar], [yvar]);
+    expect(theories.stringRepresentation(fy)).toEqual("(and (= y 0) (= y 42))");
 });
 
 test ("Implication. Unsat", () => {
