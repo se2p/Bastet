@@ -25,28 +25,86 @@
 
 import {Refiner, Unwrapper} from "../Refiner";
 import {FrontierSet, ReachedSet} from "../../algorithms/StateSet";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {AbstractionState, AbstractionStateLattice} from "./AbstractionAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
+import {
+    BooleanFormula,
+    FirstOrderFormula,
+    FloatFormula,
+    IntegerFormula,
+    ListFormula,
+    RealFormula,
+    StringFormula
+} from "../../../utils/ConjunctiveNormalForm";
 import {PrecisionOperator} from "./AbstractionComputation";
-import {PredicatePrecision} from "../../AbstractionPrecision";
+import {PrecisionRole, PredicatePrecision, PredicatePrecisionLattice} from "../../AbstractionPrecision";
 import {AccessibilityRelation} from "../Accessibility";
+import {FirstOrderSolver} from "../../domains/FirstOrderDomain";
+import {TransformerTheories} from "../../domains/MemoryTransformer";
+import {BastetConfiguration} from "../../../utils/BastetConfiguration";
+
+export class AbstractionRefinerConfig extends BastetConfiguration {
+
+    constructor(dict: {}) {
+        super(dict, ['AbstractionRefiner']);
+    }
+
+    get useLazyAbstraction(): boolean {
+        return this.getBoolProperty('use-lazy-abstraction', false);
+    }
+}
+
+class InterpolationSolution {
+    private readonly _targetState: AbstractState;
+    private readonly _interpolants: FirstOrderFormula[];
+
+    constructor(e: AbstractionState, interpolants: FirstOrderFormula[]) {
+        this._targetState = Preconditions.checkNotUndefined(e);
+        this._interpolants = Preconditions.checkNotUndefined(interpolants);
+    }
+
+    get targetState(): AbstractState {
+        return this._targetState;
+    }
+
+    get interpolants(): FirstOrderFormula[] {
+        return this._interpolants;
+    }
+}
 
 export class AbstractionRefiner implements Refiner<AbstractionState, AbstractState>, PrecisionOperator<AbstractionState, PredicatePrecision> {
 
     private readonly _unwrapper: Unwrapper<AbstractState, AbstractElement>;
 
     private readonly _lattice: AbstractionStateLattice;
+    private readonly _prover: FirstOrderSolver<FirstOrderFormula>;
+    private readonly _theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
+    private _lastInterpolationSolution: InterpolationSolution;
 
-    constructor(unwrapper: Unwrapper<AbstractState, AbstractElement>, lattice: AbstractionStateLattice) {
+    private _currentPrecision: PredicatePrecision;
+    private readonly _precisionLattice: PredicatePrecisionLattice<FirstOrderFormula>;
+    private readonly _config: AbstractionRefinerConfig;
+
+    constructor(config: {}, unwrapper: Unwrapper<AbstractState, AbstractElement>, lattice: AbstractionStateLattice, theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
+                precisionLattice: PredicatePrecisionLattice<FirstOrderFormula>) {
+        this._config = new AbstractionRefinerConfig(config);
         this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
         this._lattice = Preconditions.checkNotUndefined(lattice);
+        this._prover = lattice.summaryLattice.prover;
+        this._theories = Preconditions.checkNotUndefined(theories);
+        this._precisionLattice = Preconditions.checkNotUndefined(precisionLattice);
+        this._currentPrecision = precisionLattice.bottom();
     }
 
     public checkIsFeasible(reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractionState>, e: AbstractionState, purpose?: string): boolean {
         // 1. Build the abstract path formula (describes a set of paths)
+        // 1.1 Extract the sequence of states for that a widening was computed along the
+        // given accessibility relation.
+        const wideningStateSeq: AbstractionState[] = this.determineWideningStateSeqTo(ar, e);
+        const blockFormulas: FirstOrderFormula[] = this.extractTraceBlockFormulas(wideningStateSeq);
+        Preconditions.checkState(wideningStateSeq.length == blockFormulas.length - 1);
 
         // Use:
         //      isWideningState function
@@ -55,10 +113,27 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
         // ATTENTION: We assume that there is only one unique sequence of
         // abstraction states along the abstract reachability relation.
 
-        // 2. Check the feasibility of the path formula
-        const pathFormula: FirstOrderFormula = null;
+        // 2. Check the feasibility of the trace formula
+        this._prover.push();
+        try {
+            for (let blockFormula of blockFormulas) {
+                this._prover.assert(blockFormula);
+            }
 
-        throw new ImplementMeException();
+            const feasible =  !this._prover.isUnsat();
+
+            if (!feasible) {
+                // Compute interpolant
+                const interpolants: FirstOrderFormula[] = this._prover.collectInterpolants();
+                Preconditions.checkState(interpolants.length === blockFormulas.length - 1,
+                    "There should have been one interpolant for each intermediate point");
+                this._lastInterpolationSolution = new InterpolationSolution(e, interpolants);
+            }
+
+            return feasible;
+        } finally {
+            this._prover.pop();
+        }
     }
 
     public refinePrecision(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>,
@@ -69,7 +144,25 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
         //  -> Und man wirft den Teil weg, für den die Precision zu niedrig war
         // TODO: welche Prädikate sollen zur AbstractionPrecision hinzugefügt werden?
         //  ->
-        throw new ImplementMeException();
+
+        // Cache must have been filled before invoking this method.
+        Preconditions.checkState(this._lastInterpolationSolution !== null);
+
+        Preconditions.checkArgument(infeasibleState === this._lastInterpolationSolution.targetState);
+
+        this._currentPrecision = this._lastInterpolationSolution.interpolants
+            .map((f) => new PredicatePrecision([f], PrecisionRole.INTERMEDIATE))
+            .reduce((precision, last) => this._precisionLattice.join(precision, last),
+                this._currentPrecision);
+
+        if (this._config.useLazyAbstraction) {
+            throw new ImplementMeForException("Lazy abstraction not yet supported");
+        } else {
+            for (const e of ar.initial()) {
+                reached.removeAll(ar.successorsOf(e));
+            }
+            return [frontier, reached];
+        }
     }
 
     /**
@@ -84,7 +177,14 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
 
     public precisionFor(state: AbstractionState): PredicatePrecision {
         return state.getPrecision().stack.reduce((pi: PredicatePrecision, result: PredicatePrecision) =>
-                this._lattice.precStacLattice.lattice.join(pi, result), this._lattice.precStacLattice.lattice.bottom());
+            this._lattice.precStacLattice.lattice.join(pi, result), this._currentPrecision);
     }
 
+    private determineWideningStateSeqTo(ar: AccessibilityRelation<AbstractionState>, e: AbstractionState): AbstractionState[] {
+        throw new ImplementMeException();
+    }
+
+    private extractTraceBlockFormulas(wideningStateSeq: AbstractionState[]): FirstOrderFormula[] {
+        throw new ImplementMeException();
+    }
 }

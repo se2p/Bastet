@@ -162,6 +162,10 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         this._model = null;
     }
 
+    public collectInterpolants(): Z3FirstOrderFormula[] {
+        throw new ImplementMeException();
+    }
+
     /**
      * @inheritDoc
      */

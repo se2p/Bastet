@@ -185,6 +185,8 @@ export abstract class FirstOrderSolver<F extends FirstOrderFormula> {
 
     public abstract cartesianAbstraction(abstractionProblem: F, predicates: F[]): F;
 
+    public abstract collectInterpolants(): F[];
+
 }
 
 export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>

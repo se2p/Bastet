@@ -112,7 +112,8 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
         this._abstractDomain = new AbstractionAbstractDomain(wrappedAnalysis.abstractDomain, summaryLattice, abstractionComp);
         this._transferRelation = new AbstractionTransferRelation(wrappedAnalysis, this._abstractDomain, theories);
-        this._refiner = new AbstractionRefiner(this, this._abstractDomain.lattice);
+        this._refiner = new AbstractionRefiner(config, this, this._abstractDomain.lattice, theories,
+            this._abstractDomain.lattice.precStacLattice.lattice);
 
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = new AbstractionMergeOperator(this._task, this.wrappedAnalysis, this._abstractDomain.lattice);
