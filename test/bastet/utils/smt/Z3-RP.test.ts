@@ -68,7 +68,7 @@ test("Bool: Short 2", () => {
     expect(prover.isUnsat()).toBe(false);
 })
 
-test("Bool: Short 3", () => {
+xtest("Bool: Short 3", () => {
     let prover2 = smt.createProver(ctx);
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const bx = theories.boolTheory.abstractBooleanValue(x);
@@ -164,7 +164,7 @@ test("Bool: Long 3", () => {
     expect(prover.isUnsat()).toBe(true);
 })
 
-test("AllSat 1", () => {
+xtest("AllSat 1", () => {
     const basicTerm = builder.basicBoolTerm1();
     const predicates = builder.predicForBoolTerm1();
 
