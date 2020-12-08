@@ -41,7 +41,7 @@ export interface Refiner<E extends AbstractElement, F extends AbstractState> {
      * @param purpose??: An information for logging and performance debugging
      *      which describes the purpose of the feasibility check.
      */
-    checkIsFeasible(reached: ReachedSet<F>, e: E, purpose?: string): boolean;
+    checkIsFeasible(reached: ReachedSet<F>, ar: AccessibilityRelation<F>, e: E, purpose?: string): boolean;
 
     /**
      * Refine the abstraction precision of the analysis to rule
@@ -51,7 +51,7 @@ export interface Refiner<E extends AbstractElement, F extends AbstractState> {
      * @param reached: The set of abstract states that have been reached, including infeasible ones.
      * @param infeasibleState: The infeasible state that should be eliminated by the refinement.
      */
-    refinePrecision(frontier: FrontierSet<F>, reached: ReachedSet<F>, infeasibleState: E): [FrontierSet<F>, ReachedSet<F>];
+    refinePrecision(frontier: FrontierSet<F>, reached: ReachedSet<F>, ar: AccessibilityRelation<F>, infeasibleState: E): [FrontierSet<F>, ReachedSet<F>];
 
 }
 
@@ -77,11 +77,11 @@ export class WrappingRefiner<F extends AbstractState, E extends AbstractElement,
         this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
     }
 
-    checkIsFeasible(reached: ReachedSet<F>, e: E, purpose?: string): boolean {
-        return this._wrapped.checkIsFeasible(reached, this._unwrapper.unwrap(e), purpose);
+    checkIsFeasible(reached: ReachedSet<F>, ar: AccessibilityRelation<F>, e: E, purpose?: string): boolean {
+        return this._wrapped.checkIsFeasible(reached, ar, this._unwrapper.unwrap(e), purpose);
     }
 
-    refinePrecision(frontier: FrontierSet<F>, reached: ReachedSet<F>, infeasibleState: E): [FrontierSet<F>, ReachedSet<F>] {
+    refinePrecision(frontier: FrontierSet<F>, reached: ReachedSet<F>, ar: AccessibilityRelation<F>, infeasibleState: E): [FrontierSet<F>, ReachedSet<F>] {
         throw new ImplementMeException();
     }
 

@@ -41,7 +41,7 @@ import {getTheOnlyElement} from "../../utils/Collections";
  * In the coarsest relation, each state is reachable
  * directly from each other state.
  */
-export interface AccessibilityRelation<E extends AbstractElement, F extends AbstractState>
+export interface AccessibilityRelation<F extends AbstractState>
     extends DirectedGraph<F> {
 
     /**
@@ -77,7 +77,7 @@ export interface AccessibilityRelation<E extends AbstractElement, F extends Abst
 
 }
 
-export class DefaultAccessRelation<F extends AbstractState> implements AccessibilityRelation<F, F> {
+export class DefaultAccessRelation<F extends AbstractState> implements AccessibilityRelation<F> {
 
     private readonly _labeler: TransitionLabelProvider<F>;
 
@@ -186,7 +186,7 @@ export class AccessRelationBuilder<F extends AbstractState> {
         return this;
     }
 
-    public build(): AccessibilityRelation<F , F> {
+    public build(): AccessibilityRelation<F> {
         return new DefaultAccessRelation(this._lbl, this._ctc,
             ImmSet(this._initial),
             ImmMap(this._predecessorsOf.entries()),
@@ -198,9 +198,9 @@ export class AccessRelationBuilder<F extends AbstractState> {
 export class AccessibilityRelations {
 
     public static backwardsAccessible<F extends AbstractState>(
-        ar: AccessibilityRelation<F, F>, state: F,
+        ar: AccessibilityRelation<F>, state: F,
         labeler?: TransitionLabelProvider<F>,
-        concretizer?: Concretizer<ConcreteElement, F>): AccessibilityRelation<F, F> {
+        concretizer?: Concretizer<ConcreteElement, F>): AccessibilityRelation<F> {
 
         const builder = new AccessRelationBuilder<F>()
             .setLabeler(ar.labeler()).setConcretizer(ar.concretizer());
@@ -237,7 +237,7 @@ export class AccessibilityRelations {
     }
 
     public static filterForwards<F extends AbstractState>(
-        ar: AccessibilityRelation<F, F>, filter: (s1: F, s2: F) => boolean) {
+        ar: AccessibilityRelation<F>, filter: (s1: F, s2: F) => boolean) {
         const builder = new AccessRelationBuilder()
             .setConcretizer(ar.concretizer())
             .setLabeler(ar.labeler());
@@ -263,7 +263,7 @@ export class AccessibilityRelations {
         return builder.build();
     }
 
-    public static mapToArray<F extends AbstractState>(ar: AccessibilityRelation<F, F>): F[] {
+    public static mapToArray<F extends AbstractState>(ar: AccessibilityRelation<F>): F[] {
         const array: F[] = [];
         let state: F = getTheOnlyElement(ar.initial());
 

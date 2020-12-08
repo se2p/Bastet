@@ -34,6 +34,7 @@ import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
 import {getActiveBudget} from "../../utils/Budgets";
 import {getTheOnlyElement} from "../../utils/Collections";
+import {AccessibilityRelation} from "../analyses/Accessibility";
 
 export const STAT_KEY_BMC_ITERATIONS = "iterations";
 
@@ -83,15 +84,17 @@ export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState>
                 const properties = this._analysis.target(targetState);
 
                 // Check the feasibility with the refiner
-                let isFeasible: boolean;
                 this._feasibilityCheckStats.startTimer();
                 try {
-                    isFeasible = this._refiner.checkIsFeasible(reached, targetState as E, `Target state feasibility for ${properties.toString()}`);
+                    const ar = this._analysis.accessibility(reached, targetState);
+                    const isFeasible: boolean = this._refiner.checkIsFeasible(reached, ar,
+                        targetState as E, `Target state feasibility for ${properties.toString()}`);
+
                     if (isFeasible) {
                         return [frontier, reached];
                     } else {
                         // Refine the abstraction
-                        [frontier, reached] = this.eliminateInfeasibleState(frontier, reached, targetState);
+                        [frontier, reached] = this.eliminateInfeasibleState(frontier, reached, ar, targetState);
                     }
                 } finally {
                     this._feasibilityCheckStats.stopTimer();
@@ -102,7 +105,7 @@ export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState>
         return [frontier, reached];
     }
 
-    protected eliminateInfeasibleState(frontier: FrontierSet<E>, reached: ReachedSet<E>, targetState: E): [FrontierSet<E>, ReachedSet<E>]{
-        return this._refiner.refinePrecision(frontier, reached, targetState);
+    protected eliminateInfeasibleState(frontier: FrontierSet<E>, reached: ReachedSet<E>, ar: AccessibilityRelation<E>, targetState: E): [FrontierSet<E>, ReachedSet<E>]{
+        return this._refiner.refinePrecision(frontier, reached, ar, targetState);
     }
 }

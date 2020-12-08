@@ -155,7 +155,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         }
     }
 
-    chooseFinitePathAlong(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): AbstractState[] {
+    chooseFinitePathAlong(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AbstractState[] {
         throw new ImplementMeException();
     }
 
@@ -324,24 +324,24 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
+    testify(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
+    testifyOne(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState> {
         const reaching = AccessibilityRelations.backwardsAccessible(accessibility, state, this, this.abstractDomain);
         return this.wrappedAnalysis.testifyOne(reaching, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
-    accessibility(reached: ReachedSet<GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
+    accessibility(reached: ReachedSet<GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState> {
         return reached as GraphReachedSetWrapper<GraphAbstractState>;
     }
 

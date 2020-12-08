@@ -186,23 +186,23 @@ export class DebugAnalysis<F extends AbstractState>
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<DebugState, F>, state: F): AccessibilityRelation<DebugState, F> {
+    testify(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation<F> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<DebugState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<DebugState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<DebugState, F>, state: F): AccessibilityRelation<DebugState, F> {
+    testifyOne(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation<F> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<DebugState, F> {
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<F> {
         throw new ImplementMeException();
     }
 

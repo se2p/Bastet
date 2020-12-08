@@ -446,19 +446,19 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         actors.put("actorOrder", this._task.actors.map(a => a.ident).toString())
     }
 
-    testify(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {
+    testify(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         return this._wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {
+    testifyOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         return this._wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         return this._wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         return this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
@@ -466,7 +466,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         throw new NotSupportedException();
     }
 
-    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {
+    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         throw new ImplementMeException();
     }
 

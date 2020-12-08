@@ -134,7 +134,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         this._domain = Preconditions.checkNotUndefined(abstractDomain);
     }
 
-    testify(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState, AbstractState> {
+    testify(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         throw new ImplementMeException();
     }
 
@@ -147,7 +147,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
      * @param accessibility
      * @param targetState
      */
-    testifyOne(accessibility: AccessibilityRelation<AbstractState, AbstractState>, targetState: AbstractState): AccessibilityRelation<AbstractState, AbstractState> {
+    testifyOne(accessibility: AccessibilityRelation<AbstractState>, targetState: AbstractState): AccessibilityRelation<AbstractState> {
         const alternatives = this.determineBranchingAlternatives(accessibility, targetState);
         if (alternatives.elements.length == 0) {
             return accessibility;
@@ -173,14 +173,14 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
 
         // Testify the accessibility relation based on the model for the `choiceQuery` formula
         // - make sure to return the empty accessibility relation in case the formula is infeasible
-        const result: AccessibilityRelation<AbstractState, AbstractState> = this.strenghtenRelation(
+        const result: AccessibilityRelation<AbstractState> = this.strenghtenRelation(
             accessibility, alternatives, satAssignement, targetState);
 
         // return the result (strengthened accessibility relation)
         return result;
     }
 
-    private determineBranchingAlternatives(accessibility: AccessibilityRelation<AbstractState, AbstractState>, targetState: AbstractState): BranchingAlternatives {
+    private determineBranchingAlternatives(accessibility: AccessibilityRelation<AbstractState>, targetState: AbstractState): BranchingAlternatives {
         const initialState: AbstractState = getTheOnlyElement(accessibility.initial());
         const worklist: AbstractState[] = [initialState];
         const result: BranchingAlternatives = new BranchingAlternatives();
@@ -208,7 +208,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         return result;
     }
 
-    private getBranchingTo(ar: AccessibilityRelation<AbstractState, AbstractState>, from: AbstractState): ConditionalBranch[] {
+    private getBranchingTo(ar: AccessibilityRelation<AbstractState>, from: AbstractState): ConditionalBranch[] {
         const nextSplit = this.getNextSplitState(ar, from);
         if (!nextSplit) {
             return [];
@@ -239,7 +239,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         return result;
     }
 
-    private getNextSplitState(ar: AccessibilityRelation<AbstractState, AbstractState>, from: AbstractState): AbstractState | null {
+    private getNextSplitState(ar: AccessibilityRelation<AbstractState>, from: AbstractState): AbstractState | null {
        const worklist: AbstractState[] = [];
        worklist.push(from);
        while (worklist.length > 0) {
@@ -271,18 +271,18 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         return result;
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         throw new ImplementMeException();
     }
 
     /**
      * Get the program operations with SCOPES and SSA indices.
      */
-    private getTransitionLabels(ar: AccessibilityRelation<AbstractState, AbstractState>, from: AbstractState, to: AbstractState): ProgramOperation[] {
+    private getTransitionLabels(ar: AccessibilityRelation<AbstractState>, from: AbstractState, to: AbstractState): ProgramOperation[] {
         return ar.labeler().getTransitionLabel(from, to);
     }
 
@@ -316,13 +316,13 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         return this._theories.boolTheory.equal(branchCondition, branchPredicate);
     }
 
-    private recoverTraceFormula(accessibility: AccessibilityRelation<AbstractState, AbstractState>, targetState: AbstractState): BooleanFormula {
+    private recoverTraceFormula(accessibility: AccessibilityRelation<AbstractState>, targetState: AbstractState): BooleanFormula {
         return targetState.accept(new StateFormulaVisitor());
     }
 
-    private strenghtenRelation(accessibility: AccessibilityRelation<AbstractState, AbstractState>,
+    private strenghtenRelation(accessibility: AccessibilityRelation<AbstractState>,
                                alternatives: BranchingAlternatives, satAssignement: ConcreteMemory,
-                               targetState: AbstractState): AccessibilityRelation<AbstractState, AbstractState> {
+                               targetState: AbstractState): AccessibilityRelation<AbstractState> {
         const result = AccessibilityRelations.filterForwards(accessibility, (s1, s2) => {
             const branchName = this.createBranchName(s1, s2);
             const assignement = satAssignement.booleanMem.get(branchName);

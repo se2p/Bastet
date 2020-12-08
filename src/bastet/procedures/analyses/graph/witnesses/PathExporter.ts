@@ -57,7 +57,7 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
         this.exportTargetState(testified, violating);
     }
 
-    private exportPath(pathAr: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, violating: GraphAbstractState) {
+    private exportPath(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState) {
         let fs = require('fs');
         const filepath = `output/cex_path_${violating.getId()}.txt`;
         const pathElements: string[] = [];
@@ -83,7 +83,7 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
         return this._tlp.getTransitionLabel(work, succ);
     }
 
-    private exportTargetState(ar: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, violating: GraphAbstractState) {
+    private exportTargetState(ar: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState) {
         const violatingConcreteElement: ConcreteElement = ar.concretizer().concretizeOne(violating);
         Preconditions.checkArgument(violatingConcreteElement instanceof ConcreteMemory);
         const errorState: ConcreteMemory = violatingConcreteElement as ConcreteMemory;
@@ -104,7 +104,7 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
         fs.writeFileSync(filepath, JSON.stringify(targetJson, null, 4));
     }
 
-    private exportConcretePath(pathAr: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, violating: GraphAbstractState) {
+    private exportConcretePath(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState) {
         const pathElements = [];
 
         const concrete: ConcreteElement = pathAr.concretizer().concretizeOne(violating);

@@ -230,26 +230,26 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<AbstractionState, AbstractState>, state: AbstractState): AccessibilityRelation<AbstractionState, AbstractState> {
+    testify(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<AbstractionState, AbstractState>, state: AbstractState): AccessibilityRelation<AbstractionState, AbstractState> {
+    testifyOne(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<AbstractionState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractionState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         const resultWithSSA = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
 
         // TODO: Remove the SSA-Indices from the concrete elements along the path
         throw new ImplementMeException();
     }
 
-    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractionState, AbstractState> {
+    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {
         throw new ImplementMeException();
     }
 

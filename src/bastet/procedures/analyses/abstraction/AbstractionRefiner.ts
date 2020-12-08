@@ -29,10 +29,11 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {AbstractionState, AbstractionStateLattice} from "./AbstractionAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {AccessibilityOperator} from "../ProgramAnalysis";
+import {AccessibilityOperator, WidenOperator} from "../ProgramAnalysis";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 import {PrecisionOperator} from "./AbstractionComputation";
 import {PredicatePrecision} from "../../AbstractionPrecision";
+import {AccessibilityRelation} from "../Accessibility";
 
 export class AbstractionRefiner implements Refiner<AbstractionState, AbstractState>, PrecisionOperator<AbstractionState, PredicatePrecision> {
 
@@ -40,18 +41,17 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
 
     private readonly _lattice: AbstractionStateLattice;
 
-    private readonly _accOp: AccessibilityOperator<AbstractionState, AbstractState>;
+    private readonly _widenOp: WidenOperator<AbstractionState, AbstractState>;
 
     constructor(unwrapper: Unwrapper<AbstractState, AbstractElement>, lattice: AbstractionStateLattice,
-                accOp: AccessibilityOperator<AbstractionState, AbstractState>) {
+                widenOp: WidenOperator<AbstractionState, AbstractState>) {
         this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
         this._lattice = Preconditions.checkNotUndefined(lattice);
-        this._accOp = Preconditions.checkNotUndefined(accOp);
+        this._widenOp = Preconditions.checkNotUndefined(widenOp);
     }
 
-    public checkIsFeasible(reached: ReachedSet<AbstractState>, e: AbstractionState, purpose?: string): boolean {
+    public checkIsFeasible(reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractionState>, e: AbstractionState, purpose?: string): boolean {
         // 1. Build the abstract path formula (describes a set of paths)
-        const ar = this._accOp.accessibility(reached, e);
 
         // Use:
         //      isWideningState operator (from the CPA)
@@ -67,6 +67,7 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
     }
 
     public refinePrecision(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>,
+                           ar: AccessibilityRelation<AbstractionState>,
                            infeasibleState: AbstractState): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         // TODO: welchen Teil vom ReachedSet wegwerfen?
         //  -> Man wirft den Teil weg, der infeasible ist
@@ -83,7 +84,7 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
      * @private
      */
     private isWideningState(state: AbstractionState) {
-        return state.getWrappedState() === this._lattice.wrappedStateLattice.top();
+        return this._widenOp.isWideningState(state);
     }
 
     public precisionFor(state: AbstractionState): PredicatePrecision {

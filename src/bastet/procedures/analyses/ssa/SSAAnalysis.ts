@@ -196,26 +196,26 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<SSAState, AbstractState>, state: AbstractState): AccessibilityRelation<SSAState, AbstractState> {
+    testify(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<SSAState, AbstractState>, state: AbstractState): AccessibilityRelation<SSAState, AbstractState> {
+    testifyOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<SSAState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<SSAState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         const resultWithSSA = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
 
         // TODO: Remove the SSA-Indices from the concrete elements along the path
         throw new ImplementMeException();
     }
 
-    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<SSAState, AbstractState> {
+    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         throw new ImplementMeException();
     }
 

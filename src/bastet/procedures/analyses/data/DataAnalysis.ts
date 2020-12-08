@@ -128,7 +128,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         throw new NotSupportedException();
     }
 
-    chooseFinitePathAlong(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): AbstractState[] {
+    chooseFinitePathAlong(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AbstractState[] {
         throw new ImplementMeException();
     }
 
@@ -136,7 +136,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return this._transferRelation.abstractSucc(fromState);
     }
 
-    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<DataAbstractState, AbstractState> {
+    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         throw new ImplementMeException();
     }
 
@@ -234,19 +234,19 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
     }
 
-    testify(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<DataAbstractState, AbstractState> {
+    testify(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         return this._testifier.testify(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         return this._testifier.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         return this._testifier.testifyConcreteOne(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<DataAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<DataAbstractState, AbstractState> {
+    testifyOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         return this._testifier.testifyOne(accessibility, state);
     }
 

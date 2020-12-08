@@ -81,7 +81,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         });
     }
 
-    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<E, F> {
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation< F> {
        return this._wrappedAnalysis.accessibility(reached, state);
     }
 
@@ -217,25 +217,25 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<E, F>, state: F): AccessibilityRelation<E, F> {
+    testify(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation< F> {
         return this._testifyStats.runWithTimer(() => {
             return this.wrappedAnalysis.testify(accessibility, state);
         });
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<E, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]> {
         return this._testifyStats.runWithTimer(() => {
             return this.wrappedAnalysis.testifyConcrete(accessibility, state);
         });
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<E, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]> {
         return this._testifyStats.runWithTimer(() => {
             return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
         });
     }
 
-    testifyOne(accessibility: AccessibilityRelation<E, F>, state: F): AccessibilityRelation<E, F> {
+    testifyOne(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation< F> {
         return this._testifyStats.runWithTimer(() => {
             return this.wrappedAnalysis.testifyOne(accessibility, state);
         });
