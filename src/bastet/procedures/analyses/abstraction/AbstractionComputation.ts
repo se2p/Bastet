@@ -124,15 +124,13 @@ export class BooleanPredicateAbstraction extends PredicateAbstraction {
         const instantiatedPredicates: FirstOrderFormula[] = this.instantiatePrecisionFor(of, withPrecision.predicates.toArray());
         const newSummary: FirstOrderFormula = this.instantiateAsSummary(this._prover.booleanAbstraction(abstractionProblem, instantiatedPredicates));
 
-/*
         console.log("-ABST-PROB----------");
         console.log(this._prover.stringRepresentation(abstractionProblem));
-        console.log("-INST-PI-----");
+        console.log(`-INST-PI-----${withPrecision.predicates.size}`);
         instantiatedPredicates.forEach((p) => console.log(this._prover.stringRepresentation(p)));
 
         console.log(">>>");
         console.log(this._prover.stringRepresentation(newSummary));
-*/
 
         return of.withAbstraction(newSummary)
             .withWrappedState(this._stateToSummarizeLattice.top());

@@ -40,6 +40,8 @@ import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentExc
 import {DebugState} from "./debug/DebugAbstractDomain";
 import {getTheOnlyElement} from "../../utils/Collections";
 import {AbstractionState} from "./abstraction/AbstractionAbstractDomain";
+import {ProgramAnalysis} from "./ProgramAnalysis";
+import {ConcreteElement} from "../domains/ConcreteElements";
 
 const colormap = require('colormap')
 
@@ -197,6 +199,21 @@ export class ColorByActorVisitor extends StateColorVisitor {
 }
 
 export class PenSizeVisitor extends DelegatingStateVisitor<number> {
+
+    private readonly _analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>;
+
+    constructor(analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>) {
+        super();
+        this._analysis = Preconditions.checkNotUndefined(analysis);
+    }
+
+    public visitGraphAbstractState(state: GraphAbstractState): number {
+        if (this._analysis.target(state).length > 0) {
+            return 4;
+        } else {
+            return this.defaultResultFor(state);
+        }
+    }
 
     protected defaultResultFor(element: AbstractElement): number {
         return 1;

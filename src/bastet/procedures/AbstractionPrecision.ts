@@ -225,7 +225,7 @@ export class PredicatePrecisionLattice<F extends FirstOrderFormula> implements A
             return element2;
         }
 
-        return element1.withPredicates(element2.predicates);
+        return element1.withPredicates(element2.predicates.union(element1.predicates));
     }
 
     meet(element1: PredicatePrecision, element2: PredicatePrecision): PredicatePrecision {

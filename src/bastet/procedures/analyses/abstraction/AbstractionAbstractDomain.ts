@@ -140,10 +140,6 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
         const formula2: FirstOrderFormula = this.summaryLattice.meet(element2.getAbstraction(),
             getTheOnlyElement(DataAbstractStates.extractFrom(element2)).blockFormula);
 
-        console.log("IMPL-----------");
-        console.log(this.summaryLattice.prover.stringRepresentation(formula1));
-        console.log(this.summaryLattice.prover.stringRepresentation(formula2));
-
         return this._summaryLattice.isIncluded(formula1, formula2);
     }
 

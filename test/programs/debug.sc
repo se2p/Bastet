@@ -8,21 +8,22 @@ actor MiniActor is RuntimeEntity begin
        declare z as int
        define x as 3
        define y as 0
-       define z as 4
 
        precision push x + y = 3
-       precision push y >= 0
-       precision push x <= 3
-       precision push z > 2
+       precision push y > 0
+       precision push y = 0
+       precision push x < 3
+       precision push y < 3
+       precision push x = 3
 
        until x = 0 repeat begin
            define x as x - 1
            define y as y + 1
        end
 
-       if y = 3 then begin
+       if not y = 3 then begin
             _RUNTIME_signalFailure()
-        end
+       end
     end
 
 end

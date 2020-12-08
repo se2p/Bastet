@@ -227,7 +227,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     exportAnalysisResult(reachedPrime: StateSet<AbstractState>, frontierPrime: StateSet<AbstractState>) {
-        const exporter = new GraphToDot(this._task, this, this,
+        const exporter = new GraphToDot(this._task, this, this, this,
             reachedPrime as StateSet<GraphAbstractState>,
             frontierPrime as StateSet<GraphAbstractState>);
 
@@ -251,7 +251,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     private onStateError(reached: GraphReachedSetWrapper<GraphAbstractState>, e: GraphAbstractState): void {
-        const toDot = new GraphContextToDot(this._task, this, reached);
+        const toDot = new GraphContextToDot(this._task, this, this, reached);
         toDot.writeContextToFile(`output/state-${e.getId()}-context.dot`, e.getId());
     }
 

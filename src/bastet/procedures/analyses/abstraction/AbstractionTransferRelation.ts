@@ -66,7 +66,8 @@ export class AbstractionTransferRelation implements LabeledTransferRelation<Abst
             const e = fromState.withWrappedState(w);
 
             if (op.ast instanceof PrecisionPushStatement) {
-                result.push(e.withPrecision(e.getPrecision().push(this.parseToPredicatePrecision(op.ast.predicate))));
+                const predicate = this.parseToPredicatePrecision(op.ast.predicate);
+                result.push(e.withPrecision(e.getPrecision().push(predicate)));
             } else if (op.ast instanceof PrecisionPushStatement) {
                 result.push(e.withPrecision(e.getPrecision().pop()));
             } else {
