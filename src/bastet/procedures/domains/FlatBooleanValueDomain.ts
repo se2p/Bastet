@@ -24,13 +24,13 @@
  */
 
 
-import {AbstractionPrecision} from "./AbstractDomain";
 import {AbstractBoolean, AbstractBooleanDomain, BooleanTheory} from './MemoryTransformer'
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {ConcreteBoolean, ConcreteDomain} from './ConcreteElements'
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Record as ImmRec} from "immutable";
 import {Variable} from "../../syntax/ast/core/Variable";
+import {AbstractionPrecision} from "../AbstractionPrecision";
 
 export class FlatBoolLattice implements Lattice<FlatBooleanValue> {
 

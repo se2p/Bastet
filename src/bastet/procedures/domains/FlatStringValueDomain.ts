@@ -23,11 +23,12 @@
  *
  */
 
-import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
+import {AbstractDomain} from "./AbstractDomain";
 import {AbstractString} from "./MemoryTransformer";
 import {Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {ConcreteDomain, ConcreteString} from './ConcreteElements'
+import {AbstractionPrecision} from "../AbstractionPrecision";
 
 export class FlatStringValueDomain implements AbstractDomain<ConcreteString, AbstractString> {
 
