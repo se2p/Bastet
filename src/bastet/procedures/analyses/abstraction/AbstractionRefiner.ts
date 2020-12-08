@@ -29,7 +29,6 @@ import {ImplementMeException} from "../../../core/exceptions/ImplementMeExceptio
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {AbstractionState, AbstractionStateLattice} from "./AbstractionAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {AccessibilityOperator, WidenOperator} from "../ProgramAnalysis";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 import {PrecisionOperator} from "./AbstractionComputation";
 import {PredicatePrecision} from "../../AbstractionPrecision";
@@ -41,20 +40,16 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
 
     private readonly _lattice: AbstractionStateLattice;
 
-    private readonly _widenOp: WidenOperator<AbstractionState, AbstractState>;
-
-    constructor(unwrapper: Unwrapper<AbstractState, AbstractElement>, lattice: AbstractionStateLattice,
-                widenOp: WidenOperator<AbstractionState, AbstractState>) {
+    constructor(unwrapper: Unwrapper<AbstractState, AbstractElement>, lattice: AbstractionStateLattice) {
         this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
         this._lattice = Preconditions.checkNotUndefined(lattice);
-        this._widenOp = Preconditions.checkNotUndefined(widenOp);
     }
 
     public checkIsFeasible(reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractionState>, e: AbstractionState, purpose?: string): boolean {
         // 1. Build the abstract path formula (describes a set of paths)
 
         // Use:
-        //      isWideningState operator (from the CPA)
+        //      isWideningState function
         //      DataAbstractStates.extractFrom(...)
 
         // ATTENTION: We assume that there is only one unique sequence of
@@ -84,7 +79,7 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
      * @private
      */
     private isWideningState(state: AbstractionState) {
-        return this._widenOp.isWideningState(state);
+        throw new ImplementMeException();
     }
 
     public precisionFor(state: AbstractionState): PredicatePrecision {
