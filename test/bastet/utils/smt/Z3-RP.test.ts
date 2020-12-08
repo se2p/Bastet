@@ -208,8 +208,6 @@ test("BPA 1",() => {
     const fOLattice = smt.createLattice(prover, theories.boolTheory);
     const fOD = new FirstOrderDomain(fOLattice);
 
-    const endForm = fOD.booleanPredicateAbstraction(basicTerm,abstractPrec,ctx);
-    console.log(endForm);
 })
 
 class TestFormulaBuilder {
