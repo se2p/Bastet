@@ -27,8 +27,6 @@ import {MergeOperator} from "../ProgramAnalysis";
 import {AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {App} from "../../../syntax/app/App";
-import {LabeledTransferRelation} from "../TransferRelation";
-import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
 import {AbstractionState, AbstractionStateLattice} from "./AbstractionAbstractDomain";
 
 export class AbstractionMergeOperator implements MergeOperator<AbstractionState> {

@@ -25,24 +25,24 @@
 
 import {AbstractState, Lattice} from "../../../lattices/Lattice";
 import {AbstractionPrecision, PredicatePrecision, PredicatePrecisionLattice} from "../../AbstractionPrecision";
-import {AbstractionState, AbstractionStateLattice} from "./AbstractionAbstractDomain";
+import {AbstractionState} from "./AbstractionAbstractDomain";
 import {
     BooleanFormula,
     FirstOrderFormula,
     FloatFormula,
-    IntegerFormula, ListFormula,
-    RealFormula, StringFormula
+    IntegerFormula,
+    ListFormula,
+    RealFormula,
+    StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {FirstOrderSolver} from "../../domains/FirstOrderDomain";
 import {AbstractTheories} from "../../domains/MemoryTransformer";
-import {SSAMap, SSAState, SSAStateLattice} from "../ssa/SSAAbstractDomain";
+import {SSAState} from "../ssa/SSAAbstractDomain";
 import {DataAbstractStates} from "../data/DataAbstractStates";
-import {from} from "immutable/contrib/cursor";
 import {getTheOnlyElement} from "../../../utils/Collections";
 import {SSAAbstractStates} from "../ssa/SSAAbstractStates";
-import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
 
 export interface AbstractionComputation<E extends AbstractState, P extends AbstractionPrecision> {
 

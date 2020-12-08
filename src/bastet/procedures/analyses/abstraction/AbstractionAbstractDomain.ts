@@ -23,24 +23,18 @@
  *
  */
 
-import {
-    AbstractElement,
-    AbstractElementVisitor,
-    AbstractState,
-    Lattice,
-    LatticeWithComplements
-} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {List as ImmList, Map as ImmMap, Record as ImmRec} from "immutable"
+import {Record as ImmRec} from "immutable"
 import {SingletonStateWrapper} from "../AbstractStates";
-import {ConcreteDomain, ConcreteElement, ConcreteMemory, ConcretePrimitive} from "../../domains/ConcreteElements";
+import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
 import {
     AbstractionPrecision,
-    PredicatePrecision,
-    PredicatePrecisionLattice, PredicatePrecisionStack,
+    PredicatePrecisionLattice,
+    PredicatePrecisionStack,
     PredicatePrecisionStackLattice
 } from "../../AbstractionPrecision";
 import {AbstractionComputation} from "./AbstractionComputation";

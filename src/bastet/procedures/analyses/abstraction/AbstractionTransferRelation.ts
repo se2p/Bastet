@@ -32,14 +32,16 @@ import {Concern} from "../../../syntax/Concern";
 import {AbstractionAbstractDomain, AbstractionState} from "./AbstractionAbstractDomain";
 import {PrecisionPushStatement} from "../../../syntax/ast/core/Precisions";
 import {BooleanExpression} from "../../../syntax/ast/core/expressions/BooleanExpression";
-import {DataBoolExpressionVisitor, DataTransformerVisitor} from "../data/DataTransformerVisitor";
+import {DataBoolExpressionVisitor} from "../data/DataTransformerVisitor";
 import {TransformerTheories} from "../../domains/MemoryTransformer";
 import {
     BooleanFormula,
     FirstOrderFormula,
     FloatFormula,
-    IntegerFormula, ListFormula,
-    RealFormula, StringFormula
+    IntegerFormula,
+    ListFormula,
+    RealFormula,
+    StringFormula
 } from "../../../utils/ConjunctiveNormalForm";
 import {PrecisionRole, PredicatePrecision} from "../../AbstractionPrecision";
 
