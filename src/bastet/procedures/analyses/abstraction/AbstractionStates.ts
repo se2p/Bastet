@@ -43,7 +43,7 @@ export class AbstractionStateCollector extends DelegatingStateVisitor<Abstractio
 
 }
 
-export class AbstractionStateStates {
+export class AbstractionStateStates { // TODO: rename to AbstractionStates
 
     public static extractFrom(fromState: AbstractState): AbstractionState[] {
         const visitor = new AbstractionStateCollector();

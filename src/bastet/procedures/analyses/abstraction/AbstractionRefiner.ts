@@ -44,6 +44,8 @@ import {AccessibilityRelation} from "../Accessibility";
 import {FirstOrderSolver} from "../../domains/FirstOrderDomain";
 import {TransformerTheories} from "../../domains/MemoryTransformer";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
+import {getTheOnlyElement} from "../../../utils/Collections";
+import {AbstractionStateStates} from "./AbstractionStates";
 
 export class AbstractionRefinerConfig extends BastetConfiguration {
 
@@ -102,9 +104,9 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
         // 1. Build the abstract path formula (describes a set of paths)
         // 1.1 Extract the sequence of states for that a widening was computed along the
         // given accessibility relation.
-        const wideningStateSeq: AbstractionState[] = this.determineWideningStateSeqTo(ar, e);
+        const wideningStateSeq: AbstractionState[] = this.getBlockStateSequence(ar, e);
         const blockFormulas: FirstOrderFormula[] = this.extractTraceBlockFormulas(wideningStateSeq);
-        Preconditions.checkState(wideningStateSeq.length == blockFormulas.length - 1);
+        Preconditions.checkState(wideningStateSeq.length == blockFormulas.length + 1);
 
         // Use:
         //      isWideningState function
@@ -120,7 +122,7 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
                 this._prover.assert(blockFormula);
             }
 
-            const feasible =  !this._prover.isUnsat();
+            const feasible = !this._prover.isUnsat();
 
             if (!feasible) {
                 // Compute interpolant
@@ -166,13 +168,13 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
     }
 
     /**
-     * Determine wheter or not a widening was performed for a given abstract state.
+     * Determine whether or not a widening was performed for a given abstract state.
      *
      * @param state
      * @private
      */
     private isWideningState(state: AbstractionState) {
-        throw new ImplementMeException();
+        return this._lattice.wrappedStateLattice.isIncluded(this._lattice.wrappedStateLattice.top(), state.getWrappedState());
     }
 
     public precisionFor(state: AbstractionState): PredicatePrecision {
@@ -180,8 +182,27 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
             this._lattice.precStacLattice.lattice.join(pi, result), this._currentPrecision);
     }
 
-    private determineWideningStateSeqTo(ar: AccessibilityRelation<AbstractionState>, e: AbstractionState): AbstractionState[] {
-        throw new ImplementMeException();
+    private getBlockStateSequence(ar: AccessibilityRelation<AbstractState>, e: AbstractState): AbstractionState[] {
+        const result: AbstractionState[] = [];
+        result.push(AbstractionRefiner.getSingleAbstractionState(e));
+
+        const predecessors: AbstractionState[] = ar.predecessorsOf(e)
+            .map(AbstractionRefiner.getSingleAbstractionState);
+        for (const pred of predecessors) {
+            if (this.isWideningState(pred)) {
+                result.push(pred);
+            } else {
+                for (const abstractState of ar.predecessorsOf(pred)) {
+                    predecessors.push(AbstractionRefiner.getSingleAbstractionState(abstractState));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private static getSingleAbstractionState(e: AbstractState): AbstractionState {
+        return getTheOnlyElement(AbstractionStateStates.extractFrom(e));
     }
 
     private extractTraceBlockFormulas(wideningStateSeq: AbstractionState[]): FirstOrderFormula[] {
