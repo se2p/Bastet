@@ -39,13 +39,12 @@ import {
 } from "../../AbstractionPrecision";
 import {AbstractionComputation} from "./AbstractionComputation";
 import {AbstractDomain} from "../../domains/AbstractDomain";
-import {DataAbstractStates} from "../data/DataAbstractStates";
-import {getTheOnlyElement} from "../../../utils/Collections";
+import {BlockSummary, BlockSummaryLattice} from "./BlockSummary";
 
 
 export interface AbstractionStateAttribs extends AbstractElement, SingletonStateWrapper {
 
-    abstraction: FirstOrderFormula;
+    summary: BlockSummary;
 
     precision: PredicatePrecisionStack;
 
@@ -55,7 +54,7 @@ export interface AbstractionStateAttribs extends AbstractElement, SingletonState
 
 const AbstractionStateRecord = ImmRec({
 
-    abstraction: null,
+    summary: null,
 
     precision: null,
 
@@ -65,12 +64,12 @@ const AbstractionStateRecord = ImmRec({
 
 export class AbstractionState extends AbstractionStateRecord implements AbstractionStateAttribs, AbstractState {
 
-    constructor(abstraction: FirstOrderFormula, precision: PredicatePrecisionStack, wrapped: AbstractElement) {
-        super({abstraction: abstraction, precision: precision, wrappedState: wrapped});
+    constructor(summary: BlockSummary, precision: PredicatePrecisionStack, wrapped: AbstractElement) {
+        super({summary: summary, precision: precision, wrappedState: wrapped});
     }
 
-    public getAbstraction(): FirstOrderFormula {
-        return this.get("abstraction");
+    public getSummary(): BlockSummary {
+        return this.get("summary");
     }
 
     public getPrecision(): PredicatePrecisionStack {
@@ -81,8 +80,8 @@ export class AbstractionState extends AbstractionStateRecord implements Abstract
         return this.get("wrappedState");
     }
 
-    public withAbstraction(formula: FirstOrderFormula): AbstractionState {
-        return this.set("abstraction", formula);
+    public withSummary(summary: BlockSummary): AbstractionState {
+        return this.set("summary", summary);
     }
 
     public withWrappedState(wrapped: AbstractElement): AbstractionState {
@@ -108,7 +107,7 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
 
     private readonly _wrappedStateLattice: Lattice<AbstractElement>;
 
-    private readonly _summaryLattice: FirstOrderLattice<FirstOrderFormula>;
+    private readonly _summaryLattice: BlockSummaryLattice;
 
     private readonly _bottom: AbstractionState;
 
@@ -118,7 +117,7 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
 
     constructor(summaryLattice: FirstOrderLattice<FirstOrderFormula>, wrappedStateLattice: Lattice<AbstractElement>) {
         this._wrappedStateLattice = Preconditions.checkNotUndefined(wrappedStateLattice);
-        this._summaryLattice = Preconditions.checkNotUndefined(summaryLattice);
+        this._summaryLattice = new BlockSummaryLattice(summaryLattice);
         this._precStacLattice = new PredicatePrecisionStackLattice(new PredicatePrecisionLattice(summaryLattice));
         this._bottom = new AbstractionState(this._summaryLattice.bottom(), this._precStacLattice.bottom(), wrappedStateLattice.bottom());
         this._top = new AbstractionState(this._summaryLattice.top(), this._precStacLattice.top(), wrappedStateLattice.top());
@@ -129,23 +128,19 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
     }
 
     isIncluded(element1: AbstractionState, element2: AbstractionState): boolean {
-        const formula1: FirstOrderFormula = this.summaryLattice.meet(element1.getAbstraction(),
-            getTheOnlyElement(DataAbstractStates.extractFrom(element1)).blockFormula);
-        const formula2: FirstOrderFormula = this.summaryLattice.meet(element2.getAbstraction(),
-            getTheOnlyElement(DataAbstractStates.extractFrom(element2)).blockFormula);
-
-        return this._summaryLattice.isIncluded(formula1, formula2);
+        // TODO: use "summary.summaryFormula" instead of "summary.summary" -> need to create a getter for summaryFormula
+        return this.summaryLattice.folLattice.isIncluded(element1.summary.summary, element2.summary.summary);
     }
 
     join(element1: AbstractionState, element2: AbstractionState): AbstractionState {
         return element1
-            .withAbstraction(this._summaryLattice.join(element1.getAbstraction(), element2.getAbstraction()))
+            .withSummary(this._summaryLattice.join(element1.summary, element2.summary))
             .withWrappedState(this._wrappedStateLattice.join(element1.getWrappedState(), element2.getWrappedState()));
     }
 
     meet(element1: AbstractionState, element2: AbstractionState): AbstractionState {
         return element1
-            .withAbstraction(this._summaryLattice.meet(element1.getAbstraction(), element2.getAbstraction()))
+            .withSummary(this._summaryLattice.meet(element1.summary, element2.summary))
             .withWrappedState(this._wrappedStateLattice.meet(element1.getWrappedState(), element2.getWrappedState()));
 
     }
@@ -158,7 +153,7 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
         return this._wrappedStateLattice;
     }
 
-    get summaryLattice(): FirstOrderLattice<FirstOrderFormula> {
+    get summaryLattice(): BlockSummaryLattice {
         return this._summaryLattice;
     }
 

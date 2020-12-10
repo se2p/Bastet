@@ -32,7 +32,7 @@ import {DataAbstractState} from "./DataAbstractDomain";
 import { Preconditions } from "../../../utils/Preconditions";
 import {AccessibilityRelation} from "../Accessibility";
 
-export class DataRefiner implements Refiner<DataAbstractState, AbstractState> {
+export class DataRefiner implements Refiner<AbstractState> {
 
     private readonly _lattice: LatticeWithComplements<AbstractState>;
 

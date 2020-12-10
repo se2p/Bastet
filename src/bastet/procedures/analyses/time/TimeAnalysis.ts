@@ -141,8 +141,8 @@ export class TimeAnalysis<F extends AbstractState>
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<TimeState, F> {
-        return new WrappingRefiner(this._wrappedAnalysis.refiner, this);
+    get refiner(): Refiner<F> {
+        return new WrappingRefiner(this._wrappedAnalysis.refiner);
     }
 
     get wrappedAnalysis(): ProgramAnalysis<any, any, F> {

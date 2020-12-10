@@ -62,7 +62,7 @@ class InterpolationSolution {
     private readonly _targetState: AbstractState;
     private readonly _interpolants: FirstOrderFormula[];
 
-    constructor(e: AbstractionState, interpolants: FirstOrderFormula[]) {
+    constructor(e: AbstractState, interpolants: FirstOrderFormula[]) {
         this._targetState = Preconditions.checkNotUndefined(e);
         this._interpolants = Preconditions.checkNotUndefined(interpolants);
     }
@@ -76,7 +76,7 @@ class InterpolationSolution {
     }
 }
 
-export class AbstractionRefiner implements Refiner<AbstractionState, AbstractState>, PrecisionOperator<AbstractionState, PredicatePrecision> {
+export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOperator<AbstractionState, PredicatePrecision> {
 
     private readonly _unwrapper: Unwrapper<AbstractState, AbstractElement>;
 
@@ -90,17 +90,17 @@ export class AbstractionRefiner implements Refiner<AbstractionState, AbstractSta
     private readonly _config: AbstractionRefinerConfig;
 
     constructor(config: {}, unwrapper: Unwrapper<AbstractState, AbstractElement>, lattice: AbstractionStateLattice, theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
-                precisionLattice: PredicatePrecisionLattice<FirstOrderFormula>) {
+                precisionLattice: PredicatePrecisionLattice<FirstOrderFormula>, prover: FirstOrderSolver<FirstOrderFormula>) {
         this._config = new AbstractionRefinerConfig(config);
         this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
         this._lattice = Preconditions.checkNotUndefined(lattice);
-        this._prover = lattice.summaryLattice.prover;
+        this._prover = prover;
         this._theories = Preconditions.checkNotUndefined(theories);
         this._precisionLattice = Preconditions.checkNotUndefined(precisionLattice);
         this._currentPrecision = precisionLattice.bottom();
     }
 
-    public checkIsFeasible(reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractionState>, e: AbstractionState, purpose?: string): boolean {
+    public checkIsFeasible(reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractionState>, e: AbstractState, purpose?: string): boolean {
         // 1. Build the abstract path formula (describes a set of paths)
         // 1.1 Extract the sequence of states for that a widening was computed along the
         // given accessibility relation.

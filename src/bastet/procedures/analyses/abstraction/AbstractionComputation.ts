@@ -43,6 +43,7 @@ import {SSAState} from "../ssa/SSAAbstractDomain";
 import {DataAbstractStates} from "../data/DataAbstractStates";
 import {getTheOnlyElement} from "../../../utils/Collections";
 import {SSAAbstractStates} from "../ssa/SSAAbstractStates";
+import {BlockSummary} from "./BlockSummary";
 
 export interface AbstractionComputation<E extends AbstractState, P extends AbstractionPrecision> {
 
@@ -110,7 +111,7 @@ export abstract class PredicateAbstraction implements AbstractionComputation<Abs
      * @protected
      */
     protected constructAbstractionProblem(of: AbstractionState): FirstOrderFormula {
-        return this._theories.boolTheory.and(of.getAbstraction(), this.extractBlockFormula(of));
+        return this._theories.boolTheory.and(of.getSummary().summaryFormula, this.extractBlockFormula(of));
     }
 
     abstract computeAbstraction(of: AbstractionState, withPrecision: PredicatePrecision): AbstractionState;
@@ -120,6 +121,7 @@ export abstract class PredicateAbstraction implements AbstractionComputation<Abs
 export class BooleanPredicateAbstraction extends PredicateAbstraction {
 
     computeAbstraction(of: AbstractionState, withPrecision: PredicatePrecision): AbstractionState {
+        const blockFormula: FirstOrderFormula = this.extractBlockFormula(of);
         const abstractionProblem: FirstOrderFormula = this.constructAbstractionProblem(of);
         const instantiatedPredicates: FirstOrderFormula[] = this.instantiatePrecisionFor(of, withPrecision.predicates.toArray());
         const newSummary: FirstOrderFormula = this.instantiateAsSummary(this._prover.booleanAbstraction(abstractionProblem, instantiatedPredicates));
@@ -132,7 +134,7 @@ export class BooleanPredicateAbstraction extends PredicateAbstraction {
         // console.log(">>>");
         // console.log(this._prover.stringRepresentation(newSummary));
 
-        return of.withAbstraction(newSummary)
+        return of.withSummary(new BlockSummary(blockFormula, newSummary))
             .withWrappedState(this._stateToSummarizeLattice.top());
     }
 

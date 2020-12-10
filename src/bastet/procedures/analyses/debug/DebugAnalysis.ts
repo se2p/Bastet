@@ -63,7 +63,7 @@ export class DebugAnalysis<F extends AbstractState>
 
     private readonly _transfer: DebugTransferRelation;
 
-    private readonly _refiner: Refiner<DebugState, F>;
+    private readonly _refiner: Refiner<F>;
 
     private readonly _mergeOperator: MergeJoinOperator<DebugState>;
 
@@ -134,8 +134,8 @@ export class DebugAnalysis<F extends AbstractState>
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<DebugState, F> {
-        return new WrappingRefiner(this._wrappedAnalysis.refiner, this);
+    get refiner(): Refiner<F> {
+        return new WrappingRefiner(this._wrappedAnalysis.refiner);
     }
 
     get wrappedAnalysis(): ProgramAnalysisWithLabels<any, any, F> {

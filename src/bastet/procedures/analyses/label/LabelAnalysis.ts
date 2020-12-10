@@ -163,8 +163,8 @@ export class LabelAnalysis<F extends AbstractState>
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<LabelState, F> {
-        return new WrappingRefiner(this._wrappedAnalysis.refiner, this);
+    get refiner(): Refiner<F> {
+        return new WrappingRefiner(this._wrappedAnalysis.refiner);
     }
 
     get wrappedAnalysis(): ProgramAnalysis<any, any, F> {

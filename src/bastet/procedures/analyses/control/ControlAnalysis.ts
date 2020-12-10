@@ -268,8 +268,8 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         return e.getWrappedState();
     }
 
-    get refiner(): Refiner<ControlAbstractState, AbstractState> {
-        return new WrappingRefiner(this.wrappedAnalysis.refiner, this);
+    get refiner(): Refiner<AbstractState> {
+        return new WrappingRefiner(this.wrappedAnalysis.refiner);
     }
 
     get wrappedAnalysis(): ProgramAnalysisWithLabels<any, any, AbstractState> {

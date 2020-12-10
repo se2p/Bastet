@@ -132,8 +132,8 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return e.getWrappedState();
     }
 
-    get refiner(): Refiner<SSAState, AbstractState> {
-        return new WrappingRefiner(this._wrappedAnalysis.refiner, this);
+    get refiner(): Refiner<AbstractState> {
+        return new WrappingRefiner(this._wrappedAnalysis.refiner);
     }
 
     get abstractDomain(): AbstractDomain<ConcreteElement, SSAState> {

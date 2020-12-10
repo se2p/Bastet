@@ -238,8 +238,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         return e.getWrappedState();
     }
 
-    get refiner(): Refiner<GraphAbstractState, GraphAbstractState> {
-        return new WrappingRefiner(this._wrappedAnalysis.refiner, this);
+    get refiner(): Refiner<GraphAbstractState> {
+        return new WrappingRefiner(this._wrappedAnalysis.refiner);
     }
 
     get abstractDomain(): AbstractDomain<ConcreteElement, GraphAbstractState> {

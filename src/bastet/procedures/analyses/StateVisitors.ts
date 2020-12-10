@@ -102,7 +102,7 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
     }
 
     visitAbstractionState(element: AbstractionState): string {
-        return `${element.getAbstraction().toString()} ${element.getWrappedState().accept(this)}\n`;
+        return `${element.getSummary().summaryFormula.toString()} ${element.getWrappedState().accept(this)}\n`;
     }
 
     visitDebugState(element: DebugState): string {
