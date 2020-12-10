@@ -72,6 +72,8 @@ export class ControlAnalysisConfig extends BastetConfiguration {
     }
 
     get widenOnLoopHeads(): boolean {
+        // TODO: im predicateAbstraction branch in der predicate-abstraction.json diesen Parameter noch auf true
+        //  setzen
         return this.getBoolProperty('widen-on-loop-heads', false);
     }
 
