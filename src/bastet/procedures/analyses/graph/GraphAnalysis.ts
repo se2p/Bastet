@@ -164,7 +164,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         for (const succ of this._transferRelation.abstractSucc(fromState)) {
             if (this.target(succ).length > 0) {
                 // Only add feasible states
-                if (!Lattices.isFeasible(succ, this._abstractDomain.lattice)) {
+                if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Block Feasibility")) {
                     continue;
                 }
             }

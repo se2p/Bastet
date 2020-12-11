@@ -52,7 +52,7 @@ export class AbstractionMergeOperator implements MergeOperator<AbstractionState>
             return false;
         }
 
-        return state1.getSummary().equals(state2.getSummary());
+        return state1.getEnteringSummary().equals(state2.getEnteringSummary());
     }
 
 }

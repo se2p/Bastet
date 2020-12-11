@@ -59,6 +59,7 @@ import {BooleanPredicateAbstraction, PredicateAbstraction} from "./AbstractionCo
 import {TransformerTheories} from "../../domains/MemoryTransformer";
 import {SSAAnalysis} from "../ssa/SSAAnalysis";
 import {PredicatePrecisionLattice} from "../../AbstractionPrecision";
+import {Optional} from "../../../utils/Optional";
 
 
 export class AbstractionAnalysisConfig extends BastetConfiguration {
@@ -183,7 +184,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     initialStatesFor(task: App): AbstractionState[] {
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            return new AbstractionState(this._abstractDomain.lattice.summaryLattice.top(), this._abstractDomain.lattice.precStacLattice.bottom(), w);
+            return new AbstractionState(this._abstractDomain.lattice.folLattice.top(), w, this._abstractDomain.lattice.precStacLattice.bottom(), Optional.absent());
         } );
     }
 

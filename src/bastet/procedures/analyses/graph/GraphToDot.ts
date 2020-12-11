@@ -82,7 +82,8 @@ export class GraphToDot  {
             + this._traversalKeyProvider.getLexiOrderKey(e).toString());
         const stateColor = e.accept(new ColorByActorVisitor(this._task));
         const pensize = e.accept(new PenSizeVisitor(this._analysis));
-        this._dot.push(`    ${e.getId()} [label="${stateLabel}" penwidth=${pensize} color="black" fillcolor="${stateColor}"];`);
+        const shape = this._analysis.target(e).length > 0? "doubleoctagon" : "box";
+        this._dot.push(`    ${e.getId()} [label="${stateLabel}" shape="${shape}" penwidth=${pensize} color="black" fillcolor="${stateColor}"];`);
     }
 
     private opLabel(op: ProgramOperation): string {

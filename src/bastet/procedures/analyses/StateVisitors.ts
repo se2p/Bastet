@@ -102,7 +102,7 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
     }
 
     visitAbstractionState(element: AbstractionState): string {
-        return `${element.getSummary().summaryFormula.toString()} ${element.getWrappedState().accept(this)}\n`;
+        return `${element.getEnteringSummary().toString()} ${element.getWrappedState().accept(this)}\n`;
     }
 
     visitDebugState(element: DebugState): string {
@@ -207,9 +207,9 @@ export class PenSizeVisitor extends DelegatingStateVisitor<number> {
         this._analysis = Preconditions.checkNotUndefined(analysis);
     }
 
-    public visitGraphAbstractState(state: GraphAbstractState): number {
-        if (this._analysis.target(state).length > 0) {
-            return 4;
+    visitAbstractionState(state: AbstractionState): number {
+        if (state.getWideningOf().isPresent()) {
+            return 7;
         } else {
             return this.defaultResultFor(state);
         }

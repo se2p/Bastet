@@ -6,7 +6,7 @@ actor MiniActor is RuntimeEntity begin
        declare x as int
        declare y as int
        declare z as int
-       define x as 3
+       define x as 77
        define y as 0
 
        until x = 0 repeat begin
@@ -14,7 +14,7 @@ actor MiniActor is RuntimeEntity begin
            define y as y + 1
        end
 
-       if not y = 3 then begin
+       if not y = 77 then begin
             _RUNTIME_signalFailure()
        end
     end

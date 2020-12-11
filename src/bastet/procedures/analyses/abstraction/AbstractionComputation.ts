@@ -111,7 +111,7 @@ export abstract class PredicateAbstraction implements AbstractionComputation<Abs
      * @protected
      */
     protected constructAbstractionProblem(of: AbstractionState): FirstOrderFormula {
-        return this._theories.boolTheory.and(of.getSummary().summaryFormula, this.extractBlockFormula(of));
+        return this._theories.boolTheory.and(of.getEnteringSummary(), this.extractBlockFormula(of));
     }
 
     abstract computeAbstraction(of: AbstractionState, withPrecision: PredicatePrecision): AbstractionState;
@@ -121,7 +121,6 @@ export abstract class PredicateAbstraction implements AbstractionComputation<Abs
 export class BooleanPredicateAbstraction extends PredicateAbstraction {
 
     computeAbstraction(of: AbstractionState, withPrecision: PredicatePrecision): AbstractionState {
-        const blockFormula: FirstOrderFormula = this.extractBlockFormula(of);
         const abstractionProblem: FirstOrderFormula = this.constructAbstractionProblem(of);
         const instantiatedPredicates: FirstOrderFormula[] = this.instantiatePrecisionFor(of, withPrecision.predicates.toArray());
         const newSummary: FirstOrderFormula = this.instantiateAsSummary(this._prover.booleanAbstraction(abstractionProblem, instantiatedPredicates));
@@ -130,12 +129,12 @@ export class BooleanPredicateAbstraction extends PredicateAbstraction {
         // console.log(this._prover.stringRepresentation(abstractionProblem));
         // console.log(`-INST-PI-----${withPrecision.predicates.size}`);
         // instantiatedPredicates.forEach((p) => console.log(this._prover.stringRepresentation(p)));
-        //
         // console.log(">>>");
         // console.log(this._prover.stringRepresentation(newSummary));
 
-        return of.withSummary(new BlockSummary(blockFormula, newSummary))
-            .withWrappedState(this._stateToSummarizeLattice.top());
+        return of.withEnteringSummary(newSummary)
+            .withWrappedState(this._stateToSummarizeLattice.top())
+            .withWideningOf(of);
     }
 
 }

@@ -174,7 +174,7 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
      * @private
      */
     private isWideningState(state: AbstractionState) {
-        return this._lattice.wrappedStateLattice.isIncluded(this._lattice.wrappedStateLattice.top(), state.getWrappedState());
+        return state.getWideningOf().isPresent();
     }
 
     public precisionFor(state: AbstractionState): PredicatePrecision {

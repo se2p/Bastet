@@ -65,7 +65,7 @@ export class AbstractionTransferRelation implements LabeledTransferRelation<Abst
     abstractSuccFor(fromState: AbstractionState, op: ProgramOperation, co: Concern): Iterable<AbstractionState> {
         const result: AbstractionState[] = [];
         for (const w of this._wrapped.abstractSuccFor(fromState.wrappedState, op, co)) {
-            const e = fromState.withWrappedState(w);
+            const e = fromState.withWrappedState(w).withoutWideningOf();
 
             if (op.ast instanceof PrecisionPushStatement) {
                 const predicate = this.parseToPredicatePrecision(op.ast.predicate);
