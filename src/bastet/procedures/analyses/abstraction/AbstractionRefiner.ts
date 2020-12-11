@@ -47,6 +47,7 @@ import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {getTheOnlyElement} from "../../../utils/Collections";
 import {AbstractionStateStates} from "./AbstractionStates";
 import {DataAbstractStates} from "../../../../../../../../../../Users/stahlbau/uni/develop/bastet-framework/src/bastet/procedures/analyses/data/DataAbstractStates";
+import {SSAAbstractStates} from "../../../../../../../../../../Users/stahlbau/uni/develop/bastet-framework/src/bastet/procedures/analyses/ssa/SSAAbstractStates";
 
 export class AbstractionRefinerConfig extends BastetConfiguration {
 
@@ -106,8 +107,8 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         // 1.1 Extract the sequence of states for that a widening was computed along the
         // given accessibility relation.
         const wideningStateSeq: AbstractionState[] = this.getBlockStateSequence(ar, e);
-        const blockFormulas: FirstOrderFormula[] = this.extractTraceBlockFormulas(wideningStateSeq);
-        Preconditions.checkState(wideningStateSeq.length == blockFormulas.length);
+        const alignedBlockFormulas: FirstOrderFormula[] = this.alignSsaIndices(wideningStateSeq, this.extractTraceBlockFormulas(wideningStateSeq));
+        Preconditions.checkState(wideningStateSeq.length == alignedBlockFormulas.length);
 
         // Use:
         //      isWideningState function
@@ -119,7 +120,7 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         // 2. Check the feasibility of the trace formula
         this._prover.push();
         try {
-            for (const blockFormula of blockFormulas) {
+            for (const blockFormula of alignedBlockFormulas) {
                 console.log(this._prover.stringRepresentation(blockFormula));
                 this._prover.assert(blockFormula);
             }
@@ -130,7 +131,7 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
                 console.log("Interpolants needed!");
                 // Compute interpolant
                 const interpolants: FirstOrderFormula[] = this._prover.collectInterpolants();
-                Preconditions.checkState(interpolants.length === blockFormulas.length - 1,
+                Preconditions.checkState(interpolants.length === alignedBlockFormulas.length - 1,
                     "There should have been one interpolant for each intermediate point");
                 this._lastInterpolationSolution = new InterpolationSolution(e, interpolants);
             } else {
@@ -141,6 +142,14 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         } finally {
             this._prover.pop();
         }
+    }
+
+    alignSsaIndices(wideningStateSeq: AbstractionState[], blockFormulas: FirstOrderFormula[]): FirstOrderFormula[] {
+        Preconditions.checkArgument(blockFormulas.length > 0);
+        const result: FirstOrderFormula[] = [blockFormulas[0]];
+
+
+        return result;
     }
 
     public refinePrecision(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>,
