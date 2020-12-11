@@ -46,8 +46,11 @@ import {TransformerTheories} from "../../domains/MemoryTransformer";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {getTheOnlyElement} from "../../../utils/Collections";
 import {AbstractionStateStates} from "./AbstractionStates";
-import {DataAbstractStates} from "../../../../../../../../../../Users/stahlbau/uni/develop/bastet-framework/src/bastet/procedures/analyses/data/DataAbstractStates";
-import {SSAAbstractStates} from "../../../../../../../../../../Users/stahlbau/uni/develop/bastet-framework/src/bastet/procedures/analyses/ssa/SSAAbstractStates";
+import {Map as ImmMap} from "immutable"
+import {SSAState} from "../ssa/SSAAbstractDomain";
+import {SSAAbstractStates} from "../ssa/SSAAbstractStates";
+import {DataAbstractStates} from "../data/DataAbstractStates";
+
 
 export class AbstractionRefinerConfig extends BastetConfiguration {
 
@@ -148,6 +151,18 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         Preconditions.checkArgument(blockFormulas.length > 0);
         const result: FirstOrderFormula[] = [blockFormulas[0]];
 
+        const firstSSAState: SSAState = getTheOnlyElement(SSAAbstractStates.extractFrom(wideningStateSeq[0]));
+        let previousSsaMap: ImmMap<string, number> = firstSSAState.getSSA();
+        const currentSsaMap: { [id: string]: number } = {};
+
+        for (const f of blockFormulas.slice(1, blockFormulas.length)) {
+            result.push(this._theories.instantiate(f, (v, oldIndex) => {
+                const newIndex = (previousSsaMap[v] || 0) + oldIndex;
+                currentSsaMap[v] = newIndex;
+                return newIndex;
+            }));
+            previousSsaMap = ImmMap(currentSsaMap);
+        }
 
         return result;
     }
@@ -225,11 +240,11 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         const result: FirstOrderFormula[] = [];
 
         for (const abst of wideningStateSeq) {
-             if (abst.getWideningOf().isPresent()) {
-                 result.push(getTheOnlyElement(DataAbstractStates.extractFrom(abst.getWideningOf().getValue())).blockFormula);
-             } else {
-                 result.push(getTheOnlyElement(DataAbstractStates.extractFrom(abst)).blockFormula);
-             }
+            if (abst.getWideningOf().isPresent()) {
+                result.push(getTheOnlyElement(DataAbstractStates.extractFrom(abst.getWideningOf().getValue())).blockFormula);
+            } else {
+                result.push(getTheOnlyElement(DataAbstractStates.extractFrom(abst)).blockFormula);
+            }
         }
 
         return result;

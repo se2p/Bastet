@@ -35,7 +35,7 @@ import {
     RealTheory,
     StringTheory
 } from "../../../procedures/domains/MemoryTransformer";
-import {Record as ImmRec} from "immutable";
+import {Map as ImmMap, Record as ImmRec} from "immutable";
 import {LibZ3InContext, Z3_ast, Z3_sort} from "./libz3";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../../procedures/domains/ConcreteElements";
 import {Preconditions} from "../../Preconditions";
@@ -47,6 +47,10 @@ import {Variable} from "../../../syntax/ast/core/Variable";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {VariableCollectingVisitor} from "./Z3AST";
 import {SCOPE_SEPARATOR} from "../../../procedures/analyses/control/DataLocationScoping";
+import {AbstractionState} from "../../../procedures/analyses/abstraction/AbstractionAbstractDomain";
+import {SSAState} from "../../../procedures/analyses/ssa/SSAAbstractDomain";
+import {getTheOnlyElement} from "../../Collections";
+import {SSAAbstractStates} from "../../../procedures/analyses/ssa/SSAAbstractStates";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;
 
@@ -859,10 +863,10 @@ export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3F
     }
 
     public uninstantiate(formula: Z3Formula): Z3Formula {
-        return this.instantiate(formula, (n) => NaN);
+        return this.instantiate(formula, (n, o) => NaN);
     }
 
-    public instantiate(formula: Z3Formula, indexFn: (name: string) => number): Z3Formula {
+    public instantiate(formula: Z3Formula, indexFn: (name: string, oldIndex: number) => number): Z3Formula {
         // 1. Collect all variables
         const visitor = new VariableCollectingVisitor(this._ctx);
         let vars = visitor.visit(formula.getAST());
@@ -871,15 +875,18 @@ export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3F
         const substitutions: Map<Z3Formula, Z3Formula> = new Map();
         for (let [k, v] of vars) {
             const parts = k.split(SCOPE_SEPARATOR);
-            if (parts.length > 1) {
-                const isInstance = !isNaN(parseInt(parts[parts.length-1]));
+            let oldIndex = NaN;
+            const hasIndex = parts.length > 1;
+            if (hasIndex) {
+                oldIndex = parseInt(parts[parts.length-1]);
+                const isInstance = !isNaN(oldIndex);
                 if (isInstance) {
                     // Uninstantiate instances
                     parts.splice(parts.length-1, 1);
                     k = parts.join(SCOPE_SEPARATOR);
                 }
             }
-            const newIndex = indexFn(k);
+            const newIndex = indexFn(k, oldIndex);
             const sort: Z3_sort = this._ctx.get_sort(v.getAST());
             let v_new;
             if (isNaN(newIndex)) {
@@ -899,6 +906,26 @@ export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3F
         }
 
         return this.substitute(formula, fromASTs, toASTs);
+    }
+
+    public alignSsaIndices(blockFormulas: Z3Formula[], ssaOffset: Map<string, number>): Z3Formula[] {
+        Preconditions.checkArgument(blockFormulas.length > 0);
+
+        const result: Z3Formula[] = [blockFormulas[0]];
+
+        let previousSsaMap: ImmMap<string, number> = ImmMap(ssaOffset);
+        const currentSsaMap: { [id: string]: number } = {};
+
+        for (const f of blockFormulas.slice(1, blockFormulas.length)) {
+            result.push(this.instantiate(f, (v, oldIndex) => {
+                const newIndex = (previousSsaMap[v] || 0) + oldIndex;
+                currentSsaMap[v] = newIndex;
+                return newIndex;
+            }));
+            previousSsaMap = ImmMap(currentSsaMap);
+        }
+
+        return result;
     }
 
 }

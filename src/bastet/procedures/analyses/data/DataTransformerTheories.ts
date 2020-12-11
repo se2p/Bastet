@@ -104,8 +104,12 @@ export class Theories implements TransformerTheories<FirstOrderFormula, BooleanF
         return this._wrapped.stringRepresentation(element);
     }
 
-    instantiate(formula: FirstOrderFormula, indexFn: (name: string) => number): FirstOrderFormula {
+    instantiate(formula: FirstOrderFormula, indexFn: (name: string, oldIndex: number) => number): FirstOrderFormula {
         return this._wrapped.instantiate(formula, indexFn);
+    }
+
+    alignSsaIndices(blockFormulas: FirstOrderFormula[], ssaOffset: Map<string, number>): FirstOrderFormula[] {
+        return this._wrapped.alignSsaIndices(blockFormulas, ssaOffset);
     }
 
     uninstantiate(formula: FirstOrderFormula): FirstOrderFormula {

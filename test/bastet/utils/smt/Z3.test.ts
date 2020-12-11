@@ -78,6 +78,22 @@ test ("Substitute", () => {
     expect(theories.stringRepresentation(fy)).toEqual("(and (= y 0) (= y 42))");
 });
 
+test ("Instantiate", () => {
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
+    const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@6"), IntegerType.instance()));
+
+    const fx = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(y),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const fy = theories.instantiate(fx, (v, oldIndex) => oldIndex + 1);
+    expect(theories.stringRepresentation(fy)).toEqual("(and (= x@3 0) (= y@7 42))");
+});
+
 test ("Implication. Unsat", () => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
     prover.push();

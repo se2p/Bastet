@@ -29,6 +29,7 @@ import {AbstractElement} from "../../lattices/Lattice";
 import {AbstractDomain} from "./AbstractDomain";
 import {AbstractStringList} from "./StringListAbstractDomain";
 import {Variable} from "../../syntax/ast/core/Variable";
+import {Z3Formula} from "../../utils/smt/z3/Z3Theories";
 
 export interface AbstractValue extends AbstractElement {
 
@@ -315,7 +316,9 @@ export interface TheoryIndependent<E extends AbstractElement> {
 
     uninstantiate(formula: E): E;
 
-    instantiate(formula: E, indexFn: (name: string) => number): E;
+    instantiate(formula: E, indexFn: (name: string, oldIndex: number) => number): E;
+
+    alignSsaIndices(blockFormulas: E[], ssaOffset: Map<string, number>): E[];
 
 }
 
