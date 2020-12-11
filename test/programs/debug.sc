@@ -5,7 +5,6 @@ actor MiniActor is RuntimeEntity begin
     script on startup do begin
        declare x as int
        declare y as int
-       declare z as int
        define x as 77
        define y as 0
 
@@ -13,6 +12,9 @@ actor MiniActor is RuntimeEntity begin
            define x as x - 1
            define y as y + 1
        end
+
+       declare abc as int
+       define abc as 234
 
        if not y = 77 then begin
             _RUNTIME_signalFailure()

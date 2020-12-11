@@ -227,6 +227,10 @@ export class SSAStateVisitor implements AbstractStateVisitor<SSAState> {
         throw new ImplementMeForException(element.constructor.name);
     }
 
+    visitAbstractionState(element: AbstractionState): SSAState {
+        return element.getWrappedState().accept(this);
+    }
+
     visitControlAbstractState(element: ControlAbstractState): SSAState {
         return element.wrappedState.accept(this);
     }

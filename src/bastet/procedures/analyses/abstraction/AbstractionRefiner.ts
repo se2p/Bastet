@@ -46,6 +46,7 @@ import {TransformerTheories} from "../../domains/MemoryTransformer";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {getTheOnlyElement} from "../../../utils/Collections";
 import {AbstractionStateStates} from "./AbstractionStates";
+import {DataAbstractStates} from "../../../../../../../../../../Users/stahlbau/uni/develop/bastet-framework/src/bastet/procedures/analyses/data/DataAbstractStates";
 
 export class AbstractionRefinerConfig extends BastetConfiguration {
 
@@ -106,7 +107,7 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         // given accessibility relation.
         const wideningStateSeq: AbstractionState[] = this.getBlockStateSequence(ar, e);
         const blockFormulas: FirstOrderFormula[] = this.extractTraceBlockFormulas(wideningStateSeq);
-        Preconditions.checkState(wideningStateSeq.length == blockFormulas.length + 1);
+        Preconditions.checkState(wideningStateSeq.length == blockFormulas.length);
 
         // Use:
         //      isWideningState function
@@ -118,18 +119,22 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         // 2. Check the feasibility of the trace formula
         this._prover.push();
         try {
-            for (let blockFormula of blockFormulas) {
+            for (const blockFormula of blockFormulas) {
+                console.log(this._prover.stringRepresentation(blockFormula));
                 this._prover.assert(blockFormula);
             }
 
             const feasible = !this._prover.isUnsat();
 
             if (!feasible) {
+                console.log("Interpolants needed!");
                 // Compute interpolant
                 const interpolants: FirstOrderFormula[] = this._prover.collectInterpolants();
                 Preconditions.checkState(interpolants.length === blockFormulas.length - 1,
                     "There should have been one interpolant for each intermediate point");
                 this._lastInterpolationSolution = new InterpolationSolution(e, interpolants);
+            } else {
+                console.log("Seems to be a feasible counterexample!");
             }
 
             return feasible;
@@ -182,23 +187,25 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
             this._lattice.precStacLattice.lattice.join(pi, result), this._currentPrecision);
     }
 
-    private getBlockStateSequence(ar: AccessibilityRelation<AbstractState>, e: AbstractState): AbstractionState[] {
+    private getBlockStateSequence(ar: AccessibilityRelation<AbstractState>, target: AbstractState): AbstractionState[] {
         const result: AbstractionState[] = [];
-        result.push(AbstractionRefiner.getSingleAbstractionState(e));
 
-        const predecessors: AbstractionState[] = ar.predecessorsOf(e)
-            .map(AbstractionRefiner.getSingleAbstractionState);
-        for (const pred of predecessors) {
-            if (this.isWideningState(pred)) {
-                result.push(pred);
-            } else {
-                for (const abstractState of ar.predecessorsOf(pred)) {
-                    predecessors.push(AbstractionRefiner.getSingleAbstractionState(abstractState));
-                }
+        const worklist: AbstractState[] = [];
+        worklist.push(target);
+
+        while (worklist.length > 0) {
+            const state: AbstractState = worklist.pop();
+            const abst: AbstractionState = getTheOnlyElement(AbstractionStateStates.extractFrom(state));
+            if (abst.getWideningOf().isPresent() || state === target) {
+                result.push(abst);
+            }
+
+            for (const pred of ar.predecessorsOf(state)) {
+                worklist.push(pred);
             }
         }
 
-        return result;
+        return result.reverse();
     }
 
     private static getSingleAbstractionState(e: AbstractState): AbstractionState {
@@ -206,6 +213,17 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
     }
 
     private extractTraceBlockFormulas(wideningStateSeq: AbstractionState[]): FirstOrderFormula[] {
-        throw new ImplementMeException();
+        const result: FirstOrderFormula[] = [];
+
+        for (const abst of wideningStateSeq) {
+             if (abst.getWideningOf().isPresent()) {
+                 result.push(getTheOnlyElement(DataAbstractStates.extractFrom(abst.getWideningOf().getValue())).blockFormula);
+             } else {
+                 result.push(getTheOnlyElement(DataAbstractStates.extractFrom(abst)).blockFormula);
+             }
+        }
+
+        return result;
+
     }
 }
