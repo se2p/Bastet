@@ -318,7 +318,7 @@ export interface TheoryIndependent<E extends AbstractElement> {
 
     instantiate(formula: E, indexFn: (name: string, oldIndex: number) => number): E;
 
-    alignSsaIndices(blockFormulas: E[], ssaOffset: Map<string, number>): E[];
+    alignSsaIndices(blockFormulas: E[], ssaOffsets: Map<string, number>[]): E[];
 
 }
 

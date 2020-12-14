@@ -148,23 +148,9 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
     }
 
     alignSsaIndices(wideningStateSeq: AbstractionState[], blockFormulas: FirstOrderFormula[]): FirstOrderFormula[] {
-        Preconditions.checkArgument(blockFormulas.length > 0);
-        const result: FirstOrderFormula[] = [blockFormulas[0]];
-
-        const firstSSAState: SSAState = getTheOnlyElement(SSAAbstractStates.extractFrom(wideningStateSeq[0]));
-        let previousSsaMap: ImmMap<string, number> = firstSSAState.getSSA();
-        const currentSsaMap: { [id: string]: number } = {};
-
-        for (const f of blockFormulas.slice(1, blockFormulas.length)) {
-            result.push(this._theories.instantiate(f, (v, oldIndex) => {
-                const newIndex = (previousSsaMap[v] || 0) + oldIndex;
-                currentSsaMap[v] = Math.max((currentSsaMap[v] || 0), newIndex);
-                return newIndex;
-            }));
-            previousSsaMap = ImmMap(currentSsaMap);
-        }
-
-        return result;
+        Preconditions.checkArgument(wideningStateSeq.length == blockFormulas.length);
+        const ssaMaps = wideningStateSeq.map((e) => new Map(getTheOnlyElement(SSAAbstractStates.extractFrom(e)).getSSA()));
+        return this._theories.alignSsaIndices(blockFormulas, ssaMaps);
     }
 
     public refinePrecision(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>,
@@ -220,7 +206,10 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         while (worklist.length > 0) {
             const state: AbstractState = worklist.pop();
             const abst: AbstractionState = getTheOnlyElement(AbstractionStateStates.extractFrom(state));
-            if (abst.getWideningOf().isPresent() || state === target) {
+
+            if (abst.getWideningOf().isPresent()) {
+                result.push(abst.getWideningOf().getValue());
+            } else if (state === target) {
                 result.push(abst);
             }
 

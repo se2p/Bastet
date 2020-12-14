@@ -47,10 +47,6 @@ import {Variable} from "../../../syntax/ast/core/Variable";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {VariableCollectingVisitor} from "./Z3AST";
 import {SCOPE_SEPARATOR} from "../../../procedures/analyses/control/DataLocationScoping";
-import {AbstractionState} from "../../../procedures/analyses/abstraction/AbstractionAbstractDomain";
-import {SSAState} from "../../../procedures/analyses/ssa/SSAAbstractDomain";
-import {getTheOnlyElement} from "../../Collections";
-import {SSAAbstractStates} from "../../../procedures/analyses/ssa/SSAAbstractStates";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;
 
@@ -908,21 +904,19 @@ export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3F
         return this.substitute(formula, fromASTs, toASTs);
     }
 
-    public alignSsaIndices(blockFormulas: Z3Formula[], ssaOffset: Map<string, number>): Z3Formula[] {
+    public alignSsaIndices(blockFormulas: Z3Formula[], ssaOffsets: Map<string, number>[]): Z3Formula[] {
         Preconditions.checkArgument(blockFormulas.length > 0);
 
         const result: Z3Formula[] = [blockFormulas[0]];
+        let offsetSsaMap: ImmMap<string, number> = ImmMap();
 
-        let previousSsaMap: ImmMap<string, number> = ImmMap(ssaOffset);
-        const currentSsaMap: { [id: string]: number } = {};
-
-        for (const f of blockFormulas.slice(1, blockFormulas.length)) {
+        for (let i=1; i<blockFormulas.length; i++) {
+            const f = blockFormulas[i];
+            offsetSsaMap = offsetSsaMap.mergeDeepWith((o, n, k) => o + n, ssaOffsets[i-1]);
             result.push(this.instantiate(f, (v, oldIndex) => {
-                const newIndex = (previousSsaMap[v] || 0) + oldIndex;
-                currentSsaMap[v] = Math.max((currentSsaMap[v] || 0), newIndex);
+                const newIndex = (offsetSsaMap.get(v) || 0)  + oldIndex;
                 return newIndex;
             }));
-            previousSsaMap = ImmMap(currentSsaMap);
         }
 
         return result;

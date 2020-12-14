@@ -108,7 +108,7 @@ export class Theories implements TransformerTheories<FirstOrderFormula, BooleanF
         return this._wrapped.instantiate(formula, indexFn);
     }
 
-    alignSsaIndices(blockFormulas: FirstOrderFormula[], ssaOffset: Map<string, number>): FirstOrderFormula[] {
+    alignSsaIndices(blockFormulas: FirstOrderFormula[], ssaOffset: Map<string, number>[]): FirstOrderFormula[] {
         return this._wrapped.alignSsaIndices(blockFormulas, ssaOffset);
     }
 
