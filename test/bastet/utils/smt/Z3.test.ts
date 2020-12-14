@@ -94,7 +94,7 @@ test ("Instantiate, increment by 1", () => {
     expect(theories.stringRepresentation(fy)).toEqual("(and (= x@3 0) (= y@7 42))");
 });
 
-test ("Instantiate, increment by 10", () => {
+test ("Instantiate, increment by 10, case 1", () => {
     const x1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
     const x2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@6"), IntegerType.instance()));
 
@@ -110,7 +110,29 @@ test ("Instantiate, increment by 10", () => {
     expect(theories.stringRepresentation(fy)).toEqual("(and (= x@12 0) (= x@16 42))");
 });
 
-test ("Instantiate, mapping", () => {
+test ("Instantiate, increment by 10, case 2", () => {
+    const x1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
+    const x2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@6"), IntegerType.instance()));
+    const x3 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@7"), IntegerType.instance()));
+
+    const fx = theories.boolTheory.and(theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x1),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x2),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42)))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x3),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(1))),
+        );
+
+    const fy = theories.instantiate(fx, (v, oldIndex) => oldIndex + 10);
+    expect(theories.stringRepresentation(fy)).toEqual("(and (= x@12 0) (= x@16 42) (= x@17 1))");
+});
+
+
+test ("Instantiate, mapping 1", () => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@6"), IntegerType.instance()));
 
@@ -127,6 +149,7 @@ test ("Instantiate, mapping", () => {
     const fy = theories.instantiate(fx, (v, oldIndex) => mapping[v]);
     expect(theories.stringRepresentation(fy)).toEqual("(and (= x@22 0) (= y@66 42))");
 });
+
 
 test ("Implication. Unsat", () => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
