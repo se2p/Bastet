@@ -27,6 +27,7 @@ import {
     Z3_ast_vector,
     Z3_func_decl,
     Z3_model,
+    Z3_param,
     Z3_solver,
     Z3_sort,
     Z3_symbol,
@@ -162,7 +163,12 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         this._model = null;
     }
 
-    public collectInterpolants(): Z3FirstOrderFormula[] {
+    public collectInterpolants(): Z3BooleanFormula[] {
+        // See https://gitlab.infosun.fim.uni-passau.de/model-checking/tools/bastet-framework/-/issues/112
+        const pf: Z3_ast = null;
+        const pat: Z3_ast = null;
+        const param: Z3_param = null;
+        this._ctx.get_interpolant(pf, pat, param);
         throw new ImplementMeException();
     }
 

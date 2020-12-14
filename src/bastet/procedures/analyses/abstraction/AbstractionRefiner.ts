@@ -167,6 +167,8 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
 
         Preconditions.checkArgument(infeasibleState === this._lastInterpolationSolution.targetState);
 
+        // TODO: Split interpolants, optionally, into their Boolean atoms
+
         this._currentPrecision = this._lastInterpolationSolution.interpolants
             .map((f) => new PredicatePrecision([f], PrecisionRole.INTERMEDIATE))
             .reduce((precision, last) => this._precisionLattice.join(precision, last),
