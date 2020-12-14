@@ -919,7 +919,7 @@ export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3F
         for (const f of blockFormulas.slice(1, blockFormulas.length)) {
             result.push(this.instantiate(f, (v, oldIndex) => {
                 const newIndex = (previousSsaMap[v] || 0) + oldIndex;
-                currentSsaMap[v] = newIndex;
+                currentSsaMap[v] = Math.max((currentSsaMap[v] || 0), newIndex);
                 return newIndex;
             }));
             previousSsaMap = ImmMap(currentSsaMap);

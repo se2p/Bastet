@@ -78,7 +78,7 @@ test ("Substitute", () => {
     expect(theories.stringRepresentation(fy)).toEqual("(and (= y 0) (= y 42))");
 });
 
-test ("Instantiate", () => {
+test ("Instantiate, increment by 1", () => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@6"), IntegerType.instance()));
 
@@ -92,6 +92,40 @@ test ("Instantiate", () => {
 
     const fy = theories.instantiate(fx, (v, oldIndex) => oldIndex + 1);
     expect(theories.stringRepresentation(fy)).toEqual("(and (= x@3 0) (= y@7 42))");
+});
+
+test ("Instantiate, increment by 10", () => {
+    const x1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
+    const x2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@6"), IntegerType.instance()));
+
+    const fx = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x1),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x2),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const fy = theories.instantiate(fx, (v, oldIndex) => oldIndex + 10);
+    expect(theories.stringRepresentation(fy)).toEqual("(and (= x@12 0) (= x@16 42))");
+});
+
+test ("Instantiate, mapping", () => {
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
+    const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@6"), IntegerType.instance()));
+
+    const mapping = { "x": 22, "y": 66};
+
+    const fx = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(y),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const fy = theories.instantiate(fx, (v, oldIndex) => mapping[v]);
+    expect(theories.stringRepresentation(fy)).toEqual("(and (= x@22 0) (= y@66 42))");
 });
 
 test ("Implication. Unsat", () => {
