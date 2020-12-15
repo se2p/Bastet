@@ -34,13 +34,12 @@ import {
 } from './libz3';
 import {Preconditions} from "../../Preconditions";
 import {WasmJSInstance} from "./WasmInstance";
-import {Z3BooleanFormula, Z3FirstOrderFormula, Z3FirstOrderLattice, Z3Theories} from "./Z3Theories";
+import {Z3BooleanFormula, Z3FirstOrderFormula, Z3FirstOrderLattice, Z3Formula, Z3Theories} from "./Z3Theories";
 import {FirstOrderSolver} from "../../../procedures/domains/FirstOrderDomain";
 import {Sint32, Uint32} from "./ctypes";
 import {BooleanTheory} from "../../../procedures/domains/MemoryTransformer";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {BastetConfiguration} from "../../BastetConfiguration";
-import {FirstOrderFormula} from "../../ConjunctiveNormalForm";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
@@ -136,12 +135,14 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
     private _ctx: LibZ3InContext;
     private _solver: Z3_solver;
     private _model: Z3Model;
+    private _theories: Z3Theories;
 
-    constructor(ctx: LibZ3InContext) {
+    constructor(ctx: LibZ3InContext, theories: Z3Theories) {
         super();
         this._ctx = Preconditions.checkNotUndefined(ctx);
         this._solver = this._ctx.mk_solver();
         this._ctx.solver_inc_ref(this._solver);
+        this._theories = theories;
     }
 
     private solve(): number {
@@ -160,16 +161,49 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
     public isUnsat(): boolean {
         const checkResult: number = this.solve();
         return checkResult == Z3_UNSATISFIABLE;
-        this._model = null;
+        this._model = null; // FIXME: What's the purpose of doing this? It's unreachable code... Can it be deleted?
+                            //  Or should it be executed before the return statement?
     }
 
+    // FIXME: Memory Leak! Result of this method should be a Z3FormulaVector that can release the memory
+    //  (it must decrease the references)
     public collectInterpolants(): Z3BooleanFormula[] {
-        // See https://gitlab.infosun.fim.uni-passau.de/model-checking/tools/bastet-framework/-/issues/112
-        const pf: Z3_ast = null;
-        const pat: Z3_ast = null;
-        const param: Z3_param = null;
-        this._ctx.get_interpolant(pf, pat, param);
-        throw new ImplementMeException();
+        // TODO: the following check is very expensive and should somehow be cached so that it can be reused
+        // Preconditions.checkState(this.isUnsat(), "Formula should have been unsatisfiable");
+
+        const assertedFormulas = new Z3Vector(this._ctx, this._ctx.solver_get_assertions(this._solver));
+        try {
+            // A refutation from premises (assertions) C (i.e., a proof of "false" from a set of formulas C).
+            const pf: Z3_ast = this._ctx.solver_get_proof(this._solver);
+
+            // An interpolation pattern over C. The pattern pat is a formula combining the formulas in C using
+            // logical conjunction and the "interp" operator (see Z3_mk_interpolant).
+            const pat: Z3_ast = this.buildInterpolationProblem(assertedFormulas.asArray()).getAST();
+
+            const param: Z3_param = this._ctx.mk_params();
+
+            return new Z3Vector(this._ctx, this._ctx.get_interpolant(pf, pat, param)).asArray();
+        } finally {
+            assertedFormulas.release();
+        }
+    }
+
+    // FIXME: memory leaks! Have to increment and decrement the reference counters!
+    private buildInterpolationProblem(seq: Z3BooleanFormula[]): Z3Formula {
+        Preconditions.checkArgument(seq.length > 1,
+            `Only got ${seq.length} formula(s) but there should have been at least 2`);
+
+        const interpolationPoints: Z3_ast[] = [];
+        for (const formula of seq) {
+            const point = this._ctx.mk_interpolant(formula.getAST());
+            interpolationPoints.push(point);
+            this._ctx.inc_ref(point);
+        }
+
+        const trueBool = this._theories.boolTheory.trueBool().getAST();
+        const conjunction = interpolationPoints.reduce((x, y) =>
+            this._theories.boolTheory.and(new Z3BooleanFormula(x), new Z3BooleanFormula(y)).getAST(), trueBool);
+        return new Z3BooleanFormula(conjunction);
     }
 
     /**
@@ -377,7 +411,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         let model: Z3Model
         let cons: Z3Const[];
         let returnConst: Z3Const;
-        const prover = new Z3ProverEnvironment(ctx)
+        const prover = new Z3ProverEnvironment(ctx, this._theories);
         prover.push();
         prover.assert(formula);
         try {
@@ -435,7 +469,7 @@ export class Z3Vector {
         this._ctx.ast_vector_dec_ref(this._v);
     }
 
-    public get(index: number): FirstOrderFormula {
+    public get(index: number): Z3Formula {
         return new Z3BooleanFormula(this._ctx.ast_vector_get(this._v, new Uint32(index)));
     }
 
@@ -443,10 +477,10 @@ export class Z3Vector {
         return this._ctx.ast_vector_size(this._v).val();
     }
 
-    public asArray(): FirstOrderFormula[] {
+    public asArray(): Z3Formula[] {
         const result = [];
-        var i = this.size();
-        while (i > 0) {
+        var i = this.size() - 1;
+        while (i >= 0) {
             result.push(this.get(i));
             i--;
         }
@@ -588,7 +622,7 @@ export class Z3SMT extends LibZ3NonContext {
     }
 
     public createProver(ctx: LibZ3InContext): Z3ProverEnvironment {
-        return new Z3ProverEnvironment(ctx);
+        return new Z3ProverEnvironment(ctx, this.createTheories(ctx));
     }
 
     public createTheories(ctx: LibZ3InContext): Z3Theories {
