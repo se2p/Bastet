@@ -48,6 +48,7 @@ import {LabelAnalysis} from "./analyses/label/LabelAnalysis";
 import {IllegalArgumentException} from "../core/exceptions/IllegalArgumentException";
 import {AbstractionAnalysis} from "./analyses/abstraction/AbstractionAnalysis";
 import {DataAnalysis} from "./analyses/data/DataAnalysis";
+import {CEGARAlgorithm} from "./algorithms/CEGARAlgorithm";
 
 export class MainAnalysisConfig extends BastetConfiguration {
 
