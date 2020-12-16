@@ -31,20 +31,23 @@ import {IllegalStateException} from "../../../core/exceptions/IllegalStateExcept
 import {DataAbstractState} from "./DataAbstractDomain";
 import { Preconditions } from "../../../utils/Preconditions";
 import {AccessibilityRelation} from "../Accessibility";
+import {DataAbstractStates} from "./DataAbstractStates";
+import {getTheOnlyElement} from "../../../utils/Collections";
 
 export class DataRefiner implements Refiner<AbstractState> {
 
-    private readonly _lattice: LatticeWithComplements<AbstractState>;
+    private readonly _lattice: LatticeWithComplements<DataAbstractState>;
 
-    constructor(lattice: LatticeWithComplements<AbstractState>) {
+    constructor(lattice: LatticeWithComplements<DataAbstractState>) {
         this._lattice = lattice;
     }
 
-    checkIsFeasible(reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractState>, e: DataAbstractState, purpose: string = null): boolean {
+    checkIsFeasible(reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractState>, fullState: AbstractState, purpose: string = null): boolean {
         Preconditions.checkNotUndefined(reached);
-        Preconditions.checkNotUndefined(e);
+        Preconditions.checkNotUndefined(fullState);
 
-        return Lattices.isFeasible(e, this._lattice, purpose);
+        const dataState: DataAbstractState = getTheOnlyElement(DataAbstractStates.extractFrom(fullState));
+        return Lattices.isFeasible(dataState, this._lattice, purpose);
     }
 
     refinePrecision(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractState>, infeasibleState: DataAbstractState): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
