@@ -50,6 +50,7 @@ import {Map as ImmMap} from "immutable"
 import {SSAState} from "../ssa/SSAAbstractDomain";
 import {SSAAbstractStates} from "../ssa/SSAAbstractStates";
 import {DataAbstractStates} from "../data/DataAbstractStates";
+import {PerfTimer} from "../../../utils/PerfTimer";
 
 
 export class AbstractionRefinerConfig extends BastetConfiguration {
@@ -123,6 +124,8 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         // 2. Check the feasibility of the trace formula
         this._prover.push();
         try {
+            const timer = this.logRefinementStart(purpose);
+
             for (const blockFormula of alignedBlockFormulas) {
                 console.log(this._prover.stringRepresentation(blockFormula));
                 this._prover.assert(blockFormula);
@@ -144,10 +147,31 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
                 console.log("Seems to be a feasible counterexample!");
             }
 
+            this.logRefinementStop(feasible, timer);
+
             return feasible;
         } finally {
             this._prover.pop();
         }
+    }
+
+    private logRefinementStart(purpose?: string) {
+        if (purpose) {
+            console.group(`Feasibility Check (${purpose})...`);
+        } else {
+            console.group("Feasibility Check...");
+        }
+
+        const timer = new PerfTimer(null);
+        timer.start();
+
+        return timer;
+    }
+
+    private logRefinementStop(feasible, timer: PerfTimer) {
+        timer.stop();
+        console.log(`${feasible ? "Feasible" : "Infeasible"} ${timer.lastIntervalDuration}`)
+        console.groupEnd();
     }
 
     alignSsaIndices(wideningStateSeq: AbstractionState[], blockFormulas: FirstOrderFormula[]): FirstOrderFormula[] {
@@ -244,4 +268,6 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         return result;
 
     }
+
+
 }
