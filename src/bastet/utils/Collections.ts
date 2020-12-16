@@ -40,6 +40,14 @@ export function getTheOnlyElement<E>(it: Iterable<E>): E {
    return result;
 }
 
+export function getAtMostOneElement<E>(it: Iterable<E>): E[] {
+   for (const r of it) {
+      return [r];
+   }
+
+   return [];
+}
+
 export function getTheNextElement<E>(it: Iterable<E>): E {
    for (const r of it) {
       return r;

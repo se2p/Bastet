@@ -44,7 +44,7 @@ import {AccessibilityRelation} from "../Accessibility";
 import {FirstOrderSolver} from "../../domains/FirstOrderDomain";
 import {TransformerTheories} from "../../domains/MemoryTransformer";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
-import {getTheOnlyElement} from "../../../utils/Collections";
+import {getAtMostOneElement, getTheOnlyElement} from "../../../utils/Collections";
 import {AbstractionStateStates} from "./AbstractionStates";
 import {Map as ImmMap} from "immutable"
 import {SSAState} from "../ssa/SSAAbstractDomain";
@@ -112,6 +112,7 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         // given accessibility relation.
         const wideningStateSeq: AbstractionState[] = this.getBlockStateSequence(ar, e);
         const alignedBlockFormulas: FirstOrderFormula[] = this.alignSsaIndices(wideningStateSeq, this.extractTraceBlockFormulas(wideningStateSeq));
+        console.log(`Trace with ${alignedBlockFormulas.length} block formulas`);
         Preconditions.checkState(wideningStateSeq.length == alignedBlockFormulas.length);
 
         // Use:
@@ -126,7 +127,6 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         try {
             const timer = this.logRefinementStart(purpose);
 
-            console.log(`Trace with ${alignedBlockFormulas.length} block formulas`);
             for (const blockFormula of alignedBlockFormulas) {
                 console.log(this._theories.stringRepresentation(blockFormula));
                 this._prover.assert(blockFormula);
@@ -134,7 +134,9 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
 
             const feasible = !this._prover.isUnsat();
 
-            if (!feasible) {
+            if (feasible) {
+                console.log("Seems to be a feasible counterexample (a real Bug?)!");
+            } else {
                 console.log("Counterexample infeasible. Higher abstraction precision needed!");
 
                 // Compute interpolant
@@ -151,8 +153,6 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
                 //     "There should have been one interpolant for each intermediate point");
 
                 this._lastInterpolationSolution = new InterpolationSolution(e, interpolants);
-            } else {
-                console.log("Seems to be a feasible counterexample!");
             }
 
             this.logRefinementStop(feasible, timer);
@@ -251,7 +251,7 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
                 result.push(abst);
             }
 
-            for (const pred of ar.predecessorsOf(state)) {
+            for (const pred of getAtMostOneElement(ar.predecessorsOf(state))) {
                 worklist.push(pred);
             }
         }
