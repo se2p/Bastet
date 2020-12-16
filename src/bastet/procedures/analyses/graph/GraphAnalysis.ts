@@ -87,6 +87,11 @@ export class GraphAnalysisConfig extends BastetConfiguration {
         return this.getStringProperty('witnessHandler', 'DoNothing');
     }
 
+    get checkTargetFeasibility(): boolean {
+        return this.getBoolProperty('checkTargetFeasibility', false);
+    }
+
+
     get graphConstructionOrder(): string {
         return this.getStringProperty('graphConstructionOrder', 'WaitAtMeet');
     }
@@ -163,9 +168,11 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         const result: GraphAbstractState[] = [];
         for (const succ of this._transferRelation.abstractSucc(fromState)) {
             if (this.target(succ).length > 0) {
-                // Only add feasible states
-                if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Block Feasibility")) {
-                    continue;
+                // Only add feasible states (avoids to check the feasibility of the full trace, if done in the refiner)
+                if (this._config.checkTargetFeasibility) {
+                    if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Block Feasibility")) {
+                        continue;
+                    }
                 }
             }
             result.push(succ);

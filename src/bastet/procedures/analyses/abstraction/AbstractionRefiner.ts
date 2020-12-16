@@ -126,17 +126,25 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         try {
             const timer = this.logRefinementStart(purpose);
 
+            console.log(`Trace with ${alignedBlockFormulas.length} block formulas`);
             for (const blockFormula of alignedBlockFormulas) {
-                console.log(this._prover.stringRepresentation(blockFormula));
+                console.log(this._theories.stringRepresentation(blockFormula));
                 this._prover.assert(blockFormula);
             }
 
-            const feasible = !this._prover.isUnsat();
+            const feasible = this._prover.isSat();
 
             if (!feasible) {
-                console.log("Interpolants needed!");
+                console.log("Counterexample infeasible. Higher abstraction precision needed!");
+
                 // Compute interpolant
                 const interpolants: FirstOrderFormula[] = this._prover.collectInterpolants();
+                Preconditions.checkState(interpolants.length > 0,
+                    "Assuming interpolants to be present for an infeasible counterexample");
+
+                for (const itp of interpolants) {
+                    console.log("ITP", this._theories.stringRepresentation(itp));
+                }
 
                 // FIXME: check this precondition
                 // Preconditions.checkState(interpolants.length === alignedBlockFormulas.length - 1,

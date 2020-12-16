@@ -391,7 +391,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         //TODO
         const theories = new Z3Theories(this._ctx);
         const propVars = this.propVarsFromMap(varMap);
-        let retForm;
+        let retForm = theories.boolTheory.falseBool();
         retTable.forEach(row => {
             let form;
             for (let i = 0; i < row.length; i++) {

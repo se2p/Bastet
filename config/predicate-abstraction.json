@@ -23,14 +23,16 @@
     },
 
     "ControlAnalysis": {
-        "widen-on-loop-heads": true
+        "widen-on-loop-heads": true,
+        "widen-after-each-step": true
     },
 
     "GraphAnalysis": {
         "mergeIntoOperator": "StandardMergeIntoOperator",
         "stopOperator": "CheckCoverage",
         "witnessHandler": "ExportPath",
-        "graphConstructionOrder": "WaitAtMeet"
+        "graphConstructionOrder": "WaitAtMeet",
+        "checkTargetFeasibility": true
     },
 
     "MultiPropertyAlgorithm" : {

@@ -863,6 +863,9 @@ export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3F
     }
 
     public instantiate(formula: Z3Formula, indexFn: (name: string, oldIndex: number) => number): Z3Formula {
+        Preconditions.checkNotUndefined(formula);
+        Preconditions.checkNotUndefined(indexFn);
+
         // 1. Collect all variables
         const visitor = new VariableCollectingVisitor(this._ctx);
         let vars = visitor.visit(formula.getAST());

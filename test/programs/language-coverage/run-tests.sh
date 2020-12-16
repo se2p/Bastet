@@ -93,7 +93,7 @@ do
     RESULT_FILE=$(mktemp)
     printf "`basename $f`"
      timeout 120 ./scripts/bastet.sh \
-        -c config/default.json,config/benchmarking.delta.json \
+        -c config/predicate-abstraction.json,config/benchmarking.delta.json \
         -P $f \
         -S test/programs/empty.sc \
         -I src/public/library.sc \

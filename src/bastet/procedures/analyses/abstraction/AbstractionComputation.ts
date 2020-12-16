@@ -100,6 +100,7 @@ export abstract class PredicateAbstraction implements AbstractionComputation<Abs
      * @protected
      */
     protected instantiateAsSummary(formula: FirstOrderFormula) : FirstOrderFormula {
+        Preconditions.checkNotUndefined(formula);
         return this._theories.instantiate(formula, (v) => 0);
     }
 
