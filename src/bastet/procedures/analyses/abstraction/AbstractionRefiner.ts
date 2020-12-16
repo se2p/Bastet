@@ -143,10 +143,6 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
                 Preconditions.checkState(interpolants.length > 0,
                     "Assuming interpolants to be present for an infeasible counterexample");
 
-                for (const itp of interpolants) {
-                    console.log("ITP", this._theories.stringRepresentation(itp));
-                }
-
                 // FIXME: check this precondition
                 // Preconditions.checkState(interpolants.length === alignedBlockFormulas.length - 1,
                 //     "There should have been one interpolant for each intermediate point");

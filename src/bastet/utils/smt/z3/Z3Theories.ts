@@ -925,19 +925,14 @@ export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3F
 
         const result: Z3Formula[] = [blockFormulas[0]];
         let offsetSsaMap: ImmMap<string, number> = ImmMap();
-        console.log("-----------------");
-        console.log(this.stringRepresentation(blockFormulas[0]))
 
         for (let i=1; i<blockFormulas.length; i++) {
             const f = blockFormulas[i];
             offsetSsaMap = fnMerge(offsetSsaMap, ssaOffsets[i-1]);
-            console.log("B:", this.stringRepresentation(f));
-            console.log("O:", offsetSsaMap.toString());
             const fPrime = this.instantiate(f, (v, oldIndex) => {
                 const newIndex = (offsetSsaMap.get(v) || 0)  + oldIndex;
                 return newIndex;
             });
-            console.log("P:", this.stringRepresentation(fPrime));
             result.push(fPrime);
         }
 
