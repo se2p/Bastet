@@ -160,8 +160,9 @@ test ("Align, case 1", () => {
     const y2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@2"), IntegerType.instance()));
 
     const mapping1 = new Map(ImmMap<string, number>([["x", 1], ["y", 1]]));
-    const mapping2 = new Map(ImmMap<string, number>([["x", 1], ["y", 0]]));
+    const mapping2 = new Map(ImmMap<string, number>([["x", 0]]));
     const mapping3 = new Map(ImmMap<string, number>([["x", 1], ["y", 0]]));
+    const mapping4 = new Map(ImmMap<string, number>([["x", 1], ["y", 0]]));
 
     const f1 = theories.boolTheory.and(
         theories.intTheory.isNumberEqualTo(
@@ -171,14 +172,7 @@ test ("Align, case 1", () => {
             theories.intTheory.abstractNumberValue(y0),
             theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
 
-    const f2 = theories.boolTheory.and(
-        theories.intTheory.isNumberEqualTo(
-            theories.intTheory.abstractNumberValue(x1),
-            theories.intTheory.plus(theories.intTheory.abstractNumberValue(x0),
-                theories.intTheory.fromConcreteNumber(new ConcreteNumber(1)))),
-        theories.intTheory.isNumberEqualTo(
-            theories.intTheory.abstractNumberValue(y0),
-            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+    const f2 = theories.boolTheory.trueBool();
 
     const f3 = theories.boolTheory.and(
         theories.intTheory.isNumberEqualTo(
@@ -189,7 +183,16 @@ test ("Align, case 1", () => {
             theories.intTheory.abstractNumberValue(y0),
             theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
 
-    const fs = theories.alignSsaIndices([f1, f2, f3], [mapping1, mapping2, mapping3]);
+    const f4 = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x1),
+            theories.intTheory.plus(theories.intTheory.abstractNumberValue(x0),
+                theories.intTheory.fromConcreteNumber(new ConcreteNumber(1)))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(y0),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const fs = theories.alignSsaIndices([f1, f2, f3, f4], [mapping1, mapping2, mapping3, mapping4]);
     const f = fs.reduce((e, r) => theories.boolTheory.and(e, r), theories.boolTheory.trueBool());
     console.log(theories.stringRepresentation(f));
 });

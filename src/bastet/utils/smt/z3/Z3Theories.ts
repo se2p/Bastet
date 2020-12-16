@@ -35,7 +35,7 @@ import {
     RealTheory,
     StringTheory
 } from "../../../procedures/domains/MemoryTransformer";
-import {Map as ImmMap, Record as ImmRec} from "immutable";
+import {Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {LibZ3InContext, Z3_ast, Z3_sort} from "./libz3";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../../procedures/domains/ConcreteElements";
 import {Preconditions} from "../../Preconditions";
@@ -910,16 +910,35 @@ export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3F
     public alignSsaIndices(blockFormulas: Z3Formula[], ssaOffsets: Map<string, number>[]): Z3Formula[] {
         Preconditions.checkArgument(blockFormulas.length > 0);
 
+        const fnMerge = (m1: ImmMap<string, number>, m2: Map<string, number>): ImmMap<string, number> => {
+            const keys = ImmSet(m1.keys()).union(ImmSet(m2.keys()));
+            let result = m1;
+
+            for (const k in keys) {
+                const v1 = m1.get(k) || 0;
+                const v2 = m2.get(k) || 0;
+                result = result.set(k, v1 + v2);
+            }
+
+            return result;
+        };
+
         const result: Z3Formula[] = [blockFormulas[0]];
         let offsetSsaMap: ImmMap<string, number> = ImmMap();
+        console.log("-----------------");
+        console.log(this.stringRepresentation(blockFormulas[0]))
 
         for (let i=1; i<blockFormulas.length; i++) {
             const f = blockFormulas[i];
-            offsetSsaMap = offsetSsaMap.mergeDeepWith((o, n, k) => o + n, ssaOffsets[i-1]);
-            result.push(this.instantiate(f, (v, oldIndex) => {
+            offsetSsaMap = fnMerge(offsetSsaMap, ssaOffsets[i-1]);
+            console.log("B:", this.stringRepresentation(f));
+            console.log("O:", offsetSsaMap.toString());
+            const fPrime = this.instantiate(f, (v, oldIndex) => {
                 const newIndex = (offsetSsaMap.get(v) || 0)  + oldIndex;
                 return newIndex;
-            }));
+            });
+            console.log("P:", this.stringRepresentation(fPrime));
+            result.push(fPrime);
         }
 
         return result;

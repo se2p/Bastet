@@ -1,6 +1,8 @@
-program Mini1Program
+program Test
 
-actor MiniActor is RuntimeEntity begin
+actor Actor begin
+
+    extern _RUNTIME_signalFailure ()
 
     script on startup do begin
         declare x as int

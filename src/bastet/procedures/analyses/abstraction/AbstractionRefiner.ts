@@ -128,7 +128,6 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
             const timer = this.logRefinementStart(purpose);
 
             for (const blockFormula of alignedBlockFormulas) {
-                console.log(this._theories.stringRepresentation(blockFormula));
                 this._prover.assert(blockFormula);
             }
 
