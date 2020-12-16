@@ -44,11 +44,18 @@ export class AbstractionMergeOperator implements MergeOperator<AbstractionState>
     }
 
     merge(state1: AbstractionState, state2: AbstractionState): AbstractionState {
-        return this._lattice.join(state1, state2);
+        const wrappedMerged = this._wrappedMergeOp.merge(state1.getWrappedState(), state2.getWrappedState());
+        return state1
+            .withEnteringSummary(this._lattice.folLattice.join(state1.enteringSummary, state2.enteringSummary))
+            .withWrappedState(wrappedMerged);
     }
 
     shouldMerge(state1: AbstractionState, state2: AbstractionState): boolean {
         if (!state1.getPrecision().equals(state2.getPrecision())) {
+            return false;
+        }
+
+        if (!this._wrappedMergeOp.shouldMerge(state1, state2)) {
             return false;
         }
 
