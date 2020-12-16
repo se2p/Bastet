@@ -119,7 +119,7 @@ export class AnalysisProcedureFactory {
                 const [frontier, reached] = outerAnalysis.createStateSets();
 
                 const reachabilityAlgorithm = new ReachabilityAlgorithm(config, outerAnalysis, this._statistics);
-                const bmcAlgorithm = new FeasibilityAlgorithm(reachabilityAlgorithm, outerAnalysis.refiner, outerAnalysis, this._statistics);
+                const bmcAlgorithm = new CEGARAlgorithm(reachabilityAlgorithm, outerAnalysis.refiner, outerAnalysis, this._statistics);
                 const multiPropertyAlgorithm = new MultiPropertyAlgorithm(config, task, bmcAlgorithm, outerAnalysis, this._statistics,
                     (v, s, u, stats) => {
                         outerAnalysis.finalizeResults(frontier, reached);
@@ -165,7 +165,7 @@ export class AnalysisProcedureFactory {
                 const [frontier, reached] = outerAnalysis.createStateSets();
 
                 const reachabilityAlgorithm = new ReachabilityAlgorithm(config, outerAnalysis, this._statistics);
-                const bmcAlgorithm = new CEGARAlgorithm(reachabilityAlgorithm, outerAnalysis.refiner, outerAnalysis, this._statistics);
+                const bmcAlgorithm = new FeasibilityAlgorithm(reachabilityAlgorithm, outerAnalysis.refiner, outerAnalysis, this._statistics);
                 const multiPropertyAlgorithm = new MultiPropertyAlgorithm(config, task, bmcAlgorithm, outerAnalysis, this._statistics,
                     (v, s, u, stats) => {
                     outerAnalysis.finalizeResults(frontier, reached);

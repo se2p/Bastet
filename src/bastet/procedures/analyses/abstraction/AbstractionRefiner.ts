@@ -132,7 +132,7 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
                 this._prover.assert(blockFormula);
             }
 
-            const feasible = this._prover.isSat();
+            const feasible = !this._prover.isUnsat();
 
             if (!feasible) {
                 console.log("Counterexample infeasible. Higher abstraction precision needed!");
@@ -213,6 +213,7 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
             throw new ImplementMeForException("Lazy abstraction not yet supported");
         } else {
             for (const e of ar.initial()) {
+                frontier.add(e);
                 reached.removeAll(ar.successorsOf(e));
             }
             return [frontier, reached];

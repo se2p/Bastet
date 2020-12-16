@@ -80,7 +80,7 @@ export class WrappingRefiner<F extends AbstractState, W extends AbstractElement>
     }
 
     refinePrecision(frontier: FrontierSet<F>, reached: ReachedSet<F>, ar: AccessibilityRelation<F>, infeasibleState: F): [FrontierSet<F>, ReachedSet<F>] {
-        throw new ImplementMeException();
+        return this._wrapped.refinePrecision(frontier, reached, ar, infeasibleState);
     }
 
 }
