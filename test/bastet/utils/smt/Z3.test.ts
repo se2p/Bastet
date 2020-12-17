@@ -25,9 +25,15 @@ import {VariableWithDataLocation} from "../../../../src/bastet/syntax/ast/core/V
 import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataLocation";
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
 import {ConcreteNumber, ConcreteString} from "../../../../src/bastet/procedures/domains/ConcreteElements";
-import {Z3FirstOrderLattice, Z3NumberFormula, Z3Theories} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
+import {
+    Z3BooleanFormula,
+    Z3FirstOrderLattice,
+    Z3NumberFormula,
+    Z3Theories
+} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
 import {BooleanType, IntegerType, StringType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
 import {Map as ImmMap, Record as ImmRec} from "immutable";
+import {FirstOrderFormula} from "../../../../src/bastet/utils/ConjunctiveNormalForm";
 
 
 let smt: Z3SMT;
@@ -196,6 +202,40 @@ test ("Align, case 1", () => {
     const f = fs.reduce((e, r) => theories.boolTheory.and(e, r), theories.boolTheory.trueBool());
     console.log(theories.stringRepresentation(f));
 });
+
+test ("Align, case 2", () => {
+    const x0 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@0"), IntegerType.instance()));
+    const x1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@1"), IntegerType.instance()));
+    const x2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
+    const y0 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@0"), IntegerType.instance()));
+    const y1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@1"), IntegerType.instance()));
+    const y2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@2"), IntegerType.instance()));
+
+    const mapping1 = new Map(ImmMap<string, number>([["x", 1], ["y", 2]]));
+    const mapping2 = new Map(ImmMap<string, number>([["x", 1], ["y", 0]]));
+
+    const f1 = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x1),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(y2),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const f2 = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x1),
+            theories.intTheory.plus(theories.intTheory.abstractNumberValue(x0),
+                theories.intTheory.fromConcreteNumber(new ConcreteNumber(1)))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(y0),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const fs: Z3BooleanFormula[] = theories.alignSsaIndices([f1, f2], [mapping1, mapping2]);
+    const f = fs.reduce((e, r) => theories.boolTheory.and(e, r), theories.boolTheory.trueBool());
+    expect(theories.stringRepresentation(f)).toEqual("(and true (= x@1 0) (= y@2 42) (= x@2 (+ x@1 1)) (= y@2 42))")
+});
+
 
 
 test ("Implication. Unsat", () => {
