@@ -914,7 +914,7 @@ export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3F
             const keys = ImmSet(m1.keys()).union(ImmSet(m2.keys()));
             let result = m1;
 
-            for (const k in keys) {
+            for (const k of keys) {
                 const v1 = m1.get(k) || 0;
                 const v2 = m2.get(k) || 0;
                 result = result.set(k, v1 + v2);
