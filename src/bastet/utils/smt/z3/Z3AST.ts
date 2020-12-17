@@ -193,7 +193,9 @@ export class VariableCollectingVisitor extends Z3Visitor<ImmMap<string, Z3Formul
             const symbol: Z3_symbol = this._ctx.get_decl_name(decl);
             const name: string = this._ctx.get_symbol_string(symbol);
 
-            result = result.set(name, new Z3Formula(node));
+            if (!(name == "true" || name == "false")) {
+                result = result.set(name, new Z3Formula(node));
+            }
         }
         childs.decRef();
         return result;
