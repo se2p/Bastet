@@ -140,6 +140,10 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
 
                 // Compute interpolant
                 const interpolants: FirstOrderFormula[] = this._prover.collectInterpolants();
+                console.group();
+                interpolants.forEach((itp) => console.log("Interpolant", this._theories.stringRepresentation(itp)));
+                console.groupEnd();
+
                 Preconditions.checkState(interpolants.length > 0,
                     "Assuming interpolants to be present for an infeasible counterexample");
 
