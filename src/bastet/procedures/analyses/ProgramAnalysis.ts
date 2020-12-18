@@ -49,7 +49,7 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
        TargetOperator<E>, MergeIntoOperator<E, F>,
        MergeOperator<E>, StopOperator<E, F>, WidenOperator<E, F>, PartitionOperator<E, F>,
        WitnessHandler<F>, TraversalOrderOperator<E, F>, ResultFinalization<F>,
-       TestificationOperator<E, F> {
+       TestificationOperator<E, F>, AccessibilityOperator<E, F> {
 
     /**
      * The abstract domain the analysis works with.
@@ -60,7 +60,13 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
     /**
      * A refiner component for abstraction precision refinement.
      */
-    refiner: Refiner<E>;
+    refiner: Refiner<F>;
+
+}
+
+export interface AccessibilityOperator<E extends AbstractElement, F extends AbstractState> {
+
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<F>;
 
 }
 
@@ -123,7 +129,7 @@ export interface TestificationOperator<E extends AbstractElement, F extends Abst
      * @param accessibility
      * @param state
      */
-    testify(accessibility: AccessibilityRelation<E, F>, state: F): AccessibilityRelation<E, F>;
+    testify(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation<F>;
 
     /**
      * Guarantees to return at most one abstract path.
@@ -131,9 +137,9 @@ export interface TestificationOperator<E extends AbstractElement, F extends Abst
      * @param accessibility
      * @param state
      */
-    testifyOne(accessibility: AccessibilityRelation<E, F>, state: F): AccessibilityRelation<E, F>;
+    testifyOne(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation<F>;
 
-    testifyConcrete(accessibility: AccessibilityRelation<E, F>, state: F): Iterable<ConcreteElement[]>;
+    testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]>;
 
     /**
      * Guaratnees to return at most one concrete path.
@@ -141,7 +147,7 @@ export interface TestificationOperator<E extends AbstractElement, F extends Abst
      * @param accessibility
      * @param state
      */
-    testifyConcreteOne(accessibility: AccessibilityRelation<E, F>, state: F): Iterable<ConcreteElement[]>;
+    testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]>;
 
 }
 
@@ -298,6 +304,13 @@ export interface WidenOperator<E extends AbstractElement, F extends AbstractStat
      * @param reached
      */
     widen(state: E, reached: Iterable<F>): E;
+
+    /**
+     * Determine if a widening should be or was computed for a given
+     * abstract state---note that the widening might have been computed but
+     * no information might have been lost.
+     */
+    isWideningState(state: E): boolean;
 
 }
 

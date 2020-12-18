@@ -26,12 +26,13 @@
 import {AbstractElementVisitor, AbstractState, LatticeWithComplements} from "../../../lattices/Lattice";
 import {Record as ImmRec} from "immutable";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
+import {AbstractDomain} from "../../domains/AbstractDomain";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 import {ConcreteDomain, ConcreteMemory,} from "../../domains/ConcreteElements";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
 import {Preconditions} from "../../../utils/Preconditions";
 import {FirstOrderDomain, FirstOrderLattice, FirstOrderSolver} from "../../domains/FirstOrderDomain";
+import {AbstractionPrecision} from "../../AbstractionPrecision";
 
 export interface DataAbstractStateAttributes {
 
@@ -99,9 +100,8 @@ export class DataAbstractStateLattice implements LatticeWithComplements<DataAbst
     }
 
     isIncluded(element1: DataAbstractState, element2: DataAbstractState): boolean {
-        //if (!this._propLattice.isIncluded(element1.summaryFormula, element2.summaryFormula)) {
-        //    return false;
-        //}
+        Preconditions.checkNotUndefined(element1);
+        Preconditions.checkNotUndefined(element2);
 
         return this._folLattice.isIncluded(element1.blockFormula, element2.blockFormula);
     }

@@ -154,6 +154,7 @@ import {
     TerminateProgramStatement
 } from "../../../syntax/ast/core/statements/InternalStatement";
 import {DataLocation} from "../../../syntax/app/controlflow/DataLocation";
+import {PrecisionPopStatement, PrecisionPushStatement} from "../../../syntax/ast/core/Precisions";
 
 abstract class TransformingVisitor<RT, B extends AbstractBoolean, I extends AbstractInteger, R extends AbstractReal,
     F extends AbstractFloat, S extends AbstractString, L extends AbstractList> implements CoreVisitor<RT> {
@@ -696,6 +697,14 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
 
     visit(node: AstNode): B {
         throw new ImplementMeException();
+    }
+
+    visitPrecisionPopStatement(node: PrecisionPopStatement): B {
+        return this._mem;
+    }
+
+    visitPrecisionPushStatement(node: PrecisionPushStatement): B {
+        return this._mem;
     }
 
 }

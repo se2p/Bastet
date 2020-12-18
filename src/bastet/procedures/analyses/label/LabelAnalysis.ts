@@ -48,6 +48,7 @@ import {AccessibilityRelation} from "../Accessibility";
 import {LabelAbstractDomain, LabelState} from "./LabelAbstractDomain";
 import {LabelTransferRelation} from "./LabelTransferRelation";
 import {MergeJoinOperator} from "../Operators";
+import {SSAState} from "../ssa/SSAAbstractDomain";
 
 let bigStepNumber: number = 0; // FIXME: THIS IS A HACK
 
@@ -69,8 +70,6 @@ export class LabelAnalysis<F extends AbstractState>
 
     private readonly _transfer: LabelTransferRelation;
 
-    private readonly _refiner: WrappingRefiner<LabelState, any>;
-
     private readonly _mergeOperator: MergeJoinOperator<LabelState>;
 
     private readonly _task: App;
@@ -81,7 +80,6 @@ export class LabelAnalysis<F extends AbstractState>
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new LabelAbstractDomain(wrappedAnalysis.abstractDomain);
         this._mergeOperator = new MergeJoinOperator(this._abstractDomain);
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._transfer = new LabelTransferRelation(wrappedAnalysis, () => bigStepNumber);
     }
 
@@ -144,6 +142,10 @@ export class LabelAnalysis<F extends AbstractState>
         return this._wrappedAnalysis.target(state.getWrappedState());
     }
 
+    isWideningState(state: LabelState): boolean {
+        return this._wrappedAnalysis.isWideningState(state.getWrappedState());
+    }
+
     widen(state: LabelState, reached: Iterable<F>): LabelState {
         const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {
@@ -161,8 +163,8 @@ export class LabelAnalysis<F extends AbstractState>
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<LabelState> {
-        return this._refiner;
+    get refiner(): Refiner<F> {
+        return new WrappingRefiner(this._wrappedAnalysis.refiner);
     }
 
     get wrappedAnalysis(): ProgramAnalysis<any, any, F> {
@@ -213,20 +215,24 @@ export class LabelAnalysis<F extends AbstractState>
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<LabelState, F>, state: F): AccessibilityRelation<LabelState, F> {
+    testify(accessibility: AccessibilityRelation< F>, state: F): AccessibilityRelation< F> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<LabelState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation< F>, state: F): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<LabelState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation< F>, state: F): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<LabelState, F>, state: F): AccessibilityRelation<LabelState, F> {
+    testifyOne(accessibility: AccessibilityRelation< F>, state: F): AccessibilityRelation< F> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
+    }
+
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<F> {
+        throw new ImplementMeException();
     }
 
 }

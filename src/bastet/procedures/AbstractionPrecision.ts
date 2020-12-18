@@ -23,8 +23,8 @@
  *
  */
 
-import {AbstractElement, Lattice} from "../lattices/Lattice";
-import {Record as ImmRec, Set as ImmSet} from "immutable";
+import {AbstractElement, Lattice, Lattices} from "../lattices/Lattice";
+import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable";
 import {FirstOrderFormula} from "../utils/ConjunctiveNormalForm";
 import {FirstOrderLattice} from "./domains/FirstOrderDomain";
 import {Preconditions} from "../utils/Preconditions";
@@ -55,11 +55,11 @@ export interface AbstractionPrecisionLattice<P extends AbstractionPrecision> ext
 
 }
 
-enum PrecisionRole {
+export enum PrecisionRole {
     TOP_MAINTAIN_ALL, BOTTOM_MAINTAIN_NOTHING, INTERMEDIATE
 }
 
-export interface DataAbstractStateAttributes {
+export interface PredicatePrecisionAttributes {
 
     role: PrecisionRole,
     predicates: ImmSet<FirstOrderFormula>;
@@ -73,7 +73,7 @@ const PredicatePrecisionRecord = ImmRec({
 
 });
 
-export class PredicatePrecision extends PredicatePrecisionRecord implements AbstractionPrecision, AbstractionPrecision, DataAbstractStateAttributes {
+export class PredicatePrecision extends PredicatePrecisionRecord implements AbstractionPrecision, PredicatePrecisionAttributes {
 
     constructor(predicates: Iterable<FirstOrderFormula>, role: PrecisionRole) {
         super({'predicates': ImmSet(predicates), 'role': role });
@@ -114,6 +114,79 @@ export class PredicatePrecision extends PredicatePrecisionRecord implements Abst
 
 }
 
+export interface PredicatePrecisionStackAttributes {
+
+    stack: ImmList<PredicatePrecision>;
+
+}
+
+const PredicatePrecisionStackRecord = ImmRec({
+
+    stack: ImmList()
+
+});
+
+export class PredicatePrecisionStack extends PredicatePrecisionStackRecord implements PredicatePrecisionStackAttributes {
+
+    constructor(stack: ImmList<PredicatePrecision>) {
+        super({'stack': stack});
+    }
+
+    public push(element: PredicatePrecision): this {
+        return this.set('stack', this.stack.push(element));
+    }
+
+    public pop(): this {
+        return this.set('stack', this.stack.pop());
+    }
+
+}
+
+export class PredicatePrecisionStackLattice implements Lattice<PredicatePrecisionStack> {
+
+    private readonly _bottom: PredicatePrecisionStack;
+    private readonly _lattice: PredicatePrecisionLattice<FirstOrderFormula>;
+    private readonly _top: PredicatePrecisionStack;
+
+    constructor(predicatePrecLattice: PredicatePrecisionLattice<FirstOrderFormula>) {
+        this._lattice = Preconditions.checkNotUndefined(predicatePrecLattice);
+        this._bottom = new PredicatePrecisionStack(ImmList());
+        this._top = new PredicatePrecisionStack(ImmList([this._lattice.top(), this._lattice.top()]));
+    }
+
+    bottom(): PredicatePrecisionStack {
+        return this._bottom;
+    }
+
+    isIncluded(element1: PredicatePrecisionStack, element2: PredicatePrecisionStack): boolean {
+        return element1.equals(element2);
+    }
+
+    join(element1: PredicatePrecisionStack, element2: PredicatePrecisionStack): PredicatePrecisionStack {
+        if (element1.equals(element2)) {
+            return element1;
+        } else {
+            return this.top();
+        }
+    }
+
+    meet(element1: PredicatePrecisionStack, element2: PredicatePrecisionStack): PredicatePrecisionStack {
+        if (element1.equals(element2)) {
+            return element1;
+        } else {
+            return this.bottom();
+        }
+    }
+
+    top(): PredicatePrecisionStack {
+        return this._top;
+    }
+
+    get lattice(): PredicatePrecisionLattice<FirstOrderFormula> {
+        return this._lattice;
+    }
+}
+
 /**
  * Precision lattice for Boolean predicate abstraction.
  */
@@ -152,7 +225,7 @@ export class PredicatePrecisionLattice<F extends FirstOrderFormula> implements A
             return element2;
         }
 
-        return element1.withPredicates(element2.predicates);
+        return element1.withPredicates(element2.predicates.union(element1.predicates));
     }
 
     meet(element1: PredicatePrecision, element2: PredicatePrecision): PredicatePrecision {

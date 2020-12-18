@@ -33,6 +33,8 @@ import {Preconditions} from "../../utils/Preconditions";
 import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
 import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
 import {getActiveBudget} from "../../utils/Budgets";
+import {getTheOnlyElement} from "../../utils/Collections";
+import {AccessibilityRelation} from "../analyses/Accessibility";
 
 export const STAT_KEY_BMC_ITERATIONS = "iterations";
 
@@ -62,29 +64,37 @@ export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState>
         this._feasibilityCheckStats = this._statistics.withContext("feasibility-check");
     }
 
+    private identifyTargetStates(reached: ReachedSet<E>): Set<E> {
+        return new Set(reached.getAddedLast().filter((e) => this._analysis.target(e).length > 0));
+    }
+
     public run(frontier: FrontierSet<E>, reached: ReachedSet<E>): [FrontierSet<E>, ReachedSet<E>] {
         do {
             this._statistics.increment(STAT_KEY_BMC_ITERATIONS);
             getActiveBudget().raiseIfExhausted();
-            [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);
-            if (!frontier.isEmpty()) {
-                // Target state was found
-                Preconditions.checkState(reached.getAddedLast().length > 0);
-                const targetState = reached.getAddedLast()[0];
-                Preconditions.checkState(this._analysis.target(targetState as E).length > 0);
 
+            // Run the wrapped (reachability) analysis
+            [frontier, reached] = this._wrappedAlgorithm.run(frontier, reached);
+
+            // Check for target states to check feasibility for
+            const targetStates = this.identifyTargetStates(reached);
+            if (targetStates.size > 0) {
+                const targetState = getTheOnlyElement(targetStates);
+                Preconditions.checkState(this._analysis.target(targetState as E).length > 0);
                 const properties = this._analysis.target(targetState);
 
                 // Check the feasibility with the refiner
-                let isFeasible: boolean;
                 this._feasibilityCheckStats.startTimer();
                 try {
-                    isFeasible = this._refiner.checkIsFeasible(targetState as E, `Target state feasibility for ${properties.toString()}`);
+                    const ar = this._analysis.accessibility(reached, targetState);
+                    const isFeasible: boolean = this._refiner.checkIsFeasible(reached, ar,
+                        targetState as E, `Target state feasibility for ${properties.toString()}`);
+
                     if (isFeasible) {
                         return [frontier, reached];
                     } else {
                         // Refine the abstraction
-                        [frontier, reached] = this.eliminateInfeasibleState(frontier, reached, targetState);
+                        [frontier, reached] = this.eliminateInfeasibleState(frontier, reached, ar, targetState);
                     }
                 } finally {
                     this._feasibilityCheckStats.stopTimer();
@@ -95,7 +105,7 @@ export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState>
         return [frontier, reached];
     }
 
-    protected eliminateInfeasibleState(frontier: FrontierSet<E>, reached: ReachedSet<E>, targetState: E): [FrontierSet<E>, ReachedSet<E>]{
-        return this._refiner.refinePrecision(frontier, reached, targetState);
+    protected eliminateInfeasibleState(frontier: FrontierSet<E>, reached: ReachedSet<E>, ar: AccessibilityRelation<E>, targetState: E): [FrontierSet<E>, ReachedSet<E>]{
+        return this._refiner.refinePrecision(frontier, reached, ar, targetState);
     }
 }

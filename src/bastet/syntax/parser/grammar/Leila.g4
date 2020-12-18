@@ -218,6 +218,8 @@ commonStmt  :
   | 'reset' 'timer' # ResetTimerStatement
   | 'epsilon' # EpsilonStatement
   | 'assume' boolExpr # AssumeStatement
+  | 'precision' 'push' boolExpr # PrecisionPushStatement
+  | 'precision' 'pop' # PrecisionPopStatement
   | setStmt # SetStatement
   ;
 

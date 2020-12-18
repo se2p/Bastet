@@ -25,12 +25,20 @@ import {VariableWithDataLocation} from "../../../../src/bastet/syntax/ast/core/V
 import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataLocation";
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
 import {ConcreteNumber, ConcreteString} from "../../../../src/bastet/procedures/domains/ConcreteElements";
-import {Z3FirstOrderLattice, Z3NumberFormula} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
+import {
+    Z3BooleanFormula,
+    Z3FirstOrderLattice,
+    Z3NumberFormula,
+    Z3Theories
+} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
 import {BooleanType, IntegerType, StringType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
+import {Map as ImmMap, Record as ImmRec} from "immutable";
+import {FirstOrderFormula} from "../../../../src/bastet/utils/ConjunctiveNormalForm";
+
 
 let smt: Z3SMT;
 let ctx;
-let theories;
+let theories: Z3Theories;
 let prover;
 
 beforeAll( async (done) => {
@@ -59,6 +67,176 @@ test ("Case: True", () => {
     expect(isUnsat).toBe(false);
     prover.pop();
 });
+
+test ("Substitute", () => {
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
+    const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), IntegerType.instance()));
+    const xvar = theories.intTheory.abstractNumberValue(x);
+    const yvar = theories.intTheory.abstractNumberValue(y);
+
+    const fx = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const fy = theories.substitute(fx, [xvar], [yvar]);
+    expect(theories.stringRepresentation(fy)).toEqual("(and (= y 0) (= y 42))");
+});
+
+test ("Instantiate, increment by 1", () => {
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
+    const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@6"), IntegerType.instance()));
+
+    const fx = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(y),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const fy = theories.instantiate(fx, (v, oldIndex) => oldIndex + 1);
+    expect(theories.stringRepresentation(fy)).toEqual("(and (= x@3 0) (= y@7 42))");
+});
+
+test ("Instantiate, increment by 10, case 1", () => {
+    const x1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
+    const x2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@6"), IntegerType.instance()));
+
+    const fx = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x1),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x2),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const fy = theories.instantiate(fx, (v, oldIndex) => oldIndex + 10);
+    expect(theories.stringRepresentation(fy)).toEqual("(and (= x@12 0) (= x@16 42))");
+});
+
+test ("Instantiate, increment by 10, case 2", () => {
+    const x1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
+    const x2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@6"), IntegerType.instance()));
+    const x3 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@7"), IntegerType.instance()));
+
+    const fx = theories.boolTheory.and(theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x1),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x2),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42)))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x3),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(1))),
+        );
+
+    const fy = theories.instantiate(fx, (v, oldIndex) => oldIndex + 10);
+    expect(theories.stringRepresentation(fy)).toEqual("(and (= x@12 0) (= x@16 42) (= x@17 1))");
+});
+
+test ("Instantiate, mapping 1", () => {
+    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
+    const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@6"), IntegerType.instance()));
+
+    const mapping = { "x": 22, "y": 66};
+
+    const fx = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(y),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const fy = theories.instantiate(fx, (v, oldIndex) => mapping[v]);
+    expect(theories.stringRepresentation(fy)).toEqual("(and (= x@22 0) (= y@66 42))");
+});
+
+test ("Align, case 1", () => {
+    const x0 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@0"), IntegerType.instance()));
+    const x1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@1"), IntegerType.instance()));
+    const x2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
+    const y0 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@0"), IntegerType.instance()));
+    const y1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@1"), IntegerType.instance()));
+    const y2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@2"), IntegerType.instance()));
+
+    const mapping1 = new Map(ImmMap<string, number>([["x", 1], ["y", 1]]));
+    const mapping2 = new Map(ImmMap<string, number>([["x", 0]]));
+    const mapping3 = new Map(ImmMap<string, number>([["x", 1], ["y", 0]]));
+    const mapping4 = new Map(ImmMap<string, number>([["x", 1], ["y", 0]]));
+
+    const f1 = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x1),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(y0),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const f2 = theories.boolTheory.trueBool();
+
+    const f3 = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x1),
+            theories.intTheory.plus(theories.intTheory.abstractNumberValue(x0),
+                theories.intTheory.fromConcreteNumber(new ConcreteNumber(1)))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(y0),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const f4 = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x1),
+            theories.intTheory.plus(theories.intTheory.abstractNumberValue(x0),
+                theories.intTheory.fromConcreteNumber(new ConcreteNumber(1)))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(y0),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const fs = theories.alignSsaIndices([f1, f2, f3, f4], [mapping1, mapping2, mapping3, mapping4]);
+    const f = fs.reduce((e, r) => theories.boolTheory.and(e, r), theories.boolTheory.trueBool());
+    console.log(theories.stringRepresentation(f));
+});
+
+test ("Align, case 2", () => {
+    const x0 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@0"), IntegerType.instance()));
+    const x1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@1"), IntegerType.instance()));
+    const x2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@2"), IntegerType.instance()));
+    const y0 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@0"), IntegerType.instance()));
+    const y1 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@1"), IntegerType.instance()));
+    const y2 = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@2"), IntegerType.instance()));
+
+    const mapping1 = new Map(ImmMap<string, number>([["x", 1], ["y", 2]]));
+    const mapping2 = new Map(ImmMap<string, number>([["x", 1], ["y", 0]]));
+
+    const f1 = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x1),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(0))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(y2),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const f2 = theories.boolTheory.and(
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(x1),
+            theories.intTheory.plus(theories.intTheory.abstractNumberValue(x0),
+                theories.intTheory.fromConcreteNumber(new ConcreteNumber(1)))),
+        theories.intTheory.isNumberEqualTo(
+            theories.intTheory.abstractNumberValue(y0),
+            theories.intTheory.fromConcreteNumber(new ConcreteNumber(42))));
+
+    const fs: Z3BooleanFormula[] = theories.alignSsaIndices([f1, f2], [mapping1, mapping2]);
+    const f = fs.reduce((e, r) => theories.boolTheory.and(e, r), theories.boolTheory.trueBool());
+    expect(theories.stringRepresentation(f)).toEqual("(and true (= x@1 0) (= y@2 42) (= x@2 (+ x@1 1)) (= y@2 42))")
+});
+
+
 
 test ("Implication. Unsat", () => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
@@ -91,6 +269,7 @@ test ("Implication. Sat", () => {
     expect(isUnsat).toBe(false);
     prover.pop();
 });
+
 
 test("Lattice Include 1", () => {
     const lattice = new Z3FirstOrderLattice(theories.boolTheory, prover);

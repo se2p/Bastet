@@ -39,6 +39,9 @@ import {ImplementMeForException} from "../../core/exceptions/ImplementMeExceptio
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {DebugState} from "./debug/DebugAbstractDomain";
 import {getTheOnlyElement} from "../../utils/Collections";
+import {AbstractionState} from "./abstraction/AbstractionAbstractDomain";
+import {ProgramAnalysis} from "./ProgramAnalysis";
+import {ConcreteElement} from "../domains/ConcreteElements";
 
 const colormap = require('colormap')
 
@@ -96,6 +99,10 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
 
     visit(element: AbstractElement): string {
         return "";
+    }
+
+    visitAbstractionState(element: AbstractionState): string {
+        return `${element.getEnteringSummary().toString()} ${element.getWrappedState().accept(this)}\n`;
     }
 
     visitDebugState(element: DebugState): string {
@@ -193,6 +200,21 @@ export class ColorByActorVisitor extends StateColorVisitor {
 
 export class PenSizeVisitor extends DelegatingStateVisitor<number> {
 
+    private readonly _analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>;
+
+    constructor(analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>) {
+        super();
+        this._analysis = Preconditions.checkNotUndefined(analysis);
+    }
+
+    visitAbstractionState(state: AbstractionState): number {
+        if (state.getWideningOf().isPresent()) {
+            return 7;
+        } else {
+            return this.defaultResultFor(state);
+        }
+    }
+
     protected defaultResultFor(element: AbstractElement): number {
         return 1;
     }
@@ -203,6 +225,10 @@ export class SSAStateVisitor implements AbstractStateVisitor<SSAState> {
 
     visit(element: AbstractElement): SSAState {
         throw new ImplementMeForException(element.constructor.name);
+    }
+
+    visitAbstractionState(element: AbstractionState): SSAState {
+        return element.getWrappedState().accept(this);
     }
 
     visitControlAbstractState(element: ControlAbstractState): SSAState {

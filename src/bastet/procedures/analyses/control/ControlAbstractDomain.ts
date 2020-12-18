@@ -24,7 +24,7 @@
  */
 
 import {SingletonStateWrapper} from "../AbstractStates";
-import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
+import {AbstractDomain} from "../../domains/AbstractDomain";
 import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {ActorId} from "../../../syntax/app/Actor";
@@ -41,6 +41,7 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {DataLocation, DataLocations, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
+import {AbstractionPrecision} from "../../AbstractionPrecision";
 
 /**
  * Current thread state that is active or becomes active if...
@@ -587,15 +588,22 @@ export class ControlLattice implements Lattice<ControlAbstractState> {
 
     private readonly _wrapped: Lattice<AbstractElement>;
 
+    private readonly _bottom: ControlAbstractState;
+
     constructor(wrapped: Lattice<AbstractElement>) {
         this._wrapped = Preconditions.checkNotUndefined(wrapped);
+        this._bottom = new ControlAbstractState(ImmList(), ImmList(), this._wrapped.bottom(), ImmSet(), ImmSet(), ImmSet(), ImmMap());
     }
 
     bottom(): ControlAbstractState {
-        throw new ImplementMeException();
+        return this._bottom;
     }
 
     isIncluded(element1: ControlAbstractState, element2: ControlAbstractState): boolean {
+        if (element2 === this._bottom) {
+            return this._wrapped.isIncluded(element1.getWrappedState(), element2.getWrappedState());
+        }
+
         throw new ImplementMeException();
     }
 

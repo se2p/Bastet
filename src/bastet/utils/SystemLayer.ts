@@ -37,7 +37,7 @@ export interface SystemLayer {
 export class NodeSystemLayer implements SystemLayer {
 
     readFileAsJson(filePath: string): {} {
-        Preconditions.checkArgument(fs.existsSync(filePath), "File does not exists.")
+        Preconditions.checkArgument(fs.existsSync(filePath), `File "${filePath}" does not exists.`)
         const data: string = fs.readFileSync(filePath, 'utf8');
         return JSON.parse(data);
     }

@@ -34,7 +34,7 @@ import {Concretizer, UnavailableConcretizer} from "../../domains/AbstractDomain"
 import {ConcreteElement} from "../../domains/ConcreteElements";
 
 export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState>
-    implements ReachedSet<GraphAbstractState>, AccessibilityRelation<E, E> {
+    implements ReachedSet<GraphAbstractState>, AccessibilityRelation<E> {
 
     private readonly _frontierSet: FrontierSet<E>;
 

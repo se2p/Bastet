@@ -24,13 +24,13 @@
  */
 
 
-import {AbstractionPrecision} from "./AbstractDomain";
 import {AbstractBoolean, AbstractBooleanDomain, BooleanTheory} from './MemoryTransformer'
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {ConcreteBoolean, ConcreteDomain} from './ConcreteElements'
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Record as ImmRec} from "immutable";
 import {Variable} from "../../syntax/ast/core/Variable";
+import {AbstractionPrecision} from "../AbstractionPrecision";
 
 export class FlatBoolLattice implements Lattice<FlatBooleanValue> {
 
@@ -179,6 +179,15 @@ export class FlatBooleanValueTheory implements BooleanTheory<FlatBooleanValue> {
         } else {
             return this.falseBool();
         }
+    }
+    /**
+     * Logical XOR operator for FlatBooleanValue. Returns if either op1 or op2 is true and not both.
+     */
+    xor(op1: FlatBooleanValue, op2: FlatBooleanValue): FlatBooleanValue {
+        return this.and(
+            this.or(op1, op2),
+            this.not(this.and(op1, op2))
+        );
     }
 
 }

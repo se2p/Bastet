@@ -23,12 +23,12 @@
  *
  */
 
-import {AbstractionPrecision} from "./AbstractDomain";
 import {ConcreteDomain, ConcreteStringList} from './ConcreteElements'
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
 import {AbstractList, AbstractStringListDomain, ListTheory} from "./MemoryTransformer";
+import {AbstractionPrecision} from "../AbstractionPrecision";
 
 export interface AbstractStringList extends AbstractElement {
 

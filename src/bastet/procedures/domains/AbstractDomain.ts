@@ -26,6 +26,7 @@
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {ConcreteDomain, ConcreteElement} from "./ConcreteElements";
 import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
+import {AbstractionPrecision} from "../AbstractionPrecision";
 
 export class ConcreteNumberElement implements ConcreteElement {
 
@@ -47,10 +48,9 @@ export class ConcreteMapElement implements ConcreteElement {
 
 }
 
-export interface AbstractionPrecision {
-
-}
-
+/**
+ * A concretizer is a function that maps an abstract element (of type `E`) to a concrete element (of type `C`).
+ */
 export interface Concretizer<C extends ConcreteElement, E extends AbstractElement> {
 
     concretize(element: E): Iterable<C>;
@@ -71,6 +71,12 @@ export class UnavailableConcretizer<C extends ConcreteElement, E extends Abstrac
 
 }
 
+/**
+ * An abstract domain consists of three components:
+ *  - A set of concrete states of type `C`.
+ *  - A (semi-)lattice, whose elements (of type `E`) are also called {@link AbstractElement abstract states}.
+ *  - A concretization function that maps from `E` to `C`.
+ */
 export interface AbstractDomain<C extends ConcreteElement, E extends AbstractElement> extends Concretizer<C, E> {
 
     lattice: Lattice<E>;

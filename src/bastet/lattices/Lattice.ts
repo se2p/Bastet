@@ -26,22 +26,38 @@
 import {Record as ImmRec} from "immutable";
 import {PerfTimer} from "../utils/PerfTimer";
 
+/**
+ * Common interface for all lattice elements.
+ */
 export interface AbstractElement extends ImmRec<any> {
 
 }
 
+/**
+ * A visitor for {@link AbstractElement}s.
+ */
 export interface AbstractElementVisitor<T> {
 
     visit(element: AbstractElement): T;
 
 }
 
+/**
+ * A lattice element that implements the visitor pattern.
+ */
 export interface AbstractState extends AbstractElement {
 
     accept<T>(visitor: AbstractElementVisitor<T>): T;
 
 }
 
+/**
+ * A (bounded) lattice is an algebraic structure consisting of the following:
+ *  - A partially ordered set of elements, also called {@link AbstractState abstract states}.
+ *  - The partial order is given by the so called inclusion relation (is-less-or equal)
+ *  - Every two elements have a least upper bound (join) and a greatest lower bound (meet).
+ *  - In addition, if the lattice is bounded, there exists a greatest element (top) and a least element (bottom).
+ */
 export interface Lattice<E extends AbstractElement> {
 
     /**
@@ -77,12 +93,26 @@ export interface Lattice<E extends AbstractElement> {
 
 }
 
+/**
+ * A bounded {@link Lattice} where every element `a: E` also has a complement `complement(a): E`. That is:
+ * ```ts
+ * meet(a, complement(a)) == meet(complement(a), a) == bottom()
+ * join(a, complement(a)) == join(complement(a), a) == top()
+ * ```
+ */
 export interface LatticeWithComplements<E extends AbstractElement> extends Lattice<E> {
 
+    /**
+     * Returns the complement of the given element.
+     * @param element the element for which to return its complement
+     */
     complement(element: E): E;
 
 }
 
+/**
+ * Utility class for working with {@link Lattice}s.
+ */
 export class Lattices {
 
     private static isFeasible0<E extends AbstractElement>(element: E, inLattice: Lattice<E>) {

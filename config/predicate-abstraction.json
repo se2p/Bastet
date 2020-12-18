@@ -1,0 +1,42 @@
+{
+
+    "output-dir": "./output/",
+
+    "MainAnalysis": {
+        "print-statistics": true,
+        "export-artifacts": true,
+        "analysis": "predicate"
+    },
+
+    "Transformer": {
+        "enable-message-dispatcher-loop": false,
+        "use-busy-waiting": false,
+        "use-busy-wait-until-cond": true
+    },
+
+    "ReachabilityAlgorithm": {
+        "dump-graph-after-iteration": false
+    },
+
+    "DataAnalysis": {
+        "encode-floats-as": "Reals"
+    },
+
+    "ControlAnalysis": {
+        "widen-on-loop-heads": true,
+        "widen-after-each-step": false
+    },
+
+    "GraphAnalysis": {
+        "mergeIntoOperator": "StandardMergeIntoOperator",
+        "stopOperator": "CheckCoverage",
+        "witnessHandler": "ExportPath",
+        "graphConstructionOrder": "WaitAtMeet",
+        "checkTargetFeasibility": true
+    },
+
+    "MultiPropertyAlgorithm" : {
+        "budget-total-walltime-secs": -1
+    }
+
+}

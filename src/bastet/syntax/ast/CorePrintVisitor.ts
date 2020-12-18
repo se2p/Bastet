@@ -134,6 +134,7 @@ import {
     SignalTargetReachedStatement,
     TerminateProgramStatement
 } from "./core/statements/InternalStatement";
+import {PrecisionPopStatement, PrecisionPushStatement} from "./core/Precisions";
 
 export class CorePrintVisitor implements CoreEventVisitor<string>,
     CoreBoolExpressionVisitor<string>, CoreNumberExpressionVisitor<string>,
@@ -145,6 +146,14 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
 
     visitReturnStatement(node: ReturnStatement): string {
         return 'RETURN';
+    }
+
+    visitPrecisionPushStatement(node: PrecisionPushStatement): string {
+        return `precision push ${node.predicate.accept(this)}`;
+    }
+
+    visitPrecisionPopStatement(node: PrecisionPopStatement): string {
+        return "precision pop"
     }
 
     visitUnqualifiedMessageNamespace(node: UnqualifiedMessageNamespace): string {

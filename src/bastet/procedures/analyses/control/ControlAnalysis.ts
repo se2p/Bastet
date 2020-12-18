@@ -72,6 +72,8 @@ export class ControlAnalysisConfig extends BastetConfiguration {
     }
 
     get widenOnLoopHeads(): boolean {
+        // TODO: im predicateAbstraction branch in der predicate-abstraction.json diesen Parameter noch auf true
+        //  setzen
         return this.getBoolProperty('widen-on-loop-heads', false);
     }
 
@@ -101,8 +103,6 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
 
     private readonly _transferRelation: ControlTransferRelation;
 
-    private readonly _refiner: Refiner<ControlAbstractState>;
-
     private readonly _task: App;
 
     private readonly _statistics: AnalysisStatistics;
@@ -117,23 +117,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         this._abstractDomain = new ControlAbstractDomain(wrappedAnalysis.abstractDomain);
         this._transferRelation = new ControlTransferRelation(this._config, task, this.wrappedAnalysis,
             this._wrappedAnalysis.abstractDomain, this._statistics);
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
-        const result: ControlAbstractState[] = [];
-        for (const r of this._transferRelation.abstractSucc(fromState)) {
-            const steppedToLoopHead = r.getSteppedFor().map((i) =>
-                r.getIndexedThreadState(i)).filter((ts) => this.isThreadOnLoophead(ts.threadStatus)
-                && ts.threadStatus.getActorId() != "IOActor").map((ts) => ts.threadStatus.getRelationLocation());  // HACK: Filter the event-dispatcher loop
-
-            //...
-            if (steppedToLoopHead.isEmpty() || this.refiner.checkIsFeasible(r, `Loop unrolling for ${steppedToLoopHead.toString()}`)) {
-                result.push(r);
-            }
-        }
-
-        return result;
+        return this._transferRelation.abstractSucc(fromState);
     }
 
     createUniquePartition(): Object {
@@ -248,18 +235,27 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         return result;
     }
 
-    widen(state: ControlAbstractState, reached: Iterable<AbstractState>): ControlAbstractState {
+    isWideningState(state: ControlAbstractState): boolean {
         const isWideningState = this._config.widenAfterEachStep
-                || (this._config.widenOnLoopHeads && this.steppedToLoopHead(state));
+            || (this._config.widenOnLoopHeads && this.steppedToLoopHead(state));
 
         if (this._config.widenAfterFunctionReturn || this._config.widenBeforeFunctionCall) {
             throw new ImplementMeException();
         }
 
-        if (isWideningState) {
+        return isWideningState;
+    }
+
+    widen(state: ControlAbstractState, reached: Iterable<AbstractState>): ControlAbstractState {
+        if (this.isWideningState(state)) {
             const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
             if (wrappedResult != state.getWrappedState()) {
-                return state.withWrappedState(wrappedResult);
+                // Also the control state has to be widened (get rid of loop stacks)
+                let result = state
+                for (let steppedIx of state.getSteppedFor()) {
+                   result = result.withThreadStateUpdate(steppedIx, (ts) => ts.withLoopStack(ImmList()));
+                }
+                return result.withWrappedState(wrappedResult);
             } else {
                 return state;
             }
@@ -272,8 +268,8 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         return e.getWrappedState();
     }
 
-    get refiner(): Refiner<ControlAbstractState> {
-        return this._refiner;
+    get refiner(): Refiner<AbstractState> {
+        return new WrappingRefiner(this.wrappedAnalysis.refiner);
     }
 
     get wrappedAnalysis(): ProgramAnalysisWithLabels<any, any, AbstractState> {
@@ -452,24 +448,28 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         actors.put("actorOrder", this._task.actors.map(a => a.ident).toString())
     }
 
-    testify(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {
+    testify(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         return this._wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): AccessibilityRelation<ControlAbstractState, AbstractState> {
+    testifyOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         return this._wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         return this._wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<ControlAbstractState, AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         return this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
     abstractSuccFor(fromState: ControlAbstractState, op: ProgramOperation, co: Concern): Iterable<ControlAbstractState> {
         throw new NotSupportedException();
+    }
+
+    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
+        throw new ImplementMeException();
     }
 
 

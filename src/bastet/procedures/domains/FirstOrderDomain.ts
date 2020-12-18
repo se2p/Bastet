@@ -24,7 +24,6 @@
  */
 
 
-import {AbstractDomain, AbstractionPrecision} from "./AbstractDomain";
 import {
     ConcreteBoolean,
     ConcreteDomain,
@@ -37,10 +36,12 @@ import {FirstOrderFormula} from "../../utils/ConjunctiveNormalForm";
 import {LatticeWithComplements} from "../../lattices/Lattice";
 import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
-import {Z3Model, Z3Vector} from "../../utils/smt/z3/Z3SMT";
 import {BooleanTheory} from "./MemoryTransformer";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 import {PerfTimer} from "../../utils/PerfTimer";
+import {AbstractDomain} from "./AbstractDomain";
+import {AbstractionPrecision} from "../AbstractionPrecision";
+import {Z3Model, Z3Vector} from "../../utils/smt/z3/Z3SMT";
 
 export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
     prover: FirstOrderSolver<F>;
@@ -81,7 +82,6 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
             // (This involves a call to the solver's `check` method, which has
             // to be called before we are allowed to query a model.)
             if (!this.solver.isSat()) {
-                this.solver.getCores().asArray().forEach((f) => this.lattice.prover.stringRepresentation(f));
                 throw new IllegalArgumentException("Model only available for satisfiable formula!");
             }
 
@@ -177,7 +177,16 @@ export abstract class FirstOrderSolver<F extends FirstOrderFormula> {
 
     public abstract getCores(): Z3Vector;
 
-    public abstract stringRepresentation(f: FirstOrderFormula): string;
+    public abstract stringRepresentation(f: F): string;
+
+    public abstract allSat(abstractionProblem: F, predicates: F[]): boolean[][];
+
+    public abstract booleanAbstraction(abstractionProblem: F, predicates: F[]): F;
+
+    public abstract cartesianAbstraction(abstractionProblem: F, predicates: F[]): F;
+
+    public abstract collectInterpolants(): F[];
+
 }
 
 export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
@@ -196,6 +205,9 @@ export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
     }
 
     isIncluded(element1: F, element2: F): boolean {
+        Preconditions.checkNotUndefined(element1);
+        Preconditions.checkNotUndefined(element2);
+
         this._prover.push();
         try {
             // UNSAT a  <=>  a lessOrEqual ⊥

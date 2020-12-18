@@ -1,203 +1,208 @@
 // Generated from src/bastet/syntax/parser/grammar/Leila.g4 by ANTLR 4.7.3-SNAPSHOT
+
 // @ts-nocheck
 
-import { ParseTreeListener } from "antlr4ts/tree/ParseTreeListener";
+import {ParseTreeListener} from "antlr4ts/tree/ParseTreeListener";
 
-import { IdentExpressionContext } from "./LeilaParser";
-import { StrIdentExpressionContext } from "./LeilaParser";
-import { FullMethodDefinitionContext } from "./LeilaParser";
-import { ExternMethodDefinitionContext } from "./LeilaParser";
-import { RestartScriptContext } from "./LeilaParser";
-import { ListTypeContext } from "./LeilaParser";
-import { ActorTypeContext } from "./LeilaParser";
-import { PrimitiveContext } from "./LeilaParser";
-import { StringLiteralExpressionContext } from "./LeilaParser";
-import { StringVariableExpressionContext } from "./LeilaParser";
-import { StringParanthExpressionContext } from "./LeilaParser";
-import { StringCallStatementExpressionContext } from "./LeilaParser";
-import { NumAsStringExpressionContext } from "./LeilaParser";
-import { BoolAsStringExpressionContext } from "./LeilaParser";
-import { StringAttributeOfExpressionContext } from "./LeilaParser";
-import { JoinStringsExpressionContext } from "./LeilaParser";
-import { IthLetterOfStringExpressionContext } from "./LeilaParser";
-import { IthStringItemOfExpressionContext } from "./LeilaParser";
-import { DefaultStringExpressionContext } from "./LeilaParser";
-import { UnspecifiedStringExpressionContext } from "./LeilaParser";
-import { IntegerLiteralExpressionContext } from "./LeilaParser";
-import { DecimalLiteralExpressionContext } from "./LeilaParser";
-import { ConcreteActorModeContext } from "./LeilaParser";
-import { ActorRoleModeContext } from "./LeilaParser";
-import { ExternFunctionReturnDefinitionContext } from "./LeilaParser";
-import { ExternVoidReturnDefinitionContext } from "./LeilaParser";
-import { QualifiedNamespaceContext } from "./LeilaParser";
-import { UnqualifiedNamespaceContext } from "./LeilaParser";
-import { StoreEvalResultStatementContext } from "./LeilaParser";
-import { StoreCallResultStatementContext } from "./LeilaParser";
-import { ListVariableExpressionContext } from "./LeilaParser";
-import { ListWithElementsExpressionContext } from "./LeilaParser";
-import { StopAllContext } from "./LeilaParser";
-import { StopThisContext } from "./LeilaParser";
-import { DeleteThisCloneContext } from "./LeilaParser";
-import { ActorVariableExpressionContext } from "./LeilaParser";
-import { ActorSelfExpressionContext } from "./LeilaParser";
-import { LocateActorExpressionContext } from "./LeilaParser";
-import { StartCloneActorExpressionContext } from "./LeilaParser";
-import { UsherActorExpressionContext } from "./LeilaParser";
-import { AtomicBlockContext } from "./LeilaParser";
-import { NonAtomicBlocContext } from "./LeilaParser";
-import { NumLiteralExpressionContext } from "./LeilaParser";
-import { NumVariableExpressionContext } from "./LeilaParser";
-import { NumBracketsContext } from "./LeilaParser";
-import { NumCallStatementExpressionContext } from "./LeilaParser";
-import { StringToFloatExpressionContext } from "./LeilaParser";
-import { StringToIntExpressionContext } from "./LeilaParser";
-import { BoolToIntExpressionContext } from "./LeilaParser";
-import { NumToFloatExpressionContext } from "./LeilaParser";
-import { NumToIntExpressionContext } from "./LeilaParser";
-import { TimerExpressionContext } from "./LeilaParser";
-import { LengthOfStringExpressionContext } from "./LeilaParser";
-import { LengthOfListExpressionContext } from "./LeilaParser";
-import { IndexOfExpressionContext } from "./LeilaParser";
-import { NumMulExpressionContext } from "./LeilaParser";
-import { NumDivExpressionContext } from "./LeilaParser";
-import { NumModExpressionContext } from "./LeilaParser";
-import { NumPlusExpressionContext } from "./LeilaParser";
-import { NumMinusExpressionContext } from "./LeilaParser";
-import { DefaultNumExprContext } from "./LeilaParser";
-import { UnspecifiedNumExprContext } from "./LeilaParser";
-import { NumberExpressionContext } from "./LeilaParser";
-import { StringExpressionContext } from "./LeilaParser";
-import { AtomicMethodContext } from "./LeilaParser";
-import { NamedScriptIdentContext } from "./LeilaParser";
-import { AnonymousScriptIdentContext } from "./LeilaParser";
-import { DeleteAllFromStatementContext } from "./LeilaParser";
-import { DeleteIthFromStatementContext } from "./LeilaParser";
-import { AddElementToStatementContext } from "./LeilaParser";
-import { InsertAtStatementContext } from "./LeilaParser";
-import { ReplaceElementAtStatementContext } from "./LeilaParser";
-import { NamedMessageDestinationContext } from "./LeilaParser";
-import { ActorMessageDestinationContext } from "./LeilaParser";
-import { FunctionReturnDefinitionContext } from "./LeilaParser";
-import { VoidReturnDefinitionContext } from "./LeilaParser";
-import { WaitSecsStatementContext } from "./LeilaParser";
-import { WaitUntilStatementContext } from "./LeilaParser";
-import { StopOthersInActorStatementContext } from "./LeilaParser";
-import { CreateCloneOfStatementContext } from "./LeilaParser";
-import { BroadcastMessageStatementContext } from "./LeilaParser";
-import { BroadcastAndWaitStatementContext } from "./LeilaParser";
-import { ResetTimerStatementContext } from "./LeilaParser";
-import { EpsilonStatementContext } from "./LeilaParser";
-import { AssumeStatementContext } from "./LeilaParser";
-import { SetStatementContext } from "./LeilaParser";
-import { DeclareVariableContext } from "./LeilaParser";
-import { NeverEventContext } from "./LeilaParser";
-import { BootstrapEventContext } from "./LeilaParser";
-import { AfterBootstrapMonitoringEventContext } from "./LeilaParser";
-import { StartupEventContext } from "./LeilaParser";
-import { CloneStartEventContext } from "./LeilaParser";
-import { MessageReceivedEventContext } from "./LeilaParser";
-import { ConditionReachedEventContext } from "./LeilaParser";
-import { AfterStatementMonitoringEventContext } from "./LeilaParser";
-import { IntegerTypeContext } from "./LeilaParser";
-import { FloatingPointTypeContext } from "./LeilaParser";
-import { BooleanTypeContext } from "./LeilaParser";
-import { StringTypeContext } from "./LeilaParser";
-import { EnumTypeContext } from "./LeilaParser";
-import { UserMessageContext } from "./LeilaParser";
-import { SystemMessageContext } from "./LeilaParser";
-import { PureElseContext } from "./LeilaParser";
-import { ElseIfCaseContext } from "./LeilaParser";
-import { EmptyElseCaseContext } from "./LeilaParser";
-import { FlatVariableContext } from "./LeilaParser";
-import { QualifiedVariableContext } from "./LeilaParser";
-import { BoolLiteralExpressionContext } from "./LeilaParser";
-import { BoolVariableExpressionContext } from "./LeilaParser";
-import { BoolParanthExpressionContext } from "./LeilaParser";
-import { BoolCallStatementExpressionContext } from "./LeilaParser";
-import { NumAsBoolExpressionContext } from "./LeilaParser";
-import { StringAsBoolExpressionContext } from "./LeilaParser";
-import { NegatedBoolExpressionContext } from "./LeilaParser";
-import { BoolAndExpressionContext } from "./LeilaParser";
-import { BoolOrExpressionContext } from "./LeilaParser";
-import { GreaterEqualExpressionContext } from "./LeilaParser";
-import { GreaterThanExpressionContext } from "./LeilaParser";
-import { LessThanExpressionContext } from "./LeilaParser";
-import { LessEqualExpressionContext } from "./LeilaParser";
-import { EqualsExpressionContext } from "./LeilaParser";
-import { StrContainsExpressionContext } from "./LeilaParser";
-import { DefaultBoolExpressionContext } from "./LeilaParser";
-import { UnspecifiedBoolExpressionContext } from "./LeilaParser";
-import { ControlStatementContext } from "./LeilaParser";
-import { NonControlStatementContext } from "./LeilaParser";
-import { StmtListStatementContext } from "./LeilaParser";
-import { ImageResourceContext } from "./LeilaParser";
-import { SoundResourceContext } from "./LeilaParser";
-import { ProgramContext } from "./LeilaParser";
-import { FileTypeContext } from "./LeilaParser";
-import { ActorDefinitionListContext } from "./LeilaParser";
-import { ActorDefinitionContext } from "./LeilaParser";
-import { InheritsFromContext } from "./LeilaParser";
-import { ActorModeContext } from "./LeilaParser";
-import { ActorComponentsDefinitionContext } from "./LeilaParser";
-import { ResourceContext } from "./LeilaParser";
-import { ResourceTypeContext } from "./LeilaParser";
-import { ResourceListContext } from "./LeilaParser";
-import { DeclarationStmtContext } from "./LeilaParser";
-import { DeclarationStmtListContext } from "./LeilaParser";
-import { TypeContext } from "./LeilaParser";
-import { PrimitiveTypeContext } from "./LeilaParser";
-import { ScriptContext } from "./LeilaParser";
-import { ScriptIdentContext } from "./LeilaParser";
-import { ScriptListContext } from "./LeilaParser";
-import { ScriptAttributeListContext } from "./LeilaParser";
-import { ScriptAttributeContext } from "./LeilaParser";
-import { EventContext } from "./LeilaParser";
-import { MessageNamespaceContext } from "./LeilaParser";
-import { MethodDefinitionListContext } from "./LeilaParser";
-import { MethodDefinitionContext } from "./LeilaParser";
-import { MethodResultDeclarationContext } from "./LeilaParser";
-import { ExternMethodResultDeclarationContext } from "./LeilaParser";
-import { MethodAttributeListContext } from "./LeilaParser";
-import { MethodAttributeContext } from "./LeilaParser";
-import { ParameterContext } from "./LeilaParser";
-import { ParameterListContext } from "./LeilaParser";
-import { ParameterListPlainContext } from "./LeilaParser";
-import { StmtListContext } from "./LeilaParser";
-import { BlockModeContext } from "./LeilaParser";
-import { StmtListPlainContext } from "./LeilaParser";
-import { ControlStmtContext } from "./LeilaParser";
-import { IfStmtContext } from "./LeilaParser";
-import { ElseCaseContext } from "./LeilaParser";
-import { UntilStmtContext } from "./LeilaParser";
-import { RepeatTimesStmtContext } from "./LeilaParser";
-import { RepeatForeverStmtContext } from "./LeilaParser";
-import { CallStmtContext } from "./LeilaParser";
-import { ExpressionListContext } from "./LeilaParser";
-import { ExpressionListPlainContext } from "./LeilaParser";
-import { ExpressionStmtContext } from "./LeilaParser";
-import { StmtContext } from "./LeilaParser";
-import { MetaAttributeListContext } from "./LeilaParser";
-import { MetaAttributeContext } from "./LeilaParser";
-import { NonCtrlStmtContext } from "./LeilaParser";
-import { CommonStmtContext } from "./LeilaParser";
-import { ListStmtContext } from "./LeilaParser";
-import { SetStmtContext } from "./LeilaParser";
-import { SetStmtListContext } from "./LeilaParser";
-import { TerminationStmtContext } from "./LeilaParser";
-import { StringExprContext } from "./LeilaParser";
-import { BoolExprContext } from "./LeilaParser";
-import { NumOrStringExprContext } from "./LeilaParser";
-import { NumExprContext } from "./LeilaParser";
-import { ListExprContext } from "./LeilaParser";
-import { ActorExprContext } from "./LeilaParser";
-import { ExpressionContext } from "./LeilaParser";
-import { UnspecifiedExprContext } from "./LeilaParser";
-import { VariableContext } from "./LeilaParser";
-import { IdentContext } from "./LeilaParser";
-import { NumberContext } from "./LeilaParser";
-import { ResourceLocatorContext } from "./LeilaParser";
-import { MessageContext } from "./LeilaParser";
-import { MessageDestinationContext } from "./LeilaParser";
+import {
+    ActorComponentsDefinitionContext,
+    ActorDefinitionContext,
+    ActorDefinitionListContext,
+    ActorExprContext,
+    ActorMessageDestinationContext,
+    ActorModeContext,
+    ActorRoleModeContext,
+    ActorSelfExpressionContext,
+    ActorTypeContext,
+    ActorVariableExpressionContext,
+    AddElementToStatementContext,
+    AfterBootstrapMonitoringEventContext,
+    AfterStatementMonitoringEventContext,
+    AnonymousScriptIdentContext,
+    AssumeStatementContext,
+    AtomicBlockContext,
+    AtomicMethodContext,
+    BlockModeContext,
+    BoolAndExpressionContext,
+    BoolAsStringExpressionContext,
+    BoolCallStatementExpressionContext,
+    BooleanTypeContext,
+    BoolExprContext,
+    BoolLiteralExpressionContext,
+    BoolOrExpressionContext,
+    BoolParanthExpressionContext,
+    BoolToIntExpressionContext,
+    BoolVariableExpressionContext,
+    BootstrapEventContext,
+    BroadcastAndWaitStatementContext,
+    BroadcastMessageStatementContext,
+    CallStmtContext,
+    CloneStartEventContext,
+    CommonStmtContext,
+    ConcreteActorModeContext,
+    ConditionReachedEventContext,
+    ControlStatementContext,
+    ControlStmtContext,
+    CreateCloneOfStatementContext,
+    DecimalLiteralExpressionContext,
+    DeclarationStmtContext,
+    DeclarationStmtListContext,
+    DeclareVariableContext,
+    DefaultBoolExpressionContext,
+    DefaultNumExprContext,
+    DefaultStringExpressionContext,
+    DeleteAllFromStatementContext,
+    DeleteIthFromStatementContext,
+    DeleteThisCloneContext,
+    ElseCaseContext,
+    ElseIfCaseContext,
+    EmptyElseCaseContext,
+    EnumTypeContext,
+    EpsilonStatementContext,
+    EqualsExpressionContext,
+    EventContext,
+    ExpressionContext,
+    ExpressionListContext,
+    ExpressionListPlainContext,
+    ExpressionStmtContext,
+    ExternFunctionReturnDefinitionContext,
+    ExternMethodDefinitionContext,
+    ExternMethodResultDeclarationContext,
+    ExternVoidReturnDefinitionContext,
+    FileTypeContext,
+    FlatVariableContext,
+    FloatingPointTypeContext,
+    FullMethodDefinitionContext,
+    FunctionReturnDefinitionContext,
+    GreaterEqualExpressionContext,
+    GreaterThanExpressionContext,
+    IdentContext,
+    IdentExpressionContext,
+    IfStmtContext,
+    ImageResourceContext,
+    IndexOfExpressionContext,
+    InheritsFromContext,
+    InsertAtStatementContext,
+    IntegerLiteralExpressionContext,
+    IntegerTypeContext,
+    IthLetterOfStringExpressionContext,
+    IthStringItemOfExpressionContext,
+    JoinStringsExpressionContext,
+    LengthOfListExpressionContext,
+    LengthOfStringExpressionContext,
+    LessEqualExpressionContext,
+    LessThanExpressionContext,
+    ListExprContext,
+    ListStmtContext,
+    ListTypeContext,
+    ListVariableExpressionContext,
+    ListWithElementsExpressionContext,
+    LocateActorExpressionContext,
+    MessageContext,
+    MessageDestinationContext,
+    MessageNamespaceContext,
+    MessageReceivedEventContext,
+    MetaAttributeContext,
+    MetaAttributeListContext,
+    MethodAttributeContext,
+    MethodAttributeListContext,
+    MethodDefinitionContext,
+    MethodDefinitionListContext,
+    MethodResultDeclarationContext,
+    NamedMessageDestinationContext,
+    NamedScriptIdentContext,
+    NegatedBoolExpressionContext,
+    NeverEventContext,
+    NonAtomicBlocContext,
+    NonControlStatementContext,
+    NonCtrlStmtContext,
+    NumAsBoolExpressionContext,
+    NumAsStringExpressionContext,
+    NumberContext,
+    NumberExpressionContext,
+    NumBracketsContext,
+    NumCallStatementExpressionContext,
+    NumDivExpressionContext,
+    NumExprContext,
+    NumLiteralExpressionContext,
+    NumMinusExpressionContext,
+    NumModExpressionContext,
+    NumMulExpressionContext,
+    NumOrStringExprContext,
+    NumPlusExpressionContext,
+    NumToFloatExpressionContext,
+    NumToIntExpressionContext,
+    NumVariableExpressionContext,
+    ParameterContext,
+    ParameterListContext,
+    ParameterListPlainContext,
+    PrecisionPopStatementContext,
+    PrecisionPushStatementContext,
+    PrimitiveContext,
+    PrimitiveTypeContext,
+    ProgramContext,
+    PureElseContext,
+    QualifiedNamespaceContext,
+    QualifiedVariableContext,
+    RepeatForeverStmtContext,
+    RepeatTimesStmtContext,
+    ReplaceElementAtStatementContext,
+    ResetTimerStatementContext,
+    ResourceContext,
+    ResourceListContext,
+    ResourceLocatorContext,
+    ResourceTypeContext,
+    RestartScriptContext,
+    ScriptAttributeContext,
+    ScriptAttributeListContext,
+    ScriptContext,
+    ScriptIdentContext,
+    ScriptListContext,
+    SetStatementContext,
+    SetStmtContext,
+    SetStmtListContext,
+    SoundResourceContext,
+    StartCloneActorExpressionContext,
+    StartupEventContext,
+    StmtContext,
+    StmtListContext,
+    StmtListPlainContext,
+    StmtListStatementContext,
+    StopAllContext,
+    StopOthersInActorStatementContext,
+    StopThisContext,
+    StoreCallResultStatementContext,
+    StoreEvalResultStatementContext,
+    StrContainsExpressionContext,
+    StrIdentExpressionContext,
+    StringAsBoolExpressionContext,
+    StringAttributeOfExpressionContext,
+    StringCallStatementExpressionContext,
+    StringExprContext,
+    StringExpressionContext,
+    StringLiteralExpressionContext,
+    StringParanthExpressionContext,
+    StringToFloatExpressionContext,
+    StringToIntExpressionContext,
+    StringTypeContext,
+    StringVariableExpressionContext,
+    SystemMessageContext,
+    TerminationStmtContext,
+    TimerExpressionContext,
+    TypeContext,
+    UnqualifiedNamespaceContext,
+    UnspecifiedBoolExpressionContext,
+    UnspecifiedExprContext,
+    UnspecifiedNumExprContext,
+    UnspecifiedStringExpressionContext,
+    UntilStmtContext,
+    UserMessageContext,
+    UsherActorExpressionContext,
+    VariableContext,
+    VoidReturnDefinitionContext,
+    WaitSecsStatementContext,
+    WaitUntilStatementContext
+} from "./LeilaParser";
 
 
 /**
@@ -1309,6 +1314,32 @@ export interface LeilaListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitAssumeStatement?: (ctx: AssumeStatementContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `PrecisionPushStatement`
+	 * labeled alternative in `LeilaParser.commonStmt`.
+	 * @param ctx the parse tree
+	 */
+	enterPrecisionPushStatement?: (ctx: PrecisionPushStatementContext) => void;
+	/**
+	 * Exit a parse tree produced by the `PrecisionPushStatement`
+	 * labeled alternative in `LeilaParser.commonStmt`.
+	 * @param ctx the parse tree
+	 */
+	exitPrecisionPushStatement?: (ctx: PrecisionPushStatementContext) => void;
+
+	/**
+	 * Enter a parse tree produced by the `PrecisionPopStatement`
+	 * labeled alternative in `LeilaParser.commonStmt`.
+	 * @param ctx the parse tree
+	 */
+	enterPrecisionPopStatement?: (ctx: PrecisionPopStatementContext) => void;
+	/**
+	 * Exit a parse tree produced by the `PrecisionPopStatement`
+	 * labeled alternative in `LeilaParser.commonStmt`.
+	 * @param ctx the parse tree
+	 */
+	exitPrecisionPopStatement?: (ctx: PrecisionPopStatementContext) => void;
 
 	/**
 	 * Enter a parse tree produced by the `SetStatement`

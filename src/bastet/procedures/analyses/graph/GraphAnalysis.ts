@@ -34,7 +34,7 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {GraphAbstractDomain, GraphAbstractState, GraphAbstractStateFactory} from "./GraphAbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {GraphTransferRelation} from "./GraphTransferRelation";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractState, Lattices} from "../../../lattices/Lattice";
 import {
     CHOOSE_EITHER,
     CHOOSE_FIRST,
@@ -87,6 +87,11 @@ export class GraphAnalysisConfig extends BastetConfiguration {
         return this.getStringProperty('witnessHandler', 'DoNothing');
     }
 
+    get checkTargetFeasibility(): boolean {
+        return this.getBoolProperty('checkTargetFeasibility', false);
+    }
+
+
     get graphConstructionOrder(): string {
         return this.getStringProperty('graphConstructionOrder', 'WaitAtMeet');
     }
@@ -102,8 +107,6 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any, any>;
 
     private readonly _transferRelation: GraphTransferRelation;
-
-    private readonly _refiner: Refiner<GraphAbstractState>;
 
     private readonly _task: App;
 
@@ -125,7 +128,6 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new GraphAbstractDomain(wrappedAnalysis.abstractDomain);
         this._transferRelation = new GraphTransferRelation(this._wrappedAnalysis, this._wrappedAnalysis, this._wrappedAnalysis, this._statistics);
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
 
         if (this._config.mergeIntoOperator == 'NoMergeIntoOperator') {
             this._mergeIntoOp = new NoMergeIntoOperator<GraphAbstractState, GraphAbstractState>();
@@ -158,12 +160,25 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         }
     }
 
-    chooseFinitePathAlong(accessibility: AccessibilityRelation<AbstractState, AbstractState>, state: AbstractState): AbstractState[] {
+    chooseFinitePathAlong(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AbstractState[] {
         throw new ImplementMeException();
     }
 
     abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
-        return this._transferRelation.abstractSucc(fromState);
+        const result: GraphAbstractState[] = [];
+        for (const succ of this._transferRelation.abstractSucc(fromState)) {
+            if (this.target(succ).length > 0) {
+                // Only add feasible states (avoids to check the feasibility of the full trace, if done in the refiner)
+                if (this._config.checkTargetFeasibility) {
+                    if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Block Feasibility")) {
+                        continue;
+                    }
+                }
+            }
+            result.push(succ);
+        }
+
+        return result;
     }
 
     join(state1: GraphAbstractState, state2: GraphAbstractState): GraphAbstractState {
@@ -197,6 +212,10 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         return this._wrappedAnalysis.target(state.wrappedState);
     }
 
+    isWideningState(state: GraphAbstractState): boolean {
+        return this.wrappedAnalysis.isWideningState(state.getWrappedState());
+    }
+
     widen(state: GraphAbstractState, reached: Iterable<GraphAbstractState>): GraphAbstractState {
         const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {
@@ -215,7 +234,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     exportAnalysisResult(reachedPrime: StateSet<AbstractState>, frontierPrime: StateSet<AbstractState>) {
-        const exporter = new GraphToDot(this._task, this, this,
+        const exporter = new GraphToDot(this._task, this, this, this,
             reachedPrime as StateSet<GraphAbstractState>,
             frontierPrime as StateSet<GraphAbstractState>);
 
@@ -227,7 +246,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     get refiner(): Refiner<GraphAbstractState> {
-        return this._refiner;
+        return new WrappingRefiner(this._wrappedAnalysis.refiner);
     }
 
     get abstractDomain(): AbstractDomain<ConcreteElement, GraphAbstractState> {
@@ -239,7 +258,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     private onStateError(reached: GraphReachedSetWrapper<GraphAbstractState>, e: GraphAbstractState): void {
-        const toDot = new GraphContextToDot(this._task, this, reached);
+        const toDot = new GraphContextToDot(this._task, this, this, reached);
         toDot.writeContextToFile(`output/state-${e.getId()}-context.dot`, e.getId());
     }
 
@@ -262,7 +281,9 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     stopPartitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {
-        return reached.getStateSet(ofState);
+        return reached;
+        // FIXME: Re-add sime sort of partitioning for the stop operator!
+        // return reached.getStateSet(ofState);
     }
 
     widenPartitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {
@@ -310,21 +331,25 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
+    testify(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState, GraphAbstractState> {
+    testifyOne(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState> {
         const reaching = AccessibilityRelations.backwardsAccessible(accessibility, state, this, this.abstractDomain);
         return this.wrappedAnalysis.testifyOne(reaching, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
+    }
+
+    accessibility(reached: ReachedSet<GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState> {
+        return reached as GraphReachedSetWrapper<GraphAbstractState>;
     }
 
 }

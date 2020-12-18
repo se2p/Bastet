@@ -25,24 +25,29 @@
 
 import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {TransitionLabelProvider} from "../ProgramAnalysis";
+import {ProgramAnalysis, TransitionLabelProvider} from "../ProgramAnalysis";
 import {PenSizeVisitor, StateColorVisitor, StateLabelVisitor} from "../StateVisitors";
 import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 import {App} from "../../../syntax/app/App";
 import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
+import {ConcreteElement} from "../../domains/ConcreteElements";
 
 export class GraphContextToDot  {
 
+    private readonly _task: App;
+    private readonly _analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>;
+    private readonly _reached: GraphReachedSetWrapper<GraphAbstractState>;
+    private readonly _transLabProvider: TransitionLabelProvider<GraphAbstractState>;
+
     private _headerdot: any[];
     private _dot: string[];
-    private _reached: GraphReachedSetWrapper<GraphAbstractState>;
-    private _transLabProvider: TransitionLabelProvider<GraphAbstractState>;
-    private _task: App;
 
     constructor(task: App,
+                analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
                 transLabProvider: TransitionLabelProvider<GraphAbstractState>,
                 reached: GraphReachedSetWrapper<GraphAbstractState>) {
         this._task = Preconditions.checkNotUndefined(task);
+        this._analysis = Preconditions.checkNotUndefined(analysis);
         this._transLabProvider = Preconditions.checkNotUndefined(transLabProvider);
         this._reached = Preconditions.checkNotUndefined(reached);
         this._headerdot = [];
@@ -52,7 +57,7 @@ export class GraphContextToDot  {
     private writeState(e: GraphAbstractState) {
         const stateLabel = GraphContextToDot.escapeForDot(e.accept(new StateLabelVisitor(this._task)));
         const stateColor = e.accept(new StateColorVisitor());
-        const pensize = e.accept(new PenSizeVisitor());
+        const pensize = e.accept(new PenSizeVisitor(this._analysis));
         this._dot.push(`    ${e.getId()} [label="${stateLabel}" penwidth=${pensize} color="black" fillcolor="${stateColor}"];`);
     }
 

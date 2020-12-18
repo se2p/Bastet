@@ -64,8 +64,6 @@ export class TimeAnalysis<F extends AbstractState>
 
     private readonly _mergeOperator: TimeMergeOperator;
 
-    private readonly _refiner: WrappingRefiner<TimeState, any>;
-
     private readonly _task: App;
 
     constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics,
@@ -76,7 +74,6 @@ export class TimeAnalysis<F extends AbstractState>
         this._timeProfile = Preconditions.checkNotUndefined(timeProfile);
         this._abstractDomain = new TimeAbstractDomain(wrappedAnalysis.abstractDomain);
         this._mergeOperator = new TimeMergeOperator(wrappedAnalysis);
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._transfer = new TimeTransferRelation(task, timeProfile, wrappedAnalysis);
     }
 
@@ -99,6 +96,10 @@ export class TimeAnalysis<F extends AbstractState>
         } );
     }
 
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation< F> {
+        throw new ImplementMeException();
+    }
+
     join(state1: TimeState, state2: TimeState): TimeState {
         return this._abstractDomain.lattice.join(state1, state2);
     }
@@ -112,11 +113,15 @@ export class TimeAnalysis<F extends AbstractState>
     }
 
     stop(state: TimeState, reached: Iterable<F>, unwrapper: (e: F) => TimeState): boolean {
-        return this._wrappedAnalysis.stop(state, reached, unwrapper);
+        return this._wrappedAnalysis.stop(state.getWrappedState(), reached, unwrapper);
     }
 
     target(state: TimeState): Property[] {
         return this._wrappedAnalysis.target(state.getWrappedState());
+    }
+
+    isWideningState(state: TimeState): boolean {
+        return this._wrappedAnalysis.isWideningState(state.getWrappedState());
     }
 
     widen(state: TimeState, reached: Iterable<F>): TimeState {
@@ -136,8 +141,8 @@ export class TimeAnalysis<F extends AbstractState>
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<TimeState> {
-        return this._refiner;
+    get refiner(): Refiner<F> {
+        return new WrappingRefiner(this._wrappedAnalysis.refiner);
     }
 
     get wrappedAnalysis(): ProgramAnalysis<any, any, F> {
@@ -188,19 +193,19 @@ export class TimeAnalysis<F extends AbstractState>
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<TimeState, F>, state: F): AccessibilityRelation<TimeState, F> {
+    testify(accessibility: AccessibilityRelation< F>, state: F): AccessibilityRelation< F> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<TimeState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation< F>, state: F): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<TimeState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation< F>, state: F): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<TimeState, F>, state: F): AccessibilityRelation<TimeState, F> {
+    testifyOne(accessibility: AccessibilityRelation< F>, state: F): AccessibilityRelation< F> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 

@@ -88,7 +88,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         this.exportPath(testified, violating);
     }
 
-    private exportPath(pathAr: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, violating: GraphAbstractState) {
+    private exportPath(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState) {
         const errorWitness: ErrorWitness = this.extractErrorWitness(pathAr, violating);
 
         if (this._config.collapseAtomicBlocks) {
@@ -114,7 +114,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         this.exportErrorWitness(errorWitness);
     }
 
-    private extractErrorWitness(pathAr: AccessibilityRelation<GraphAbstractState, GraphAbstractState>, violating: GraphAbstractState): ErrorWitness {
+    private extractErrorWitness(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState): ErrorWitness {
         const path: GraphAbstractState[] = AccessibilityRelations.mapToArray(pathAr);
         const violatedProperties: Property[] = this._analysis.target(violating);
 

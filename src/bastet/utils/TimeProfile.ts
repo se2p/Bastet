@@ -34,6 +34,7 @@ import {
     DeclareStackVariableStatement,
     DeclareSystemVariableStatement
 } from "../syntax/ast/core/statements/DeclarationStatement";
+import {PrecisionPopStatement, PrecisionPushStatement} from "../syntax/ast/core/Precisions";
 
 /**
  * A STATIC time profile for a given program operation.
@@ -93,7 +94,9 @@ export class StaticTimeProfile implements ProgramTimeProfile {
         } else if (op.ast instanceof EpsilonStatement
             || op.ast instanceof DeclareStackVariableStatement
             || op.ast instanceof DeclareActorVariableStatement
-            || op.ast instanceof DeclareSystemVariableStatement) {
+            || op.ast instanceof DeclareSystemVariableStatement
+            || op.ast instanceof PrecisionPushStatement
+            || op.ast instanceof PrecisionPopStatement) {
             return this._noDurationProfile;
         } else {
             return this._avgOpProfile;

@@ -26,10 +26,11 @@
 import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
 import {OperationId, ProgramOperation, ProgramOperations} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {List as ImmList, Record as ImmRec} from "immutable";
-import {AbstractDomain, AbstractionPrecision} from "../../domains/AbstractDomain";
+import {AbstractDomain} from "../../domains/AbstractDomain";
 import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {AbstractionPrecision} from "../../AbstractionPrecision";
 
 export interface LabeledTransferAttributes {
 

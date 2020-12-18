@@ -4,7 +4,8 @@
 
     "MainAnalysis": {
         "print-statistics": true,
-        "export-artifacts": true
+        "export-artifacts": true,
+        "analysis": "bmc"
     },
 
     "Transformer": {

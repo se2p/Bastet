@@ -97,6 +97,7 @@ import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement
 import {VariableWithDataLocation} from "./core/Variable";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
+import {PrecisionPopStatement, PrecisionPushStatement} from "./core/Precisions";
 
 export class AttributeReadEvent {
     
@@ -327,6 +328,14 @@ export class AttributeReadEventVisitor implements CoreVisitor<AttributeReadEvent
 
     visitPlusExpression(node: PlusExpression): AttributeReadEvent {
         return this.visitBinaryExpression(node);
+    }
+
+    visitPrecisionPushStatement(node: PrecisionPushStatement): AttributeReadEvent {
+        return this.nothingReadEvent;
+    }
+
+    visitPrecisionPopStatement(node: PrecisionPopStatement): AttributeReadEvent {
+        return this.nothingReadEvent;
     }
 
     private visitBinaryExpression(node: BinaryExpression<any, any>): AttributeReadEvent {

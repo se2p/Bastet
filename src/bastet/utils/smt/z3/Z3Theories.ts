@@ -35,7 +35,7 @@ import {
     RealTheory,
     StringTheory
 } from "../../../procedures/domains/MemoryTransformer";
-import {Record as ImmRec} from "immutable";
+import {Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {LibZ3InContext, Z3_ast, Z3_sort} from "./libz3";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString} from "../../../procedures/domains/ConcreteElements";
 import {Preconditions} from "../../Preconditions";
@@ -45,6 +45,8 @@ import {SMTFirstOrderLattice} from "../../../procedures/domains/FirstOrderDomain
 import {Z3ProverEnvironment} from "./Z3SMT";
 import {Variable} from "../../../syntax/ast/core/Variable";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+import {VariableCollectingVisitor} from "./Z3AST";
+import {SCOPE_SEPARATOR} from "../../../procedures/analyses/control/DataLocationScoping";
 
 export type Z3FirstOrderFormula = Z3BooleanFormula;
 
@@ -60,7 +62,7 @@ const Z3FormulaRecord = ImmRec({
 
 });
 
-export class Z3Formula extends Z3FormulaRecord implements FirstOrderFormula  {
+export class Z3Formula extends Z3FormulaRecord implements FirstOrderFormula {
 
     constructor(ast: Z3_ast) {
         super({ast_pointer: ast.val()});
@@ -104,7 +106,7 @@ export class Z3ListFormula extends Z3Formula implements AbstractList {
 
 }
 
-class Z3Theory {
+class Z3MappedFunction {
 
     protected readonly _ctx: LibZ3InContext;
 
@@ -112,11 +114,11 @@ class Z3Theory {
         this._ctx = Preconditions.checkNotUndefined(ctx);
     }
 
-    protected freeArray(heapBytes){
+    protected freeArray(heapBytes) {
         this._ctx.wasmInstance._free(heapBytes.byteOffset);
     }
 
-    protected arrayToHeap(typedArray){
+    protected arrayToHeap(typedArray) {
         const wasmInstance = this._ctx.wasmInstance;
         var numBytes = typedArray.length * typedArray.BYTES_PER_ELEMENT;
         var ptr = wasmInstance._malloc(numBytes);
@@ -127,12 +129,25 @@ class Z3Theory {
 
 }
 
+class Z3Theory extends Z3MappedFunction {
+
+    constructor(ctx: LibZ3InContext) {
+        super(ctx);
+    }
+
+}
+
 export class Z3BooleanTheory extends Z3Theory implements BooleanTheory<Z3BooleanFormula> {
 
     constructor(ctx: LibZ3InContext) {
         super(ctx);
     }
 
+    /**
+     * Creates a Boolean variable with the given variable name `id`.
+     *
+     * @param id
+     */
     abstractBooleanValue(id: Variable): Z3BooleanFormula {
         return new Z3BooleanFormula(this._ctx.mk_const(this._ctx.mk_string_symbol(id.qualifiedName), this._ctx.mk_bool_sort()));
     }
@@ -202,6 +217,16 @@ export class Z3BooleanTheory extends Z3Theory implements BooleanTheory<Z3Boolean
 
     trueBool(): Z3BooleanFormula {
         return new Z3BooleanFormula(this._ctx.mk_true());
+    }
+
+    /**
+     * Logical XOR operator for Z3BooleanFormula. Returns if either op1 or op2 is true and not both.
+     */
+    xor(op1: Z3BooleanFormula, op2: Z3BooleanFormula): Z3BooleanFormula {
+        return this.and(
+            this.or(op1, op2),
+            this.not(this.and(op1, op2))
+        );
     }
 
 }
@@ -726,7 +751,7 @@ export class Z3ListTheory implements ListTheory<Z3ListFormula> {
 
 }
 
-export class Z3Theories implements AbstractTheories<Z3Formula, Z3BooleanFormula, Z3IntegerFormula, Z3RealFormula, Z3FloatFormula, Z3StringFormula, Z3ListFormula> {
+export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3Formula, Z3BooleanFormula, Z3IntegerFormula, Z3RealFormula, Z3FloatFormula, Z3StringFormula, Z3ListFormula> {
 
     private readonly _boolTheory: BooleanTheory<Z3BooleanFormula>;
 
@@ -740,10 +765,8 @@ export class Z3Theories implements AbstractTheories<Z3Formula, Z3BooleanFormula,
 
     private readonly _stringTheory: Z3StringTheory;
 
-    private readonly _ctx: LibZ3InContext;
-
     constructor(ctx: LibZ3InContext) {
-        this._ctx = Preconditions.checkNotUndefined(ctx);
+        super(ctx);
         this._boolTheory = new Z3BooleanTheory(ctx);
         this._intTheory = new Z3IntegerTheory(ctx);
         this._realTheory = new Z3RealTheory(ctx);
@@ -803,6 +826,117 @@ export class Z3Theories implements AbstractTheories<Z3Formula, Z3BooleanFormula,
 
     stringRepresentation(element: Z3Formula): string {
         return this._ctx.ast_to_string(element.getAST());
+    }
+
+    public substitute(base: Z3Formula, from: Z3Formula[], to: Z3Formula[]): Z3Formula {
+        Preconditions.checkArgument(from.length == to.length);
+        const fromArray = new Int32Array(from.map(f => f.getAST().val()));
+        const fromArrayOnHeap = this.arrayToHeap(fromArray);
+        const toArray = new Int32Array(to.map(f => f.getAST().val()));
+        const toArrayOnHeap = this.arrayToHeap(toArray);
+
+        try {
+            return new Z3Formula(this._ctx.substitute(base.getAST(), new Uint32(from.length), new Ptr(fromArrayOnHeap.byteOffset), new Ptr(toArrayOnHeap.byteOffset)));
+        } finally {
+            this.freeArray(fromArrayOnHeap);
+            this.freeArray(toArrayOnHeap);
+        }
+    }
+
+    public substituteVars(base: Z3Formula, to: Z3Formula): Z3Formula {
+        const toArray = new Int32Array([to.getAST().val()]);
+        const toArrayOnHeap = this.arrayToHeap(toArray);
+
+        try {
+            return new Z3Formula(this._ctx.substitute_vars(base.getAST(), new Uint32(toArray.length), new Ptr(toArrayOnHeap.byteOffset)));
+        } finally {
+            this.freeArray(toArrayOnHeap);
+        }
+    }
+
+    public makeVariable(withName: string, withSort: Z3_sort): Z3Formula {
+        return new Z3Formula(this._ctx.mk_const(this._ctx.mk_string_symbol(withName), withSort));
+    }
+
+    public uninstantiate(formula: Z3Formula): Z3Formula {
+        return this.instantiate(formula, (n, o) => NaN);
+    }
+
+    public instantiate(formula: Z3Formula, indexFn: (name: string, oldIndex: number) => number): Z3Formula {
+        Preconditions.checkNotUndefined(formula);
+        Preconditions.checkNotUndefined(indexFn);
+
+        // 1. Collect all variables
+        const visitor = new VariableCollectingVisitor(this._ctx);
+        let vars = visitor.visit(formula.getAST());
+
+        // 2. Compute the mapping
+        const substitutions: Map<Z3Formula, Z3Formula> = new Map();
+        for (let [k, v] of vars) {
+            const parts = k.split(SCOPE_SEPARATOR);
+            let oldIndex = NaN;
+            const hasIndex = parts.length > 1;
+            if (hasIndex) {
+                oldIndex = parseInt(parts[parts.length-1]);
+                const isInstance = !isNaN(oldIndex);
+                if (isInstance) {
+                    // Uninstantiate instances
+                    parts.splice(parts.length-1, 1);
+                    k = parts.join(SCOPE_SEPARATOR);
+                }
+            }
+            const newIndex = indexFn(k, oldIndex);
+            const sort: Z3_sort = this._ctx.get_sort(v.getAST());
+            let v_new;
+            if (isNaN(newIndex)) {
+                v_new = this.makeVariable(`${k}`, sort);
+            } else {
+                v_new = this.makeVariable(`${k}${SCOPE_SEPARATOR}${newIndex}`, sort);
+            }
+            substitutions.set(v, v_new);
+        }
+
+        // 3. Apply the mapping
+        const fromASTs: Z3Formula[] = [];
+        const toASTs: Z3Formula[] = [];
+        for (let [k, v] of substitutions) {
+            fromASTs.push(k);
+            toASTs.push(v);
+        }
+
+        return this.substitute(formula, fromASTs, toASTs);
+    }
+
+    public alignSsaIndices(blockFormulas: Z3Formula[], ssaOffsets: Map<string, number>[]): Z3Formula[] {
+        Preconditions.checkArgument(blockFormulas.length > 0);
+
+        const fnMerge = (m1: ImmMap<string, number>, m2: Map<string, number>): ImmMap<string, number> => {
+            const keys = ImmSet(m1.keys()).union(ImmSet(m2.keys()));
+            let result = m1;
+
+            for (const k of keys) {
+                const v1 = m1.get(k) || 0;
+                const v2 = m2.get(k) || 0;
+                result = result.set(k, v1 + v2);
+            }
+
+            return result;
+        };
+
+        const result: Z3Formula[] = [blockFormulas[0]];
+        let offsetSsaMap: ImmMap<string, number> = ImmMap();
+
+        for (let i=1; i<blockFormulas.length; i++) {
+            const f = blockFormulas[i];
+            offsetSsaMap = fnMerge(offsetSsaMap, ssaOffsets[i-1]);
+            const fPrime = this.instantiate(f, (v, oldIndex) => {
+                const newIndex = (offsetSsaMap.get(v) || 0)  + oldIndex;
+                return newIndex;
+            });
+            result.push(fPrime);
+        }
+
+        return result;
     }
 
 }

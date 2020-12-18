@@ -25,12 +25,16 @@
 
 
 import {Refiner} from "../Refiner";
-import {DataAbstractState} from "./DataAbstractDomain";
-import {Lattices, LatticeWithComplements} from "../../../lattices/Lattice";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {AbstractState, Lattices, LatticeWithComplements} from "../../../lattices/Lattice";
 import {FrontierSet, ReachedSet} from "../../algorithms/StateSet";
+import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import {DataAbstractState} from "./DataAbstractDomain";
+import { Preconditions } from "../../../utils/Preconditions";
+import {AccessibilityRelation} from "../Accessibility";
+import {DataAbstractStates} from "./DataAbstractStates";
+import {getTheOnlyElement} from "../../../utils/Collections";
 
-export class DataRefiner implements Refiner<DataAbstractState> {
+export class DataRefiner implements Refiner<AbstractState> {
 
     private readonly _lattice: LatticeWithComplements<DataAbstractState>;
 
@@ -38,12 +42,16 @@ export class DataRefiner implements Refiner<DataAbstractState> {
         this._lattice = lattice;
     }
 
-    checkIsFeasible(e: DataAbstractState, purpose: string = null): boolean {
-        return Lattices.isFeasible(e, this._lattice, purpose);
+    checkIsFeasible(reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractState>, fullState: AbstractState, purpose: string = null): boolean {
+        Preconditions.checkNotUndefined(reached);
+        Preconditions.checkNotUndefined(fullState);
+
+        const dataState: DataAbstractState = getTheOnlyElement(DataAbstractStates.extractFrom(fullState));
+        return Lattices.isFeasible(dataState, this._lattice, purpose);
     }
 
-    refinePrecision(frontier: FrontierSet<DataAbstractState>, reached: ReachedSet<DataAbstractState>, infeasibleState: DataAbstractState) {
-        throw new ImplementMeException();
+    refinePrecision(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractState>, infeasibleState: DataAbstractState): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
+        throw new IllegalStateException("This refiner does not support precision refinement!");
     }
 
 }

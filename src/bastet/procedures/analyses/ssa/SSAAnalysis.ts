@@ -54,17 +54,15 @@ export class SSAAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWithLabels<ConcreteElement, SSAState, F>,
+export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, SSAState, AbstractState>,
     LabeledTransferRelation<SSAState>,
     Unwrapper<SSAState, AbstractElement> {
 
     private readonly _abstractDomain: AbstractDomain<ConcreteElement, SSAState>;
 
-    private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, AbstractState, F>;
+    private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, AbstractState, AbstractState>;
 
     private readonly _transferRelation: SSATransferRelation;
-
-    private readonly _refiner: Refiner<SSAState>;
 
     private readonly _task: App;
 
@@ -74,14 +72,13 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
 
     private readonly _config: SSAAnalysisConfig;
 
-    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics) {
+    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>, statistics: AnalysisStatistics) {
         this._config = new SSAAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new SSAAbstractDomain(wrappedAnalysis.abstractDomain);
 
         this._transferRelation = new SSATransferRelation(wrappedAnalysis);
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = new SSAMergeOperator(this._task, this.wrappedAnalysis, this.wrappedAnalysis);
     }
@@ -110,7 +107,7 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return this._mergeOp.merge(state1, state2);
     }
 
-    stop(state: SSAState, reached: Iterable<F>, unwrapper: (F) => SSAState): boolean {
+    stop(state: SSAState, reached: Iterable<AbstractState>, unwrapper: (F) => SSAState): boolean {
         return this._wrappedAnalysis.stop(state.getWrappedState(), reached, (e) => e.getWrappedState());
     }
 
@@ -118,7 +115,11 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return this._wrappedAnalysis.target(state.wrappedState);
     }
 
-    widen(state: SSAState, reached: Iterable<F>): SSAState {
+    isWideningState(state: SSAState): boolean {
+        return this.isWideningState(state);
+    }
+
+    widen(state: SSAState, reached: Iterable<AbstractState>): SSAState {
         const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {
             return state.withWrappedState(wrappedResult);
@@ -131,15 +132,15 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return e.getWrappedState();
     }
 
-    get refiner(): Refiner<SSAState> {
-        return this._refiner;
+    get refiner(): Refiner<AbstractState> {
+        return new WrappingRefiner(this._wrappedAnalysis.refiner);
     }
 
     get abstractDomain(): AbstractDomain<ConcreteElement, SSAState> {
         return this._abstractDomain;
     }
 
-    get wrappedAnalysis(): ProgramAnalysisWithLabels<any, any, F> {
+    get wrappedAnalysis(): ProgramAnalysisWithLabels<any, any, AbstractState> {
         return this._wrappedAnalysis;
     }
 
@@ -150,23 +151,24 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         } );
     }
 
-    createStateSets(): [FrontierSet<F>, ReachedSet<F>] {
+    createStateSets(): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         return this.wrappedAnalysis.createStateSets();
     }
 
-    mergeInto(state: SSAState, frontier: StateSet<F>, reached: ReachedSet<F>, unwrapper: (F) => SSAState, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
+    mergeInto(state: SSAState, frontier: StateSet<AbstractState>, reached: ReachedSet<AbstractState>,
+              unwrapper: (F) => SSAState, wrapper: (E) => AbstractState): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         throw new ImplementMeException();
     }
 
-    widenPartitionOf(ofState: SSAState, reached: ReachedSet<F>): Iterable<F> {
+    widenPartitionOf(ofState: SSAState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
         throw new ImplementMeException();
     }
 
-    stopPartitionOf(ofState: SSAState, reached: ReachedSet<F>): Iterable<F> {
+    stopPartitionOf(ofState: SSAState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
         throw new ImplementMeException();
     }
 
-    mergePartitionOf(ofState: SSAState, reached: ReachedSet<F>): Iterable<F> {
+    mergePartitionOf(ofState: SSAState, reached: ReachedSet<AbstractState>): Iterable<AbstractState> {
         throw new ImplementMeException();
     }
 
@@ -174,7 +176,7 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return this._wrappedAnalysis.getPartitionKeys(element.getWrappedState());
     }
 
-    handleViolatingState(reached: ReachedSet<F>, violating: F) {
+    handleViolatingState(reached: ReachedSet<AbstractState>, violating: AbstractState) {
         throw new ImplementMeException();
     }
 
@@ -190,26 +192,30 @@ export class SSAAnalysis<F extends AbstractState> implements ProgramAnalysisWith
         return this._wrappedAnalysis.getLexiDiffKey(ofState.getWrappedState());
     }
 
-    finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
+    finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<SSAState, F>, state: F): AccessibilityRelation<SSAState, F> {
+    testify(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<SSAState, F>, state: F): AccessibilityRelation<SSAState, F> {
+    testifyOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<SSAState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<SSAState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         const resultWithSSA = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
 
         // TODO: Remove the SSA-Indices from the concrete elements along the path
+        throw new ImplementMeException();
+    }
+
+    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         throw new ImplementMeException();
     }
 

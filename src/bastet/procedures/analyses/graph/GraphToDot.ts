@@ -26,7 +26,12 @@
 import {StateSet} from "../../algorithms/StateSet";
 import {GraphAbstractState} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {TransitionLabelProvider, TraversalOrderOperator} from "../ProgramAnalysis";
+import {
+    ProgramAnalysis,
+    ProgramAnalysisWithLabels,
+    TransitionLabelProvider,
+    TraversalOrderOperator
+} from "../ProgramAnalysis";
 import {
     ColorByActorVisitor,
     PaperLabelVisitor,
@@ -37,8 +42,12 @@ import {
 import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 import {App} from "../../../syntax/app/App";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ConcreteElement} from "../../domains/ConcreteElements";
 
 export class GraphToDot  {
+
+    private readonly _task: App;
+    private readonly _analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>;
 
     private _headerdot: any[];
     private _dot: string[];
@@ -47,16 +56,17 @@ export class GraphToDot  {
     private _frontier: StateSet<GraphAbstractState>;
     private _transLabProvider: TransitionLabelProvider<GraphAbstractState>;
     private _traversalKeyProvider: TraversalOrderOperator<GraphAbstractState, GraphAbstractState>;
-    private _task: App;
 
     private _frontierIndicatorSeq: number
 
     constructor(task: App,
+                analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
                 transLabProvider: TransitionLabelProvider<GraphAbstractState>,
                 traversalKeyProvider: TraversalOrderOperator<GraphAbstractState, GraphAbstractState>,
                 reached: StateSet<GraphAbstractState>,
                 frontier: StateSet<GraphAbstractState>) {
         this._task = Preconditions.checkNotUndefined(task);
+        this._analysis = Preconditions.checkNotUndefined(analysis);
         this._transLabProvider = Preconditions.checkNotUndefined(transLabProvider);
         this._traversalKeyProvider = Preconditions.checkNotUndefined(traversalKeyProvider);
         this._reached = Preconditions.checkNotUndefined(reached);
@@ -71,8 +81,9 @@ export class GraphToDot  {
         const stateLabel = GraphToDot.escapeForDot(e.accept(new StateLabelVisitor(this._task))
             + this._traversalKeyProvider.getLexiOrderKey(e).toString());
         const stateColor = e.accept(new ColorByActorVisitor(this._task));
-        const pensize = e.accept(new PenSizeVisitor());
-        this._dot.push(`    ${e.getId()} [label="${stateLabel}" penwidth=${pensize} color="black" fillcolor="${stateColor}"];`);
+        const pensize = e.accept(new PenSizeVisitor(this._analysis));
+        const shape = this._analysis.target(e).length > 0? "doubleoctagon" : "box";
+        this._dot.push(`    ${e.getId()} [label="${stateLabel}" shape="${shape}" penwidth=${pensize} color="black" fillcolor="${stateColor}"];`);
     }
 
     private opLabel(op: ProgramOperation): string {

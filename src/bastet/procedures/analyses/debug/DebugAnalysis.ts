@@ -63,7 +63,7 @@ export class DebugAnalysis<F extends AbstractState>
 
     private readonly _transfer: DebugTransferRelation;
 
-    private readonly _refiner: WrappingRefiner<DebugState, any>;
+    private readonly _refiner: Refiner<F>;
 
     private readonly _mergeOperator: MergeJoinOperator<DebugState>;
 
@@ -75,7 +75,6 @@ export class DebugAnalysis<F extends AbstractState>
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new DebugAbstractDomain(wrappedAnalysis.abstractDomain);
         this._mergeOperator = new MergeJoinOperator(this._abstractDomain);
-        this._refiner = new WrappingRefiner(this._wrappedAnalysis.refiner, this);
         this._transfer = new DebugTransferRelation(wrappedAnalysis);
     }
 
@@ -114,6 +113,10 @@ export class DebugAnalysis<F extends AbstractState>
         return this._wrappedAnalysis.target(state.getWrappedState());
     }
 
+    isWideningState(state: DebugState): boolean {
+        return this._wrappedAnalysis.isWideningState(state.getWrappedState());
+    }
+
     widen(state: DebugState, reached: Iterable<F>): DebugState {
         const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {
@@ -131,8 +134,8 @@ export class DebugAnalysis<F extends AbstractState>
         return this._abstractDomain;
     }
 
-    get refiner(): Refiner<DebugState> {
-        return this._refiner;
+    get refiner(): Refiner<F> {
+        return new WrappingRefiner(this._wrappedAnalysis.refiner);
     }
 
     get wrappedAnalysis(): ProgramAnalysisWithLabels<any, any, F> {
@@ -160,43 +163,47 @@ export class DebugAnalysis<F extends AbstractState>
     }
 
     getPartitionKeys(element: DebugState): ImmSet<PartitionKey> {
-        return this._wrappedAnalysis.getPartitionKeys(element.getWrappedState());
+        return this.wrappedAnalysis.getPartitionKeys(element.getWrappedState());
     }
 
     handleViolatingState(reached: ReachedSet<F>, violating: F) {
-        return this._wrappedAnalysis.handleViolatingState(reached, violating);
+        return this.wrappedAnalysis.handleViolatingState(reached, violating);
     }
 
     compareStateOrder(a: DebugState, b: DebugState): number {
-        return this._wrappedAnalysis.compareStateOrder(a.getWrappedState(), b.getWrappedState());
+        return this.wrappedAnalysis.compareStateOrder(a.getWrappedState(), b.getWrappedState());
     }
 
     getLexiOrderKey(ofState: DebugState): LexiKey {
-        return this._wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
+        return this.wrappedAnalysis.getLexiOrderKey(ofState.getWrappedState());
     }
 
     getLexiDiffKey(ofState: DebugState): LexiKey {
-        return this._wrappedAnalysis.getLexiDiffKey(ofState.getWrappedState());
+        return this.wrappedAnalysis.getLexiDiffKey(ofState.getWrappedState());
     }
 
     finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>) {
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<DebugState, F>, state: F): AccessibilityRelation<DebugState, F> {
+    testify(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation<F> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<DebugState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<DebugState, F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<DebugState, F>, state: F): AccessibilityRelation<DebugState, F> {
+    testifyOne(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation<F> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
+    }
+
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<F> {
+        throw new ImplementMeException();
     }
 
 }

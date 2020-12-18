@@ -29,6 +29,7 @@ import {AbstractElement} from "../../lattices/Lattice";
 import {AbstractDomain} from "./AbstractDomain";
 import {AbstractStringList} from "./StringListAbstractDomain";
 import {Variable} from "../../syntax/ast/core/Variable";
+import {Z3Formula} from "../../utils/smt/z3/Z3Theories";
 
 export interface AbstractValue extends AbstractElement {
 
@@ -88,7 +89,6 @@ export class IdentifiableMemoryCell {
         return this._name;
     }
 }
-
 
 
 export class BooleanVariable extends IdentifiableMemoryCell {
@@ -300,6 +300,8 @@ export interface BooleanTheory<B extends AbstractBoolean> {
 
     or(op1: B, op2: B): B;
 
+    xor(op1: B, op2: B): B;
+
     equal(op1: B, op2: B): B;
 
     implies(op1: B, op2: B): B;
@@ -311,6 +313,12 @@ export interface TheoryIndependent<E extends AbstractElement> {
     simplify(element: E): E;
 
     stringRepresentation(element: E): string;
+
+    uninstantiate(formula: E): E;
+
+    instantiate(formula: E, indexFn: (name: string, oldIndex: number) => number): E;
+
+    alignSsaIndices(blockFormulas: E[], ssaOffsets: Map<string, number>[]): E[];
 
 }
 
