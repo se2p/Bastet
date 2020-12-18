@@ -194,6 +194,23 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
             `Only got ${seq.length} formula(s) but there should have been at least 2`);
 
         const interpolationPoints: Z3_ast[] = [];
+        for (const formula of seq.reverse()) {
+            const point = this._ctx.mk_interpolant(formula.getAST());
+            interpolationPoints.push(point);
+            this._ctx.inc_ref(point);
+        }
+
+        const trueBool: Z3_ast = this._theories.boolTheory.trueBool().getAST();
+        const conjunction = interpolationPoints.reduce((x, y) => this._ctx.mk_interpolant(
+            this._theories.boolTheory.and(new Z3BooleanFormula(x), new Z3BooleanFormula(y)).getAST()), trueBool);
+        return new Z3BooleanFormula(conjunction);
+    }
+
+    private buildInterpolationProblem2(seq: Z3BooleanFormula[]): Z3Formula {
+        Preconditions.checkArgument(seq.length > 1,
+            `Only got ${seq.length} formula(s) but there should have been at least 2`);
+
+        const interpolationPoints: Z3_ast[] = [];
         for (const formula of seq) {
             const point = this._ctx.mk_interpolant(formula.getAST());
             interpolationPoints.push(point);
