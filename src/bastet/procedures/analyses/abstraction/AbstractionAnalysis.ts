@@ -44,7 +44,7 @@ import {AccessibilityRelation} from "../Accessibility";
 import {AbstractionAbstractDomain, AbstractionState} from "./AbstractionAbstractDomain";
 import {AbstractionTransferRelation} from "./AbstractionTransferRelation";
 import {AbstractionMergeOperator} from "./AbstractionMergeOperator";
-import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
+import {FirstOrderLattice, FirstOrderSolver} from "../../domains/FirstOrderDomain";
 import {
     BooleanFormula,
     FirstOrderFormula,
@@ -93,6 +93,8 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
     private readonly _config: AbstractionAnalysisConfig;
 
+    private readonly _solver: FirstOrderSolver<FirstOrderFormula>;
+
     constructor(config: {}, task: App, summaryLattice: FirstOrderLattice<FirstOrderFormula>,
                 theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
                 wrappedAnalysis: SSAAnalysis,
@@ -118,6 +120,8 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = new AbstractionMergeOperator(this._task, this.wrappedAnalysis, this._abstractDomain.lattice);
+
+        this._solver = summaryLattice.prover;
     }
 
     getTransitionLabel(from: AbstractionState, to: AbstractionState): ProgramOperation[] {
@@ -253,12 +257,12 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
     incRef(state: AbstractionState) {
         this.wrappedAnalysis.incRef(state.getWrappedState());
-        throw new ImplementMeException();
+        this._solver.incRef(state.getEnteringSummary());
     }
 
     decRef(state: AbstractionState) {
         this.wrappedAnalysis.decRef(state.getWrappedState());
-        throw new ImplementMeException();
+        this._solver.decRef(state.getEnteringSummary());
     }
 
     accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {

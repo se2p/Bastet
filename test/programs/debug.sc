@@ -6,7 +6,13 @@ actor Actor begin
 
     script on startup do begin
         declare x as int
-        if x = x then begin
+        declare y as int
+        define y as 99
+        until y = 0 repeat begin
+            define y as y - 1
+        end
+
+        if not x = x then begin
             _RUNTIME_signalFailure()
         end
     end

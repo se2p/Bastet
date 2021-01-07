@@ -31,6 +31,7 @@ import {Heap} from 'heap-js';
 import {LexiKey} from "../../utils/Lexicographic";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {StateReferenceOperator} from "../analyses/ProgramAnalysis";
 
 export interface PartitionKeyAttribs extends AbstractElement {
 
@@ -252,11 +253,16 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
 
     private readonly _intraPartitionComparator: StateOrderingFunction<E>;
 
+    private readonly _refCountOperator: StateReferenceOperator<E>;
+
     private _lastPartitionIndex: number;
 
-    constructor(diffKeyOperator: SinglePartitionKeyFunction<E>, intraPartitionComparator: StateOrderingFunction<E>) {
+    constructor(diffKeyOperator: SinglePartitionKeyFunction<E>, 
+                intraPartitionComparator: StateOrderingFunction<E>,
+                refCountOperator: StateReferenceOperator<E>) {
         this._diffKeyOperator = Preconditions.checkNotUndefined(diffKeyOperator);
         this._intraPartitionComparator = Preconditions.checkNotUndefined(intraPartitionComparator);
+        this._refCountOperator = Preconditions.checkNotUndefined(refCountOperator);
         this._size = 0;
         this._elements = new Set<E>();
         this._partitions = ImmMap<LexiKey, PriorityFrontierSet<E>>().asMutable();
@@ -290,6 +296,7 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
     }
 
     public remove(element: E) {
+        this._refCountOperator.decRef(element);
         const partitionKey = this.getPartitionKey(element);
 
         this.getPartition(partitionKey).remove(element);
@@ -301,6 +308,7 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
     }
 
     public add(element: E) {
+        this._refCountOperator.incRef(element);
         const partitionKey = this.getPartitionKey(element);
         this.getPartition(partitionKey).add(element);
 

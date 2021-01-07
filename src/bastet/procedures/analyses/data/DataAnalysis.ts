@@ -67,7 +67,7 @@ import {List as ImmList, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {AccessibilityRelation} from "../Accessibility";
 import {DataTestifier} from "./DataTestifier";
-import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
+import {FirstOrderLattice, FirstOrderSolver} from "../../domains/FirstOrderDomain";
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 import {DataRefiner} from "./DataRefiner";
 import {Theories} from "./DataTransformerTheories";
@@ -108,6 +108,8 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     private readonly _refiner: DataRefiner;
 
+    private readonly _solver: FirstOrderSolver<FirstOrderFormula>;
+
     constructor(config:{}, folLattice: FirstOrderLattice<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
                 theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
                 statistics: AnalysisStatistics) {
@@ -116,6 +118,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
         this._config = new DataAnalysisConfig(config);
         this._theories = new Theories(this._config.encodeFloatsAs, Preconditions.checkNotUndefined(theories));
+        this._solver = folLattice.prover;
         this._abstractDomain = new DataAbstractDomain(folLattice, propLattice);
         this._transferRelation = new DataTransferRelation(this._abstractDomain, this._theories);
         this._testifier = new DataTestifier(this._theories, this._abstractDomain);
@@ -255,10 +258,10 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     }
 
     incRef(state: DataAbstractState) {
-        throw new ImplementMeException();
+        this._solver.incRef(state.blockFormula);
     }
 
     decRef(state: DataAbstractState) {
-        throw new ImplementMeException();
+        this._solver.decRef(state.blockFormula);
     }
 }

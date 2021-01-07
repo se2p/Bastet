@@ -464,6 +464,14 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         }
         return retTerm;
     }
+
+    public incRef(f: Z3FirstOrderFormula) {
+        this._ctx.inc_ref(f.getAST());
+    }
+
+    public decRef(f: Z3FirstOrderFormula) {
+        this._ctx.dec_ref(f.getAST());
+    }
 }
 
 export class Z3Vector {

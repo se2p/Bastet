@@ -112,6 +112,7 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         // given accessibility relation.
         const wideningStateSeq: AbstractionState[] = this.getBlockStateSequence(ar, e);
         const alignedBlockFormulas: FirstOrderFormula[] = this.alignSsaIndices(wideningStateSeq, this.extractTraceBlockFormulas(wideningStateSeq));
+        alignedBlockFormulas.forEach((f) => this._prover.incRef(f));
         console.log(`Trace with ${alignedBlockFormulas.length} block formulas`);
         Preconditions.checkState(wideningStateSeq.length == alignedBlockFormulas.length);
 
@@ -158,6 +159,7 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
 
             return feasible;
         } finally {
+            alignedBlockFormulas.forEach((f) => this._prover.decRef(f));
             this._prover.pop();
         }
     }

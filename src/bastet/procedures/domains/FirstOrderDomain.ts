@@ -187,6 +187,10 @@ export abstract class FirstOrderSolver<F extends FirstOrderFormula> {
 
     public abstract collectInterpolants(): F[];
 
+    public abstract incRef(f: F);
+
+    public abstract decRef(f: F);
+
 }
 
 export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>

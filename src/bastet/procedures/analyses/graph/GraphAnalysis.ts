@@ -267,7 +267,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         if (this._config.graphConstructionOrder == "DepthFirst") {
             frontierSet = new DefaultFrontierSet();
         } else if (this._config.graphConstructionOrder == "WaitAtMeet") {
-            frontierSet = new DifferencingFrontierSet<GraphAbstractState>((e) => this.getLexiDiffKey(e), (e, f) => this.compareStateOrder(e, f));
+            frontierSet = new DifferencingFrontierSet<GraphAbstractState>((e) => this.getLexiDiffKey(e), (e, f) => this.compareStateOrder(e, f), this);
         } else {
             throw new IllegalArgumentException("Invalid custruction order: " + this._config.graphConstructionOrder);
         }
