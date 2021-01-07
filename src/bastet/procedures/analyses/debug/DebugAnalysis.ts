@@ -206,4 +206,12 @@ export class DebugAnalysis<F extends AbstractState>
         throw new ImplementMeException();
     }
 
+    incRef(state: DebugState) {
+        this.wrappedAnalysis.incRef(state.getWrappedState());
+    }
+
+    decRef(state: DebugState) {
+        this.wrappedAnalysis.decRef(state.getWrappedState());
+    }
+
 }

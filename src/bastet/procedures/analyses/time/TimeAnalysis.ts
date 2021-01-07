@@ -209,4 +209,12 @@ export class TimeAnalysis<F extends AbstractState>
         return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 
+    decRef(state: TimeState) {
+        this.wrappedAnalysis.decRef(state.getWrappedState());
+    }
+
+    incRef(state: TimeState) {
+        this.wrappedAnalysis.incRef(state.getWrappedState());
+    }
+
 }

@@ -472,5 +472,12 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         throw new ImplementMeException();
     }
 
+    incRef(state: ControlAbstractState) {
+        this.wrappedAnalysis.incRef(state.getWrappedState());
+    }
+
+    decRef(state: ControlAbstractState) {
+        this.wrappedAnalysis.decRef(state.getWrappedState());
+    }
 
 }

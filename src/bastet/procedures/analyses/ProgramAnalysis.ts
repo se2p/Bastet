@@ -49,7 +49,7 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
        TargetOperator<E>, MergeIntoOperator<E, F>,
        MergeOperator<E>, StopOperator<E, F>, WidenOperator<E, F>, PartitionOperator<E, F>,
        WitnessHandler<F>, TraversalOrderOperator<E, F>, ResultFinalization<F>,
-       TestificationOperator<E, F>, AccessibilityOperator<E, F> {
+       TestificationOperator<E, F>, AccessibilityOperator<E, F>, StateReferenceOperator<E> {
 
     /**
      * The abstract domain the analysis works with.
@@ -61,6 +61,25 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
      * A refiner component for abstraction precision refinement.
      */
     refiner: Refiner<F>;
+
+}
+
+export interface StateReferenceOperator<E extends AbstractElement> {
+
+    /**
+     * Increment the number of references to this state.
+     * Is intended to be called whenever a state is added to the set 'reached'.
+     *
+     * @param state
+     */
+    incRef(state: E);
+
+    /**
+     * Decrement the number of references to this state.
+     *
+     * @param state
+     */
+    decRef(state: E);
 
 }
 

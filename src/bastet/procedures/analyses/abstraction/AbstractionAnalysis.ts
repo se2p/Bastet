@@ -251,6 +251,16 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
         throw new ImplementMeException();
     }
 
+    incRef(state: AbstractionState) {
+        this.wrappedAnalysis.incRef(state.getWrappedState());
+        throw new ImplementMeException();
+    }
+
+    decRef(state: AbstractionState) {
+        this.wrappedAnalysis.decRef(state.getWrappedState());
+        throw new ImplementMeException();
+    }
+
     accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {
         throw new ImplementMeException();
     }

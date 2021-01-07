@@ -253,4 +253,12 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     get theories(): TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula> {
         return this._theories;
     }
+
+    incRef(state: DataAbstractState) {
+        throw new ImplementMeException();
+    }
+
+    decRef(state: DataAbstractState) {
+        throw new ImplementMeException();
+    }
 }

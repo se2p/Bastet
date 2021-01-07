@@ -235,4 +235,12 @@ export class LabelAnalysis<F extends AbstractState>
         throw new ImplementMeException();
     }
 
+    incRef(state: LabelState) {
+        this.wrappedAnalysis.incRef(state.getWrappedState());
+    }
+
+    decRef(state: LabelState) {
+        this.wrappedAnalysis.decRef(state.getWrappedState());
+    }
+
 }

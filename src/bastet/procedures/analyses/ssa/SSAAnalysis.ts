@@ -219,4 +219,13 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         throw new ImplementMeException();
     }
 
+    incRef(state: SSAState) {
+        this.wrappedAnalysis.incRef(state.getWrappedState());
+    }
+
+    decRef(state: SSAState) {
+        this.wrappedAnalysis.decRef(state.getWrappedState());
+    }
+
+
 }

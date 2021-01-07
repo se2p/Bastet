@@ -241,5 +241,13 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         });
     }
 
+    incRef(state: E) {
+        this.wrappedAnalysis.incRef(state);
+    }
+
+    decRef(state: E) {
+        this.wrappedAnalysis.decRef(state);
+    }
+
 }
 

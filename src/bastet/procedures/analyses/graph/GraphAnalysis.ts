@@ -352,4 +352,12 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         return reached as GraphReachedSetWrapper<GraphAbstractState>;
     }
 
+    incRef(state: GraphAbstractState) {
+        this.wrappedAnalysis.incRef(state.getWrappedState());
+    }
+
+    decRef(state: GraphAbstractState) {
+        this.wrappedAnalysis.decRef(state.getWrappedState());
+    }
+
 }
