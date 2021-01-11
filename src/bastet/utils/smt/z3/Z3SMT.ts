@@ -130,37 +130,6 @@ const Z3_L_FALSE = -1;
 const Z3_UNSATISFIABLE = -1;
 const Z3_SATISFIABLE = 1;
 
-class AbstractionVariableBinding {
-
-    private readonly _freeVariable: Z3BooleanFormula;
-    private readonly _predicate: Z3BooleanFormula;
-    private readonly _variableIndex: number;
-    private readonly _variableName: string;
-
-    constructor(freeVariable: Z3BooleanFormula, predicate: Z3BooleanFormula, variableIndex: number, variableName: string) {
-        this._freeVariable = freeVariable;
-        this._predicate = predicate;
-        this._variableIndex = variableIndex;
-        this._variableName = variableName;
-    }
-
-    get freeVariable(): Z3BooleanFormula {
-        return this._freeVariable;
-    }
-
-    get predicate(): Z3BooleanFormula {
-        return this._predicate;
-    }
-
-    get variableIndex(): number {
-        return this._variableIndex;
-    }
-
-    get variableName(): string {
-        return this._variableName;
-    }
-}
-
 export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
 
     private _ctx: LibZ3InContext;
@@ -330,8 +299,6 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
     public stringRepresentation(f: Z3FirstOrderFormula): string {
         return this._ctx.ast_to_string(f.getAST());
     }
-
-
 
     private createFreeVariables(abstrPrec: Z3BooleanFormula[]): [string, Z3BooleanFormula][] {
         const result: [string, Z3BooleanFormula][] = [];
