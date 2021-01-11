@@ -545,9 +545,7 @@ export class Z3Model {
     private getConstValue(ctx: LibZ3InContext, constDecl: Z3_func_decl, model: Z3_model): Z3ConstType {
         const constInterp: Z3_ast = ctx.model_get_const_interp(model, constDecl);
         ctx.inc_ref(constInterp);
-
         const value = this.mapInterpToValue(constInterp, ctx);
-
         ctx.dec_ref(constInterp);
 
         return value;
@@ -571,70 +569,6 @@ export class Z3Model {
 }
 
 type Z3ConstType = string | number | boolean;
-
-export class Z3Const {
-
-    private readonly _name: string;
-    private readonly _value: Z3ConstType;
-
-    constructor(name: string, value: Z3ConstType) {
-        Preconditions.checkNotUndefined(name);
-
-        this._name = name;
-        this._value = value;
-    }
-
-    public getName(): string {
-        return this._name;
-    }
-
-    public getValue(): Z3ConstType {
-        return this._value;
-    }
-
-    public static of(constDecl: Z3_func_decl, ctx: LibZ3InContext, model: Z3_model): Z3Const {
-        Preconditions.checkNotUndefined(constDecl);
-        Preconditions.checkNotUndefined(ctx);
-        Preconditions.checkNotUndefined(model);
-
-        return new Z3Const(Z3Const.getConstName(ctx, constDecl), this.getConstValue(ctx, constDecl, model));
-    }
-
-    private static getConstName(ctx: LibZ3InContext, constDecl: Z3_func_decl): string {
-        const symbol: Z3_symbol = ctx.get_decl_name(constDecl);
-        return ctx.get_symbol_string(symbol);
-    }
-
-    private static getConstValue(ctx: LibZ3InContext, constDecl: Z3_func_decl, model: Z3_model): Z3ConstType {
-        const constInterp: Z3_ast = ctx.model_get_const_interp(model, constDecl);
-        ctx.inc_ref(constInterp);
-
-        const value = this.mapInterpToValue(constInterp, ctx);
-
-        ctx.dec_ref(constInterp);
-
-        return value;
-    }
-
-    private static mapInterpToValue(constInterp: Z3_ast, ctx: LibZ3InContext): Z3ConstType {
-        const sort: Z3_sort = ctx.get_sort(constInterp);
-        const sortString: string = ctx.sort_to_string(sort);
-
-        switch (sortString) {
-            case "String":
-                return ctx.get_string(constInterp);
-            case "Int":
-                return parseInt(ctx.get_numeral_string(constInterp));
-            case "Bool":
-                return Z3_L_TRUE == ctx.get_bool_value(constInterp).val();
-            case "Real":
-                return parseFloat(ctx.get_numeral_string(constInterp));
-            default:
-                throw new IllegalStateException(`Unknown const type '${sortString}'`)
-        }
-    }
-}
-
 
 export class SolverConfig extends BastetConfiguration {
 
