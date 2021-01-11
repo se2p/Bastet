@@ -262,7 +262,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
     decRef(state: AbstractionState) {
         this.wrappedAnalysis.decRef(state.getWrappedState());
-        // this._solver.decRef(state.getEnteringSummary());
+        this._solver.decRef(state.getEnteringSummary());
     }
 
     accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {

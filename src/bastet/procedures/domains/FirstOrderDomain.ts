@@ -33,7 +33,7 @@ import {
     ConcreteString
 } from "./ConcreteElements";
 import {FirstOrderFormula} from "../../utils/ConjunctiveNormalForm";
-import {LatticeWithComplements} from "../../lattices/Lattice";
+import {LatticeWithComplements, WithReferenceCounting} from "../../lattices/Lattice";
 import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
 import {BooleanTheory} from "./MemoryTransformer";
@@ -44,8 +44,10 @@ import {AbstractionPrecision} from "../AbstractionPrecision";
 import {Z3Model, Z3Vector} from "../../utils/smt/z3/Z3SMT";
 import {Z3BooleanFormula} from "../../utils/smt/z3/Z3Theories";
 
-export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
+export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F>, WithReferenceCounting<F> {
+
     prover: FirstOrderSolver<F>;
+
 }
 
 export class FirstOrderDomain<F extends FirstOrderFormula>
@@ -245,6 +247,14 @@ export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
 
     get prover(): FirstOrderSolver<F> {
         return this._prover;
+    }
+
+    decRef(element: F) {
+        this._prover.decRef(element);
+    }
+
+    incRef(element: F) {
+        this._prover.incRef(element);
     }
 
 }

@@ -185,9 +185,11 @@ export class VariableCollectingVisitor extends Z3Visitor<ImmMap<string, Z3Formul
     visitConstantOrApplication(node: Z3_ast): ImmMap<string, Z3Formula> {
         let result = ImmMap<string, Z3Formula>([]);
         const childs = this.children(node);
+
         for (let c of childs.list) {
             result = result.merge(this.visit(c));
         }
+
         if (childs.list.length == 0) {
             const decl: Z3_func_decl = this._ctx.get_app_decl(node);
             const symbol: Z3_symbol = this._ctx.get_decl_name(decl);
@@ -197,7 +199,9 @@ export class VariableCollectingVisitor extends Z3Visitor<ImmMap<string, Z3Formul
                 result = result.set(name, new Z3Formula(node));
             }
         }
+
         childs.release();
+
         return result;
     }
 

@@ -51,6 +51,23 @@ export interface AbstractState extends AbstractElement {
 
 }
 
+export interface WithReferenceCounting<E extends AbstractElement> {
+
+    /**
+     * Increment the number of references to this element.
+     *
+     * @param element
+     */
+    incRef(element: E);
+
+    /**
+     * Decrement the number of references to this element.
+     *
+     * @param element
+     */
+    decRef(element: E);
+}
+
 /**
  * A (bounded) lattice is an algebraic structure consisting of the following:
  *  - A partially ordered set of elements, also called {@link AbstractState abstract states}.
