@@ -296,11 +296,11 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
     }
 
     public remove(element: E) {
-        this._refCountOperator.decRef(element);
         const partitionKey = this.getPartitionKey(element);
 
         this.getPartition(partitionKey).remove(element);
         if (this._elements.delete(element)) {
+            this._refCountOperator.decRef(element);
             this._size--;
         }
 
