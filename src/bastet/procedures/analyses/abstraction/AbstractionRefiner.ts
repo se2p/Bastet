@@ -171,7 +171,8 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
 
     private releaseInterpolationSolution() {
         if (this._lastInterpolationSolution) {
-            this._lastInterpolationSolution.interpolants.forEach(itp => this._prover.decRef(itp));
+            // The following causes a Z3 memory issue:
+            //      this._lastInterpolationSolution.interpolants.forEach(itp => this._prover.decRef(itp));
         }
     }
 
