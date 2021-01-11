@@ -410,7 +410,7 @@ test("Get model for unsat formula", () => {
 
        const model = prover.getModel();
        expect(model.getNumConst()).toBe(0);
-       expect(model.getConstValues()).toStrictEqual([]);
+       expect(model.getValueMap().size).toBe(0);
    } finally {
        prover.pop();
    }
@@ -435,7 +435,8 @@ test("Get model for int formula", () => {
 
         const model: Z3Model = prover.getModel();
         expect(model.getNumConst()).toBe(2);
-        expect(model.getConstValues()).toStrictEqual([new Z3Const("y", 4), new Z3Const("x", 2)]);
+        expect(model.getValueMap().get("y")).toStrictEqual(4);
+        expect(model.getValueMap().get("x")).toStrictEqual(2);
     } finally {
         prover.pop();
     }
@@ -444,10 +445,17 @@ test("Get model for int formula", () => {
 test('Get model for string formula', () => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), StringType.instance()));
 
-    const xContainsB = theories.stringTheory.stringContains(theories.stringTheory.abstractStringValue(x), theories.stringTheory.fromConcrete(new ConcreteString("B")));
+    const xContainsB = theories.stringTheory.stringContains(
+        theories.stringTheory.abstractStringValue(x),
+        theories.stringTheory.fromConcrete(new ConcreteString("B")));
 
-    const xJoinedOther = theories.stringTheory.joinStrings(theories.stringTheory.abstractStringValue(x), theories.stringTheory.fromConcrete(new ConcreteString("b")));
-    const xJoinedOtherEqualsBob = theories.stringTheory.stringsEqual(xJoinedOther, theories.stringTheory.fromConcrete(new ConcreteString("Bob")));
+    const xJoinedOther = theories.stringTheory.joinStrings(
+        theories.stringTheory.abstractStringValue(x),
+        theories.stringTheory.fromConcrete(new ConcreteString("b")));
+
+    const xJoinedOtherEqualsBob = theories.stringTheory.stringsEqual(
+        xJoinedOther,
+        theories.stringTheory.fromConcrete(new ConcreteString("Bob")));
 
     prover.push();
     try {
@@ -457,7 +465,7 @@ test('Get model for string formula', () => {
 
         const model: Z3Model = prover.getModel();
         expect(model.getNumConst()).toBe(1);
-        expect(model.getConstValues()).toStrictEqual([new Z3Const("x", "Bo")]);
+        expect(model.getValueMap().get("x")).toStrictEqual("Bo"); // Seems to be a bug in Z3 (should return Bob)
     } finally {
         prover.pop();
     }
@@ -477,11 +485,9 @@ test('Get model for boolean formula (x && !z)', () => {
         const model: Z3Model = prover.getModel();
         expect(model.getNumConst()).toBe(2);
 
-        const constValues = model.getConstValues();
-        const constZ = constValues.find(constV => constV.getName() === "z");
-        expect(constZ.getValue()).toBe(false);
-        const constX = constValues.find(constV => constV.getName() === "x");
-        expect(constX.getValue()).toBe(true);
+        const constValues = model.getValueMap();
+        expect(constValues.get("z")).toBe(false);
+        expect(constValues.get("x")).toBe(true);
     } finally {
         prover.pop();
     }

@@ -107,6 +107,9 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
     }
 
     public checkIsFeasible(reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractionState>, e: AbstractState, purpose?: string): boolean {
+        // The previous interpolation solution gets invalidated with this call
+        this.releaseInterpolationSolution();
+
         // 1. Build the abstract path formula (describes a set of paths)
         // 1.1 Extract the sequence of states for that a widening was computed along the
         // given accessibility relation.
@@ -141,6 +144,8 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
 
                 // Compute interpolant
                 const interpolants: FirstOrderFormula[] = this._prover.collectInterpolants();
+                interpolants.forEach(itp => this._prover.incRef(itp));
+
                 console.group();
                 interpolants.forEach((itp) => console.log("Interpolant", this._theories.stringRepresentation(itp)));
                 console.groupEnd();
@@ -161,6 +166,12 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         } finally {
             alignedBlockFormulas.forEach((f) => this._prover.decRef(f));
             this._prover.pop();
+        }
+    }
+
+    private releaseInterpolationSolution() {
+        if (this._lastInterpolationSolution) {
+            this._lastInterpolationSolution.interpolants.forEach(itp => this._prover.decRef(itp));
         }
     }
 
@@ -192,32 +203,36 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
     public refinePrecision(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>,
                            ar: AccessibilityRelation<AbstractionState>,
                            infeasibleState: AbstractState): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
-        // TODO: welchen Teil vom ReachedSet wegwerfen?
-        //  -> Man wirft den Teil weg, der infeasible ist
-        //  -> Und man wirft den Teil weg, für den die Precision zu niedrig war
-        // TODO: welche Prädikate sollen zur AbstractionPrecision hinzugefügt werden?
-        //  ->
+        try {
+            // TODO: welchen Teil vom ReachedSet wegwerfen?
+            //  -> Man wirft den Teil weg, der infeasible ist
+            //  -> Und man wirft den Teil weg, für den die Precision zu niedrig war
+            // TODO: welche Prädikate sollen zur AbstractionPrecision hinzugefügt werden?
+            //  ->
 
-        // Cache must have been filled before invoking this method.
-        Preconditions.checkState(this._lastInterpolationSolution !== null);
+            // Cache must have been filled before invoking this method.
+            Preconditions.checkState(this._lastInterpolationSolution !== null);
 
-        Preconditions.checkArgument(infeasibleState === this._lastInterpolationSolution.targetState);
+            Preconditions.checkArgument(infeasibleState === this._lastInterpolationSolution.targetState);
 
-        // TODO: Split interpolants, optionally, into their Boolean atoms
+            // TODO: Split interpolants, optionally, into their Boolean atoms
 
-        this._currentPrecision = this._lastInterpolationSolution.interpolants
-            .map((f) => new PredicatePrecision([f], PrecisionRole.INTERMEDIATE))
-            .reduce((precision, last) => this._precisionLattice.join(precision, last),
-                this._currentPrecision);
+            this._currentPrecision = this._lastInterpolationSolution.interpolants
+                .map((f) => new PredicatePrecision([f], PrecisionRole.INTERMEDIATE))
+                .reduce((precision, last) => this._precisionLattice.join(precision, last),
+                    this._currentPrecision);
 
-        if (this._config.useLazyAbstraction) {
-            throw new ImplementMeForException("Lazy abstraction not yet supported");
-        } else {
-            for (const e of ar.initial()) {
-                frontier.add(e);
-                reached.removeAll(ar.successorsOf(e));
+            if (this._config.useLazyAbstraction) {
+                throw new ImplementMeForException("Lazy abstraction not yet supported");
+            } else {
+                for (const e of ar.initial()) {
+                    frontier.add(e);
+                    reached.removeAll(ar.successorsOf(e));
+                }
+                return [frontier, reached];
             }
-            return [frontier, reached];
+        } finally {
+            this.releaseInterpolationSolution();
         }
     }
 

@@ -42,6 +42,7 @@ import {PerfTimer} from "../../utils/PerfTimer";
 import {AbstractDomain} from "./AbstractDomain";
 import {AbstractionPrecision} from "../AbstractionPrecision";
 import {Z3Model, Z3Vector} from "../../utils/smt/z3/Z3SMT";
+import {Z3BooleanFormula} from "../../utils/smt/z3/Z3Theories";
 
 export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
     prover: FirstOrderSolver<F>;
@@ -93,22 +94,19 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
             const booleans = new Map<string, ConcreteBoolean>();
             const lists = new Map<string, ConcreteList<ConcreteString>>();
 
-            model.getConstValues().forEach(constObj => {
-                const value = constObj.getValue();
-                const name = constObj.getName();
-
-                switch (typeof value) {
+            model.getValueMap().forEach((varValue, varName) => {
+                switch (typeof varValue) {
                     case 'boolean':
-                        booleans.set(name, new ConcreteBoolean(value));
+                        booleans.set(varName, new ConcreteBoolean(varValue));
                         break;
                     case 'number':
-                        numbers.set(name, new ConcreteNumber(value));
+                        numbers.set(varName, new ConcreteNumber(varValue));
                         break;
                     case 'string':
-                        strings.set(name, new ConcreteString(value));
+                        strings.set(varName, new ConcreteString(varValue));
                         break;
                     default:
-                        throw new ImplementMeForException("attributes of type " + typeof value);
+                        throw new ImplementMeForException("attributes of type " + typeof varValue);
                 }
             });
 
@@ -179,7 +177,7 @@ export abstract class FirstOrderSolver<F extends FirstOrderFormula> {
 
     public abstract stringRepresentation(f: F): string;
 
-    public abstract allSat(abstractionProblem: F, predicates: F[]): boolean[][];
+    public abstract allSat(abstractionProblem: Z3BooleanFormula, freeVariables: [string, Z3BooleanFormula][]): boolean[][];
 
     public abstract booleanAbstraction(abstractionProblem: F, predicates: F[]): F;
 

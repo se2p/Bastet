@@ -24,7 +24,7 @@
 
     "ControlAnalysis": {
         "widen-on-loop-heads": true,
-        "widen-after-each-step": true
+        "widen-after-each-step": false
     },
 
     "GraphAnalysis": {

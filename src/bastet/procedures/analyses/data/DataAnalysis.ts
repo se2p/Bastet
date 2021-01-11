@@ -262,6 +262,6 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
     }
 
     decRef(state: DataAbstractState) {
-        this._solver.decRef(state.blockFormula);
+        // this._solver.decRef(state.blockFormula);
     }
 }

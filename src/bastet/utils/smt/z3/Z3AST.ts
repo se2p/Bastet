@@ -72,13 +72,13 @@ export class Z3AstNodeList {
         this._list = Preconditions.checkNotUndefined(list);
         this._ctx = Preconditions.checkNotUndefined(ctx);
 
-        for (let e of list) {
+        for (const e of list) {
             this._ctx.inc_ref(e);
         }
     }
 
-    public decRef() {
-        for (let e of this._list) {
+    public release() {
+        for (const e of this._list) {
             this._ctx.dec_ref(e);
         }
     }
@@ -197,7 +197,7 @@ export class VariableCollectingVisitor extends Z3Visitor<ImmMap<string, Z3Formul
                 result = result.set(name, new Z3Formula(node));
             }
         }
-        childs.decRef();
+        childs.release();
         return result;
     }
 
