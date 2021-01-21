@@ -195,7 +195,7 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         console.groupEnd();
     }
 
-    alignSsaIndices(wideningStateSeq: AbstractionState[], blockFormulas: FirstOrderFormula[]): FirstOrderFormula[] {
+    private alignSsaIndices(wideningStateSeq: AbstractionState[], blockFormulas: FirstOrderFormula[]): FirstOrderFormula[] {
         Preconditions.checkArgument(wideningStateSeq.length == blockFormulas.length);
         const ssaMaps = wideningStateSeq.map((e) => new Map(getTheOnlyElement(SSAAbstractStates.extractFrom(e)).getSSA()));
         return this._theories.alignSsaIndices(blockFormulas, ssaMaps);
