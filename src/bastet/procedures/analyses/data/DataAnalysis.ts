@@ -110,16 +110,15 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     private readonly _solver: FirstOrderSolver<FirstOrderFormula>;
 
-    constructor(config:{}, folLattice: FirstOrderLattice<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>,
+    constructor(config:{}, folLattice: FirstOrderLattice<FirstOrderFormula>,
                 theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
                 statistics: AnalysisStatistics) {
         Preconditions.checkNotUndefined(folLattice);
-        Preconditions.checkNotUndefined(propLattice);
 
         this._config = new DataAnalysisConfig(config);
         this._theories = new Theories(this._config.encodeFloatsAs, Preconditions.checkNotUndefined(theories));
         this._solver = folLattice.prover;
-        this._abstractDomain = new DataAbstractDomain(folLattice, propLattice);
+        this._abstractDomain = new DataAbstractDomain(folLattice);
         this._transferRelation = new DataTransferRelation(this._abstractDomain, this._theories);
         this._testifier = new DataTestifier(this._theories, this._abstractDomain);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);

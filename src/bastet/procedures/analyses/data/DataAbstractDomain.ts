@@ -38,33 +38,24 @@ export interface DataAbstractStateAttributes {
 
     blockFormula: FirstOrderFormula;
 
-    summaryFormula: PropositionalFormula;
-
 }
 
 const DataAbstractStateRecord = ImmRec({
 
     blockFormula: null,
 
-    summaryFormula: null
-
 });
 
 export class DataAbstractState extends DataAbstractStateRecord implements DataAbstractStateAttributes, AbstractState {
 
     blockFormula: FirstOrderFormula;
-    summaryFormula: PropositionalFormula;
 
-    constructor(blockFormula: FirstOrderFormula, summaryFormula: PropositionalFormula) {
-        super({blockFormula: blockFormula, summaryFormula: summaryFormula});
+    constructor(blockFormula: FirstOrderFormula) {
+        super({blockFormula: blockFormula});
     }
 
     public withBlockFormula(value: FirstOrderFormula): DataAbstractState {
         return this.set('blockFormula', value);
-    }
-
-    public withSummaryFormula(value: PropositionalFormula): DataAbstractState {
-        return this.set('summaryFormula', value);
     }
 
     public accept<R>(visitor: AbstractElementVisitor<R>): R {
@@ -86,13 +77,10 @@ export class DataAbstractStateLattice implements LatticeWithComplements<DataAbst
 
     private readonly _folLattice: LatticeWithComplements<FirstOrderFormula>;
 
-    private readonly _propLattice: LatticeWithComplements<PropositionalFormula>;
-
-    constructor(folLattice: LatticeWithComplements<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>) {
+    constructor(folLattice: LatticeWithComplements<FirstOrderFormula>) {
         this._folLattice = Preconditions.checkNotUndefined(folLattice);
-        this._propLattice = Preconditions.checkNotUndefined(propLattice);
-        this._bottom = new DataAbstractState(folLattice.bottom(), propLattice.bottom());
-        this._top = new DataAbstractState(folLattice.top(), propLattice.top());
+        this._bottom = new DataAbstractState(folLattice.bottom());
+        this._top = new DataAbstractState(folLattice.top());
     }
 
     bottom(): DataAbstractState {
@@ -108,14 +96,12 @@ export class DataAbstractStateLattice implements LatticeWithComplements<DataAbst
 
     join(element1: DataAbstractState, element2: DataAbstractState): DataAbstractState {
         return element1
-            .withBlockFormula(this._folLattice.join(element1.blockFormula, element2.blockFormula))
-            .withSummaryFormula(this._propLattice.join(element1.summaryFormula, element2.summaryFormula));
+            .withBlockFormula(this._folLattice.join(element1.blockFormula, element2.blockFormula));
     }
 
     meet(element1: DataAbstractState, element2: DataAbstractState): DataAbstractState {
         return element1
-            .withBlockFormula(this._folLattice.meet(element1.blockFormula, element2.blockFormula))
-            .withSummaryFormula(this._propLattice.meet(element1.summaryFormula, element2.summaryFormula));
+            .withBlockFormula(this._folLattice.meet(element1.blockFormula, element2.blockFormula));
     }
 
     top(): DataAbstractState {
@@ -123,8 +109,7 @@ export class DataAbstractStateLattice implements LatticeWithComplements<DataAbst
     }
 
     complement(element: DataAbstractState): DataAbstractState {
-        return new DataAbstractState(this._folLattice.complement(element.blockFormula),
-            this._propLattice.complement(element.summaryFormula));
+        return new DataAbstractState(this._folLattice.complement(element.blockFormula));
     }
 
 }
@@ -135,8 +120,8 @@ export class DataAbstractDomain implements AbstractDomain<ConcreteMemory, DataAb
     private readonly _lattice: LatticeWithComplements<DataAbstractState>;
     private readonly _solver: FirstOrderSolver<FirstOrderFormula>;
 
-    constructor(folLattice: FirstOrderLattice<FirstOrderFormula>, propLattice: LatticeWithComplements<PropositionalFormula>) {
-        this._lattice = new DataAbstractStateLattice(folLattice, propLattice);
+    constructor(folLattice: FirstOrderLattice<FirstOrderFormula>) {
+        this._lattice = new DataAbstractStateLattice(folLattice);
         this._folDomain = new FirstOrderDomain(folLattice);
         this._solver = folLattice.prover;
     }

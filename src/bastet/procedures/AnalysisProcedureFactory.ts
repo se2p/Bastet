@@ -93,7 +93,6 @@ export class AnalysisProcedureFactory {
 
             async runPredicate(task: App): Promise<MultiPropertyAnalysisResult> {
                 const smt = await SMTFactory.createZ3();
-                const bddlib = await BDDLibraryFactory.createBDDLib();
 
                 this._statistics = new AnalysisStatistics("BASTET", {});
                 this._result = new MultiPropertyAnalysisResult(ImmSet<Property>(), ImmSet<Property>(), task.getProperties(), this._statistics);
@@ -107,7 +106,7 @@ export class AnalysisProcedureFactory {
                 const prover = smt.createProver(defaultContect);
                 const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
-                const dataAnalysis = new DataAnalysis(config, firstOrderLattice, bddlib.lattice, theories, this._statistics);
+                const dataAnalysis = new DataAnalysis(config, firstOrderLattice, theories, this._statistics);
                 const labelAnalysis = new LabelAnalysis(task, dataAnalysis, this._statistics);
                 const ssaAnalysis = new SSAAnalysis(config, task, labelAnalysis, this._statistics);
                 const abstractionAnalysis = new AbstractionAnalysis(config, task, firstOrderLattice, dataAnalysis.theories, ssaAnalysis, this._statistics);
@@ -140,7 +139,6 @@ export class AnalysisProcedureFactory {
 
             async runBMC(task: App): Promise<MultiPropertyAnalysisResult> {
                 const smt = await SMTFactory.createZ3();
-                const bddlib = await BDDLibraryFactory.createBDDLib();
 
                 this._statistics = new AnalysisStatistics("BASTET", {});
                 this._result = new MultiPropertyAnalysisResult(ImmSet<Property>(), ImmSet<Property>(), task.getProperties(), this._statistics);
@@ -154,7 +152,7 @@ export class AnalysisProcedureFactory {
                 const prover = smt.createProver(defaultContect);
                 const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
-                const dataAnalysis = new DataAnalysis(config, firstOrderLattice, bddlib.lattice, theories, this._statistics);
+                const dataAnalysis = new DataAnalysis(config, firstOrderLattice, theories, this._statistics);
                 const labelAnalysis = new LabelAnalysis(task, dataAnalysis, this._statistics);
                 const ssaAnalysis = new SSAAnalysis(config, task, labelAnalysis, this._statistics);
                 const timeAnalysis = new TimeAnalysis(task, ssaAnalysis, this._statistics, new StaticTimeProfile());
