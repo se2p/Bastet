@@ -27,8 +27,8 @@ import {LabeledTransferRelation} from "../TransferRelation";
 import {SSAState} from "./SSAAbstractDomain";
 import {
     AssumeOperation,
-    ProgramOperation, ProgramOperationFactory,
-    ProgramOperations,
+    ProgramOperation,
+    ProgramOperationFactory,
     RawOperation
 } from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {AbstractElement} from "../../../lattices/Lattice";
