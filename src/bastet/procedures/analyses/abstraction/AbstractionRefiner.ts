@@ -62,6 +62,10 @@ export class AbstractionRefinerConfig extends BastetConfiguration {
     get useLazyAbstraction(): boolean {
         return this.getBoolProperty('use-lazy-abstraction', false);
     }
+
+    get dumpPathFormula(): boolean {
+        return this.getBoolProperty('dump-path-formula', false);
+    }
 }
 
 class InterpolationSolution {
@@ -95,6 +99,8 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
     private readonly _precisionLattice: PredicatePrecisionLattice<FirstOrderFormula>;
     private readonly _config: AbstractionRefinerConfig;
 
+    private _feasibilityCheck: number;
+
     constructor(config: {}, unwrapper: Unwrapper<AbstractState, AbstractElement>, lattice: AbstractionStateLattice, theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
                 precisionLattice: PredicatePrecisionLattice<FirstOrderFormula>, prover: FirstOrderSolver<FirstOrderFormula>) {
         this._config = new AbstractionRefinerConfig(config);
@@ -104,9 +110,12 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         this._theories = Preconditions.checkNotUndefined(theories);
         this._precisionLattice = Preconditions.checkNotUndefined(precisionLattice);
         this._currentPrecision = precisionLattice.bottom();
+        this._feasibilityCheck = 0;
     }
 
     public checkIsFeasible(reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractionState>, e: AbstractState, purpose?: string): boolean {
+        this._feasibilityCheck++;
+
         // The previous interpolation solution gets invalidated with this call
         this.releaseInterpolationSolution();
 
@@ -134,6 +143,8 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
             for (const blockFormula of alignedBlockFormulas) {
                 this._prover.assert(blockFormula);
             }
+
+            this.dumpPathFormula(alignedBlockFormulas);
 
             const feasible = !this._prover.isUnsat();
 
@@ -296,4 +307,15 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
     }
 
 
+    private dumpPathFormula(alignedBlockFormulas: FirstOrderFormula[]) {
+        if (!this._config.dumpPathFormula) {
+            return;
+        }
+
+        const pathFormula = alignedBlockFormulas.reduce((f1, f2) => this._theories.boolTheory.and(f1, f2), this._theories.boolTheory.trueBool());
+        const s = this._prover.stringRepresentation(pathFormula);
+
+        let fs = require('fs');
+        fs.writeFileSync(`output/refinement-${this._feasibilityCheck}-path.smt`, s);
+    }
 }

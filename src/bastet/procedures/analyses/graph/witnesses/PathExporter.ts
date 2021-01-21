@@ -48,7 +48,7 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
         this._tlp = Preconditions.checkNotUndefined(tlp);
     }
 
-    handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
+    public handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
         Preconditions.checkArgument(reached instanceof GraphReachedSetWrapper);
         const ar: GraphReachedSetWrapper<GraphAbstractState> = reached as GraphReachedSetWrapper<GraphAbstractState>;
         const testified = this._analysis.testifyOne(ar, violating);

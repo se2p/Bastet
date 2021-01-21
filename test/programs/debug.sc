@@ -1,41 +1,43 @@
 program Mini1Program
 
-actor MiniActor is RuntimeEntity begin
+actor ActorA is ScratchSprite begin
 
     script on startup do begin
-        declare r as int
-        define r as 0
+        define x as 0
+        define y as 0
+        define direction as 90
 
-        declare a1 as int
-        define a1 as 1
+        declare n as int
+        define n as 10
 
-        if (a1 > 0) then begin
-            define r as r + 1
-            define r as r + 0
-            define r as r + 0
-            define r as r + 0
-            define r as r + 0
-            define r as r + 0
-            define r as r + 0
-            define r as r + 0
-            define r as r + 0
-            define r as r + 0
-            define r as r + 0
-            define r as r + 0
-            until true repeat begin
-                define r as r + 0
-            end
-        end else begin
-            define r as r + 1
-            until true repeat begin
-                define r as r + 0
-            end
-        end
+        declare nf as float
+        declare dx as float
+        declare dy as float
+        declare ndir as float
+        declare input as float
+        declare radians as float
 
-        if not (r = 1) then begin
-            _RUNTIME_signalFailure()
+        define nf as cast n to float
+
+        define ndir as cast direction to float
+        define radians as 0.0
+        define dx as nf * mathCos(radians)
+        define dy as nf * mathSin(radians)
+
+        define input as radians
+
+        declare tmpx as int
+        declare tmpy as int
+        define tmpx as cast dx to int
+        define tmpy as cast dy to int
+
+        define x as x + tmpx
+        define y as y + tmpy
+
+
+        if not (x >= 9 and x <= 11) then begin
+            _RUNTIME_signalFailure("moveSteps Test")
         end
     end
 
 end
-

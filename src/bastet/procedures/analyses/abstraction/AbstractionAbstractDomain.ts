@@ -206,6 +206,19 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
     }
 
     meet(element1: AbstractionState, element2: AbstractionState): AbstractionState {
+        // Case 1:
+        //      e1: a_0 > 5 and i_0 < 3
+        //      e2: a_0 > 10 and i_0 = 0
+        // Case 2:
+        //      e3: a_0 > 5 and i_0 < 3
+        //      e4: a_1 = 4
+        // Case 3:
+        //      e5: a_1 = 1 and b_1 = 2
+        //      e6: a_1 = a_0 + 1
+
+        // Not commutative:
+        //      e5 * e6 == a_1 = 1 and b_1 = 2 and a_2 = a_1 + 1
+        //      e6 * e5 == a_1 = a_0 + 1 and a_2 = 1 and b_1 = 2
         throw new ImplementMeException();
     }
 

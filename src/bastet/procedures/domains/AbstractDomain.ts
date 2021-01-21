@@ -87,4 +87,12 @@ export interface AbstractDomain<C extends ConcreteElement, E extends AbstractEle
 
     concreteDomain: ConcreteDomain<C>;
 
+    /**
+     * Sequential composition of abstract states.
+     *
+     * @param e1
+     * @param e2
+     */
+    composeSeq(e1: E, e2: E): E;
+
 }
