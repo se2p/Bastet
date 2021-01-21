@@ -40,11 +40,12 @@ import {
 import {AbstractionComputation} from "./AbstractionComputation";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Optional} from "../../../utils/Optional";
-import {DataAbstractStates} from "../data/DataAbstractStates";
-import {getTheOnlyElement} from "../../../utils/Collections";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 
 
 export interface AbstractionStateAttribs extends AbstractElement, SingletonStateWrapper {
+
+    blockId: number;
 
     enteringSummary: FirstOrderFormula;
 
@@ -58,6 +59,8 @@ export interface AbstractionStateAttribs extends AbstractElement, SingletonState
 
 const AbstractionStateRecord = ImmRec({
 
+    blockId: 0,
+
     enteringSummary: null,
 
     wrappedState: null,
@@ -70,8 +73,16 @@ const AbstractionStateRecord = ImmRec({
 
 export class AbstractionState extends AbstractionStateRecord implements AbstractionStateAttribs, AbstractState {
 
-    constructor(enteringSummary: FirstOrderFormula, wrappedState: AbstractElement, precision: PredicatePrecisionStack, wideningOf: Optional<AbstractionState>) {
-        super({enteringSummary: enteringSummary, precision: precision, wrappedState: wrappedState, wideningOf: wideningOf});
+    constructor(blockId: number, enteringSummary: FirstOrderFormula, wrappedState: AbstractElement, precision: PredicatePrecisionStack, wideningOf: Optional<AbstractionState>) {
+        super({blockId: blockId, enteringSummary: enteringSummary, precision: precision, wrappedState: wrappedState, wideningOf: wideningOf});
+    }
+
+    public getBlockId(): number {
+        return this.blockId;
+    }
+
+    public withFreshBlockId(): AbstractionState {
+        return this.set('blockId', BLOCK_SEQ_NO++);
     }
 
     public getEnteringSummary(): FirstOrderFormula {
@@ -137,8 +148,8 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
         this._wrappedStateLattice = Preconditions.checkNotUndefined(wrappedStateLattice);
         this._folLattice = Preconditions.checkNotUndefined(summaryLattice);
         this._precStacLattice = new PredicatePrecisionStackLattice(new PredicatePrecisionLattice(summaryLattice));
-        this._bottom = new AbstractionState(this._folLattice.bottom(), wrappedStateLattice.bottom(), this._precStacLattice.bottom(), Optional.absent());
-        this._top = new AbstractionState(this._folLattice.top(), wrappedStateLattice.top(), this._precStacLattice.top(), Optional.absent());
+        this._bottom = new AbstractionState(-3, this._folLattice.bottom(), wrappedStateLattice.bottom(), this._precStacLattice.bottom(), Optional.absent());
+        this._top = new AbstractionState(-2, this._folLattice.top(), wrappedStateLattice.top(), this._precStacLattice.top(), Optional.absent());
     }
 
     bottom(): AbstractionState {
@@ -146,19 +157,44 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
     }
 
     isIncluded(element1: AbstractionState, element2: AbstractionState): boolean {
+        if (element2 === this._top) {
+            return true;
+        } else if (element2 === this._bottom) {
+            if (element1 === this._bottom) {
+                return true;
+            }
+        }
+
+        // ATTENTION: "Stop", and with it "isIncluded", should work across blocks!
+        // To make this mathematically cleaner, a separate lattice is needed:
+        // one for the blocks only (with block id and a wrapped state), and one for the actual summary
+
         if (element1.getWideningOf().isPresent() !== element2.getWideningOf().isPresent()) {
             return false;
         } else if (element1.getWideningOf().isPresent()) {
             return this._folLattice.isIncluded(element1.getEnteringSummary(), element2.getEnteringSummary());
         } else {
-            const blockFormula1 = getTheOnlyElement(DataAbstractStates.extractFrom(element1)).blockFormula;
-            const blockFormula2 = getTheOnlyElement(DataAbstractStates.extractFrom(element2)).blockFormula;
-            return this._folLattice.isIncluded(this._folLattice.meet(element1.getEnteringSummary(), blockFormula1),
-                this._folLattice.meet(element2.getEnteringSummary(), blockFormula2));
+            // The mathematically clean coverage check:
+            // const blockFormula1 = getTheOnlyElement(DataAbstractStates.extractFrom(element1)).blockFormula;
+            // const blockFormula2 = getTheOnlyElement(DataAbstractStates.extractFrom(element2)).blockFormula;
+            // return this._folLattice.isIncluded(this._folLattice.meet(element1.getEnteringSummary(), blockFormula1),
+            //    this._folLattice.meet(element2.getEnteringSummary(), blockFormula2));
+
+            return this._folLattice.isIncluded(element1.getEnteringSummary(), element2.getEnteringSummary());
         }
     }
 
     join(element1: AbstractionState, element2: AbstractionState): AbstractionState {
+        if (element1 === this._top || element2 === this._top) {
+            return this._top;
+        } else if (element1 === this._bottom || element2 === this._bottom) {
+            throw new ImplementMeException();
+        }
+
+        if (element1.blockId != element2.blockId) {
+            throw new IllegalArgumentException("Join across blocks not expected.");
+        }
+
         if (element1.getWideningOf().isPresent() !== element2.getWideningOf().isPresent()) {
             return this.top();
         } else if (element1.getWideningOf().isPresent()) {
@@ -190,6 +226,8 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
         return this._precStacLattice;
     }
 }
+
+var BLOCK_SEQ_NO = 0;
 
 export class AbstractionAbstractDomain implements AbstractDomain<ConcreteElement, AbstractionState> {
 
@@ -224,7 +262,10 @@ export class AbstractionAbstractDomain implements AbstractDomain<ConcreteElement
     }
 
     widen(element: AbstractionState, precision: AbstractionPrecision): AbstractionState {
-        return this._abstractionFunction.computeAbstraction(element, precision).withWideningOf(element);
+        return this._abstractionFunction
+            .computeAbstraction(element, precision)
+            .withWideningOf(element)
+            .withFreshBlockId();
     }
 
     get concreteDomain(): ConcreteDomain<ConcreteElement> {

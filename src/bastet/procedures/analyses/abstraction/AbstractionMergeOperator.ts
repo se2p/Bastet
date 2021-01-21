@@ -51,6 +51,10 @@ export class AbstractionMergeOperator implements MergeOperator<AbstractionState>
     }
 
     shouldMerge(state1: AbstractionState, state2: AbstractionState): boolean {
+        if (state1.blockId != state2.blockId) {
+            return false;
+        }
+
         if (!state1.getPrecision().equals(state2.getPrecision())) {
             return false;
         }

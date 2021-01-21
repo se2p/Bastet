@@ -188,7 +188,8 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     initialStatesFor(task: App): AbstractionState[] {
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            return new AbstractionState(this._abstractDomain.lattice.folLattice.top(), w, this._abstractDomain.lattice.precStacLattice.bottom(), Optional.absent());
+            return new AbstractionState(0, this._abstractDomain.lattice.folLattice.top(), w, this._abstractDomain.lattice.precStacLattice.bottom(), Optional.absent())
+                .withFreshBlockId();
         } );
     }
 
