@@ -73,10 +73,8 @@ export class DataTransferRelation implements LabeledTransferRelation<DataAbstrac
 
     private abstractSuccForAst(fromState: DataAbstractState, ast: AstNode): Iterable<DataAbstractState> {
         const visitor = new DataTransformerVisitor(fromState.blockFormula, this._theories);
-
         const blockFormulaPrime: FirstOrderFormula = ast.accept(visitor);
-
-        return [new DataAbstractState(blockFormulaPrime, fromState.summaryFormula)];
+        return [new DataAbstractState(blockFormulaPrime)];
     }
 
 }
