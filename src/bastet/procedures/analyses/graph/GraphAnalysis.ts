@@ -42,8 +42,7 @@ import {
     DefaultFrontierSet, DifferencingFrontierSet,
     FrontierSet,
     PartitionKey,
-    PriorityFrontierSet,
-    ReachedSet, SingleStatePartitionOperator,
+    ReachedSet,
     StatePartitionOperator,
     StateSet,
 } from "../../algorithms/StateSet";
@@ -281,9 +280,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     stopPartitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {
-        return reached;
-        // FIXME: Re-add sime sort of partitioning for the stop operator!
-        // return reached.getStateSet(ofState);
+        return reached.getStateSet(ofState);
     }
 
     widenPartitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {
