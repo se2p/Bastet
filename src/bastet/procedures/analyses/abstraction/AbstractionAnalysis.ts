@@ -23,7 +23,7 @@
  *
  */
 
-import {MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
+import {MergeOperator, ProgramAnalysisWithLabels, StopOperator} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
@@ -60,6 +60,7 @@ import {TransformerTheories} from "../../domains/MemoryTransformer";
 import {SSAAnalysis} from "../ssa/SSAAnalysis";
 import {PredicatePrecisionLattice} from "../../AbstractionPrecision";
 import {Optional} from "../../../utils/Optional";
+import {AbstractionStopOperator} from "./AbstractionStopOperator";
 
 
 export class AbstractionAnalysisConfig extends BastetConfiguration {
@@ -91,6 +92,8 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
     private readonly _mergeOp: MergeOperator<AbstractionState>;
 
+    private readonly _stopOp: StopOperator<AbstractionState, AbstractState>;
+
     private readonly _config: AbstractionAnalysisConfig;
 
     private readonly _solver: FirstOrderSolver<FirstOrderFormula>;
@@ -120,6 +123,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = new AbstractionMergeOperator(this._task, this.wrappedAnalysis, this._abstractDomain.lattice);
+        this._stopOp = new AbstractionStopOperator(this._abstractDomain, this._wrappedAnalysis);
 
         this._solver = summaryLattice.prover;
     }
@@ -149,12 +153,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     }
 
     stop(state: AbstractionState, reached: Iterable<AbstractState>, unwrapper: (AbstractState) => AbstractionState): boolean {
-        for (let r of reached) {
-            if (this._abstractDomain.lattice.isIncluded(state, unwrapper(r))) {
-                return true;
-            }
-        }
-        return false;
+        return this._stopOp.stop(state, reached, unwrapper);
     }
 
     target(state: AbstractionState): Property[] {

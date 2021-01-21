@@ -3,19 +3,39 @@ program Mini1Program
 actor MiniActor is RuntimeEntity begin
 
     script on startup do begin
-       declare x as int
-       declare y as int
-       define x as 3
-       define y as 0
+        declare r as int
+        define r as 0
 
-       until x = 0 repeat begin
-           define x as x - 1
-           define y as y + 1
-       end
+        declare a1 as int
+        define a1 as 1
 
-       if not y = 3 then begin
+        if (a1 > 0) then begin
+            define r as r + 1
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            define r as r + 0
+            until true repeat begin
+                define r as r + 0
+            end
+        end else begin
+            define r as r + 1
+            until true repeat begin
+                define r as r + 0
+            end
+        end
+
+        if not (r = 1) then begin
             _RUNTIME_signalFailure()
-       end
+        end
     end
 
 end
+

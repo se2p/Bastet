@@ -40,6 +40,8 @@ import {
 import {AbstractionComputation} from "./AbstractionComputation";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Optional} from "../../../utils/Optional";
+import {DataAbstractStates} from "../data/DataAbstractStates";
+import {getTheOnlyElement} from "../../../utils/Collections";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 
 
@@ -174,13 +176,10 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
         } else if (element1.getWideningOf().isPresent()) {
             return this._folLattice.isIncluded(element1.getEnteringSummary(), element2.getEnteringSummary());
         } else {
-            // The mathematically clean coverage check:
-            // const blockFormula1 = getTheOnlyElement(DataAbstractStates.extractFrom(element1)).blockFormula;
-            // const blockFormula2 = getTheOnlyElement(DataAbstractStates.extractFrom(element2)).blockFormula;
-            // return this._folLattice.isIncluded(this._folLattice.meet(element1.getEnteringSummary(), blockFormula1),
-            //    this._folLattice.meet(element2.getEnteringSummary(), blockFormula2));
-
-            return this._folLattice.isIncluded(element1.getEnteringSummary(), element2.getEnteringSummary());
+            const blockFormula1 = getTheOnlyElement(DataAbstractStates.extractFrom(element1)).blockFormula;
+            const blockFormula2 = getTheOnlyElement(DataAbstractStates.extractFrom(element2)).blockFormula;
+            return this._folLattice.isIncluded(this._folLattice.meet(element1.getEnteringSummary(), blockFormula1),
+                this._folLattice.meet(element2.getEnteringSummary(), blockFormula2));
         }
     }
 
