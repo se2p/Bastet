@@ -193,7 +193,7 @@ export class PartitionedOrderedSet<E extends AbstractElement> {
         return this.getPartition(key);
     }
 
-    private getPartition(key: PartitionKey): Set<E> {
+    public getPartition(key: PartitionKey): Set<E> {
         Preconditions.checkNotUndefined(key);
         let result = this._partitions.get(key);
         if (!result) {
