@@ -87,7 +87,7 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
         const script = actor.getScript(t.getScriptId());
 
         const astVisitor = new CorePrintVisitor();
-        return `${wasStepped(threadIndex) ? "*" : ""}[${t.getThreadId()} a${t.getInAtomicMode()} ${t.getActorId()} ${t.getScriptId()} ${script.event.accept(astVisitor)} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()} ${t.getWaitingForThreads().join("+")}]`;
+        return `${wasStepped(threadIndex) ? "*" : ""}[${t.getThreadId()} a${t.getInAtomicMode()} ${t.getActorId()} ${t.getScriptId()} ${script.event.accept(astVisitor)} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()} ${t.getWaitingForThreads().join("+")} ${t.getLoopStack().toString()}]`;
     }
 
     private formatConditionThreadDetails(cs: ControlAbstractState, t: ThreadState, threadIndex: number): string {
@@ -102,7 +102,7 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
     }
 
     visitAbstractionState(element: AbstractionState): string {
-        return `${element.getEnteringSummary().toString()} ${element.getWrappedState().accept(this)}\n`;
+        return `Block-${element.blockId} ${element.getEnteringSummary().toString()} ${element.getWrappedState().accept(this)}\n`;
     }
 
     visitDebugState(element: DebugState): string {
