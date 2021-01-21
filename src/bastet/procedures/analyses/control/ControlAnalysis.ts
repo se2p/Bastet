@@ -127,21 +127,35 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         return {id: this._seq++};
     }
 
-    getPartitionKeys(element: ControlAbstractState): ImmSet<PartitionKey> {
-        var controlPartition;
+    getControlPartition(element: ControlAbstractState): PartitionKey {
+        const steppedFor: ImmSet<ThreadId> = element.getSteppedFor();
+        const locations: ImmSet<LocationId> = ImmSet(element.getThreadStates()
+            .map((ts) => ts.getRelationLocation().getLocationId()));
+        const callstacks: ImmSet<ImmList<MethodCall>> = ImmSet(element.getThreadStates()
+            .map((ts) => ts.getCallStack()));
+        const loopstacks: ImmSet<ImmList<RelationLocation>> = ImmSet(element.getThreadStates()
+            .map((ts) => ts.getLoopStack()));
+        return new PartitionKey(ImmList([steppedFor, locations, callstacks, loopstacks]));
+    }
 
+    getStopPartitionKeys(element: ControlAbstractState): ImmSet<PartitionKey> {
+        const controlPartition = this.getControlPartition(element);
+
+        let result: ImmSet<PartitionKey> = ImmSet();
+        for (const wrappedPartition of this.wrappedAnalysis.getPartitionKeys(element.getWrappedState())) {
+            result = result.add(controlPartition.concat(wrappedPartition));
+        }
+
+        return result;
+    }
+
+    getMergePartitionKeys(element: ControlAbstractState): ImmSet<PartitionKey> {
+        var controlPartition;
         if (this.steppedToLoopHead(element)) {
             // Results in a factor 2 performance boost of the merge operation
             controlPartition = new PartitionKey(ImmList([this.createUniquePartition()]));
         } else {
-            const steppedFor: ImmSet<ThreadId> = element.getSteppedFor();
-            const locations: ImmSet<LocationId> = ImmSet(element.getThreadStates()
-                .map((ts) => ts.getRelationLocation().getLocationId()));
-            const callstacks: ImmSet<ImmList<MethodCall>> = ImmSet(element.getThreadStates()
-                .map((ts) => ts.getCallStack()));
-            const loopstacks: ImmSet<ImmList<RelationLocation>> = ImmSet(element.getThreadStates()
-                .map((ts) => ts.getLoopStack()));
-            controlPartition = new PartitionKey(ImmList([steppedFor, locations, callstacks, loopstacks]));
+            controlPartition = this.getControlPartition(element);
         }
 
         let result: ImmSet<PartitionKey> = ImmSet();
@@ -150,6 +164,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         }
 
         return result;
+    }
+
+    getPartitionKeys(element: ControlAbstractState): ImmSet<PartitionKey> {
+        return this.getStopPartitionKeys(element); // this.getMergePartitionKeys(element).union(this.getStopPartitionKeys(element));
     }
 
     join(state1: ControlAbstractState, state2: ControlAbstractState): ControlAbstractState {
@@ -186,7 +204,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
             return false;
         }
 
-        if (this.steppedToLoopHead(state1) || this.steppedToLoopHead(state2)) {
+        if (this.isWideningState(state1) || this.isWideningState(state2)) {
             // Do also consider threads that were not stepped!
             // Needed, for example, if the specification is checked after stepping on a loop head.
             return false;
