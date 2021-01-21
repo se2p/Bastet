@@ -46,6 +46,7 @@ import {VAR_SCOPING_SPLITTER} from "../../../../syntax/app/controlflow/DataLocat
 import {DataLocationScoper} from "../../control/DataLocationScoping";
 import {AttributeReadEvent, AttributeReadEventVisitor} from "../../../../syntax/ast/AttributeReadEventVisitor";
 import {ProgramOperation} from "../../../../syntax/app/controlflow/ops/ProgramOperation";
+import {GLOBAL_TIME_MICROS_VAR} from "../../../../syntax/app/SystemVariables";
 
 export interface WitnessExporterConfig {
     export: 'ALL' | 'ONLY_ACTIONS';
@@ -139,7 +140,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             const ssaState = currentState.accept(ssaStateVisitor);
             const memoryInStep = ssaState.getPrimitiveAttributes(errorState);
             const targetStates = WitnessExporter.groupByTargets(memoryInStep);
-            const globalTime = memoryInStep.get("__global_time_micros");
+            const globalTime = memoryInStep.get(GLOBAL_TIME_MICROS_VAR);
             step.timestamp = globalTime ? globalTime.value : 0;
 
             targetStates.forEach((state, targetName) => {
