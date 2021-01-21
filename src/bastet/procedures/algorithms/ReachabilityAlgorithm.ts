@@ -159,7 +159,10 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
             const timeForSucc = statAnalysis.succStats.contextTimer.totalDuration;
             const timeForMerge = statAnalysis.mergeIntoStats.contextTimer.totalDuration;
 
-            console.log(`Reached ${reached.getSize()} states, ${frontier.getSize()} in frontier, succ ${timeForSucc - this._lastTimeForSucc}, merge ${timeForMerge - this._lastTimeForMerge}, stop ${timeForStop - this._lastTimeForStop}, widen ${timeForWiden - this._lastTimeForWiden}, heap ${process.memoryUsage().heapUsed / 1024 / 1024}`);
+            const rn = function(num: number) { return num.toFixed(3); }
+            const ms = function(num: number) { return `${num.toFixed(2)}ms`; }
+
+            console.log(`Reached ${reached.getSize()} states, ${frontier.getSize()} in frontier, succ ${ms(timeForSucc - this._lastTimeForSucc)}, merge ${ms(timeForMerge - this._lastTimeForMerge)}, stop ${ms(timeForStop - this._lastTimeForStop)}, widen ${ms(timeForWiden - this._lastTimeForWiden)}, heap ${rn(process.memoryUsage().heapUsed / 1024 / 1024)}`);
 
             this._lastOutputTime = performance.now();
             this._lastTimeForWiden = timeForWiden;
