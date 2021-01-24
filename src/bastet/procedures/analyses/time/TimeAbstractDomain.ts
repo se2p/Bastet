@@ -165,4 +165,8 @@ export class TimeAbstractDomain implements AbstractDomain<ConcreteElement, TimeS
     get concreteDomain(): ConcreteDomain<ConcreteElement> {
         throw new ImplementMeException();
     }
+
+    composeSeq(e1: TimeState, e2: TimeState): TimeState {
+        throw new ImplementMeException();
+    }
 }

@@ -134,6 +134,10 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
         return this._lattice;
     }
 
+    composeSeq(e1: F, e2: F): F {
+        throw new ImplementMeException();
+    }
+
 }
 
 export abstract class FirstOrderSolver<F extends FirstOrderFormula> {

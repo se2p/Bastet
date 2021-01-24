@@ -153,6 +153,10 @@ export class DataAbstractDomain implements AbstractDomain<ConcreteMemory, DataAb
     get folDomain(): FirstOrderDomain<FirstOrderFormula> {
         return this._folDomain;
     }
+
+    composeSeq(e1: DataAbstractState, e2: DataAbstractState): DataAbstractState {
+        throw new ImplementMeException();
+    }
 }
 
 

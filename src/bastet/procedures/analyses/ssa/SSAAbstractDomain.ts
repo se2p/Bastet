@@ -195,4 +195,8 @@ export class SSAAbstractDomain implements AbstractDomain<ConcreteElement, SSASta
     get concreteDomain(): ConcreteDomain<ConcreteElement> {
         throw new ImplementMeException();
     }
+
+    composeSeq(e1: SSAState, e2: SSAState): SSAState {
+        throw new ImplementMeException();
+    }
 }

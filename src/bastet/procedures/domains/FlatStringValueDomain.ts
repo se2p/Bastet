@@ -54,4 +54,8 @@ export class FlatStringValueDomain implements AbstractDomain<ConcreteString, Abs
         throw new ImplementMeException();
     }
 
+    composeSeq(e1: AbstractString, e2: AbstractString): AbstractString {
+        throw new ImplementMeException();
+    }
+
 }

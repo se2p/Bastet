@@ -669,4 +669,8 @@ export class ControlAbstractDomain implements AbstractDomain<ControlConcreteStat
         return this._lattice;
     }
 
+    composeSeq(e1: ControlAbstractState, e2: ControlAbstractState): ControlAbstractState {
+        throw new ImplementMeException();
+    }
+
 }

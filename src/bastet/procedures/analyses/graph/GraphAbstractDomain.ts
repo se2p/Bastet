@@ -226,4 +226,8 @@ export class GraphAbstractDomain implements AbstractDomain<ConcreteElement, Grap
     get concreteDomain(): ConcreteDomain<ConcreteElement> {
         throw new ImplementMeException();
     }
+
+    composeSeq(e1: GraphAbstractState, e2: GraphAbstractState): GraphAbstractState {
+        throw new ImplementMeException();
+    }
 }

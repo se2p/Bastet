@@ -55,4 +55,8 @@ export class ListValueDomain implements AbstractDomain<ConcreteList<ConcreteStri
         throw new ImplementMeException();
     }
 
+    composeSeq(e1: AbstractList, e2: AbstractList): AbstractList {
+        throw new ImplementMeException();
+    }
+
 }

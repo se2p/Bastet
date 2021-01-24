@@ -148,4 +148,8 @@ export class DebugAbstractDomain implements AbstractDomain<ConcreteElement, Debu
     get concreteDomain(): ConcreteDomain<ConcreteElement> {
         throw new ImplementMeException();
     }
+
+    composeSeq(e1: DebugState, e2: DebugState): DebugState {
+        throw new ImplementMeException();
+    }
 }

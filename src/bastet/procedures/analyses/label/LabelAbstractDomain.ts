@@ -194,4 +194,8 @@ export class LabelAbstractDomain implements AbstractDomain<ConcreteElement, Labe
     get concreteDomain(): ConcreteDomain<ConcreteElement> {
         throw new ImplementMeException();
     }
+
+    composeSeq(e1: LabelState, e2: LabelState): LabelState {
+        throw new ImplementMeException();
+    }
 }

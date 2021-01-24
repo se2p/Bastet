@@ -102,4 +102,8 @@ export class StringListAbstractDomain implements AbstractStringListDomain {
         return this._lattice;
     }
 
+    composeSeq(e1: AbstractStringList, e2: AbstractStringList): AbstractStringList {
+        throw new ImplementMeException();
+    }
+
 }

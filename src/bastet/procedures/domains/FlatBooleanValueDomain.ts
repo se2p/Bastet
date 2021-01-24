@@ -226,4 +226,8 @@ export class FlatBooleanValueDomain implements AbstractBooleanDomain<FlatBoolean
         return this._lattice;
     }
 
+    composeSeq(e1: FlatBooleanValue, e2: FlatBooleanValue): FlatBooleanValue {
+        throw new ImplementMeException();
+    }
+
 }

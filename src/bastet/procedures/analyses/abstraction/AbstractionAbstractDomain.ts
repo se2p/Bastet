@@ -284,4 +284,8 @@ export class AbstractionAbstractDomain implements AbstractDomain<ConcreteElement
         throw new ImplementMeException();
     }
 
+    composeSeq(e1: AbstractionState, e2: AbstractionState): AbstractionState {
+        throw new ImplementMeException();
+    }
+
 }
