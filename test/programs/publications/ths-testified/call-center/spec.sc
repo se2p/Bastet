@@ -5,7 +5,7 @@ actor PhoneCostumeObserver is Observer begin
 
     define atomic checkBehaviorSatisfied () begin
         declare currentCostume as string
-        define currentCostume as attribute "active_graphic_name" of phone
+        define currentCostume as attribute "activeGraphicName" of phone
 
         declare ceoVisible as boolean
         define ceoVisible as currentCostume = "ceo"
