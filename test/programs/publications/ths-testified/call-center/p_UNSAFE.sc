@@ -34,7 +34,7 @@ actor Phone is ScratchSprite begin
                     define representativeId as 2
                 end else if answer() = "2" then begin
                     define representativeId as 1
-                end else begin
+                end else if answer() = "9" then begin
                     define representativeId as 4
                 end
             end else if representativeId = 1 then begin

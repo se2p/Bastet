@@ -1,0 +1,296 @@
+{
+  "steps": [
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "bubbleStart": 84,
+            "active_graphic_height": 360,
+            "active_graphic_width": 480,
+            "active_graphic_name": "phone",
+            "bubbleText": "",
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "bubbleDuration": 85,
+            "STAGE_WIDTH": 480,
+            "size": 100,
+            "active_graphic_half_height": 180,
+            "bubbleType": "",
+            "active_graphic_half_width": 240,
+            "STAGE_HEIGHT": 360,
+            "layer": 0
+          },
+          "name": "Phone"
+        }
+      ],
+      "action": "EPSILON"
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "bubbleStart": 84,
+            "active_graphic_height": 360,
+            "active_graphic_width": 480,
+            "active_graphic_name": "phone",
+            "bubbleText": "",
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "bubbleDuration": 85,
+            "STAGE_WIDTH": 480,
+            "size": 100,
+            "active_graphic_half_height": 180,
+            "bubbleType": "",
+            "active_graphic_half_width": 240,
+            "STAGE_HEIGHT": 360,
+            "layer": 0
+          },
+          "name": "Phone"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 2000151
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "bubbleStart": 84,
+            "active_graphic_height": 360,
+            "active_graphic_width": 480,
+            "active_graphic_name": "phone",
+            "bubbleText": "",
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "bubbleDuration": 85,
+            "STAGE_WIDTH": 480,
+            "size": 100,
+            "active_graphic_half_height": 180,
+            "bubbleType": "",
+            "active_graphic_half_width": 240,
+            "STAGE_HEIGHT": 360,
+            "layer": 0
+          },
+          "name": "Phone"
+        }
+      ],
+      "action": "ANSWER",
+      "answer": "1"
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "bubbleStart": 84,
+            "active_graphic_height": 360,
+            "active_graphic_width": 480,
+            "active_graphic_name": "phone",
+            "bubbleText": "",
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "bubbleDuration": 85,
+            "STAGE_WIDTH": 480,
+            "size": 100,
+            "active_graphic_half_height": 180,
+            "bubbleType": "",
+            "active_graphic_half_width": 240,
+            "STAGE_HEIGHT": 360,
+            "layer": 0
+          },
+          "name": "Phone"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 1000261
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "bubbleStart": 84,
+            "active_graphic_height": 360,
+            "active_graphic_width": 480,
+            "active_graphic_name": "phone",
+            "bubbleText": "",
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "bubbleDuration": 85,
+            "STAGE_WIDTH": 480,
+            "size": 100,
+            "active_graphic_half_height": 180,
+            "bubbleType": "",
+            "active_graphic_half_width": 240,
+            "STAGE_HEIGHT": 360,
+            "layer": 0
+          },
+          "name": "Phone"
+        }
+      ],
+      "action": "ANSWER",
+      "answer": "9"
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "bubbleStart": 84,
+            "active_graphic_height": 360,
+            "active_graphic_width": 480,
+            "active_graphic_name": "phone",
+            "bubbleText": "",
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "bubbleDuration": 85,
+            "STAGE_WIDTH": 480,
+            "size": 100,
+            "active_graphic_half_height": 180,
+            "bubbleType": "",
+            "active_graphic_half_width": 240,
+            "STAGE_HEIGHT": 360,
+            "layer": 0
+          },
+          "name": "Phone"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 110
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "bubbleStart": 84,
+            "active_graphic_height": 360,
+            "active_graphic_width": 480,
+            "active_graphic_name": "phone",
+            "bubbleText": "",
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "bubbleDuration": 85,
+            "STAGE_WIDTH": 480,
+            "size": 100,
+            "active_graphic_half_height": 180,
+            "bubbleType": "",
+            "active_graphic_half_width": 240,
+            "STAGE_HEIGHT": 360,
+            "layer": 0
+          },
+          "name": "Phone"
+        }
+      ],
+      "action": "ANSWER",
+      "answer": "9"
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "bubbleStart": 84,
+            "active_graphic_height": 360,
+            "active_graphic_width": 480,
+            "active_graphic_name": "phone",
+            "bubbleText": "",
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "bubbleDuration": 85,
+            "STAGE_WIDTH": 480,
+            "size": 100,
+            "active_graphic_half_height": 180,
+            "bubbleType": "",
+            "active_graphic_half_width": 240,
+            "STAGE_HEIGHT": 360,
+            "layer": 0
+          },
+          "name": "Phone"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 110
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "bubbleStart": 84,
+            "active_graphic_height": 360,
+            "active_graphic_width": 480,
+            "active_graphic_name": "phone",
+            "bubbleText": "",
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "bubbleDuration": 85,
+            "STAGE_WIDTH": 480,
+            "size": 100,
+            "active_graphic_half_height": 180,
+            "bubbleType": "",
+            "active_graphic_half_width": 240,
+            "STAGE_HEIGHT": 360,
+            "layer": 0
+          },
+          "name": "Phone"
+        }
+      ],
+      "action": "ANSWER",
+      "answer": "9"
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "bubbleStart": 84,
+            "active_graphic_height": 360,
+            "active_graphic_width": 480,
+            "active_graphic_name": "ceo",
+            "bubbleText": "",
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "bubbleDuration": 85,
+            "STAGE_WIDTH": 480,
+            "size": 100,
+            "active_graphic_half_height": 180,
+            "bubbleType": "",
+            "active_graphic_half_width": 240,
+            "STAGE_HEIGHT": 360,
+            "layer": 0
+          },
+          "name": "Phone"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 300
+    }
+  ],
+  "violations": [
+    "CEO should not be reachable"
+  ]
+}

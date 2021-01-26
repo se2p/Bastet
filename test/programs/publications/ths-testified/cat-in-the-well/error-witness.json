@@ -1,0 +1,1063 @@
+{
+  "steps": [
+    {
+      "id": 283,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 6,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -209,
+            "y": 149,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 560,
+      "actionLabel": "broadcast \"__BOOTSTRAP_FINISHED\"/\"\"SYSTEM\"\" and wait; epsilon; define cat as locate actor \"Cat\"; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@1 as integer; declare CatObserver@checkBehaviorSatisfied@catY@1 as integer; define CatObserver@checkBehaviorSatisfied@catX@2 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@2 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@1 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@2 as CatObserver@checkBehaviorSatisfied@catX@2 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@2; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@3 as CatObserver@checkBehaviorSatisfied@__tmp_243@2; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@3; epsilon; RETURN; leave atomic; epsilon; broadcast \"__STARTUP\"/\"\"SYSTEM\"\"; epsilon; declare __op_time_283@1 as integer; assume __op_time_283@1 >= 10; assume __op_time_283@1 <= 1000; define __global_time_micros@39 as (__global_time_micros@38 + __op_time_283@1); define Cat@stepsLeft@2 as 6; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@3 as integer; declare CatObserver@checkBehaviorSatisfied@catY@3 as integer; define CatObserver@checkBehaviorSatisfied@catX@4 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@4 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@4 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@5 as CatObserver@checkBehaviorSatisfied@catX@4 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@5; epsilon; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@5; epsilon; RETURN; leave atomic; epsilon; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@6 as CatObserver@checkBehaviorSatisfied@__tmp_243@5; declare __op_time_287@1 as integer; assume __op_time_287@1 >= 10; assume __op_time_287@1 <= 1000; define __global_time_micros@40 as (__global_time_micros@39 + __op_time_287@1); assume not Cat@stepsLeft@2 = 0; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@5 as integer; declare CatObserver@checkBehaviorSatisfied@catY@5 as integer; define CatObserver@checkBehaviorSatisfied@catX@6 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@6 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@7 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@8 as CatObserver@checkBehaviorSatisfied@catX@6 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@8; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@9 as CatObserver@checkBehaviorSatisfied@__tmp_243@8; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@9; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_234@1 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@7 as integer; declare CatObserver@checkBehaviorSatisfied@catY@7 as integer; define CatObserver@checkBehaviorSatisfied@catX@8 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@8 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@10 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@11 as CatObserver@checkBehaviorSatisfied@catX@8 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@11; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@12 as CatObserver@checkBehaviorSatisfied@__tmp_243@11; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@12; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_235@1 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@9 as integer; declare CatObserver@checkBehaviorSatisfied@catY@9 as integer; define CatObserver@checkBehaviorSatisfied@catX@10 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@10 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@13 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@14 as CatObserver@checkBehaviorSatisfied@catX@10 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@14; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@15 as CatObserver@checkBehaviorSatisfied@__tmp_243@14; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@15; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 560
+    },
+    {
+      "id": 284,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 6,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -209,
+            "y": 149,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 570,
+      "actionLabel": "define Cat@script233@__tmp_235@2 as keyPressedByCodeNondet(Cat@KEY_UP@2); declare Cat@keyPressedByCodeNondet@key@1 as integer; declare __op_time_290@1 as integer; assume __op_time_290@1 >= 10; assume __op_time_290@1 <= 1000; define __global_time_micros@41 as (__global_time_micros@40 + __op_time_290@1); define Cat@keyPressedByCodeNondet@key@2 as Cat@KEY_UP@2; enter atomic",
+      "action": "KEY_UP",
+      "keyPressed": 38
+    },
+    {
+      "id": 396,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 6,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -209,
+            "y": 149,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 700,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@1 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@1 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@2 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@1 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@3 as Cat@keyPressedNondet@result@1; leave atomic; define Cat@keyPressedByCodeNondet@result@2 as Cat@keyPressedByCodeNondet@__tmp_146@3 = Cat@keyPressedByCodeNondet@key@2; RETURN; define Cat@script233@__tmp_235@3 as Cat@keyPressedByCodeNondet@result@2; declare __op_time_291@1 as integer; assume __op_time_291@1 >= 100; assume __op_time_291@1 <= 10000; define __global_time_micros@42 as (__global_time_micros@41 + __op_time_291@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@11 as integer; declare CatObserver@checkBehaviorSatisfied@catY@11 as integer; define CatObserver@checkBehaviorSatisfied@catX@12 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@12 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@16 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@17 as CatObserver@checkBehaviorSatisfied@catX@12 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@17; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@18 as CatObserver@checkBehaviorSatisfied@__tmp_243@17; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@18; epsilon; RETURN; leave atomic; epsilon; declare __op_time_292@1 as integer; assume __op_time_292@1 >= 10; assume __op_time_292@1 <= 1000; define __global_time_micros@43 as (__global_time_micros@42 + __op_time_292@1); define Cat@script233@__tmp_234@2 as Cat@script233@__tmp_235@3; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@13 as integer; declare CatObserver@checkBehaviorSatisfied@catY@13 as integer; define CatObserver@checkBehaviorSatisfied@catX@14 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@14 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@19 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@20 as CatObserver@checkBehaviorSatisfied@catX@14 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@20; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@21 as CatObserver@checkBehaviorSatisfied@__tmp_243@20; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@21; epsilon; RETURN; leave atomic; epsilon; declare __op_time_294@1 as integer; assume __op_time_294@1 >= 10; assume __op_time_294@1 <= 1000; define __global_time_micros@44 as (__global_time_micros@43 + __op_time_294@1); assume not Cat@script233@__tmp_234@2; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@15 as integer; declare CatObserver@checkBehaviorSatisfied@catY@15 as integer; define CatObserver@checkBehaviorSatisfied@catX@16 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@16 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@22 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@23 as CatObserver@checkBehaviorSatisfied@catX@16 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@23; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@24 as CatObserver@checkBehaviorSatisfied@__tmp_243@23; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@24; epsilon; RETURN; leave atomic; epsilon; epsilon; epsilon; declare __op_time_299@1 as integer; assume __op_time_299@1 >= 10; assume __op_time_299@1 <= 1000; define __global_time_micros@46 as (__global_time_micros@45 + __op_time_299@1); assume not Cat@script233@__tmp_234@3; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@19 as integer; declare CatObserver@checkBehaviorSatisfied@catY@19 as integer; define CatObserver@checkBehaviorSatisfied@catX@20 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@20 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@28 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@29 as CatObserver@checkBehaviorSatisfied@catX@20 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@29; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@30 as CatObserver@checkBehaviorSatisfied@__tmp_243@29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@30; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_236@1 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@21 as integer; declare CatObserver@checkBehaviorSatisfied@catY@21 as integer; define CatObserver@checkBehaviorSatisfied@catX@22 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@22 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@31 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@32 as CatObserver@checkBehaviorSatisfied@catX@22 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@32; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@33 as CatObserver@checkBehaviorSatisfied@__tmp_243@32; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@33; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_237@1 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@23 as integer; declare CatObserver@checkBehaviorSatisfied@catY@23 as integer; define CatObserver@checkBehaviorSatisfied@catX@24 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@24 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@34 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@35 as CatObserver@checkBehaviorSatisfied@catX@24 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@35; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@36 as CatObserver@checkBehaviorSatisfied@__tmp_243@35; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@36; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 130
+    },
+    {
+      "id": 397,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 6,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -209,
+            "y": 149,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 710,
+      "actionLabel": "define Cat@script233@__tmp_237@2 as keyPressedByCodeNondet(Cat@KEY_DOWN@2); declare Cat@keyPressedByCodeNondet@key@3 as integer; declare __op_time_308@1 as integer; assume __op_time_308@1 >= 10; assume __op_time_308@1 <= 1000; define __global_time_micros@47 as (__global_time_micros@46 + __op_time_308@1); define Cat@keyPressedByCodeNondet@key@4 as Cat@KEY_DOWN@2; enter atomic",
+      "action": "KEY_DOWN",
+      "keyPressed": 40
+    },
+    {
+      "id": 509,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 6,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -209,
+            "y": 149,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 850,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@3 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@4 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@5 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@2 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@6 as Cat@keyPressedNondet@result@2; leave atomic; define Cat@keyPressedByCodeNondet@result@4 as Cat@keyPressedByCodeNondet@__tmp_146@6 = Cat@keyPressedByCodeNondet@key@4; RETURN; define Cat@script233@__tmp_237@3 as Cat@keyPressedByCodeNondet@result@4; declare __op_time_309@1 as integer; assume __op_time_309@1 >= 100; assume __op_time_309@1 <= 10000; define __global_time_micros@48 as (__global_time_micros@47 + __op_time_309@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@25 as integer; declare CatObserver@checkBehaviorSatisfied@catY@25 as integer; define CatObserver@checkBehaviorSatisfied@catX@26 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@26 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@37 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@38 as CatObserver@checkBehaviorSatisfied@catX@26 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@38; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@39 as CatObserver@checkBehaviorSatisfied@__tmp_243@38; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@39; epsilon; RETURN; leave atomic; epsilon; declare __op_time_310@1 as integer; assume __op_time_310@1 >= 10; assume __op_time_310@1 <= 1000; define __global_time_micros@49 as (__global_time_micros@48 + __op_time_310@1); define Cat@script233@__tmp_236@2 as Cat@script233@__tmp_237@3; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@27 as integer; declare CatObserver@checkBehaviorSatisfied@catY@27 as integer; define CatObserver@checkBehaviorSatisfied@catX@28 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@28 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@40 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@41 as CatObserver@checkBehaviorSatisfied@catX@28 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@41; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@42 as CatObserver@checkBehaviorSatisfied@__tmp_243@41; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@42; epsilon; RETURN; leave atomic; epsilon; declare __op_time_312@1 as integer; assume __op_time_312@1 >= 10; assume __op_time_312@1 <= 1000; define __global_time_micros@50 as (__global_time_micros@49 + __op_time_312@1); assume not Cat@script233@__tmp_236@2; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@29 as integer; declare CatObserver@checkBehaviorSatisfied@catY@29 as integer; define CatObserver@checkBehaviorSatisfied@catX@30 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@30 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@43 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@44 as CatObserver@checkBehaviorSatisfied@catX@30 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@44; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@45 as CatObserver@checkBehaviorSatisfied@__tmp_243@44; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@45; epsilon; RETURN; leave atomic; epsilon; epsilon; epsilon; declare __op_time_317@1 as integer; assume __op_time_317@1 >= 10; assume __op_time_317@1 <= 1000; define __global_time_micros@52 as (__global_time_micros@51 + __op_time_317@1); assume not Cat@script233@__tmp_236@3; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@33 as integer; declare CatObserver@checkBehaviorSatisfied@catY@33 as integer; define CatObserver@checkBehaviorSatisfied@catX@34 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@34 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@49 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@50 as CatObserver@checkBehaviorSatisfied@catX@34 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@50; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@51 as CatObserver@checkBehaviorSatisfied@__tmp_243@50; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@51; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_238@1 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@35 as integer; declare CatObserver@checkBehaviorSatisfied@catY@35 as integer; define CatObserver@checkBehaviorSatisfied@catX@36 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@36 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@52 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@53 as CatObserver@checkBehaviorSatisfied@catX@36 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@53; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@54 as CatObserver@checkBehaviorSatisfied@__tmp_243@53; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@54; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_239@1 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@37 as integer; declare CatObserver@checkBehaviorSatisfied@catY@37 as integer; define CatObserver@checkBehaviorSatisfied@catX@38 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@38 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@55 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@56 as CatObserver@checkBehaviorSatisfied@catX@38 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@56; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@57 as CatObserver@checkBehaviorSatisfied@__tmp_243@56; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@57; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 140
+    },
+    {
+      "id": 510,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 6,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -209,
+            "y": 149,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 860,
+      "actionLabel": "define Cat@script233@__tmp_239@2 as keyPressedByCodeNondet(Cat@KEY_RIGHT@2); declare Cat@keyPressedByCodeNondet@key@5 as integer; declare __op_time_326@1 as integer; assume __op_time_326@1 >= 10; assume __op_time_326@1 <= 1000; define __global_time_micros@53 as (__global_time_micros@52 + __op_time_326@1); define Cat@keyPressedByCodeNondet@key@6 as Cat@KEY_RIGHT@2; enter atomic",
+      "action": "KEY_DOWN",
+      "keyPressed": 39
+    },
+    {
+      "id": 707,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 5,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -209,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 1000881,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@5 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@7 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@8 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@3 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@9 as Cat@keyPressedNondet@result@3; leave atomic; define Cat@keyPressedByCodeNondet@result@6 as Cat@keyPressedByCodeNondet@__tmp_146@9 = Cat@keyPressedByCodeNondet@key@6; RETURN; define Cat@script233@__tmp_239@3 as Cat@keyPressedByCodeNondet@result@6; declare __op_time_327@1 as integer; assume __op_time_327@1 >= 100; assume __op_time_327@1 <= 10000; define __global_time_micros@54 as (__global_time_micros@53 + __op_time_327@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@39 as integer; declare CatObserver@checkBehaviorSatisfied@catY@39 as integer; define CatObserver@checkBehaviorSatisfied@catX@40 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@40 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@58 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@59 as CatObserver@checkBehaviorSatisfied@catX@40 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@59; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@60 as CatObserver@checkBehaviorSatisfied@__tmp_243@59; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@60; epsilon; RETURN; leave atomic; epsilon; declare __op_time_332@1 as integer; assume __op_time_332@1 >= 10; assume __op_time_332@1 <= 1000; define __global_time_micros@55 as (__global_time_micros@54 + __op_time_332@1); define Cat@script233@__tmp_238@2 as Cat@script233@__tmp_239@3; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@41 as integer; declare CatObserver@checkBehaviorSatisfied@catY@41 as integer; define CatObserver@checkBehaviorSatisfied@catX@42 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@42 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@61 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@62 as CatObserver@checkBehaviorSatisfied@catX@42 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@62; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@63 as CatObserver@checkBehaviorSatisfied@__tmp_243@62; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@63; epsilon; RETURN; leave atomic; epsilon; declare __op_time_335@1 as integer; assume __op_time_335@1 >= 10; assume __op_time_335@1 <= 1000; define __global_time_micros@56 as (__global_time_micros@55 + __op_time_335@1); assume Cat@script233@__tmp_238@2; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@43 as integer; declare CatObserver@checkBehaviorSatisfied@catY@43 as integer; define CatObserver@checkBehaviorSatisfied@catX@44 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@44 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@64 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@65 as CatObserver@checkBehaviorSatisfied@catX@44 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@65; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@66 as CatObserver@checkBehaviorSatisfied@__tmp_243@65; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@66; epsilon; RETURN; leave atomic; epsilon; declare __op_time_337@1 as integer; assume __op_time_337@1 >= 10; assume __op_time_337@1 <= 1000; define __global_time_micros@57 as (__global_time_micros@56 + __op_time_337@1); define Cat@script233@__tmp_238@3 as not Cat@x@2 = 211; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@45 as integer; declare CatObserver@checkBehaviorSatisfied@catY@45 as integer; define CatObserver@checkBehaviorSatisfied@catX@46 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@46 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@67 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@68 as CatObserver@checkBehaviorSatisfied@catX@46 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@68; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@69 as CatObserver@checkBehaviorSatisfied@__tmp_243@68; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@69; epsilon; RETURN; leave atomic; epsilon; epsilon; declare __op_time_342@1 as integer; assume __op_time_342@1 >= 10; assume __op_time_342@1 <= 1000; define __global_time_micros@58 as (__global_time_micros@57 + __op_time_342@1); assume Cat@script233@__tmp_238@3; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@47 as integer; declare CatObserver@checkBehaviorSatisfied@catY@47 as integer; define CatObserver@checkBehaviorSatisfied@catX@48 as Cat@x@2; define CatObserver@checkBehaviorSatisfied@catY@48 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@70 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@71 as CatObserver@checkBehaviorSatisfied@catX@48 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@71; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@72 as CatObserver@checkBehaviorSatisfied@__tmp_243@71; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@72; epsilon; RETURN; leave atomic; epsilon; declare __op_time_345@1 as integer; assume __op_time_345@1 >= 10; assume __op_time_345@1 <= 1000; define __global_time_micros@59 as (__global_time_micros@58 + __op_time_345@1); define Cat@x@3 as (Cat@x@2 + 60); epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@49 as integer; declare CatObserver@checkBehaviorSatisfied@catY@49 as integer; define CatObserver@checkBehaviorSatisfied@catX@50 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@50 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@73 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@74 as CatObserver@checkBehaviorSatisfied@catX@50 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@74; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@75 as CatObserver@checkBehaviorSatisfied@__tmp_243@74; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@75; epsilon; RETURN; leave atomic; epsilon; declare __op_time_348@1 as integer; assume __op_time_348@1 >= 10; assume __op_time_348@1 <= 1000; define __global_time_micros@60 as (__global_time_micros@59 + __op_time_348@1); define Cat@stepsLeft@3 as Cat@stepsLeft@2 - 1; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@51 as integer; declare CatObserver@checkBehaviorSatisfied@catY@51 as integer; define CatObserver@checkBehaviorSatisfied@catX@52 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@52 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@76 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@77 as CatObserver@checkBehaviorSatisfied@catX@52 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@77; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@78 as CatObserver@checkBehaviorSatisfied@__tmp_243@77; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@78; epsilon; RETURN; leave atomic; epsilon; _RUNTIME_waitSeconds(1); define __wait_until_micros@2 as _RUNTIME_micros(); define __wait_until_micros@3 as __global_time_micros@60; declare __op_time_353@1 as integer; assume __op_time_353@1 >= 10; assume __op_time_353@1 <= 1000; define __global_time_micros@61 as (__global_time_micros@60 + __op_time_353@1); define __wait_until_micros@4 as (__wait_until_micros@3 + 1 * 1000000); declare __op_time_354@1 as integer; assume __op_time_354@1 >= 10; assume __op_time_354@1 <= 1000; define __global_time_micros@62 as (__global_time_micros@61 + __op_time_354@1); define __global_time_micros@63 as (__wait_until_micros@4 + 1); epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@53 as integer; declare CatObserver@checkBehaviorSatisfied@catY@53 as integer; define CatObserver@checkBehaviorSatisfied@catX@54 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@54 as Cat@y@2; declare CatObserver@checkBehaviorSatisfied@__tmp_243@79 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@80 as CatObserver@checkBehaviorSatisfied@catX@54 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@80; epsilon; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@80; epsilon; RETURN; leave atomic; epsilon; epsilon; declare __op_time_380@1 as integer; assume __op_time_380@1 >= 10; assume __op_time_380@1 <= 1000; define __global_time_micros@65 as (__global_time_micros@64 + __op_time_380@1); assume not Cat@stepsLeft@3 = 0; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@63 as integer; declare CatObserver@checkBehaviorSatisfied@catY@63 as integer; define CatObserver@checkBehaviorSatisfied@catX@64 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@64 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@94 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@95 as CatObserver@checkBehaviorSatisfied@catX@64 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@95; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@96 as CatObserver@checkBehaviorSatisfied@__tmp_243@95; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@96; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_234@4 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@65 as integer; declare CatObserver@checkBehaviorSatisfied@catY@65 as integer; define CatObserver@checkBehaviorSatisfied@catX@66 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@66 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@97 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@98 as CatObserver@checkBehaviorSatisfied@catX@66 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@98; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@99 as CatObserver@checkBehaviorSatisfied@__tmp_243@98; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@99; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_235@4 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@67 as integer; declare CatObserver@checkBehaviorSatisfied@catY@67 as integer; define CatObserver@checkBehaviorSatisfied@catX@68 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@68 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@100 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@101 as CatObserver@checkBehaviorSatisfied@catX@68 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@101; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@102 as CatObserver@checkBehaviorSatisfied@__tmp_243@101; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@102; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 1000021
+    },
+    {
+      "id": 708,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 5,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -209,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 1000891,
+      "actionLabel": "define Cat@script233@__tmp_235@5 as keyPressedByCodeNondet(Cat@KEY_UP@2); declare Cat@keyPressedByCodeNondet@key@9 as integer; declare __op_time_390@1 as integer; assume __op_time_390@1 >= 10; assume __op_time_390@1 <= 1000; define __global_time_micros@66 as (__global_time_micros@65 + __op_time_390@1); define Cat@keyPressedByCodeNondet@key@10 as Cat@KEY_UP@2; enter atomic",
+      "action": "KEY_UP",
+      "keyPressed": 38
+    },
+    {
+      "id": 836,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 5,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -209,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 1001021,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@9 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@13 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@14 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@5 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@15 as Cat@keyPressedNondet@result@5; leave atomic; define Cat@keyPressedByCodeNondet@result@10 as Cat@keyPressedByCodeNondet@__tmp_146@15 = Cat@keyPressedByCodeNondet@key@10; RETURN; define Cat@script233@__tmp_235@6 as Cat@keyPressedByCodeNondet@result@10; declare __op_time_391@1 as integer; assume __op_time_391@1 >= 100; assume __op_time_391@1 <= 10000; define __global_time_micros@67 as (__global_time_micros@66 + __op_time_391@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@69 as integer; declare CatObserver@checkBehaviorSatisfied@catY@69 as integer; define CatObserver@checkBehaviorSatisfied@catX@70 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@70 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@103 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@104 as CatObserver@checkBehaviorSatisfied@catX@70 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@104; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@105 as CatObserver@checkBehaviorSatisfied@__tmp_243@104; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@105; epsilon; RETURN; leave atomic; epsilon; declare __op_time_392@1 as integer; assume __op_time_392@1 >= 10; assume __op_time_392@1 <= 1000; define __global_time_micros@68 as (__global_time_micros@67 + __op_time_392@1); define Cat@script233@__tmp_234@5 as Cat@script233@__tmp_235@6; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@71 as integer; declare CatObserver@checkBehaviorSatisfied@catY@71 as integer; define CatObserver@checkBehaviorSatisfied@catX@72 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@72 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@106 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@107 as CatObserver@checkBehaviorSatisfied@catX@72 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@107; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@108 as CatObserver@checkBehaviorSatisfied@__tmp_243@107; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@108; epsilon; RETURN; leave atomic; epsilon; declare __op_time_393@1 as integer; assume __op_time_393@1 >= 10; assume __op_time_393@1 <= 1000; define __global_time_micros@69 as (__global_time_micros@68 + __op_time_393@1); assume Cat@script233@__tmp_234@5; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@73 as integer; declare CatObserver@checkBehaviorSatisfied@catY@73 as integer; define CatObserver@checkBehaviorSatisfied@catX@74 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@74 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@109 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@110 as CatObserver@checkBehaviorSatisfied@catX@74 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@110; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@111 as CatObserver@checkBehaviorSatisfied@__tmp_243@110; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@111; epsilon; RETURN; leave atomic; epsilon; declare __op_time_395@1 as integer; assume __op_time_395@1 >= 10; assume __op_time_395@1 <= 1000; define __global_time_micros@70 as (__global_time_micros@69 + __op_time_395@1); define Cat@script233@__tmp_234@6 as not Cat@y@3 = 149; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@75 as integer; declare CatObserver@checkBehaviorSatisfied@catY@75 as integer; define CatObserver@checkBehaviorSatisfied@catX@76 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@76 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@112 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@113 as CatObserver@checkBehaviorSatisfied@catX@76 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@113; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@114 as CatObserver@checkBehaviorSatisfied@__tmp_243@113; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@114; epsilon; RETURN; leave atomic; epsilon; epsilon; declare __op_time_399@1 as integer; assume __op_time_399@1 >= 10; assume __op_time_399@1 <= 1000; define __global_time_micros@71 as (__global_time_micros@70 + __op_time_399@1); assume not Cat@script233@__tmp_234@6; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@77 as integer; declare CatObserver@checkBehaviorSatisfied@catY@77 as integer; define CatObserver@checkBehaviorSatisfied@catX@78 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@78 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@115 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@116 as CatObserver@checkBehaviorSatisfied@catX@78 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@116; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@117 as CatObserver@checkBehaviorSatisfied@__tmp_243@116; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@117; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_236@4 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@79 as integer; declare CatObserver@checkBehaviorSatisfied@catY@79 as integer; define CatObserver@checkBehaviorSatisfied@catX@80 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@80 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@118 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@119 as CatObserver@checkBehaviorSatisfied@catX@80 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@119; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@120 as CatObserver@checkBehaviorSatisfied@__tmp_243@119; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@120; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_237@4 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@81 as integer; declare CatObserver@checkBehaviorSatisfied@catY@81 as integer; define CatObserver@checkBehaviorSatisfied@catX@82 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@82 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@121 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@122 as CatObserver@checkBehaviorSatisfied@catX@82 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@122; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@123 as CatObserver@checkBehaviorSatisfied@__tmp_243@122; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@123; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 130
+    },
+    {
+      "id": 837,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 5,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -209,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 1001031,
+      "actionLabel": "define Cat@script233@__tmp_237@5 as keyPressedByCodeNondet(Cat@KEY_DOWN@2); declare Cat@keyPressedByCodeNondet@key@11 as integer; declare __op_time_408@1 as integer; assume __op_time_408@1 >= 10; assume __op_time_408@1 <= 1000; define __global_time_micros@72 as (__global_time_micros@71 + __op_time_408@1); define Cat@keyPressedByCodeNondet@key@12 as Cat@KEY_DOWN@2; enter atomic",
+      "action": "KEY_UP",
+      "keyPressed": 40
+    },
+    {
+      "id": 1034,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 4,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -149,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 2001342,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@11 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@16 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@17 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@6 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@18 as Cat@keyPressedNondet@result@6; leave atomic; define Cat@keyPressedByCodeNondet@result@12 as Cat@keyPressedByCodeNondet@__tmp_146@18 = Cat@keyPressedByCodeNondet@key@12; RETURN; define Cat@script233@__tmp_237@6 as Cat@keyPressedByCodeNondet@result@12; declare __op_time_409@1 as integer; assume __op_time_409@1 >= 100; assume __op_time_409@1 <= 10000; define __global_time_micros@73 as (__global_time_micros@72 + __op_time_409@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@83 as integer; declare CatObserver@checkBehaviorSatisfied@catY@83 as integer; define CatObserver@checkBehaviorSatisfied@catX@84 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@84 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@124 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@125 as CatObserver@checkBehaviorSatisfied@catX@84 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@125; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@126 as CatObserver@checkBehaviorSatisfied@__tmp_243@125; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@126; epsilon; RETURN; leave atomic; epsilon; declare __op_time_414@1 as integer; assume __op_time_414@1 >= 10; assume __op_time_414@1 <= 1000; define __global_time_micros@74 as (__global_time_micros@73 + __op_time_414@1); define Cat@script233@__tmp_236@5 as Cat@script233@__tmp_237@6; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@85 as integer; declare CatObserver@checkBehaviorSatisfied@catY@85 as integer; define CatObserver@checkBehaviorSatisfied@catX@86 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@86 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@127 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@128 as CatObserver@checkBehaviorSatisfied@catX@86 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@128; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@129 as CatObserver@checkBehaviorSatisfied@__tmp_243@128; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@129; epsilon; RETURN; leave atomic; epsilon; declare __op_time_417@1 as integer; assume __op_time_417@1 >= 10; assume __op_time_417@1 <= 1000; define __global_time_micros@75 as (__global_time_micros@74 + __op_time_417@1); assume Cat@script233@__tmp_236@5; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@87 as integer; declare CatObserver@checkBehaviorSatisfied@catY@87 as integer; define CatObserver@checkBehaviorSatisfied@catX@88 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@88 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@130 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@131 as CatObserver@checkBehaviorSatisfied@catX@88 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@131; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@132 as CatObserver@checkBehaviorSatisfied@__tmp_243@131; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@132; epsilon; RETURN; leave atomic; epsilon; declare __op_time_419@1 as integer; assume __op_time_419@1 >= 10; assume __op_time_419@1 <= 1000; define __global_time_micros@76 as (__global_time_micros@75 + __op_time_419@1); define Cat@script233@__tmp_236@6 as not Cat@y@3 = 0 - 151; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@89 as integer; declare CatObserver@checkBehaviorSatisfied@catY@89 as integer; define CatObserver@checkBehaviorSatisfied@catX@90 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@90 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@133 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@134 as CatObserver@checkBehaviorSatisfied@catX@90 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@134; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@135 as CatObserver@checkBehaviorSatisfied@__tmp_243@134; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@135; epsilon; RETURN; leave atomic; epsilon; epsilon; declare __op_time_424@1 as integer; assume __op_time_424@1 >= 10; assume __op_time_424@1 <= 1000; define __global_time_micros@77 as (__global_time_micros@76 + __op_time_424@1); assume Cat@script233@__tmp_236@6; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@91 as integer; declare CatObserver@checkBehaviorSatisfied@catY@91 as integer; define CatObserver@checkBehaviorSatisfied@catX@92 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@92 as Cat@y@3; declare CatObserver@checkBehaviorSatisfied@__tmp_243@136 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@137 as CatObserver@checkBehaviorSatisfied@catX@92 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@137; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@138 as CatObserver@checkBehaviorSatisfied@__tmp_243@137; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@138; epsilon; RETURN; leave atomic; epsilon; declare __op_time_427@1 as integer; assume __op_time_427@1 >= 10; assume __op_time_427@1 <= 1000; define __global_time_micros@78 as (__global_time_micros@77 + __op_time_427@1); define Cat@y@4 as Cat@y@3 - 60; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@93 as integer; declare CatObserver@checkBehaviorSatisfied@catY@93 as integer; define CatObserver@checkBehaviorSatisfied@catX@94 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@94 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@139 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@140 as CatObserver@checkBehaviorSatisfied@catX@94 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@140; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@141 as CatObserver@checkBehaviorSatisfied@__tmp_243@140; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@141; epsilon; RETURN; leave atomic; epsilon; declare __op_time_430@1 as integer; assume __op_time_430@1 >= 10; assume __op_time_430@1 <= 1000; define __global_time_micros@79 as (__global_time_micros@78 + __op_time_430@1); define Cat@stepsLeft@4 as Cat@stepsLeft@3 - 1; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@95 as integer; declare CatObserver@checkBehaviorSatisfied@catY@95 as integer; define CatObserver@checkBehaviorSatisfied@catX@96 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@96 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@142 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@143 as CatObserver@checkBehaviorSatisfied@catX@96 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@143; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@144 as CatObserver@checkBehaviorSatisfied@__tmp_243@143; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@144; epsilon; RETURN; leave atomic; epsilon; _RUNTIME_waitSeconds(1); define __wait_until_micros@5 as _RUNTIME_micros(); define __wait_until_micros@6 as __global_time_micros@79; declare __op_time_435@1 as integer; assume __op_time_435@1 >= 10; assume __op_time_435@1 <= 1000; define __global_time_micros@80 as (__global_time_micros@79 + __op_time_435@1); define __wait_until_micros@7 as (__wait_until_micros@6 + 1 * 1000000); declare __op_time_436@1 as integer; assume __op_time_436@1 >= 10; assume __op_time_436@1 <= 1000; define __global_time_micros@81 as (__global_time_micros@80 + __op_time_436@1); define __global_time_micros@82 as (__wait_until_micros@7 + 1); epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@97 as integer; declare CatObserver@checkBehaviorSatisfied@catY@97 as integer; define CatObserver@checkBehaviorSatisfied@catX@98 as Cat@x@3; define CatObserver@checkBehaviorSatisfied@catY@98 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@145 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@146 as CatObserver@checkBehaviorSatisfied@catX@98 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@146; epsilon; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@146; epsilon; RETURN; leave atomic; epsilon; epsilon; declare __op_time_509@1 as integer; assume __op_time_509@1 >= 10; assume __op_time_509@1 <= 1000; define __global_time_micros@95 as (__global_time_micros@94 + __op_time_509@1); assume not Cat@stepsLeft@4 = 0; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@127 as integer; declare CatObserver@checkBehaviorSatisfied@catY@127 as integer; define CatObserver@checkBehaviorSatisfied@catX@128 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@128 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@190 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@191 as CatObserver@checkBehaviorSatisfied@catX@128 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@191; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@192 as CatObserver@checkBehaviorSatisfied@__tmp_243@191; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@192; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_234@7 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@129 as integer; declare CatObserver@checkBehaviorSatisfied@catY@129 as integer; define CatObserver@checkBehaviorSatisfied@catX@130 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@130 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@193 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@194 as CatObserver@checkBehaviorSatisfied@catX@130 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@194; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@195 as CatObserver@checkBehaviorSatisfied@__tmp_243@194; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@195; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_235@7 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@131 as integer; declare CatObserver@checkBehaviorSatisfied@catY@131 as integer; define CatObserver@checkBehaviorSatisfied@catX@132 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@132 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@196 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@197 as CatObserver@checkBehaviorSatisfied@catX@132 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@197; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@198 as CatObserver@checkBehaviorSatisfied@__tmp_243@197; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@198; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 1000311
+    },
+    {
+      "id": 1035,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 4,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -149,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 2001352,
+      "actionLabel": "define Cat@script233@__tmp_235@8 as keyPressedByCodeNondet(Cat@KEY_UP@2); declare Cat@keyPressedByCodeNondet@key@17 as integer; declare __op_time_512@1 as integer; assume __op_time_512@1 >= 10; assume __op_time_512@1 <= 1000; define __global_time_micros@96 as (__global_time_micros@95 + __op_time_512@1); define Cat@keyPressedByCodeNondet@key@18 as Cat@KEY_UP@2; enter atomic",
+      "action": "KEY_UP",
+      "keyPressed": 38
+    },
+    {
+      "id": 1147,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 4,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -149,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 2001482,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@17 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@25 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@26 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@9 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@27 as Cat@keyPressedNondet@result@9; leave atomic; define Cat@keyPressedByCodeNondet@result@18 as Cat@keyPressedByCodeNondet@__tmp_146@27 = Cat@keyPressedByCodeNondet@key@18; RETURN; define Cat@script233@__tmp_235@9 as Cat@keyPressedByCodeNondet@result@18; declare __op_time_513@1 as integer; assume __op_time_513@1 >= 100; assume __op_time_513@1 <= 10000; define __global_time_micros@97 as (__global_time_micros@96 + __op_time_513@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@133 as integer; declare CatObserver@checkBehaviorSatisfied@catY@133 as integer; define CatObserver@checkBehaviorSatisfied@catX@134 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@134 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@199 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@200 as CatObserver@checkBehaviorSatisfied@catX@134 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@200; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@201 as CatObserver@checkBehaviorSatisfied@__tmp_243@200; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@201; epsilon; RETURN; leave atomic; epsilon; declare __op_time_514@1 as integer; assume __op_time_514@1 >= 10; assume __op_time_514@1 <= 1000; define __global_time_micros@98 as (__global_time_micros@97 + __op_time_514@1); define Cat@script233@__tmp_234@8 as Cat@script233@__tmp_235@9; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@135 as integer; declare CatObserver@checkBehaviorSatisfied@catY@135 as integer; define CatObserver@checkBehaviorSatisfied@catX@136 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@136 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@202 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@203 as CatObserver@checkBehaviorSatisfied@catX@136 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@203; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@204 as CatObserver@checkBehaviorSatisfied@__tmp_243@203; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@204; epsilon; RETURN; leave atomic; epsilon; declare __op_time_516@1 as integer; assume __op_time_516@1 >= 10; assume __op_time_516@1 <= 1000; define __global_time_micros@99 as (__global_time_micros@98 + __op_time_516@1); assume not Cat@script233@__tmp_234@8; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@137 as integer; declare CatObserver@checkBehaviorSatisfied@catY@137 as integer; define CatObserver@checkBehaviorSatisfied@catX@138 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@138 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@205 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@206 as CatObserver@checkBehaviorSatisfied@catX@138 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@206; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@207 as CatObserver@checkBehaviorSatisfied@__tmp_243@206; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@207; epsilon; RETURN; leave atomic; epsilon; epsilon; epsilon; declare __op_time_521@1 as integer; assume __op_time_521@1 >= 10; assume __op_time_521@1 <= 1000; define __global_time_micros@101 as (__global_time_micros@100 + __op_time_521@1); assume not Cat@script233@__tmp_234@9; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@141 as integer; declare CatObserver@checkBehaviorSatisfied@catY@141 as integer; define CatObserver@checkBehaviorSatisfied@catX@142 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@142 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@211 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@212 as CatObserver@checkBehaviorSatisfied@catX@142 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@212; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@213 as CatObserver@checkBehaviorSatisfied@__tmp_243@212; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@213; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_236@7 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@143 as integer; declare CatObserver@checkBehaviorSatisfied@catY@143 as integer; define CatObserver@checkBehaviorSatisfied@catX@144 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@144 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@214 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@215 as CatObserver@checkBehaviorSatisfied@catX@144 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@215; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@216 as CatObserver@checkBehaviorSatisfied@__tmp_243@215; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@216; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_237@7 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@145 as integer; declare CatObserver@checkBehaviorSatisfied@catY@145 as integer; define CatObserver@checkBehaviorSatisfied@catX@146 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@146 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@217 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@218 as CatObserver@checkBehaviorSatisfied@catX@146 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@218; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@219 as CatObserver@checkBehaviorSatisfied@__tmp_243@218; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@219; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 130
+    },
+    {
+      "id": 1148,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 4,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -149,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 2001492,
+      "actionLabel": "define Cat@script233@__tmp_237@8 as keyPressedByCodeNondet(Cat@KEY_DOWN@2); declare Cat@keyPressedByCodeNondet@key@19 as integer; declare __op_time_530@1 as integer; assume __op_time_530@1 >= 10; assume __op_time_530@1 <= 1000; define __global_time_micros@102 as (__global_time_micros@101 + __op_time_530@1); define Cat@keyPressedByCodeNondet@key@20 as Cat@KEY_DOWN@2; enter atomic",
+      "action": "KEY_UP",
+      "keyPressed": 40
+    },
+    {
+      "id": 1260,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 4,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -149,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 2001622,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@19 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@28 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@29 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@10 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@30 as Cat@keyPressedNondet@result@10; leave atomic; define Cat@keyPressedByCodeNondet@result@20 as Cat@keyPressedByCodeNondet@__tmp_146@30 = Cat@keyPressedByCodeNondet@key@20; RETURN; define Cat@script233@__tmp_237@9 as Cat@keyPressedByCodeNondet@result@20; declare __op_time_531@1 as integer; assume __op_time_531@1 >= 100; assume __op_time_531@1 <= 10000; define __global_time_micros@103 as (__global_time_micros@102 + __op_time_531@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@147 as integer; declare CatObserver@checkBehaviorSatisfied@catY@147 as integer; define CatObserver@checkBehaviorSatisfied@catX@148 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@148 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@220 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@221 as CatObserver@checkBehaviorSatisfied@catX@148 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@221; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@222 as CatObserver@checkBehaviorSatisfied@__tmp_243@221; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@222; epsilon; RETURN; leave atomic; epsilon; declare __op_time_536@1 as integer; assume __op_time_536@1 >= 10; assume __op_time_536@1 <= 1000; define __global_time_micros@104 as (__global_time_micros@103 + __op_time_536@1); define Cat@script233@__tmp_236@8 as Cat@script233@__tmp_237@9; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@149 as integer; declare CatObserver@checkBehaviorSatisfied@catY@149 as integer; define CatObserver@checkBehaviorSatisfied@catX@150 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@150 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@223 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@224 as CatObserver@checkBehaviorSatisfied@catX@150 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@224; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@225 as CatObserver@checkBehaviorSatisfied@__tmp_243@224; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@225; epsilon; RETURN; leave atomic; epsilon; declare __op_time_540@1 as integer; assume __op_time_540@1 >= 10; assume __op_time_540@1 <= 1000; define __global_time_micros@105 as (__global_time_micros@104 + __op_time_540@1); assume not Cat@script233@__tmp_236@8; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@151 as integer; declare CatObserver@checkBehaviorSatisfied@catY@151 as integer; define CatObserver@checkBehaviorSatisfied@catX@152 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@152 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@226 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@227 as CatObserver@checkBehaviorSatisfied@catX@152 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@227; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@228 as CatObserver@checkBehaviorSatisfied@__tmp_243@227; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@228; epsilon; RETURN; leave atomic; epsilon; epsilon; epsilon; declare __op_time_547@1 as integer; assume __op_time_547@1 >= 10; assume __op_time_547@1 <= 1000; define __global_time_micros@107 as (__global_time_micros@106 + __op_time_547@1); assume not Cat@script233@__tmp_236@9; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@155 as integer; declare CatObserver@checkBehaviorSatisfied@catY@155 as integer; define CatObserver@checkBehaviorSatisfied@catX@156 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@156 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@232 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@233 as CatObserver@checkBehaviorSatisfied@catX@156 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@233; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@234 as CatObserver@checkBehaviorSatisfied@__tmp_243@233; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@234; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_238@7 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@157 as integer; declare CatObserver@checkBehaviorSatisfied@catY@157 as integer; define CatObserver@checkBehaviorSatisfied@catX@158 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@158 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@235 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@236 as CatObserver@checkBehaviorSatisfied@catX@158 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@236; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@237 as CatObserver@checkBehaviorSatisfied@__tmp_243@236; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@237; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_239@7 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@159 as integer; declare CatObserver@checkBehaviorSatisfied@catY@159 as integer; define CatObserver@checkBehaviorSatisfied@catX@160 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@160 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@238 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@239 as CatObserver@checkBehaviorSatisfied@catX@160 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@239; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@240 as CatObserver@checkBehaviorSatisfied@__tmp_243@239; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@240; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 130
+    },
+    {
+      "id": 1261,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 4,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -149,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 2001632,
+      "actionLabel": "define Cat@script233@__tmp_239@8 as keyPressedByCodeNondet(Cat@KEY_RIGHT@2); declare Cat@keyPressedByCodeNondet@key@21 as integer; declare __op_time_562@1 as integer; assume __op_time_562@1 >= 10; assume __op_time_562@1 <= 1000; define __global_time_micros@108 as (__global_time_micros@107 + __op_time_562@1); define Cat@keyPressedByCodeNondet@key@22 as Cat@KEY_RIGHT@2; enter atomic",
+      "action": "KEY_DOWN",
+      "keyPressed": 39
+    },
+    {
+      "id": 1458,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 3,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -89,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 3001803,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@21 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@31 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@32 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@11 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@33 as Cat@keyPressedNondet@result@11; leave atomic; define Cat@keyPressedByCodeNondet@result@22 as Cat@keyPressedByCodeNondet@__tmp_146@33 = Cat@keyPressedByCodeNondet@key@22; RETURN; define Cat@script233@__tmp_239@9 as Cat@keyPressedByCodeNondet@result@22; declare __op_time_563@1 as integer; assume __op_time_563@1 >= 100; assume __op_time_563@1 <= 10000; define __global_time_micros@109 as (__global_time_micros@108 + __op_time_563@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@161 as integer; declare CatObserver@checkBehaviorSatisfied@catY@161 as integer; define CatObserver@checkBehaviorSatisfied@catX@162 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@162 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@241 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@242 as CatObserver@checkBehaviorSatisfied@catX@162 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@242; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@243 as CatObserver@checkBehaviorSatisfied@__tmp_243@242; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@243; epsilon; RETURN; leave atomic; epsilon; declare __op_time_570@1 as integer; assume __op_time_570@1 >= 10; assume __op_time_570@1 <= 1000; define __global_time_micros@110 as (__global_time_micros@109 + __op_time_570@1); define Cat@script233@__tmp_238@8 as Cat@script233@__tmp_239@9; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@163 as integer; declare CatObserver@checkBehaviorSatisfied@catY@163 as integer; define CatObserver@checkBehaviorSatisfied@catX@164 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@164 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@244 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@245 as CatObserver@checkBehaviorSatisfied@catX@164 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@245; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@246 as CatObserver@checkBehaviorSatisfied@__tmp_243@245; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@246; epsilon; RETURN; leave atomic; epsilon; declare __op_time_573@1 as integer; assume __op_time_573@1 >= 10; assume __op_time_573@1 <= 1000; define __global_time_micros@111 as (__global_time_micros@110 + __op_time_573@1); assume Cat@script233@__tmp_238@8; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@165 as integer; declare CatObserver@checkBehaviorSatisfied@catY@165 as integer; define CatObserver@checkBehaviorSatisfied@catX@166 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@166 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@247 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@248 as CatObserver@checkBehaviorSatisfied@catX@166 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@248; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@249 as CatObserver@checkBehaviorSatisfied@__tmp_243@248; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@249; epsilon; RETURN; leave atomic; epsilon; declare __op_time_575@1 as integer; assume __op_time_575@1 >= 10; assume __op_time_575@1 <= 1000; define __global_time_micros@112 as (__global_time_micros@111 + __op_time_575@1); define Cat@script233@__tmp_238@9 as not Cat@x@4 = 211; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@167 as integer; declare CatObserver@checkBehaviorSatisfied@catY@167 as integer; define CatObserver@checkBehaviorSatisfied@catX@168 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@168 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@250 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@251 as CatObserver@checkBehaviorSatisfied@catX@168 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@251; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@252 as CatObserver@checkBehaviorSatisfied@__tmp_243@251; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@252; epsilon; RETURN; leave atomic; epsilon; epsilon; declare __op_time_580@1 as integer; assume __op_time_580@1 >= 10; assume __op_time_580@1 <= 1000; define __global_time_micros@113 as (__global_time_micros@112 + __op_time_580@1); assume Cat@script233@__tmp_238@9; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@169 as integer; declare CatObserver@checkBehaviorSatisfied@catY@169 as integer; define CatObserver@checkBehaviorSatisfied@catX@170 as Cat@x@4; define CatObserver@checkBehaviorSatisfied@catY@170 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@253 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@254 as CatObserver@checkBehaviorSatisfied@catX@170 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@254; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@255 as CatObserver@checkBehaviorSatisfied@__tmp_243@254; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@255; epsilon; RETURN; leave atomic; epsilon; declare __op_time_583@1 as integer; assume __op_time_583@1 >= 10; assume __op_time_583@1 <= 1000; define __global_time_micros@114 as (__global_time_micros@113 + __op_time_583@1); define Cat@x@5 as (Cat@x@4 + 60); epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@171 as integer; declare CatObserver@checkBehaviorSatisfied@catY@171 as integer; define CatObserver@checkBehaviorSatisfied@catX@172 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@172 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@256 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@257 as CatObserver@checkBehaviorSatisfied@catX@172 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@257; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@258 as CatObserver@checkBehaviorSatisfied@__tmp_243@257; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@258; epsilon; RETURN; leave atomic; epsilon; declare __op_time_586@1 as integer; assume __op_time_586@1 >= 10; assume __op_time_586@1 <= 1000; define __global_time_micros@115 as (__global_time_micros@114 + __op_time_586@1); define Cat@stepsLeft@5 as Cat@stepsLeft@4 - 1; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@173 as integer; declare CatObserver@checkBehaviorSatisfied@catY@173 as integer; define CatObserver@checkBehaviorSatisfied@catX@174 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@174 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@259 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@260 as CatObserver@checkBehaviorSatisfied@catX@174 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@260; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@261 as CatObserver@checkBehaviorSatisfied@__tmp_243@260; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@261; epsilon; RETURN; leave atomic; epsilon; _RUNTIME_waitSeconds(1); define __wait_until_micros@8 as _RUNTIME_micros(); define __wait_until_micros@9 as __global_time_micros@115; declare __op_time_591@1 as integer; assume __op_time_591@1 >= 10; assume __op_time_591@1 <= 1000; define __global_time_micros@116 as (__global_time_micros@115 + __op_time_591@1); define __wait_until_micros@10 as (__wait_until_micros@9 + 1 * 1000000); declare __op_time_592@1 as integer; assume __op_time_592@1 >= 10; assume __op_time_592@1 <= 1000; define __global_time_micros@117 as (__global_time_micros@116 + __op_time_592@1); define __global_time_micros@118 as (__wait_until_micros@10 + 1); epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@175 as integer; declare CatObserver@checkBehaviorSatisfied@catY@175 as integer; define CatObserver@checkBehaviorSatisfied@catX@176 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@176 as Cat@y@4; declare CatObserver@checkBehaviorSatisfied@__tmp_243@262 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@263 as CatObserver@checkBehaviorSatisfied@catX@176 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@263; epsilon; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@263; epsilon; RETURN; leave atomic; epsilon; epsilon; declare __op_time_631@1 as integer; assume __op_time_631@1 >= 10; assume __op_time_631@1 <= 1000; define __global_time_micros@125 as (__global_time_micros@124 + __op_time_631@1); assume not Cat@stepsLeft@5 = 0; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@191 as integer; declare CatObserver@checkBehaviorSatisfied@catY@191 as integer; define CatObserver@checkBehaviorSatisfied@catX@192 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@192 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@286 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@287 as CatObserver@checkBehaviorSatisfied@catX@192 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@287; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@288 as CatObserver@checkBehaviorSatisfied@__tmp_243@287; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@288; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_234@10 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@193 as integer; declare CatObserver@checkBehaviorSatisfied@catY@193 as integer; define CatObserver@checkBehaviorSatisfied@catX@194 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@194 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@289 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@290 as CatObserver@checkBehaviorSatisfied@catX@194 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@290; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@291 as CatObserver@checkBehaviorSatisfied@__tmp_243@290; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@291; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_235@10 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@195 as integer; declare CatObserver@checkBehaviorSatisfied@catY@195 as integer; define CatObserver@checkBehaviorSatisfied@catX@196 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@196 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@292 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@293 as CatObserver@checkBehaviorSatisfied@catX@196 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@293; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@294 as CatObserver@checkBehaviorSatisfied@__tmp_243@293; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@294; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 1000171
+    },
+    {
+      "id": 1459,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 3,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -89,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 3001813,
+      "actionLabel": "define Cat@script233@__tmp_235@11 as keyPressedByCodeNondet(Cat@KEY_UP@2); declare Cat@keyPressedByCodeNondet@key@25 as integer; declare __op_time_634@1 as integer; assume __op_time_634@1 >= 10; assume __op_time_634@1 <= 1000; define __global_time_micros@126 as (__global_time_micros@125 + __op_time_634@1); define Cat@keyPressedByCodeNondet@key@26 as Cat@KEY_UP@2; enter atomic",
+      "action": "KEY_UP",
+      "keyPressed": 38
+    },
+    {
+      "id": 1571,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 3,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -89,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 3001943,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@25 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@37 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@38 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@13 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@39 as Cat@keyPressedNondet@result@13; leave atomic; define Cat@keyPressedByCodeNondet@result@26 as Cat@keyPressedByCodeNondet@__tmp_146@39 = Cat@keyPressedByCodeNondet@key@26; RETURN; define Cat@script233@__tmp_235@12 as Cat@keyPressedByCodeNondet@result@26; declare __op_time_635@1 as integer; assume __op_time_635@1 >= 100; assume __op_time_635@1 <= 10000; define __global_time_micros@127 as (__global_time_micros@126 + __op_time_635@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@197 as integer; declare CatObserver@checkBehaviorSatisfied@catY@197 as integer; define CatObserver@checkBehaviorSatisfied@catX@198 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@198 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@295 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@296 as CatObserver@checkBehaviorSatisfied@catX@198 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@296; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@297 as CatObserver@checkBehaviorSatisfied@__tmp_243@296; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@297; epsilon; RETURN; leave atomic; epsilon; declare __op_time_636@1 as integer; assume __op_time_636@1 >= 10; assume __op_time_636@1 <= 1000; define __global_time_micros@128 as (__global_time_micros@127 + __op_time_636@1); define Cat@script233@__tmp_234@11 as Cat@script233@__tmp_235@12; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@199 as integer; declare CatObserver@checkBehaviorSatisfied@catY@199 as integer; define CatObserver@checkBehaviorSatisfied@catX@200 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@200 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@298 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@299 as CatObserver@checkBehaviorSatisfied@catX@200 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@299; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@300 as CatObserver@checkBehaviorSatisfied@__tmp_243@299; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@300; epsilon; RETURN; leave atomic; epsilon; declare __op_time_638@1 as integer; assume __op_time_638@1 >= 10; assume __op_time_638@1 <= 1000; define __global_time_micros@129 as (__global_time_micros@128 + __op_time_638@1); assume not Cat@script233@__tmp_234@11; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@201 as integer; declare CatObserver@checkBehaviorSatisfied@catY@201 as integer; define CatObserver@checkBehaviorSatisfied@catX@202 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@202 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@301 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@302 as CatObserver@checkBehaviorSatisfied@catX@202 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@302; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@303 as CatObserver@checkBehaviorSatisfied@__tmp_243@302; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@303; epsilon; RETURN; leave atomic; epsilon; epsilon; epsilon; declare __op_time_643@1 as integer; assume __op_time_643@1 >= 10; assume __op_time_643@1 <= 1000; define __global_time_micros@131 as (__global_time_micros@130 + __op_time_643@1); assume not Cat@script233@__tmp_234@12; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@205 as integer; declare CatObserver@checkBehaviorSatisfied@catY@205 as integer; define CatObserver@checkBehaviorSatisfied@catX@206 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@206 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@307 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@308 as CatObserver@checkBehaviorSatisfied@catX@206 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@308; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@309 as CatObserver@checkBehaviorSatisfied@__tmp_243@308; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@309; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_236@10 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@207 as integer; declare CatObserver@checkBehaviorSatisfied@catY@207 as integer; define CatObserver@checkBehaviorSatisfied@catX@208 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@208 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@310 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@311 as CatObserver@checkBehaviorSatisfied@catX@208 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@311; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@312 as CatObserver@checkBehaviorSatisfied@__tmp_243@311; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@312; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_237@10 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@209 as integer; declare CatObserver@checkBehaviorSatisfied@catY@209 as integer; define CatObserver@checkBehaviorSatisfied@catX@210 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@210 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@313 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@314 as CatObserver@checkBehaviorSatisfied@catX@210 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@314; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@315 as CatObserver@checkBehaviorSatisfied@__tmp_243@314; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@315; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 130
+    },
+    {
+      "id": 1572,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 3,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -89,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 3001953,
+      "actionLabel": "define Cat@script233@__tmp_237@11 as keyPressedByCodeNondet(Cat@KEY_DOWN@2); declare Cat@keyPressedByCodeNondet@key@27 as integer; declare __op_time_652@1 as integer; assume __op_time_652@1 >= 10; assume __op_time_652@1 <= 1000; define __global_time_micros@132 as (__global_time_micros@131 + __op_time_652@1); define Cat@keyPressedByCodeNondet@key@28 as Cat@KEY_DOWN@2; enter atomic",
+      "action": "KEY_UP",
+      "keyPressed": 40
+    },
+    {
+      "id": 1684,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 3,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -89,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 3002083,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@27 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@40 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@41 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@14 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@42 as Cat@keyPressedNondet@result@14; leave atomic; define Cat@keyPressedByCodeNondet@result@28 as Cat@keyPressedByCodeNondet@__tmp_146@42 = Cat@keyPressedByCodeNondet@key@28; RETURN; define Cat@script233@__tmp_237@12 as Cat@keyPressedByCodeNondet@result@28; declare __op_time_653@1 as integer; assume __op_time_653@1 >= 100; assume __op_time_653@1 <= 10000; define __global_time_micros@133 as (__global_time_micros@132 + __op_time_653@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@211 as integer; declare CatObserver@checkBehaviorSatisfied@catY@211 as integer; define CatObserver@checkBehaviorSatisfied@catX@212 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@212 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@316 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@317 as CatObserver@checkBehaviorSatisfied@catX@212 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@317; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@318 as CatObserver@checkBehaviorSatisfied@__tmp_243@317; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@318; epsilon; RETURN; leave atomic; epsilon; declare __op_time_658@1 as integer; assume __op_time_658@1 >= 10; assume __op_time_658@1 <= 1000; define __global_time_micros@134 as (__global_time_micros@133 + __op_time_658@1); define Cat@script233@__tmp_236@11 as Cat@script233@__tmp_237@12; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@213 as integer; declare CatObserver@checkBehaviorSatisfied@catY@213 as integer; define CatObserver@checkBehaviorSatisfied@catX@214 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@214 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@319 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@320 as CatObserver@checkBehaviorSatisfied@catX@214 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@320; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@321 as CatObserver@checkBehaviorSatisfied@__tmp_243@320; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@321; epsilon; RETURN; leave atomic; epsilon; declare __op_time_662@1 as integer; assume __op_time_662@1 >= 10; assume __op_time_662@1 <= 1000; define __global_time_micros@135 as (__global_time_micros@134 + __op_time_662@1); assume not Cat@script233@__tmp_236@11; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@215 as integer; declare CatObserver@checkBehaviorSatisfied@catY@215 as integer; define CatObserver@checkBehaviorSatisfied@catX@216 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@216 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@322 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@323 as CatObserver@checkBehaviorSatisfied@catX@216 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@323; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@324 as CatObserver@checkBehaviorSatisfied@__tmp_243@323; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@324; epsilon; RETURN; leave atomic; epsilon; epsilon; epsilon; declare __op_time_669@1 as integer; assume __op_time_669@1 >= 10; assume __op_time_669@1 <= 1000; define __global_time_micros@137 as (__global_time_micros@136 + __op_time_669@1); assume not Cat@script233@__tmp_236@12; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@219 as integer; declare CatObserver@checkBehaviorSatisfied@catY@219 as integer; define CatObserver@checkBehaviorSatisfied@catX@220 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@220 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@328 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@329 as CatObserver@checkBehaviorSatisfied@catX@220 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@329; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@330 as CatObserver@checkBehaviorSatisfied@__tmp_243@329; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@330; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_238@10 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@221 as integer; declare CatObserver@checkBehaviorSatisfied@catY@221 as integer; define CatObserver@checkBehaviorSatisfied@catX@222 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@222 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@331 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@332 as CatObserver@checkBehaviorSatisfied@catX@222 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@332; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@333 as CatObserver@checkBehaviorSatisfied@__tmp_243@332; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@333; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_239@10 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@223 as integer; declare CatObserver@checkBehaviorSatisfied@catY@223 as integer; define CatObserver@checkBehaviorSatisfied@catX@224 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@224 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@334 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@335 as CatObserver@checkBehaviorSatisfied@catX@224 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@335; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@336 as CatObserver@checkBehaviorSatisfied@__tmp_243@335; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@336; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 130
+    },
+    {
+      "id": 1685,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 3,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -89,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 3002093,
+      "actionLabel": "define Cat@script233@__tmp_239@11 as keyPressedByCodeNondet(Cat@KEY_RIGHT@2); declare Cat@keyPressedByCodeNondet@key@29 as integer; declare __op_time_684@1 as integer; assume __op_time_684@1 >= 10; assume __op_time_684@1 <= 1000; define __global_time_micros@138 as (__global_time_micros@137 + __op_time_684@1); define Cat@keyPressedByCodeNondet@key@30 as Cat@KEY_RIGHT@2; enter atomic",
+      "action": "KEY_DOWN",
+      "keyPressed": 39
+    },
+    {
+      "id": 1882,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 2,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -29,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 4003254,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@29 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@43 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@44 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@15 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@45 as Cat@keyPressedNondet@result@15; leave atomic; define Cat@keyPressedByCodeNondet@result@30 as Cat@keyPressedByCodeNondet@__tmp_146@45 = Cat@keyPressedByCodeNondet@key@30; RETURN; define Cat@script233@__tmp_239@12 as Cat@keyPressedByCodeNondet@result@30; declare __op_time_685@1 as integer; assume __op_time_685@1 >= 100; assume __op_time_685@1 <= 10000; define __global_time_micros@139 as (__global_time_micros@138 + __op_time_685@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@225 as integer; declare CatObserver@checkBehaviorSatisfied@catY@225 as integer; define CatObserver@checkBehaviorSatisfied@catX@226 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@226 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@337 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@338 as CatObserver@checkBehaviorSatisfied@catX@226 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@338; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@339 as CatObserver@checkBehaviorSatisfied@__tmp_243@338; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@339; epsilon; RETURN; leave atomic; epsilon; declare __op_time_692@1 as integer; assume __op_time_692@1 >= 10; assume __op_time_692@1 <= 1000; define __global_time_micros@140 as (__global_time_micros@139 + __op_time_692@1); define Cat@script233@__tmp_238@11 as Cat@script233@__tmp_239@12; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@227 as integer; declare CatObserver@checkBehaviorSatisfied@catY@227 as integer; define CatObserver@checkBehaviorSatisfied@catX@228 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@228 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@340 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@341 as CatObserver@checkBehaviorSatisfied@catX@228 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@341; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@342 as CatObserver@checkBehaviorSatisfied@__tmp_243@341; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@342; epsilon; RETURN; leave atomic; epsilon; declare __op_time_695@1 as integer; assume __op_time_695@1 >= 10; assume __op_time_695@1 <= 1000; define __global_time_micros@141 as (__global_time_micros@140 + __op_time_695@1); assume Cat@script233@__tmp_238@11; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@229 as integer; declare CatObserver@checkBehaviorSatisfied@catY@229 as integer; define CatObserver@checkBehaviorSatisfied@catX@230 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@230 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@343 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@344 as CatObserver@checkBehaviorSatisfied@catX@230 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@344; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@345 as CatObserver@checkBehaviorSatisfied@__tmp_243@344; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@345; epsilon; RETURN; leave atomic; epsilon; declare __op_time_697@1 as integer; assume __op_time_697@1 >= 10; assume __op_time_697@1 <= 1000; define __global_time_micros@142 as (__global_time_micros@141 + __op_time_697@1); define Cat@script233@__tmp_238@12 as not Cat@x@5 = 211; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@231 as integer; declare CatObserver@checkBehaviorSatisfied@catY@231 as integer; define CatObserver@checkBehaviorSatisfied@catX@232 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@232 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@346 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@347 as CatObserver@checkBehaviorSatisfied@catX@232 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@347; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@348 as CatObserver@checkBehaviorSatisfied@__tmp_243@347; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@348; epsilon; RETURN; leave atomic; epsilon; epsilon; declare __op_time_702@1 as integer; assume __op_time_702@1 >= 10; assume __op_time_702@1 <= 1000; define __global_time_micros@143 as (__global_time_micros@142 + __op_time_702@1); assume Cat@script233@__tmp_238@12; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@233 as integer; declare CatObserver@checkBehaviorSatisfied@catY@233 as integer; define CatObserver@checkBehaviorSatisfied@catX@234 as Cat@x@5; define CatObserver@checkBehaviorSatisfied@catY@234 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@349 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@350 as CatObserver@checkBehaviorSatisfied@catX@234 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@350; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@351 as CatObserver@checkBehaviorSatisfied@__tmp_243@350; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@351; epsilon; RETURN; leave atomic; epsilon; declare __op_time_705@1 as integer; assume __op_time_705@1 >= 10; assume __op_time_705@1 <= 1000; define __global_time_micros@144 as (__global_time_micros@143 + __op_time_705@1); define Cat@x@6 as (Cat@x@5 + 60); epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@235 as integer; declare CatObserver@checkBehaviorSatisfied@catY@235 as integer; define CatObserver@checkBehaviorSatisfied@catX@236 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@236 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@352 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@353 as CatObserver@checkBehaviorSatisfied@catX@236 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@353; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@354 as CatObserver@checkBehaviorSatisfied@__tmp_243@353; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@354; epsilon; RETURN; leave atomic; epsilon; declare __op_time_708@1 as integer; assume __op_time_708@1 >= 10; assume __op_time_708@1 <= 1000; define __global_time_micros@145 as (__global_time_micros@144 + __op_time_708@1); define Cat@stepsLeft@6 as Cat@stepsLeft@5 - 1; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@237 as integer; declare CatObserver@checkBehaviorSatisfied@catY@237 as integer; define CatObserver@checkBehaviorSatisfied@catX@238 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@238 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@355 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@356 as CatObserver@checkBehaviorSatisfied@catX@238 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@356; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@357 as CatObserver@checkBehaviorSatisfied@__tmp_243@356; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@357; epsilon; RETURN; leave atomic; epsilon; _RUNTIME_waitSeconds(1); define __wait_until_micros@11 as _RUNTIME_micros(); define __wait_until_micros@12 as __global_time_micros@145; declare __op_time_713@1 as integer; assume __op_time_713@1 >= 10; assume __op_time_713@1 <= 1000; define __global_time_micros@146 as (__global_time_micros@145 + __op_time_713@1); define __wait_until_micros@13 as (__wait_until_micros@12 + 1 * 1000000); declare __op_time_714@1 as integer; assume __op_time_714@1 >= 10; assume __op_time_714@1 <= 1000; define __global_time_micros@147 as (__global_time_micros@146 + __op_time_714@1); define __global_time_micros@148 as (__wait_until_micros@13 + 1); epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@239 as integer; declare CatObserver@checkBehaviorSatisfied@catY@239 as integer; define CatObserver@checkBehaviorSatisfied@catX@240 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@240 as Cat@y@5; declare CatObserver@checkBehaviorSatisfied@__tmp_243@358 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@359 as CatObserver@checkBehaviorSatisfied@catX@240 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@359; epsilon; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@359; epsilon; RETURN; leave atomic; epsilon; epsilon; declare __op_time_753@1 as integer; assume __op_time_753@1 >= 10; assume __op_time_753@1 <= 1000; define __global_time_micros@155 as (__global_time_micros@154 + __op_time_753@1); assume not Cat@stepsLeft@6 = 0; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@255 as integer; declare CatObserver@checkBehaviorSatisfied@catY@255 as integer; define CatObserver@checkBehaviorSatisfied@catX@256 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@256 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@382 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@383 as CatObserver@checkBehaviorSatisfied@catX@256 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@383; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@384 as CatObserver@checkBehaviorSatisfied@__tmp_243@383; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@384; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_234@13 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@257 as integer; declare CatObserver@checkBehaviorSatisfied@catY@257 as integer; define CatObserver@checkBehaviorSatisfied@catX@258 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@258 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@385 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@386 as CatObserver@checkBehaviorSatisfied@catX@258 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@386; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@387 as CatObserver@checkBehaviorSatisfied@__tmp_243@386; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@387; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_235@13 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@259 as integer; declare CatObserver@checkBehaviorSatisfied@catY@259 as integer; define CatObserver@checkBehaviorSatisfied@catX@260 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@260 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@388 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@389 as CatObserver@checkBehaviorSatisfied@catX@260 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@389; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@390 as CatObserver@checkBehaviorSatisfied@__tmp_243@389; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@390; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 1001161
+    },
+    {
+      "id": 1883,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 2,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -29,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 4003264,
+      "actionLabel": "define Cat@script233@__tmp_235@14 as keyPressedByCodeNondet(Cat@KEY_UP@2); declare Cat@keyPressedByCodeNondet@key@33 as integer; declare __op_time_756@1 as integer; assume __op_time_756@1 >= 10; assume __op_time_756@1 <= 1000; define __global_time_micros@156 as (__global_time_micros@155 + __op_time_756@1); define Cat@keyPressedByCodeNondet@key@34 as Cat@KEY_UP@2; enter atomic",
+      "action": "KEY_UP",
+      "keyPressed": 38
+    },
+    {
+      "id": 1995,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 2,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -29,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 4003394,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@33 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@49 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@50 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@17 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@51 as Cat@keyPressedNondet@result@17; leave atomic; define Cat@keyPressedByCodeNondet@result@34 as Cat@keyPressedByCodeNondet@__tmp_146@51 = Cat@keyPressedByCodeNondet@key@34; RETURN; define Cat@script233@__tmp_235@15 as Cat@keyPressedByCodeNondet@result@34; declare __op_time_757@1 as integer; assume __op_time_757@1 >= 100; assume __op_time_757@1 <= 10000; define __global_time_micros@157 as (__global_time_micros@156 + __op_time_757@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@261 as integer; declare CatObserver@checkBehaviorSatisfied@catY@261 as integer; define CatObserver@checkBehaviorSatisfied@catX@262 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@262 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@391 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@392 as CatObserver@checkBehaviorSatisfied@catX@262 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@392; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@393 as CatObserver@checkBehaviorSatisfied@__tmp_243@392; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@393; epsilon; RETURN; leave atomic; epsilon; declare __op_time_758@1 as integer; assume __op_time_758@1 >= 10; assume __op_time_758@1 <= 1000; define __global_time_micros@158 as (__global_time_micros@157 + __op_time_758@1); define Cat@script233@__tmp_234@14 as Cat@script233@__tmp_235@15; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@263 as integer; declare CatObserver@checkBehaviorSatisfied@catY@263 as integer; define CatObserver@checkBehaviorSatisfied@catX@264 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@264 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@394 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@395 as CatObserver@checkBehaviorSatisfied@catX@264 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@395; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@396 as CatObserver@checkBehaviorSatisfied@__tmp_243@395; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@396; epsilon; RETURN; leave atomic; epsilon; declare __op_time_760@1 as integer; assume __op_time_760@1 >= 10; assume __op_time_760@1 <= 1000; define __global_time_micros@159 as (__global_time_micros@158 + __op_time_760@1); assume not Cat@script233@__tmp_234@14; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@265 as integer; declare CatObserver@checkBehaviorSatisfied@catY@265 as integer; define CatObserver@checkBehaviorSatisfied@catX@266 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@266 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@397 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@398 as CatObserver@checkBehaviorSatisfied@catX@266 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@398; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@399 as CatObserver@checkBehaviorSatisfied@__tmp_243@398; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@399; epsilon; RETURN; leave atomic; epsilon; epsilon; epsilon; declare __op_time_765@1 as integer; assume __op_time_765@1 >= 10; assume __op_time_765@1 <= 1000; define __global_time_micros@161 as (__global_time_micros@160 + __op_time_765@1); assume not Cat@script233@__tmp_234@15; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@269 as integer; declare CatObserver@checkBehaviorSatisfied@catY@269 as integer; define CatObserver@checkBehaviorSatisfied@catX@270 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@270 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@403 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@404 as CatObserver@checkBehaviorSatisfied@catX@270 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@404; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@405 as CatObserver@checkBehaviorSatisfied@__tmp_243@404; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@405; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_236@13 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@271 as integer; declare CatObserver@checkBehaviorSatisfied@catY@271 as integer; define CatObserver@checkBehaviorSatisfied@catX@272 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@272 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@406 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@407 as CatObserver@checkBehaviorSatisfied@catX@272 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@407; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@408 as CatObserver@checkBehaviorSatisfied@__tmp_243@407; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@408; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_237@13 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@273 as integer; declare CatObserver@checkBehaviorSatisfied@catY@273 as integer; define CatObserver@checkBehaviorSatisfied@catX@274 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@274 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@409 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@410 as CatObserver@checkBehaviorSatisfied@catX@274 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@410; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@411 as CatObserver@checkBehaviorSatisfied@__tmp_243@410; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@411; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 130
+    },
+    {
+      "id": 1996,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 2,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -29,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 4003404,
+      "actionLabel": "define Cat@script233@__tmp_237@14 as keyPressedByCodeNondet(Cat@KEY_DOWN@2); declare Cat@keyPressedByCodeNondet@key@35 as integer; declare __op_time_774@1 as integer; assume __op_time_774@1 >= 10; assume __op_time_774@1 <= 1000; define __global_time_micros@162 as (__global_time_micros@161 + __op_time_774@1); define Cat@keyPressedByCodeNondet@key@36 as Cat@KEY_DOWN@2; enter atomic",
+      "action": "KEY_UP",
+      "keyPressed": 40
+    },
+    {
+      "id": 2108,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 2,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -29,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 4003534,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@35 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@52 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@53 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@18 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@54 as Cat@keyPressedNondet@result@18; leave atomic; define Cat@keyPressedByCodeNondet@result@36 as Cat@keyPressedByCodeNondet@__tmp_146@54 = Cat@keyPressedByCodeNondet@key@36; RETURN; define Cat@script233@__tmp_237@15 as Cat@keyPressedByCodeNondet@result@36; declare __op_time_775@1 as integer; assume __op_time_775@1 >= 100; assume __op_time_775@1 <= 10000; define __global_time_micros@163 as (__global_time_micros@162 + __op_time_775@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@275 as integer; declare CatObserver@checkBehaviorSatisfied@catY@275 as integer; define CatObserver@checkBehaviorSatisfied@catX@276 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@276 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@412 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@413 as CatObserver@checkBehaviorSatisfied@catX@276 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@413; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@414 as CatObserver@checkBehaviorSatisfied@__tmp_243@413; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@414; epsilon; RETURN; leave atomic; epsilon; declare __op_time_780@1 as integer; assume __op_time_780@1 >= 10; assume __op_time_780@1 <= 1000; define __global_time_micros@164 as (__global_time_micros@163 + __op_time_780@1); define Cat@script233@__tmp_236@14 as Cat@script233@__tmp_237@15; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@277 as integer; declare CatObserver@checkBehaviorSatisfied@catY@277 as integer; define CatObserver@checkBehaviorSatisfied@catX@278 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@278 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@415 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@416 as CatObserver@checkBehaviorSatisfied@catX@278 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@416; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@417 as CatObserver@checkBehaviorSatisfied@__tmp_243@416; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@417; epsilon; RETURN; leave atomic; epsilon; declare __op_time_784@1 as integer; assume __op_time_784@1 >= 10; assume __op_time_784@1 <= 1000; define __global_time_micros@165 as (__global_time_micros@164 + __op_time_784@1); assume not Cat@script233@__tmp_236@14; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@279 as integer; declare CatObserver@checkBehaviorSatisfied@catY@279 as integer; define CatObserver@checkBehaviorSatisfied@catX@280 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@280 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@418 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@419 as CatObserver@checkBehaviorSatisfied@catX@280 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@419; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@420 as CatObserver@checkBehaviorSatisfied@__tmp_243@419; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@420; epsilon; RETURN; leave atomic; epsilon; epsilon; epsilon; declare __op_time_791@1 as integer; assume __op_time_791@1 >= 10; assume __op_time_791@1 <= 1000; define __global_time_micros@167 as (__global_time_micros@166 + __op_time_791@1); assume not Cat@script233@__tmp_236@15; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@283 as integer; declare CatObserver@checkBehaviorSatisfied@catY@283 as integer; define CatObserver@checkBehaviorSatisfied@catX@284 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@284 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@424 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@425 as CatObserver@checkBehaviorSatisfied@catX@284 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@425; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@426 as CatObserver@checkBehaviorSatisfied@__tmp_243@425; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@426; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_238@13 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@285 as integer; declare CatObserver@checkBehaviorSatisfied@catY@285 as integer; define CatObserver@checkBehaviorSatisfied@catX@286 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@286 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@427 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@428 as CatObserver@checkBehaviorSatisfied@catX@286 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@428; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@429 as CatObserver@checkBehaviorSatisfied@__tmp_243@428; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@429; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_239@13 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@287 as integer; declare CatObserver@checkBehaviorSatisfied@catY@287 as integer; define CatObserver@checkBehaviorSatisfied@catX@288 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@288 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@430 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@431 as CatObserver@checkBehaviorSatisfied@catX@288 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@431; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@432 as CatObserver@checkBehaviorSatisfied@__tmp_243@431; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@432; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 130
+    },
+    {
+      "id": 2109,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 2,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": -29,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 4003544,
+      "actionLabel": "define Cat@script233@__tmp_239@14 as keyPressedByCodeNondet(Cat@KEY_RIGHT@2); declare Cat@keyPressedByCodeNondet@key@37 as integer; declare __op_time_806@1 as integer; assume __op_time_806@1 >= 10; assume __op_time_806@1 <= 1000; define __global_time_micros@168 as (__global_time_micros@167 + __op_time_806@1); define Cat@keyPressedByCodeNondet@key@38 as Cat@KEY_RIGHT@2; enter atomic",
+      "action": "KEY_DOWN",
+      "keyPressed": 39
+    },
+    {
+      "id": 2306,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 1,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": 31,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 5005785,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@37 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@55 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@56 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@19 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@57 as Cat@keyPressedNondet@result@19; leave atomic; define Cat@keyPressedByCodeNondet@result@38 as Cat@keyPressedByCodeNondet@__tmp_146@57 = Cat@keyPressedByCodeNondet@key@38; RETURN; define Cat@script233@__tmp_239@15 as Cat@keyPressedByCodeNondet@result@38; declare __op_time_807@1 as integer; assume __op_time_807@1 >= 100; assume __op_time_807@1 <= 10000; define __global_time_micros@169 as (__global_time_micros@168 + __op_time_807@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@289 as integer; declare CatObserver@checkBehaviorSatisfied@catY@289 as integer; define CatObserver@checkBehaviorSatisfied@catX@290 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@290 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@433 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@434 as CatObserver@checkBehaviorSatisfied@catX@290 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@434; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@435 as CatObserver@checkBehaviorSatisfied@__tmp_243@434; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@435; epsilon; RETURN; leave atomic; epsilon; declare __op_time_814@1 as integer; assume __op_time_814@1 >= 10; assume __op_time_814@1 <= 1000; define __global_time_micros@170 as (__global_time_micros@169 + __op_time_814@1); define Cat@script233@__tmp_238@14 as Cat@script233@__tmp_239@15; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@291 as integer; declare CatObserver@checkBehaviorSatisfied@catY@291 as integer; define CatObserver@checkBehaviorSatisfied@catX@292 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@292 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@436 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@437 as CatObserver@checkBehaviorSatisfied@catX@292 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@437; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@438 as CatObserver@checkBehaviorSatisfied@__tmp_243@437; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@438; epsilon; RETURN; leave atomic; epsilon; declare __op_time_817@1 as integer; assume __op_time_817@1 >= 10; assume __op_time_817@1 <= 1000; define __global_time_micros@171 as (__global_time_micros@170 + __op_time_817@1); assume Cat@script233@__tmp_238@14; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@293 as integer; declare CatObserver@checkBehaviorSatisfied@catY@293 as integer; define CatObserver@checkBehaviorSatisfied@catX@294 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@294 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@439 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@440 as CatObserver@checkBehaviorSatisfied@catX@294 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@440; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@441 as CatObserver@checkBehaviorSatisfied@__tmp_243@440; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@441; epsilon; RETURN; leave atomic; epsilon; declare __op_time_819@1 as integer; assume __op_time_819@1 >= 10; assume __op_time_819@1 <= 1000; define __global_time_micros@172 as (__global_time_micros@171 + __op_time_819@1); define Cat@script233@__tmp_238@15 as not Cat@x@6 = 211; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@295 as integer; declare CatObserver@checkBehaviorSatisfied@catY@295 as integer; define CatObserver@checkBehaviorSatisfied@catX@296 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@296 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@442 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@443 as CatObserver@checkBehaviorSatisfied@catX@296 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@443; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@444 as CatObserver@checkBehaviorSatisfied@__tmp_243@443; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@444; epsilon; RETURN; leave atomic; epsilon; epsilon; declare __op_time_824@1 as integer; assume __op_time_824@1 >= 10; assume __op_time_824@1 <= 1000; define __global_time_micros@173 as (__global_time_micros@172 + __op_time_824@1); assume Cat@script233@__tmp_238@15; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@297 as integer; declare CatObserver@checkBehaviorSatisfied@catY@297 as integer; define CatObserver@checkBehaviorSatisfied@catX@298 as Cat@x@6; define CatObserver@checkBehaviorSatisfied@catY@298 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@445 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@446 as CatObserver@checkBehaviorSatisfied@catX@298 = 31; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@446; epsilon; define CatObserver@checkBehaviorSatisfied@__tmp_243@447 as CatObserver@checkBehaviorSatisfied@__tmp_243@446; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@447; epsilon; RETURN; leave atomic; epsilon; declare __op_time_827@1 as integer; assume __op_time_827@1 >= 10; assume __op_time_827@1 <= 1000; define __global_time_micros@174 as (__global_time_micros@173 + __op_time_827@1); define Cat@x@7 as (Cat@x@6 + 60); epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@299 as integer; declare CatObserver@checkBehaviorSatisfied@catY@299 as integer; define CatObserver@checkBehaviorSatisfied@catX@300 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@300 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@448 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@449 as CatObserver@checkBehaviorSatisfied@catX@300 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@449; define CatObserver@checkBehaviorSatisfied@__tmp_243@450 as CatObserver@checkBehaviorSatisfied@catY@300 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@450; epsilon; RETURN; leave atomic; epsilon; declare __op_time_830@1 as integer; assume __op_time_830@1 >= 10; assume __op_time_830@1 <= 1000; define __global_time_micros@175 as (__global_time_micros@174 + __op_time_830@1); define Cat@stepsLeft@7 as Cat@stepsLeft@6 - 1; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@301 as integer; declare CatObserver@checkBehaviorSatisfied@catY@301 as integer; define CatObserver@checkBehaviorSatisfied@catX@302 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@302 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@451 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@452 as CatObserver@checkBehaviorSatisfied@catX@302 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@452; define CatObserver@checkBehaviorSatisfied@__tmp_243@453 as CatObserver@checkBehaviorSatisfied@catY@302 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@453; epsilon; RETURN; leave atomic; epsilon; _RUNTIME_waitSeconds(1); define __wait_until_micros@14 as _RUNTIME_micros(); define __wait_until_micros@15 as __global_time_micros@175; declare __op_time_835@1 as integer; assume __op_time_835@1 >= 10; assume __op_time_835@1 <= 1000; define __global_time_micros@176 as (__global_time_micros@175 + __op_time_835@1); define __wait_until_micros@16 as (__wait_until_micros@15 + 1 * 1000000); declare __op_time_836@1 as integer; assume __op_time_836@1 >= 10; assume __op_time_836@1 <= 1000; define __global_time_micros@177 as (__global_time_micros@176 + __op_time_836@1); define __global_time_micros@178 as (__wait_until_micros@16 + 1); epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@303 as integer; declare CatObserver@checkBehaviorSatisfied@catY@303 as integer; define CatObserver@checkBehaviorSatisfied@catX@304 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@304 as Cat@y@6; declare CatObserver@checkBehaviorSatisfied@__tmp_243@454 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@455 as CatObserver@checkBehaviorSatisfied@catX@304 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@455; define CatObserver@checkBehaviorSatisfied@__tmp_243@456 as CatObserver@checkBehaviorSatisfied@catY@304 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@456; epsilon; RETURN; leave atomic; epsilon; epsilon; declare __op_time_875@1 as integer; assume __op_time_875@1 >= 10; assume __op_time_875@1 <= 1000; define __global_time_micros@185 as (__global_time_micros@184 + __op_time_875@1); assume not Cat@stepsLeft@7 = 0; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@319 as integer; declare CatObserver@checkBehaviorSatisfied@catY@319 as integer; define CatObserver@checkBehaviorSatisfied@catX@320 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@320 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@478 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@479 as CatObserver@checkBehaviorSatisfied@catX@320 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@479; define CatObserver@checkBehaviorSatisfied@__tmp_243@480 as CatObserver@checkBehaviorSatisfied@catY@320 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@480; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_234@16 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@321 as integer; declare CatObserver@checkBehaviorSatisfied@catY@321 as integer; define CatObserver@checkBehaviorSatisfied@catX@322 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@322 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@481 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@482 as CatObserver@checkBehaviorSatisfied@catX@322 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@482; define CatObserver@checkBehaviorSatisfied@__tmp_243@483 as CatObserver@checkBehaviorSatisfied@catY@322 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@483; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_235@16 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@323 as integer; declare CatObserver@checkBehaviorSatisfied@catY@323 as integer; define CatObserver@checkBehaviorSatisfied@catX@324 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@324 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@484 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@485 as CatObserver@checkBehaviorSatisfied@catX@324 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@485; define CatObserver@checkBehaviorSatisfied@__tmp_243@486 as CatObserver@checkBehaviorSatisfied@catY@324 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@486; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 1002241
+    },
+    {
+      "id": 2307,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 1,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": 31,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 5005795,
+      "actionLabel": "define Cat@script233@__tmp_235@17 as keyPressedByCodeNondet(Cat@KEY_UP@2); declare Cat@keyPressedByCodeNondet@key@41 as integer; declare __op_time_878@1 as integer; assume __op_time_878@1 >= 10; assume __op_time_878@1 <= 1000; define __global_time_micros@186 as (__global_time_micros@185 + __op_time_878@1); define Cat@keyPressedByCodeNondet@key@42 as Cat@KEY_UP@2; enter atomic",
+      "action": "KEY_UP",
+      "keyPressed": 38
+    },
+    {
+      "id": 2419,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 1,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": 31,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 5005925,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@41 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@61 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@62 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@21 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@63 as Cat@keyPressedNondet@result@21; leave atomic; define Cat@keyPressedByCodeNondet@result@42 as Cat@keyPressedByCodeNondet@__tmp_146@63 = Cat@keyPressedByCodeNondet@key@42; RETURN; define Cat@script233@__tmp_235@18 as Cat@keyPressedByCodeNondet@result@42; declare __op_time_879@1 as integer; assume __op_time_879@1 >= 100; assume __op_time_879@1 <= 10000; define __global_time_micros@187 as (__global_time_micros@186 + __op_time_879@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@325 as integer; declare CatObserver@checkBehaviorSatisfied@catY@325 as integer; define CatObserver@checkBehaviorSatisfied@catX@326 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@326 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@487 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@488 as CatObserver@checkBehaviorSatisfied@catX@326 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@488; define CatObserver@checkBehaviorSatisfied@__tmp_243@489 as CatObserver@checkBehaviorSatisfied@catY@326 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@489; epsilon; RETURN; leave atomic; epsilon; declare __op_time_880@1 as integer; assume __op_time_880@1 >= 10; assume __op_time_880@1 <= 1000; define __global_time_micros@188 as (__global_time_micros@187 + __op_time_880@1); define Cat@script233@__tmp_234@17 as Cat@script233@__tmp_235@18; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@327 as integer; declare CatObserver@checkBehaviorSatisfied@catY@327 as integer; define CatObserver@checkBehaviorSatisfied@catX@328 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@328 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@490 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@491 as CatObserver@checkBehaviorSatisfied@catX@328 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@491; define CatObserver@checkBehaviorSatisfied@__tmp_243@492 as CatObserver@checkBehaviorSatisfied@catY@328 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@492; epsilon; RETURN; leave atomic; epsilon; declare __op_time_882@1 as integer; assume __op_time_882@1 >= 10; assume __op_time_882@1 <= 1000; define __global_time_micros@189 as (__global_time_micros@188 + __op_time_882@1); assume not Cat@script233@__tmp_234@17; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@329 as integer; declare CatObserver@checkBehaviorSatisfied@catY@329 as integer; define CatObserver@checkBehaviorSatisfied@catX@330 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@330 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@493 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@494 as CatObserver@checkBehaviorSatisfied@catX@330 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@494; define CatObserver@checkBehaviorSatisfied@__tmp_243@495 as CatObserver@checkBehaviorSatisfied@catY@330 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@495; epsilon; RETURN; leave atomic; epsilon; epsilon; epsilon; declare __op_time_887@1 as integer; assume __op_time_887@1 >= 10; assume __op_time_887@1 <= 1000; define __global_time_micros@191 as (__global_time_micros@190 + __op_time_887@1); assume not Cat@script233@__tmp_234@18; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@333 as integer; declare CatObserver@checkBehaviorSatisfied@catY@333 as integer; define CatObserver@checkBehaviorSatisfied@catX@334 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@334 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@499 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@500 as CatObserver@checkBehaviorSatisfied@catX@334 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@500; define CatObserver@checkBehaviorSatisfied@__tmp_243@501 as CatObserver@checkBehaviorSatisfied@catY@334 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@501; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_236@16 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@335 as integer; declare CatObserver@checkBehaviorSatisfied@catY@335 as integer; define CatObserver@checkBehaviorSatisfied@catX@336 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@336 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@502 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@503 as CatObserver@checkBehaviorSatisfied@catX@336 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@503; define CatObserver@checkBehaviorSatisfied@__tmp_243@504 as CatObserver@checkBehaviorSatisfied@catY@336 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@504; epsilon; RETURN; leave atomic; epsilon; declare Cat@script233@__tmp_237@16 as boolean; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@337 as integer; declare CatObserver@checkBehaviorSatisfied@catY@337 as integer; define CatObserver@checkBehaviorSatisfied@catX@338 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@338 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@505 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@506 as CatObserver@checkBehaviorSatisfied@catX@338 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@506; define CatObserver@checkBehaviorSatisfied@__tmp_243@507 as CatObserver@checkBehaviorSatisfied@catY@338 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@507; epsilon; RETURN; leave atomic; epsilon",
+      "action": "WAIT",
+      "waitMicros": 130
+    },
+    {
+      "id": 2420,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 1,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": 31,
+            "y": 89,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "Cat",
+      "timestamp": 5005935,
+      "actionLabel": "define Cat@script233@__tmp_237@17 as keyPressedByCodeNondet(Cat@KEY_DOWN@2); declare Cat@keyPressedByCodeNondet@key@43 as integer; declare __op_time_896@1 as integer; assume __op_time_896@1 >= 10; assume __op_time_896@1 <= 1000; define __global_time_micros@192 as (__global_time_micros@191 + __op_time_896@1); define Cat@keyPressedByCodeNondet@key@44 as Cat@KEY_DOWN@2; enter atomic",
+      "action": "KEY_DOWN",
+      "keyPressed": 40
+    },
+    {
+      "id": 2529,
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 21,
+            "active_graphic_width": 42,
+            "stepsLeft": 1,
+            "STAGE_HALF_WIDTH": 240,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_height": 44,
+            "active_graphic_half_height": 22,
+            "x": 31,
+            "y": 29,
+            "active_graphic_name": "cat",
+            "STAGE_HEIGHT": 360,
+            "direction": 90,
+            "STAGE_WIDTH": 480
+          },
+          "name": "Cat"
+        }
+      ],
+      "actionTargetName": "CatObserver",
+      "timestamp": 5006085,
+      "actionLabel": "epsilon; declare Cat@keyPressedByCodeNondet@result@43 as boolean; declare Cat@keyPressedByCodeNondet@__tmp_146@64 as integer; define Cat@keyPressedByCodeNondet@__tmp_146@65 as keyPressedNondet(); enter atomic; epsilon; declare Cat@keyPressedNondet@result@22 as integer; RETURN; define Cat@keyPressedByCodeNondet@__tmp_146@66 as Cat@keyPressedNondet@result@22; leave atomic; define Cat@keyPressedByCodeNondet@result@44 as Cat@keyPressedByCodeNondet@__tmp_146@66 = Cat@keyPressedByCodeNondet@key@44; RETURN; define Cat@script233@__tmp_237@18 as Cat@keyPressedByCodeNondet@result@44; declare __op_time_897@1 as integer; assume __op_time_897@1 >= 100; assume __op_time_897@1 <= 10000; define __global_time_micros@193 as (__global_time_micros@192 + __op_time_897@1); leave atomic; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@339 as integer; declare CatObserver@checkBehaviorSatisfied@catY@339 as integer; define CatObserver@checkBehaviorSatisfied@catX@340 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@340 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@508 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@509 as CatObserver@checkBehaviorSatisfied@catX@340 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@509; define CatObserver@checkBehaviorSatisfied@__tmp_243@510 as CatObserver@checkBehaviorSatisfied@catY@340 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@510; epsilon; RETURN; leave atomic; epsilon; declare __op_time_902@1 as integer; assume __op_time_902@1 >= 10; assume __op_time_902@1 <= 1000; define __global_time_micros@194 as (__global_time_micros@193 + __op_time_902@1); define Cat@script233@__tmp_236@17 as Cat@script233@__tmp_237@18; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@341 as integer; declare CatObserver@checkBehaviorSatisfied@catY@341 as integer; define CatObserver@checkBehaviorSatisfied@catX@342 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@342 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@511 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@512 as CatObserver@checkBehaviorSatisfied@catX@342 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@512; define CatObserver@checkBehaviorSatisfied@__tmp_243@513 as CatObserver@checkBehaviorSatisfied@catY@342 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@513; epsilon; RETURN; leave atomic; epsilon; declare __op_time_905@1 as integer; assume __op_time_905@1 >= 10; assume __op_time_905@1 <= 1000; define __global_time_micros@195 as (__global_time_micros@194 + __op_time_905@1); assume Cat@script233@__tmp_236@17; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@343 as integer; declare CatObserver@checkBehaviorSatisfied@catY@343 as integer; define CatObserver@checkBehaviorSatisfied@catX@344 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@344 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@514 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@515 as CatObserver@checkBehaviorSatisfied@catX@344 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@515; define CatObserver@checkBehaviorSatisfied@__tmp_243@516 as CatObserver@checkBehaviorSatisfied@catY@344 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@516; epsilon; RETURN; leave atomic; epsilon; declare __op_time_907@1 as integer; assume __op_time_907@1 >= 10; assume __op_time_907@1 <= 1000; define __global_time_micros@196 as (__global_time_micros@195 + __op_time_907@1); define Cat@script233@__tmp_236@18 as not Cat@y@7 = 0 - 151; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@345 as integer; declare CatObserver@checkBehaviorSatisfied@catY@345 as integer; define CatObserver@checkBehaviorSatisfied@catX@346 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@346 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@517 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@518 as CatObserver@checkBehaviorSatisfied@catX@346 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@518; define CatObserver@checkBehaviorSatisfied@__tmp_243@519 as CatObserver@checkBehaviorSatisfied@catY@346 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@519; epsilon; RETURN; leave atomic; epsilon; epsilon; declare __op_time_912@1 as integer; assume __op_time_912@1 >= 10; assume __op_time_912@1 <= 1000; define __global_time_micros@197 as (__global_time_micros@196 + __op_time_912@1); assume Cat@script233@__tmp_236@18; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@347 as integer; declare CatObserver@checkBehaviorSatisfied@catY@347 as integer; define CatObserver@checkBehaviorSatisfied@catX@348 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@348 as Cat@y@7; declare CatObserver@checkBehaviorSatisfied@__tmp_243@520 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@521 as CatObserver@checkBehaviorSatisfied@catX@348 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@521; define CatObserver@checkBehaviorSatisfied@__tmp_243@522 as CatObserver@checkBehaviorSatisfied@catY@348 = 29; epsilon; assume not CatObserver@checkBehaviorSatisfied@__tmp_243@522; epsilon; RETURN; leave atomic; epsilon; declare __op_time_915@1 as integer; assume __op_time_915@1 >= 10; assume __op_time_915@1 <= 1000; define __global_time_micros@198 as (__global_time_micros@197 + __op_time_915@1); define Cat@y@8 as Cat@y@7 - 60; epsilon; checkBehaviorSatisfied(); enter atomic; epsilon; declare CatObserver@checkBehaviorSatisfied@catX@349 as integer; declare CatObserver@checkBehaviorSatisfied@catY@349 as integer; define CatObserver@checkBehaviorSatisfied@catX@350 as Cat@x@7; define CatObserver@checkBehaviorSatisfied@catY@350 as Cat@y@8; declare CatObserver@checkBehaviorSatisfied@__tmp_243@523 as boolean; define CatObserver@checkBehaviorSatisfied@__tmp_243@524 as CatObserver@checkBehaviorSatisfied@catX@350 = 31; assume CatObserver@checkBehaviorSatisfied@__tmp_243@524; define CatObserver@checkBehaviorSatisfied@__tmp_243@525 as CatObserver@checkBehaviorSatisfied@catY@350 = 29; epsilon; assume CatObserver@checkBehaviorSatisfied@__tmp_243@525; REACHED (\"Cat may not fall in the well!\")",
+      "action": "WAIT",
+      "waitMicros": 150
+    }
+  ],
+  "violations": [
+    "Cat may not fall in the well!"
+  ]
+}

@@ -1,0 +1,489 @@
+{
+  "steps": [
+    {
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 22,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "layer": 0,
+            "size": 100,
+            "visible": true,
+            "STAGE_HALF_HEIGHT": 180,
+            "active_graphic_half_height": 31,
+            "active_graphic_height": 63,
+            "STAGE_HEIGHT": 360,
+            "x": 74,
+            "y": 90,
+            "active_graphic_name": "flag",
+            "direction": 90,
+            "STAGE_WIDTH": 480,
+            "active_graphic_width": 45
+          },
+          "name": "Pole"
+        },
+        {
+          "variables": {
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_half_height": 23,
+            "active_graphic_half_width": 23,
+            "STAGE_HEIGHT": 360,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "active_graphic_height": 46,
+            "x": -143,
+            "y": -150,
+            "active_graphic_name": "marble",
+            "active_graphic_width": 46,
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240
+          },
+          "name": "Marble"
+        }
+      ],
+      "action": "EPSILON"
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 22,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "layer": 0,
+            "size": 100,
+            "visible": true,
+            "STAGE_HALF_HEIGHT": 180,
+            "active_graphic_half_height": 31,
+            "active_graphic_height": 63,
+            "STAGE_HEIGHT": 360,
+            "x": 74,
+            "y": 90,
+            "active_graphic_name": "flag",
+            "direction": 90,
+            "STAGE_WIDTH": 480,
+            "active_graphic_width": 45
+          },
+          "name": "Pole"
+        },
+        {
+          "variables": {
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_half_height": 23,
+            "active_graphic_half_width": 23,
+            "STAGE_HEIGHT": 360,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "active_graphic_height": 46,
+            "x": -143,
+            "y": -150,
+            "active_graphic_name": "marble",
+            "active_graphic_width": 46,
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240
+          },
+          "name": "Marble"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 60
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 22,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "layer": 0,
+            "size": 100,
+            "visible": true,
+            "STAGE_HALF_HEIGHT": 180,
+            "active_graphic_half_height": 31,
+            "active_graphic_height": 63,
+            "STAGE_HEIGHT": 360,
+            "x": 74,
+            "y": 90,
+            "active_graphic_name": "flag",
+            "direction": 90,
+            "STAGE_WIDTH": 480,
+            "active_graphic_width": 45
+          },
+          "name": "Pole"
+        },
+        {
+          "variables": {
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_half_height": 23,
+            "active_graphic_half_width": 23,
+            "STAGE_HEIGHT": 360,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "active_graphic_height": 46,
+            "x": -143,
+            "y": -150,
+            "active_graphic_name": "marble",
+            "active_graphic_width": 46,
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240
+          },
+          "name": "Marble"
+        }
+      ],
+      "action": "MOUSE_DOWN"
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 22,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "layer": 0,
+            "size": 100,
+            "visible": true,
+            "STAGE_HALF_HEIGHT": 180,
+            "active_graphic_half_height": 31,
+            "active_graphic_height": 63,
+            "STAGE_HEIGHT": 360,
+            "x": 74,
+            "y": 90,
+            "active_graphic_name": "flag",
+            "direction": 90,
+            "STAGE_WIDTH": 480,
+            "active_graphic_width": 45
+          },
+          "name": "Pole"
+        },
+        {
+          "variables": {
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_half_height": 23,
+            "active_graphic_half_width": 23,
+            "STAGE_HEIGHT": 360,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "active_graphic_height": 46,
+            "x": -143,
+            "y": -150,
+            "active_graphic_name": "marble",
+            "active_graphic_width": 46,
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240
+          },
+          "name": "Marble"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 140
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 22,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "layer": 0,
+            "size": 100,
+            "visible": true,
+            "STAGE_HALF_HEIGHT": 180,
+            "active_graphic_half_height": 31,
+            "active_graphic_height": 63,
+            "STAGE_HEIGHT": 360,
+            "x": 74,
+            "y": 90,
+            "active_graphic_name": "flag",
+            "direction": 90,
+            "STAGE_WIDTH": 480,
+            "active_graphic_width": 45
+          },
+          "name": "Pole"
+        },
+        {
+          "variables": {
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_half_height": 23,
+            "active_graphic_half_width": 23,
+            "STAGE_HEIGHT": 360,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "active_graphic_height": 46,
+            "x": -143,
+            "y": -150,
+            "active_graphic_name": "marble",
+            "active_graphic_width": 46,
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240
+          },
+          "name": "Marble"
+        }
+      ],
+      "action": "MOUSE_MOVE",
+      "mousePosition": {
+        "y": 64
+      }
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 22,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "layer": 0,
+            "size": 100,
+            "visible": true,
+            "STAGE_HALF_HEIGHT": 180,
+            "active_graphic_half_height": 31,
+            "active_graphic_height": 63,
+            "STAGE_HEIGHT": 360,
+            "x": 74,
+            "y": 90,
+            "active_graphic_name": "flag",
+            "direction": 90,
+            "STAGE_WIDTH": 480,
+            "active_graphic_width": 45
+          },
+          "name": "Pole"
+        },
+        {
+          "variables": {
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_half_height": 23,
+            "active_graphic_half_width": 23,
+            "STAGE_HEIGHT": 360,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "active_graphic_height": 46,
+            "x": -143,
+            "y": 64,
+            "active_graphic_name": "marble",
+            "active_graphic_width": 46,
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240
+          },
+          "name": "Marble"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 150
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 22,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "layer": 0,
+            "size": 100,
+            "visible": true,
+            "STAGE_HALF_HEIGHT": 180,
+            "active_graphic_half_height": 31,
+            "active_graphic_height": 63,
+            "STAGE_HEIGHT": 360,
+            "x": 74,
+            "y": 90,
+            "active_graphic_name": "flag",
+            "direction": 90,
+            "STAGE_WIDTH": 480,
+            "active_graphic_width": 45
+          },
+          "name": "Pole"
+        },
+        {
+          "variables": {
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_half_height": 23,
+            "active_graphic_half_width": 23,
+            "STAGE_HEIGHT": 360,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "active_graphic_height": 46,
+            "x": -143,
+            "y": 64,
+            "active_graphic_name": "marble",
+            "active_graphic_width": 46,
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240
+          },
+          "name": "Marble"
+        }
+      ],
+      "action": "MOUSE_UP"
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 22,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "layer": 0,
+            "size": 100,
+            "visible": true,
+            "STAGE_HALF_HEIGHT": 180,
+            "active_graphic_half_height": 31,
+            "active_graphic_height": 63,
+            "STAGE_HEIGHT": 360,
+            "x": 74,
+            "y": 90,
+            "active_graphic_name": "flag",
+            "direction": 90,
+            "STAGE_WIDTH": 480,
+            "active_graphic_width": 45
+          },
+          "name": "Pole"
+        },
+        {
+          "variables": {
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_half_height": 23,
+            "active_graphic_half_width": 23,
+            "STAGE_HEIGHT": 360,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "active_graphic_height": 46,
+            "x": -143,
+            "y": 64,
+            "active_graphic_name": "marble",
+            "active_graphic_width": 46,
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240
+          },
+          "name": "Marble"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 160
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 22,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "layer": 0,
+            "size": 100,
+            "visible": true,
+            "STAGE_HALF_HEIGHT": 180,
+            "active_graphic_half_height": 31,
+            "active_graphic_height": 63,
+            "STAGE_HEIGHT": 360,
+            "x": 74,
+            "y": 90,
+            "active_graphic_name": "flag",
+            "direction": 90,
+            "STAGE_WIDTH": 480,
+            "active_graphic_width": 45
+          },
+          "name": "Pole"
+        },
+        {
+          "variables": {
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_half_height": 23,
+            "active_graphic_half_width": 23,
+            "STAGE_HEIGHT": 360,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "active_graphic_height": 46,
+            "x": -143,
+            "y": 64,
+            "active_graphic_name": "marble",
+            "active_graphic_width": 46,
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240
+          },
+          "name": "Marble"
+        }
+      ],
+      "action": "MOUSE_MOVE",
+      "mousePosition": {
+        "x": -201,
+        "y": 64
+      }
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "active_graphic_half_width": 22,
+            "STAGE_HALF_WIDTH": 240,
+            "color_effect_value": 0,
+            "layer": 0,
+            "size": 100,
+            "visible": true,
+            "STAGE_HALF_HEIGHT": 180,
+            "active_graphic_half_height": 31,
+            "active_graphic_height": 63,
+            "STAGE_HEIGHT": 360,
+            "x": 74,
+            "y": 90,
+            "active_graphic_name": "flag",
+            "direction": 90,
+            "STAGE_WIDTH": 480,
+            "active_graphic_width": 45
+          },
+          "name": "Pole"
+        },
+        {
+          "variables": {
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "active_graphic_half_height": 23,
+            "active_graphic_half_width": 23,
+            "STAGE_HEIGHT": 360,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "visible": true,
+            "active_graphic_height": 46,
+            "x": -201,
+            "y": 64,
+            "active_graphic_name": "marble",
+            "active_graphic_width": 46,
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240
+          },
+          "name": "Marble"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 110
+    }
+  ],
+  "violations": [
+    "Marble not inside the track"
+  ]
+}
