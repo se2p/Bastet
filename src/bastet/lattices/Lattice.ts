@@ -24,6 +24,7 @@
  */
 
 import {Record as ImmRec} from "immutable";
+import { IllegalArgumentException } from "../core/exceptions/IllegalArgumentException";
 import {PerfTimer} from "../utils/PerfTimer";
 
 /**
@@ -147,8 +148,12 @@ export class Lattices {
         const timer = new PerfTimer(null);
         timer.start();
         try {
-            isFeasible = this.isFeasible0(element, inLattice);
-            return isFeasible;
+            try {
+                isFeasible = this.isFeasible0(element, inLattice);
+                return isFeasible;
+            } catch(e) {
+                throw new IllegalArgumentException(`Checking feasibility for "${purpose}" failed: ${e.toString()}`);
+            }
         } finally {
             timer.stop();
             console.log(`${isFeasible ? "Feasible" : "Infeasible"} ${timer.lastIntervalDuration}`)
