@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BASTET task6 UNSAFE PredAbs" type="NodeJSConfigurationType" folderName="ASE20" application-parameters="-c config/predicate-abstraction.json -P test/programs/publications/ase20-verified/task6-monkey/task6program_UNSAFE.sc -S test/programs/publications/ase20-verified/task6-monkey/task6spec.sc -I src/public/library.sc" node-parameters="--require ts-node/register --max-old-space-size=10192" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>

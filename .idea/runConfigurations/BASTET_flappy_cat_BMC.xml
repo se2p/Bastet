@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BASTET flappy-cat BMC" type="NodeJSConfigurationType" folderName="Testified: Bounded Model Checking" application-parameters="-P test/programs/publications/ths-testified/flappy-cat/p_UNSAFE.sc -S test/programs/publications/ths-testified/flappy-cat/spec.sc -I src/public/library.sc" node-parameters="--experimental-wasi-unstable-preview1 --experimental-wasm-bigint --require ts-node/register" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>
