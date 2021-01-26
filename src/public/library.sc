@@ -984,6 +984,9 @@ role RuntimeEntity is MathActor, KeyboardIO begin
          define result as keyPressed() = key
     end returns result : boolean
 
+    define atomic keyPressedByCodeNondet (key: integer) begin
+    end returns result : boolean
+
     define atomic keyPressed () begin
         declare io as actor
         define io as locate actor "IOActor"
