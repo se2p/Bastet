@@ -53,7 +53,7 @@ import {Property} from "../../../syntax/Property";
 import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
 import {AnalysisStatistics} from "../AnalysisStatistics";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {NoMergeIntoOperator, NoStopOperator, StandardMergeIntoOperator} from "../Operators";
+import {NewMergeIntoOperator, NoMergeIntoOperator, NoStopOperator, StandardMergeIntoOperator} from "../Operators";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {Set as ImmSet} from "immutable";
@@ -130,6 +130,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
 
         if (this._config.mergeIntoOperator == 'NoMergeIntoOperator') {
             this._mergeIntoOp = new NoMergeIntoOperator<GraphAbstractState, GraphAbstractState>();
+        } else if (this._config.mergeIntoOperator == 'NewMergeIntoOperator') {
+            this._mergeIntoOp = new NewMergeIntoOperator(this, this, this._statistics);
         } else if (this._config.mergeIntoOperator == 'StandardMergeIntoOperator') {
             this._mergeIntoOp = new StandardMergeIntoOperator(this, this, this._statistics);
         } else {
@@ -169,7 +171,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
             if (this.target(succ).length > 0) {
                 // Only add feasible states (avoids to check the feasibility of the full trace, if done in the refiner)
                 if (this._config.checkTargetFeasibility) {
-                    if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Block Feasibility")) {
+                    if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Block Target Feasibility")) {
                         continue;
                     }
                 }
@@ -193,10 +195,11 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         Preconditions.checkArgument(state2.getMergeOf().size > 0);
 
         return GraphAbstractStateFactory.withFreshID(
-            state1.getPredecessors().union(state2.getPredecessors()),
-            state1.getMergeOf().union(state2.getMergeOf()),
-            this._wrappedAnalysis.merge(state1.getWrappedState(), state2.getWrappedState()),
-            state1.getPartitionKeys(), state1.orderKey);
+                state1.getPredecessors().union(state2.getPredecessors()),
+                state1.getMergeOf().union(state2.getMergeOf()),
+                this._wrappedAnalysis.merge(state1.getWrappedState(), state2.getWrappedState()),
+                state1.getPartitionKeys(), state1.orderKey)
+            .withOrderKey(state1.orderKey);
     }
 
     mergeInto(state: GraphAbstractState, frontier: FrontierSet<GraphAbstractState>, reached: ReachedSet<GraphAbstractState>, unwrapper: (AbstractElement) => GraphAbstractState, wrapper: (E) => AbstractElement): [FrontierSet<GraphAbstractState>, ReachedSet<GraphAbstractState>] {
