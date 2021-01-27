@@ -131,7 +131,7 @@ export class AppBuilder {
         const initScript = this.buildInitScript(acd.resourceDefs, acd.declarationStmts, acd.initStmts);
         const methodDefs = this.buildMethodDefs(acd.methodDefs);
         const externalMethodSigs = this.buildExternalMethodSigs(acd.externalMethodDecls);
-        const scripts = this.buildScripts(acd.scriptList).concat([initScript]);
+        const scripts = [initScript].concat(this.buildScripts(acd.scriptList));
         const methods = this.buildMethods(acd.methodDefs);
         const concern = this.determineConcern(actorDefinition);
 
