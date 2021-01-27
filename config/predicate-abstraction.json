@@ -10,7 +10,7 @@
 
     "Transformer": {
         "enable-message-dispatcher-loop": false,
-        "use-busy-waiting": false,
+        "use-busy-waiting": true,
         "use-busy-wait-until-cond": true
     },
 
