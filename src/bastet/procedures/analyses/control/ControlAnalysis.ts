@@ -464,6 +464,9 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
 
         const actors = this._statistics.withContext("Actors");
         actors.put("actorOrder", this._task.actors.map(a => a.ident).toString())
+        for (const a of this._task.actors) {
+            actors.withContext(a.ident).put("scripts", Array.from(a.scripts).map((s) => s.transitions.name).toString());
+        }
     }
 
     testify(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
