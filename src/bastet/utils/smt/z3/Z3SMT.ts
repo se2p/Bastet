@@ -179,29 +179,33 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
     // FIXME: Memory Leak! Result of this method should be a Z3FormulaVector that can release the memory
     //  (it must decrease the references)
     public collectInterpolants(): Z3BooleanFormula[] {
-        // TODO: the following check is very expensive and should somehow be cached so that it can be reused
-        // Preconditions.checkState(this.isUnsat(), "Formula should have been unsatisfiable");
-
-        const assertedFormulas = new Z3Vector(this._ctx, this._ctx.solver_get_assertions(this._solver));
-
-        // A refutation from premises (assertions) C (i.e., a proof of "false" from a set of formulas C).
-        const proof: Z3_ast = this._ctx.solver_get_proof(this._solver);
-        this._ctx.inc_ref(proof);
         try {
-            // An interpolation pattern over C. The pattern pat is a formula combining the formulas in C using
-            // logical conjunction and the "interp" operator (see Z3_mk_interpolant).
-            const asserted = assertedFormulas.asArray();
-            asserted.forEach((f) => this.incRef(f));
+            // TODO: the following check is very expensive and should somehow be cached so that it can be reused
+            // Preconditions.checkState(this.isUnsat(), "Formula should have been unsatisfiable");
+
+            const assertedFormulas = new Z3Vector(this._ctx, this._ctx.solver_get_assertions(this._solver));
+
+            // A refutation from premises (assertions) C (i.e., a proof of "false" from a set of formulas C).
+            const proof: Z3_ast = this._ctx.solver_get_proof(this._solver);
+            this._ctx.inc_ref(proof);
             try {
-                const pat: Z3_ast = this.buildInterpolationProblem(asserted).getAST();
-                const param: Z3_param = this._ctx.mk_params();
-                return new Z3Vector(this._ctx, this._ctx.get_interpolant(proof, pat, param)).asArray();
+                // An interpolation pattern over C. The pattern pat is a formula combining the formulas in C using
+                // logical conjunction and the "interp" operator (see Z3_mk_interpolant).
+                const asserted = assertedFormulas.asArray();
+                asserted.forEach((f) => this.incRef(f));
+                try {
+                    const pat: Z3_ast = this.buildInterpolationProblem(asserted).getAST();
+                    const param: Z3_param = this._ctx.mk_params();
+                    return new Z3Vector(this._ctx, this._ctx.get_interpolant(proof, pat, param)).asArray();
+                } finally {
+                    this._ctx.dec_ref(proof);
+                    asserted.forEach((f) => this.decRef(f));
+                }
             } finally {
-                this._ctx.dec_ref(proof);
-                asserted.forEach((f) => this.decRef(f));
+                assertedFormulas.release();
             }
-        } finally {
-            assertedFormulas.release();
+        } catch (e) {
+            throw new IllegalArgumentException(`Interpolation failed. ${e.toString()}`);
         }
     }
 

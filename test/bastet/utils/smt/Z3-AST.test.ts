@@ -32,6 +32,7 @@ import {ConcreteNumber} from "../../../../src/bastet/procedures/domains/Concrete
 import {SMTFactory, Z3SMT} from "../../../../src/bastet/utils/smt/z3/Z3SMT";
 import {VariableCollectingVisitor, Z3Visitor} from "../../../../src/bastet/utils/smt/z3/Z3AST";
 import {Z3Theories} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
+import {AnalysisStatistics} from "../../../../src/bastet/procedures/analyses/AnalysisStatistics";
 
 let smt: Z3SMT;
 let ctx;
@@ -42,7 +43,7 @@ beforeAll( async (done) => {
     smt = await SMTFactory.createZ3();
     ctx = smt.createContext();
     theories = smt.createTheories(ctx);
-    prover = smt.createProver(ctx);
+    prover = smt.createProver(ctx, new AnalysisStatistics("Test", {}));
     done();
 });
 

@@ -1,42 +1,36 @@
 program Mini1Program
 
 actor ActorA is ScratchSprite begin
+    image Elefant "1.svg"
 
     script on startup do begin
         define x as 0
         define y as 0
-        define direction as 90
+        define size as 100
+        changeActiveGraphicTo("Elefant")
+    end
 
-        declare n as int
-        define n as 10
+end
 
-        declare nf as float
-        declare dx as float
-        declare dy as float
-        declare ndir as float
-        declare input as float
-        declare radians as float
+actor ActorB is ScratchSprite begin
+    image Elefant "1.svg"
 
-        define nf as cast n to float
+    script on bootstrap do begin
 
-        define ndir as cast direction to float
-        define radians as 0.0
-        define dx as nf * mathCos(radians)
-        define dy as nf * mathSin(radians)
+    end
 
-        define input as radians
-
-        declare tmpx as int
-        declare tmpy as int
-        define tmpx as cast dx to int
-        define tmpy as cast dy to int
-
-        define x as x + tmpx
-        define y as y + tmpy
+    script on startup do begin
+       define x as 1
+       define y as 1
+       define size as 100
+       changeActiveGraphicTo("Elefant")
 
 
-        if not (x >= 9 and x <= 11) then begin
-            _RUNTIME_signalFailure("moveSteps Test")
+       declare actorA as actor
+       define actorA as locate actor "ActorA"
+
+       if not touchingObject(actorA) then begin
+            _RUNTIME_signalFailure("Touching Object Test")
         end
     end
 
