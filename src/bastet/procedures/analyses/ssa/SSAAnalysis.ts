@@ -28,7 +28,12 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
-import {ConcreteElement} from "../../domains/ConcreteElements";
+import {
+    ConcreteElement,
+    ConcreteMemory,
+    ConcretePrimitive,
+    ConcreteUnifiedMemory
+} from "../../domains/ConcreteElements";
 import {LabeledTransferRelation} from "../TransferRelation";
 import {SSAAbstractDomain, SSAState} from "./SSAAbstractDomain";
 import {SSATransferRelation} from "./SSATransferRelation";
@@ -44,6 +49,9 @@ import {SSAMergeOperator} from "./SSAMergeOperator";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {AccessibilityRelation} from "../Accessibility";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+import {SSAAbstractStates} from "./SSAAbstractStates";
+import {getTheOnlyElement} from "../../../utils/Collections";
 
 
 export class SSAAnalysisConfig extends BastetConfiguration {
@@ -204,15 +212,29 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
-        const resultWithSSA = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
+        const resultWithSSA: Iterable<[AbstractState, ConcreteElement][]> = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
 
-        // TODO: Remove the SSA-Indices from the concrete elements along the path
-        throw new ImplementMeException();
+        for (const seq of resultWithSSA) {
+            const result: [AbstractState, ConcreteElement][] = [];
+            for (const [e, c] of seq) {
+                if (c instanceof ConcreteMemory) {
+                    const ssaState = getTheOnlyElement(SSAAbstractStates.extractFrom(e));
+                    const mem = ssaState.getPrimitiveAttributes(c);
+                    result.push([e, new ConcreteUnifiedMemory(mem)]);
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            }
+
+            return [result];
+        }
+
+        return [];
     }
 
     accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
@@ -226,6 +248,5 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
     decRef(state: SSAState) {
         this.wrappedAnalysis.decRef(state.getWrappedState());
     }
-
 
 }

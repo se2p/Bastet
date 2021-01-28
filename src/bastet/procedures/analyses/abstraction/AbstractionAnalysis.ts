@@ -244,16 +244,12 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
         return this._wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
-        const resultWithSSA = this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
-
-        // TODO: Remove the SSA-Indices from the concrete elements along the path
-        // TODO: Das Alignment der SSA-Indices hier machen
-        throw new ImplementMeException();
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
+        return this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
     incRef(state: AbstractionState) {

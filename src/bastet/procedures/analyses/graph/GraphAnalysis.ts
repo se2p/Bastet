@@ -344,11 +344,11 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         return this.wrappedAnalysis.testifyOne(reaching, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): Iterable<[GraphAbstractState, ConcreteElement][]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): Iterable<[GraphAbstractState, ConcreteElement][]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 

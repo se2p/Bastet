@@ -49,7 +49,7 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
        TargetOperator<E>, MergeIntoOperator<E, F>,
        MergeOperator<E>, StopOperator<E, F>, WidenOperator<E, F>, PartitionOperator<E, F>,
        WitnessHandler<F>, TraversalOrderOperator<E, F>, ResultFinalization<F>,
-       TestificationOperator<E, F>, AccessibilityOperator<E, F>, StateReferenceOperator<E> {
+       TestificationOperator<E, F, C>, AccessibilityOperator<E, F>, StateReferenceOperator<E> {
 
     /**
      * The abstract domain the analysis works with.
@@ -136,7 +136,8 @@ export interface InitOperator<E extends AbstractElement, F extends AbstractState
  * Testification operator. The testification concept is described in the paper
  *  "Witness validation and stepwise testification across software verifiers".
  */
-export interface TestificationOperator<E extends AbstractElement, F extends AbstractState> {
+export interface TestificationOperator<E extends AbstractElement, F extends AbstractState,
+    C extends ConcreteElement> {
 
     /**
      * Refine the given accessibility relation `accessibility` such that the given
@@ -158,7 +159,7 @@ export interface TestificationOperator<E extends AbstractElement, F extends Abst
      */
     testifyOne(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation<F>;
 
-    testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]>;
+    testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<[F, C][]>;
 
     /**
      * Guarantees to return at most one concrete path.
@@ -166,7 +167,7 @@ export interface TestificationOperator<E extends AbstractElement, F extends Abst
      * @param accessibility
      * @param state
      */
-    testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]>;
+    testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<[F, C][]>;
 
 }
 

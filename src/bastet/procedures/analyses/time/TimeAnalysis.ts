@@ -197,11 +197,11 @@ export class TimeAnalysis<F extends AbstractState>
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation< F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation< F>, state: F): Iterable<[F, ConcreteElement][]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation< F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation< F>, state: F): Iterable<[F, ConcreteElement][]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 

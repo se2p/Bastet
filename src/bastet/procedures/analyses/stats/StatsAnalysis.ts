@@ -223,13 +223,13 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         });
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<[F, C][]> {
         return this._testifyStats.runWithTimer(() => {
             return this.wrappedAnalysis.testifyConcrete(accessibility, state);
         });
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<[F, C][]> {
         return this._testifyStats.runWithTimer(() => {
             return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
         });

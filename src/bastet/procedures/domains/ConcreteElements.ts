@@ -27,7 +27,7 @@ import {Lattice} from "../../lattices/Lattice";
 import {ImmutableMap} from "../../utils/ImmutableMap";
 import {ImmutableList} from "../../utils/ImmutableList";
 import {Preconditions} from "../../utils/Preconditions";
-import {Record as ImmRec} from "immutable";
+import {Record as ImmRec, Map as ImmMap} from "immutable";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 
 export interface ConcreteElement {
@@ -174,6 +174,22 @@ export class ConcreteBoundedStringListDomain implements ConcreteDomain<ConcreteS
 
 }
 
+export class ConcreteUnifiedMemory implements ConcreteElement {
+
+    private readonly _mem: ImmMap<string, ConcretePrimitive<any>>;
+
+    constructor(mem: ImmMap<string, ConcretePrimitive<any>>) {
+        this._mem = Preconditions.checkNotUndefined(mem);
+    }
+
+    public variables(): Iterable<string> {
+        return this._mem.keys();
+    }
+
+    public get(variable: string): ConcretePrimitive<any> {
+        return this._mem.get(variable);
+    }
+}
 
 export class ConcreteMemory implements ConcreteElement {
 

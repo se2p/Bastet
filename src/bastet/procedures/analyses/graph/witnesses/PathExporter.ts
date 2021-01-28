@@ -30,12 +30,14 @@ import {ReachedSet} from "../../../algorithms/StateSet";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {GraphReachedSetWrapper} from "../GraphStatesSetWrapper";
 import {TransitionLabelProvider, WrappingProgramAnalysis} from "../../ProgramAnalysis";
-import {ConcreteElement, ConcreteMemory} from "../../../domains/ConcreteElements";
+import {ConcreteElement, ConcreteMemory, ConcreteUnifiedMemory} from "../../../domains/ConcreteElements";
 import {AccessibilityRelation} from "../../Accessibility";
 import {ProgramOperation} from "../../../../syntax/app/controlflow/ops/ProgramOperation";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
 import {SSAStateVisitor} from "../../StateVisitors";
 import {SSAState} from "../../ssa/SSAAbstractDomain";
+import {getTheOnlyElement} from "../../../../utils/Collections";
+import {IllegalStateException} from "../../../../core/exceptions/IllegalStateException";
 
 export class PathExporter implements WitnessHandler<GraphAbstractState> {
 
@@ -107,42 +109,20 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
     private exportConcretePath(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState) {
         const pathElements = [];
 
-        // Hier reinhängen mit Zugriff auf den Lattice (und dessen Join-Methode) durch die Analysis
-        // this._analysis.wrappedAnalysis.abstractDomain.lattice.join()
+        const conreteSeq: [GraphAbstractState, ConcreteElement][] = getTheOnlyElement(this._analysis.testifyConcreteOne(pathAr, violating));
 
-        /*
-         * Idea: copy the workflow of AbstractionRefiner.checkIsFeasible(ar, e)
-         */
-
-        this._analysis.testifyConcreteOne(pathAr, violating);
-
-        const abstractStates = Array.from(pathAr.initial());
-        // abstractStates.map(s => pathAr.concretizer().concretizeOne(s));
-
-        const concrete: ConcreteElement = pathAr.concretizer().concretizeOne(violating);
-        Preconditions.checkArgument(concrete instanceof ConcreteMemory);
-        const concreteMem: ConcreteMemory = concrete as ConcreteMemory;
-
-        const worklist: GraphAbstractState[] = [];
-        Array.from(pathAr.initial()).forEach((e) => worklist.push(e));
-
-        while (worklist.length > 0) {
-            const work = worklist.pop();
-
-            const elementJson = {};
-            const ssaState: SSAState = work.accept(new SSAStateVisitor());
-            for (const [k, v] of ssaState.getPrimitiveAttributes(concreteMem)) {
-                if (k.indexOf("__op_time_") == 0) {
-                    continue;
-                }
-                elementJson[k] = v.value;
-            }
-            pathElements.push({'id': work.getId(), 'mem': elementJson});
-
-            const succs = pathAr.successorsOf(work);
-            Preconditions.checkArgument(succs.length <= 1, "The path to export most not contain branchings!");
-            for (const succ of succs) {
-                worklist.push(succ);
+        for (const [e, c] of conreteSeq) {
+            if (c instanceof ConcreteUnifiedMemory) {
+                const elementJson = {};
+                 for (const k of c.variables()) {
+                    if (k.indexOf("__op_time_") == 0) {
+                        continue;
+                 }
+                    elementJson[k] = c.get(k);
+                 }
+                pathElements.push({'id': e.getId(), 'mem': elementJson});
+            } else {
+                throw new IllegalStateException("Not supported");
             }
         }
 

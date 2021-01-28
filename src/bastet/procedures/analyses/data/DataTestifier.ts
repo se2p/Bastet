@@ -126,7 +126,7 @@ class StateFormulaVisitor extends DelegatingStateVisitor<BooleanFormula> {
 
 }
 
-export class DataTestifier implements TestificationOperator<AbstractState, AbstractState> {
+export class DataTestifier implements TestificationOperator<AbstractState, AbstractState, ConcreteMemory> {
 
     protected readonly _theories: TransformerTheories<AbstractBoolean, AbstractBoolean, AbstractInteger,
         AbstractReal, AbstractFloat, AbstractString, AbstractList>;
@@ -152,7 +152,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
      * @param targetState
      */
     private testifyOneIncludeConcrete(accessibility: AccessibilityRelation<AbstractState>,
-                                     targetState: AbstractState): [AccessibilityRelation<AbstractState>, Iterable<ConcreteElement[]>] {
+                                     targetState: AbstractState): [AccessibilityRelation<AbstractState>, Iterable<[AbstractState, ConcreteMemory][]>] {
         const alternatives = this.determineBranchingAlternatives(accessibility, targetState);
 
         // Create the branching formula
@@ -178,7 +178,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         const result: AccessibilityRelation<AbstractState> = this.strenghtenRelation(
             accessibility, alternatives, satAssignement, targetState);
 
-        const concreteSeq: Iterable<ConcreteElement[]> = [this.buildConcreteStateSeq(result, satAssignement)];
+        const concreteSeq: Iterable<[AbstractState, ConcreteMemory][]> = [this.buildConcreteStateSeq(result, satAssignement)];
 
         // return the result (strengthened accessibility relation)
         return [result, concreteSeq];
@@ -279,11 +279,11 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         return result;
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteMemory][]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteMemory][]> {
         return this.testifyOneIncludeConcrete(accessibility, state)[1];
     }
 
@@ -365,7 +365,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         return result;
     }
 
-    private buildConcreteStateSeq(result: AccessibilityRelation<AbstractState>, satAssignement: ConcreteMemory) {
-        return AccessibilityRelations.toSequence(result).map(e => satAssignement);
+    private buildConcreteStateSeq(result: AccessibilityRelation<AbstractState>, satAssignement: ConcreteMemory): [AbstractState, ConcreteMemory][] {
+        return AccessibilityRelations.toSequence(result).map(e => [e, satAssignement]);
     }
 }
