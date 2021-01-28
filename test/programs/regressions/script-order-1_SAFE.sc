@@ -10,7 +10,11 @@ actor Worker begin
 
     script on startup do begin
         repeat forever begin
-            define x as x + 1
+            if x = 0 then begin
+                define x as 1
+            end else begin
+                define x as 0
+            end
         end
     end
 

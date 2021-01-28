@@ -30,7 +30,7 @@ actor Boss begin
 
     extern _RUNTIME_micros () returns integer
 
-    define atomic checkBehaviorSatisfied () begin
+    define atomic check () begin
         declare current_x as int
         define current_x as cast attribute "x" of o to int
 
@@ -49,12 +49,10 @@ actor Boss begin
         define last_change as _RUNTIME_micros()
         define o as locate actor "Worker"
         define last_x as cast attribute "x" of o to int
-
-        checkBehaviorSatisfied()
     end
 
     script on statement finished do begin
-        checkBehaviorSatisfied()
+        check()
     end
 
 end
