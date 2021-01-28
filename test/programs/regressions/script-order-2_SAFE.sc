@@ -10,11 +10,7 @@ actor Worker begin
 
     script on startup do begin
         repeat forever begin
-            if x = 0 then begin
-                define x as 1
-            end else begin
-                define x as 0
-            end
+            define x as x + 1
         end
     end
 
@@ -30,7 +26,7 @@ actor Boss begin
 
     extern _RUNTIME_micros () returns integer
 
-    define atomic check () begin
+    define atomic checkBehaviorSatisfied () begin
         declare current_x as int
         define current_x as cast attribute "x" of o to int
 
@@ -49,10 +45,12 @@ actor Boss begin
         define last_change as _RUNTIME_micros()
         define o as locate actor "Worker"
         define last_x as cast attribute "x" of o to int
+
+        checkBehaviorSatisfied()
     end
 
     script on statement finished do begin
-        check()
+        checkBehaviorSatisfied()
     end
 
 end

@@ -20,7 +20,7 @@
  *
  */
 
-import {SMTFactory, Z3Const, Z3Model, Z3SMT} from "../../../../src/bastet/utils/smt/z3/Z3SMT";
+import {SMTFactory, Z3Model, Z3SMT} from "../../../../src/bastet/utils/smt/z3/Z3SMT";
 import {VariableWithDataLocation} from "../../../../src/bastet/syntax/ast/core/Variable";
 import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataLocation";
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
@@ -34,6 +34,7 @@ import {
 import {BooleanType, IntegerType, StringType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
 import {Map as ImmMap, Record as ImmRec} from "immutable";
 import {FirstOrderFormula} from "../../../../src/bastet/utils/ConjunctiveNormalForm";
+import {AnalysisStatistics} from "../../../../src/bastet/procedures/analyses/AnalysisStatistics";
 
 
 let smt: Z3SMT;
@@ -45,7 +46,7 @@ beforeAll( async (done) => {
     smt = await SMTFactory.createZ3();
     ctx = smt.createContext();
     theories = smt.createTheories(ctx);
-    prover = smt.createProver(ctx);
+    prover = smt.createProver(ctx, new AnalysisStatistics("Test", {}));
     done();
 });
 

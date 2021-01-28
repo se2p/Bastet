@@ -46,6 +46,7 @@ import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {BooleanType} from "../../../syntax/ast/core/ScratchType";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+import {AnalysisStatistics} from "../../../procedures/analyses/AnalysisStatistics";
 
 export var PreModule = {
     print: function (text) {
@@ -132,17 +133,27 @@ const Z3_SATISFIABLE = 1;
 
 export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
 
-    private _ctx: LibZ3InContext;
-    private _solver: Z3_solver;
     private _model: Z3Model;
-    private _theories: Z3Theories;
 
-    constructor(ctx: LibZ3InContext, theories: Z3Theories) {
+    private readonly _ctx: LibZ3InContext;
+    private readonly _solver: Z3_solver;
+    private readonly _theories: Z3Theories;
+    private readonly _stats: AnalysisStatistics;
+    private readonly _statAllSat: AnalysisStatistics;
+    private readonly _statBoolPredAbs: AnalysisStatistics;
+    private readonly _statBoolPredAbsSetup: AnalysisStatistics;
+    private readonly _statBoolPredAbsAllSat: AnalysisStatistics;
+
+    constructor(ctx: LibZ3InContext, theories: Z3Theories, stats: AnalysisStatistics) {
         super();
         this._ctx = Preconditions.checkNotUndefined(ctx);
         this._solver = this._ctx.mk_solver();
         this._ctx.solver_inc_ref(this._solver);
-        this._theories = theories;
+        this._theories = Preconditions.checkNotUndefined(theories);
+        this._stats = Preconditions.checkNotUndefined(stats).withContext("SMT");
+        this._statBoolPredAbs = this._stats.withContext("bool-pred-abs");
+        this._statBoolPredAbsSetup = this._statBoolPredAbs.withContext("setup");
+        this._statBoolPredAbsAllSat = this._statBoolPredAbs.withContext("all-sat");
     }
 
     private solve(): number {
@@ -168,29 +179,33 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
     // FIXME: Memory Leak! Result of this method should be a Z3FormulaVector that can release the memory
     //  (it must decrease the references)
     public collectInterpolants(): Z3BooleanFormula[] {
-        // TODO: the following check is very expensive and should somehow be cached so that it can be reused
-        // Preconditions.checkState(this.isUnsat(), "Formula should have been unsatisfiable");
-
-        const assertedFormulas = new Z3Vector(this._ctx, this._ctx.solver_get_assertions(this._solver));
-
-        // A refutation from premises (assertions) C (i.e., a proof of "false" from a set of formulas C).
-        const proof: Z3_ast = this._ctx.solver_get_proof(this._solver);
-        this._ctx.inc_ref(proof);
         try {
-            // An interpolation pattern over C. The pattern pat is a formula combining the formulas in C using
-            // logical conjunction and the "interp" operator (see Z3_mk_interpolant).
-            const asserted = assertedFormulas.asArray();
-            asserted.forEach((f) => this.incRef(f));
+            // TODO: the following check is very expensive and should somehow be cached so that it can be reused
+            // Preconditions.checkState(this.isUnsat(), "Formula should have been unsatisfiable");
+
+            const assertedFormulas = new Z3Vector(this._ctx, this._ctx.solver_get_assertions(this._solver));
+
+            // A refutation from premises (assertions) C (i.e., a proof of "false" from a set of formulas C).
+            const proof: Z3_ast = this._ctx.solver_get_proof(this._solver);
+            this._ctx.inc_ref(proof);
             try {
-                const pat: Z3_ast = this.buildInterpolationProblem(asserted).getAST();
-                const param: Z3_param = this._ctx.mk_params();
-                return new Z3Vector(this._ctx, this._ctx.get_interpolant(proof, pat, param)).asArray();
+                // An interpolation pattern over C. The pattern pat is a formula combining the formulas in C using
+                // logical conjunction and the "interp" operator (see Z3_mk_interpolant).
+                const asserted = assertedFormulas.asArray();
+                asserted.forEach((f) => this.incRef(f));
+                try {
+                    const pat: Z3_ast = this.buildInterpolationProblem(asserted).getAST();
+                    const param: Z3_param = this._ctx.mk_params();
+                    return new Z3Vector(this._ctx, this._ctx.get_interpolant(proof, pat, param)).asArray();
+                } finally {
+                    this._ctx.dec_ref(proof);
+                    asserted.forEach((f) => this.decRef(f));
+                }
             } finally {
-                this._ctx.dec_ref(proof);
-                asserted.forEach((f) => this.decRef(f));
+                assertedFormulas.release();
             }
-        } finally {
-            assertedFormulas.release();
+        } catch (e) {
+            throw new IllegalArgumentException(`Interpolation failed. ${e.toString()}`);
         }
     }
 
@@ -397,13 +412,18 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
      * @param predicates
      */
     booleanAbstraction(formulaToAbstract: Z3FirstOrderFormula, predicates: Z3FirstOrderFormula[]): Z3FirstOrderFormula {
+        this._statBoolPredAbsSetup.startTimer();
         // Create a new free Boolean variable for each of the predicates
         const freeVariables: [string, Z3BooleanFormula][] = this.createFreeVariables(predicates);
 
         // Create the formula to compute allSatFor (adds the free variables along with equivalences)
         const newForm: Z3BooleanFormula = this.formWithVariable(formulaToAbstract, predicates, freeVariables);
+        this._statBoolPredAbsSetup.stopTimer();
 
+        this._statBoolPredAbsAllSat.startTimer();
         const retTable = this.allSat(newForm, freeVariables);
+        this._statBoolPredAbsAllSat.stopTimer();
+
         return this.truthTableToSummaryFormula(retTable, predicates);
     }
 
@@ -602,8 +622,8 @@ export class Z3SMT extends LibZ3NonContext {
         return new LibZ3InContext(this._wasmInstance, ctx);
     }
 
-    public createProver(ctx: LibZ3InContext): Z3ProverEnvironment {
-        return new Z3ProverEnvironment(ctx, this.createTheories(ctx));
+    public createProver(ctx: LibZ3InContext, stats: AnalysisStatistics): Z3ProverEnvironment {
+        return new Z3ProverEnvironment(ctx, this.createTheories(ctx), stats);
     }
 
     public createTheories(ctx: LibZ3InContext): Z3Theories {

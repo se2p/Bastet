@@ -25,7 +25,7 @@
 
 // Test by Robert Pernerstorfer
 
-import {SMTFactory, Z3Const, Z3Model, Z3SMT} from "../../../../src/bastet/utils/smt/z3/Z3SMT";
+import {SMTFactory, Z3Model, Z3SMT} from "../../../../src/bastet/utils/smt/z3/Z3SMT";
 import {VariableWithDataLocation} from "../../../../src/bastet/syntax/ast/core/Variable";
 import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataLocation";
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
@@ -38,6 +38,7 @@ import {
 } from "../../../../src/bastet/utils/smt/z3/Z3Theories";
 import {BooleanType, IntegerType, StringType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
 import {FirstOrderDomain} from "../../../../src/bastet/procedures/domains/FirstOrderDomain";
+import {AnalysisStatistics} from "../../../../src/bastet/procedures/analyses/AnalysisStatistics";
 
 let smt: Z3SMT;
 let ctx;
@@ -49,7 +50,7 @@ beforeAll(async (done) => {
     smt = await SMTFactory.createZ3();
     ctx = smt.createContext();
     theories = smt.createTheories(ctx);
-    prover = smt.createProver(ctx);
+    prover = smt.createProver(ctx, new AnalysisStatistics("Test", {}));
     done();
     builder = new TestFormulaBuilder(theories);
 });
@@ -69,7 +70,7 @@ test("Bool: Short 2", () => {
 })
 
 xtest("Bool: Short 3", () => {
-    let prover2 = smt.createProver(ctx);
+    const prover2 = smt.createProver(ctx, new AnalysisStatistics("Test", {}));
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const bx = theories.boolTheory.abstractBooleanValue(x);
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));

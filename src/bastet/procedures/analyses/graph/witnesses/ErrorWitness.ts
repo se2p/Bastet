@@ -24,100 +24,96 @@ import {Action} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {ConcretePrimitive} from "../../../domains/ConcreteElements";
 import {WitnessExporter} from "./WitnessExporter";
+import {DataLocationScoper} from "../../control/DataLocationScoping";
 
-export class Target {
-    private static readonly SCRATCH_TARGET_ATTRIBUTES = ["x", "y", "direction", "draggable", "rotationStyle", "visible", "size"];
+export class ErrorWitnessActor {
     name: string;
-    scratchAttributes: { [key: string]: string | boolean | number } = {}; //TODO add default scratch attributes
-    userDefinedAttributes: { [key: string]: string | boolean | number } = {};
+    variables: { [key: string]: string | boolean | number } = {}; //TODO add default scratch attributes
+    /**
+     * Variables that were declared inside a method
+     */
+    methodVariables: { [key: string]: string | boolean | number } = {};
 
-    removeUserDefinedAttributes(attributeToRemove: string[]) {
-        for (const attribute of attributeToRemove) {
-            if (this.userDefinedAttributes[attribute] != undefined) {
-                delete this.userDefinedAttributes[attribute];
+    removeVariables(variableNames: string[]) {
+        Object.keys(this.variables).forEach(variable => {
+            if (variableNames.includes(variable)) {
+                delete this.variables[variable];
             }
-        }
-    }
-
-    removeAttributesStartingWith(attributes: string[]) {
-        const attributesToRemove = Object.keys(this.userDefinedAttributes).filter(attribute => attributes.some(prefix => attribute.startsWith(prefix)));
-        this.removeUserDefinedAttributes(attributesToRemove);
-    }
-
-    removeActorPrefix(): void {
-        Target.removeAttributesWithTargetPrefix(this.scratchAttributes);
-        Target.removeAttributesWithTargetPrefix(this.userDefinedAttributes);
-    }
-
-    private static removeAttributesWithTargetPrefix(attributes): void {
-        Object.keys(attributes).forEach(attributeWithActorName => {
-            const {attribute} = WitnessExporter.splitTargetPrefixFromAttribute(attributeWithActorName);
-
-            const value = attributes[attributeWithActorName];
-            delete attributes[attributeWithActorName];
-            attributes[attribute] = value;
         })
     }
 
-    static fromConcretePrimitives(name: string, attributes: Map<string, ConcretePrimitive<any>>): Target {
-        const target = new Target();
+    removeActorPrefix(): void {
+        Object.keys(this.variables).forEach(scopedVariableName => {
+            const {attribute} = WitnessExporter.splitTargetPrefixFromAttribute(scopedVariableName);
+
+            const value = this.variables[scopedVariableName];
+            delete this.variables[scopedVariableName];
+
+            if (this.isActorVariable(scopedVariableName)) {
+                this.variables[attribute] = value;
+            } else if (this.methodVariables) {
+                this.methodVariables[scopedVariableName] = value;
+            }
+        });
+    }
+
+    static fromConcretePrimitives(name: string, attributes: Map<string, ConcretePrimitive<any>>): ErrorWitnessActor {
+        const target = new ErrorWitnessActor();
         target.name = name;
 
         attributes.forEach((value, attribute) => {
-            if (this.isScratchAttribute(attribute)) {
-                target.scratchAttributes[attribute] = value.value;
-            } else {
-                target.userDefinedAttributes[attribute] = value.value;
-            }
+            target.variables[attribute] = value.value;
         });
 
         return target;
     }
 
-    static isScratchAttribute(name: string): boolean {
-        if (WitnessExporter.isTargetAttribute(name)) {
-            name = WitnessExporter.splitTargetPrefixFromAttribute(name).attribute;
-        }
+    isActorVariable(scopedVariableName: string): boolean {
+        const scopedVariableNameName = DataLocationScoper.rightUnwrapScope(scopedVariableName);
+        const actorName = scopedVariableNameName.prefix;
 
-        return this.SCRATCH_TARGET_ATTRIBUTES.includes(name);
+        return actorName === this.name;
+    }
+
+    clone(): ErrorWitnessActor {
+        const data = JSON.parse(JSON.stringify(this));
+        return Object.assign(new ErrorWitnessActor(), data);
     }
 }
 
-export class MousePosition {
-    readonly x: number;
-    readonly y: number;
-
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
-    }
+export interface MousePosition {
+    x: number;
+    y: number;
 }
 
 export class ErrorWitnessStep {
     timestamp: number;
     action: Action;
+    epsilonType: Action;
     waitMicros?: number;
-    keyPressed?: number
+    keyPressed?: number;
+    answer?: string;
     actionLabel: string;
     actionTargetName: string;
     mousePosition: MousePosition;
-    targets: Target[] = [];
+    actors: ErrorWitnessActor[] = [];
 
-    isEmpty(): boolean {
-        return !this.action || this.targets.length === 0;
+    constructor(public id: number) {
     }
 
-    relevantTransition(prev: ErrorWitnessStep) {
-        this.targets = this.targets.sort((t1, t2) => t1.name.localeCompare(t2.name));
-        return !prev
-            || this.timestamp - prev.timestamp > 1000
-            || JSON.stringify(this.targets) !== JSON.stringify(prev.targets);
-    }
-
-    getUserDefinedAttributeValue(targetName: string, attribute: string): any {
-        const target = this.targets.find(t => t.name === targetName);
+    getVariableValue(targetName: string, attribute: string): any {
+        const target = this.actors.find(t => t.name === targetName);
         Preconditions.checkNotUndefined(target);
-        return target.userDefinedAttributes[attribute];
+        console.log(target.variables)
+        return target.variables[attribute];
+    }
+
+    clone(): ErrorWitnessStep {
+        const data = JSON.parse(JSON.stringify(this));
+        const clone: ErrorWitnessStep = Object.assign(new ErrorWitnessStep(this.id), data);
+        clone.actors = this.actors.map(actor => actor.clone());
+
+        return clone;
     }
 }
 

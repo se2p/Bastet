@@ -38,29 +38,47 @@ import {ControlAbstractState, RelationLocation} from "../../control/ControlAbstr
 import {ControlLocationExtractor} from "../../control/ControlUtils";
 import {Action, ErrorWitnessActionVisitor} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
-import {ErrorWitness, ErrorWitnessStep, MousePosition, Target} from "./ErrorWitness";
+import {ErrorWitness, ErrorWitnessActor, ErrorWitnessStep} from "./ErrorWitness";
 import {AccessibilityRelation, AccessibilityRelations} from "../../Accessibility";
 import {Property} from "../../../../syntax/Property";
 import {getTheOnlyElement} from "../../../../utils/Collections";
 import {VAR_SCOPING_SPLITTER} from "../../../../syntax/app/controlflow/DataLocation";
 import {DataLocationScoper} from "../../control/DataLocationScoping";
-import {AttributeReadEvent, AttributeReadEventVisitor} from "../../../../syntax/ast/AttributeReadEventVisitor";
 import {ProgramOperation} from "../../../../syntax/app/controlflow/ops/ProgramOperation";
+import {
+    ActionExtractor,
+    AnswerActionExtractor,
+    KeyPressedActionExtractor,
+    MouseDownActionExtractor,
+    MouseXActionExtractor,
+    MouseYActionExtractor,
+    SpriteClickBroadcastActionExtractor,
+} from "./ActionExtractor";
 import {GLOBAL_TIME_MICROS_VAR} from "../../../../syntax/app/SystemVariables";
 
 export interface WitnessExporterConfig {
     export: 'ALL' | 'ONLY_ACTIONS';
     collapseAtomicBlocks: boolean;
-    removeAttributeStartingWith: string[];
-    removeActorPrefixFromAttributes: boolean
+    removeEpsilonType: boolean;
+    removeMethodVariables: boolean;
+    removeVariables: string[];
+    removeActors: string[];
+    removeStepsBeforeBootstrap: boolean;
+    minWaitTime: number;
+    keepDebuggingAttributes: boolean;
 }
 
 export const DEFAULT_WITNESS_EXPORTER_CONFIG: WitnessExporterConfig = {
     export: 'ONLY_ACTIONS',
     collapseAtomicBlocks: true,
-    removeAttributeStartingWith: ['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE',
-        'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT', '__tmp'],
-    removeActorPrefixFromAttributes: true
+    removeEpsilonType: true,
+    removeMethodVariables: true,
+    removeVariables: ['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE',
+        'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT'],
+    removeActors: ['IOActor', '.*Observer'],
+    removeStepsBeforeBootstrap: true,
+    minWaitTime: 0,
+    keepDebuggingAttributes: false
 }
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
@@ -92,25 +110,42 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     private exportPath(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState) {
         const errorWitness: ErrorWitness = this.extractErrorWitness(pathAr, violating);
 
-        if (this._config.collapseAtomicBlocks) {
-            errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
-        }
-
         if (this._config.export === "ONLY_ACTIONS") {
-            errorWitness.steps = WitnessExporter.collapseActionSegments(errorWitness.steps);
+            errorWitness.steps = WitnessExporter.collapseEpsilonsToWait(errorWitness.steps);
         }
-
-        errorWitness.steps.forEach(step => {
-            step.targets.forEach(target => {
-                if (this._config.removeActorPrefixFromAttributes) {
-                    target.removeActorPrefix();
-                }
-
-                target.removeAttributesStartingWith(this._config.removeAttributeStartingWith);
-            })
-        })
 
         WitnessExporter.addWaitTimes(errorWitness.steps);
+        errorWitness.steps = WitnessExporter.removeStepsWithLowWaitTime(errorWitness.steps, this._config.minWaitTime);
+
+        errorWitness.steps.forEach(step => {
+            step.actors = step.actors.filter(actor => {
+               return !this._config.removeActors.some(actorToRemove => {
+                   const regex = new RegExp(actorToRemove);
+                   return regex.test(actor.name);
+               })
+            });
+
+            if (!this._config.keepDebuggingAttributes) {
+                step.timestamp = undefined;
+                step.actionTargetName = undefined;
+                step.actionLabel = undefined;
+                step.id = undefined;
+            }
+
+            step.actors.forEach(target => {
+                target.removeActorPrefix();
+
+                target.removeVariables(this._config.removeVariables);
+
+                if (this._config.removeMethodVariables) {
+                    delete target.methodVariables;
+                }
+            })
+
+            if (this._config.removeEpsilonType) {
+                delete step.epsilonType;
+            }
+        })
 
         this.exportErrorWitness(errorWitness);
     }
@@ -127,13 +162,20 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         errorWitness.violations = violatedProperties.map(property => property.getText);
 
         let previousState: GraphAbstractState = undefined;
-        const mouseXReadEventVisitor = new AttributeReadEventVisitor("mouseX");
-        const mouseYReadEventVisitor = new AttributeReadEventVisitor("mouseY");
-        const keyPressedReadEventVisitor = new AttributeReadEventVisitor("keyPressed");
+        const actionExtractors: ActionExtractor[] = [
+            new MouseXActionExtractor(),
+            new MouseYActionExtractor(),
+            new MouseDownActionExtractor(),
+            new SpriteClickBroadcastActionExtractor(),
+            new AnswerActionExtractor(),
+            new KeyPressedActionExtractor()
+        ];
+
         const ssaStateVisitor = new SSAStateVisitor();
 
+        let index = 0;
         for (const currentState of path) {
-            const step = new ErrorWitnessStep();
+            const step = new ErrorWitnessStep(index);
             const relationLocation = this.getRelationLocationForState(currentState);
             step.actionTargetName = relationLocation ? relationLocation.getActorId() : undefined;
 
@@ -144,8 +186,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             step.timestamp = globalTime ? globalTime.value : 0;
 
             targetStates.forEach((state, targetName) => {
-                const target = Target.fromConcretePrimitives(targetName, state);
-                step.targets.push(target);
+                const target = ErrorWitnessActor.fromConcretePrimitives(targetName, state);
+                step.actors.push(target);
             })
 
             if (previousState) {
@@ -156,26 +198,50 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                     .map(o => o.ast.accept(this._labelPrintVisitor))
                     .join("; ");
 
-                const mousePos = this.getMouseInput(step, transitionLabel, mouseXReadEventVisitor, mouseYReadEventVisitor);
-                if (mousePos) {
-                    step.action = Action.MOUSE_INPUT;
-                    step.mousePosition = mousePos;
+                for (const actionExtractor of actionExtractors) {
+                    actionExtractor.processOperations(transitionLabel, step);
                 }
 
-                const keyPressed = this.getKeyPressed(step, transitionLabel, keyPressedReadEventVisitor);
-                if (keyPressed) {
-                    Preconditions.checkState(step.action === undefined, `Action already set to ${step.action}`);
-                    step.action = Action.KEY_PRESSED;
-                    step.keyPressed = keyPressed;
-                }
-
-                if (!step.action) {
-                    step.action = this.getDefaultAction(transitionLabel);
-                }
+                step.epsilonType = this.getDefaultAction(transitionLabel);
             }
 
             errorWitness.steps.push(step);
             previousState = currentState;
+            index++;
+        }
+
+        if (this._config.removeStepsBeforeBootstrap) {
+            errorWitness.steps = WitnessExporter.removeAllBeforeAction(errorWitness.steps, Action.INITIAL_STATE);
+        }
+
+        let alteredSteps = [];
+        const steps = errorWitness.steps;
+        while (steps.length > 0) {
+            const step = steps.shift();
+            for (const actionExtractor of actionExtractors) {
+                const extraStep = actionExtractor.setActionForStep(step, steps);
+
+                if (extraStep) {
+                    alteredSteps.push(extraStep);
+                }
+            }
+
+            alteredSteps.push(step);
+        }
+
+        errorWitness.steps = alteredSteps;
+
+        let mousePosition = {x: undefined, y: undefined};
+        errorWitness.steps.forEach(step => {
+            if (step.action === Action.MOUSE_MOVE) {
+                step.mousePosition = {x: step.mousePosition.x === undefined ? mousePosition.x : step.mousePosition.x,
+                    y: step.mousePosition.y === undefined ? mousePosition.y : step.mousePosition.y};
+                mousePosition = step.mousePosition;
+            }
+        });
+
+        if (this._config.collapseAtomicBlocks) {
+            errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
         }
 
         return errorWitness;
@@ -193,90 +259,75 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             }).action;
     }
 
-    private getKeyPressed(step: ErrorWitnessStep, transitionLabel: ProgramOperation[], keyPressedReadEventVisitor: AttributeReadEventVisitor): number {
-        const keyPressedEvent = transitionLabel
-            .map(o => o.ast.accept(keyPressedReadEventVisitor))
-            .reduce((prev, cur) => prev.combine(cur));
-
-        if (keyPressedEvent && keyPressedEvent.readFrom) {
-            return Number(step.getUserDefinedAttributeValue(step.actionTargetName, WitnessExporter.removeSSAIndex(keyPressedEvent.readFrom)));
-        } else {
-            return undefined;
-        }
-    }
-
-    private getMouseInput(step: ErrorWitnessStep, transitionLabel: ProgramOperation[],
-                           mouseXReadEventVisitor: AttributeReadEventVisitor,
-                           mouseYReadEventVisitor: AttributeReadEventVisitor): MousePosition {
-        const mouseXRead: AttributeReadEvent = transitionLabel
-            .map(o => o.ast.accept(mouseXReadEventVisitor))
-            .reduce((prev, cur) => prev.combine(cur));
-
-        const mouseYRead: AttributeReadEvent = transitionLabel
-            .map(o => o.ast.accept(mouseYReadEventVisitor))
-            .reduce((prev, cur) => prev.combine(cur));
-
-        if ((mouseXRead && mouseXRead.readFrom) || (mouseYRead && mouseYRead.readFrom)) {
-            const mouseX = mouseXRead.readFrom ? WitnessExporter.removeSSAIndex(mouseXRead.readFrom) : undefined;
-            const mouseY = mouseYRead.readFrom ? WitnessExporter.removeSSAIndex(mouseYRead.readFrom) : undefined;
-
-            const x = step.getUserDefinedAttributeValue(step.actionTargetName, mouseX) || 0;
-            const y = step.getUserDefinedAttributeValue(step.actionTargetName, mouseY) || 0;
-
-            return new MousePosition(x, y);
-        } else {
-            return undefined;
-        }
-    }
-
     /**
-     * Combines actions with their non action successors.
-     * E.g. [DEFINE, DECLARE, MOUSE_INPUT, KEY_PRESSED, DEFINE, EPSILON] will result in
-     * [INITIAL_STEP, MOUSE_INPUT, KEY_PRESSED] where the last step contains the state information of the last step
-     * EPSILON and the first two steps are combined in INITIAL_STEP.
+     * Collapses steps between actions into one wait step
      *
-     * @param errorWitnessSteps The steps to reduce to only actions
+     * @param errorWitnessSteps The steps to reduce to only actions and waits
      */
-    private static collapseActionSegments(errorWitnessSteps: ErrorWitnessStep[]): ErrorWitnessStep[] {
+    private static collapseEpsilonsToWait(errorWitnessSteps: ErrorWitnessStep[]): ErrorWitnessStep[] {
+        errorWitnessSteps[0].action = Action.EPSILON;
+        const filteredArray = [errorWitnessSteps[0]];
+
+        let prevStep: ErrorWitnessStep;
+
+        for (let i = 1; i < errorWitnessSteps.length; i++) {
+            const step = errorWitnessSteps[i];
+            if (step.action !== undefined) {
+                if (prevStep) {
+                    prevStep.action = Action.WAIT;
+                    filteredArray.push(prevStep);
+                    prevStep = undefined;
+                }
+
+                filteredArray.push(step);
+            } else {
+                if (prevStep) {
+                    step.actionLabel = `${prevStep.actionLabel}; ${step.actionLabel}`;
+                }
+
+                prevStep = step;
+            }
+        }
+
+        if (prevStep) {
+            prevStep.action = Action.WAIT;
+            filteredArray.push(prevStep);
+        }
+
+        return filteredArray;
+    }
+
+    private static removeAllBeforeAction(steps: ErrorWitnessStep[], action: Action): ErrorWitnessStep[] {
+        let index = steps.findIndex(step => step.epsilonType === action);
+
+        Preconditions.checkState(index >= 0);
+
+        return steps.slice(index, steps.length);
+    }
+
+    private static removeStepsWithLowWaitTime(steps: ErrorWitnessStep[], timeThreshold: number): ErrorWitnessStep[] {
         const filteredArray = [];
 
-        let previousAction: ErrorWitnessStep = undefined;
+        let prevStep: ErrorWitnessStep = undefined;
 
-        for (const step of errorWitnessSteps) {
-            if (previousAction) {
-                if (step.action === Action.MOUSE_INPUT) {
-                    if (previousAction.action !== Action.MOUSE_INPUT
-                        || previousAction.mousePosition.x !== step.mousePosition.x
-                        || previousAction.mousePosition.y !== step.mousePosition.y) {
-                        filteredArray.push(previousAction);
-                    } else {
-                        step.actionLabel = `${previousAction.actionLabel}; ${step.actionLabel}`;
-                    }
-                } else if (step.action === Action.KEY_PRESSED) {
-                    filteredArray.push(previousAction);
-                } else if (step.timestamp - previousAction.timestamp > 1000) {
-                    if (previousAction.action !== Action.WAIT) {
-                        filteredArray.push(previousAction);
-                    } else {
-                        step.actionLabel = `${previousAction.actionLabel}; ${step.actionLabel}`;
-                    }
+        for (const step of steps) {
+            if (step.action === Action.WAIT && step.waitMicros < timeThreshold && prevStep) {
+                prevStep.actors = step.actors;
+                prevStep.timestamp = step.timestamp;
+                prevStep.actionLabel = `${prevStep.actionLabel}; ${step.actionLabel}`;
 
-                    step.action = Action.WAIT;
-                } else {
-                    step.action = previousAction.action;
-                    step.keyPressed = previousAction.keyPressed;
-                    step.mousePosition = previousAction.mousePosition;
-                    step.actionLabel = `${previousAction.actionLabel}; ${step.actionLabel}`;
-                }
+                filteredArray.push(prevStep);
+                prevStep = undefined;
             } else {
-                step.action = Action.INITIAL_STATE;
+                if (prevStep) {
+                    filteredArray.push(prevStep);
+                }
+                prevStep = step;
             }
-
-            previousAction = step;
         }
 
-        if (!filteredArray.includes(previousAction)) {
-            filteredArray.push(previousAction);
+        if (prevStep) {
+            filteredArray.push(prevStep);
         }
 
         return filteredArray;
@@ -302,7 +353,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         const targets = new Map<string, Map<string, T>>();
 
         map.forEach((value, attributeWithTarget) => {
-            if (this.isTargetAttribute(attributeWithTarget)) {
+            if (attributeWithTarget.includes(VAR_SCOPING_SPLITTER)) {
                 const {target} = WitnessExporter.splitTargetPrefixFromAttribute(attributeWithTarget);
 
                 let targetMap = targets.get(target);
@@ -312,16 +363,10 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
                 targetMap.set(attributeWithTarget, value);
                 targets.set(target, targetMap);
-            } else {
-                // TODO figure out what to do with other attributes (__op_time_129, ...)
             }
         })
 
         return targets;
-    }
-
-    private static removeSSAIndex(attributeWithSSA: string): string {
-        return DataLocationScoper.rightUnwrapScope(attributeWithSSA).prefix;
     }
 
     public static splitTargetPrefixFromAttribute(attributeWithTargetName: string): {attribute: string, target: string} {
@@ -330,40 +375,33 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return {attribute, target};
     }
 
-    public static isTargetAttribute(attribute: string): boolean {
-        return attribute.includes(VAR_SCOPING_SPLITTER);
-    }
-
     private static collapseAtomics(steps: ErrorWitnessStep[]): ErrorWitnessStep[] {
         const filteredArray = [];
 
         let openAtomicBrackets = 0;
-        let collapsedActionLabel = undefined;
+        let atomicBlock: ErrorWitnessStep[] = [];
 
         for (const step of steps) {
-            if (step.action === Action.LEAVE_ATOMIC) {
+            if (step.epsilonType === Action.LEAVE_ATOMIC
+                    || step.epsilonType === Action.REACHED_VIOLATION && openAtomicBrackets > 0) {
+                atomicBlock.push(step);
                 openAtomicBrackets--;
 
                 Preconditions.checkArgument(openAtomicBrackets >= 0, "Missing opening atomic bracket")
 
                 if (openAtomicBrackets === 0) {
-                    step.action = Action.COLLAPSED_ATOMIC;
-                    step.actionLabel = `${collapsedActionLabel}; ${step.actionLabel}`;
-                    collapsedActionLabel = undefined;
+                    this.collapseOneAtomicBlock(atomicBlock).forEach(step => {
+                        filteredArray.push(step);
+                    });
+                    atomicBlock = [];
                 }
-            } else if (step.action === Action.ENTER_ATOMIC) {
+            } else if (step.epsilonType === Action.ENTER_ATOMIC) {
                 openAtomicBrackets++;
-            } else if (step.action === Action.REACHED_VIOLATION && openAtomicBrackets > 0) {
-                // Error was reached inside an atomic block
-                openAtomicBrackets--;
-                step.actionLabel = `${collapsedActionLabel}; ${step.actionLabel}`;
-                collapsedActionLabel = undefined;
-            }
-
-            if (openAtomicBrackets === 0) {
-                filteredArray.push(step);
+                atomicBlock.push(step);
+            } else if (openAtomicBrackets > 0) {
+                atomicBlock.push(step);
             } else {
-                collapsedActionLabel = collapsedActionLabel ? `${collapsedActionLabel}; ${step.actionLabel}` : step.actionLabel;
+                filteredArray.push(step);
             }
         }
 
@@ -372,12 +410,41 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return filteredArray;
     }
 
+    private static collapseOneAtomicBlock(atomicBlock: ErrorWitnessStep[]): ErrorWitnessStep[] {
+        const lastStep = atomicBlock[atomicBlock.length - 1];
+
+        let collapsedAtomicBlock: ErrorWitnessStep[] = [];
+        let collapsedActionLabel: string = undefined;
+
+        for (const step of atomicBlock) {
+            const isRelevant = step.action !== undefined || step === lastStep;
+
+            if (isRelevant) {
+                step.actors = lastStep.actors.map(actor => {
+                    // Clone data to prevent side-effects
+                    return actor.clone();
+                });
+                if (collapsedActionLabel) {
+                    step.actionLabel = `${collapsedActionLabel}; ${step.actionLabel}`;
+                    collapsedActionLabel = undefined;
+                }
+
+                collapsedAtomicBlock.push(step);
+            } else {
+                collapsedActionLabel = collapsedActionLabel ? `${collapsedActionLabel}; ${step.actionLabel}` : step.actionLabel;
+            }
+        }
+
+        return collapsedAtomicBlock;
+    }
+
     private static addWaitTimes(steps: ErrorWitnessStep[]): void {
         let prevStep: ErrorWitnessStep;
 
         for (const step of steps) {
-            if (prevStep && step.action === Action.WAIT) {
-                step.waitMicros = step.timestamp - prevStep.timestamp;
+            if (step.action === Action.WAIT) {
+                const prevTime = prevStep ? prevStep.timestamp : 0;
+                step.waitMicros = step.timestamp - prevTime;
             }
 
             prevStep = step;

@@ -58,6 +58,8 @@ export class GraphTransferRelation implements TransferRelation<GraphAbstractStat
             const partitionKeys = this._wrappedPartitionOp.getPartitionKeys(w);
             const orderKey = this._traversalOp.getLexiOrderKey(w).concat(new LexiKey([-newStateId])); // Prefer older states;
             const succState = GraphAbstractStateFactory.withID(newStateId, [fromState.id], [], w, partitionKeys, orderKey);
+
+            // console.log(`${fromState.getId()} ---> ${succState.getId()}`);
             result.push(succState);
         }
 

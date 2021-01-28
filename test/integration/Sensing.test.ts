@@ -19,7 +19,6 @@
  *   limitations under the License.
  *
  */
-import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
 test("Test touchingObject 1 safe", done => {

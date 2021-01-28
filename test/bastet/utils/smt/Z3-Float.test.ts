@@ -26,6 +26,7 @@ import {VariableWithDataLocation} from "../../../../src/bastet/syntax/ast/core/V
 import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataLocation";
 import {FloatType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
+import {AnalysisStatistics} from "../../../../src/bastet/procedures/analyses/AnalysisStatistics";
 
 let smt: Z3SMT;
 let ctx;
@@ -36,7 +37,7 @@ beforeAll( async (done) => {
     smt = await SMTFactory.createZ3();
     ctx = smt.createContext();
     theories = smt.createTheories(ctx);
-    prover = smt.createProver(ctx);
+    prover = smt.createProver(ctx, new AnalysisStatistics("Test", {}));
     done();
 });
 

@@ -765,6 +765,8 @@ export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3F
 
     private readonly _stringTheory: Z3StringTheory;
 
+    private readonly _formulaVarsCache: Map<Z3Formula, ImmMap<string, Z3Formula>>;
+
     constructor(ctx: LibZ3InContext) {
         super(ctx);
         this._boolTheory = new Z3BooleanTheory(ctx);
@@ -773,6 +775,7 @@ export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3F
         this._floatTheory = new Z3FloatTheory(ctx);
         this._stringTheory = new Z3StringTheory(ctx);
         this._listTheory = new Z3ListTheory(ctx);
+        this._formulaVarsCache = new Map();
     }
 
     get boolTheory(): BooleanTheory<Z3BooleanFormula> {
@@ -867,8 +870,7 @@ export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3F
         Preconditions.checkNotUndefined(indexFn);
 
         // 1. Collect all variables
-        const visitor = new VariableCollectingVisitor(this._ctx);
-        let vars = visitor.visit(formula.getAST());
+        let vars: ImmMap<string, Z3Formula> = this.collectVariables(formula);
 
         // 2. Compute the mapping
         const substitutions: Map<Z3Formula, Z3Formula> = new Map();
@@ -905,6 +907,17 @@ export class Z3Theories extends Z3MappedFunction implements AbstractTheories<Z3F
         }
 
         return this.substitute(formula, fromASTs, toASTs);
+    }
+
+    private collectVariables(f: Z3Formula): ImmMap<string, Z3Formula> {
+        let result = this._formulaVarsCache.get(f);
+        if (!result) {
+            const visitor = new VariableCollectingVisitor(this._ctx);
+            result = visitor.visit(f.getAST());
+            this._formulaVarsCache.set(f, result);
+        }
+
+        return result;
     }
 
     public alignSsaIndices(blockFormulas: Z3Formula[], ssaOffsets: Map<string, number>[]): Z3Formula[] {

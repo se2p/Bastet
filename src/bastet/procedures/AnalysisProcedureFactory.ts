@@ -101,9 +101,9 @@ export class AnalysisProcedureFactory {
                 struStats.computeStatisitcs(task, this._statistics.withContext("Task"));
 
                 // TODO: Delete the context after the analysis is no more in use
-                const defaultContect = smt.createContext();
-                const theories = new Z3Theories(defaultContect);
-                const prover = smt.createProver(defaultContect);
+                const defaultContext = smt.createContext();
+                const theories = new Z3Theories(defaultContext);
+                const prover = smt.createProver(defaultContext, this._statistics);
                 const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
                 const dataAnalysis = new DataAnalysis(config, firstOrderLattice, theories, this._statistics);
@@ -149,7 +149,7 @@ export class AnalysisProcedureFactory {
                 // TODO: Delete the context after the analysis is no more in use
                 const defaultContect = smt.createContext();
                 const theories = new Z3Theories(defaultContect);
-                const prover = smt.createProver(defaultContect);
+                const prover = smt.createProver(defaultContect, this._statistics);
                 const firstOrderLattice = smt.createLattice(prover, theories.boolTheory);
 
                 const dataAnalysis = new DataAnalysis(config, firstOrderLattice, theories, this._statistics);

@@ -92,11 +92,24 @@ export abstract class Z3Visitor<R> implements Z3AstVisitor<R> {
 
     protected readonly _ctx: LibZ3InContext
 
+    private readonly _visited: Map<number, R>;
+
     constructor(ctx: LibZ3InContext) {
         this._ctx = Preconditions.checkNotUndefined(ctx);
+        this._visited = new Map();
     }
 
     visit(node: Z3_ast): R {
+        let result: R = this._visited.get(node.val());
+        if (!result) {
+            result = this.visit0(node);
+            this._visited.set(node.val(), result);
+        }
+
+        return result;
+    }
+
+    visit0(node: Z3_ast): R {
         switch (this.getAstKind(node)) {
             case Z3AstKind.Z3_APP_AST:
                 return this.visitConstantOrApplication(node);
@@ -186,7 +199,7 @@ export class VariableCollectingVisitor extends Z3Visitor<ImmMap<string, Z3Formul
         let result = ImmMap<string, Z3Formula>([]);
         const childs = this.children(node);
 
-        for (let c of childs.list) {
+        for (const c of childs.list) {
             result = result.merge(this.visit(c));
         }
 

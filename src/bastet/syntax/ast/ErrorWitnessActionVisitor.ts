@@ -93,12 +93,18 @@ import {
 } from "./CoreVisitor";
 import {CorePrintVisitor} from "./CorePrintVisitor";
 import {PrecisionPopStatement, PrecisionPushStatement} from "./core/Precisions";
+import {BOOTSTRAP_FINISHED_MESSAGE_MSG} from "./core/Message";
 
 export enum Action {
     DEFINE = "DEFINE",
     DECLARE = "DECLARE",
     METHOD_CALL = "METHOD_CALL",
     EPSILON = "EPSILON",
+    MOUSE_MOVE = "MOUSE_MOVE",
+    MOUSE_DOWN = "MOUSE_DOWN",
+    MOUSE_UP = "MOUSE_UP",
+    KEY_DOWN = "KEY_DOWN",
+    KEY_UP = "KEY_UP",
     MOUSE_INPUT = "MOUSE_INPUT",
     KEY_PRESSED = "KEY_PRESSED",
     INITIAL_STATE = "INITIAL_STATE",
@@ -106,22 +112,34 @@ export enum Action {
     ENTER_ATOMIC = "ENTER_ATOMIC",
     LEAVE_ATOMIC = "LEAVE_ATOMIC",
     COLLAPSED_ATOMIC = "COLLAPSED_ATOMIC",
-    REACHED_VIOLATION = "REACHED_VIOLATION"
+    REACHED_VIOLATION = "REACHED_VIOLATION",
+    ANSWER = "ANSWER"
 }
 
 export class ActionWithWeight {
     constructor(public action: Action, public weight: number) {
     }
 
+    public static readonly INITIAL_STATE = new ActionWithWeight(Action.INITIAL_STATE, 5);
     public static readonly DEFINE = new ActionWithWeight(Action.DEFINE, 1);
     public static readonly DECLARE = new ActionWithWeight(Action.DECLARE, 0);
     public static readonly METHOD_CALL = new ActionWithWeight(Action.METHOD_CALL, 2);
     public static readonly EPSILON = new ActionWithWeight(Action.EPSILON, 0);
     public static readonly MOUSE_INPUT = new ActionWithWeight(Action.MOUSE_INPUT, 2);
-    public static readonly INITIAL_STATE = new ActionWithWeight(Action.INITIAL_STATE, 2);
     public static readonly ENTER_ATOMIC = new ActionWithWeight(Action.ENTER_ATOMIC, 3);
     public static readonly LEAVE_ATOMIC = new ActionWithWeight(Action.LEAVE_ATOMIC, 3);
     public static readonly REACHED_VIOLATION = new ActionWithWeight(Action.REACHED_VIOLATION, 2);
+
+    public static isActionEpsilonLike(action: Action) {
+        return !action || [
+            Action.DEFINE,
+            Action.DECLARE,
+            Action.METHOD_CALL,
+            Action.EPSILON,
+            Action.ENTER_ATOMIC,
+            Action.LEAVE_ATOMIC,
+            Action.COLLAPSED_ATOMIC].includes(action);
+    }
 }
 
 export class ErrorWitnessActionVisitor implements CoreVisitor<ActionWithWeight>, CoreBoolExpressionVisitor<ActionWithWeight>, CoreNumberExpressionVisitor<ActionWithWeight>,
@@ -190,7 +208,9 @@ CoreNonCtrlStatementnVisitor<ActionWithWeight>{
     }
 
     visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): ActionWithWeight {
-        return ActionWithWeight.EPSILON;
+        const broadcast = node.msg.messageid.accept(this.printer);
+
+        return broadcast === `"${BOOTSTRAP_FINISHED_MESSAGE_MSG}"` ? ActionWithWeight.INITIAL_STATE : ActionWithWeight.EPSILON;
     }
 
     visitBroadcastMessageStatement(node: BroadcastMessageStatement): ActionWithWeight {
