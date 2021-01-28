@@ -301,7 +301,7 @@ export class AbstractionAbstractDomain implements AbstractDomain<ConcreteElement
         const c1: ConcreteElement = this.concretizeOne(e1);
         const c2: ConcreteElement = this.concretizeOne(e2);
 
-
+        throw new ImplementMeException();
     }
 
 }
