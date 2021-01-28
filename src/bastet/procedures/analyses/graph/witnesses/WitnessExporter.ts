@@ -151,7 +151,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     }
 
     private extractErrorWitness(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState): ErrorWitness {
-        const path: GraphAbstractState[] = AccessibilityRelations.mapToArray(pathAr);
+        const path: GraphAbstractState[] = AccessibilityRelations.toSequence(pathAr);
         const violatedProperties: Property[] = this._analysis.target(violating);
 
         const violatingConcreteElement: ConcreteElement = pathAr.concretizer().concretizeOne(violating);

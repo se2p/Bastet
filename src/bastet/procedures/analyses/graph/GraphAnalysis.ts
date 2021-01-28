@@ -67,6 +67,7 @@ import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {PathExporter} from "./witnesses/PathExporter";
 import {IfMergedStopOperator} from "./IfMergedStopOperator";
+import {Optional} from "../../../utils/Optional";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 
@@ -193,12 +194,13 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     merge(state1: GraphAbstractState, state2: GraphAbstractState): GraphAbstractState {
         Preconditions.checkArgument(state1.getMergeOf().size > 0);
         Preconditions.checkArgument(state2.getMergeOf().size > 0);
+        Preconditions.checkArgument(state2.getWideningOf().isAbsent());
 
         return GraphAbstractStateFactory.withFreshID(
                 state1.getPredecessors().union(state2.getPredecessors()),
                 state1.getMergeOf().union(state2.getMergeOf()),
                 this._wrappedAnalysis.merge(state1.getWrappedState(), state2.getWrappedState()),
-                state1.getPartitionKeys(), state1.orderKey)
+                state1.getPartitionKeys(), state1.orderKey, state1.getWideningOf())
             .withOrderKey(state1.orderKey);
     }
 
@@ -221,7 +223,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     widen(state: GraphAbstractState, reached: Iterable<GraphAbstractState>): GraphAbstractState {
         const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {
-            return state.withWrappedState(wrappedResult);
+            return state.withWrappedState(wrappedResult)
+                .withWideningOf(Optional.of(state));
         } else {
             return state;
         }
@@ -231,7 +234,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
             const partitionKeys = this._wrappedAnalysis.getPartitionKeys(w);
-            return GraphAbstractStateFactory.withFreshID([],[],  w, partitionKeys, new LexiKey([]));
+            return GraphAbstractStateFactory.withFreshID([],[],  w, partitionKeys, new LexiKey([]),
+                Optional.absent<GraphAbstractState>());
         } );
     }
 

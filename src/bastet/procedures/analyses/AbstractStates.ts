@@ -30,6 +30,7 @@ import {SSAState} from "./ssa/SSAAbstractDomain";
 import {DataAbstractState} from "./data/DataAbstractDomain";
 import {TimeState} from "./time/TimeAbstractDomain";
 import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
+import {Optional} from "../../utils/Optional";
 
 export interface SingletonStateWrapper {
 
@@ -76,6 +77,26 @@ export class AbstractStates {
             return e.getId();
         }
         throw new ImplementMeForException(e.constructor.name);
+    }
+
+    public static getWideningOf(e: AbstractState): AbstractState {
+        if (e instanceof GraphAbstractState) {
+            if (e.getWideningOf().isPresent()) {
+                return e.getWideningOf().getValue();
+            } else {
+                return e;
+            }
+        } else {
+            throw new ImplementMeForException(e.constructor.name);
+        }
+    }
+
+    public static wideningOf(e: AbstractState): Optional<AbstractState> {
+        if (e instanceof GraphAbstractState) {
+            return e.getWideningOf();
+        } else {
+            throw new ImplementMeForException(e.constructor.name);
+        }
     }
 
 }

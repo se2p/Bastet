@@ -31,6 +31,7 @@ import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {StatePartitionOperator} from "../../algorithms/StateSet";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {AnalysisStatistics} from "../AnalysisStatistics";
+import {Optional} from "../../../utils/Optional";
 
 export class GraphTransferRelation implements TransferRelation<GraphAbstractState> {
 
@@ -57,7 +58,8 @@ export class GraphTransferRelation implements TransferRelation<GraphAbstractStat
             const newStateId = GraphAbstractStateFactory.freshStateID();
             const partitionKeys = this._wrappedPartitionOp.getPartitionKeys(w);
             const orderKey = this._traversalOp.getLexiOrderKey(w).concat(new LexiKey([-newStateId])); // Prefer older states;
-            const succState = GraphAbstractStateFactory.withID(newStateId, [fromState.id], [], w, partitionKeys, orderKey);
+            const succState = GraphAbstractStateFactory.withID(newStateId, [fromState.id], [], w,
+                partitionKeys, orderKey, Optional.absent<GraphAbstractState>());
 
             // console.log(`${fromState.getId()} ---> ${succState.getId()}`);
             result.push(succState);

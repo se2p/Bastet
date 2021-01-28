@@ -29,7 +29,7 @@ import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
 import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {BooleanFormula} from "../../../utils/ConjunctiveNormalForm";
+import {BooleanFormula, FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 import {
     BranchingAssumeStatement,
     StrengtheningAssumeStatement
@@ -50,8 +50,12 @@ import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {BooleanType} from "../../../syntax/ast/core/ScratchType";
 import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
-import {getTheOnlyElement} from "../../../utils/Collections";
+import {getAtMostOneElement, getTheOnlyElement} from "../../../utils/Collections";
 import {DataTransformerVisitor} from "./DataTransformerVisitor";
+import {AbstractionState} from "../abstraction/AbstractionAbstractDomain";
+import {AbstractionStateStates} from "../abstraction/AbstractionStates";
+import {DataAbstractStates} from "./DataAbstractStates";
+import {SSAAbstractStates} from "../ssa/SSAAbstractStates";
 
 class BranchingAlternative {
 
@@ -147,11 +151,9 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
      * @param accessibility
      * @param targetState
      */
-    testifyOne(accessibility: AccessibilityRelation<AbstractState>, targetState: AbstractState): AccessibilityRelation<AbstractState> {
+    private testifyOneIncludeConcrete(accessibility: AccessibilityRelation<AbstractState>,
+                                     targetState: AbstractState): [AccessibilityRelation<AbstractState>, Iterable<ConcreteElement[]>] {
         const alternatives = this.determineBranchingAlternatives(accessibility, targetState);
-        if (alternatives.elements.length == 0) {
-            return accessibility;
-        }
 
         // Create the branching formula
         let branchingFormula: BooleanFormula = this._theories.boolTheory.trueBool();
@@ -176,8 +178,14 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         const result: AccessibilityRelation<AbstractState> = this.strenghtenRelation(
             accessibility, alternatives, satAssignement, targetState);
 
+        const concreteSeq: Iterable<ConcreteElement[]> = [this.buildConcreteStateSeq(result, satAssignement)];
+
         // return the result (strengthened accessibility relation)
-        return result;
+        return [result, concreteSeq];
+    }
+
+    public testifyOne(accessibility: AccessibilityRelation<AbstractState>, targetState: AbstractState): AccessibilityRelation<AbstractState> {
+        return this.testifyOneIncludeConcrete(accessibility, targetState)[0];
     }
 
     private determineBranchingAlternatives(accessibility: AccessibilityRelation<AbstractState>, targetState: AbstractState): BranchingAlternatives {
@@ -276,7 +284,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
     }
 
     testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
-        throw new ImplementMeException();
+        return this.testifyOneIncludeConcrete(accessibility, state)[1];
     }
 
     /**
@@ -317,7 +325,23 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
     }
 
     private recoverTraceFormula(accessibility: AccessibilityRelation<AbstractState>, targetState: AbstractState): BooleanFormula {
-        return targetState.accept(new StateFormulaVisitor());
+        const wideningStates: AbstractState[] = AccessibilityRelations.getWidenedSequence(accessibility, targetState);
+        const unalignedFormulas: FirstOrderFormula[] = wideningStates
+            .map(e => getTheOnlyElement(DataAbstractStates.extractFrom(e)).blockFormula);
+
+        if (unalignedFormulas.length == 1) {
+            return getTheOnlyElement(unalignedFormulas);
+        } else {
+            const alignedBlockFormulas: FirstOrderFormula[] = this.alignSsaIndices(wideningStates, unalignedFormulas);
+            return alignedBlockFormulas.reduce((f, r) => this._theories.boolTheory.and(f, r),
+                this._theories.boolTheory.trueBool());
+        }
+    }
+
+    private alignSsaIndices(wideningStateSeq: AbstractState[], blockFormulas: FirstOrderFormula[]): FirstOrderFormula[] {
+        Preconditions.checkArgument(wideningStateSeq.length == blockFormulas.length);
+        const ssaMaps = wideningStateSeq.map((e) => new Map(getTheOnlyElement(SSAAbstractStates.extractFrom(e)).getSSA()));
+        return this._theories.alignSsaIndices(blockFormulas, ssaMaps);
     }
 
     private strenghtenRelation(accessibility: AccessibilityRelation<AbstractState>,
@@ -339,5 +363,9 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
 
         Preconditions.checkState(result.isReachable(targetState), "The target state must be reachable in the strengthened relation!");
         return result;
+    }
+
+    private buildConcreteStateSeq(result: AccessibilityRelation<AbstractState>, satAssignement: ConcreteMemory) {
+        return AccessibilityRelations.toSequence(result).map(e => satAssignement);
     }
 }

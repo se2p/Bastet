@@ -40,7 +40,7 @@ import {
 } from "../../../utils/ConjunctiveNormalForm";
 import {PrecisionOperator} from "./AbstractionComputation";
 import {PrecisionRole, PredicatePrecision, PredicatePrecisionLattice} from "../../AbstractionPrecision";
-import {AccessibilityRelation} from "../Accessibility";
+import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
 import {FirstOrderSolver} from "../../domains/FirstOrderDomain";
 import {TransformerTheories} from "../../domains/MemoryTransformer";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
@@ -264,27 +264,8 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
     }
 
     private getBlockStateSequence(ar: AccessibilityRelation<AbstractState>, target: AbstractState): AbstractionState[] {
-        const result: AbstractionState[] = [];
-
-        const worklist: AbstractState[] = [];
-        worklist.push(target);
-
-        while (worklist.length > 0) {
-            const state: AbstractState = worklist.pop();
-            const abst: AbstractionState = getTheOnlyElement(AbstractionStateStates.extractFrom(state));
-
-            if (abst.getWideningOf().isPresent()) {
-                result.push(abst.getWideningOf().getValue());
-            } else if (state === target) {
-                result.push(abst);
-            }
-
-            for (const pred of getAtMostOneElement(ar.predecessorsOf(state))) {
-                worklist.push(pred);
-            }
-        }
-
-        return result.reverse();
+        return AccessibilityRelations.getWidenedSequence(ar, target)
+            .map(e => getTheOnlyElement(AbstractionStateStates.extractFrom(e)));
     }
 
     private static getSingleAbstractionState(e: AbstractState): AbstractionState {
@@ -303,9 +284,7 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         }
 
         return result;
-
     }
-
 
     private dumpPathFormula(alignedBlockFormulas: FirstOrderFormula[]) {
         if (!this._config.dumpPathFormula) {

@@ -60,6 +60,10 @@ export class Optional<T extends AbstractElement> extends OptionalRecord implemen
         return this.getValue() !== null;
     }
 
+    public isAbsent(): boolean {
+        return this.getValue() === null;
+    }
+
     public static absent<T extends AbstractElement>(): Optional<T> {
        return new Optional(null);
     }
