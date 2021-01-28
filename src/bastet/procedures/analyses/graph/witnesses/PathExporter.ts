@@ -107,6 +107,18 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
     private exportConcretePath(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState) {
         const pathElements = [];
 
+        // Hier reinhängen mit Zugriff auf den Lattice (und dessen Join-Methode) durch die Analysis
+        // this._analysis.wrappedAnalysis.abstractDomain.lattice.join()
+
+        /*
+         * Idea: copy the workflow of AbstractionRefiner.checkIsFeasible(ar, e)
+         */
+
+        this._analysis.testifyConcreteOne(pathAr, violating);
+
+        const abstractStates = Array.from(pathAr.initial());
+        // abstractStates.map(s => pathAr.concretizer().concretizeOne(s));
+
         const concrete: ConcreteElement = pathAr.concretizer().concretizeOne(violating);
         Preconditions.checkArgument(concrete instanceof ConcreteMemory);
         const concreteMem: ConcreteMemory = concrete as ConcreteMemory;

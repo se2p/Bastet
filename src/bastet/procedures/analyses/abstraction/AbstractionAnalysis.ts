@@ -233,30 +233,31 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     }
 
     finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
-        return this.wrappedAnalysis.finalizeResults(frontier, reached);
+        return this._wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
     testify(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {
-        return this.wrappedAnalysis.testify(accessibility, state);
+        return this._wrappedAnalysis.testify(accessibility, state);
     }
 
     testifyOne(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {
-        return this.wrappedAnalysis.testifyOne(accessibility, state);
+        return this._wrappedAnalysis.testifyOne(accessibility, state);
     }
 
     testifyConcrete(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
-        const resultWithSSA = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+        const resultWithSSA = this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
 
         // TODO: Remove the SSA-Indices from the concrete elements along the path
+        // TODO: Das Alignment der SSA-Indices hier machen
         throw new ImplementMeException();
     }
 
     incRef(state: AbstractionState) {
-        this.wrappedAnalysis.incRef(state.getWrappedState());
+        this._wrappedAnalysis.incRef(state.getWrappedState());
         this._solver.incRef(state.getEnteringSummary());
     }
 

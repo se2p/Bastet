@@ -206,19 +206,6 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
     }
 
     meet(element1: AbstractionState, element2: AbstractionState): AbstractionState {
-        // Case 1:
-        //      e1: a_0 > 5 and i_0 < 3
-        //      e2: a_0 > 10 and i_0 = 0
-        // Case 2:
-        //      e3: a_0 > 5 and i_0 < 3
-        //      e4: a_1 = 4
-        // Case 3:
-        //      e5: a_1 = 1 and b_1 = 2
-        //      e6: a_1 = a_0 + 1
-
-        // Not commutative:
-        //      e5 * e6 == a_1 = 1 and b_1 = 2 and a_2 = a_1 + 1
-        //      e6 * e5 == a_1 = a_0 + 1 and a_2 = 1 and b_1 = 2
         throw new ImplementMeException();
     }
 
@@ -284,8 +271,37 @@ export class AbstractionAbstractDomain implements AbstractDomain<ConcreteElement
         throw new ImplementMeException();
     }
 
+    /**
+     * Sequential composition of two abstraction states.
+     *
+     * @param e1
+     * @param e2
+     */
     composeSeq(e1: AbstractionState, e2: AbstractionState): AbstractionState {
-        throw new ImplementMeException();
+        // Case 1:
+        //      e1: a_0 > 5 and i_0 < 3
+        //      e2: a_0 > 10 and i_0 = 0
+        // Case 2:
+        //      e3: a_0 > 5 and i_0 < 3
+        //      e4: a_1 = 4
+        // Case 3:
+        //      e5: a_1 = 1 and b_1 = 2
+        //      e6: a_1 = a_0 + 1
+
+        // Not commutative:
+        //      e5 * e6 == a_1 = 1 and b_1 = 2 and a_2 = a_1 + 1
+        //      e6 * e5 == a_1 = a_0 + 1 and a_2 = 1 and b_1 = 2
+
+        // Workflow:
+        // (1) We somehow need to concretize the abstraction states
+        // (2) We somehow need to turn these into FirstOrderFormulas or Z3Formulas
+        // (3) This allows is to perform the SSA alignment
+        // (4) Finally we can conjunct the aligned formulae and return the result
+
+        const c1: ConcreteElement = this.concretizeOne(e1);
+        const c2: ConcreteElement = this.concretizeOne(e2);
+
+
     }
 
 }

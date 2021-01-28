@@ -161,7 +161,7 @@ export interface TestificationOperator<E extends AbstractElement, F extends Abst
     testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]>;
 
     /**
-     * Guaratnees to return at most one concrete path.
+     * Guarantees to return at most one concrete path.
      *
      * @param accessibility
      * @param state
