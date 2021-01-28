@@ -993,6 +993,14 @@ role RuntimeEntity is MathActor, KeyboardIO begin
         define result as cast (attribute "keyPressed" of io) to int
     end returns result : integer
 
+    define atomic keyPressedByCodeNondet (key: int) begin
+         define result as keyPressedNondet() = key
+    end returns result : boolean
+
+    define atomic keyPressedNondet() begin
+        // non-det (variable `result` is not initialized)
+    end returns result : int
+
     @ Category "Sensing"
     @ Block "key (string as key) pressed?"
     @ Opcode "sensing_keypressed"
