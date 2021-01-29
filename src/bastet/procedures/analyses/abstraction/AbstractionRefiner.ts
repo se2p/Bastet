@@ -113,6 +113,11 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         this._feasibilityCheck = 0;
     }
 
+    private neitherTrueNorFalse(f: FirstOrderFormula): boolean {
+        return !(this._theories.boolTheory.trueBool().equals(f)
+                || this._theories.boolTheory.falseBool().equals(f));
+    }
+
     public checkIsFeasible(reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractionState>, e: AbstractState, purpose?: string): boolean {
         this._feasibilityCheck++;
 
@@ -158,7 +163,8 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
                 interpolants.forEach(itp => this._prover.incRef(itp));
 
                 console.group();
-                interpolants.forEach((itp) => console.log("Interpolant", this._theories.stringRepresentation(itp)));
+                console.log(`Identified ${interpolants.filter(itp => this.neitherTrueNorFalse(itp)).length} interpolants.`)
+                // interpolants.forEach((itp) => console.log("Interpolant", this._theories.stringRepresentation(itp)));
                 console.groupEnd();
 
                 Preconditions.checkState(interpolants.length > 0,
