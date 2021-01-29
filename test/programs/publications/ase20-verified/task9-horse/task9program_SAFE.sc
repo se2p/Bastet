@@ -23,7 +23,7 @@ actor Pferd is ScratchSprite begin
                       define i as i + 1
                   end
               end else begin
-                  define color_effect_value as (62.0 + color_effect_value)
+                  define colorEffectValue as (62.0 + colorEffectValue)
               end
               wait 1 seconds
           end
