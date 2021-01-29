@@ -228,6 +228,7 @@ export class ConcreteMemory implements ConcreteElement {
     getPrimitiveAttributeByName(name: string): ConcretePrimitive<any> {
         return this._numberMem.get(name) || this._stringMem.get(name) || this._booleanMem.get(name);
     }
+
 }
 
 export class ConcreteList<Of> implements ConcreteElement {

@@ -159,7 +159,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         let branchingFormula: BooleanFormula = this._theories.boolTheory.trueBool();
         for (const a of alternatives.elements) {
             branchingFormula = this._theories.boolTheory.and(branchingFormula, a.branchPredicateEquiv);
-            // console.log(a.branchName, this._theories.stringRepresentation(a.branchPredicateEquiv));
+            console.log(a.branchName, this._theories.stringRepresentation(a.branchPredicateEquiv));
         }
         Object.freeze(branchingFormula);
         // console.log(this._theories.stringRepresentation(branchingFormula));
@@ -169,6 +169,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
 
         // Build the path-choice query
         const choiceQuery = this._theories.boolTheory.and(traceFormula, branchingFormula);
+        console.log(this._theories.stringRepresentation(choiceQuery));
 
         // Get one satisfying assignment (model of the choiceQuery formula)
         const satAssignement: ConcreteMemory = this._domain.folDomain.concretizeOne(choiceQuery);

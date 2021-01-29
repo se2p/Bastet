@@ -171,9 +171,8 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
      */
     public isUnsat(): boolean {
         const checkResult: number = this.solve();
+        this._model = null;
         return checkResult == Z3_UNSATISFIABLE;
-        this._model = null; // FIXME: What's the purpose of doing this? It's unreachable code... Can it be deleted?
-                            //  Or should it be executed before the return statement?
     }
 
     // FIXME: Memory Leak! Result of this method should be a Z3FormulaVector that can release the memory
@@ -248,9 +247,9 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
      * @inheritDoc
      */
     public isSat(): boolean {
+        this._model = null;
         const checkResult: number = this.solve();
         return checkResult == Z3_SATISFIABLE;
-        this._model = null;
     }
 
     /**

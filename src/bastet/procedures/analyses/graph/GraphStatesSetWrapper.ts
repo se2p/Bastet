@@ -44,12 +44,16 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
 
     private readonly _onStateToInspect: (r: GraphReachedSetWrapper<E>, e: E) => void;
 
-    constructor(frontierSet: FrontierSet<E>, partitionOp: StatePartitionOperator<E>, onStateToInspect: (r: GraphReachedSetWrapper<E>, e: E) => void) {
+    private readonly _labeler: TransitionLabelProvider<E>;
+
+    constructor(frontierSet: FrontierSet<E>, partitionOp: StatePartitionOperator<E>, 
+                onStateToInspect: (r: GraphReachedSetWrapper<E>, e: E) => void, labeler: TransitionLabelProvider<E>) {
         super(partitionOp);
         this._frontierSet = Preconditions.checkNotUndefined(frontierSet);
         this._children = new Map<GraphStateId, GraphStateId[]>();
         this._idToStateMap = new Map<GraphStateId, E>();
         this._onStateToInspect = Preconditions.checkNotUndefined(onStateToInspect);
+        this._labeler = Preconditions.checkNotUndefined(labeler);
     }
 
     public add(element: E): any {
@@ -196,7 +200,7 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
     }
 
     labeler(): TransitionLabelProvider<E> {
-        return new UnavailableTransitionLabelProvider();
+        return this._labeler;
     }
 
     concretizer(): Concretizer<ConcreteElement, E> {

@@ -278,7 +278,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
             throw new IllegalArgumentException("Invalid custruction order: " + this._config.graphConstructionOrder);
         }
 
-        const reachedSet = new GraphReachedSetWrapper(frontierSet, this, (r, e) => {this.onStateError(r,e)});
+        const reachedSet = new GraphReachedSetWrapper(frontierSet, this, (r, e) => {this.onStateError(r,e)}, this);
         return [frontierSet, reachedSet];
     }
 
@@ -349,7 +349,8 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     testifyConcreteOne(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): Iterable<[GraphAbstractState, ConcreteElement][]> {
-        return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
+        const reaching = AccessibilityRelations.backwardsAccessible(accessibility, state, this, this.abstractDomain);
+        return this.wrappedAnalysis.testifyConcreteOne(reaching, state);
     }
 
     accessibility(reached: ReachedSet<GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState> {

@@ -205,7 +205,8 @@ export class AccessibilityRelations {
         concretizer?: Concretizer<ConcreteElement, F>): AccessibilityRelation<F> {
 
         const builder = new AccessRelationBuilder<F>()
-            .setLabeler(ar.labeler()).setConcretizer(ar.concretizer());
+            .setLabeler(ar.labeler())
+            .setConcretizer(ar.concretizer());
 
         if (labeler) {
             builder.setLabeler(labeler);
