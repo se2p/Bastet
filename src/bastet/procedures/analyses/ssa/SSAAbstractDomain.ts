@@ -116,9 +116,7 @@ export function extractPrimitiveAttributes(memory: ConcreteMemory, ssa: ImmMap<s
 
         if (!attribute) {
             // TODO why are attributes in SSAMap but not in memory?
-            // console.log(`${attributeWithIndex} was undefined`);
         } else {
-            console.log(`${attributeName} ${ssaIndex} ${attribute}`);
             attributes.set(attributeName, attribute);
         }
     })
