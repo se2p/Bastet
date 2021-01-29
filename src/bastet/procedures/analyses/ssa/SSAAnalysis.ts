@@ -35,7 +35,7 @@ import {
     ConcreteUnifiedMemory
 } from "../../domains/ConcreteElements";
 import {LabeledTransferRelation} from "../TransferRelation";
-import {SSAAbstractDomain, SSAState} from "./SSAAbstractDomain";
+import {extractPrimitiveAttributes, SSAAbstractDomain, SSAState} from "./SSAAbstractDomain";
 import {SSATransferRelation} from "./SSATransferRelation";
 import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
@@ -219,12 +219,31 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
     testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
         const resultWithSSA: Iterable<[AbstractState, ConcreteElement][]> = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
 
+        const plus = (m1: ImmMap<string, number>, m2: ImmMap<string, number>): ImmMap<string, number> => {
+            const keys = ImmSet(m1.keys()).union(ImmSet(m2.keys()));
+            let result = m1;
+
+            for (const k of keys) {
+                const v1 = m1.get(k) || 0;
+                const v2 = m2.get(k) || 0;
+                result = result.set(k, v1 + v2);
+            }
+
+            return result;
+        };
+
         for (const seq of resultWithSSA) {
             const result: [AbstractState, ConcreteElement][] = [];
+            let ssaBase = this._abstractDomain.lattice.top().getSSA();
+            let ssaAligned = ssaBase;
             for (const [e, c] of seq) {
                 if (c instanceof ConcreteMemory) {
-                    const ssaState = getTheOnlyElement(SSAAbstractStates.extractFrom(e));
-                    const mem = ssaState.getPrimitiveAttributes(c);
+                    const ssaStateAtPos = getTheOnlyElement(SSAAbstractStates.extractFrom(e));
+                    if (this._abstractDomain.lattice.top() === ssaStateAtPos) {
+                        ssaBase = ssaAligned;
+                    }
+                    ssaAligned = plus(ssaBase, ssaStateAtPos.getSSA());
+                    const mem = extractPrimitiveAttributes(c, ssaAligned);
                     result.push([e, new ConcreteUnifiedMemory(mem)]);
                 } else {
                     throw new IllegalArgumentException();
