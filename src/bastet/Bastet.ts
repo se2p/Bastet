@@ -125,12 +125,6 @@ export class Bastet {
     }
 
     public registerOnExitNotifiers() {
-        process.stdin.resume();
-
-        process.on('SIGTERM', function () {
-            console.log("Caught SIGTERM signal");
-        });
-
         process.on('SIGINT', function () {
             console.log("Caught SIGINT signal");
             process.exit();
