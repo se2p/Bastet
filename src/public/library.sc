@@ -25,6 +25,11 @@ actor IOActor is RuntimeEntity begin
      * The last answer given to an `ask` block
      */
     declare answer as string
+    declare askActive as boolean
+
+    script on bootstrap do begin
+        define askActive as false
+    end
 
     script on message "ASK" () in "SYSTEM" do atomic begin
         declare nondetStr as string
@@ -32,7 +37,9 @@ actor IOActor is RuntimeEntity begin
         declare inputDurationSecs as integer
         assume inputDurationSecs > 0
         assume inputDurationSecs < 30
+        define askActive as true
         wait inputDurationSecs seconds
+        define askActive as false
         // UNSOUND: might wait arbitrarily long
     end
 
