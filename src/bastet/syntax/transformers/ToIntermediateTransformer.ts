@@ -155,7 +155,7 @@ import {
     StoreCallResultStatementContext,
     StoreEvalResultStatementContext,
     StrContainsExpressionContext,
-    StrIdentExpressionContext,
+    StrIdentExpressionContext, StringAsBoolExpressionContext,
     StringAttributeOfExpressionContext,
     StringCallStatementExpressionContext,
     StringLiteralExpressionContext,
@@ -1741,6 +1741,15 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
     public visitNumAsBoolExpression(ctx: NumAsBoolExpressionContext): TransformerResult {
         const tr = ctx.numExpr().accept(this);
+        Preconditions.checkArgument(!(tr.node instanceof Identifier));
+
+        return new TransformerResult(
+            tr.statementsToPrepend,
+            new CastExpression(tr.node as Expression, BooleanType.instance()));
+    }
+
+    public visitStringAsBoolExpression(ctx: StringAsBoolExpressionContext): TransformerResult {
+        const tr = ctx.stringExpr().accept(this);
         Preconditions.checkArgument(!(tr.node instanceof Identifier));
 
         return new TransformerResult(
