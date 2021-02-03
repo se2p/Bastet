@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BASTET brain-game-1 UNSAFE BMC" type="NodeJSConfigurationType" folderName="Testified: Predicate Abstraction" application-parameters="-c config/default.json -P test/programs/publications/ths-testified/brain-game/program-1_UNSAFE.sc -S test/programs/publications/ths-testified/brain-game/spec.sc -I src/public/library.sc" node-parameters="--experimental-wasi-unstable-preview1 --experimental-wasm-bigint --require ts-node/register" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>
