@@ -8,6 +8,7 @@ actor ProgramObserver is Observer begin
     declare no as actor
 
     declare lastScore as integer
+    declare correct as integer
     declare questions as integer
     declare lastAskActive as boolean
 
@@ -67,15 +68,18 @@ actor ProgramObserver is Observer begin
                 define entered as cast attribute "answer" of io to integer
 
                 if expected = entered then begin
-                    define state as 2
-                    define stateEntered as _RUNTIME_micros()
+                    define correct as correct + 1
+                    if correct = 5 then begin
+                        define state as 2
+                        define stateEntered as _RUNTIME_micros()
+                    end
                 end else begin
                     define state as 3
                     define stateEntered as _RUNTIME_micros()
                 end
             end
         end else if state = 2 then begin
-            // Reaction to the CORRECT answer expected within the next 100msec
+            // Reaction after ALL questions were answered correctly, expected within the next 100msec
             declare noShown as boolean
             define noShown as noVisible and not lastNoVisible
 
@@ -140,6 +144,7 @@ actor ProgramObserver is Observer begin
         define lastAskActive as false
         define lastScore as cast attribute "score" of game to int
 
+        define correct as 0
         define questions as 0
         define state as 0
         define stateEntered as _RUNTIME_micros()
