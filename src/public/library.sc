@@ -28,11 +28,7 @@ actor IOActor is RuntimeEntity begin
     declare integerAnswer as integer
     declare askActive as boolean
 
-    script on bootstrap do begin
-        define askActive as false
-    end
-
-    script on message "ASK" () in "SYSTEM" do atomic begin
+    define atomic handleAsk() begin
         declare nondetStr as string
         define answer as nondetStr
         declare nondetInt as integer
@@ -44,6 +40,17 @@ actor IOActor is RuntimeEntity begin
         wait inputDurationSecs seconds
         define askActive as false
         // UNSOUND: might wait arbitrarily long
+    end
+
+    script on bootstrap do begin
+        define askActive as false
+    end
+
+    script on message "ASK" () in "SYSTEM" do atomic begin
+        // Delegating to an atomic ask-handler function.
+        // This is a workarround since 'atomic' scripts
+        // are not yet implemented in BASTET (while the keyword exists).
+        handleAsk()
     end
 
     /**
@@ -2096,6 +2103,10 @@ role ScratchSprite is ScratchEntity begin
         define bubbleText as msg
         define bubbleStart as _RUNTIME_millis()
         define bubbleType as "say"
+    end
+
+    define atomic say (msg: string) begin
+        sayText(msg)
     end
 
     @ Category "Motion"
