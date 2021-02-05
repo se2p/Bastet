@@ -28,7 +28,7 @@ actor IOActor is RuntimeEntity begin
     declare integerAnswer as integer
     declare askActive as boolean
 
-    define atomic handleAsk() begin
+    define atomic beginAsk() begin
         declare nondetStr as string
         define answer as nondetStr
         declare nondetInt as integer
@@ -37,8 +37,8 @@ actor IOActor is RuntimeEntity begin
         assume inputDurationSecs > 0
         assume inputDurationSecs < 30
         define askActive as true
+        // ATTENTION/FIXME: The following wait statement should allow to interleave other threads
         wait inputDurationSecs seconds
-        define askActive as false
         // UNSOUND: might wait arbitrarily long
     end
 
@@ -46,11 +46,9 @@ actor IOActor is RuntimeEntity begin
         define askActive as false
     end
 
-    script on message "ASK" () in "SYSTEM" do atomic begin
-        // Delegating to an atomic ask-handler function.
-        // This is a workarround since 'atomic' scripts
-        // are not yet implemented in BASTET (while the keyword exists).
-        handleAsk()
+    script on message "ASK" () in "SYSTEM" do begin
+        beginAsk()
+        define askActive as false
     end
 
     /**
