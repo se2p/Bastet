@@ -9,8 +9,7 @@ actor Game is ScratchSprite begin
 
     define myAskAndWait (a: integer, b: integer) begin
         declare exercise as string
-        define exercise as (join (join (cast a to string) " + ") (cast b to string))
-        askAndWait (join ("Please enter the result of adding the two numbers? ") exercise)
+        askAndWait (exercise)
     end
 
     script on startup do begin
@@ -21,7 +20,7 @@ actor Game is ScratchSprite begin
             define b as randomBetween(1, max)
             myAskAndWait(a, b)
             declare c as integer
-            define c as cast answer() to integer
+            define c as integerAnswer()
             if not (c = a + b) then begin
                 broadcast "Game Over"
                 stop all

@@ -25,6 +25,7 @@ actor IOActor is RuntimeEntity begin
      * The last answer given to an `ask` block
      */
     declare answer as string
+    declare integerAnswer as integer
     declare askActive as boolean
 
     script on bootstrap do begin
@@ -34,6 +35,8 @@ actor IOActor is RuntimeEntity begin
     script on message "ASK" () in "SYSTEM" do atomic begin
         declare nondetStr as string
         define answer as nondetStr
+        declare nondetInt as integer
+        define integerAnswer as nondetInt
         declare inputDurationSecs as integer
         assume inputDurationSecs > 0
         assume inputDurationSecs < 30
@@ -1335,6 +1338,12 @@ role ScratchEntity is RuntimeEntity begin
         define io as locate actor "IOActor"
         define result as attribute "answer" of io
     end returns result : string
+
+    define atomic integerAnswer () begin
+        declare io as actor
+        define io as locate actor "IOActor"
+        define result as cast attribute "integerAnswer" of io to integer
+    end returns result : integer
 
     @ Category "Sensing"
     @ Block "timer"
