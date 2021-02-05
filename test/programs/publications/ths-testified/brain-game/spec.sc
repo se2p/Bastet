@@ -87,13 +87,13 @@ actor ProgramObserver is Observer begin
             define yesShown as yesVisible and not lastYesVisible
 
             if _RUNTIME_micros() - stateEntered > 100000 then begin
-                _RUNTIME_signalFailure("Expected the sprite for the correct answer to be shown within 100msec.")
+                _RUNTIME_signalFailure("Expected the sprite for the CORRECT answer to be shown within 100msec.")
             end else begin
                 if yesShown then begin
                     define state as 0
                     define stateEntered as _RUNTIME_micros()
                 end else if noShown then begin
-                    _RUNTIME_signalFailure("Expected the sprite for the correct answer to be shown---not the sprite for the wrong answer.")
+                    _RUNTIME_signalFailure("Expected the sprite for the CORRECT answer to be shown---not the sprite for the wrong answer.")
                 end
             end
         end else if state = 3 then begin
@@ -105,13 +105,13 @@ actor ProgramObserver is Observer begin
             define yesShown as yesVisible and not lastYesVisible
 
             if _RUNTIME_micros() - stateEntered > 100000 then begin
-                _RUNTIME_signalFailure("Expected the sprite for the wrong answer to be shown within 100msec.")
+                _RUNTIME_signalFailure("Expected the sprite for the WRONG answer to be shown within 100msec.")
             end else begin
                 if noShown then begin
                     define state as 0
                     define stateEntered as _RUNTIME_micros()
                 end else if yesShown then begin
-                    _RUNTIME_signalFailure("Expected the sprite for the wrong answer to be shown---not the sprite for the correct answer.")
+                    _RUNTIME_signalFailure("Expected the sprite for the WRONG answer to be shown---not the sprite for the correct answer.")
                 end
             end
         end
