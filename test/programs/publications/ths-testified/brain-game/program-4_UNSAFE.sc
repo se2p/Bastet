@@ -23,13 +23,13 @@ actor Game is ScratchSprite begin
             define c as integerAnswer()
             if not (c = a + b) then begin
                 define score as score - 1 // <-- line must be removed for SAFE
-                broadcast "Game Over"
+                broadcast "Game Over" and wait
                 stop all
             end else begin
                 define score as score + 1
             end
         end
-        broadcast "Success"
+        broadcast "Success" and wait
     end
 end
 
