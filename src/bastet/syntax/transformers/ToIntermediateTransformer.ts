@@ -1580,7 +1580,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
     public visitQualifiedNamespace(ctx: QualifiedNamespaceContext): TransformerResult {
         return new TransformerResult(StatementList.empty(),
-            new QualifiedMessageNamespace(new StringLiteral(ctx.String().text)));
+            new QualifiedMessageNamespace(new StringLiteral(this.unquote(ctx.String().text))));
     }
 
     public visitUnqualifiedNamespace(ctx: UnqualifiedNamespaceContext): TransformerResult {
@@ -1588,7 +1588,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     public visitNamedMessageDestination(ctx: NamedMessageDestinationContext): TransformerResult {
-        const namespace = new StringLiteral(ctx.String().text);
+        const namespace = new StringLiteral(this.unquote(ctx.String().text));
         return new TransformerResult(StatementList.empty(),
             new NamedDestination(namespace as StringLiteral));
     }
