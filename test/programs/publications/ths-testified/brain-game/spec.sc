@@ -65,7 +65,7 @@ actor ProgramObserver is Observer begin
                 define expected as x + y
 
                 declare entered as integer
-                define entered as cast attribute "answer" of io to integer
+                define entered as cast attribute "integerAnswer" of io to integer
 
                 if expected = entered then begin
                     define correct as correct + 1
@@ -86,8 +86,8 @@ actor ProgramObserver is Observer begin
             declare yesShown as boolean
             define yesShown as yesVisible and not lastYesVisible
 
-            if _RUNTIME_micros() - stateEntered > 100000 then begin
-                _RUNTIME_signalFailure("Expected the sprite for the CORRECT answer to be shown within 100msec.")
+            if _RUNTIME_micros() - stateEntered > 200000 then begin
+                _RUNTIME_signalFailure("Expected the sprite for the CORRECT answer to be shown within 200msec.")
             end else begin
                 if yesShown then begin
                     define state as 0
@@ -97,15 +97,15 @@ actor ProgramObserver is Observer begin
                 end
             end
         end else if state = 3 then begin
-            // Reaction to the WRONG answer expected within the next 100msec
+            // Reaction to the WRONG answer expected within the next 200msec
             declare noShown as boolean
             define noShown as noVisible and not lastNoVisible
 
             declare yesShown as boolean
             define yesShown as yesVisible and not lastYesVisible
 
-            if _RUNTIME_micros() - stateEntered > 100000 then begin
-                _RUNTIME_signalFailure("Expected the sprite for the WRONG answer to be shown within 100msec.")
+            if _RUNTIME_micros() - stateEntered > 200000 then begin
+                _RUNTIME_signalFailure("Expected the sprite for the WRONG answer to be shown within 200msec.")
             end else begin
                 if noShown then begin
                     define state as 0
