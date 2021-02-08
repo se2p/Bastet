@@ -23,7 +23,7 @@
     },
 
     "GraphAnalysis": {
-        "mergeIntoOperator": "StandardMergeIntoOperator",
+        "mergeIntoOperator": "NewMergeIntoOperator",
         "stopOperator": "IfMerged",
         "witnessHandler": "ExportPath",
         "graphConstructionOrder": "WaitAtMeet"
