@@ -1,10 +1,12 @@
 program CatInTheWell
 
 actor Cat is ScratchSprite begin
+
     image cat "cat.svg"
+
     declare stepsLeft as int
 
-    script on bootstrap do begin
+    script on bootstrap finished do begin
         goTo(0-209, 149)
         changeCostumeTo("cat")
     end
