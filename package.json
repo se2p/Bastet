@@ -41,7 +41,7 @@
     "@types/node": "^14.6.2",
     "@typescript-eslint/eslint-plugin": "^4.8.1",
     "@typescript-eslint/parser": "^4.8.1",
-    "antlr4ts-cli": "^0.5.0-alpha.3",
+    "antlr4ts-cli": "^0.5.0-alpha.4",
     "eslint": "^7.8.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-sinon": "^4.0.0",
@@ -60,7 +60,7 @@
   "dependencies": {
     "@types/lodash": "^4.14.161",
     "acorn": "^8.0.1",
-    "antlr4ts": "^0.5.0-alpha.3",
+    "antlr4ts": "^0.5.0-alpha.4",
     "colormap": "^2.3.1",
     "commander": "^6.1.0",
     "core-util-is": "^1.0.2",
