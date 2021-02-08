@@ -136,7 +136,7 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
                 this._mergeCosts.startTimer();
                 const ePrimePrimePrime: F = wrapper(this._mergeOp.merge(state, unwrapper(r)));
                 this._mergeCosts.stopTimer();
-                // console.log(`merge ${state['id']} to ${r['id']} resulting in ${ePrimePrimePrime['id']}`)
+                // console.log(`merging ${state['id']} to ${r['id']} resulting in ${ePrimePrimePrime['id']}`)
 
                 removeFromReached.add(r);
                 addToReached.add(ePrimePrimePrime);
@@ -203,7 +203,7 @@ export class NewMergeIntoOperator<E extends AbstractElement, F extends AbstractS
                 this._mergeCosts.startTimer();
                 merged = this._mergeOp.merge(unwrapper(merged), unwrapper(r));
                 this._mergeCosts.stopTimer();
-                // console.log(`merge ${merged['id']} to ${r['id']} resulting in ${merged['id']}`)
+                // console.log(`merging ${state['id']} to ${r['id']} resulting in ${merged['id']}`)
 
                 removeFromReached.add(r);
             }
