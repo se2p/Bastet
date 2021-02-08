@@ -85,7 +85,7 @@ scriptAttribute : 'restart' # RestartScript ;
 event :
   'never' # NeverEvent
   | 'bootstrap' # BootstrapEvent
-  | 'bootstrap' 'finished' # AfterBootstrapMonitoringEvent
+  | ('bootstrap' 'finished' | 'setup') # AfterBootstrapMonitoringEvent
   | 'startup' # StartupEvent
   | 'started' 'as' 'clone' # CloneStartEvent
   | 'message' stringExpr parameterList messageNamespace # MessageReceivedEvent
