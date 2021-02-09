@@ -20,8 +20,8 @@ actor Stage is ScratchStage begin
         showVariable("score")
         repeat forever begin
             if (score < 0) then begin
-                broadcast "game over"
-                switchBackdropToId("youLost")
+                // broadcast "game over"
+                // switchBackdropToId("youLost")  <--- this makes the program UNSAFE
             end else begin
                 if (score = maxPoints) then begin
                     broadcast "game over"

@@ -92,7 +92,7 @@ actor Bat1 is ScratchSprite begin
     script on message "SPRITE_CLICK" () do begin
         if not hit then begin
             define hit as true
-            define Stage.score as Stage.score + (0-2)
+            // define Stage.score as Stage.score + (0-2)  <--- this makes the program UNSAFE
             changeCostumeTo("bat-c")
             wait 1 seconds
             hide()

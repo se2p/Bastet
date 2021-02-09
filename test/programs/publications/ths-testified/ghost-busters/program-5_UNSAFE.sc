@@ -24,8 +24,8 @@ actor Stage is ScratchStage begin
                 switchBackdropToId("youLost")
             end else begin
                 if (score = maxPoints) then begin
-                    broadcast "game over"
-                    switchBackdropToId("youWon")
+                    // broadcast "game over"
+                    // switchBackdropToId("youWon")  <--- this makes the program UNSAFE
                 end
             end
         end
