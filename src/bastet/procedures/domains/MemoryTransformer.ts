@@ -25,7 +25,7 @@
 
 import {BooleanType, FloatType, IntegerType, ScratchType, StringType} from "../../syntax/ast/core/ScratchType";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString, ConcreteStringList} from "./ConcreteElements";
-import {AbstractElement} from "../../lattices/Lattice";
+import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {AbstractDomain} from "./AbstractDomain";
 import {AbstractStringList} from "./StringListAbstractDomain";
 import {Variable} from "../../syntax/ast/core/Variable";
