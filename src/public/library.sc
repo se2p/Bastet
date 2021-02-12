@@ -813,16 +813,21 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     extern _RUNTIME_integerFromInterval (fromNum: integer, toNum: integer) returns integer
 
-    /**
+   /**
      * A random integer in the interval [from, to],
      * that is, both end points are included.
      */
-    extern randomIntegerBetween (intervalStart: integer, intervalEnd: integer) returns integer
+    define randomIntegerBetween (intervalStart: integer, intervalEnd: integer) begin
+        assume result >= intervalStart
+        assume result <= intervalEnd
+    end returns result: integer
 
     /**
      * See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
      */
-    extern randomBetween (intervalStart: integer, intervalEnd: integer) returns integer
+    define randomBetween (intervalStart: integer, intervalEnd: integer) begin
+        define result as randomIntegerBetween(intervalStart, intervalEnd)
+    end returns result: integer
 
     @ Category "Operator"
     @ Block "[ceiling v] of (num)"

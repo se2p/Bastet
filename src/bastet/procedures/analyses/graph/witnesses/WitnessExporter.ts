@@ -30,7 +30,7 @@ import {ReachedSet} from "../../../algorithms/StateSet";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {GraphReachedSetWrapper} from "../GraphStatesSetWrapper";
 import {TransitionLabelProvider, WrappingProgramAnalysis} from "../../ProgramAnalysis";
-import {ConcreteElement, ConcreteMemory} from "../../../domains/ConcreteElements";
+import {ConcreteElement, ConcreteMemory, ConcreteUnifiedMemory, ConcreteProgramState, ConcreteProgramState} from "../../../domains/ConcreteElements";
 import {SSAStateVisitor} from "../../StateVisitors";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {App} from "../../../../syntax/app/App";
@@ -103,13 +103,25 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
         Preconditions.checkArgument(reached instanceof GraphReachedSetWrapper);
         const ar: GraphReachedSetWrapper<GraphAbstractState> = reached as GraphReachedSetWrapper<GraphAbstractState>;
-        const testified = this._analysis.testifyOne(ar, violating);
-        this.exportPath(testified, violating);
+        const testifiedSeq: [GraphAbstractState, ConcreteElement][] =
+            getTheOnlyElement(this._analysis.testifyConcreteOne(ar, violating));
+
+        // kein Visitor notwendig
+        // ConcreteElement as ConcreteProgramState
+
+        this.exportPath(ar, testifiedSeq, violating);
     }
 
-    private exportPath(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState) {
-        const errorWitness: ErrorWitness = this.extractErrorWitness(pathAr, violating);
+    private exportPath(pathAr: AccessibilityRelation<GraphAbstractState>, testifiedSeq: [GraphAbstractState, ConcreteElement][], violating: GraphAbstractState) {
+        const errorWitness: ErrorWitness = this.extractErrorWitness(pathAr, violating, testifiedSeq);
 
+        // Post-processing and filtering
+        this.produceWitnessAbstraction(errorWitness);
+
+        this.exportErrorWitness(errorWitness);
+    }
+
+    private produceWitnessAbstraction(errorWitness: ErrorWitness) {
         if (this._config.export === "ONLY_ACTIONS") {
             errorWitness.steps = WitnessExporter.collapseEpsilonsToWait(errorWitness.steps);
         }
@@ -119,10 +131,10 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         errorWitness.steps.forEach(step => {
             step.actors = step.actors.filter(actor => {
-               return !this._config.removeActors.some(actorToRemove => {
-                   const regex = new RegExp(actorToRemove);
-                   return regex.test(actor.name);
-               })
+                return !this._config.removeActors.some(actorToRemove => {
+                    const regex = new RegExp(actorToRemove);
+                    return regex.test(actor.name);
+                })
             });
 
             if (!this._config.keepDebuggingAttributes) {
@@ -146,17 +158,13 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                 delete step.epsilonType;
             }
         })
-
-        this.exportErrorWitness(errorWitness);
     }
 
-    private extractErrorWitness(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState): ErrorWitness {
-        const path: GraphAbstractState[] = AccessibilityRelations.toSequence(pathAr);
+    private extractErrorWitness(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState,
+                                testifiedSeq: [GraphAbstractState, ConcreteElement][]): ErrorWitness {
         const violatedProperties: Property[] = this._analysis.target(violating);
 
-        const violatingConcreteElement: ConcreteElement = pathAr.concretizer().concretizeOne(violating);
-        Preconditions.checkArgument(violatingConcreteElement instanceof ConcreteMemory);
-        const errorState: ConcreteMemory = violatingConcreteElement as ConcreteMemory;
+        const errorState: ConcreteProgramState = testifiedSeq[testifiedSeq.length - 1][1] as ConcreteProgramState;
 
         const errorWitness = new ErrorWitness();
         errorWitness.violations = violatedProperties.map(property => property.getText);
@@ -169,20 +177,18 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             new SpriteClickBroadcastActionExtractor(),
             new AnswerActionExtractor(),
             new KeyPressedActionExtractor()
+            // TODO: Aufrufe von RNG extrahieren mit einem neuen Extractor
         ];
 
         const ssaStateVisitor = new SSAStateVisitor();
 
         let index = 0;
-        for (const currentState of path) {
+        for (const [e, c] of testifiedSeq) {
             const step = new ErrorWitnessStep(index);
-            const relationLocation = this.getRelationLocationForState(currentState);
+            const relationLocation = this.getRelationLocationForState(e);
             step.actionTargetName = relationLocation ? relationLocation.getActorId() : undefined;
 
-            const ssaState = currentState.accept(ssaStateVisitor);
-            const memoryInStep = ssaState.getPrimitiveAttributes(errorState);
-            const targetStates = WitnessExporter.groupByTargets(memoryInStep);
-            const globalTime = memoryInStep.get(GLOBAL_TIME_MICROS_VAR);
+            const globalTime = c.get(GLOBAL_TIME_MICROS_VAR);
             step.timestamp = globalTime ? globalTime.value : 0;
 
             targetStates.forEach((state, targetName) => {
@@ -192,7 +198,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
             if (previousState) {
                 // Set step action and action label
-                const transitionLabel = this._tlp.getTransitionLabel(previousState, currentState);
+                const transitionLabel = this._tlp.getTransitionLabel(previousState, e);
 
                 step.actionLabel = transitionLabel
                     .map(o => o.ast.accept(this._labelPrintVisitor))
@@ -206,7 +212,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             }
 
             errorWitness.steps.push(step);
-            previousState = currentState;
+            previousState = e;
             index++;
         }
 
@@ -349,7 +355,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return getTheOnlyElement(controlLocations);
     }
 
-    private static groupByTargets<T>(map: ImmMap<string, T>): Map<string, Map<string, T>> {
+/*    private static groupByTargets<T>(map: ImmMap<string, T>): Map<string, Map<string, T>> {
         const targets = new Map<string, Map<string, T>>();
 
         map.forEach((value, attributeWithTarget) => {
@@ -367,7 +373,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         })
 
         return targets;
-    }
+    }*/
 
     public static splitTargetPrefixFromAttribute(attributeWithTargetName: string): {attribute: string, target: string} {
         const target = DataLocationScoper.leftUnwrapScope(attributeWithTargetName).prefix;

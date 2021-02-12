@@ -37,7 +37,6 @@ import {
     PaperLabelVisitor,
     PenSizeVisitor,
     StateColorVisitor,
-    StateLabelVisitor
 } from "../StateVisitors";
 import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 import {App} from "../../../syntax/app/App";
@@ -78,7 +77,7 @@ export class GraphToDot  {
     }
 
     private writeState(e: GraphAbstractState) {
-        const stateLabel = GraphToDot.escapeForDot(e.accept(new StateLabelVisitor(this._task))
+        const stateLabel = GraphToDot.escapeForDot(e.accept(new PaperLabelVisitor(this._task))
             + this._traversalKeyProvider.getLexiOrderKey(e).toString());
         const stateColor = e.accept(new ColorByActorVisitor(this._task));
         const pensize = e.accept(new PenSizeVisitor(this._analysis));

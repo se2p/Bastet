@@ -191,6 +191,23 @@ export class ConcreteUnifiedMemory implements ConcreteElement {
     }
 }
 
+export class ConcreteProgramState {
+
+    private readonly _actorStates: ImmMap<string, ConcreteUnifiedMemory>;
+
+    constructor(actorStates: ImmMap<string, ConcreteUnifiedMemory>) {
+        this._actorStates = actorStates;
+    }
+
+    public getActorMemory(actor: string): ConcreteUnifiedMemory {
+        return this._actorStates.get(actor);
+    }
+
+    public getActors(): Iterable<string> {
+        return this._actorStates.keys();
+    }
+}
+
 export class ConcreteMemory implements ConcreteElement {
 
     private readonly _numberMem: ImmutableMap<string, ConcreteNumber>;

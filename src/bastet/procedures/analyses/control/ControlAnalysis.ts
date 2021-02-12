@@ -482,7 +482,23 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
     }
 
     testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
-        return this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
+        const seq: Iterable<[AbstractState, ConcreteElement][]> = this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
+        const result: [[AbstractState, ConcreteElement][]] = [];
+
+        const toProgramState = function(c: ConcreteUnifiedMemory): ConcreteProgramState {
+            VAR_SCOPING_SPLITTER
+        };
+
+        // Given a sequence of concrete unified memories to goal is to build a sequence of concrete states
+        for (const s of seq) {
+            const sPrime: [AbstractState, ConcreteProgramState][] = [];
+
+            for (const [e, c] of s) {
+                sPrime.push([e, toProgramState(c as ConcreteUnifiedMemory)]);
+            }
+        }
+
+        return result;
     }
 
     abstractSuccFor(fromState: ControlAbstractState, op: ProgramOperation, co: Concern): Iterable<ControlAbstractState> {
