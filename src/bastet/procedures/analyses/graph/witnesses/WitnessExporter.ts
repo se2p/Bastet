@@ -30,7 +30,7 @@ import {ReachedSet} from "../../../algorithms/StateSet";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {GraphReachedSetWrapper} from "../GraphStatesSetWrapper";
 import {TransitionLabelProvider, WrappingProgramAnalysis} from "../../ProgramAnalysis";
-import {ConcreteElement, ConcreteMemory, ConcreteUnifiedMemory, ConcreteProgramState, ConcreteProgramState} from "../../../domains/ConcreteElements";
+import {ConcreteElement, ConcreteMemory, ConcreteUnifiedMemory, ConcreteProgramState} from "../../../domains/ConcreteElements";
 import {SSAStateVisitor} from "../../StateVisitors";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {App} from "../../../../syntax/app/App";
@@ -145,8 +145,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             }
 
             step.actors.forEach(target => {
-                target.removeActorPrefix();
-
                 target.removeVariables(this._config.removeVariables);
 
                 if (this._config.removeMethodVariables) {
@@ -184,17 +182,19 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         let index = 0;
         for (const [e, c] of testifiedSeq) {
+            Preconditions.checkArgument(c instanceof ConcreteProgramState);
+            const cp = c as ConcreteProgramState;
             const step = new ErrorWitnessStep(index);
             const relationLocation = this.getRelationLocationForState(e);
             step.actionTargetName = relationLocation ? relationLocation.getActorId() : undefined;
 
-            const globalTime = c.get(GLOBAL_TIME_MICROS_VAR);
+            const globalTime = cp.globalState.get(GLOBAL_TIME_MICROS_VAR);
             step.timestamp = globalTime ? globalTime.value : 0;
 
-            targetStates.forEach((state, targetName) => {
-                const target = ErrorWitnessActor.fromConcretePrimitives(targetName, state);
+            for (const actor of cp.getActors()) {
+                const target = ErrorWitnessActor.fromConcreteActorState(actor, cp.getActorMemory(actor));
                 step.actors.push(target);
-            })
+            }
 
             if (previousState) {
                 // Set step action and action label

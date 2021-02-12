@@ -22,13 +22,15 @@
 
 import {Action} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {Preconditions} from "../../../../utils/Preconditions";
-import {ConcretePrimitive} from "../../../domains/ConcreteElements";
-import {WitnessExporter} from "./WitnessExporter";
+import {ConcretePrimitive, ConcreteUnifiedMemory} from "../../../domains/ConcreteElements";
 import {DataLocationScoper} from "../../control/DataLocationScoping";
 
 export class ErrorWitnessActor {
+
     name: string;
+
     variables: { [key: string]: string | boolean | number } = {}; //TODO add default scratch attributes
+
     /**
      * Variables that were declared inside a method
      */
@@ -42,28 +44,13 @@ export class ErrorWitnessActor {
         })
     }
 
-    removeActorPrefix(): void {
-        Object.keys(this.variables).forEach(scopedVariableName => {
-            const {attribute} = WitnessExporter.splitTargetPrefixFromAttribute(scopedVariableName);
-
-            const value = this.variables[scopedVariableName];
-            delete this.variables[scopedVariableName];
-
-            if (this.isActorVariable(scopedVariableName)) {
-                this.variables[attribute] = value;
-            } else if (this.methodVariables) {
-                this.methodVariables[scopedVariableName] = value;
-            }
-        });
-    }
-
-    static fromConcretePrimitives(name: string, attributes: Map<string, ConcretePrimitive<any>>): ErrorWitnessActor {
+    static fromConcreteActorState(actorName: string, actorMemory: ConcreteUnifiedMemory): ErrorWitnessActor {
         const target = new ErrorWitnessActor();
-        target.name = name;
+        target.name = actorName;
 
-        attributes.forEach((value, attribute) => {
-            target.variables[attribute] = value.value;
-        });
+        for (const v of actorMemory.variables()) {
+            target.variables[v] = actorMemory.get(v).value;
+        }
 
         return target;
     }

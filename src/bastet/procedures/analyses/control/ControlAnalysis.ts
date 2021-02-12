@@ -508,9 +508,9 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
             for (const k of c.variables()) {
                 const value = c.get(k);
                 if (k.includes(VAR_SCOPING_SPLITTER)) {
-                    const actor = splitTargetPrefixFromAttribute(k).target;
-                    const actorMem = actorStates.get(actor) || new ConcreteUnifiedMemory(ImmMap());
-                    actorStates.set(actor, actorMem.withValue(k, value));
+                    const split = splitTargetPrefixFromAttribute(k);
+                    const actorMem = actorStates.get(split.target) || new ConcreteUnifiedMemory(ImmMap());
+                    actorStates.set(split.target, actorMem.withValue(split.attribute, value));
                 } else {
                     globalState = globalState.withValue(k, value);
                 }
