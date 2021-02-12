@@ -27,7 +27,6 @@ import {ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnal
 import {
     ControlAbstractDomain,
     ControlAbstractState,
-    ControlConcreteState,
     IndexedThread,
     MethodCall,
     RelationLocation,
@@ -99,13 +98,13 @@ export class ControlAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcreteState, ControlAbstractState, AbstractState>,
-    WrappingProgramAnalysis<ControlConcreteState, ControlAbstractState, AbstractState>,
+export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgramState, ControlAbstractState, AbstractState>,
+    WrappingProgramAnalysis<ConcreteProgramState, ControlAbstractState, AbstractState>,
     Unwrapper<ControlAbstractState, AbstractElement> {
 
     private readonly _config: ControlAnalysisConfig;
 
-    private readonly _abstractDomain: AbstractDomain<ControlConcreteState, ControlAbstractState>;
+    private readonly _abstractDomain: AbstractDomain<ConcreteProgramState, ControlAbstractState>;
 
     private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>;
 
@@ -485,45 +484,21 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         return this._wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
-        return this._wrappedAnalysis.testifyConcrete(accessibility, state);
+    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteProgramState][]> {
+        throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteProgramState][]> {
         const seq: Iterable<[AbstractState, ConcreteElement][]> = this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
-        const result: [AbstractState, ConcreteElement][][] = [];
+        const result: [AbstractState, ConcreteProgramState][][] = [];
 
         // Given a sequence of concrete unified memories to goal is to build a sequence of concrete PROGRAM states
-
-        const splitTargetPrefixFromAttribute = (attributeWithTargetName: string): {attribute: string, target: string} => {
-            const target = DataLocationScoper.leftUnwrapScope(attributeWithTargetName).prefix;
-            const attribute = DataLocationScoper.rightUnwrapScope(attributeWithTargetName).suffix;
-            return {attribute, target};
-        }
-
-        const toProgramState = (c: ConcreteUnifiedMemory): ConcreteProgramState => {
-            const actorStates: Map<string, ConcreteUnifiedMemory> = new Map();
-            let globalState: ConcreteUnifiedMemory = new ConcreteUnifiedMemory(ImmMap());
-
-            for (const k of c.variables()) {
-                const value = c.get(k);
-                if (k.includes(VAR_SCOPING_SPLITTER)) {
-                    const split = splitTargetPrefixFromAttribute(k);
-                    const actorMem = actorStates.get(split.target) || new ConcreteUnifiedMemory(ImmMap());
-                    actorStates.set(split.target, actorMem.withValue(split.attribute, value));
-                } else {
-                    globalState = globalState.withValue(k, value);
-                }
-            }
-
-            return new ConcreteProgramState(globalState, ImmMap(actorStates));
-        };
 
         for (const s of seq) {
             const sPrime: [AbstractState, ConcreteProgramState][] = [];
 
             for (const [e, c] of s) {
-                sPrime.push([e, toProgramState(c as ConcreteUnifiedMemory)]);
+                sPrime.push([e, this._abstractDomain.enrich(c as ConcreteUnifiedMemory)]);
             }
 
             result.push(sPrime);

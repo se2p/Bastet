@@ -25,7 +25,13 @@
 
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {Record as ImmRec} from "immutable";
-import {ConcreteDomain, ConcreteElementFactory, ConcreteNumber, ConcreteNumberOrderLattice} from "./ConcreteElements";
+import {
+    ConcreteDomain,
+    ConcreteElement,
+    ConcreteElementFactory,
+    ConcreteNumber,
+    ConcreteNumberOrderLattice
+} from "./ConcreteElements";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
 import {AbstractNumber, AbstractNumberDomain} from "./MemoryTransformer";
@@ -132,6 +138,10 @@ export class NumIntervalValueDomain implements AbstractNumberDomain {
 
     widen(element: NumIntervalValue, precision: AbstractionPrecision): NumIntervalValue {
         throw new ImplementMeException();
+    }
+
+    enrich(element: ConcreteElement): ConcreteNumber {
+       return element as ConcreteNumber;
     }
 
     get lattice(): Lattice<NumIntervalValue> {

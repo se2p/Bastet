@@ -27,7 +27,6 @@ import {LabeledTransferRelation} from "../TransferRelation";
 import {ValueAbstractDomain, ValueAbstractState} from "./ValueAbstractDomain";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {ValueTransformerVisitor} from "./ValueTransformerVisitor";
 import {TransformerTheories} from "../../domains/MemoryTransformer";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AstNode} from "../../../syntax/ast/AstNode";
@@ -40,6 +39,7 @@ import {
     ConcreteMemory,
     ConcreteString, ConcreteStringList
 } from "../../domains/ConcreteElements";
+import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 
 export class ValueTransferRelation implements LabeledTransferRelation<ValueAbstractState> {
 
@@ -68,8 +68,9 @@ export class ValueTransferRelation implements LabeledTransferRelation<ValueAbstr
     }
 
     private abstractSuccForAst(fromState: ValueAbstractState, ast: AstNode): Iterable<ValueAbstractState> {
-        const visitor = new ValueTransformerVisitor(fromState, this._abstDomain.lattice, this._theories);
-        return [ast.accept(visitor)];
+        // const visitor = new ValueTransformerVisitor(fromState, this._abstDomain.lattice, this._theories);
+        // return [ast.accept(visitor)];
+        throw new ImplementMeException();
     }
 
 }

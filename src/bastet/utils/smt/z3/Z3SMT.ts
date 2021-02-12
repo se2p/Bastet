@@ -47,6 +47,13 @@ import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {BooleanType} from "../../../syntax/ast/core/ScratchType";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AnalysisStatistics} from "../../../procedures/analyses/AnalysisStatistics";
+import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
+import {
+    ConcreteBoolean, ConcreteFloat,
+    ConcreteInteger,
+    ConcretePrimitive,
+    ConcreteString, ConcreteUnifiedMemory
+} from "../../../procedures/domains/ConcreteElements";
 
 export var PreModule = {
     print: function (text) {
@@ -368,7 +375,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         let i: number = 0;
         while (this.isSat()) {
             // Get the model for the satisfying formula
-            let modelConstValueMap: Map<string, Z3ConstType>;
+            let modelConstValueMap: ConcreteUnifiedMemory;
             {
                 const model: Z3Model = this.getModel();
                 try {
@@ -384,15 +391,15 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
             let newFormula: Z3BooleanFormula;
             let j: number = 0;
             freeVariables.forEach(([variableName, variableFormula]) => {
-                let modelValue: Z3ConstType = modelConstValueMap.get(variableName);
+                let modelValue: ConcretePrimitive<any> = modelConstValueMap.get(variableName);
                 let helpForm = variableFormula;
-                if (modelValue == null || typeof modelValue != 'boolean') {
+                if (modelValue == null || !(modelValue instanceof ConcreteBoolean)) {
                     throw new IllegalArgumentException("There's a problem in 'abstractionProblem'");
                 } else {
-                    if (!modelValue) {
+                    if (!modelValue.value) {
                         helpForm = theories.boolTheory.not(helpForm);
                     }
-                    result[i][j] = modelValue
+                    result[i][j] = modelValue.value;
                 }
                 newFormula = this.boolTermAnd(newFormula, helpForm, theories);
                 j++;
@@ -525,7 +532,7 @@ export class Z3Model {
 
     private readonly _model: Z3_model;
 
-    private _valueMap: Map<string, Z3ConstType>
+    private _valueMap: ConcreteUnifiedMemory;
 
     constructor(ctx: LibZ3InContext, model: Z3_model) {
         this._ctx = Preconditions.checkNotUndefined(ctx);
@@ -543,25 +550,25 @@ export class Z3Model {
         return ctx.get_symbol_string(symbol);
     }
 
-    private mapInterpToValue(constInterp: Z3_ast, ctx: LibZ3InContext): Z3ConstType {
+    private mapInterpToValue(constInterp: Z3_ast, ctx: LibZ3InContext): ConcretePrimitive<any> {
         const sort: Z3_sort = ctx.get_sort(constInterp);
         const sortString: string = ctx.sort_to_string(sort);
 
         switch (sortString) {
             case "String":
-                return ctx.get_string(constInterp);
+                return new ConcreteString(ctx.get_string(constInterp));
             case "Int":
-                return parseInt(ctx.get_numeral_string(constInterp));
+                return new ConcreteInteger(parseInt(ctx.get_numeral_string(constInterp)));
             case "Bool":
-                return Z3_L_TRUE == ctx.get_bool_value(constInterp).val();
+                return new ConcreteBoolean(Z3_L_TRUE == ctx.get_bool_value(constInterp).val());
             case "Real":
-                return parseFloat(ctx.get_numeral_string(constInterp));
+                return new ConcreteFloat(parseFloat(ctx.get_numeral_string(constInterp)));
             default:
                 throw new IllegalStateException(`Unknown const type '${sortString}'`)
         }
     }
 
-    private getConstValue(ctx: LibZ3InContext, constDecl: Z3_func_decl, model: Z3_model): Z3ConstType {
+    private getConstValue(ctx: LibZ3InContext, constDecl: Z3_func_decl, model: Z3_model): ConcretePrimitive<any> {
         const constInterp: Z3_ast = ctx.model_get_const_interp(model, constDecl);
         ctx.inc_ref(constInterp);
         const value = this.mapInterpToValue(constInterp, ctx);
@@ -570,13 +577,14 @@ export class Z3Model {
         return value;
     }
 
-    public getValueMap(): Map<string, Z3ConstType> {
+    public getValueMap(): ConcreteUnifiedMemory {
         if (!this._valueMap) {
-            this._valueMap = new Map<string, Z3ConstType>();
+            const valueMap = new Map<string, ConcretePrimitive<any>>();
             for (let index = 0; index < this.getNumConst(); index++) {
                 const constDecl: Z3_func_decl = this._ctx.model_get_const_decl(this._model, new Uint32(index));
-                this._valueMap.set(this.getConstName(this._ctx, constDecl), this.getConstValue(this._ctx, constDecl, this._model));
+                valueMap.set(this.getConstName(this._ctx, constDecl), this.getConstValue(this._ctx, constDecl, this._model));
             }
+            this._valueMap = new ConcreteUnifiedMemory(ImmMap(valueMap));
         }
 
         return this._valueMap;
@@ -587,7 +595,7 @@ export class Z3Model {
     }
 }
 
-type Z3ConstType = string | number | boolean;
+type Z3VariableAssignment = string | number | boolean;
 
 export class SolverConfig extends BastetConfiguration {
 

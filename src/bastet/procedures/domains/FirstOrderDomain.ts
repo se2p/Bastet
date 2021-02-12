@@ -26,7 +26,7 @@
 
 import {
     ConcreteBoolean,
-    ConcreteDomain,
+    ConcreteDomain, ConcreteElement, ConcreteFloat, ConcreteInteger,
     ConcreteList,
     ConcreteMemory,
     ConcreteNumber,
@@ -43,6 +43,7 @@ import {AbstractDomain} from "./AbstractDomain";
 import {AbstractionPrecision} from "../AbstractionPrecision";
 import {Z3Model, Z3Vector} from "../../utils/smt/z3/Z3SMT";
 import {Z3BooleanFormula} from "../../utils/smt/z3/Z3Theories";
+import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
 
 export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F>, WithReferenceCounting<F> {
 
@@ -91,35 +92,18 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
             console.log("Querying model")
             const model = this.solver.getModel();
 
-            const numbers = new Map<string, ConcreteNumber>();
-            const strings = new Map<string, ConcreteString>();
-            const booleans = new Map<string, ConcreteBoolean>();
-            const lists = new Map<string, ConcreteList<ConcreteString>>();
-
-            model.getValueMap().forEach((varValue, varName) => {
-                switch (typeof varValue) {
-                    case 'boolean':
-                        booleans.set(varName, new ConcreteBoolean(varValue));
-                        break;
-                    case 'number':
-                        numbers.set(varName, new ConcreteNumber(varValue));
-                        break;
-                    case 'string':
-                        strings.set(varName, new ConcreteString(varValue));
-                        break;
-                    default:
-                        throw new ImplementMeForException("attributes of type " + typeof varValue);
-                }
-            });
-
             this.solver.pop();
 
-            return new ConcreteMemory(numbers, strings, booleans, lists);
+            return model.getValueMap().toConcreteMemory();
         } finally {
             timer.stop();
             console.log(`Concretized in ${timer.lastIntervalDuration}ms`)
             console.groupEnd();
         }
+    }
+
+    enrich(element: ConcreteElement): ConcreteMemory {
+        return element as ConcreteMemory;
     }
 
     widen(element: F, precision: AbstractionPrecision): F {

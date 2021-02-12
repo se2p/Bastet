@@ -158,6 +158,10 @@ export class TimeAbstractDomain implements AbstractDomain<ConcreteElement, TimeS
         return this._wrapped.concretizeOne(element.getWrappedState());
     }
 
+    enrich(element: ConcreteElement): ConcreteElement {
+        return element;
+    }
+
     widen(element: TimeState, precision: AbstractionPrecision): TimeState {
         throw new ImplementMeException();
     }

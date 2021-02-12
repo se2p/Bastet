@@ -121,7 +121,7 @@ import {
     AbstractList, AbstractMemory,
     AbstractNumber,
     AbstractReal,
-    AbstractString,
+    AbstractString, AbstractStringList,
     NumberTheory,
     TransformerTheories
 } from "../../domains/MemoryTransformer";
@@ -161,7 +161,6 @@ import {
 } from "../../../syntax/ast/core/statements/InternalStatement";
 import {DataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {PrecisionPopStatement, PrecisionPushStatement} from "../../../syntax/ast/core/Precisions";
-import {AbstractStringList} from "../../domains/StringListAbstractDomain";
 import {AbstractElement, Lattice} from "../../../lattices/Lattice";
 
 abstract class TransformingVisitor<RT extends AbstractElement, M extends AbstractMemory, B extends AbstractBoolean, I extends AbstractInteger,

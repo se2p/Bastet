@@ -26,7 +26,7 @@
 
 import {AbstractBoolean, AbstractBooleanDomain, BooleanTheory} from './MemoryTransformer'
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
-import {ConcreteBoolean, ConcreteDomain} from './ConcreteElements'
+import {ConcreteBoolean, ConcreteDomain, ConcreteElement} from './ConcreteElements'
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Record as ImmRec} from "immutable";
 import {Variable} from "../../syntax/ast/core/Variable";
@@ -211,6 +211,10 @@ export class FlatBooleanValueDomain implements AbstractBooleanDomain<FlatBoolean
     }
 
     concretizeOne(element: FlatBooleanValue): ConcreteBoolean {
+        throw new ImplementMeException();
+    }
+
+    enrich(element: ConcreteElement): ConcreteBoolean {
         throw new ImplementMeException();
     }
 

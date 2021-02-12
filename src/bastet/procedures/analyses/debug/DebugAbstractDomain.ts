@@ -141,6 +141,10 @@ export class DebugAbstractDomain implements AbstractDomain<ConcreteElement, Debu
         return this._wrapped.concretizeOne(element.getWrappedState());
     }
 
+    enrich(element: ConcreteElement): ConcreteElement {
+        return element;
+    }
+
     widen(element: DebugState, precision: AbstractionPrecision): DebugState {
         throw new ImplementMeException();
     }

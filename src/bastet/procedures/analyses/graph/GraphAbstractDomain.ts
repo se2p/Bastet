@@ -236,6 +236,10 @@ export class GraphAbstractDomain implements AbstractDomain<ConcreteElement, Grap
         return this._wrapped.concretizeOne(element.getWrappedState());
     }
 
+    enrich(element: ConcreteElement): ConcreteElement {
+        return element;
+    }
+
     widen(element: GraphAbstractState, precision: AbstractionPrecision): GraphAbstractState {
         throw new ImplementMeException();
     }

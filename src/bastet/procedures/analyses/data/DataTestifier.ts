@@ -347,7 +347,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
                                targetState: AbstractState): AccessibilityRelation<AbstractState> {
         const result = AccessibilityRelations.filterForwards(accessibility, (s1, s2) => {
             const branchName = this.createBranchName(s1, s2);
-            const assignement = satAssignement.booleanMem.get(branchName);
+            const assignement = satAssignement.booleans.get(branchName);
             if (assignement !== undefined) {
                 if (assignement.value) {
                     return true;

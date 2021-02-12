@@ -28,7 +28,7 @@ import {Record as ImmRec} from "immutable";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
-import {ConcreteDomain, ConcreteMemory,} from "../../domains/ConcreteElements";
+import {ConcreteDomain, ConcreteElement, ConcreteMemory,} from "../../domains/ConcreteElements";
 import {PropositionalFormula} from "../../../utils/bdd/BDD";
 import {Preconditions} from "../../../utils/Preconditions";
 import {FirstOrderDomain, FirstOrderLattice, FirstOrderSolver} from "../../domains/FirstOrderDomain";
@@ -136,6 +136,11 @@ export class DataAbstractDomain implements AbstractDomain<ConcreteMemory, DataAb
 
     concretizeOne(element: DataAbstractState): ConcreteMemory {
         return this._folDomain.concretizeOne(element.blockFormula);
+    }
+
+    enrich(element: ConcreteElement): ConcreteMemory {
+        Preconditions.checkArgument(element instanceof ConcreteMemory);
+        return element as ConcreteMemory;
     }
 
     widen(element: DataAbstractState, precision: AbstractionPrecision): DataAbstractState {

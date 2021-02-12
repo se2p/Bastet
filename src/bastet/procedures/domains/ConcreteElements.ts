@@ -29,7 +29,7 @@ import {
     AbstractInteger,
     AbstractList, AbstractMemory,
     AbstractNumber,
-    AbstractReal, AbstractString
+    AbstractReal, AbstractString, AbstractStringList
 } from "./MemoryTransformer";
 
 type float = number;
@@ -39,7 +39,7 @@ import {AbstractElement, AbstractState, Lattice, AbstractElementVisitor} from ".
 import {Preconditions} from "../../utils/Preconditions";
 import {Record as ImmRec, Map as ImmMap} from "immutable";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {AbstractStringList} from "./StringListAbstractDomain";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
 
 function containsAll<K, V>(map1: ImmMap<K, V>, map2: ImmMap<K, V>): boolean {
     throw new ImplementMeException();
@@ -214,7 +214,7 @@ export interface ConcreteUnifiedMemoryAttributes {
 
 const ConcreteUnifiedMemoryRecord = ImmRec({
 
-    mem: null,
+    mem: ImmMap<string, ConcretePrimitive<any>>(),
 
 });
 
@@ -233,31 +233,62 @@ export class ConcreteUnifiedMemory extends ConcreteUnifiedMemoryRecord implement
     }
 
     public withValue(forVariable: string, value: ConcretePrimitive<any>): ConcreteUnifiedMemory {
-       return new ConcreteUnifiedMemory(this._mem.set(forVariable, value));
+       return new ConcreteUnifiedMemory(this.mem.set(forVariable, value));
+    }
+
+    public toConcreteMemory(): ConcreteMemory {
+        const integers: Map<string, ConcreteInteger> = new Map();
+        const floats: Map<string, ConcreteFloat> = new Map();
+        const strings: Map<string, ConcreteString> = new Map();
+        const booleans: Map<string, ConcreteBoolean> = new Map();
+        const lists: Map<string, ConcreteStringList> = new Map();
+
+        for (const [name, value] of this.mem.entries()) {
+            if (value instanceof ConcreteInteger) {
+                integers[name] = value;
+            } else if (value instanceof ConcreteFloat) {
+                floats[name] = value;
+            } else if (value instanceof ConcreteString) {
+                strings[name] = value;
+            } else if (value instanceof ConcreteBoolean) {
+                booleans[name] = value;
+            } else if (value instanceof ConcreteStringList) {
+                lists[name] = value;
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        return new ConcreteMemory(ImmMap(integers), ImmMap(floats), ImmMap(strings), ImmMap(booleans), ImmMap(lists));
     }
 }
 
-export class ConcreteProgramState {
+export interface ConcreteProgramStateAttributes {
 
-    private readonly _globalState: ConcreteUnifiedMemory;
+    globalState: ConcreteUnifiedMemory;
+    actorStates: ImmMap<string, ConcreteUnifiedMemory>;
 
-    private readonly _actorStates: ImmMap<string, ConcreteUnifiedMemory>;
+}
+
+const ConcreteProgramStateRecord = ImmRec({
+
+    globalState: null,
+    actorStates: null
+
+});
+
+export class ConcreteProgramState extends ConcreteProgramStateRecord implements ConcreteProgramStateAttributes, ConcreteElement {
 
     constructor(globalState: ConcreteUnifiedMemory, actorStates: ImmMap<string, ConcreteUnifiedMemory>) {
-        this._globalState = Preconditions.checkNotUndefined(globalState);
-        this._actorStates = Preconditions.checkNotUndefined(actorStates);
-    }
-
-    get globalState(): ConcreteUnifiedMemory {
-        return this._globalState;
+        super({globalState: globalState, actorStates: actorStates});
     }
 
     public getActorMemory(actor: string): ConcreteUnifiedMemory {
-        return this._actorStates.get(actor);
+        return this.actorStates.get(actor);
     }
 
     public getActors(): Iterable<string> {
-        return this._actorStates.keys();
+        return this.actorStates.keys();
     }
 }
 
@@ -283,9 +314,11 @@ const ConcreteMemoryRecord = ImmRec({
 
 export class ConcreteMemory extends ConcreteMemoryRecord implements ConcreteMemoryStateAttributes, ConcreteElement, AbstractState, AbstractBoolean, AbstractMemory {
 
-    constructor(integerMem: ImmMap<string, ConcreteInteger>, floatMem: ImmMap<string, ConcreteFloat>,
+    constructor(integerMem: ImmMap<string, ConcreteInteger>,
+                floatMem: ImmMap<string, ConcreteFloat>,
                 stringMem: ImmMap<string, ConcreteString>,
-                booleanMem: ImmMap<string, ConcreteBoolean>, listMem: ImmMap<string, ConcreteList<ConcreteString>>) {
+                booleanMem: ImmMap<string, ConcreteBoolean>,
+                listMem: ImmMap<string, ConcreteList<ConcreteString>>) {
         super({integers: integerMem, floats: floatMem, strings: stringMem, booleans: booleanMem, lists: listMem});
     }
 

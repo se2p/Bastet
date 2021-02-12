@@ -187,6 +187,10 @@ export class LabelAbstractDomain implements AbstractDomain<ConcreteElement, Labe
         return this._wrapped.concretizeOne(element.getWrappedState());
     }
 
+    enrich(element: ConcreteElement): ConcreteElement {
+        return element;
+    }
+
     widen(element: LabelState, precision: AbstractionPrecision): LabelState {
         throw new ImplementMeException();
     }

@@ -260,6 +260,10 @@ export class AbstractionAbstractDomain implements AbstractDomain<ConcreteElement
         return this._wrapped.concretizeOne(element.getWrappedState());
     }
 
+    enrich(element: ConcreteElement): ConcreteElement {
+        return element;
+    }
+
     widen(element: AbstractionState, precision: AbstractionPrecision): AbstractionState {
         return this._abstractionFunction
             .computeAbstraction(element, precision)

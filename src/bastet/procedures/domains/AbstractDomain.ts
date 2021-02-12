@@ -24,29 +24,10 @@
  */
 
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
-import {ConcreteDomain, ConcreteElement} from "./ConcreteElements";
+import {ConcreteDomain, ConcreteElement, ConcreteProgramState} from "./ConcreteElements";
 import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
 import {AbstractionPrecision} from "../AbstractionPrecision";
 
-export class ConcreteNumberElement implements ConcreteElement {
-
-}
-
-export class ConcreteBoolElement implements ConcreteElement {
-
-}
-
-export class ConcreteStringElement implements ConcreteElement {
-
-}
-
-export class ConcreteListElement implements ConcreteElement {
-
-}
-
-export class ConcreteMapElement implements ConcreteElement {
-
-}
 
 /**
  * A concretizer is a function that maps an abstract element (of type `E`) to a concrete element (of type `C`).
@@ -57,6 +38,8 @@ export interface Concretizer<C extends ConcreteElement, E extends AbstractElemen
 
     concretizeOne(element: E): C;
 
+    enrich(element: ConcreteElement): C;
+
 }
 
 export class UnavailableConcretizer<C extends ConcreteElement, E extends AbstractElement> implements Concretizer<C, E> {
@@ -66,6 +49,10 @@ export class UnavailableConcretizer<C extends ConcreteElement, E extends Abstrac
     }
 
     concretizeOne(element: E): C {
+        throw new NotSupportedException();
+    }
+
+    enrich(element: ConcreteElement): C {
         throw new NotSupportedException();
     }
 

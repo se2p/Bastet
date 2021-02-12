@@ -191,6 +191,10 @@ export class SSAAbstractDomain implements AbstractDomain<ConcreteElement, SSASta
         return this._wrapped.concretizeOne(element.getWrappedState());
     }
 
+    enrich(element: ConcreteElement): ConcreteElement {
+        throw new ImplementMeException();
+    }
+
     widen(element: SSAState, precision: AbstractionPrecision): SSAState {
         throw new ImplementMeException();
     }

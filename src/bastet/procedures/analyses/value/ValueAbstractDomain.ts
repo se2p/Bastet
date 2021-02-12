@@ -27,7 +27,7 @@ import {AbstractElementVisitor, AbstractState, Lattice, LatticeWithComplements} 
 import {Record as ImmRec} from "immutable";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AbstractDomain} from "../../domains/AbstractDomain";
-import {ConcreteDomain, ConcreteMemory, ConcreteMemoryLattice,} from "../../domains/ConcreteElements";
+import {ConcreteDomain, ConcreteElement, ConcreteMemory, ConcreteMemoryLattice,} from "../../domains/ConcreteElements";
 import {AbstractionPrecision} from "../../AbstractionPrecision";
 
 export type ValueAbstractState = ConcreteMemory;
@@ -50,6 +50,10 @@ export class ValueAbstractDomain implements AbstractDomain<ConcreteMemory, Concr
 
     concretizeOne(element: ValueAbstractState): ConcreteMemory {
         return element;
+    }
+
+    enrich(element: ConcreteElement): ConcreteMemory {
+        return element as ConcreteMemory;
     }
 
     widen(element: ValueAbstractState, precision: AbstractionPrecision): ConcreteMemory {

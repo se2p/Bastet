@@ -30,7 +30,12 @@ import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "i
 import {ActorId} from "../../../syntax/app/Actor";
 import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {ConcreteDomain, ConcreteElement} from '../../domains/ConcreteElements'
+import {
+    ConcreteDomain,
+    ConcreteElement,
+    ConcreteProgramState,
+    ConcreteUnifiedMemory
+} from '../../domains/ConcreteElements'
 import {App} from "../../../syntax/app/App";
 import {AfterStatementMonitoringEvent, SingularityEvent, TerminationEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Property} from "../../../syntax/Property";
@@ -38,10 +43,16 @@ import {TransRelId} from "../../../syntax/app/controlflow/TransitionRelation";
 import {ScriptId} from "../../../syntax/app/controlflow/Script";
 import {OperationId} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Preconditions} from "../../../utils/Preconditions";
-import {DataLocation, DataLocations, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
+import {
+    DataLocation,
+    DataLocations,
+    TypedDataLocation,
+    VAR_SCOPING_SPLITTER
+} from "../../../syntax/app/controlflow/DataLocation";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {AbstractionPrecision} from "../../AbstractionPrecision";
+import {DataLocationScoper} from "./DataLocationScoping";
 
 /**
  * Current thread state that is active or becomes active if...
@@ -64,10 +75,6 @@ export enum ThreadComputationState {
 }
 
 export type ThreadId = number;
-
-export interface ControlConcreteState {
-
-}
 
 export interface RelationLocationAttributes {
 
@@ -634,7 +641,7 @@ export class ControlLattice implements Lattice<ControlAbstractState> {
 
 }
 
-export class ControlAbstractDomain implements AbstractDomain<ControlConcreteState, ControlAbstractState> {
+export class ControlAbstractDomain implements AbstractDomain<ConcreteProgramState, ControlAbstractState> {
 
     private readonly _lattice: Lattice<ControlAbstractState>;
 
@@ -645,23 +652,54 @@ export class ControlAbstractDomain implements AbstractDomain<ControlConcreteStat
         this._lattice = new ControlLattice(wrapped.lattice);
     }
 
-    abstract(elements: Iterable<ControlConcreteState>): ControlAbstractState {
+    abstract(elements: Iterable<ConcreteProgramState>): ControlAbstractState {
         throw new ImplementMeException();
     }
 
-    concretize(element: ControlAbstractState): Iterable<ControlConcreteState> {
+    concretize(element: ControlAbstractState): Iterable<ConcreteProgramState> {
         throw new ImplementMeException();
     }
 
-    concretizeOne(element: ControlAbstractState): ControlConcreteState {
-        return this._wrapped.concretizeOne(element.getWrappedState());
+    concretizeOne(element: ControlAbstractState): ConcreteProgramState {
+        return this.enrich(this._wrapped.concretizeOne(element.getWrappedState()));
+    }
+
+    enrich(element: ConcreteElement): ConcreteProgramState {
+        Preconditions.checkArgument(element instanceof ConcreteUnifiedMemory);
+        const m = element as ConcreteUnifiedMemory;
+
+        const splitTargetPrefixFromAttribute = (attributeWithTargetName: string): {attribute: string, target: string} => {
+            const target = DataLocationScoper.leftUnwrapScope(attributeWithTargetName).prefix;
+            const attribute = DataLocationScoper.rightUnwrapScope(attributeWithTargetName).suffix;
+            return {attribute, target};
+        }
+
+        const toProgramState = (c: ConcreteUnifiedMemory): ConcreteProgramState => {
+            const actorStates: Map<string, ConcreteUnifiedMemory> = new Map();
+            let globalState: ConcreteUnifiedMemory = new ConcreteUnifiedMemory(ImmMap());
+
+            for (const k of c.variables()) {
+                const value = c.get(k);
+                if (k.includes(VAR_SCOPING_SPLITTER)) {
+                    const split = splitTargetPrefixFromAttribute(k);
+                    const actorMem = actorStates.get(split.target) || new ConcreteUnifiedMemory(ImmMap());
+                    actorStates.set(split.target, actorMem.withValue(split.attribute, value));
+                } else {
+                    globalState = globalState.withValue(k, value);
+                }
+            }
+
+            return new ConcreteProgramState(globalState, ImmMap(actorStates));
+        };
+
+        return toProgramState(m);
     }
 
     widen(element: ControlAbstractState, precision: AbstractionPrecision): ControlAbstractState {
         throw new ImplementMeException();
     }
 
-    get concreteDomain(): ConcreteDomain<ControlConcreteState> {
+    get concreteDomain(): ConcreteDomain<ConcreteProgramState> {
         throw new ImplementMeException();
     }
 
