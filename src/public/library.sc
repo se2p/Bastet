@@ -866,6 +866,22 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     extern label (str: string)
 
+    /**
+     * A random integer in the interval [from, to],
+     * that is, both end points are included.
+     */
+    def randomIntegerBetween (intervalStart: integer, intervalEnd: integer) begin
+        assume result >= intervalStart
+        assume result <= intervalEnd
+    end returns result: integer
+
+    /**
+     * See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
+     */
+    def randomBetween (intervalStart: integer, intervalEnd: integer) begin
+        define result as randomIntegerBetween(intervalStart, intervalEnd)
+    end returns result: integer
+
     define getGraphicIdByIndex (idx: integer) begin
         define result as ""
     end returns result: string
