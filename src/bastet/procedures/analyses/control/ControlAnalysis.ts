@@ -54,12 +54,20 @@ import {TransitionRelation} from "../../../syntax/app/controlflow/TransitionRela
 import {ControlCoverageExaminer} from "./coverage/ControlCoverage";
 import {ControlLocationExtractor} from "./ControlUtils";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
+import {Record as ImmRec, Map as ImmMap} from "immutable";
 import {ReturnStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 import {AccessibilityRelation} from "../Accessibility";
-import {ConcreteElement} from "../../domains/ConcreteElements";
+import {
+    ConcreteElement,
+    ConcretePrimitive,
+    ConcreteProgramState,
+    ConcreteUnifiedMemory
+} from "../../domains/ConcreteElements";
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 import {Concern} from "../../../syntax/Concern";
 import {AfterStatementMonitoringEvent} from "../../../syntax/ast/core/CoreEvent";
+import {VAR_SCOPING_SPLITTER} from "../../../syntax/app/controlflow/DataLocation";
+import {DataLocationScoper} from "./DataLocationScoping";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -483,13 +491,34 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
 
     testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
         const seq: Iterable<[AbstractState, ConcreteElement][]> = this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
-        const result: [[AbstractState, ConcreteElement][]] = [];
+        const result: [AbstractState, ConcreteElement][][] = [];
 
-        const toProgramState = function(c: ConcreteUnifiedMemory): ConcreteProgramState {
-            VAR_SCOPING_SPLITTER
+        // Given a sequence of concrete unified memories to goal is to build a sequence of concrete PROGRAM states
+
+        const splitTargetPrefixFromAttribute = (attributeWithTargetName: string): {attribute: string, target: string} => {
+            const target = DataLocationScoper.leftUnwrapScope(attributeWithTargetName).prefix;
+            const attribute = DataLocationScoper.rightUnwrapScope(attributeWithTargetName).suffix;
+            return {attribute, target};
+        }
+
+        const toProgramState = (c: ConcreteUnifiedMemory): ConcreteProgramState => {
+            const actorStates: Map<string, ConcreteUnifiedMemory> = new Map();
+            let globalState: ConcreteUnifiedMemory = new ConcreteUnifiedMemory(ImmMap());
+
+            for (const k of c.variables()) {
+                const value = c.get(k);
+                if (k.includes(VAR_SCOPING_SPLITTER)) {
+                    const actor = splitTargetPrefixFromAttribute(k).target;
+                    const actorMem = actorStates.get(actor) || new ConcreteUnifiedMemory(ImmMap());
+                    actorStates.set(actor, actorMem.withValue(k, value));
+                } else {
+                    globalState = globalState.withValue(k, value);
+                }
+            }
+
+            return new ConcreteProgramState(globalState, ImmMap(actorStates));
         };
 
-        // Given a sequence of concrete unified memories to goal is to build a sequence of concrete states
         for (const s of seq) {
             const sPrime: [AbstractState, ConcreteProgramState][] = [];
 

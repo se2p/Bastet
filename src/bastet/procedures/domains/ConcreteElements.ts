@@ -189,14 +189,25 @@ export class ConcreteUnifiedMemory implements ConcreteElement {
     public get(variable: string): ConcretePrimitive<any> {
         return this._mem.get(variable);
     }
+
+    public withValue(forVariable: string, value: ConcretePrimitive<any>): ConcreteUnifiedMemory {
+       return new ConcreteUnifiedMemory(this._mem.set(forVariable, value));
+    }
 }
 
 export class ConcreteProgramState {
 
+    private readonly _globalState: ConcreteUnifiedMemory;
+
     private readonly _actorStates: ImmMap<string, ConcreteUnifiedMemory>;
 
-    constructor(actorStates: ImmMap<string, ConcreteUnifiedMemory>) {
-        this._actorStates = actorStates;
+    constructor(globalState: ConcreteUnifiedMemory, actorStates: ImmMap<string, ConcreteUnifiedMemory>) {
+        this._globalState = Preconditions.checkNotUndefined(globalState);
+        this._actorStates = Preconditions.checkNotUndefined(actorStates);
+    }
+
+    get globalState(): ConcreteUnifiedMemory {
+        return this._globalState;
     }
 
     public getActorMemory(actor: string): ConcreteUnifiedMemory {
