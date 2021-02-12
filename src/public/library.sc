@@ -42,6 +42,20 @@ actor IOActor is RuntimeEntity begin
         // UNSOUND: might wait arbitrarily long
     end
 
+    define atomic makeInputVariablesNonDet() begin
+        declare nondetX as integer
+        define mouseX as nondetX
+
+        declare nondetY as integer
+        define mouseY as nondetY
+
+        declare nondetKey as integer
+        define keyPressed as nondetKey
+
+        declare nondetDown as boolean
+        define mouseDown as nondetDown
+    end
+
     script on bootstrap do begin
         define askActive as false
     end
@@ -58,17 +72,8 @@ actor IOActor is RuntimeEntity begin
     script messageDispatcherLoop on startup do begin
         // Hack as long no other dispatch handling is in place
         repeat forever begin
-            declare nondetX as integer
-            define mouseX as nondetX
-
-            declare nondetY as integer
-            define mouseY as nondetY
-
-            declare nondetKey as integer
-            define keyPressed as nondetKey
-
-            declare nondetDown as boolean
-            define mouseDown as nondetDown
+            makeInputVariablesNonDet()
+         _RUNTIME_signalFailure("Test MsgLoop")
 
             define mouseClicked as mouseDown and not lastMouseDown
             if mouseClicked then begin
@@ -812,17 +817,6 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     extern _RUNTIME_numberFromInterval (fromNum: integer, toNum: integer) returns integer
 
     extern _RUNTIME_integerFromInterval (fromNum: integer, toNum: integer) returns integer
-
-    /**
-     * A random integer in the interval [from, to],
-     * that is, both end points are included.
-     */
-    extern randomIntegerBetween (intervalStart: integer, intervalEnd: integer) returns integer
-
-    /**
-     * See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
-     */
-    extern randomBetween (intervalStart: integer, intervalEnd: integer) returns integer
 
     @ Category "Operator"
     @ Block "[ceiling v] of (num)"
