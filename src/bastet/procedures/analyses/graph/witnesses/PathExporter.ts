@@ -93,7 +93,7 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
         const filepath = `output/cex_target_${violating.getId()}.json`;
         const targetJson: {} = {'boolean': {}, 'number': {}, 'string': {}};
         for (const k of errorState.variables()) {
-            const v = errorState.get(k);
+            const v = errorState.getValue(k);
             if (v instanceof ConcreteString) {
                 targetJson['string'][k] = v.value;
             } else if (v instanceof ConcreteNumber) {
@@ -119,7 +119,7 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
                     if (k.indexOf("__op_time_") == 0) {
                         continue;
                  }
-                    elementJson[k] = c.get(k).value;
+                    elementJson[k] = c.getValue(k).value;
                  }
                 pathElements.push({'id': e.getId(), 'mem': elementJson});
             } else {

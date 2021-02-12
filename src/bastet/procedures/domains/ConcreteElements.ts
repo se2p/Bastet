@@ -228,12 +228,20 @@ export class ConcreteUnifiedMemory extends ConcreteUnifiedMemoryRecord implement
         return this.mem.keys();
     }
 
-    public get(variable: string): ConcretePrimitive<any> {
+    public getValue(variable: string): ConcretePrimitive<any> {
         return this.mem.get(variable);
+    }
+
+    public getPrimitiveValue(variable: string): (number | boolean | string | (number | boolean | string)[]) {
+        return this.mem.get(variable).value;
     }
 
     public withValue(forVariable: string, value: ConcretePrimitive<any>): ConcreteUnifiedMemory {
        return new ConcreteUnifiedMemory(this.mem.set(forVariable, value));
+    }
+
+    public getSize(): number {
+        return this.mem.size;
     }
 
     public toConcreteMemory(): ConcreteMemory {

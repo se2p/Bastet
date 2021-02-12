@@ -411,7 +411,7 @@ test("Get model for unsat formula", () => {
 
        const model = prover.getModel();
        expect(model.getNumConst()).toBe(0);
-       expect(model.getValueMap().size).toBe(0);
+       expect(model.getValueMap().getSize()).toBe(0);
    } finally {
        prover.pop();
    }
@@ -436,8 +436,8 @@ test("Get model for int formula", () => {
 
         const model: Z3Model = prover.getModel();
         expect(model.getNumConst()).toBe(2);
-        expect(model.getValueMap().get("y")).toStrictEqual(4);
-        expect(model.getValueMap().get("x")).toStrictEqual(2);
+        expect(model.getValueMap().getPrimitiveValue("y")).toStrictEqual(4);
+        expect(model.getValueMap().getPrimitiveValue("x")).toStrictEqual(2);
     } finally {
         prover.pop();
     }
@@ -466,7 +466,7 @@ test('Get model for string formula', () => {
 
         const model: Z3Model = prover.getModel();
         expect(model.getNumConst()).toBe(1);
-        expect(model.getValueMap().get("x")).toStrictEqual("Bo"); // Seems to be a bug in Z3 (should return Bob)
+        expect(model.getValueMap().getPrimitiveValue("x")).toStrictEqual("Bo"); // Seems to be a bug in Z3 (should return Bob)
     } finally {
         prover.pop();
     }
@@ -487,8 +487,8 @@ test('Get model for boolean formula (x && !z)', () => {
         expect(model.getNumConst()).toBe(2);
 
         const constValues = model.getValueMap();
-        expect(constValues.get("z")).toBe(false);
-        expect(constValues.get("x")).toBe(true);
+        expect(constValues.getPrimitiveValue("z")).toBe(false);
+        expect(constValues.getPrimitiveValue("x")).toBe(true);
     } finally {
         prover.pop();
     }

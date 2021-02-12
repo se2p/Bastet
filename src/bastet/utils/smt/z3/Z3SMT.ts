@@ -391,7 +391,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
             let newFormula: Z3BooleanFormula;
             let j: number = 0;
             freeVariables.forEach(([variableName, variableFormula]) => {
-                let modelValue: ConcretePrimitive<any> = modelConstValueMap.get(variableName);
+                let modelValue: ConcretePrimitive<any> = modelConstValueMap.getValue(variableName);
                 let helpForm = variableFormula;
                 if (modelValue == null || !(modelValue instanceof ConcreteBoolean)) {
                     throw new IllegalArgumentException("There's a problem in 'abstractionProblem'");

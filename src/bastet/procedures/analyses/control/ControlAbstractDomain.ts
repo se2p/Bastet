@@ -679,7 +679,7 @@ export class ControlAbstractDomain implements AbstractDomain<ConcreteProgramStat
             let globalState: ConcreteUnifiedMemory = new ConcreteUnifiedMemory(ImmMap());
 
             for (const k of c.variables()) {
-                const value = c.get(k);
+                const value = c.getValue(k);
                 if (k.includes(VAR_SCOPING_SPLITTER)) {
                     const split = splitTargetPrefixFromAttribute(k);
                     const actorMem = actorStates.get(split.target) || new ConcreteUnifiedMemory(ImmMap());

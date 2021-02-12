@@ -49,7 +49,7 @@ export class ErrorWitnessActor {
         target.name = actorName;
 
         for (const v of actorMemory.variables()) {
-            target.variables[v] = actorMemory.get(v).value;
+            target.variables[v] = actorMemory.getValue(v).value;
         }
 
         return target;
