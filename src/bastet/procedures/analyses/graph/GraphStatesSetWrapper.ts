@@ -29,7 +29,7 @@ import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {Set as ImmSet} from "immutable";
 import {AccessibilityRelation} from "../Accessibility";
-import {TransitionLabelProvider, UnavailableTransitionLabelProvider} from "../ProgramAnalysis";
+import {TransitionLabelProvider} from "../ProgramAnalysis";
 import {Concretizer, UnavailableConcretizer} from "../../domains/AbstractDomain";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 

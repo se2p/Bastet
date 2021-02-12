@@ -22,7 +22,7 @@
 
 import {Action} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {Preconditions} from "../../../../utils/Preconditions";
-import {ConcretePrimitive, ConcreteUnifiedMemory} from "../../../domains/ConcreteElements";
+import {ConcreteUnifiedMemory} from "../../../domains/ConcreteElements";
 import {DataLocationScoper} from "../../control/DataLocationScoping";
 
 export class ErrorWitnessActor {

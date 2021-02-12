@@ -33,7 +33,6 @@ import {TransitionLabelProvider, WrappingProgramAnalysis} from "../../ProgramAna
 import {
     ConcreteBoolean,
     ConcreteElement,
-    ConcreteMemory,
     ConcreteNumber,
     ConcreteString,
     ConcreteUnifiedMemory
@@ -41,8 +40,6 @@ import {
 import {AccessibilityRelation} from "../../Accessibility";
 import {ProgramOperation} from "../../../../syntax/app/controlflow/ops/ProgramOperation";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
-import {SSAStateVisitor} from "../../StateVisitors";
-import {SSAState} from "../../ssa/SSAAbstractDomain";
 import {getTheOnlyElement} from "../../../../utils/Collections";
 import {IllegalStateException} from "../../../../core/exceptions/IllegalStateException";
 import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";

@@ -26,18 +26,8 @@
 import {StateSet} from "../../algorithms/StateSet";
 import {GraphAbstractState} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {
-    ProgramAnalysis,
-    ProgramAnalysisWithLabels,
-    TransitionLabelProvider,
-    TraversalOrderOperator
-} from "../ProgramAnalysis";
-import {
-    ColorByActorVisitor,
-    PaperLabelVisitor,
-    PenSizeVisitor,
-    StateColorVisitor,
-} from "../StateVisitors";
+import {ProgramAnalysis, TransitionLabelProvider, TraversalOrderOperator} from "../ProgramAnalysis";
+import {ColorByActorVisitor, PaperLabelVisitor, PenSizeVisitor,} from "../StateVisitors";
 import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 import {App} from "../../../syntax/app/App";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
