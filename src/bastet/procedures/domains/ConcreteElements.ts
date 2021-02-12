@@ -231,6 +231,34 @@ export class ConcreteUnifiedMemory extends ConcreteUnifiedMemoryRecord implement
     public get(variable: string): ConcretePrimitive<any> {
         return this.mem.get(variable);
     }
+
+    public withValue(forVariable: string, value: ConcretePrimitive<any>): ConcreteUnifiedMemory {
+       return new ConcreteUnifiedMemory(this._mem.set(forVariable, value));
+    }
+}
+
+export class ConcreteProgramState {
+
+    private readonly _globalState: ConcreteUnifiedMemory;
+
+    private readonly _actorStates: ImmMap<string, ConcreteUnifiedMemory>;
+
+    constructor(globalState: ConcreteUnifiedMemory, actorStates: ImmMap<string, ConcreteUnifiedMemory>) {
+        this._globalState = Preconditions.checkNotUndefined(globalState);
+        this._actorStates = Preconditions.checkNotUndefined(actorStates);
+    }
+
+    get globalState(): ConcreteUnifiedMemory {
+        return this._globalState;
+    }
+
+    public getActorMemory(actor: string): ConcreteUnifiedMemory {
+        return this._actorStates.get(actor);
+    }
+
+    public getActors(): Iterable<string> {
+        return this._actorStates.keys();
+    }
 }
 
 export interface ConcreteMemoryStateAttributes {

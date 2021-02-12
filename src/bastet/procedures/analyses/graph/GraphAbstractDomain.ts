@@ -34,7 +34,6 @@ import {LexiKey} from "../../../utils/Lexicographic";
 import {AbstractionPrecision} from "../../AbstractionPrecision";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Optional} from "../../../utils/Optional";
-import {AbstractionState} from "../abstraction/AbstractionAbstractDomain";
 
 export type GraphStateId = number;
 

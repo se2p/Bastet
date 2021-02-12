@@ -23,10 +23,9 @@
  *
  */
 
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
+import {AbstractState} from "../../../lattices/Lattice";
 import {StopOperator} from "../ProgramAnalysis";
 import {GraphAbstractState} from "./GraphAbstractDomain";
-import {Preconditions} from "../../../utils/Preconditions";
 
 export class IfMergedStopOperator<F extends AbstractState> implements StopOperator<GraphAbstractState, GraphAbstractState> {
 
