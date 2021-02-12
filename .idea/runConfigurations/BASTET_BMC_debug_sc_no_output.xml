@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BASTET BMC debug.sc no output" type="NodeJSConfigurationType" application-parameters="-c config/default.json -P test/programs/debug.sc -S test/programs/empty.sc -I src/public/library.sc" node-parameters="--experimental-wasi-unstable-preview1 --experimental-wasm-bigint --require ts-node/register" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>
