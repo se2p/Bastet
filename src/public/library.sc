@@ -864,7 +864,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
      * A random integer in the interval [from, to],
      * that is, both end points are included.
      */
-    def randomIntegerBetween (intervalStart: integer, intervalEnd: integer) begin
+    define randomIntegerBetween (intervalStart: integer, intervalEnd: integer) begin
         assume result >= intervalStart
         assume result <= intervalEnd
     end returns result: integer
@@ -872,7 +872,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     /**
      * See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
      */
-    def randomBetween (intervalStart: integer, intervalEnd: integer) begin
+    define randomBetween (intervalStart: integer, intervalEnd: integer) begin
         define result as randomIntegerBetween(intervalStart, intervalEnd)
     end returns result: integer
 
