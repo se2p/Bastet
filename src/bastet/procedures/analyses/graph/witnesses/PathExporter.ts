@@ -43,7 +43,7 @@ import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
 import {getTheOnlyElement} from "../../../../utils/Collections";
 import {IllegalStateException} from "../../../../core/exceptions/IllegalStateException";
 import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
-import {IllegalArgumentException} from "../../../../../../../../../../../Users/stahlbau/uni/develop/bastet-framework/src/bastet/core/exceptions/IllegalArgumentException";
+import {IllegalArgumentException} from "../../../../core/exceptions/IllegalArgumentException";
 
 export class PathExporter implements WitnessHandler<GraphAbstractState> {
 
