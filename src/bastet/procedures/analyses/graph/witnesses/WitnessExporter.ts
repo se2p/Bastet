@@ -105,19 +105,18 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         const testifiedSeq: [GraphAbstractState, ConcreteElement][] =
             getTheOnlyElement(this._analysis.testifyConcreteOne(ar, violating));
 
-        // kein Visitor notwendig
-        // ConcreteElement as ConcreteProgramState
-
         this.exportPath(ar, testifiedSeq, violating);
     }
 
     private exportPath(pathAr: AccessibilityRelation<GraphAbstractState>, testifiedSeq: [GraphAbstractState, ConcreteElement][], violating: GraphAbstractState) {
+        // Produce the full error witness
         const errorWitness: ErrorWitness = this.extractErrorWitness(pathAr, violating, testifiedSeq);
 
-        // Post-processing and filtering
+        // Compute an abstraction of the error witness (includes post-processing and filtering)
         this.produceWitnessAbstraction(errorWitness);
 
-        this.exportErrorWitness(errorWitness);
+        // Write the witness to the output file
+        this.writeErrorWitness(errorWitness);
     }
 
     private produceWitnessAbstraction(errorWitness: ErrorWitness) {
@@ -456,7 +455,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         }
     }
 
-    private exportErrorWitness(errorWitness: ErrorWitness) {
+    private writeErrorWitness(errorWitness: ErrorWitness) {
         let fs = require('fs');
         fs.writeFileSync("output/error-witness.json", JSON.stringify(errorWitness, null, 2));
     }
