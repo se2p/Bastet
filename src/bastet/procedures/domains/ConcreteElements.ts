@@ -253,15 +253,15 @@ export class ConcreteUnifiedMemory extends ConcreteUnifiedMemoryRecord implement
 
         for (const [name, value] of this.mem.entries()) {
             if (value instanceof ConcreteInteger) {
-                integers[name] = value;
+                integers.set(name, value);
             } else if (value instanceof ConcreteFloat) {
-                floats[name] = value;
+                floats.set(name, value);
             } else if (value instanceof ConcreteString) {
-                strings[name] = value;
+                strings.set(name, value);
             } else if (value instanceof ConcreteBoolean) {
-                booleans[name] = value;
+                booleans.set(name, value);
             } else if (value instanceof ConcreteStringList) {
-                lists[name] = value;
+                lists.set(name, value);
             } else {
                 throw new IllegalArgumentException();
             }

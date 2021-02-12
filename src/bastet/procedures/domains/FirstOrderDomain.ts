@@ -91,10 +91,11 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
 
             console.log("Querying model")
             const model = this.solver.getModel();
+            const result = model.getValueMap().toConcreteMemory();
 
             this.solver.pop();
 
-            return model.getValueMap().toConcreteMemory();
+            return result;
         } finally {
             timer.stop();
             console.log(`Concretized in ${timer.lastIntervalDuration}ms`)
