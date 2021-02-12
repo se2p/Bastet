@@ -29,6 +29,9 @@ let intermediatePath = path.join(__dirname, intermediateRelPath);
 let configRelPath = "../../../../../config/default.json";
 let configFilePath = path.join(__dirname, configRelPath);
 
+let ciConfigRelPath = "../../../../../config/ci.delta.json";
+let ciConfigFilePath = path.join(__dirname, ciConfigRelPath);
+
 let specRelPath = "../../../../specs/empty.sc";
 let specFilePath = path.join(__dirname, specRelPath);
 
@@ -56,7 +59,7 @@ function execute(bastet: Bastet, fixturePath: string, done) {
 
 function execute_explicit(bastet: Bastet, fixturePath: string, expectSuccess: boolean, done) {
     async function asyncAwaitFunction(): Promise<AnalysisResult> {
-        return await bastet.runFor([configFilePath], intermediatePath, fixturePath, specFilePath);
+        return await bastet.runFor([configFilePath, ciConfigFilePath], intermediatePath, fixturePath, specFilePath);
     }
 
     asyncAwaitFunction().then(result => {
