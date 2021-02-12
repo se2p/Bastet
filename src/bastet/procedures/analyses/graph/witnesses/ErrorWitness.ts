@@ -104,8 +104,14 @@ export class ErrorWitnessStep {
     }
 }
 
+export class Mock {
+    forFunction: string;
+    outputs: (string | number | boolean) [];
+}
+
 export class ErrorWitness {
     programName: string;
     violations: string[];
     steps: ErrorWitnessStep[] = [];
+    mocks: Mock[] = [];
 }

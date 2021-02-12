@@ -525,6 +525,8 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
             for (const [e, c] of s) {
                 sPrime.push([e, toProgramState(c as ConcreteUnifiedMemory)]);
             }
+
+            result.push(sPrime);
         }
 
         return result;

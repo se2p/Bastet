@@ -86,9 +86,11 @@ export class SpriteClickBroadcastActionExtractor extends BroadcastActionExtracto
 }
 
 export abstract class QueryMethodActionExtractor implements ActionExtractor {
+
     private readonly _actionMethodNames: string[];
     private readonly _visitor: MethodValueReadVisitor;
     private readonly _stepToAssignments: Map<number, Assignment[]> = new Map<number, Assignment[]>();
+
     /**
      * The array includes the names of all variables that were read inside an if statement and assigned a value from an
      * action method

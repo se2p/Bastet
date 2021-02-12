@@ -109,6 +109,10 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     }
 
     private exportPath(pathAr: AccessibilityRelation<GraphAbstractState>, testifiedSeq: [GraphAbstractState, ConcreteElement][], violating: GraphAbstractState) {
+        Preconditions.checkNotUndefined(pathAr);
+        Preconditions.checkNotUndefined(testifiedSeq);
+        Preconditions.checkNotUndefined(violating);
+
         // Produce the full error witness
         const errorWitness: ErrorWitness = this.extractErrorWitness(pathAr, violating, testifiedSeq);
 
