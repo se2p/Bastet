@@ -35,7 +35,7 @@ let ciConfigFilePath = path.join(__dirname, ciConfigRelPath);
 let specRelPath = "../../../../specs/empty.sc";
 let specFilePath = path.join(__dirname, specRelPath);
 
-let timeout: number = 20000;
+let timeout: number = 20000; // in milliseconds
 export {timeout, execFixture, execute, execute_explicit};
 
 function execFixture(fixturePath: string, done) {
