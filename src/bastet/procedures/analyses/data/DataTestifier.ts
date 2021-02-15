@@ -171,7 +171,6 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         // Get one satisfying assignment (model of the choiceQuery formula)
         const satAssignement: ConcreteMemory = this._domain.folDomain.concretizeOne(choiceQuery);
         Preconditions.checkNotUndefined(satAssignement);
-        console.log(satAssignement.toJSON());
 
         // Testify the accessibility relation based on the model for the `choiceQuery` formula
         // - make sure to return the empty accessibility relation in case the formula is infeasible
