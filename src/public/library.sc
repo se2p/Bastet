@@ -24,13 +24,13 @@ actor IOActor is RuntimeEntity begin
     /**
      * The last answer given to an `ask` block
      */
-    declare answer as string
     declare integerAnswer as integer
     declare askActive as boolean
 
     define atomic beginAsk() begin
-        declare nondetStr as string
-        define answer as nondetStr
+        // declare nondetStr as string
+        // define answer as nondetStr
+
         declare nondetInt as integer
         define integerAnswer as nondetInt
         declare inputDurationSecs as integer
