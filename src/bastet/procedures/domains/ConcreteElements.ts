@@ -40,7 +40,8 @@ import {Preconditions} from "../../utils/Preconditions";
 import {Record as ImmRec, Map as ImmMap} from "immutable";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {Optional} from "../../utils/Optional";
+import {VariableWithDataLocation} from "../../syntax/ast/core/Variable";
+import {VAR_SCOPING_SPLITTER} from "../../syntax/app/controlflow/DataLocation";
 
 function containsAll<K, V>(map1: ImmMap<K, V>, map2: ImmMap<K, V>): boolean {
     throw new ImplementMeException();
@@ -272,6 +273,56 @@ export class ConcreteUnifiedMemory extends ConcreteUnifiedMemoryRecord implement
     }
 }
 
+export interface ConcreteProgramStateAttributes {
+
+    globalState: ConcreteUnifiedMemory;
+    actorStates: ImmMap<string, ConcreteUnifiedMemory>;
+
+}
+
+const ConcreteProgramStateRecord = ImmRec({
+
+    globalState: new ConcreteUnifiedMemory(ImmMap()),
+    actorStates: ImmMap<string, ConcreteUnifiedMemory>()
+
+});
+
+export class ConcreteProgramState extends ConcreteProgramStateRecord implements ConcreteProgramStateAttributes, ConcreteElement {
+
+    constructor(globalState: ConcreteUnifiedMemory, actorStates: ImmMap<string, ConcreteUnifiedMemory>) {
+        super({globalState: globalState, actorStates: actorStates});
+    }
+
+    public getActorMemory(actor: string): ConcreteUnifiedMemory {
+        return this.actorStates.get(actor);
+    }
+
+    public getActors(): Iterable<string> {
+        return this.actorStates.keys();
+    }
+
+    public getValueFor(variable: VariableWithDataLocation): ConcretePrimitiveValue<any> {
+        // Decompose the qualified name: [Actor@]script@varName@ssaIndex
+        let parts = variable.qualifiedName.split(VAR_SCOPING_SPLITTER);
+
+        // Step 1: Check if an SSA index is present (would be the last element in the array) and remove it if necessary.
+        const ssaIndexPresent = parseInt(parts[parts.length - 1]);
+        if (ssaIndexPresent) {
+            parts = parts.slice(0, parts.length - 1);
+        }
+
+        // Step 2: Retrieve the concrete value for the given variable.
+        if (parts.length === 2) { // global variable (no actor name)
+            return this.globalState.getValue(parts.join(VAR_SCOPING_SPLITTER));
+        } else if (parts.length === 3) { // scoped variable, actor name is present
+            const actorName = parts[0];
+            const scriptAndVarName = parts.slice(1, parts.length).join(VAR_SCOPING_SPLITTER);
+            return this.getActorMemory(actorName).getValue(scriptAndVarName);
+        } else {
+            throw new IllegalArgumentException(`malformed qualified name ${variable.qualifiedName}`);
+        }
+    }
+}
 
 export interface ConcreteMemoryStateAttributes {
 
