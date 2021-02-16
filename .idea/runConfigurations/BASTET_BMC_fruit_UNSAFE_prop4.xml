@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BASTET BMC fruit UNSAFE prop4" type="NodeJSConfigurationType" folderName="FSE19" application-parameters="-P test/programs/publications/fse19-testing/fruits/fruits_UNSAFE-prop4.sc -S test/programs/publications/fse19-testing/fruits/spec.sc -I src/public/library.sc" node-parameters="--require ts-node/register --max-old-space-size=8192" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>
