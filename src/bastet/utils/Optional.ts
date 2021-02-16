@@ -69,6 +69,9 @@ export class Optional<T extends AbstractElement> extends OptionalRecord implemen
     }
 
     public static of<T extends AbstractElement>(value: T): Optional<T> {
+        if (value === null) {
+            return this.absent<T>();
+        }
         return new Optional(value);
     }
 

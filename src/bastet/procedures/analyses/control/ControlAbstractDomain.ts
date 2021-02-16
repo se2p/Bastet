@@ -689,7 +689,7 @@ export class ControlAbstractDomain implements AbstractDomain<ConcreteProgramStat
                 }
             }
 
-            return new ConcreteProgramState(globalState, ImmMap(actorStates));
+            return new ConcreteProgramState(globalState, ImmMap(actorStates), m);
         };
 
         return toProgramState(m);
