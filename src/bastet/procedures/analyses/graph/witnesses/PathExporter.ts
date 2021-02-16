@@ -31,10 +31,9 @@ import {Preconditions} from "../../../../utils/Preconditions";
 import {GraphReachedSetWrapper} from "../GraphStatesSetWrapper";
 import {TransitionLabelProvider, WrappingProgramAnalysis} from "../../ProgramAnalysis";
 import {
-    asUnifiedMemory,
     ConcreteBoolean,
     ConcreteElement, ConcreteFloat, ConcreteInteger,
-    ConcreteNumber, ConcreteProgramState,
+    ConcreteNumber,
     ConcreteString,
     ConcreteUnifiedMemory
 } from "../../../domains/ConcreteElements";
@@ -45,6 +44,7 @@ import {getTheOnlyElement} from "../../../../utils/Collections";
 import {IllegalStateException} from "../../../../core/exceptions/IllegalStateException";
 import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
 import {IllegalArgumentException} from "../../../../core/exceptions/IllegalArgumentException";
+import {asUnifiedMemory} from "../../control/ConcreteProgramState";
 
 export class PathExporter implements WitnessHandler<GraphAbstractState> {
 

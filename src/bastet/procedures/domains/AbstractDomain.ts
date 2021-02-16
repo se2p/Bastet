@@ -24,7 +24,7 @@
  */
 
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
-import {ConcreteDomain, ConcreteElement, ConcreteProgramState} from "./ConcreteElements";
+import {ConcreteDomain, ConcreteElement} from "./ConcreteElements";
 import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
 import {AbstractionPrecision} from "../AbstractionPrecision";
 

@@ -30,11 +30,11 @@ import {ReachedSet} from "../../../algorithms/StateSet";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {GraphReachedSetWrapper} from "../GraphStatesSetWrapper";
 import {TransitionLabelProvider, WrappingProgramAnalysis} from "../../ProgramAnalysis";
-import {ConcreteElement, ConcreteProgramState} from "../../../domains/ConcreteElements";
+import {ConcreteElement} from "../../../domains/ConcreteElements";
 import {SSAStateVisitor} from "../../StateVisitors";
 import {Set as ImmSet} from "immutable";
 import {App} from "../../../../syntax/app/App";
-import {ControlAbstractState, RelationLocation} from "../../control/ControlAbstractDomain";
+import {ControlAbstractState} from "../../control/ControlAbstractDomain";
 import {ControlLocationExtractor} from "../../control/ControlUtils";
 import {Action, ErrorWitnessActionVisitor} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
@@ -54,6 +54,7 @@ import {
     SpriteClickBroadcastActionExtractor,
 } from "./ActionExtractor";
 import {GLOBAL_TIME_MICROS_VAR} from "../../../../syntax/app/SystemVariables";
+import {ConcreteProgramState, RelationLocation} from "../../control/ConcreteProgramState";
 
 export interface WitnessExporterConfig {
     export: 'ALL' | 'ONLY_ACTIONS';

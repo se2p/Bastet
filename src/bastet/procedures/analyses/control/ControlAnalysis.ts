@@ -28,9 +28,7 @@ import {
     ControlAbstractDomain,
     ControlAbstractState,
     IndexedThread,
-    MethodCall,
-    RelationLocation,
-    ScheduleAbstractStateFactory, ThreadId, ThreadState
+    ScheduleAbstractStateFactory
 } from "./ControlAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
@@ -59,7 +57,6 @@ import {AccessibilityRelation} from "../Accessibility";
 import {
     ConcreteElement,
     ConcretePrimitive,
-    ConcreteProgramState,
     ConcreteUnifiedMemory
 } from "../../domains/ConcreteElements";
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
@@ -67,6 +64,7 @@ import {Concern} from "../../../syntax/Concern";
 import {AfterStatementMonitoringEvent} from "../../../syntax/ast/core/CoreEvent";
 import {VAR_SCOPING_SPLITTER} from "../../../syntax/app/controlflow/DataLocation";
 import {DataLocationScoper} from "./DataLocationScoping";
+import {ConcreteProgramState, MethodCall, RelationLocation, ThreadId, ThreadState} from "./ConcreteProgramState";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 

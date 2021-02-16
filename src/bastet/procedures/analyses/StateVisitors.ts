@@ -26,7 +26,7 @@
 
 import {AbstractStateVisitor, DelegatingStateVisitor} from "./AbstractStates";
 import {AbstractElement} from "../../lattices/Lattice";
-import {ControlAbstractState, RelationLocation, ThreadState} from "./control/ControlAbstractDomain";
+import {ControlAbstractState} from "./control/ControlAbstractDomain";
 import {DataAbstractState} from "./data/DataAbstractDomain";
 import {GraphAbstractState} from "./graph/GraphAbstractDomain";
 import {SSAState} from "./ssa/SSAAbstractDomain";
@@ -42,6 +42,7 @@ import {getTheOnlyElement} from "../../utils/Collections";
 import {AbstractionState} from "./abstraction/AbstractionAbstractDomain";
 import {ProgramAnalysis} from "./ProgramAnalysis";
 import {ConcreteElement} from "../domains/ConcreteElements";
+import {RelationLocation, ThreadState} from "./control/ConcreteProgramState";
 
 const colormap = require('colormap')
 

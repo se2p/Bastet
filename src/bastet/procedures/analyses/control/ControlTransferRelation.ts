@@ -25,15 +25,13 @@
 
 import {LabeledTransferRelation, TransferRelation, Transfers} from "../TransferRelation";
 import {
-    ControlAbstractState,
-    IndexedThread,
     MethodCall,
     RelationLocation,
     ThreadComputationState,
     ThreadId,
     ThreadState,
     ThreadStateFactory
-} from "./ControlAbstractDomain";
+} from "./ConcreteProgramState";
 import {AbstractElement, Lattices} from "../../../lattices/Lattice";
 import {ControlAnalysisConfig} from "./ControlAnalysis";
 import {App} from "../../../syntax/app/App";
@@ -138,6 +136,7 @@ import {AnalysisStatistics} from "../AnalysisStatistics";
 import {incBigStep} from "../label/LabelAnalysis";
 import {EpsilonStatement} from "../../../syntax/ast/core/statements/EpsilonStatement";
 import {StopAllStatement} from "../../../syntax/ast/core/statements/TerminationStatement";
+import {ControlAbstractState, IndexedThread} from "./ControlAbstractDomain";
 
 /**
  * Mimics the green-threading of the Scratch VM.

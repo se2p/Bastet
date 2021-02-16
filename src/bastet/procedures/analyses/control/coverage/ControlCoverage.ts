@@ -28,11 +28,11 @@ import {ReachedSet} from "../../../algorithms/StateSet";
 import {AbstractState} from "../../../../lattices/Lattice";
 import {App} from "../../../../syntax/app/App";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
-import {RelationLocation} from "../ControlAbstractDomain";
 import {Preconditions} from "../../../../utils/Preconditions";
 import {TransitionRelation} from "../../../../syntax/app/controlflow/TransitionRelation";
 import {ActorId} from "../../../../syntax/app/Actor";
 import {ControlLocationExtractor} from "../ControlUtils";
+import {RelationLocation} from "../ConcreteProgramState";
 
 export class ControlCoverageReport {
 

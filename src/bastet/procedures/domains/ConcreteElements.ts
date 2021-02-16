@@ -272,40 +272,6 @@ export class ConcreteUnifiedMemory extends ConcreteUnifiedMemoryRecord implement
     }
 }
 
-export interface ConcreteProgramStateAttributes {
-
-    enrichedFrom: Optional<ConcreteUnifiedMemory>;
-    globalState: ConcreteUnifiedMemory;
-    actorStates: ImmMap<string, ConcreteUnifiedMemory>;
-
-}
-
-const ConcreteProgramStateRecord = ImmRec({
-
-    enrichedFrom: Optional.absent<ConcreteUnifiedMemory>(),
-    globalState: null,
-    actorStates: null
-
-});
-
-export class ConcreteProgramState extends ConcreteProgramStateRecord implements ConcreteProgramStateAttributes, ConcreteElement {
-
-    constructor(globalState: ConcreteUnifiedMemory, actorStates: ImmMap<string, ConcreteUnifiedMemory>, enrichedFrom?: ConcreteUnifiedMemory) {
-        super({globalState: globalState, actorStates: actorStates, enrichedFrom: Optional.of(enrichedFrom)});
-    }
-
-    public getActorMemory(actor: string): ConcreteUnifiedMemory {
-        return this.actorStates.get(actor);
-    }
-
-    public getActors(): Iterable<string> {
-        return this.actorStates.keys();
-    }
-
-    public getEnrichedFrom(): Optional<ConcreteUnifiedMemory> {
-        return this.enrichedFrom;
-    }
-}
 
 export interface ConcreteMemoryStateAttributes {
 
@@ -595,12 +561,3 @@ export class ConcreteMemoryLattice implements Lattice<ConcreteMemory> {
 
 }
 
-export function asUnifiedMemory(c: ConcreteElement): ConcreteUnifiedMemory {
-    if (c instanceof ConcreteProgramState) {
-        return c.getEnrichedFrom().getValue();
-    } else if (c instanceof ConcreteUnifiedMemory) {
-        return c as ConcreteUnifiedMemory;
-    } else {
-        throw new IllegalArgumentException();
-    }
-}

@@ -79,6 +79,16 @@ actor IOActor is RuntimeEntity begin
                 broadcast "CLICK" () to "SYSTEM"
             end
 
+            if keyPressed = 37 then begin
+                broadcast "KEY_37_PRESSED" () to "SYSTEM"
+            end else if keyPressed = 38 then begin
+                broadcast "KEY_38_PRESSED" () to "SYSTEM"
+            end else if keyPressed = 39 then begin
+                broadcast "KEY_39_PRESSED" () to "SYSTEM"
+            end else if keyPressed = 40 then begin
+                broadcast "KEY_40_PRESSED" () to "SYSTEM"
+            end
+
             define lastKeyPressed as keyPressed
             define lastMouseDown as mouseDown
         end
