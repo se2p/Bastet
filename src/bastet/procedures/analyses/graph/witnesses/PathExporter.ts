@@ -76,7 +76,7 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
             const [work, workC] = testifiedSeq[i];
             const [succ, succC] = testifiedSeq[i+1];
 
-            const ops: ProgramOperation[] = this.getTransitionLabels(work, succ);
+            const ops: ProgramOperation[] = this.getTransitionLabels(work, succ).map(([ts, o]) => o);
             ops.forEach((o) => pathElements.push(`${work.getId()} -- ${o.ast.accept(new CorePrintVisitor())} --> ${succ.getId()}`));
         }
 

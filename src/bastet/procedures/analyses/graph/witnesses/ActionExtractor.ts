@@ -31,6 +31,7 @@ import {Preconditions} from "../../../../utils/Preconditions";
 import {DataLocationScoper} from "../../control/DataLocationScoping";
 import {Action} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {Broadcast, BroadcastVisitor} from "../../../../syntax/ast/BroadcastVisitor";
+import {ThreadState} from "../../control/ConcreteProgramState";
 
 export interface ActionExtractor {
     /**
@@ -38,7 +39,7 @@ export interface ActionExtractor {
      * @param operations
      * @param step
      */
-    processOperations(operations: ProgramOperation[], step: ErrorWitnessStep): void;
+    processOperations(operations: [ThreadState, ProgramOperation][], step: ErrorWitnessStep): void;
 
     /**
      * Sets an action for the step if necessary and can return an extra predecessor to be inserted before the step.
@@ -57,8 +58,8 @@ export abstract class BroadcastActionExtractor implements ActionExtractor {
         this._broadcast = broadcast;
     }
 
-    processOperations(operations: ProgramOperation[], step: ErrorWitnessStep): void {
-        const broadcasts = operations.map(operation => operation.ast.accept(this._broadcastVisitor))
+    processOperations(operations: [ThreadState, ProgramOperation][], step: ErrorWitnessStep): void {
+        const broadcasts = operations.map(([ts, operation]) => operation.ast.accept(this._broadcastVisitor))
             .filter(broadcast => broadcast && broadcast.id === this._broadcast);
         this._stepToBroadcasts.set(step.id, broadcasts);
     }
@@ -105,9 +106,9 @@ export abstract class QueryMethodActionExtractor implements ActionExtractor {
         this._visitor = new MethodValueReadVisitor(actionMethodNames);
     }
 
-    processOperations(operations: ProgramOperation[], step: ErrorWitnessStep): void {
+    processOperations(operations: [ThreadState, ProgramOperation][], step: ErrorWitnessStep): void {
         const readEvent = operations
-            .map(o => o.ast.accept(this._visitor))
+            .map(([ts, o]) => o.ast.accept(this._visitor))
             .reduce((prev, cur) => prev.combine(cur));
 
         if (readEvent.readFrom) {
@@ -115,7 +116,7 @@ export abstract class QueryMethodActionExtractor implements ActionExtractor {
         }
 
         const assignments = operations
-            .map(op => op.ast.accept(new MethodCallAssignmentVisitor()))
+            .map(([ts, op]) => op.ast.accept(new MethodCallAssignmentVisitor()))
             .filter(a => a !== undefined);
         this._stepToAssignments.set(step.id, assignments);
     }

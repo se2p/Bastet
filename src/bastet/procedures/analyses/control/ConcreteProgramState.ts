@@ -331,11 +331,14 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
     withRemovedWaitingFor(threadId: ThreadId): ThreadState {
         return this.withWaitingForThreads(this.getWaitingForThreads().remove(threadId));
     }
+
 }
 
 export class ThreadStateFactory {
 
     private static THREAD_ID_SEQ: number;
+
+    private static DUMMY: ThreadState;
 
     public static freshId(): number {
         if (!ThreadStateFactory.THREAD_ID_SEQ) {
@@ -344,12 +347,22 @@ export class ThreadStateFactory {
         return ThreadStateFactory.THREAD_ID_SEQ++;
     }
 
+    public static dummy(): ThreadState {
+       if (!ThreadStateFactory.DUMMY) {
+           ThreadStateFactory.DUMMY = new ThreadState(-2, "DUMMY", "DUMMY",
+               ImmList(), null, ThreadComputationState.THREAD_STATE_UNKNOWN, ImmSet(), ImmSet(), ImmList(), ImmList(), 0, -2);
+       }
+       return ThreadStateFactory.DUMMY;
+    }
+
 }
 
 export interface ConcreteProgramStateAttributes {
 
     enrichedFrom: Optional<ConcreteUnifiedMemory>;
+
     globalState: ConcreteUnifiedMemory;
+
     actorStates: ImmMap<string, ConcreteUnifiedMemory>;
 
 }

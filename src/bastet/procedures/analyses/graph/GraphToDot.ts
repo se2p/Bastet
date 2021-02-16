@@ -85,7 +85,7 @@ export class GraphToDot  {
 
     private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
         const transLabels = GraphToDot.escapeForDot(this._transLabProvider.getTransitionLabel(from, to)
-            .map(o => this.opLabel(o)).join("\n"));
+            .map(([ts, o]) => this.opLabel(o)).join("\n"));
         this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabels}"];`);
     }
 

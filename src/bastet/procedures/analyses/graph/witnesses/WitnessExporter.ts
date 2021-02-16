@@ -54,7 +54,7 @@ import {
     SpriteClickBroadcastActionExtractor,
 } from "./ActionExtractor";
 import {GLOBAL_TIME_MICROS_VAR} from "../../../../syntax/app/SystemVariables";
-import {ConcreteProgramState, RelationLocation} from "../../control/ConcreteProgramState";
+import {ConcreteProgramState, RelationLocation, ThreadState} from "../../control/ConcreteProgramState";
 
 export interface WitnessExporterConfig {
     export: 'ALL' | 'ONLY_ACTIONS';
@@ -204,7 +204,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                 const transitionLabel = this._tlp.getTransitionLabel(previousState, e);
 
                 step.actionLabel = transitionLabel
-                    .map(o => o.ast.accept(this._labelPrintVisitor))
+                    .map(([ts, o]) => o.ast.accept(this._labelPrintVisitor))
                     .join("; ");
 
                 for (const actionExtractor of actionExtractors) {
@@ -256,9 +256,9 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return errorWitness;
     }
 
-    private getDefaultAction(transitionLabel: ProgramOperation[]) {
+    private getDefaultAction(transitionLabel: [ThreadState, ProgramOperation][]) {
         return transitionLabel
-            .map(o => o.ast.accept(new ErrorWitnessActionVisitor()))
+            .map(([ts, o]) => o.ast.accept(new ErrorWitnessActionVisitor()))
             .reduce((prev, cur) => {
                 if (prev.weight > cur.weight) {
                     return prev;

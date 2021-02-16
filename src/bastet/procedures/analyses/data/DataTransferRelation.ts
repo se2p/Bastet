@@ -26,7 +26,11 @@
 import {LabeledTransferRelation} from "../TransferRelation";
 import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {
+    AssumeOperation,
+    ProgramOperation,
+    ProgramOperationInContext
+} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {DataTransformerVisitor} from "./DataTransformerVisitor";
 import {TransformerTheories} from "../../domains/MemoryTransformer";
 import {Preconditions} from "../../../utils/Preconditions";
@@ -59,13 +63,13 @@ export class DataTransferRelation implements LabeledTransferRelation<DataAbstrac
         throw new IllegalStateException("Only the labelled transfer is supported by this transfer relation");
     }
 
-    public abstractSuccFor(fromState: DataAbstractState, op: ProgramOperation, co: Concern): Iterable<DataAbstractState> {
+    public abstractSuccFor(fromState: DataAbstractState, opic: ProgramOperationInContext, co: Concern): Iterable<DataAbstractState> {
         let ast: AstNode;
-        if (op instanceof AssumeOperation) {
-            const assume = op as AssumeOperation;
+        if (opic instanceof AssumeOperation) {
+            const assume = opic.op as AssumeOperation;
             ast = new StrengtheningAssumeStatement(assume.expression);
         } else {
-            ast = op.ast;
+            ast = opic.op.ast;
         }
 
         return this.abstractSuccForAst(fromState, ast);

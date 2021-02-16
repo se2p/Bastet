@@ -35,7 +35,7 @@ import {App} from "../../../syntax/app/App";
 import {ControlTransferRelation} from "./ControlTransferRelation";
 import {Preconditions} from "../../../utils/Preconditions";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Property} from "../../../syntax/Property";
@@ -62,8 +62,6 @@ import {
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 import {Concern} from "../../../syntax/Concern";
 import {AfterStatementMonitoringEvent} from "../../../syntax/ast/core/CoreEvent";
-import {VAR_SCOPING_SPLITTER} from "../../../syntax/app/controlflow/DataLocation";
-import {DataLocationScoper} from "./DataLocationScoping";
 import {ConcreteProgramState, MethodCall, RelationLocation, ThreadId, ThreadState} from "./ConcreteProgramState";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
@@ -309,8 +307,8 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
         });
     }
 
-    getTransitionLabel(from: ControlAbstractState, to: ControlAbstractState): ProgramOperation[] {
-        let result: ProgramOperation[] = this._wrappedAnalysis.getTransitionLabel(from.getWrappedState(), to.getWrappedState());
+    getTransitionLabel(from: ControlAbstractState, to: ControlAbstractState): [ThreadState, ProgramOperation][] {
+        const result: [ThreadState, ProgramOperation][] = this._wrappedAnalysis.getTransitionLabel(from.getWrappedState(), to.getWrappedState());
         if (result.length > 0) {
             return result;
         }
@@ -331,7 +329,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
                 } else if (t == null) {
                    throw new IllegalStateException("Something is really wrong here. This seems to be a BUG") ;
                 }
-                result.push(t);
+                result.push([steppedThread, t]);
             } else {
                 const fromRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
                 const toRelation = this._task.getTransitionRelationById(toLocation.getRelationId());
@@ -341,9 +339,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
                     .filter(o => o.ast instanceof CallStatement || o.ast instanceof ReturnStatement);
                 if (calls.length > 0) {
                     const call = getTheOnlyElement(calls);
-                    result.push(call);
+                    result.push([steppedThread, call]);
                 } else {
-                    return steppedThread.getOperations().map(oid => ProgramOperation.for(oid)).toArray();
+                    const mkTuple = (t: ThreadState, o: ProgramOperation): [ThreadState, ProgramOperation] => [t, o];
+                    return steppedThread.getOperations().map(oid => mkTuple(steppedThread, ProgramOperation.for(oid))).toArray();
                 }
             }
         }
@@ -505,7 +504,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
         return result;
     }
 
-    abstractSuccFor(fromState: ControlAbstractState, op: ProgramOperation, co: Concern): Iterable<ControlAbstractState> {
+    abstractSuccFor(fromState: ControlAbstractState, op: ProgramOperationInContext, co: Concern): Iterable<ControlAbstractState> {
         throw new NotSupportedException();
     }
 

@@ -69,6 +69,7 @@ import {ConcreteElement} from "../../domains/ConcreteElements";
 import {PathExporter} from "./witnesses/PathExporter";
 import {IfMergedStopOperator} from "./IfMergedStopOperator";
 import {Optional} from "../../../utils/Optional";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 export class GraphAnalysisConfig extends BastetConfiguration {
 
@@ -91,7 +92,6 @@ export class GraphAnalysisConfig extends BastetConfiguration {
     get checkTargetFeasibility(): boolean {
         return this.getBoolProperty('checkTargetFeasibility', false);
     }
-
 
     get graphConstructionOrder(): string {
         return this.getStringProperty('graphConstructionOrder', 'WaitAtMeet');
@@ -283,7 +283,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         return [frontierSet, reachedSet];
     }
 
-    getTransitionLabel(from: GraphAbstractState, to: GraphAbstractState): ProgramOperation[] {
+    getTransitionLabel(from: GraphAbstractState, to: GraphAbstractState): [ThreadState, ProgramOperation][] {
         return this.wrappedAnalysis['getTransitionLabel'](from.getWrappedState(), to.getWrappedState());
     }
 

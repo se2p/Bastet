@@ -372,7 +372,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             this._wrappedTransferStats.startTimer();
             const wrappedAnalysisResults: Iterable<AbstractElement> = considerInterpretationFinished
                 ? [r.getWrappedState()]
-                : Transfers.withIntermediateOps(this._wrappedTransferRelation, r.wrappedState, ops, opsConcern);
+                : Transfers.withIntermediateOps(this._wrappedTransferRelation, r.wrappedState, threadToStep.threadStatus, ops, opsConcern);
             this._wrappedTransferStats.stopTimer();
 
             // Combine the result
@@ -925,7 +925,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         // 3. Check if threads that wait for certain conditions can continue to run
         //    (assume certain conditions to hold if this accelerates the analysis without being unsound)
-        return this.runStateCheckThreads(result);
+        return this.runStateCheckThreads(result, step.steppedThread);
     }
 
     private hasNonWaitingRunnable(threads: ImmList<ThreadState>, withConcern: Concern): boolean {
@@ -936,7 +936,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return nonWaitingRunnable.size > 0;
     }
 
-    private runStateCheckThreads(state: ControlAbstractState): ControlAbstractState[] {
+    private runStateCheckThreads(state: ControlAbstractState, steppedThread: IndexedThread): ControlAbstractState[] {
         if (state.getConditionStates().size == 0) {
             return [state];
         } else {
@@ -955,7 +955,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 if (timeAccel.length == 1) {
                     // We can immediately accelerate in this case
                     const accelInfo = timeAccel[0];
-                    return this.checkConditionAndWakeUpIfSatisfied(getTheOnlyElement(this.accelerateTo(state, accelInfo)));
+                    return this.checkConditionAndWakeUpIfSatisfied(getTheOnlyElement(this.accelerateTo(state, accelInfo, steppedThread)));
                 }
 
                 throw new ImplementMeException();
@@ -1017,7 +1017,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result.map((cs) => this.removeIrrelevantCondThreads(cs));
     }
 
-    private accelerateTo(state: ControlAbstractState, accelInfo: AccelInfo): ControlAbstractState[] {
+    private accelerateTo(state: ControlAbstractState, accelInfo: AccelInfo, steppedThread: IndexedThread): ControlAbstractState[] {
         Preconditions.checkNotUndefined(state);
         Preconditions.checkNotUndefined(accelInfo);
 
@@ -1028,8 +1028,12 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         const conditionScopeStack = this.buildScopeStack(accelInfo.actorId, accelTr.name);
 
-        const wrappedResult: [AbstractElement, boolean][] = Transfers.transferAlongTransitionSystem(this._wrappedTransferRelation,
-            state.getWrappedState(), accelTr, getTheOnlyElement(accelTr.entryLocationSet), Concerns.highestPriorityConcern(),
+        const wrappedResult: [AbstractElement, boolean][] = Transfers.transferAlongTransitionSystem(
+            this._wrappedTransferRelation,
+            state.getWrappedState(),
+            accelTr,
+            getTheOnlyElement(accelTr.entryLocationSet),
+            Concerns.highestPriorityConcern(), steppedThread.threadStatus,
             (op) => {return this.scopeOperations([op], state.getActorScopes(),
                 conditionScopeStack, conditionScopeStack)[0]});
 
@@ -1085,7 +1089,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         const checkResult: [AbstractElement, boolean][] = Transfers.transferAlongTransitionSystem(this._wrappedTransferRelation,
             state.getWrappedState(), script, getTheOnlyElement(script.entryLocationSet), Concerns.highestPriorityConcern(),
-            (op) => {return this.scopeOperations([op], state.getActorScopes(),
+            condThreadState, (op) => {return this.scopeOperations([op], state.getActorScopes(),
                 conditionScopeStack, conditionScopeStack)[0]});
 
         return checkResult.filter((([e, t]) => Lattices.isFeasible(e, this._wrappedDomain.lattice, "Condition Check")));

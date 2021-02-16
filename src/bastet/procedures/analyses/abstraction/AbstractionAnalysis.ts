@@ -30,7 +30,7 @@ import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {FrontierSet, PartitionKey, ReachedSet, StateSet} from "../../algorithms/StateSet";
@@ -61,6 +61,7 @@ import {SSAAnalysis} from "../ssa/SSAAnalysis";
 import {PredicatePrecisionLattice} from "../../AbstractionPrecision";
 import {Optional} from "../../../utils/Optional";
 import {AbstractionStopOperator} from "./AbstractionStopOperator";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 
 export class AbstractionAnalysisConfig extends BastetConfiguration {
@@ -128,7 +129,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
         this._solver = summaryLattice.prover;
     }
 
-    getTransitionLabel(from: AbstractionState, to: AbstractionState): ProgramOperation[] {
+    getTransitionLabel(from: AbstractionState, to: AbstractionState): [ThreadState, ProgramOperation][] {
         return this._wrappedAnalysis.getTransitionLabel(from.getWrappedState(), to.getWrappedState());
     }
 
@@ -136,7 +137,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
         return this._transferRelation.abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: AbstractionState, op: ProgramOperation, co: Concern): Iterable<AbstractionState> {
+    abstractSuccFor(fromState: AbstractionState, op: ProgramOperationInContext, co: Concern): Iterable<AbstractionState> {
         return this._transferRelation.abstractSuccFor(fromState, op, co);
     }
 

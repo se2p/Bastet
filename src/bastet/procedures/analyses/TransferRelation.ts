@@ -24,7 +24,11 @@
  */
 
 import {AbstractElement} from "../../lattices/Lattice";
-import {ProgramOperation, ProgramOperationFactory} from "../../syntax/app/controlflow/ops/ProgramOperation";
+import {
+    ProgramOperation,
+    ProgramOperationFactory,
+    ProgramOperationInContext
+} from "../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../syntax/Concern";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {Preconditions} from "../../utils/Preconditions";
@@ -34,6 +38,7 @@ import {LocationId} from "../../syntax/app/controlflow/ControlLocation";
 import {Set as ImmSet} from "immutable";
 import {SignalTargetReachedStatement} from "../../syntax/ast/core/statements/InternalStatement";
 import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {ThreadState} from "./control/ConcreteProgramState";
 
 export interface TransferRelation<E extends AbstractElement> {
 
@@ -48,7 +53,7 @@ export interface TransferRelation<E extends AbstractElement> {
 
 export interface LabeledTransferRelation<E extends AbstractElement> extends TransferRelation<E>{
 
-    abstractSuccFor(fromState: E, op: ProgramOperation, co: Concern): Iterable<E>;
+    abstractSuccFor(fromState: E, op: ProgramOperationInContext, co: Concern): Iterable<E>;
 
 }
 
@@ -56,7 +61,7 @@ export class Transfers {
 
     public static withIntermediateTransfersBefore<W extends AbstractElement>(
         transferRealtion: LabeledTransferRelation<W>, fromState: W,
-        intermediateStmts: Statement[], ops: ProgramOperation[], co: Concern): W[] {
+        intermediateStmts: Statement[], ts: ThreadState, ops: ProgramOperation[], co: Concern): W[] {
 
         let toRun: ProgramOperation[] = [];
         for (const stmt of intermediateStmts) {
@@ -65,17 +70,17 @@ export class Transfers {
         }
         toRun = toRun.concat(ops);
 
-        return Transfers.withIntermediateOps(transferRealtion, fromState, toRun, co);
+        return Transfers.withIntermediateOps(transferRealtion, fromState, ts, toRun, co);
     }
 
     public static withIntermediateOps<W extends AbstractElement>(
-        transferRealtion: LabeledTransferRelation<W>, fromState: W, ops: Iterable<ProgramOperation>, co: Concern): W[] {
+        transferRealtion: LabeledTransferRelation<W>, fromState: W, context: ThreadState, ops: Iterable<ProgramOperation>, co: Concern): W[] {
 
         let result: W[] = [fromState];
         for (const op of ops) {
             let statelistPrime: W[] = [];
             for (const w of result) {
-                for (const succ of transferRealtion.abstractSuccFor(w, op, co)) {
+                for (const succ of transferRealtion.abstractSuccFor(w, new ProgramOperationInContext(op, context), co)) {
                     statelistPrime.push(succ);
                 }
             }
@@ -90,7 +95,7 @@ export class Transfers {
      */
     public static transferAlongTransitionSystem<W extends AbstractElement>(
         abstractSucc: LabeledTransferRelation<W>, fromState: W, tr: TransitionRelation,
-        fromLocation: LocationId, co: Concern, opMapper?: (op: ProgramOperation) => ProgramOperation): [W, boolean][] {
+        fromLocation: LocationId, co: Concern, ts: ThreadState, opMapper?: (op: ProgramOperation) => ProgramOperation): [W, boolean][] {
 
         let frontier: [LocationId, ImmSet<LocationId>, W, boolean][] = [[fromLocation, ImmSet([fromLocation]), fromState, false]];
 
@@ -116,7 +121,7 @@ export class Transfers {
 
                         const targetReachedPrime = targetReached || op.ast instanceof SignalTargetReachedStatement;
 
-                        const succs = Array.from(abstractSucc.abstractSuccFor(e, op, co));
+                        const succs = Array.from(abstractSucc.abstractSuccFor(e, new ProgramOperationInContext(op, ts), co));
                         frontierPrime = frontierPrime.concat(succs.map((s) =>
                             [t.target, visited.union([t.target]), s, targetReachedPrime]));
                     }
@@ -135,9 +140,9 @@ export class LabeledTransferRelationImpl<E extends AbstractElement> implements L
 
     private readonly _abstractSucc: (fromState: E) => Iterable<E>;
 
-    private readonly _abstractSuccFor: (fromState: E, op: ProgramOperation, co: Concern) => Iterable<E>;
+    private readonly _abstractSuccFor: (fromState: E, op: ProgramOperationInContext, co: Concern) => Iterable<E>;
 
-    constructor(abstractSucc: (fromState: E) => Iterable<E>, abstractSuccFor: (fromState: E, op: ProgramOperation, co: Concern) => Iterable<E>) {
+    constructor(abstractSucc: (fromState: E) => Iterable<E>, abstractSuccFor: (fromState: E, op: ProgramOperationInContext, co: Concern) => Iterable<E>) {
         this._abstractSuccFor = Preconditions.checkNotUndefined(abstractSuccFor);
         this._abstractSucc = abstractSucc;
     }
@@ -149,8 +154,8 @@ export class LabeledTransferRelationImpl<E extends AbstractElement> implements L
         return this._abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: E, op: ProgramOperation, co: Concern): Iterable<E> {
-        return this._abstractSuccFor(fromState, op, co);
+    abstractSuccFor(fromState: E, opic: ProgramOperationInContext, co: Concern): Iterable<E> {
+        return this._abstractSuccFor(fromState, opic, co);
     }
 
     public static from<E extends AbstractElement>(tr: LabeledTransferRelation<E>) {

@@ -56,6 +56,7 @@ import {AbstractionState} from "../abstraction/AbstractionAbstractDomain";
 import {AbstractionStateStates} from "../abstraction/AbstractionStates";
 import {DataAbstractStates} from "./DataAbstractStates";
 import {SSAAbstractStates} from "../ssa/SSAAbstractStates";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 class BranchingAlternative {
 
@@ -226,7 +227,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
 
         for (const start of ar.successorsOf(nextSplit)) {
             // TODO: Refactor. Redundant compared to the loop below
-            const transAssumes = this.filterAssumes(this.getTransitionLabels(ar, nextSplit, start));
+            const transAssumes = this.filterAssumes(this.getTransitionLabels(ar, nextSplit, start).map(([ts, op]) => op));
             worklist.push(new ConditionalBranch(nextSplit, start, start, transAssumes));
         }
 
@@ -237,7 +238,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
                 result.push(work);
             } else {
                 for (const succ of succs) {
-                    const transAssumes = this.filterAssumes(this.getTransitionLabels(ar, work.branchEnd, succ));
+                    const transAssumes = this.filterAssumes(this.getTransitionLabels(ar, work.branchEnd, succ).map(([ts, op]) => op));
                     worklist.push(new ConditionalBranch(nextSplit, work.branchStart, succ, work.branchAssumes.concat(transAssumes)));
                 }
             }
@@ -289,7 +290,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
     /**
      * Get the program operations with SCOPES and SSA indices.
      */
-    private getTransitionLabels(ar: AccessibilityRelation<AbstractState>, from: AbstractState, to: AbstractState): ProgramOperation[] {
+    private getTransitionLabels(ar: AccessibilityRelation<AbstractState>, from: AbstractState, to: AbstractState): [ThreadState, ProgramOperation][] {
         return ar.labeler().getTransitionLabel(from, to);
     }
 

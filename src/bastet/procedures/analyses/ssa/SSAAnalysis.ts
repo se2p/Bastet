@@ -37,7 +37,7 @@ import {
 import {LabeledTransferRelation} from "../TransferRelation";
 import {extractPrimitiveAttributes, SSAAbstractDomain, SSAState} from "./SSAAbstractDomain";
 import {SSATransferRelation} from "./SSATransferRelation";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {FrontierSet, PartitionKey, ReachedSet, StateSet} from "../../algorithms/StateSet";
@@ -52,6 +52,7 @@ import {AccessibilityRelation} from "../Accessibility";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {SSAAbstractStates} from "./SSAAbstractStates";
 import {getTheOnlyElement} from "../../../utils/Collections";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 
 export class SSAAnalysisConfig extends BastetConfiguration {
@@ -91,7 +92,7 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         this._mergeOp = new SSAMergeOperator(this._task, this.wrappedAnalysis, this.wrappedAnalysis);
     }
 
-    getTransitionLabel(from: SSAState, to: SSAState): ProgramOperation[] {
+    getTransitionLabel(from: SSAState, to: SSAState): [ThreadState, ProgramOperation][] {
         return this._wrappedAnalysis.getTransitionLabel(from.getWrappedState(), to.getWrappedState());
     }
 
@@ -99,7 +100,7 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return this._transferRelation.abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: SSAState, op: ProgramOperation, co: Concern): Iterable<SSAState> {
+    abstractSuccFor(fromState: SSAState, op: ProgramOperationInContext, co: Concern): Iterable<SSAState> {
         return this._transferRelation.abstractSuccFor(fromState, op, co);
     }
 

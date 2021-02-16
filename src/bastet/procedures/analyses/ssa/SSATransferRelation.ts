@@ -28,7 +28,7 @@ import {SSAState} from "./SSAAbstractDomain";
 import {
     AssumeOperation,
     ProgramOperation,
-    ProgramOperationFactory,
+    ProgramOperationFactory, ProgramOperationInContext,
     RawOperation
 } from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {AbstractElement} from "../../../lattices/Lattice";
@@ -50,19 +50,19 @@ export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
         throw new IllegalStateException("This TR is only applicable to labeled transitions");
     }
 
-    abstractSuccFor(fromState: SSAState, op: ProgramOperation, co: Concern): Iterable<SSAState> {
+    abstractSuccFor(fromState: SSAState, opic: ProgramOperationInContext, co: Concern): Iterable<SSAState> {
         const ssasigner = new SSAssigner(fromState);
         const visitor = new SSATransformerVisitor(ssasigner);
 
         let opPrime: ProgramOperation;
-        if (op instanceof AssumeOperation) {
-            opPrime = ProgramOperationFactory.createAssumeOpFrom(op.expression.accept(visitor) as BooleanExpression, op.assumeType);
+        if (opic.op instanceof AssumeOperation) {
+            opPrime = ProgramOperationFactory.createAssumeOpFrom(opic.op.expression.accept(visitor) as BooleanExpression, opic.op.assumeType);
         } else {
-            opPrime = new RawOperation(op.ast.accept(visitor));
+            opPrime = new RawOperation(opic.op.ast.accept(visitor));
         }
 
         const result: SSAState[] = [];
-        for (const w of this._wrapped.abstractSuccFor(fromState.wrappedState, opPrime, co)) {
+        for (const w of this._wrapped.abstractSuccFor(fromState.wrappedState, new ProgramOperationInContext(opPrime, opic.thread), co)) {
             result.push(ssasigner.ssa.withWrappedState(w));
         }
 

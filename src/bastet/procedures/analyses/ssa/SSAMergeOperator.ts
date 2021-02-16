@@ -37,6 +37,7 @@ import {LabeledTransferRelation, Transfers} from "../TransferRelation";
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {ProgramOperationFactory} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
+import {ThreadStateFactory} from "../control/ConcreteProgramState";
 
 export class SSAMergeOperator implements MergeOperator<SSAState> {
 
@@ -96,9 +97,9 @@ export class SSAMergeOperator implements MergeOperator<SSAState> {
                 return Math.max(state1Version, state2Version);
             }, state2SSA);
 
-        const state1Synced = Transfers.withIntermediateOps(this._wrappedAbstractSuccOp, state1.getWrappedState(),
+        const state1Synced = Transfers.withIntermediateOps(this._wrappedAbstractSuccOp, state1.getWrappedState(), ThreadStateFactory.dummy(),
             state1SyncOps.map(ast => ProgramOperationFactory.createFor(ast)), Concerns.highestPriorityConcern());
-        const state2Synced = Transfers.withIntermediateOps(this._wrappedAbstractSuccOp, state2.getWrappedState(),
+        const state2Synced = Transfers.withIntermediateOps(this._wrappedAbstractSuccOp, state2.getWrappedState(), ThreadStateFactory.dummy(),
             state2SyncOps.map(ast => ProgramOperationFactory.createFor(ast)), Concerns.highestPriorityConcern());
 
         Preconditions.checkArgument(state1Synced.length == 1);

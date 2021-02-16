@@ -28,7 +28,7 @@ import {ValueAbstractDomain, ValueAbstractState} from "./ValueAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {ValueTransferRelation} from "./ValueTransferRelation";
 import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
@@ -70,6 +70,7 @@ import {LexiKey} from "../../../utils/Lexicographic";
 import {AccessibilityRelation} from "../Accessibility";
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 import {ValueRefiner} from "./ValueRefiner";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 
 export class DataAnalysisConfig extends BastetConfiguration {
@@ -113,7 +114,7 @@ export class ValueAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         this._mergeOp = StandardMergeOperatorFactory.create(this._config.mergeOperator, this._abstractDomain);
     }
 
-    getTransitionLabel(from: ValueAbstractState, to: ValueAbstractState): ProgramOperation[] {
+    getTransitionLabel(from: ValueAbstractState, to: ValueAbstractState): [ThreadState, ProgramOperation][] {
         throw new NotSupportedException();
     }
 
@@ -162,7 +163,7 @@ export class ValueAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         return [this._abstractDomain.lattice.top()];
     }
 
-    abstractSuccFor(fromState: ValueAbstractState, op: ProgramOperation, co: Concern): Iterable<ValueAbstractState> {
+    abstractSuccFor(fromState: ValueAbstractState, op: ProgramOperationInContext, co: Concern): Iterable<ValueAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
         return this._transferRelation.abstractSuccFor(fromState, op, co);

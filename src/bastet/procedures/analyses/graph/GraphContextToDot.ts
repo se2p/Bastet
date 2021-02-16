@@ -64,7 +64,7 @@ export class GraphContextToDot  {
     private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
         const visitor = new CorePrintVisitor();
         const transLabels = GraphContextToDot.escapeForDot(this._transLabProvider.getTransitionLabel(from, to)
-            .map(o => o.ast.accept(visitor)).join(";"));
+            .map(([ts, o]) => o.ast.accept(visitor)).join(";"));
         this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabels}"];`);
     }
 

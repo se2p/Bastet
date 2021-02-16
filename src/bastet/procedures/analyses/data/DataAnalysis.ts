@@ -28,7 +28,7 @@ import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {DataTransferRelation} from "./DataTransferRelation";
 import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
@@ -71,6 +71,7 @@ import {FirstOrderLattice, FirstOrderSolver} from "../../domains/FirstOrderDomai
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 import {DataRefiner} from "./DataRefiner";
 import {Theories} from "./DataTransformerTheories";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 
 export class DataAnalysisConfig extends BastetConfiguration {
@@ -126,7 +127,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         this._refiner = new DataRefiner(this._abstractDomain.lattice);
     }
 
-    getTransitionLabel(from: DataAbstractState, to: DataAbstractState): ProgramOperation[] {
+    getTransitionLabel(from: DataAbstractState, to: DataAbstractState): [ThreadState, ProgramOperation][] {
         throw new NotSupportedException();
     }
 
@@ -175,7 +176,7 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return [this._abstractDomain.lattice.top()];
     }
 
-    abstractSuccFor(fromState: DataAbstractState, op: ProgramOperation, co: Concern): Iterable<DataAbstractState> {
+    abstractSuccFor(fromState: DataAbstractState, op: ProgramOperationInContext, co: Concern): Iterable<DataAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
         return this._transferRelation.abstractSuccFor(fromState, op, co);

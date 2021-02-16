@@ -26,12 +26,11 @@
 
 import {LabeledTransferRelation} from "../TransferRelation";
 import {LabeledTransfer, LabelState} from "./LabelAbstractDomain";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
 import {List as ImmList} from "immutable";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
-
 
 export class LabelTransferRelation implements LabeledTransferRelation<LabelState> {
 
@@ -47,13 +46,14 @@ export class LabelTransferRelation implements LabeledTransferRelation<LabelState
         throw new NotSupportedException();
     }
 
-    abstractSuccFor(fromState: LabelState, op: ProgramOperation, co: Concern): Iterable<LabelState> {
+    abstractSuccFor(fromState: LabelState, opic: ProgramOperationInContext, co: Concern): Iterable<LabelState> {
         const result: LabelState[] = [];
-        for (const w of this._wrappedTransfer.abstractSuccFor(fromState.wrappedState, op, co)) {
+        for (const w of this._wrappedTransfer.abstractSuccFor(fromState.wrappedState, opic, co)) {
             result.push(fromState
-                .withTransfers(ImmList([new LabeledTransfer(fromState, op, this._bigStepProvider())]))
+                .withTransfers(ImmList([new LabeledTransfer(fromState, opic.thread, opic.op, this._bigStepProvider())]))
                 .withWrappedState(w));
         }
+
         return result;
     }
 

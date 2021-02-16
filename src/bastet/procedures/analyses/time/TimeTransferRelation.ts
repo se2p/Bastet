@@ -27,7 +27,11 @@
 import {LabeledTransferRelation, Transfers} from "../TransferRelation";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {ProgramOperation, ProgramOperationFactory} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {
+    ProgramOperation,
+    ProgramOperationFactory,
+    ProgramOperationInContext
+} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern, Concerns} from "../../../syntax/Concern";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ProgramTimeProfile} from "../../../utils/TimeProfile";
@@ -144,8 +148,8 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
         throw new IllegalStateException("Not intended to be used.");
     }
 
-    abstractSuccFor(fromState: TimeState, op: ProgramOperation, co: Concern): Iterable<TimeState> {
-        if (op.ast instanceof InitializeAnalysisStatement) {
+    abstractSuccFor(fromState: TimeState, opic: ProgramOperationInContext, co: Concern): Iterable<TimeState> {
+        if (opic.op.ast instanceof InitializeAnalysisStatement) {
             const initStmts: Statement[] = this._task.systemVariables.initStatements.elements;
 
             for (const itv of this._staticIntervals.values()) {
@@ -159,18 +163,18 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
                 initStmts.push(new StrengtheningAssumeStatement(assumeTimeMax));
             }
 
-            return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(), initStmts, [op], co)
+            return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(), initStmts, opic.thread, [opic.op], co)
                 .map((w) => fromState.withWrappedState(w));
         }
 
         let timeStatePrime = fromState;
-        if (op.ast instanceof BeginAtomicStatement) {
+        if (opic.op.ast instanceof BeginAtomicStatement) {
             timeStatePrime = timeStatePrime.withPushedBlock("block");
-        } else if (op.ast instanceof EndAtomicStatement) {
+        } else if (opic.op.ast instanceof EndAtomicStatement) {
             timeStatePrime = timeStatePrime.withPopBlock();
         }
 
-        const [minTimeMicrosExpr, maxTimeMicrosExpr, ops] = this.reinterprete(op);
+        const [minTimeMicrosExpr, maxTimeMicrosExpr, ops] = this.reinterprete(opic.op);
         let intermediateStatements: Statement[] = [];
 
         if (!this.isObserverConcern(co)) {
@@ -181,7 +185,7 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
             }
         }
 
-        return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(), intermediateStatements, ops, co)
+        return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(), intermediateStatements, opic.thread, ops, co)
             .map((w) => timeStatePrime.withWrappedState(w));
     }
 

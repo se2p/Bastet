@@ -36,6 +36,7 @@ import {WitnessHandler} from "./WitnessHandlers";
 import {LexiKey} from "../../utils/Lexicographic";
 import {AccessibilityRelation} from "./Accessibility";
 import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
+import {ThreadState} from "./control/ConcreteProgramState";
 
 /**
  * Central program analysis component---sometimes called `state interpreter`.
@@ -342,13 +343,13 @@ export interface TransitionLabelProvider<E extends AbstractElement> {
      * @param from
      * @param to
      */
-    getTransitionLabel(from: E, to: E): ProgramOperation[];
+    getTransitionLabel(from: E, to: E): [ThreadState, ProgramOperation][];
 
 }
 
 export class UnavailableTransitionLabelProvider<E extends AbstractState> implements TransitionLabelProvider<E> {
 
-    getTransitionLabel(from: E, to: E): ProgramOperation[] {
+    getTransitionLabel(from: E, to: E): [ThreadState, ProgramOperation][] {
         throw new NotSupportedException();
     }
 

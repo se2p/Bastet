@@ -39,7 +39,7 @@ import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {List as ImmList, Set as ImmSet} from "immutable";
@@ -49,6 +49,7 @@ import {LabelAbstractDomain, LabelState} from "./LabelAbstractDomain";
 import {LabelTransferRelation} from "./LabelTransferRelation";
 import {MergeJoinOperator} from "../Operators";
 import {SSAState} from "../ssa/SSAAbstractDomain";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 let bigStepNumber: number = 0; // FIXME: THIS IS A HACK
 
@@ -83,8 +84,8 @@ export class LabelAnalysis<F extends AbstractState>
         this._transfer = new LabelTransferRelation(wrappedAnalysis, () => bigStepNumber);
     }
 
-    getTransitionLabel(fromState: LabelState, toState: LabelState): ProgramOperation[] {
-        const worklist: [LabelState, ProgramOperation[]][] = [];
+    getTransitionLabel(fromState: LabelState, toState: LabelState): [ThreadState, ProgramOperation][] {
+        const worklist: [LabelState, [ThreadState, ProgramOperation][]][] = [];
         worklist.push([toState, []]);
 
         const relevantBigSteps = new Set<number>(toState.getTransfers().map((t) => t.getBigStep()));
@@ -93,8 +94,10 @@ export class LabelAnalysis<F extends AbstractState>
             const [work, workOps] = worklist.pop();
             for (const t of work.getTransfers()) {
                 if (relevantBigSteps.has(t.getBigStep())) {
-                    const workOpsPrime = [t.getOp()].concat(workOps);
+                    const opic: [ThreadState, ProgramOperation] = [t.getThreadState(), t.getOp()];
+                    const workOpsPrime: [ThreadState, ProgramOperation][] = [opic].concat(workOps);
                     const from = t.getFrom() as LabelState;
+
                     if (from == fromState) {
                         return workOpsPrime;
                     } else {
@@ -111,7 +114,7 @@ export class LabelAnalysis<F extends AbstractState>
         return this._transfer.abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: LabelState, op: ProgramOperation, co: Concern): Iterable<LabelState> {
+    abstractSuccFor(fromState: LabelState, op: ProgramOperationInContext, co: Concern): Iterable<LabelState> {
         return this._transfer.abstractSuccFor(fromState, op, co);
     }
 
