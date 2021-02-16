@@ -15,7 +15,7 @@ actor Game is ScratchSprite begin
     script on startup do begin
         define score as 0
         define max as 100
-        repeat 5 times begin
+        repeat 3 times begin
             define a as randomBetween(1, max)
             define b as randomBetween(1, max)
             myAskAndWait(a, b)

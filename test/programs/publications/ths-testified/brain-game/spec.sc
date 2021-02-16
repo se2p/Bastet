@@ -69,7 +69,7 @@ actor ProgramObserver is Observer begin
 
                 if expected = entered then begin
                     define correct as correct + 1
-                    if correct = 5 then begin
+                    if correct = 3 then begin
                         define state as 2
                         define stateEntered as _RUNTIME_micros()
                     end
