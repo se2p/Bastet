@@ -28,26 +28,16 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {ActorId} from "../../../syntax/app/Actor";
-import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {
-    ConcreteDomain,
-    ConcreteElement,
-    ConcreteUnifiedMemory
-} from '../../domains/ConcreteElements'
+import {ConcreteDomain, ConcreteElement, ConcreteUnifiedMemory} from '../../domains/ConcreteElements'
 import {App} from "../../../syntax/app/App";
 import {AfterStatementMonitoringEvent, SingularityEvent, TerminationEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Property} from "../../../syntax/Property";
 import {Preconditions} from "../../../utils/Preconditions";
-import {
-    DataLocation,
-    DataLocations,
-    VAR_SCOPING_SPLITTER
-} from "../../../syntax/app/controlflow/DataLocation";
+import {DataLocation, DataLocations, VAR_SCOPING_SPLITTER} from "../../../syntax/app/controlflow/DataLocation";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {AbstractionPrecision} from "../../AbstractionPrecision";
-import {DataLocationScoper} from "./DataLocationScoping";
 import {
     ConcreteProgramState,
     RelationLocation,
@@ -364,8 +354,9 @@ export class ControlAbstractDomain implements AbstractDomain<ConcreteProgramStat
         const m = element as ConcreteUnifiedMemory;
 
         const splitTargetPrefixFromAttribute = (attributeWithTargetName: string): {attribute: string, target: string} => {
-            const target = DataLocationScoper.leftUnwrapScope(attributeWithTargetName).prefix;
-            const attribute = DataLocationScoper.rightUnwrapScope(attributeWithTargetName).suffix;
+            const parts = attributeWithTargetName.split(VAR_SCOPING_SPLITTER);
+            const target = parts[0];
+            const attribute = parts.slice(1).join(VAR_SCOPING_SPLITTER);
             return {attribute, target};
         }
 
