@@ -872,8 +872,10 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     /**
      * A random integer in the interval [from, to],
      * that is, both end points are included.
+     * Only intended for internal use within this library,
+     * should not be used directly by programs that build upon the library.
      */
-    define randomIntegerBetween (intervalStart: integer, intervalEnd: integer) begin
+    define internalRandomBetween (intervalStart: integer, intervalEnd: integer) begin
         assume result >= intervalStart
         assume result <= intervalEnd
     end returns result: integer
@@ -882,7 +884,7 @@ role RuntimeEntity is MathActor, KeyboardIO begin
      * See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
      */
     define randomBetween (intervalStart: integer, intervalEnd: integer) begin
-        define result as randomIntegerBetween(intervalStart, intervalEnd)
+        define result as internalRandomBetween(intervalStart, intervalEnd)
     end returns result: integer
 
     define getGraphicIdByIndex (idx: integer) begin
@@ -1695,8 +1697,8 @@ role ScratchSprite is ScratchEntity begin
     @ Block "go to (random position v)"
     @ Opcode "motion_goto"
     define atomic goToRandomPosition () begin
-        define x as randomIntegerBetween(0-240, 240)
-        define y as randomIntegerBetween(0-180, 180)
+        define x as internalRandomBetween(0-240, 240)
+        define y as internalRandomBetween(0-180, 180)
     end
 
     @ Category "Motion"
@@ -2214,7 +2216,7 @@ role ScratchStage is ScratchEntity begin
     define atomic randomBackdrop () begin
          declare idx as integer
          define idx as getGraphicIndexById(activeGraphicName)
-         define idx as randomIntegerBetween(0, getNumGraphics()-1)
+         define idx as internalRandomBetween(0, getNumGraphics()-1)
 
          declare id as string
          define id as getGraphicIdByIndex(currentIdx)
