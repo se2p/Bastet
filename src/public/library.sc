@@ -73,7 +73,6 @@ actor IOActor is RuntimeEntity begin
         // Hack as long no other dispatch handling is in place
         repeat forever begin
             makeInputVariablesNonDet()
-         _RUNTIME_signalFailure("Test MsgLoop")
 
             define mouseClicked as mouseDown and not lastMouseDown
             if mouseClicked then begin
