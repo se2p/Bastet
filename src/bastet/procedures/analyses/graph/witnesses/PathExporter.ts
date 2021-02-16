@@ -31,9 +31,10 @@ import {Preconditions} from "../../../../utils/Preconditions";
 import {GraphReachedSetWrapper} from "../GraphStatesSetWrapper";
 import {TransitionLabelProvider, WrappingProgramAnalysis} from "../../ProgramAnalysis";
 import {
+    asUnifiedMemory,
     ConcreteBoolean,
-    ConcreteElement,
-    ConcreteNumber,
+    ConcreteElement, ConcreteFloat, ConcreteInteger,
+    ConcreteNumber, ConcreteProgramState,
     ConcreteString,
     ConcreteUnifiedMemory
 } from "../../../domains/ConcreteElements";
@@ -87,18 +88,19 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
     }
 
     private exportTargetState(ar: AccessibilityRelation<GraphAbstractState>, testifiedSeq: [GraphAbstractState, ConcreteElement][], violating: GraphAbstractState) {
-        const [violatingAbstract, violatingConcreteElement] = testifiedSeq[testifiedSeq.length-1];
-        Preconditions.checkArgument(violatingConcreteElement instanceof ConcreteUnifiedMemory);
-        const errorState: ConcreteUnifiedMemory = violatingConcreteElement as ConcreteUnifiedMemory;
+        const [_, violatingConcreteElement] = testifiedSeq[testifiedSeq.length-1];
+        const errorState: ConcreteUnifiedMemory = asUnifiedMemory(violatingConcreteElement);
 
         const filepath = `output/cex_target_${violating.getId()}.json`;
-        const targetJson: {} = {'boolean': {}, 'number': {}, 'string': {}};
+        const targetJson: {} = {'boolean': {}, 'integer': {}, 'float': {}, 'string': {}};
         for (const k of errorState.variables()) {
             const v = errorState.getValue(k);
             if (v instanceof ConcreteString) {
                 targetJson['string'][k] = v.value;
-            } else if (v instanceof ConcreteNumber) {
-                targetJson['number'][k] = v.value;
+            } else if (v instanceof ConcreteInteger) {
+                targetJson['integer'][k] = v.value;
+            } else if (v instanceof ConcreteFloat) {
+                targetJson['float'][k] = v.value;
             } else if (v instanceof ConcreteBoolean) {
                 targetJson['boolean'][k] = v.value;
             } else {
@@ -106,7 +108,7 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
             }
         }
 
-        let fs = require('fs');
+        const fs = require('fs');
         fs.writeFileSync(filepath, JSON.stringify(targetJson, null, 4));
     }
 
@@ -114,18 +116,16 @@ export class PathExporter implements WitnessHandler<GraphAbstractState> {
         const pathElements = [];
 
         for (const [e, c] of testifiedSeq) {
-            if (c instanceof ConcreteUnifiedMemory) {
-                const elementJson = {};
-                 for (const k of c.variables()) {
-                    if (k.indexOf("__op_time_") == 0) {
-                        continue;
-                 }
-                    elementJson[k] = c.getValue(k).value;
-                 }
-                pathElements.push({'id': e.getId(), 'mem': elementJson});
-            } else {
-                throw new IllegalArgumentException(`Not supported: ${c.constructor.name}`);
-            }
+            const co = asUnifiedMemory(c);
+
+            const elementJson = {};
+             for (const k of co.variables()) {
+                if (k.indexOf("__op_time_") == 0) {
+                    continue;
+             }
+                elementJson[k] = co.getValue(k).value;
+             }
+            pathElements.push({'id': e.getId(), 'mem': elementJson});
         }
 
         let fs = require('fs');
