@@ -104,9 +104,30 @@ export class ErrorWitnessStep {
     }
 }
 
-export class Mock {
-    forFunction: string;
-    outputs: (string | number | boolean) [];
+export interface Mock {
+    readonly forFunction: string;
+}
+
+export class ReturnValueMock<T> implements Mock {
+    readonly forFunction: string;
+    readonly returnValues: T[];
+    readonly index: number;
+
+    constructor(forFunction: string, returnValues: T[]) {
+        this.forFunction = forFunction;
+        this.returnValues = returnValues;
+        this.index = 0;
+    }
+}
+
+export class AssignmentMock implements Mock {
+    readonly forFunction: string;
+    readonly assignments: {"actorName": string, "values": {}[], "index": number}[];
+
+    constructor(forFunction: string, assignments: {"actorName": string, "values": {}[], "index": number}[]) {
+        this.forFunction = forFunction;
+        this.assignments = assignments;
+    }
 }
 
 export class ErrorWitness {
