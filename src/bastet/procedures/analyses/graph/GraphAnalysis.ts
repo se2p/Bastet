@@ -170,10 +170,11 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     abstractSucc(fromState: GraphAbstractState): Iterable<GraphAbstractState> {
         const result: GraphAbstractState[] = [];
         for (const succ of this._transferRelation.abstractSucc(fromState)) {
-            if (this.target(succ).length > 0) {
+            const targetFor = this.target(succ);
+            if (targetFor.length > 0) {
                 // Only add feasible states (avoids to check the feasibility of the full trace, if done in the refiner)
                 if (this._config.checkTargetFeasibility) {
-                    if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Block Target Feasibility")) {
+                    if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Block Target Feasibility for " + targetFor.toString())) {
                         continue;
                     }
                 }
