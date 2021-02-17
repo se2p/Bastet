@@ -34,62 +34,62 @@ actor Stage is ScratchStage begin
         initGlobalVars()
     end
 
-end 
+end
 
-actor Cat is ScratchSprite begin 
+actor Cat is ScratchSprite begin
     image cat "a766526df119fa81f51c4a94caccb725.svg"
     sound Meow "83c36d806dc92327b9e7049a565c6bff.wav"
 
-    define randomizePosition () begin 
+    define randomizePosition () begin
         define x as x + randomBetween((0-210), 210)
         define y as randomBetween((0-150), 150)
-    end 
+    end
 
-    define stepUp () begin 
+    define stepUp () begin
         if (Stage.steps > 0) then begin
             if ((y + Stage.tileHeight) < (y + Stage.tileHeight)) then begin
                 changeYBy(Stage.tileHeight)
                 stepTaken()
-            end 
-        end 
-    end 
+            end
+        end
+    end
 
-    define stepDown () begin 
+    define stepDown () begin
         if (Stage.steps > 0) then begin
             if (mathAbsF(y - Stage.tileHeight) < mathAbsF(y - Stage.tileHeight)) then begin
                 changeYBy(0 - Stage.tileHeight)
                 stepTaken()
-            end 
-        end 
-    end 
+            end
+        end
+    end
 
-    define stepLeft () begin 
+    define stepLeft () begin
         if (Stage.steps > 0) then begin
             if (mathAbsF(x - Stage.tileWidth) < mathAbsF(x - Stage.tileWidth)) then begin
                 changeXBy(0 - Stage.tileWidth)
                 stepTaken()
-            end 
-        end 
-    end 
+            end
+        end
+    end
 
-    define stepRight () begin 
+    define stepRight () begin
         if (Stage.steps > 0) then begin
             if ((x + Stage.tileWidth) < (x + Stage.tileWidth)) then begin
                 changeXBy(Stage.tileWidth)
                 stepTaken()
-            end 
-        end 
-    end 
+            end
+        end
+    end
 
-    define stepTaken () begin 
+    define stepTaken () begin
         define Stage.steps as Stage.steps + (0-1)
-        if (touchingObject(locate actor "Fishbowl")) then begin 
-            broadcast "Got you" and wait 
-        end else begin 
+        if (touchingObject(locate actor "Fishbowl")) then begin
+            broadcast "Got you" and wait  <-- not having this statement makes the program UNSAFE
+        end else begin
             if (Stage.steps = 0) then begin
                 sayTextFor("Oh no!", 2)
-            end 
-        end 
+            end
+        end
     end
 
     script on bootstrap do begin
@@ -97,45 +97,45 @@ actor Cat is ScratchSprite begin
         hide()
     end
 
-    script on startup do begin 
+    script on startup do begin
         randomizePosition()
         show()
-    end 
+    end
 
     script on message "KEY_38_PRESSED" () in "SYSTEM" do begin
         stepUp()
-    end 
+    end
 
     script on message "KEY_40_PRESSED" () in "SYSTEM" do begin
         stepDown()
-    end 
+    end
 
     script on message "KEY_37_PRESSED" () in "SYSTEM" do begin
         stepLeft()
-    end 
+    end
 
     script on message "KEY_39_PRESSED" () in "SYSTEM" do begin
         stepRight()
-    end 
+    end
 
-end 
+end
 
-actor Fishbowl is ScratchSprite begin 
+actor Fishbowl is ScratchSprite begin
     image strid "Fishbowl-a" "17c53cf0296f24722ba5b001d513e58f.svg"
     image strid "Fishbowl-b" "b3db01c5cda32fe3ea0b48dde5fa8130.svg"
     sound strid "water drop" "aa488de9e2c871e9d4faecd246ed737a.wav"
 
-    define randomizePosition () begin 
+    define randomizePosition () begin
         define x as x + randomBetween((0-210), 210)
         define y as randomBetween((0-150), 150)
-    end 
+    end
 
     script on bootstrap do begin
         changeActiveGraphicTo("Fishbowl-a")
         hide()
     end
 
-    script on startup do begin 
+    script on startup do begin
         define size as 150
         changeCostumeTo("Fishbowl-a")
         randomizePosition()
