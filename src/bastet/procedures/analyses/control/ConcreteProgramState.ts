@@ -25,7 +25,7 @@
 
 
 import {Optional} from "../../../utils/Optional";
-import {ConcreteElement, ConcreteUnifiedMemory} from "../../domains/ConcreteElements";
+import {ConcreteElement, ConcretePrimitiveValue, ConcreteUnifiedMemory} from "../../domains/ConcreteElements";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {ActorId} from "../../../syntax/app/Actor";
@@ -36,6 +36,8 @@ import {OperationId} from "../../../syntax/app/controlflow/ops/ProgramOperation"
 import {Property} from "../../../syntax/Property";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
+import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
+import {VAR_SCOPING_SPLITTER} from "../../../syntax/app/controlflow/DataLocation";
 
 /**
  * Current thread state that is active or becomes active if...
@@ -391,6 +393,28 @@ export class ConcreteProgramState extends ConcreteProgramStateRecord implements 
 
     public getEnrichedFrom(): Optional<ConcreteUnifiedMemory> {
         return this.enrichedFrom;
+    }
+
+    public getValueFor(variable: VariableWithDataLocation): ConcretePrimitiveValue<any> {
+        // Decompose the qualified name: [Actor@]script@varName@ssaIndex
+        let parts = variable.qualifiedName.split(VAR_SCOPING_SPLITTER);
+
+        // Step 1: Check if an SSA index is present (would be the last element in the array) and remove it if necessary.
+        const ssaIndexPresent = parseInt(parts[parts.length - 1]);
+        if (ssaIndexPresent) {
+            parts = parts.slice(0, parts.length - 1);
+        }
+
+        // Step 2: Retrieve the concrete value for the given variable.
+        if (parts.length === 2) { // global variable (no actor name)
+            return this.globalState.getValue(parts.join(VAR_SCOPING_SPLITTER));
+        } else if (parts.length === 3) { // scoped variable, actor name is present
+            const actorName = parts[0];
+            const scriptAndVarName = parts.slice(1, parts.length).join(VAR_SCOPING_SPLITTER);
+            return this.getActorMemory(actorName).getValue(scriptAndVarName);
+        } else {
+            throw new IllegalArgumentException(`malformed qualified name ${variable.qualifiedName}`);
+        }
     }
 }
 

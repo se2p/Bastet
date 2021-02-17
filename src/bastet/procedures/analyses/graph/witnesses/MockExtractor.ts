@@ -27,12 +27,11 @@ import {ProgramOperation} from "../../../../syntax/app/controlflow/ops/ProgramOp
 import {CallStatement} from "../../../../syntax/ast/core/statements/CallStatement";
 import {ReturnStatement} from "../../../../syntax/ast/core/statements/ControlStatement";
 import {Preconditions} from "../../../../utils/Preconditions";
-import {ConcreteProgramState} from "../../../domains/ConcreteElements";
 import {VariableWithDataLocation} from "../../../../syntax/ast/core/Variable";
 import {Identifier} from "../../../../syntax/ast/core/Identifier";
 import {DataLocations} from "../../../../syntax/app/controlflow/DataLocation";
 import {IntegerType} from "../../../../syntax/ast/core/ScratchType";
-import {ThreadState} from "../../control/ConcreteProgramState";
+import {ConcreteProgramState, ThreadState} from "../../control/ConcreteProgramState";
 
 /**
  * Can be applied to error paths to generate mocks of (probabilistic) functions. These mocks are useful in case one
@@ -138,15 +137,9 @@ export class RandomPositionMockExtractor implements MockExtractor {
                     "there should have been a call statement prior to the return statement")
                 const methodName = this._callStacks.get(actorName).pop();
                 if (this.methodName() === methodName) {
-                    // The sprite's "x" and "y" attributes containing the coordinates of the current location.
-                    const xAttr = DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance());
-                    const yAttr = DataLocations.createTypedLocation(Identifier.of("y"), IntegerType.instance());
+                    const xVal = cp.getActorMemory(actorName).getValue("x").value;
+                    const yVal = cp.getActorMemory(actorName).getValue("y").value;
 
-                    const xVar = new VariableWithDataLocation(xAttr);
-                    const yVar = new VariableWithDataLocation(yAttr)
-
-                    const xVal = cp.getValueFor(xVar).value;
-                    const yVal = cp.getValueFor(yVar).value;
                     Preconditions.checkState(Number.isInteger(xVal),
                         `x-coordinate of ${this.methodName} should have been a number`);
                     Preconditions.checkState(Number.isInteger(yVal),
