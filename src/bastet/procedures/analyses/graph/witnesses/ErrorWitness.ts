@@ -110,21 +110,21 @@ export interface Mock {
 
 export class ReturnValueMock<T> implements Mock {
     readonly forFunction: string;
-    readonly returnValues: T[];
+    readonly returns: T[];
     readonly index: number;
 
     constructor(forFunction: string, returnValues: T[]) {
         this.forFunction = forFunction;
-        this.returnValues = returnValues;
+        this.returns = returnValues;
         this.index = 0;
     }
 }
 
 export class AssignmentMock implements Mock {
     readonly forFunction: string;
-    readonly assignments: {"actorName": string, "values": {}[], "index": number}[];
+    readonly assignments: {"actor": string, "assigns": {}[], "index": number}[];
 
-    constructor(forFunction: string, assignments: {"actorName": string, "values": {}[], "index": number}[]) {
+    constructor(forFunction: string, assignments: {"actor": string, "assigns": {}[], "index": number}[]) {
         this.forFunction = forFunction;
         this.assignments = assignments;
     }

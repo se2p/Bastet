@@ -162,7 +162,7 @@ export class RandomPositionMockExtractor implements MockExtractor {
     getMock(): Mock {
         const assignments = [];
         for (const [actorName, values] of this._coordinates.entries()) {
-            assignments.push({"actorName": actorName, "values": values, "index": 0})
+            assignments.push({"actor": actorName, "assigns": values, "index": 0})
         }
         return new AssignmentMock(this._methodName, assignments);
     }
