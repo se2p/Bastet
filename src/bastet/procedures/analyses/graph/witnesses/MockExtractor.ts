@@ -111,19 +111,11 @@ export class RandomIntegerMockExtractor implements MockExtractor {
 
 export class RandomPositionMockExtractor implements MockExtractor {
 
-    // TODO: there could be multiple calls for random position per actor and also multiple actors that call the method
-    //  -> need to use a dictionary of some sort:
-    /*
-    private readonly _returnValues = {
-        "Cat" : [ { "x" : 42, "y" : 7}, {"x" : 0, "y" : 12} ],
-        "Dog" : [ { "x" : 13, "y" : 27}, {"x" : 7, "y" : 23} ] // etc.
-    }
-     */
+    private readonly _coordinates: Map<string, {"x": number, "y": number}[]>
+        = new Map<string, {x: number; y: number}[]>();
 
-    // TODO: for now, we limit ourselves to just a single sprite
-    private readonly _coordinates: {"x": number, "y": number}[] = [];
-
-    private readonly _callStack: string[] = []; // TODO: every thread needs its own stack
+    /** Models a call stack for every thread (identified by its actor name). */
+    private readonly _callStacks: Map<string, string[]> = new Map<string, string[]>();
 
     methodName(): string {
         return "goToRandomPosition";
@@ -131,15 +123,22 @@ export class RandomPositionMockExtractor implements MockExtractor {
 
     processOperations(operations: [ThreadState, ProgramOperation][], cp: ConcreteProgramState): void {
         for (const [threadState, operation] of operations) {
+            const actorName = threadState.getActorId();
             const ast = operation.ast;
             if (ast instanceof CallStatement) {
                 const callStmt = ast as CallStatement;
                 const methodName = callStmt.calledMethod.text;
-                this._callStack.push(methodName);
+                if (this._callStacks.has(actorName)) {
+                    this._callStacks.get(actorName).push(methodName);
+                } else {
+                    this._callStacks.set(actorName, [methodName]);
+                }
             } else if (ast instanceof ReturnStatement) {
-                const methodName = this._callStack.pop();
+                Preconditions.checkState(this._callStacks.has(actorName),
+                    "there should have been a call statement prior to the return statement")
+                const methodName = this._callStacks.get(actorName).pop();
                 if (this.methodName() === methodName) {
-                    // The sprites "x" and "y" attributes containing the coordinates of the current location.
+                    // The sprite's "x" and "y" attributes containing the coordinates of the current location.
                     const xAttr = DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance());
                     const yAttr = DataLocations.createTypedLocation(Identifier.of("y"), IntegerType.instance());
 
@@ -153,7 +152,12 @@ export class RandomPositionMockExtractor implements MockExtractor {
                     Preconditions.checkState(Number.isInteger(yVal),
                         `y-coordinate of ${this.methodName} should have been a number`);
 
-                    this._coordinates.push({"x": xVal, "y": yVal});
+                    const coordinates = {"x": xVal, "y": yVal};
+                    if (this._coordinates.has(actorName)) {
+                        this._coordinates.get(actorName).push(coordinates);
+                    } else {
+                        this._coordinates.set(actorName, [coordinates]);
+                    }
                 }
             }
         }
