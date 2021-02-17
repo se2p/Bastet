@@ -54,6 +54,7 @@ import {
     SpriteClickBroadcastActionExtractor,
 } from "./ActionExtractor";
 import {GLOBAL_TIME_MICROS_VAR} from "../../../../syntax/app/SystemVariables";
+import {MockExtractor, RandomIntegerMockExtractor, RandomPositionMockExtractor} from "./MockExtractor";
 import {ConcreteProgramState, RelationLocation, ThreadState} from "../../control/ConcreteProgramState";
 
 export interface WitnessExporterConfig {
@@ -177,8 +178,11 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             new MouseDownActionExtractor(),
             new SpriteClickBroadcastActionExtractor(),
             new AnswerActionExtractor(),
-            new KeyPressedActionExtractor()
-            // TODO: Aufrufe von RNG extrahieren mit einem neuen Extractor
+            new KeyPressedActionExtractor(),
+        ];
+        const mockExtractors: MockExtractor[] = [
+            new RandomIntegerMockExtractor(),
+            new RandomPositionMockExtractor()
         ];
 
         const ssaStateVisitor = new SSAStateVisitor();
@@ -209,6 +213,10 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
                 for (const actionExtractor of actionExtractors) {
                     actionExtractor.processOperations(transitionLabel, step);
+                }
+
+                for (const mockExtractor of mockExtractors) {
+                    mockExtractor.processOperations(transitionLabel, cp);
                 }
 
                 step.epsilonType = this.getDefaultAction(transitionLabel);
@@ -251,6 +259,10 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         if (this._config.collapseAtomicBlocks) {
             errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
+        }
+
+        for (const mockExtractor of mockExtractors) {
+            errorWitness.mocks.push(mockExtractor.getMock());
         }
 
         return errorWitness;
