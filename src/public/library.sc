@@ -58,6 +58,8 @@ actor IOActor is RuntimeEntity begin
 
     script on bootstrap do begin
         define askActive as false
+        define keyPressed as 0
+        define lastKeyPressed as 0
     end
 
     script on message "ASK" () in "SYSTEM" do begin
@@ -75,6 +77,7 @@ actor IOActor is RuntimeEntity begin
             makeInputVariablesNonDet()
 
             define mouseClicked as mouseDown and not lastMouseDown
+
             if mouseClicked then begin
                 broadcast "CLICK" () to "SYSTEM"
             end
@@ -125,7 +128,7 @@ role KeyboardIO begin
         end else if s = "ArrowLeft" or s = "Left" then begin
             define result as KEY_LEFT
         end else if s = "ArrowRight" or s = "Right" then begin
-            define result as KEY_LEFT
+            define result as KEY_RIGHT
         end else if s = "ArrowUp" or s = "Up" then begin
             define result as KEY_UP
         end else if s = "ArrowDown" or s = "Down" then begin
