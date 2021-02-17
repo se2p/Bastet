@@ -222,7 +222,7 @@ export class KeyPressedActionExtractor extends QueryMethodActionExtractor {
 
         const scopedKeyCodeVariableActorAndSSA = assignment.methodParameters[0];
 
-        let unwrapped = DataLocationScoper.rightUnwrapScope(scopedKeyCodeVariableActorAndSSA).prefix;
+        const unwrapped = DataLocationScoper.rightUnwrapScope(scopedKeyCodeVariableActorAndSSA).prefix;
 
         step.keyPressed = step.getVariableValue(step.actionTargetName, unwrapped);
     }

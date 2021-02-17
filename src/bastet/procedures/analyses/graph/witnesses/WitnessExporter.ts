@@ -191,7 +191,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             const relationLocation = this.getRelationLocationForState(e);
             step.actionTargetName = relationLocation ? relationLocation.getActorId() : undefined;
 
-            const globalTime = cp.globalState.get(GLOBAL_TIME_MICROS_VAR);
+            const globalTime = cp.globalState.getValue(GLOBAL_TIME_MICROS_VAR);
             step.timestamp = globalTime ? globalTime.value : 0;
 
             for (const actor of cp.getActors()) {
@@ -223,7 +223,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             errorWitness.steps = WitnessExporter.removeAllBeforeAction(errorWitness.steps, Action.INITIAL_STATE);
         }
 
-        let alteredSteps = [];
+        const alteredSteps = [];
         const steps = errorWitness.steps;
         while (steps.length > 0) {
             const step = steps.shift();
@@ -279,8 +279,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         let prevStep: ErrorWitnessStep;
 
-        for (let i = 1; i < errorWitnessSteps.length; i++) {
-            const step = errorWitnessSteps[i];
+        for (const step of errorWitnessSteps) {
             if (step.action !== undefined) {
                 if (prevStep) {
                     prevStep.action = Action.WAIT;

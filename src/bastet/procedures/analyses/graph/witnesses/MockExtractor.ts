@@ -27,10 +27,6 @@ import {ProgramOperation} from "../../../../syntax/app/controlflow/ops/ProgramOp
 import {CallStatement} from "../../../../syntax/ast/core/statements/CallStatement";
 import {ReturnStatement} from "../../../../syntax/ast/core/statements/ControlStatement";
 import {Preconditions} from "../../../../utils/Preconditions";
-import {VariableWithDataLocation} from "../../../../syntax/ast/core/Variable";
-import {Identifier} from "../../../../syntax/ast/core/Identifier";
-import {DataLocations} from "../../../../syntax/app/controlflow/DataLocation";
-import {IntegerType} from "../../../../syntax/ast/core/ScratchType";
 import {ConcreteProgramState, ThreadState} from "../../control/ConcreteProgramState";
 
 /**
@@ -63,8 +59,6 @@ export class RandomIntegerMockExtractor implements MockExtractor {
      */
     private readonly _returnValues: number[] = [];
 
-    private readonly _methodName: string = "randomBetween";
-
     /**
      * Whether the method to mock has already been encountered while processing the transition labels of a given path.
      * error witness path.
@@ -72,7 +66,7 @@ export class RandomIntegerMockExtractor implements MockExtractor {
     private _methodEncountered: boolean = false;
 
     methodName(): string {
-        return this._methodName;
+        return "randomBetween";
     }
 
     processOperations(transitionLabel: [ThreadState, ProgramOperation][], successorState: ConcreteProgramState): void {
@@ -88,18 +82,18 @@ export class RandomIntegerMockExtractor implements MockExtractor {
             if (!this._methodEncountered && ast instanceof CallStatement) { // method to mock has been called
                 const callStmt = ast as CallStatement;
                 const methodName = callStmt.calledMethod.text;
-                if (this._methodName === methodName) {
+                if (this.methodName() === methodName) {
                     this._methodEncountered = true;
                 }
             } else if (this._methodEncountered && ast instanceof ReturnStatement) { // method to mock has returned
                 const returnStmt = ast as ReturnStatement;
                 Preconditions.checkState(returnStmt.resultVariable.isPresent(),
-                    `return value for ${this._methodName} should have been present`);
+                    `return value for ${this.methodName()} should have been present`);
                 const resultVariable = returnStmt.resultVariable.value();
 
                 const resultValue = successorState.getValueFor(resultVariable).value;
                 Preconditions.checkState(Number.isInteger(resultValue),
-                    `result of calling ${this._methodName} should have been an integer`);
+                    `result of calling ${this.methodName()} should have been an integer`);
                 this._returnValues.push(resultValue);
 
                 this._methodEncountered = false;
@@ -108,8 +102,10 @@ export class RandomIntegerMockExtractor implements MockExtractor {
     }
 }
 
+/** A mock extractor for the `goToRandomPosition` block. */
 export class RandomPositionMockExtractor implements MockExtractor {
 
+    /** The x- and y-coordinates returned by "goToRandomPosition", grouped by actor. */
     private readonly _coordinates: Map<string, {"x": number, "y": number}[]>
         = new Map<string, {x: number; y: number}[]>();
 
@@ -124,9 +120,14 @@ export class RandomPositionMockExtractor implements MockExtractor {
         for (const [threadState, operation] of operations) {
             const actorName = threadState.getActorId();
             const ast = operation.ast;
+
             if (ast instanceof CallStatement) {
                 const callStmt = ast as CallStatement;
                 const methodName = callStmt.calledMethod.text;
+
+                // We need to group the methods calls by actors. Invoking "goToRandomPosition" changes the state of
+                // the current actor (as opposed to "randomBetween", which does not expose any side effects to the
+                // outside world.) Moreover, the scheduler might interleave method calls of different actors.
                 if (this._callStacks.has(actorName)) {
                     this._callStacks.get(actorName).push(methodName);
                 } else {
@@ -137,6 +138,8 @@ export class RandomPositionMockExtractor implements MockExtractor {
                     "there should have been a call statement prior to the return statement")
                 const methodName = this._callStacks.get(actorName).pop();
                 if (this.methodName() === methodName) {
+                    // When "goToRandomPosition" is popped off the stack again we know that the new x- and y-coordinate
+                    // are now readily available in the actor memory.
                     const xVal = cp.getActorMemory(actorName).getValue("x").value;
                     const yVal = cp.getActorMemory(actorName).getValue("y").value;
 
