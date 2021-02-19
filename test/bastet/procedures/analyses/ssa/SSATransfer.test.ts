@@ -26,13 +26,17 @@ import {SSATransferRelation} from "../../../../../src/bastet/procedures/analyses
 import {AbstractMockElement, TransferRelationMock} from "../../TransferRelationMock";
 import {SSAState} from "../../../../../src/bastet/procedures/analyses/ssa/SSAAbstractDomain";
 import {IntegerType, ScratchType} from "../../../../../src/bastet/syntax/ast/core/ScratchType";
-import {ProgramOperationFactory} from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
+import {
+    ProgramOperationFactory,
+    ProgramOperationInContext
+} from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
 import {StoreEvalResultToVariableStatement} from "../../../../../src/bastet/syntax/ast/core/statements/SetStatement";
 import {VariableWithDataLocation} from "../../../../../src/bastet/syntax/ast/core/Variable";
 import {DataLocations} from "../../../../../src/bastet/syntax/app/controlflow/DataLocation";
 import {Identifier} from "../../../../../src/bastet/syntax/ast/core/Identifier";
 import {Concerns} from "../../../../../src/bastet/syntax/Concern";
 import {PlusExpression} from "../../../../../src/bastet/syntax/ast/core/expressions/NumberExpression";
+import {ThreadStateFactory} from "../../../../../src/bastet/procedures/analyses/control/ConcreteProgramState";
 
 describe('SSA Transfer Relation', function() {
 
@@ -46,8 +50,8 @@ describe('SSA Transfer Relation', function() {
             new AbstractMockElement(0)
         );
 
-        const result = ssaTr.abstractSuccFor(ssaState, ProgramOperationFactory.createFor(
-            new StoreEvalResultToVariableStatement(varA, new PlusExpression(varA, varA))),
+        const result = ssaTr.abstractSuccFor(ssaState, new ProgramOperationInContext(ProgramOperationFactory.createFor(
+            new StoreEvalResultToVariableStatement(varA, new PlusExpression(varA, varA))), ThreadStateFactory.dummy()),
             Concerns.defaultProgramConcern());
 
         expect(result).toHaveLength(1);
