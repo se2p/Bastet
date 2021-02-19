@@ -76,7 +76,10 @@ import {ParameterDeclaration, ParameterDeclarationList} from "../../../syntax/as
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {DataLocation, DataLocations} from "../../../syntax/app/controlflow/DataLocation";
-import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements/DeclarationStatement";
+import {
+    DeclareActorVariableStatement,
+    DeclareStackVariableStatement, DeclareSystemVariableStatement
+} from "../../../syntax/ast/core/statements/DeclarationStatement";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
 import {
     extractStringLiteral,
@@ -137,6 +140,10 @@ import {incBigStep} from "../label/LabelAnalysis";
 import {EpsilonStatement} from "../../../syntax/ast/core/statements/EpsilonStatement";
 import {StopAllStatement} from "../../../syntax/ast/core/statements/TerminationStatement";
 import {ControlAbstractState, IndexedThread} from "./ControlAbstractDomain";
+import {
+    BranchingAssumeStatement,
+    StrengtheningAssumeStatement
+} from "../../../syntax/ast/core/statements/AssumeStatement";
 
 /**
  * Mimics the green-threading of the Scratch VM.
@@ -878,15 +885,23 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         let result: ControlAbstractState = inState;
 
         const concern = this.getStepConcern(inState);
-        const isEpsilon = step.ops.filter((o) => o.ast instanceof EpsilonStatement).length == step.ops.length;
+        const isBehaviorUnrelated = step.ops.filter((o) =>
+            o.ast instanceof EpsilonStatement
+            || o.ast instanceof BranchingAssumeStatement
+            || o.ast instanceof StrengtheningAssumeStatement
+            || o.ast instanceof BroadcastMessageStatement
+            || o.ast instanceof BroadcastAndWaitStatement
+            || o.ast instanceof DeclareActorVariableStatement
+            || o.ast instanceof DeclareStackVariableStatement
+            || o.ast instanceof DeclareSystemVariableStatement
+            || o.ast instanceof CallStatement).length > 0;
 
         //  1. Activate the specification check thread (`after statement finished`)
         //  (if the stepped thread is a program thread)
-        if (!isEpsilon) {
+        if (!isBehaviorUnrelated) {
             if (this.isProgramConcern(concern)) {
                 for (const [threadIndex, threadState] of inState.getThreadStates().entries()) {
                     const actor: Actor = this._task.getActorByName(threadState.getActorId());
-                    const isSpecificationThread = actor.isObserver;
                     const script = actor.getScript(threadState.getScriptId());
 
                     if (script.event instanceof AfterStatementMonitoringEvent) {
