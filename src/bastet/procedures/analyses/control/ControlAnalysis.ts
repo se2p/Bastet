@@ -37,7 +37,7 @@ import {Preconditions} from "../../../utils/Preconditions";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
 import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractState, Lattices} from "../../../lattices/Lattice";
 import {Property} from "../../../syntax/Property";
 import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
@@ -78,6 +78,10 @@ export class ControlAnalysisConfig extends BastetConfiguration {
         // TODO: im predicateAbstraction branch in der predicate-abstraction.json diesen Parameter noch auf true
         //  setzen
         return this.getBoolProperty('widen-on-loop-heads', false);
+    }
+
+    get checkLoopUnrollingFeasibility(): boolean {
+        return this.getBoolProperty('check-feasibility-on-unrolling', true);
     }
 
     get widenAfterEachStep(): boolean {
@@ -123,7 +127,23 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
-        return this._transferRelation.abstractSucc(fromState);
+        const getThreadRelName = (ts: ThreadState) =>
+            this._task.getTransitionRelationById(ts.getRelationLocation().getRelationId()).name;
+        const filterRelNames = (threads: ImmSet<IndexedThread>) => {
+            return threads.map(ts => getThreadRelName(ts.threadStatus)).toArray();
+        };
+
+        const result: ControlAbstractState[] = [];
+        for (const succ of this._transferRelation.abstractSucc(fromState)) {
+            const steppedToLoopThreads = this.getSteppedToLoopHeadThreads(succ);
+            if (steppedToLoopThreads.size > 0 && this._config.checkLoopUnrollingFeasibility) {
+                if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Loop unrolling for " + filterRelNames(steppedToLoopThreads).toString())) {
+                    continue;
+                }
+            }
+            result.push(succ);
+        }
+        return result;
     }
 
     createUniquePartition(): Object {
@@ -366,10 +386,13 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
         throw new ImplementMeException();
     }
 
-    private steppedToLoopHead(r: ControlAbstractState) {
-        const steppedThreads = r.getSteppedFor().map((i) =>
+    private getSteppedToLoopHeadThreads(r: ControlAbstractState) {
+        return r.getSteppedFor().map((i) =>
             r.getIndexedThreadState(i)).filter((ts) => this.isThreadOnLoophead(ts.threadStatus));
+    }
 
+    private steppedToLoopHead(r: ControlAbstractState) {
+        const steppedThreads = this.getSteppedToLoopHeadThreads(r);
         return steppedThreads.size > 0;
     }
 
