@@ -130,14 +130,14 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
         const getThreadRelName = (ts: ThreadState) =>
             this._task.getTransitionRelationById(ts.getRelationLocation().getRelationId()).name;
         const filterRelNames = (threads: ImmSet<IndexedThread>) => {
-            return threads.map(ts => getThreadRelName(ts.threadStatus)).toArray();
+            return threads.map(ts => getThreadRelName(ts.threadStatus)).filter((value, key) => key !== "messageDispatcherLoop");
         };
 
         const result: ControlAbstractState[] = [];
         for (const succ of this._transferRelation.abstractSucc(fromState)) {
-            const steppedToLoopThreads = this.getSteppedToLoopHeadThreads(succ);
-            if (steppedToLoopThreads.size > 0 && this._config.checkLoopUnrollingFeasibility) {
-                if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Loop unrolling for " + filterRelNames(steppedToLoopThreads).toString())) {
+            const steppedToLoopRelations = filterRelNames(this.getSteppedToLoopHeadThreads(succ));
+            if (steppedToLoopRelations.size > 0 && this._config.checkLoopUnrollingFeasibility) {
+                if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Loop unrolling for " + steppedToLoopRelations.toString())) {
                     continue;
                 }
             }
