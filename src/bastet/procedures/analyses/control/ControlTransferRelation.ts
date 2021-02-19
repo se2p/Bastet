@@ -899,14 +899,16 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         //  1. Activate the specification check thread (`after statement finished`)
         //  (if the stepped thread is a program thread)
         if (!isBehaviorUnrelated) {
-            if (this.isProgramConcern(concern)) {
-                for (const [threadIndex, threadState] of inState.getThreadStates().entries()) {
-                    const actor: Actor = this._task.getActorByName(threadState.getActorId());
-                    const script = actor.getScript(threadState.getScriptId());
+            if (step.steppedThread.threadStatus.getInAtomicMode() == 0) {
+                if (this.isProgramConcern(concern)) {
+                    for (const [threadIndex, threadState] of inState.getThreadStates().entries()) {
+                        const actor: Actor = this._task.getActorByName(threadState.getActorId());
+                        const script = actor.getScript(threadState.getScriptId());
 
-                    if (script.event instanceof AfterStatementMonitoringEvent) {
-                        if (threadState.getComputationState() != ThreadComputationState.THREAD_STATE_DISABLED) {
-                            result = this.restartThread(step.steppedThread.threadStatus.getThreadId(), inState, threadIndex);
+                        if (script.event instanceof AfterStatementMonitoringEvent) {
+                            if (threadState.getComputationState() != ThreadComputationState.THREAD_STATE_DISABLED) {
+                                result = this.restartThread(step.steppedThread.threadStatus.getThreadId(), inState, threadIndex);
+                            }
                         }
                     }
                 }
