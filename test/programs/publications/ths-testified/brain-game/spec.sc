@@ -116,10 +116,6 @@ actor ProgramObserver is Observer begin
             end
         end
 
-        // TODO: these two variables are unused?
-        declare correctAnswerGiven as boolean
-        declare wrongAnswerGiven as boolean
-
         if initDone then begin
             if score < lastScore then begin
                 _RUNTIME_signalFailure("The score must not decrease")
