@@ -79,7 +79,7 @@ actor ProgramObserver is Observer begin
                 end
             end
         end else if state = 2 then begin
-            // Reaction after ALL questions were answered correctly, expected within the next 100msec
+            // Reaction after ALL questions were answered correctly, expected within the next 200msec
             declare noShown as boolean
             define noShown as noVisible and not lastNoVisible
 
@@ -116,6 +116,7 @@ actor ProgramObserver is Observer begin
             end
         end
 
+        // TODO: these two variables are unused?
         declare correctAnswerGiven as boolean
         declare wrongAnswerGiven as boolean
 
