@@ -9,6 +9,6 @@
     },
 
     "GraphAnalysis": {
-        "witnessHandler": "DoNothing"
+        "witnessHandlers": ["DoNothing"]
     }
 }

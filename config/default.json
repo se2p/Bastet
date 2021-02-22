@@ -25,7 +25,7 @@
     "GraphAnalysis": {
         "mergeIntoOperator": "NewMergeIntoOperator",
         "stopOperator": "IfMerged",
-        "witnessHandler": "ExportPath",
+        "witnessHandlers": ["ExportPath"],
         "graphConstructionOrder": "WaitAtMeet"
     },
 

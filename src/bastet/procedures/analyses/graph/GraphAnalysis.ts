@@ -85,8 +85,8 @@ export class GraphAnalysisConfig extends BastetConfiguration {
         return this.getStringProperty('stopOperator', 'CheckCoverage');
     }
 
-    get witnessHandler(): string {
-        return this.getStringProperty('witnessHandler', 'DoNothing');
+    get witnessHandlers(): string[] {
+        return this.getStringListProperty('witnessHandler', []);
     }
 
     get checkTargetFeasibility(): boolean {
@@ -117,7 +117,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
 
     private readonly _stopOp: StopOperator<GraphAbstractState, GraphAbstractState>;
 
-    private readonly _witnessHandler: WitnessHandler<GraphAbstractState>;
+    private readonly _witnessHandlers: WitnessHandler<GraphAbstractState>[];
 
     private readonly _config: GraphAnalysisConfig;
 
@@ -152,14 +152,18 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
             throw new IllegalArgumentException("Illegal stop operator configuration");
         }
 
-        if (this._config.witnessHandler == 'DoNothing') {
-            this._witnessHandler = DummyHandler.create();
-        } else if (this._config.witnessHandler == 'ExportWitness') {
-            this._witnessHandler = new WitnessExporter(this, this, this._task);
-        } else if (this._config.witnessHandler == 'ExportPath') {
-            this._witnessHandler = new PathExporter(this, this);
-        } else {
-            throw new IllegalArgumentException("Illegal witness handler configuration");
+        this._witnessHandlers = [];
+
+        for (const witnessHandler of this._config.witnessHandlers) {
+            if (witnessHandler == 'DoNothing') {
+                this._witnessHandlers.push(DummyHandler.create());
+            } else if (witnessHandler == 'ExportWitness') {
+                this._witnessHandlers.push(new WitnessExporter(this, this, this._task));
+            } else if (witnessHandler == 'ExportPath') {
+                this._witnessHandlers.push(new PathExporter(this, this));
+            } else {
+                throw new IllegalArgumentException("Illegal witness handler configuration");
+            }
         }
     }
 
@@ -305,7 +309,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
-        return this._witnessHandler.handleViolatingState(reached, violating);
+        this._witnessHandlers.forEach(h => h.handleViolatingState(reached, violating));
     }
 
     compareStateOrder(a: GraphAbstractState, b: GraphAbstractState): number {
