@@ -1,5 +1,0 @@
-{
-    "GraphAnalysis": {
-        "witnessHandlers": ["ExportPath","ExportWitness"]
-    }
-}
