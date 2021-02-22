@@ -86,7 +86,7 @@ export class GraphAnalysisConfig extends BastetConfiguration {
     }
 
     get witnessHandlers(): string[] {
-        return this.getStringListProperty('witnessHandler', []);
+        return this.getStringListProperty('witnessHandlers', []);
     }
 
     get checkTargetFeasibility(): boolean {
