@@ -92,11 +92,11 @@ for f in $(find $TEST_DIR -name "*${NAME_PREFIX}*" -and -name "*.sc" | sort)
 do
     RESULT_FILE=$(mktemp)
     printf "`basename $f`"
-     timeout 300 ./scripts/bastet.sh \
-        -c config/default.json,config/benchmarking.delta.json \
+     timeout 600 ./scripts/bastet.sh \
+        -c config/predicate-abstraction.json,config/benchmarking.delta.json \
         -P $f \
         -S test/programs/empty.sc \
-        -I src/public/library.sc \
+        -I test/programs/empty.sc \
         > $RESULT_FILE 2>&1
     parse_results $f $RESULT_FILE
     rm $RESULT_FILE
