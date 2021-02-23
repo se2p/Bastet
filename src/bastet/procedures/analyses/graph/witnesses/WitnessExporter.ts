@@ -425,7 +425,9 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             }
         }
 
-        Preconditions.checkArgument(openAtomicBrackets === 0, `Missing ${openAtomicBrackets} closing atomic bracket(s)`);
+        // The following precondition would be violated in cases where the violation occurs inside an atomic method,
+        // for example, within the specification.
+        // Preconditions.checkArgument(openAtomicBrackets === 0, `Missing ${openAtomicBrackets} closing atomic bracket(s)`);
 
         return filteredArray;
     }
