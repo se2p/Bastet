@@ -203,7 +203,7 @@ export class MouseDownActionExtractor extends QueryMethodActionExtractor {
 
 export class AnswerActionExtractor extends QueryMethodActionExtractor {
     constructor() {
-        super('answer');
+        super('answer', 'integerAnswer');
     }
 
     protected setActionForStepInternal(step: ErrorWitnessStep, actionValue): void {
