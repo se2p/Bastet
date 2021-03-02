@@ -32,6 +32,7 @@ import {DataLocationScoper} from "../../control/DataLocationScoping";
 import {Action} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {Broadcast, BroadcastVisitor} from "../../../../syntax/ast/BroadcastVisitor";
 import {ThreadState} from "../../control/ConcreteProgramState";
+import {VAR_SCOPING_SPLITTER} from "../../../../syntax/app/controlflow/DataLocation";
 
 export interface ActionExtractor {
     /**
@@ -141,15 +142,21 @@ export abstract class QueryMethodActionExtractor implements ActionExtractor {
     }
 
     private getFirstDefinedVariableValue(variableName: string, steps: ErrorWitnessStep[], targetName: string): any {
+        // We unscope the variable (by removing the actor name at the very beginning).
+        const unscopedVariableName = variableName.split(VAR_SCOPING_SPLITTER).slice(1).join(VAR_SCOPING_SPLITTER);
+
+        Preconditions.checkState(variableName.split(VAR_SCOPING_SPLITTER)[0] === targetName,
+            `Variable ${variableName} should have been in scope of ${targetName}`);
+
         for (const step of steps) {
-            const value = step.getVariableValue(targetName, variableName);
+            const value = step.getVariableValue(targetName, unscopedVariableName);
 
             if (value !== undefined) {
                 return value;
             }
         }
 
-        throw new Error(`Unknown variable '${variableName}' in '${targetName}'`);
+        throw new Error(`Unknown variable '${unscopedVariableName}' in '${targetName}'`);
     }
 
     protected abstract setActionForStepInternal(step: ErrorWitnessStep, actionValue, assignment: Assignment): void;
