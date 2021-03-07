@@ -257,7 +257,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         steps = addExtraSteps(steps);
 
-        WitnessExporter.ensureContinuousMousePositions(steps);
+        steps = WitnessExporter.ensureContinuousMousePositions(steps);
 
         if (this._config.collapseAtomicBlocks) {
             steps = WitnessExporter.collapseAtomics(steps);
@@ -270,7 +270,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return new ErrorWitness(this._task.origin, violations, steps, mocks);
     }
 
-    private static ensureContinuousMousePositions(steps: ErrorWitnessStep[]) {
+    private static ensureContinuousMousePositions(steps: ErrorWitnessStep[]): ErrorWitnessStep[] {
         let mousePosition = {x: undefined, y: undefined};
         steps.forEach(step => {
             if (step.action === Action.MOUSE_MOVE) {
@@ -279,6 +279,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                 mousePosition = step.mousePosition;
             }
         });
+
+        return steps;
     }
 
     private getDefaultAction(transitionLabel: [ThreadState, ProgramOperation][]) {
