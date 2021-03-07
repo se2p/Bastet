@@ -54,7 +54,7 @@ import {ThreadState} from "../control/ConcreteProgramState";
 let bigStepNumber: number = 0; // FIXME: THIS IS A HACK
 
 export function incBigStep() {
-    bigStepNumber++;
+    bigStepNumber = bigStepNumber + 1;
 }
 
 export class LabelAnalysis<F extends AbstractState>
@@ -85,21 +85,25 @@ export class LabelAnalysis<F extends AbstractState>
     }
 
     getTransitionLabel(fromState: LabelState, toState: LabelState): [ThreadState, ProgramOperation][] {
+        const relevantBigSteps = new Set<number>(toState.getTransfers().map((t) => t.getBigStep()));
+
         const worklist: [LabelState, [ThreadState, ProgramOperation][]][] = [];
         worklist.push([toState, []]);
 
-        const relevantBigSteps = new Set<number>(toState.getTransfers().map((t) => t.getBigStep()));
+        let otherwise: [ThreadState, ProgramOperation][] = [];
 
         while (worklist.length > 0) {
             const [work, workOps] = worklist.pop();
-            for (const t of work.getTransfers()) {
-                if (relevantBigSteps.has(t.getBigStep())) {
-                    const opic: [ThreadState, ProgramOperation] = [t.getThreadState(), t.getOp()];
+            for (const transfer of work.getTransfers()) {
+                if (relevantBigSteps.has(transfer.getBigStep())) {
+                    const opic: [ThreadState, ProgramOperation] = ([transfer.getThreadState(), transfer.getOp()]);
                     const workOpsPrime: [ThreadState, ProgramOperation][] = [opic].concat(workOps);
-                    const from = t.getFrom() as LabelState;
+                    const from = transfer.getFrom() as LabelState;
 
-                    if (from == fromState) {
+                    if (from === fromState) {
                         return workOpsPrime;
+                    } else if (from.getTransfers().filter(t => relevantBigSteps.has(t.getBigStep())).isEmpty()) {
+                        otherwise = workOpsPrime;
                     } else {
                         worklist.push([from, workOpsPrime]);
                     }
@@ -107,7 +111,7 @@ export class LabelAnalysis<F extends AbstractState>
             }
         }
 
-        return [];
+        return otherwise;
     }
 
     abstractSucc(fromState: LabelState): Iterable<LabelState> {

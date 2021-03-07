@@ -49,6 +49,9 @@ export class LabelTransferRelation implements LabeledTransferRelation<LabelState
     abstractSuccFor(fromState: LabelState, opic: ProgramOperationInContext, co: Concern): Iterable<LabelState> {
         const result: LabelState[] = [];
         for (const w of this._wrappedTransfer.abstractSuccFor(fromState.wrappedState, opic, co)) {
+            // ATTENTION: Long sequences of program operations
+            //   with the same big-step-number are produced in case the SSA phi function
+            //   is applied to synchronize SSA indices.
             result.push(fromState
                 .withTransfers(ImmList([new LabeledTransfer(fromState, opic.thread, opic.op, this._bigStepProvider())]))
                 .withWrappedState(w));

@@ -31,7 +31,6 @@ import {Preconditions} from "../../../../utils/Preconditions";
 import {GraphReachedSetWrapper} from "../GraphStatesSetWrapper";
 import {TransitionLabelProvider, WrappingProgramAnalysis} from "../../ProgramAnalysis";
 import {ConcreteElement} from "../../../domains/ConcreteElements";
-import {SSAStateVisitor} from "../../StateVisitors";
 import {Set as ImmSet} from "immutable";
 import {App} from "../../../../syntax/app/App";
 import {ControlAbstractState} from "../../control/ControlAbstractDomain";
@@ -107,6 +106,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         const testifiedSeq: [GraphAbstractState, ConcreteElement][] =
             getTheOnlyElement(this._analysis.testifyConcreteOne(ar, violating));
 
+        console.log(`Extracting an error witness from a sequence of ${testifiedSeq.length} concrete states.`);
         this.exportPath(ar, testifiedSeq, violating);
     }
 
@@ -143,7 +143,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         ];
 
         const extractSteps = (): ErrorWitnessStep[] => {
-
             let index = 0;
             let previousState: GraphAbstractState = undefined;
             const rawSteps: ErrorWitnessStep[] = [];
@@ -423,7 +422,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                 atomicBlock.push(step);
                 openAtomicBrackets--;
 
-                Preconditions.checkArgument(openAtomicBrackets >= 0, "Missing opening atomic bracket")
+                Preconditions.checkArgument(openAtomicBrackets >= 0, `Missing opening atomic bracket for: ${step.actionLabel}`);
 
                 if (openAtomicBrackets === 0) {
                     this.collapseOneAtomicBlock(atomicBlock).forEach(step => {
