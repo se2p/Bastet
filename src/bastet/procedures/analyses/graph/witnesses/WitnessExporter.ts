@@ -125,47 +125,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         this.writeErrorWitness(abstractedErrorWitness);
     }
 
-    private produceWitnessAbstraction(errorWitness: ErrorWitness): ErrorWitness {
-        let steps: ErrorWitnessStep[] = errorWitness.steps;
-
-        if (this._config.export === "ONLY_ACTIONS") {
-            steps = WitnessExporter.collapseEpsilonsToWait(steps);
-        }
-
-        steps = WitnessExporter.addWaitTimes(steps);
-        steps = WitnessExporter.removeStepsWithLowWaitTime(steps, this._config.minWaitTime);
-
-        steps.forEach(step => {
-            step.actors = step.actors.filter(actor => {
-                return !this._config.removeActors.some(actorToRemove => {
-                    const regex = new RegExp(actorToRemove);
-                    return regex.test(actor.name);
-                })
-            });
-
-            if (!this._config.keepDebuggingAttributes) {
-                step.timestamp = undefined;
-                step.actionTargetName = undefined;
-                step.actionLabel = undefined;
-                step.id = undefined;
-            }
-
-            step.actors.forEach(target => {
-                target.removeVariables(this._config.removeVariables);
-
-                if (this._config.removeMethodVariables) {
-                    delete target.methodVariables;
-                }
-            })
-
-            if (this._config.removeEpsilonType) {
-                delete step.epsilonType;
-            }
-        });
-
-        return new ErrorWitness(errorWitness.programName, errorWitness.violations, steps, errorWitness.mocks);
-    }
-
     private extractErrorWitness(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState,
                                 testifiedSeq: [GraphAbstractState, ConcreteElement][]): ErrorWitness {
 
@@ -269,6 +228,48 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         return new ErrorWitness(this._task.origin, violations, steps, mocks);
     }
+    
+    private produceWitnessAbstraction(errorWitness: ErrorWitness): ErrorWitness {
+        let steps: ErrorWitnessStep[] = errorWitness.steps;
+
+        if (this._config.export === "ONLY_ACTIONS") {
+            steps = WitnessExporter.collapseEpsilonsToWait(steps);
+        }
+
+        steps = WitnessExporter.addWaitTimes(steps);
+        steps = WitnessExporter.removeStepsWithLowWaitTime(steps, this._config.minWaitTime);
+
+        steps.forEach(step => {
+            step.actors = step.actors.filter(actor => {
+                return !this._config.removeActors.some(actorToRemove => {
+                    const regex = new RegExp(actorToRemove);
+                    return regex.test(actor.name);
+                })
+            });
+
+            if (!this._config.keepDebuggingAttributes) {
+                step.timestamp = undefined;
+                step.actionTargetName = undefined;
+                step.actionLabel = undefined;
+                step.id = undefined;
+            }
+
+            step.actors.forEach(target => {
+                target.removeVariables(this._config.removeVariables);
+
+                if (this._config.removeMethodVariables) {
+                    delete target.methodVariables;
+                }
+            })
+
+            if (this._config.removeEpsilonType) {
+                delete step.epsilonType;
+            }
+        });
+
+        return new ErrorWitness(errorWitness.programName, errorWitness.violations, steps, errorWitness.mocks);
+    }
+
 
     private static ensureContinuousMousePositions(steps: ErrorWitnessStep[]): ErrorWitnessStep[] {
         let mousePosition = {x: undefined, y: undefined};
