@@ -48,7 +48,6 @@ import {AccessibilityRelation} from "../Accessibility";
 import {LabelAbstractDomain, LabelState} from "./LabelAbstractDomain";
 import {LabelTransferRelation} from "./LabelTransferRelation";
 import {MergeJoinOperator} from "../Operators";
-import {SSAState} from "../ssa/SSAAbstractDomain";
 import {ThreadState} from "../control/ConcreteProgramState";
 
 let bigStepNumber: number = 0; // FIXME: THIS IS A HACK

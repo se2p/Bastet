@@ -63,6 +63,7 @@ import {NotSupportedException} from "../../../core/exceptions/NotSupportedExcept
 import {Concern} from "../../../syntax/Concern";
 import {AfterStatementMonitoringEvent} from "../../../syntax/ast/core/CoreEvent";
 import {ConcreteProgramState, MethodCall, RelationLocation, ThreadId, ThreadState} from "./ConcreteProgramState";
+import {EpsilonStatement} from "../../../syntax/ast/core/statements/EpsilonStatement";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -328,7 +329,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
     }
 
     getTransitionLabel(from: ControlAbstractState, to: ControlAbstractState): [ThreadState, ProgramOperation][] {
-        const result: [ThreadState, ProgramOperation][] = this._wrappedAnalysis.getTransitionLabel(from.getWrappedState(), to.getWrappedState());
+        const result: [ThreadState, ProgramOperation][] = this._wrappedAnalysis
+            .getTransitionLabel(from.getWrappedState(), to.getWrappedState())
+            .filter(([t, o]) => !(o.ast instanceof EpsilonStatement));
+
         if (result.length > 0) {
             return result;
         }

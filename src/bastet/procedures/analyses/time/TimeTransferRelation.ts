@@ -163,8 +163,8 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
                 initStmts.push(new StrengtheningAssumeStatement(assumeTimeMax));
             }
 
-            return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(), initStmts, opic.thread, [opic.op], co)
-                .map((w) => fromState.withWrappedState(w));
+            return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(),
+                [].concat(initStmts), opic.thread, [opic.op], co).map((w) => fromState.withWrappedState(w));
         }
 
         let timeStatePrime = fromState;
