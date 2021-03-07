@@ -40,8 +40,8 @@ import {
     AfterBootstrapMonitoringEventContext,
     AfterStatementMonitoringEventContext,
     AnonymousScriptIdentContext,
-    AssumeStatementContext,
-    AtomicMethodContext,
+    AssumeStatementContext, AtomicBlockContext,
+    AtomicMethodContext, BlockModeContext,
     BoolAndExpressionContext,
     BoolAsStringExpressionContext,
     BoolCallStatementExpressionContext,
@@ -251,6 +251,7 @@ import {
 } from "../ast/core/CoreEvent";
 import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
 import {
+    BeginAtomicStatement, EndAtomicStatement,
     IfStatement,
     RepeatForeverStatement,
     UntilQueriedConditionStatement
@@ -931,11 +932,16 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return TransformerResult.withNode(new ParameterDeclarationList(elems.nodeList));
     }
 
+    private isAtomicBlock(ctx: StmtListContext): boolean {
+        return ctx.blockMode() instanceof AtomicBlockContext;
+    }
+
     public visitStmtList(ctx: StmtListContext): TransformerResult {
         try {
+            const isAtomic = this.isAtomicBlock(ctx);
             let result: StatementList = StatementList.empty();
 
-            for (let idc of ctx.stmtListPlain().stmt()) {
+            for (const idc of ctx.stmtListPlain().stmt()) {
                 const tr: TransformerResult = idc.accept(this);
                 result = StatementLists.concat(result, tr.statementsToPrepend);
                 const trs: StatementList = new StatementList([tr.node as Statement]);
@@ -947,6 +953,11 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
                 result = StatementLists.concat(result, tr.statementsToPrepend);
                 const trs: StatementList = new StatementList([tr.node as Statement]);
                 result = StatementLists.concat(result, trs);
+            }
+
+            if (isAtomic) {
+                result = StatementLists.concat(StatementList.from([new BeginAtomicStatement()]), result);
+                result = StatementLists.concat(result, StatementList.from([new EndAtomicStatement()]));
             }
 
             return TransformerResult.withNode(result);
