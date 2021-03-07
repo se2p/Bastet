@@ -101,7 +101,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         this._labelPrintVisitor = new CorePrintVisitor();
     }
 
-    handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
+    public handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
         Preconditions.checkArgument(reached instanceof GraphReachedSetWrapper);
         const ar: GraphReachedSetWrapper<GraphAbstractState> = reached as GraphReachedSetWrapper<GraphAbstractState>;
         const testifiedSeq: [GraphAbstractState, ConcreteElement][] =
@@ -228,7 +228,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
         return new ErrorWitness(this._task.origin, violations, steps, mocks);
     }
-    
+
     private produceWitnessAbstraction(errorWitness: ErrorWitness): ErrorWitness {
         let steps: ErrorWitnessStep[] = errorWitness.steps;
 
