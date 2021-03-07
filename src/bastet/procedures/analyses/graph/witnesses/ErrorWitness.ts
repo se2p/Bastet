@@ -74,6 +74,7 @@ export interface MousePosition {
 }
 
 export class ErrorWitnessStep {
+
     timestamp: number;
     action: Action;
     epsilonType: Action;
@@ -91,7 +92,6 @@ export class ErrorWitnessStep {
     getVariableValue(targetName: string, attribute: string): any {
         const target = this.actors.find(t => t.name === targetName);
         Preconditions.checkNotUndefined(target);
-        console.log(target.variables)
         return target.variables[attribute];
     }
 
