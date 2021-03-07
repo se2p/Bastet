@@ -38,7 +38,7 @@ import {ControlAbstractState} from "../../control/ControlAbstractDomain";
 import {ControlLocationExtractor} from "../../control/ControlUtils";
 import {Action, ErrorWitnessActionVisitor} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
-import {ErrorWitness, ErrorWitnessActor, ErrorWitnessStep} from "./ErrorWitness";
+import {ErrorWitness, ErrorWitnessActor, ErrorWitnessStep, Mock} from "./ErrorWitness";
 import {AccessibilityRelation} from "../../Accessibility";
 import {Property} from "../../../../syntax/Property";
 import {getTheOnlyElement} from "../../../../utils/Collections";
@@ -119,21 +119,23 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         const errorWitness: ErrorWitness = this.extractErrorWitness(pathAr, violating, testifiedSeq);
 
         // Compute an abstraction of the error witness (includes post-processing and filtering)
-        this.produceWitnessAbstraction(errorWitness);
+        const abstractedErrorWitness: ErrorWitness = this.produceWitnessAbstraction(errorWitness);
 
         // Write the witness to the output file
-        this.writeErrorWitness(errorWitness);
+        this.writeErrorWitness(abstractedErrorWitness);
     }
 
-    private produceWitnessAbstraction(errorWitness: ErrorWitness) {
+    private produceWitnessAbstraction(errorWitness: ErrorWitness): ErrorWitness {
+        let steps: ErrorWitnessStep[] = errorWitness.steps;
+
         if (this._config.export === "ONLY_ACTIONS") {
-            errorWitness.steps = WitnessExporter.collapseEpsilonsToWait(errorWitness.steps);
+            steps = WitnessExporter.collapseEpsilonsToWait(steps);
         }
 
-        WitnessExporter.addWaitTimes(errorWitness.steps);
-        errorWitness.steps = WitnessExporter.removeStepsWithLowWaitTime(errorWitness.steps, this._config.minWaitTime);
+        steps = WitnessExporter.addWaitTimes(steps);
+        steps = WitnessExporter.removeStepsWithLowWaitTime(steps, this._config.minWaitTime);
 
-        errorWitness.steps.forEach(step => {
+        steps.forEach(step => {
             step.actors = step.actors.filter(actor => {
                 return !this._config.removeActors.some(actorToRemove => {
                     const regex = new RegExp(actorToRemove);
@@ -159,19 +161,14 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             if (this._config.removeEpsilonType) {
                 delete step.epsilonType;
             }
-        })
+        });
+
+        return new ErrorWitness(errorWitness.programName, errorWitness.violations, steps, errorWitness.mocks);
     }
 
     private extractErrorWitness(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState,
                                 testifiedSeq: [GraphAbstractState, ConcreteElement][]): ErrorWitness {
-        const violatedProperties: Property[] = this._analysis.target(violating);
 
-        const errorState: ConcreteProgramState = testifiedSeq[testifiedSeq.length - 1][1] as ConcreteProgramState;
-
-        const errorWitness = new ErrorWitness();
-        errorWitness.violations = violatedProperties.map(property => property.getText);
-
-        let previousState: GraphAbstractState = undefined;
         const actionExtractors: ActionExtractor[] = [
             new MouseXActionExtractor(),
             new MouseYActionExtractor(),
@@ -180,92 +177,108 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             new AnswerActionExtractor(),
             new KeyPressedActionExtractor(),
         ];
+
         const mockExtractors: MockExtractor[] = [
             new RandomIntegerMockExtractor(),
             new RandomPositionMockExtractor()
         ];
 
-        const ssaStateVisitor = new SSAStateVisitor();
+        const extractSteps = (): ErrorWitnessStep[] => {
 
-        let index = 0;
-        for (const [e, c] of testifiedSeq) {
-            Preconditions.checkArgument(c instanceof ConcreteProgramState);
-            const cp = c as ConcreteProgramState;
-            const step = new ErrorWitnessStep(index);
-            const relationLocation = this.getRelationLocationForState(e);
-            step.actionTargetName = relationLocation ? relationLocation.getActorId() : undefined;
+            let index = 0;
+            let previousState: GraphAbstractState = undefined;
+            const rawSteps: ErrorWitnessStep[] = [];
 
-            const globalTime = cp.globalState.getValue(GLOBAL_TIME_MICROS_VAR);
-            step.timestamp = globalTime ? globalTime.value : 0;
+            for (const [e, c] of testifiedSeq) {
+                Preconditions.checkArgument(c instanceof ConcreteProgramState);
+                const cp = c as ConcreteProgramState;
+                const step = new ErrorWitnessStep(index);
+                const relationLocation = this.getRelationLocationForState(e);
+                step.actionTargetName = relationLocation ? relationLocation.getActorId() : undefined;
 
-            for (const actor of cp.getActors()) {
-                const target = ErrorWitnessActor.fromConcreteActorState(actor, cp.getActorMemory(actor));
-                step.actors.push(target);
+                const globalTime = cp.globalState.getValue(GLOBAL_TIME_MICROS_VAR);
+                step.timestamp = globalTime ? globalTime.value : 0;
+
+                for (const actor of cp.getActors()) {
+                    const target = ErrorWitnessActor.fromConcreteActorState(actor, cp.getActorMemory(actor));
+                    step.actors.push(target);
+                }
+
+                if (previousState) {
+                    // Set step action and action label
+                    const transitionLabel = this._tlp.getTransitionLabel(previousState, e);
+
+                    step.actionLabel = transitionLabel
+                        .map(([ts, o]) => o.ast.accept(this._labelPrintVisitor))
+                        .join("; ");
+
+                    for (const actionExtractor of actionExtractors) {
+                        actionExtractor.processOperations(transitionLabel, step);
+                    }
+
+                    for (const mockExtractor of mockExtractors) {
+                        mockExtractor.processOperations(transitionLabel, cp);
+                    }
+
+                    step.epsilonType = this.getDefaultAction(transitionLabel);
+                }
+
+                rawSteps.push(step);
+                previousState = e;
+                index++;
             }
 
-            if (previousState) {
-                // Set step action and action label
-                const transitionLabel = this._tlp.getTransitionLabel(previousState, e);
+            return rawSteps;
+        };
 
-                step.actionLabel = transitionLabel
-                    .map(([ts, o]) => o.ast.accept(this._labelPrintVisitor))
-                    .join("; ");
-
+        const addExtraSteps = (steps: ErrorWitnessStep[]): ErrorWitnessStep[] => {
+            const alteredSteps = [];
+            while (steps.length > 0) {
+                const step = steps.shift();
                 for (const actionExtractor of actionExtractors) {
-                    actionExtractor.processOperations(transitionLabel, step);
+                    const extraStep = actionExtractor.setActionForStep(step, steps);
+
+                    if (extraStep) {
+                        alteredSteps.push(extraStep);
+                    }
                 }
 
-                for (const mockExtractor of mockExtractors) {
-                    mockExtractor.processOperations(transitionLabel, cp);
-                }
-
-                step.epsilonType = this.getDefaultAction(transitionLabel);
+                alteredSteps.push(step);
             }
 
-            errorWitness.steps.push(step);
-            previousState = e;
-            index++;
-        }
+            return alteredSteps;
+        };
+
+        let steps: ErrorWitnessStep[] = extractSteps();
 
         if (this._config.removeStepsBeforeBootstrap) {
-            errorWitness.steps = WitnessExporter.removeAllBeforeAction(errorWitness.steps, Action.INITIAL_STATE);
+            steps = WitnessExporter.removeAllBeforeAction(steps, Action.INITIAL_STATE);
         }
 
-        const alteredSteps = [];
-        const steps = errorWitness.steps;
-        while (steps.length > 0) {
-            const step = steps.shift();
-            for (const actionExtractor of actionExtractors) {
-                const extraStep = actionExtractor.setActionForStep(step, steps);
+        steps = addExtraSteps(steps);
 
-                if (extraStep) {
-                    alteredSteps.push(extraStep);
-                }
-            }
+        WitnessExporter.ensureContinuousMousePositions(steps);
 
-            alteredSteps.push(step);
+        if (this._config.collapseAtomicBlocks) {
+            steps = WitnessExporter.collapseAtomics(steps);
         }
 
-        errorWitness.steps = alteredSteps;
+        const mocks: Mock[] = mockExtractors.map(m => m.getMock());
+        const violatedProperties: Property[] = this._analysis.target(violating);
+        const violations: string[] = violatedProperties.map(property => property.getText());
 
+        return new ErrorWitness(this._task.origin, violations, steps, mocks);
+    }
+
+    private static ensureContinuousMousePositions(steps: ErrorWitnessStep[]) {
         let mousePosition = {x: undefined, y: undefined};
-        errorWitness.steps.forEach(step => {
+        steps.forEach(step => {
             if (step.action === Action.MOUSE_MOVE) {
                 step.mousePosition = {x: step.mousePosition.x === undefined ? mousePosition.x : step.mousePosition.x,
                     y: step.mousePosition.y === undefined ? mousePosition.y : step.mousePosition.y};
                 mousePosition = step.mousePosition;
             }
         });
-
-        if (this._config.collapseAtomicBlocks) {
-            errorWitness.steps = WitnessExporter.collapseAtomics(errorWitness.steps);
-        }
-
-        for (const mockExtractor of mockExtractors) {
-            errorWitness.mocks.push(mockExtractor.getMock());
-        }
-
-        return errorWitness;
     }
 
     private getDefaultAction(transitionLabel: [ThreadState, ProgramOperation][]) {
@@ -460,7 +473,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return collapsedAtomicBlock;
     }
 
-    private static addWaitTimes(steps: ErrorWitnessStep[]): void {
+    private static addWaitTimes(steps: ErrorWitnessStep[]): ErrorWitnessStep[] {
         let prevStep: ErrorWitnessStep;
 
         for (const step of steps) {
@@ -471,6 +484,8 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
             prevStep = step;
         }
+
+        return steps;
     }
 
     private writeErrorWitness(errorWitness: ErrorWitness) {

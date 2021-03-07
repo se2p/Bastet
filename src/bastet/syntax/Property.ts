@@ -48,7 +48,7 @@ export class Property extends PropertyRecord implements PropertyAttributes {
         super({text: text});
     }
 
-    get getText(): string {
+    public getText(): string {
         return this.get("text");
     }
 

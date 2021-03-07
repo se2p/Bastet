@@ -131,8 +131,32 @@ export class AssignmentMock implements Mock {
 }
 
 export class ErrorWitness {
-    programName: string;
-    violations: string[];
-    steps: ErrorWitnessStep[] = [];
-    mocks: Mock[] = [];
+
+    private readonly _programName: string;
+    private readonly _violations: string[];
+    private readonly _steps: ErrorWitnessStep[];
+    private readonly _mocks: Mock[];
+
+    constructor(programName: string, violations: string[], steps: ErrorWitnessStep[], mocks: Mock[]) {
+        this._programName = Preconditions.checkNotUndefined(programName);
+        this._violations = Preconditions.checkNotUndefined(violations).slice();
+        this._steps = Preconditions.checkNotUndefined(steps).slice();
+        this._mocks = Preconditions.checkNotUndefined(mocks).slice();
+    }
+
+    get programName(): string {
+        return this._programName;
+    }
+
+    get violations(): string[] {
+        return this._violations;
+    }
+
+    get steps(): ErrorWitnessStep[] {
+        return this._steps;
+    }
+
+    get mocks(): Mock[] {
+        return this._mocks;
+    }
 }
