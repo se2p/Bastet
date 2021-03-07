@@ -93,11 +93,11 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
     constructor(analysis: WrappingProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
                 tlp: TransitionLabelProvider<GraphAbstractState>, task: App, config: WitnessExporterConfig = DEFAULT_WITNESS_EXPORTER_CONFIG) {
-        this._analysis = analysis;
-        this._tlp = tlp;
-        this._task = task;
+        this._analysis = Preconditions.checkNotUndefined(analysis);
+        this._tlp = Preconditions.checkNotUndefined(tlp);
+        this._task = Preconditions.checkNotUndefined(task);
+        this._config = Preconditions.checkNotUndefined(config);
         this._controlLocationExtractor = new ControlLocationExtractor(task);
-        this._config = config;
         this._labelPrintVisitor = new CorePrintVisitor();
     }
 
