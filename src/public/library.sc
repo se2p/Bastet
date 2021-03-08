@@ -42,20 +42,6 @@ actor IOActor is RuntimeEntity begin
         // UNSOUND: might wait arbitrarily long
     end
 
-    define atomic makeInputVariablesNonDet() begin
-        declare nondetX as integer
-        define mouseX as nondetX
-
-        declare nondetY as integer
-        define mouseY as nondetY
-
-        declare nondetKey as integer
-        define keyPressed as nondetKey
-
-        declare nondetDown as boolean
-        define mouseDown as nondetDown
-    end
-
     script on bootstrap do begin
         define askActive as false
         define keyPressed as 0
@@ -74,9 +60,21 @@ actor IOActor is RuntimeEntity begin
     script messageDispatcherLoop on startup do begin
         // Hack as long no other dispatch handling is in place
         repeat forever begin
-            makeInputVariablesNonDet()
+            atomic begin
+                declare nondetX as integer
+                define mouseX as nondetX
 
-            define mouseClicked as mouseDown and not lastMouseDown
+                declare nondetY as integer
+                define mouseY as nondetY
+
+                declare nondetKey as integer
+                define keyPressed as nondetKey
+
+                declare nondetDown as boolean
+                define mouseDown as nondetDown
+
+                define mouseClicked as mouseDown and not lastMouseDown
+            end
 
             if mouseClicked then begin
                 broadcast "CLICK" () to "SYSTEM"
@@ -1161,12 +1159,14 @@ role Observer is RuntimeEntity begin
         define halfWidth as cast attribute "activeGraphicHalfWidth" of obj to int
         define halfHeight as cast attribute "activeGraphicHalfHeight" of obj to int
 
-        define result as true
-        if not (mouseX() < x + halfWidth
-            or mouseX() > x - halfWidth
-            or mouseY() < y + halfHeight
-            or mouseY() > y - halfHeight) then begin
+        declare mx as integer
+        define mx as mouseX()
+        declare my as integer
+        define my as mouseY()
 
+        define result as true
+        if not (mx < x + halfWidth or mx > x - halfWidth
+                or my < y + halfHeight or my > y - halfHeight) then begin
             define result as false
         end
     end returns result : boolean
@@ -1238,6 +1238,8 @@ role ScratchEntity is RuntimeEntity begin
 
         define activeGraphicHalfWidth as getImageWidth(id) / 2
         define activeGraphicHalfHeight as getImageHeight(id) / 2
+
+        define activeGraphicIndex as getGraphicIndexById(id)
         //FIXME Set graphic pixels, this is currently not done as we do not supports lists yet
     end
 
@@ -2173,15 +2175,11 @@ end
  */
 role ScratchStage is ScratchEntity begin
 
-    declare currentIdx as integer
-
     declare videoTransparency as integer
 
     declare videoState as string
 
     declare tempo as integer
-
-    define currentIdx as 0
 
     @ Category "Looks"
     @ Block "switch backdrop to (id v) and wait"
@@ -2195,36 +2193,24 @@ role ScratchStage is ScratchEntity begin
     end
 
     define atomic nextBackdrop () begin
-        declare idx as integer
-        define idx as getGraphicIndexById(activeGraphicName)
-        define idx as (currentIdx+1) mod getNumGraphics()
-
+        define activeGraphicIndex as (activeGraphicIndex+1) mod getNumGraphics()
         declare id as string
-        define id as getGraphicIdByIndex(currentIdx)
-
+        define id as getGraphicIdByIndex(activeGraphicIndex)
         changeActiveGraphicTo(id)
     end
 
     define atomic previousBackdrop () begin
-        declare idx as integer
-        define idx as getGraphicIndexById(activeGraphicName)
-        define idx as (currentIdx-1) mod getNumGraphics()
-
+        define activeGraphicIndex as (activeGraphicIndex-1) mod getNumGraphics()
         declare id as string
-        define id as getGraphicIdByIndex(currentIdx)
-
+        define id as getGraphicIdByIndex(activeGraphicIndex)
         changeActiveGraphicTo(id)
     end
 
     define atomic randomBackdrop () begin
-         declare idx as integer
-         define idx as getGraphicIndexById(activeGraphicName)
-         define idx as internalRandomBetween(0, getNumGraphics()-1)
-
-         declare id as string
-         define id as getGraphicIdByIndex(currentIdx)
-
-         changeActiveGraphicTo(id)
+        define activeGraphicIndex as internalRandomBetween(0, getNumGraphics()-1)
+        declare id as string
+        define id as getGraphicIdByIndex(activeGraphicIndex)
+        changeActiveGraphicTo(id)
     end
 
 end
