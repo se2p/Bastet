@@ -47,6 +47,14 @@ export class TerminateProgramStatement extends Statement implements InternalStat
 
 }
 
+export class CheckFeasibilityStatement extends Statement implements InternalStatement {
+
+    constructor() {
+        super([]);
+    }
+
+}
+
 export class SignalTargetReachedStatement extends Statement implements InternalStatement {
 
     private readonly _targetCharacteristics: ExpressionList;
