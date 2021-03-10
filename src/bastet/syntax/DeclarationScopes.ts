@@ -310,7 +310,7 @@ export class TypeInformationStorage implements TypeInformationProvider {
             return usageScope.slice(0, 0);
 
         } else {
-            throw new IllegalArgumentException(`Type of entity ${ident.text} is not declared`);
+            throw new IllegalArgumentException(`Type of entity ${ident.text} is not declared. Make sure to register the variable in the TypeStorage.`);
         }
     }
 

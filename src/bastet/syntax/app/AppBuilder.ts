@@ -100,6 +100,28 @@ export class AppBuilder {
         return new App(programOrigin, programNode.ident.text, actorMap, typeStorage);
     }
 
+    private static fixTypeRegistry(app: App) {
+        for (const a of app.actors) {
+            for (const m of a.scripts) {
+                for (const [from, opid, to] of m.transitions.transitions) {
+                    if (ProgramOperation.for(opid).ast instanceof DeclareStackVariableStatement) {
+                        const decl = ProgramOperation.for(opid).ast as DeclareStackVariableStatement;
+                        app.typeStorage.beginActorScope(a.ident).putTypeInformation(decl.identifier, decl.variableType);
+                    }
+                }
+            }
+            for (const m of a.methods) {
+                for (const [from, opid, to] of m.transitions.transitions) {
+                    if (ProgramOperation.for(opid).ast instanceof DeclareStackVariableStatement) {
+                        const decl = ProgramOperation.for(opid).ast as DeclareStackVariableStatement;
+                        app.typeStorage.beginActorScope(a.ident).beginMethodScope(m.ident.text).putTypeInformation(decl.identifier, decl.variableType);
+                    }
+                }
+            }
+        }
+
+    }
+
     private buildActors(programAST: ProgramDefinition): ActorMap {
         let result: ActorMap = {};
         const actorDefinitions : ActorDefinition[] = programAST.actors.elements;
@@ -369,7 +391,9 @@ export class AppBuilder {
             flatActors[d.ident] = d;
         }
 
-        return new App(taskModel.origin, taskModel.ident, flatActors, taskModel.typeStorage);
+        const result = new App(taskModel.origin, taskModel.ident, flatActors, taskModel.typeStorage);
+        this.fixTypeRegistry(result);
+        return result;
     }
 
     /**
@@ -436,7 +460,9 @@ export class AppBuilder {
             actorMap[actorPrime.ident] = actorPrime;
         }
 
-        return new App(taskModel.origin, taskModel.ident, actorMap, taskModel.typeStorage);
+        const result = new App(taskModel.origin, taskModel.ident, actorMap, taskModel.typeStorage);
+        this.fixTypeRegistry(result);
+        return result;
     }
 
 }

@@ -2,7 +2,7 @@
  *   BASTET Program Analysis and Verification Framework
  *
  *   Copyright 2019 by University of Passau (uni-passau.de)
- *    
+ *
  *   Maintained by Andreas Stahlbauer (firstname@lastname.net),
  *   see the file CONTRIBUTORS.md for the list of contributors.
  *
@@ -17,7 +17,7 @@
  *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
- *   
+ *
  */
 
 import {AstNode} from "./AstNode";
@@ -76,6 +76,7 @@ import {
 import {EpsilonStatement} from "./core/statements/EpsilonStatement";
 import {ExpressionStatement} from "./core/statements/ExpressionStatement";
 import {
+    CheckFeasibilityStatement,
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
     TerminateProgramStatement,
@@ -149,6 +150,10 @@ CoreNonCtrlStatementnVisitor<ActionWithWeight>{
 
     visit(node: AstNode): ActionWithWeight {
         throw new ImplementMeForException(node.constructor.name);
+    }
+
+    visitCheckFeasibilityStatement(node: CheckFeasibilityStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
     visitReturnStatement(node: ReturnStatement): ActionWithWeight {

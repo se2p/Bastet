@@ -159,5 +159,20 @@ export class App {
         return script;
     }
 
+    public getTransitionRelations() {
+        const result: TransitionRelation[] = [];
+
+        for (const a of this.actors) {
+            for (const s of a.scripts) {
+                result.push(s.transitions);
+            }
+            for (const m of a.methods) {
+                result.push(m.transitions);
+            }
+        }
+
+        return result;
+    }
+
 }
 

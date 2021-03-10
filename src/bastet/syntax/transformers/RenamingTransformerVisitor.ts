@@ -132,6 +132,7 @@ import {
 } from "../ast/core/expressions/ActorExpression";
 import {Identifier} from "../ast/core/Identifier";
 import {
+    CheckFeasibilityStatement,
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
     TerminateProgramStatement
@@ -189,6 +190,10 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     visitPrecisionPushStatement(node: PrecisionPushStatement): AstNode {
         return new PrecisionPushStatement(node.predicate.accept(this) as BooleanExpression);
+    }
+
+    visitCheckFeasibilityStatement(node: CheckFeasibilityStatement): AstNode {
+        return node;
     }
 
     visitPrecisionPopStatement(node: PrecisionPopStatement): AstNode {

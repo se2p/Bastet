@@ -43,6 +43,7 @@ import {IntegerLiteral} from "../../ast/core/expressions/NumberExpression";
 import {CheckFeasibilityStatement, SignalTargetReachedStatement} from "../../ast/core/statements/InternalStatement";
 import {BranchingAssumeStatement} from "../../ast/core/statements/AssumeStatement";
 import {NumEqualsExpression} from "../../ast/core/expressions/BooleanExpression";
+import {StringLiteral} from "../../ast/core/expressions/StringExpression";
 
 const toposort = require('toposort');
 
@@ -1089,6 +1090,9 @@ export class TransitionRelations {
     }
 
     public static introduceCommonTargetLocation(tr: TransitionRelation): TransitionRelation {
+        return tr;
+        let numTargets = 0;
+
         // Prefix for the transition relation that declares and initializes the target variable
         const reachedTargetVarLoc = DataLocations.createTypedLocation(Identifier.fresh(), IntegerType.instance());
         const reachedTargetVar = new VariableWithDataLocation(reachedTargetVarLoc);
@@ -1100,12 +1104,13 @@ export class TransitionRelations {
             ProgramOperationFactory.createFor(initReachedTargetVarStmt));
 
         const result = TransitionRelation.builder();
-        result.addAllTransitionsOf(TransitionRelations.concat(prefixRelation, tr));
+        result.addRelation(TransitionRelations.concat(prefixRelation, tr));
 
         // The new feasibility check locations
         const targetFeasibilityCheckLock = ControlLocation.fresh();
         const targetAfterFeasibilityCheckLoc = ControlLocation.fresh();
-        result.addTransition(targetFeasibilityCheckLock, targetAfterFeasibilityCheckLoc, ProgramOperationFactory.createFor(new CheckFeasibilityStatement()));
+        result.addTransition(targetFeasibilityCheckLock, targetAfterFeasibilityCheckLoc,
+            ProgramOperationFactory.createFor(new CheckFeasibilityStatement(new StringLiteral("Check before reaching targets"))));
 
         for (const [from, opId, to] of tr.transitions) {
             const op = ProgramOperation.for(opId);
@@ -1117,7 +1122,7 @@ export class TransitionRelations {
             }
 
             if (op.ast instanceof SignalTargetReachedStatement) {
-                const targetIdExpr = IntegerLiteral.of(to);
+                const targetIdExpr = IntegerLiteral.of(from);
 
                 // Assign instead of signal + redirect
                 result.removeTransition(from, to, opId);
@@ -1130,10 +1135,16 @@ export class TransitionRelations {
                 result.addTransition(targetAfterFeasibilityCheckLoc, targetAfterAssumeLoc, ProgramOperationFactory.createFor(assumeTarget));
                 const targetTerminationLoc = ControlLocation.fresh();
                 result.addTransition(targetAfterAssumeLoc, targetTerminationLoc, op);
+
+                numTargets++;
             }
         }
 
-        return result.build();
+        if (numTargets == 0) {
+            return tr;
+        } else {
+            return this.eliminateEpsilons(result.build());
+        }
     }
 
     private static buildEquivalenceClasses(tr: TransitionRelation): Map<LocationId, LocationEquivalence> {
@@ -1207,10 +1218,11 @@ export class TransitionRelations {
     }
 
     static establishAnalysisInvariants(tr: TransitionRelation): TransitionRelation {
-        return TransitionRelations.introduceEpsilonBetweenMergeAndBranchLocs(
+        return TransitionRelations.introduceCommonTargetLocation(
+            TransitionRelations.introduceEpsilonBetweenMergeAndBranchLocs(
                 TransitionRelations.introduceEpsilonToMergeTransitions(
                     TransitionRelations.introduceEntryExitEpsilonTransition(
-                      TransitionRelations.eliminateEpsilons(tr))));
+                      TransitionRelations.eliminateEpsilons(tr)))));
     }
 
     static eliminateEpsilons(tr: TransitionRelation): TransitionRelation {

@@ -2,11 +2,11 @@
  *   BASTET Program Analysis and Verification Framework
  *
  *   Copyright 2020 by University of Passau (uni-passau.de)
- *    
+ *
  *   See the file CONTRIBUTORS.md for the list of contributors.
  *
- *   Please make sure to CITE this work in your publications if you 
- *   build on this work. Some of our maintainers or contributors might 
+ *   Please make sure to CITE this work in your publications if you
+ *   build on this work. Some of our maintainers or contributors might
  *   be interested in actively CONTRIBUTING to your research project.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,7 @@
  *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
- *   
+ *
  */
 
 import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
@@ -86,6 +86,7 @@ import {
 import {EpsilonStatement} from "./core/statements/EpsilonStatement";
 import {ExpressionStatement} from "./core/statements/ExpressionStatement";
 import {
+    CheckFeasibilityStatement,
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
     TerminateProgramStatement,
@@ -101,9 +102,9 @@ import {VAR_SCOPING_SPLITTER} from "../app/controlflow/DataLocation";
 import {PrecisionPopStatement, PrecisionPushStatement} from "./core/Precisions";
 
 export class MethodValueReadEvent {
-    
+
     constructor(public readonly readFrom: string) {
-    
+
     }
 
     combine(other: MethodValueReadEvent): MethodValueReadEvent {
@@ -136,6 +137,10 @@ export class MethodValueReadVisitor implements CoreVisitor<MethodValueReadEvent>
 
     visit(node: AstNode): MethodValueReadEvent {
         throw new ImplementMeForException(node.constructor.name);
+    }
+
+    visitCheckFeasibilityStatement(node: CheckFeasibilityStatement): MethodValueReadEvent {
+        return this.nothingReadEvent;
     }
 
     visitLocateActorExpression(node: LocateActorExpression): MethodValueReadEvent {

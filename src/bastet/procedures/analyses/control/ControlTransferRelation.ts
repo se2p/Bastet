@@ -121,6 +121,7 @@ import {
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {OptionalAstNode} from "../../../syntax/ast/AstNode";
 import {
+    CheckFeasibilityStatement,
     SignalTargetReachedStatement,
     TerminateProgramStatement
 } from "../../../syntax/ast/core/statements/InternalStatement";
@@ -591,6 +592,14 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
                 ts.withComputationState(ThreadComputationState.THREAD_STATE_FAILURE)
                     .withFailedFor(properties)), true]];
+
+        } else if (stepOp.ast instanceof CheckFeasibilityStatement) {
+            const feasible = Lattices.isFeasible(result.getWrappedState(), this._wrappedDomain.lattice, stepOp.ast.getPurpose());
+            if (!feasible) {
+                return [];
+            } else {
+                return [[result, true]];
+            }
 
         } else if (stepOp.ast instanceof BeginAtomicStatement) {
             return [[this.incrementAtomic(result, threadToStep), false]];
