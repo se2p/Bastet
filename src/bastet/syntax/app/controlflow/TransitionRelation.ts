@@ -1090,7 +1090,6 @@ export class TransitionRelations {
     }
 
     public static introduceCommonTargetLocation(tr: TransitionRelation): TransitionRelation {
-        return tr;
         let numTargets = 0;
 
         // Prefix for the transition relation that declares and initializes the target variable
