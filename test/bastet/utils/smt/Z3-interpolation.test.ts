@@ -47,7 +47,7 @@ beforeAll( async (done) => {
     done();
 });
 
-test ("Interpolation.SafeProgram", (done) => {
+test ("Interpolation.SafeProgram", async (done) => {
 
     // loop-3-SAFE.sc
     /*
@@ -108,9 +108,10 @@ test ("Interpolation.SafeProgram", (done) => {
     expect(interpolants).toContain("(= y@3 3)");
 
     prover.pop();
+    done();
 })
 
-test("Interpolation.OnlyY", (done) => {
+test("Interpolation.OnlyY", async (done) => {
     prover.push();
 
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@0"), IntegerType.instance()));
@@ -140,9 +141,10 @@ test("Interpolation.OnlyY", (done) => {
     expect(interpolantsString).toContain("(= y@0 42)");
 
     prover.pop();
+    done();
 });
 
-test ("Interpolation", (done) => {
+test ("Interpolation", async (done) => {
     prover.push();
 
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
@@ -178,4 +180,5 @@ test ("Interpolation", (done) => {
     }
 
     prover.pop();
+    done();
 });

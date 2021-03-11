@@ -20,7 +20,6 @@
  *
  */
 
-import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
 test("Test WrapClamp 1 safe", (done) => {

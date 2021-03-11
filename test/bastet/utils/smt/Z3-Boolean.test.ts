@@ -30,6 +30,7 @@ import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataL
 import {BooleanType, FloatType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
 import {AnalysisStatistics} from "../../../../src/bastet/procedures/analyses/AnalysisStatistics";
+import * as utils from "../../../bastet/procedures/analyses/data/TestUtils";
 
 let smt: Z3SMT;
 let ctx;
@@ -42,9 +43,9 @@ beforeAll( async (done) => {
     theories = smt.createTheories(ctx);
     prover = smt.createProver(ctx, new AnalysisStatistics("Test", {}));
     done();
-});
+}, utils.timeout);
 
-test("Must not cause an assertion in the solver", (done) => {
+test("Must not cause an assertion in the solver",  async (done) => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
 
@@ -59,4 +60,5 @@ test("Must not cause an assertion in the solver", (done) => {
 
     prover.assert(f);
     expect(prover.isUnsat()).toBe(false);
-});
+    done();
+}, utils.timeout);

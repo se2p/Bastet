@@ -37,25 +37,27 @@ beforeAll( async (done) => {
     done();
 });
 
-test ("Case: 1 < 0", (done) => {
+test ("Case: 1 < 0", async (done) => {
     prover.push();
     const falseFormula = theories.realTheory.isLessThan(theories.realTheory.one(), theories.realTheory.zero());
     prover.assert(falseFormula);
     const isUnsat: boolean = prover.isUnsat();
     expect(isUnsat).toBe(true);
     prover.pop();
+    done();
 });
 
-test ("Case: 1 > 0", (done) => {
+test ("Case: 1 > 0", async (done) => {
     prover.push();
     const falseFormula = theories.realTheory.isGreaterThan(theories.realTheory.one(), theories.realTheory.zero());
     prover.assert(falseFormula);
     const isUnsat: boolean = prover.isUnsat();
     expect(isUnsat).toBe(false);
     prover.pop();
+    done();
 });
 
-test ("Case: Cast real from int. True", (done) => {
+test ("Case: Cast real from int. True", async (done) => {
     prover.push();
     const intFormula = theories.intTheory.fromConcreteNumber(new ConcreteNumber(42));
     const realFormula = theories.realTheory.castFrom(intFormula);
@@ -64,9 +66,10 @@ test ("Case: Cast real from int. True", (done) => {
     const isUnsat: boolean = prover.isUnsat();
     expect(isUnsat).toBe(false);
     prover.pop();
+    done();
 });
 
-test ("Case: Cast real from int. False", (done) => {
+test ("Case: Cast real from int. False", async (done) => {
     prover.push();
     const intFormula = theories.intTheory.fromConcreteNumber(new ConcreteNumber(42));
     const realFormula = theories.realTheory.castFrom(intFormula);
@@ -75,9 +78,10 @@ test ("Case: Cast real from int. False", (done) => {
     const isUnsat: boolean = prover.isUnsat();
     expect(isUnsat).toBe(true);
     prover.pop();
+    done();
 });
 
-test ("Case: From string. True", (done) => {
+test ("Case: From string. True", async (done) => {
     prover.push();
     const realFormula1 = theories.realTheory.fromConcreteString(new ConcreteString("12.4"));
     const realFormula2 = theories.realTheory.fromConcreteString(new ConcreteString("12.5"));
@@ -86,9 +90,10 @@ test ("Case: From string. True", (done) => {
     const isUnsat: boolean = prover.isUnsat();
     expect(isUnsat).toBe(true);
     prover.pop();
+    done();
 });
 
-test ("Case: From string. False", (done) => {
+test ("Case: From string. False", async (done) => {
     prover.push();
     const realFormula1 = theories.realTheory.fromConcreteString(new ConcreteString("12.4"));
     const realFormula2 = theories.realTheory.fromConcreteString(new ConcreteString("12.5"));
@@ -97,4 +102,5 @@ test ("Case: From string. False", (done) => {
     const isUnsat: boolean = prover.isUnsat();
     expect(isUnsat).toBe(false);
     prover.pop();
+    done();
 });

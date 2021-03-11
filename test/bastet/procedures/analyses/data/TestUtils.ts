@@ -46,9 +46,9 @@ function execFixture(fixturePath: string, done) {
 function execute(bastet: Bastet, fixturePath: string, done) {
     try {
         if (fixturePath.endsWith("_SAFE.sc")) {
-            execute_explicit(bastet, fixturePath, true);
+            execute_explicit(bastet, fixturePath, true, done);
         } else if (fixturePath.endsWith("_UNSAFE.sc")) {
-            execute_explicit(bastet, fixturePath, false);
+            execute_explicit(bastet, fixturePath, false, done);
         } else {
             fail("Fixture file does not fit naming scheme")
         }
@@ -57,7 +57,7 @@ function execute(bastet: Bastet, fixturePath: string, done) {
     }
 }
 
-function execute_explicit(bastet: Bastet, fixturePath: string, expectSuccess: boolean) {
+function execute_explicit(bastet: Bastet, fixturePath: string, expectSuccess: boolean, done) {
     async function asyncAwaitFunction(): Promise<AnalysisResult> {
         return await bastet.runFor([configFilePath, ciConfigFilePath], intermediatePath, fixturePath, specFilePath);
     }
@@ -69,6 +69,7 @@ function execute_explicit(bastet: Bastet, fixturePath: string, expectSuccess: bo
             } else {
                 expect(analysisResult.violated.size).toBeGreaterThan(0)
             }
+            done();
         }
     );
 }

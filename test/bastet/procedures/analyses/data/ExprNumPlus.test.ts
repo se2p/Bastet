@@ -22,38 +22,38 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-xtest("Test num plus 1 safe", (done) => {
+xtest("Test num plus 1 safe", async (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-1_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test num plus 2 safe", (done) => {
+xtest("Test num plus 2 safe", async (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-2_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test num plus 3 safe", (done) => {
+xtest("Test num plus 3 safe", async (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-3_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test num plus 4 safe", (done) => {
+xtest("Test num plus 4 safe", async (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-4_SAFE.sc"
     let bastet = new Bastet();
     utils.execute(bastet, fixtureRelPath, done)
 }, utils.timeout);
 
-xtest("Test num plus 4 unsafe", (done) => {
+xtest("Test num plus 4 unsafe", async (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-4_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test num plus 5 unsafe", (done) => {
+xtest("Test num plus 5 unsafe", async (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-5_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test num plus 5 unsafe", (done) => {
+xtest("Test num plus 5 unsafe", async (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-num-plus-5_UNSAFE.sc"
     let bastet = new Bastet();
     utils.execute(bastet, fixtureRelPath, done);
