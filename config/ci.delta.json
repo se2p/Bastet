@@ -1,6 +1,6 @@
 {
     "MainAnalysis": {
-        "print-statistics": true,
+        "print-statistics": false,
         "export-artifacts": false
     },
 
