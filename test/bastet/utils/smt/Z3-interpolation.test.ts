@@ -47,7 +47,7 @@ beforeAll( async (done) => {
     done();
 });
 
-test ("Interpolation.SafeProgram", async () => {
+test ("Interpolation.SafeProgram", (done) => {
 
     // loop-3-SAFE.sc
     /*
@@ -110,7 +110,7 @@ test ("Interpolation.SafeProgram", async () => {
     prover.pop();
 })
 
-test("Interpolation.OnlyY", async () => {
+test("Interpolation.OnlyY", (done) => {
     prover.push();
 
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@0"), IntegerType.instance()));
@@ -142,7 +142,7 @@ test("Interpolation.OnlyY", async () => {
     prover.pop();
 });
 
-test ("Interpolation", async () => {
+test ("Interpolation", (done) => {
     prover.push();
 
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));

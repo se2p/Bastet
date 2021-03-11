@@ -22,12 +22,12 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-xtest("Test ctrl until 1 safe", async () => {
+xtest("Test ctrl until 1 safe", (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-until-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test ctrl until 1 unsafe", async () => {
+xtest("Test ctrl until 1 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-until-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);

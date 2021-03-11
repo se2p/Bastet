@@ -22,24 +22,24 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-xtest("Test bool not 1 safe", async () => {
+xtest("Test bool not 1 safe", (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-not-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test bool not 1 unsafe", async () => {
+xtest("Test bool not 1 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-not-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test bool not 2 safe", async () => {
+test("Test bool not 2 safe", (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-not-2_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test bool not 2 unsafe", async () => {
+test("Test bool not 2 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-not-2_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 

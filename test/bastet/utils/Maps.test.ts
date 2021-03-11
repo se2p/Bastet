@@ -43,7 +43,7 @@ describe('Maps.mergeMaps', function() {
         let m2 = Maps.createMap([new Identified(1), new Identified(4)]);
         assert.strictEqual(Object.keys(m2).length, 2);
 
-        assert.throws(() => {
+        assert.throws((done) => {
             let mm = Maps.mergeMaps(m1, m2);
         }, IllegalArgumentException)
     })

@@ -41,7 +41,7 @@ beforeAll( async (done) => {
     done();
 });
 
-test ("Case: 1 < 0", async () => {
+test ("Case: 1 < 0", (done) => {
     prover.push();
     const falseFormula = theories.floatTheory.isLessThan(theories.floatTheory.one(), theories.floatTheory.zero());
     prover.assert(falseFormula);
@@ -50,7 +50,7 @@ test ("Case: 1 < 0", async () => {
     prover.pop();
 });
 
-test ("Case: 1 > 0", async () => {
+test ("Case: 1 > 0", (done) => {
     prover.push();
     const falseFormula = theories.floatTheory.isGreaterThan(theories.floatTheory.one(), theories.floatTheory.zero());
     prover.assert(falseFormula);
@@ -59,7 +59,7 @@ test ("Case: 1 > 0", async () => {
     prover.pop();
 });
 
-test ("Case: Cast float from int. True", async () => {
+test ("Case: Cast float from int. True", (done) => {
     prover.push();
     const intFormula = theories.intTheory.fromConcreteNumber(new ConcreteNumber(42));
     const floatFormula = theories.floatTheory.castFrom(intFormula);
@@ -70,7 +70,7 @@ test ("Case: Cast float from int. True", async () => {
     prover.pop();
 });
 
-test ("Case: Cast float from int. False", async () => {
+test ("Case: Cast float from int. False", (done) => {
     prover.push();
     const intFormula = theories.intTheory.fromConcreteNumber(new ConcreteNumber(42));
     const floatFormula = theories.floatTheory.castFrom(intFormula);
@@ -81,7 +81,7 @@ test ("Case: Cast float from int. False", async () => {
     prover.pop();
 });
 
-test ("Case: Cast float to int. True", async () => {
+test ("Case: Cast float to int. True", (done) => {
     prover.push();
     const floatFormula = theories.floatTheory.fromConcreteNumber(new ConcreteNumber(1.1));
     const intFormula = theories.intTheory.castFrom(floatFormula);
@@ -92,7 +92,7 @@ test ("Case: Cast float to int. True", async () => {
     prover.pop();
 });
 
-xtest ("Case: Cast float to int. Variables. True", async () => {
+xtest ("Case: Cast float to int. Variables. True", (done) => {
     prover.push();
     const floatOneOne = theories.floatTheory.fromConcreteNumber(new ConcreteNumber(1.1));
     const floatVar = theories.floatTheory.abstractNumberValue(
@@ -108,7 +108,7 @@ xtest ("Case: Cast float to int. Variables. True", async () => {
 });
 
 
-test ("Case: From string. True", async () => {
+test ("Case: From string. True", (done) => {
     prover.push();
     const floatFormula1 = theories.floatTheory.fromConcreteString(new ConcreteString("12.4"));
     const floatFormula2 = theories.floatTheory.fromConcreteString(new ConcreteString("12.5"));
@@ -119,7 +119,7 @@ test ("Case: From string. True", async () => {
     prover.pop();
 });
 
-test ("Case: From string. False", async () => {
+test ("Case: From string. False", (done) => {
     prover.push();
     const floatFormula1 = theories.floatTheory.fromConcreteString(new ConcreteString("12.4"));
     const floatFormula2 = theories.floatTheory.fromConcreteString(new ConcreteString("12.5"));

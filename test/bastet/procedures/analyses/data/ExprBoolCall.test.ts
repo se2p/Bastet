@@ -22,12 +22,12 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-xtest("Test bool call 1 safe", async () => {
+xtest("Test bool call 1 safe", (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-call-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test bool call 1 unsafe", async () => {
+xtest("Test bool call 1 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-call-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);

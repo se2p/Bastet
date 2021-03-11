@@ -22,24 +22,24 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-xtest("Test ctrl if-else 1 safe", async () => {
+xtest("Test ctrl if-else 1 safe", (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-if-else-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test ctrl if-else 1 unsafe", async () => {
+xtest("Test ctrl if-else 1 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-if-else-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test ctrl if-else 2 safe", async () => {
+xtest("Test ctrl if-else 2 safe", (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-if-else-2_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test ctrl if-else 2 unsafe", async () => {
+xtest("Test ctrl if-else 2 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-if-else-2_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 

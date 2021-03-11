@@ -55,21 +55,21 @@ beforeAll(async (done) => {
     builder = new TestFormulaBuilder(theories);
 });
 
-test("Bool: Short 1", async () => {
+test("Bool: Short 1", (done) => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const bx = theories.boolTheory.abstractBooleanValue(x);
     prover.assert(bx);
     expect(prover.isSat()).toBe(true);
 })
 
-test("Bool: Short 2", async () => {
+test("Bool: Short 2", (done) => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const bx = theories.boolTheory.abstractBooleanValue(x);
     prover.assert(bx);
     expect(prover.isUnsat()).toBe(false);
 })
 
-xtest("Bool: Short 3", async () => {
+xtest("Bool: Short 3", (done) => {
     const prover2 = smt.createProver(ctx, new AnalysisStatistics("Test", {}));
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const bx = theories.boolTheory.abstractBooleanValue(x);
@@ -84,7 +84,7 @@ xtest("Bool: Short 3", async () => {
     expect(prover.isUnsat()).toBe(false);
 })
 
-// test("Bool: Short 4", async () => {
+// test("Bool: Short 4", (done) => {
 //     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
 //     const bx = theories.boolTheory.abstractBooleanValue(x);
 //     const b4 = theories.boolTheory
@@ -92,7 +92,7 @@ xtest("Bool: Short 3", async () => {
 //     expect(prover.isSat()).toBe(true);
 // })
 
-test("Bool: Long 1", async () => {
+test("Bool: Long 1", (done) => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const bx = theories.boolTheory.abstractBooleanValue(x);
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
@@ -120,7 +120,7 @@ test("Bool: Long 1", async () => {
     //const Z3Const[] = model.getConstValues();
 })
 
-test("Bool: Long 2", async () => {
+test("Bool: Long 2", (done) => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
     const z = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("z"), BooleanType.instance()));
@@ -142,7 +142,7 @@ test("Bool: Long 2", async () => {
     expect(prover.isUnsat()).toBe(true);
 })
 
-test("Bool: Long 3", async () => {
+test("Bool: Long 3", (done) => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const bx = theories.boolTheory.abstractBooleanValue(x);
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
@@ -165,7 +165,7 @@ test("Bool: Long 3", async () => {
     expect(prover.isUnsat()).toBe(true);
 })
 
-xtest("AllSat 1", async () => {
+xtest("AllSat 1", (done) => {
     const basicTerm = builder.basicBoolTerm1();
     const predicates = builder.predicForBoolTerm1();
 
@@ -186,7 +186,7 @@ xtest("AllSat 1", async () => {
 
 })
 
-test("AllSat 2", async () => {
+test("AllSat 2", (done) => {
 
     const basicTerm = builder.basicBoolTerm1();
     const predicates = builder.predicForBoolTerm1();
@@ -202,7 +202,7 @@ test("AllSat 2", async () => {
 
 })
 
-test("BPA 1",() => {
+test("BPA 1",(done) => {
     const basicTerm = builder.basicBoolTerm1();
     const abstractPrec = builder.abstrPrecForBoolTerm1();
 

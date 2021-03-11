@@ -37,7 +37,7 @@ beforeAll( async (done) => {
     done();
 });
 
-test ("Case: 1 < 0", async () => {
+test ("Case: 1 < 0", (done) => {
     prover.push();
     const falseFormula = theories.realTheory.isLessThan(theories.realTheory.one(), theories.realTheory.zero());
     prover.assert(falseFormula);
@@ -46,7 +46,7 @@ test ("Case: 1 < 0", async () => {
     prover.pop();
 });
 
-test ("Case: 1 > 0", async () => {
+test ("Case: 1 > 0", (done) => {
     prover.push();
     const falseFormula = theories.realTheory.isGreaterThan(theories.realTheory.one(), theories.realTheory.zero());
     prover.assert(falseFormula);
@@ -55,7 +55,7 @@ test ("Case: 1 > 0", async () => {
     prover.pop();
 });
 
-test ("Case: Cast real from int. True", async () => {
+test ("Case: Cast real from int. True", (done) => {
     prover.push();
     const intFormula = theories.intTheory.fromConcreteNumber(new ConcreteNumber(42));
     const realFormula = theories.realTheory.castFrom(intFormula);
@@ -66,7 +66,7 @@ test ("Case: Cast real from int. True", async () => {
     prover.pop();
 });
 
-test ("Case: Cast real from int. False", async () => {
+test ("Case: Cast real from int. False", (done) => {
     prover.push();
     const intFormula = theories.intTheory.fromConcreteNumber(new ConcreteNumber(42));
     const realFormula = theories.realTheory.castFrom(intFormula);
@@ -77,7 +77,7 @@ test ("Case: Cast real from int. False", async () => {
     prover.pop();
 });
 
-test ("Case: From string. True", async () => {
+test ("Case: From string. True", (done) => {
     prover.push();
     const realFormula1 = theories.realTheory.fromConcreteString(new ConcreteString("12.4"));
     const realFormula2 = theories.realTheory.fromConcreteString(new ConcreteString("12.5"));
@@ -88,7 +88,7 @@ test ("Case: From string. True", async () => {
     prover.pop();
 });
 
-test ("Case: From string. False", async () => {
+test ("Case: From string. False", (done) => {
     prover.push();
     const realFormula1 = theories.realTheory.fromConcreteString(new ConcreteString("12.4"));
     const realFormula2 = theories.realTheory.fromConcreteString(new ConcreteString("12.5"));

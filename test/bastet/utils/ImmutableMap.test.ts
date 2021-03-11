@@ -19,20 +19,20 @@
 
 import {ImmutableMap} from "../../../src/bastet/utils/ImmutableMap";
 
-describe("ImmutableMap", async () => {
+describe("ImmutableMap", (done) => {
 
-    describe("constructor", async () => {
+    describe("constructor", (done) => {
 
-        describe("case: empty argument", async () => {
+        describe("case: empty argument", (done) => {
 
-            it("creates an empty map form a map", async () => {
+            it("creates an empty map form a map", (done) => {
                 const emptyMap: Map<string, number> = new Map();
                 const map = new ImmutableMap<string, number>(emptyMap.entries());
 
                 expect(map.size).toBe(0);
             });
 
-            it("creates an empty map from an array", async () => {
+            it("creates an empty map from an array", (done) => {
                 const myArray: Array<[string, number]> = new Array();
                 const map = new ImmutableMap<string, number>(myArray.values());
 
@@ -41,9 +41,9 @@ describe("ImmutableMap", async () => {
 
         });
 
-        describe("case: non-empty argument", async () => {
+        describe("case: non-empty argument", (done) => {
 
-            it("creates an map from an array", async () => {
+            it("creates an map from an array", (done) => {
                 const myArray: Array<[string, number]> = [["a", 1], ["b", 1]];
                 const map = new ImmutableMap<string, number>(myArray.values());
 
@@ -54,18 +54,18 @@ describe("ImmutableMap", async () => {
 
     });
 
-    describe("get", async () => {
+    describe("get", (done) => {
 
         let subject: ImmutableMap<string, number>;
 
-        beforeEach(() => {
+        beforeEach((done) => {
             const myArray: Array<[string, number]> = [["a", 1], ["b", 2], ["d", 4]];
             subject = new ImmutableMap<string, number>(myArray.values());
         });
 
-        describe("case: existing element", async () => {
+        describe("case: existing element", (done) => {
 
-            it("provides the element", async () => {
+            it("provides the element", (done) => {
                 expect(subject.get("a")).toEqual(1);
                 expect(subject.get("b")).toEqual(2);
                 expect(subject.get("d")).toEqual(4);
@@ -73,9 +73,9 @@ describe("ImmutableMap", async () => {
 
         });
 
-        describe("case: NOT existing element", async () => {
+        describe("case: NOT existing element", (done) => {
 
-            it("returns undefined", async () => {
+            it("returns undefined", (done) => {
                 expect(subject.get("c")).toBeUndefined();
                 expect(subject.get("f")).toBeUndefined();
             });

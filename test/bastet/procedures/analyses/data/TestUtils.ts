@@ -38,18 +38,22 @@ const specFilePath = path.join(__dirname, specRelPath);
 let timeout: number = 20000; // in milliseconds
 export {timeout, execFixture, execute, execute_explicit};
 
-function execFixture(fixturePath: string) {
+function execFixture(fixturePath: string, done) {
     const bastet = new Bastet();
-    execute(bastet, fixturePath)
+    execute(bastet, fixturePath, done)
 }
 
-function execute(bastet: Bastet, fixturePath: string) {
-    if (fixturePath.endsWith("_SAFE.sc")) {
-        execute_explicit(bastet, fixturePath, true);
-    } else if (fixturePath.endsWith("_UNSAFE.sc")) {
-        execute_explicit(bastet, fixturePath, false);
-    } else {
-        fail("Fixture file does not fit naming scheme")
+function execute(bastet: Bastet, fixturePath: string, done) {
+    try {
+        if (fixturePath.endsWith("_SAFE.sc")) {
+            execute_explicit(bastet, fixturePath, true);
+        } else if (fixturePath.endsWith("_UNSAFE.sc")) {
+            execute_explicit(bastet, fixturePath, false);
+        } else {
+            fail("Fixture file does not fit naming scheme")
+        }
+    } finally {
+        done();
     }
 }
 
