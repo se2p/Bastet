@@ -22,17 +22,17 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-xtest("Test ctrl forever 1 safe", done => {
+xtest("Test ctrl forever 1 safe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-forever-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test ctrl forever 1 unsafe", done => {
+xtest("Test ctrl forever 1 unsafe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-forever-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test ctrl forever 2 unsafe", done => {
+xtest("Test ctrl forever 2 unsafe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/ctrl-forever-2_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);

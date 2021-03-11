@@ -22,24 +22,24 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-test("Test bool num greater 1 safe", done => {
+test("Test bool num greater 1 safe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-greater-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-test("Test bool num greater 1 unsafe", done => {
+test("Test bool num greater 1 unsafe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-greater-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test bool num greater 2 safe", done => {
+xtest("Test bool num greater 2 safe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-greater-2_SAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test bool num greater 2 unsafe", done => {
+xtest("Test bool num greater 2 unsafe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-greater-2_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
 

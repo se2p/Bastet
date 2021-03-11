@@ -22,24 +22,24 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-xtest("Test bool and 1 safe", done => {
+xtest("Test bool and 1 safe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-and-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test bool and 1 unsafe", done => {
+xtest("Test bool and 1 unsafe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-and-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test bool and 2 safe", done => {
+xtest("Test bool and 2 safe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-and-2_SAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test bool and 2 unsafe", done => {
+xtest("Test bool and 2 unsafe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-and-2_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
 

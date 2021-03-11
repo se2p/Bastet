@@ -22,24 +22,24 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-xtest("Test setstmt define-from-call 1 safe", done => {
+xtest("Test setstmt define-from-call 1 safe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-call-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test setstmt define-from-call 1 unsafe", done => {
+xtest("Test setstmt define-from-call 1 unsafe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-call-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test setstmt define-from-expr 2 safe", done => {
+xtest("Test setstmt define-from-expr 2 safe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-expr-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test setstmt define-from-expr 2 unsafe", done => {
+xtest("Test setstmt define-from-expr 2 unsafe", () => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-expr-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
 

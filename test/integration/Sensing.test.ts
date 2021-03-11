@@ -21,32 +21,32 @@
  */
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-test("Test touchingObject 1 safe", done => {
+test("Test touchingObject 1 safe", () => {
     const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObject-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-test("Test touchingObject 1 unsafe", done => {
+test("Test touchingObject 1 unsafe", () => {
     const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObject-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-test("Test touchingObjects 1 safe", done => {
+test("Test touchingObjects 1 safe", () => {
     const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObjects-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-test("Test touchingObjects 1 unsafe", done => {
+test("Test touchingObjects 1 unsafe", () => {
     const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObjects-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-test("Test touchingObject 2 unsafe", done => {
+test("Test touchingObject 2 unsafe", () => {
     const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-touchingObject-2_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-test("Test isDisjointFrom 1 unsafe", done => {
+test("Test isDisjointFrom 1 unsafe", () => {
     const fixtureRelPath: string = "test/programs/library-coverage/sensing/sensing-isDisjointFrom-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath, done);
+    utils.execFixture(fixtureRelPath);
 }, utils.timeout);
