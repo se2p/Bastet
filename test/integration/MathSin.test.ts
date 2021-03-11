@@ -22,35 +22,35 @@
 import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-test("Test Sin 1 safe", () => {
+test("Test Sin 1 safe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Sin-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test Sin 2 safe", () => {
+test("Test Sin 2 safe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Sin-2_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test Sin 3 safe", () => {
+test("Test Sin 3 safe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Sin-3_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 
-test("Test Sin 1 unsafe", () => {
+test("Test Sin 1 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Sin-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test Sin 2 unsafe", () => {
+test("Test Sin 2 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Sin-2_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test Sin 3 unsafe", () => {
+test("Test Sin 3 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Sin-3_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 

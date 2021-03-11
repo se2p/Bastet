@@ -23,75 +23,75 @@
 import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-test("Test WrapClamp 1 safe", () => {
+test("Test WrapClamp 1 safe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-WrapClamp-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test WrapClamp 1 unsafe", () => {
+test("Test WrapClamp 1 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-WrapClamp-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 
-test("Test MathFloor 1 safe", () => {
+test("Test MathFloor 1 safe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-MathFloor-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test MathFloor 1 unsafe", () => {
+test("Test MathFloor 1 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-MathFloor-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test MathSqrt 1 safe", () => {
+test("Test MathSqrt 1 safe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Sqrt-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test MathSqrt 1 unsafe", () => {
+test("Test MathSqrt 1 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Sqrt-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test MathSqrt 2 safe", () => {
+test("Test MathSqrt 2 safe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Sqrt-2_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test MathSqrt 2 unsafe", () => {
+test("Test MathSqrt 2 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Sqrt-2_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test MathSqrt 3 safe", () => {
+test("Test MathSqrt 3 safe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Sqrt-3_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test Nearest Perfect Sqrt 1 safe", () => {
+test("Test Nearest Perfect Sqrt 1 safe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-NearestPerfectSqrt-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test Nearest Perfect Sqrt 2 safe", () => {
+test("Test Nearest Perfect Sqrt 2 safe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-NearestPerfectSqrt-2_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
 
-test("Test Nearest Perfect Sqrt 1 unsafe", () => {
+test("Test Nearest Perfect Sqrt 1 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-NearestPerfectSqrt-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test MathAbsF 1 unsafe", () => {
+test("Test MathAbsF 1 unsafe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-AbsF-1_UNSAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test MathAbsF 1 safe", () => {
+test("Test MathAbsF 1 safe", (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-AbsF-1_SAFE.sc"
-    utils.execFixture(fixtureRelPath);
+    utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
