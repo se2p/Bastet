@@ -22,22 +22,22 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-xtest("Test common wait 1 safe", () => {
+xtest("Test common wait 1 safe", async () => {
     const fixtureRelPath: string = "test/programs/language-coverage/common-wait-1_SAFE.sc"
     utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test common wait 1 unsafe", () => {
+xtest("Test common wait 1 unsafe", async () => {
     const fixtureRelPath: string = "test/programs/language-coverage/common-wait-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test common wait 2 safe", () => {
+xtest("Test common wait 2 safe", async () => {
     const fixtureRelPath: string = "test/programs/language-coverage/common-wait-2_SAFE.sc"
     utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test common wait 2 unsafe", () => {
+xtest("Test common wait 2 unsafe", async () => {
     const fixtureRelPath: string = "test/programs/language-coverage/common-wait-2_UNSAFE.sc"
     utils.execFixture(fixtureRelPath);
 }, utils.timeout);

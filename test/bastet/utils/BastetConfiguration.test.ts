@@ -23,14 +23,14 @@
 
 import {BastetConfiguration} from "../../../src/bastet/utils/BastetConfiguration";
 
-describe("BastetConfiguration", () => {
+describe("BastetConfiguration", async () => {
 
-    test("Scoped Option", () => {
+    test("Scoped Option", async () => {
         const cfg = new BastetConfiguration({"foo": { "bar": 1}}, ["foo"]);
         expect(cfg.getProperty("bar")).toEqual(1);
     });
 
-    test("Scoped Option Boolean", () => {
+    test("Scoped Option Boolean", async () => {
         const cfg = new BastetConfiguration({"foo": { "bar": false}}, ["foo"]);
         expect(cfg.getProperty("bar", true)).toEqual(false);
     });

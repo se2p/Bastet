@@ -23,9 +23,9 @@ import {App} from "../../../../src/bastet/syntax/app/App";
 import {AppBuilder} from "../../../../src/bastet/syntax/app/AppBuilder";
 import {CodeToApp} from "../../../../src/bastet/syntax/transformers/CodeToApp";
 
-describe("AppBuilder", () => {
+describe("AppBuilder", async () => {
 
-    describe("dissolveInheritance", () => {
+    describe("dissolveInheritance", async () => {
 
         const code: string = `
             program Test
@@ -62,7 +62,7 @@ describe("AppBuilder", () => {
             expect(diss.actorNames).toContain("C");
         });
 
-        it("copies all attributes and methods from the actors it inherits from", () => {
+        it("copies all attributes and methods from the actors it inherits from", async () => {
             expect(diss.getActorByName("D").methodMap.keys()).not.toContain("caesar");
             expect(diss.getActorByName("D").methodMap.keys()).toContain("anton");
             expect(diss.getActorByName("D").methodMap.keys()).not.toContain("_RUN_foo");

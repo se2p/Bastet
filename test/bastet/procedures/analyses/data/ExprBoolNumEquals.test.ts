@@ -22,22 +22,22 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-xtest("Test bool num equals 1 safe", () => {
+xtest("Test bool num equals 1 safe", async () => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-equals-1_SAFE.sc"
     utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test bool num equals 1 unsafe", () => {
+xtest("Test bool num equals 1 unsafe", async () => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-equals-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-test("Test bool num equals 2 safe", () => {
+test("Test bool num equals 2 safe", async () => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-equals-2_SAFE.sc"
     utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-test("Test bool num equals 2 unsafe", () => {
+test("Test bool num equals 2 unsafe", async () => {
     const fixtureRelPath: string = "test/programs/language-coverage/expr-bool-number-equals-2_UNSAFE.sc"
     utils.execFixture(fixtureRelPath);
 }, utils.timeout);

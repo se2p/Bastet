@@ -27,7 +27,7 @@ import {ControlLocation} from "../../../../../src/bastet/syntax/app/controlflow/
 import {ProgramOperations, RawOperation} from "../../../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
 import {StopAllStatement} from "../../../../../src/bastet/syntax/ast/core/statements/TerminationStatement";
 
-test("case: minimal loop", () => {
+test("case: minimal loop", async () => {
     const op = new RawOperation(new StopAllStatement());
 
     const tr = TransitionRelation.builder()
@@ -39,13 +39,13 @@ test("case: minimal loop", () => {
     expect(tr.loopHeads.size).toEqual(1);
 });
 
-describe("TransitionRelation", () => {
+describe("TransitionRelation", async () => {
 
-    describe("constructor", () => {
+    describe("constructor", async () => {
 
-        describe("case: all arguments empty", () => {
+        describe("case: all arguments empty", async () => {
 
-            it("creates an empty transition relation", () => {
+            it("creates an empty transition relation", async () => {
                 const tr = new TransitionRelation(ImmMap(), ImmSet(), ImmSet(), ImmSet());
 
                 expect(tr.transitionTable.size).toEqual(0);
@@ -58,17 +58,17 @@ describe("TransitionRelation", () => {
 
 });
 
-describe("TransitionRelationBuilder", () => {
+describe("TransitionRelationBuilder", async () => {
 
-    describe("build()", () => {
+    describe("build()", async () => {
 
-        describe("case: empty relation", () => {
+        describe("case: empty relation", async () => {
             let builder = new TransitionRelationBuilder();
             let result = builder.build();
             expect(result.transitionTable.size).toEqual(0);
         });
 
-        describe("case: epsilon", () => {
+        describe("case: epsilon", async () => {
             const builder = new TransitionRelationBuilder();
             const l0 = ControlLocation.for(0);
             builder.addTransition(l0, l0, ProgramOperations.epsilon());
@@ -82,9 +82,9 @@ describe("TransitionRelationBuilder", () => {
         });
 
 
-        describe("case: sequence", () => {
+        describe("case: sequence", async () => {
 
-            it("results in connected transitions", () => {
+            it("results in connected transitions", async () => {
                 const l0 = ControlLocation.for(0);
                 const l1 = ControlLocation.for(1);
                 const l2 = ControlLocation.for(2);
@@ -108,16 +108,16 @@ describe("TransitionRelationBuilder", () => {
 
 });
 
-describe("TransitionRelations", () => {
+describe("TransitionRelations", async () => {
 
-    describe("concat()", () => {
+    describe("concat()", async () => {
 
-        describe("case: both single entry and exit point", () => {
+        describe("case: both single entry and exit point", async () => {
             const tr1 = TransitionRelations.forOpSeq(ProgramOperations.epsilon());
             const tr2 = TransitionRelations.forOpSeq(ProgramOperations.epsilon());
             const trc = TransitionRelations.concat(tr1, tr2);
 
-            it("also the result should have one exit and one entry loc", () => {
+            it("also the result should have one exit and one entry loc", async () => {
                 expect(trc.entryLocationSet.size).toEqual(1);
                 expect(trc.exitLocationSet.size).toEqual(1);
             });
@@ -125,7 +125,7 @@ describe("TransitionRelations", () => {
 
     });
 
-    describe("fork-merge-invariant", () => {
+    describe("fork-merge-invariant", async () => {
         const op = new RawOperation(new StopAllStatement());
         const tr = TransitionRelation.builder()
             .addTransitionByIDs(11, 61, op)
@@ -136,14 +136,14 @@ describe("TransitionRelations", () => {
             .build();
 
         const trPrime = TransitionRelations.introduceEpsilonToMergeTransitions(tr);
-        it ("added intermediate transitions", () => {
+        it ("added intermediate transitions", async () => {
            expect(trPrime.transitions.size).toEqual(4);
            const irrTrans = trPrime.transitionsTo(10).filter((t) => t.opId == ProgramOperations.irreducibleEpsilon().ident);
            expect(irrTrans.length).toEqual(1);
         });
     });
 
-    describe("loop-structure-invariant", () => {
+    describe("loop-structure-invariant", async () => {
         const op = new RawOperation(new StopAllStatement());
         const tr = TransitionRelation.builder()
             .addTransitionByIDs(1, 1, op)
@@ -151,14 +151,14 @@ describe("TransitionRelations", () => {
             .build();
 
         const trPrime = TransitionRelations.establishAnalysisInvariants(tr);
-        it ("added intermediate transitions", () => {
+        it ("added intermediate transitions", async () => {
             expect(trPrime.transitions.size).toBeGreaterThan(1);
         });
     });
 
-    describe("loops", () => {
+    describe("loops", async () => {
 
-        describe("case: minimal loop", () => {
+        describe("case: minimal loop", async () => {
             const op = new RawOperation(new StopAllStatement());
 
             const tr = TransitionRelation.builder()
@@ -167,12 +167,12 @@ describe("TransitionRelations", () => {
                 .addExitLocationWithID(1)
                 .build();
 
-            it("loop head identified", () => {
+            it("loop head identified", async () => {
                 expect(tr.loopHeads.size).toEqual(1);
             });
         });
 
-        describe("case: no loop", () => {
+        describe("case: no loop", async () => {
             const op = new RawOperation(new StopAllStatement());
 
             const tr = TransitionRelation.builder()
@@ -183,12 +183,12 @@ describe("TransitionRelations", () => {
                 .build();
 
 
-            it("no loop head identified", () => {
+            it("no loop head identified", async () => {
                 expect(tr.loopHeads.size).toEqual(0);
             });
         });
 
-        describe("case: with one loop", () => {
+        describe("case: with one loop", async () => {
             const op = new RawOperation(new StopAllStatement());
 
             const tr = TransitionRelation.builder()
@@ -201,13 +201,13 @@ describe("TransitionRelations", () => {
                 .build();
 
 
-            it("one loop head identified", () => {
+            it("one loop head identified", async () => {
                 expect(tr.loopHeads.size).toEqual(1);
                 expect(tr.loopHeads.contains(1)).toBe(true);
             });
         });
 
-        describe("case: forever 1", () => {
+        describe("case: forever 1", async () => {
             const op = new RawOperation(new StopAllStatement());
 
             const tr = TransitionRelation.builder()
@@ -220,7 +220,7 @@ describe("TransitionRelations", () => {
                 .addEntryLocationWithID(0)
                 .build();
 
-            it("one loop head identified", () => {
+            it("one loop head identified", async () => {
                 expect(tr.loopHeads.size).toEqual(1);
                 expect(tr.loopHeads.contains(6)).toBe(true);
                 expect(tr.getIsInLoopBodyOf(3).loopHead).toEqual(6);
@@ -229,7 +229,7 @@ describe("TransitionRelations", () => {
             });
         });
 
-        describe("case: nested", () => {
+        describe("case: nested", async () => {
             const op = new RawOperation(new StopAllStatement());
 
             const tr = TransitionRelation.builder()
@@ -247,7 +247,7 @@ describe("TransitionRelations", () => {
                 .build();
 
 
-            it("two loop heads identified", () => {
+            it("two loop heads identified", async () => {
                 expect(tr.loopHeads.size).toEqual(2);
                 expect(tr.loopHeads.contains(1)).toBe(true);
                 expect(tr.loopHeads.contains(2)).toBe(true);
@@ -256,7 +256,7 @@ describe("TransitionRelations", () => {
             });
         });
 
-        describe("case: nested 2", () => {
+        describe("case: nested 2", async () => {
             const op = new RawOperation(new StopAllStatement());
 
             const tr = TransitionRelation.builder()
@@ -271,7 +271,7 @@ describe("TransitionRelations", () => {
                 .addEntryLocationWithID(3)
                 .build();
 
-            it("two loop heads identified", () => {
+            it("two loop heads identified", async () => {
                 expect(tr.loopHeads.size).toEqual(2);
                 expect(tr.loopHeads.contains(3)).toBe(true);
                 expect(tr.loopHeads.contains(6)).toBe(true);
@@ -295,15 +295,15 @@ describe("TransitionRelations", () => {
 
     });
 
-    describe("concatTrOpGoto()", () => {
+    describe("concatTrOpGoto()", async () => {
 
-        describe("case:", () => {
+        describe("case:", async () => {
             const tr1 = TransitionRelations.forOpSeq(ProgramOperations.epsilon());
 
             const l7: ControlLocation = ControlLocation.for(7);
             const tr = TransitionRelations.concatTrOpGoto(tr1, ProgramOperations.epsilon(), l7);
 
-            it("the exit location must be l7", () => {
+            it("the exit location must be l7", async () => {
                 expect(tr.exitLocationSet.size).toEqual(1);
                 expect(tr.exitLocationSet).toContain(l7.ident);
             });
@@ -311,9 +311,9 @@ describe("TransitionRelations", () => {
 
     });
 
-    describe("eliminateEpsilons()", () => {
+    describe("eliminateEpsilons()", async () => {
 
-        describe("case: no epsilon moves", () => {
+        describe("case: no epsilon moves", async () => {
 
             const op = new RawOperation(new StopAllStatement());
 
@@ -326,7 +326,7 @@ describe("TransitionRelations", () => {
 
             const te = TransitionRelations.eliminateEpsilons(tr);
 
-            it("leaves the transition relation unmodified", () => {
+            it("leaves the transition relation unmodified", async () => {
                 expect(tr.entryLocationSet.equals(te.entryLocationSet)).toBeTruthy();
                 expect(tr.exitLocationSet.equals(te.exitLocationSet)).toBeTruthy();
                 expect(tr.transitionTable.equals(te.transitionTable)).toBeTruthy();
@@ -334,7 +334,7 @@ describe("TransitionRelations", () => {
 
         });
 
-        describe("case: with epsilon moves", () => {
+        describe("case: with epsilon moves", async () => {
             const op = new RawOperation(new StopAllStatement());
 
             const tr = TransitionRelation.builder()
@@ -347,7 +347,7 @@ describe("TransitionRelations", () => {
 
             const te = TransitionRelations.eliminateEpsilons(tr);
 
-            it("does not lead to an empty transition relation", () => {
+            it("does not lead to an empty transition relation", async () => {
                expect(te.entryLocationSet.isEmpty()).not.toBeTruthy();
                expect(te.exitLocationSet.isEmpty()).not.toBeTruthy();
                expect(te.locationSet.isEmpty()).not.toBeTruthy();

@@ -44,7 +44,7 @@ beforeAll( async (done) => {
     done();
 });
 
-test("Must not cause an assertion in the solver", () => {
+test("Must not cause an assertion in the solver", async () => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
 

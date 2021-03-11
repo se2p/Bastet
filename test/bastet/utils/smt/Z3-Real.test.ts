@@ -37,7 +37,7 @@ beforeAll( async (done) => {
     done();
 });
 
-test ("Case: 1 < 0", () => {
+test ("Case: 1 < 0", async () => {
     prover.push();
     const falseFormula = theories.realTheory.isLessThan(theories.realTheory.one(), theories.realTheory.zero());
     prover.assert(falseFormula);
@@ -46,7 +46,7 @@ test ("Case: 1 < 0", () => {
     prover.pop();
 });
 
-test ("Case: 1 > 0", () => {
+test ("Case: 1 > 0", async () => {
     prover.push();
     const falseFormula = theories.realTheory.isGreaterThan(theories.realTheory.one(), theories.realTheory.zero());
     prover.assert(falseFormula);
@@ -55,7 +55,7 @@ test ("Case: 1 > 0", () => {
     prover.pop();
 });
 
-test ("Case: Cast real from int. True", () => {
+test ("Case: Cast real from int. True", async () => {
     prover.push();
     const intFormula = theories.intTheory.fromConcreteNumber(new ConcreteNumber(42));
     const realFormula = theories.realTheory.castFrom(intFormula);
@@ -66,7 +66,7 @@ test ("Case: Cast real from int. True", () => {
     prover.pop();
 });
 
-test ("Case: Cast real from int. False", () => {
+test ("Case: Cast real from int. False", async () => {
     prover.push();
     const intFormula = theories.intTheory.fromConcreteNumber(new ConcreteNumber(42));
     const realFormula = theories.realTheory.castFrom(intFormula);
@@ -77,7 +77,7 @@ test ("Case: Cast real from int. False", () => {
     prover.pop();
 });
 
-test ("Case: From string. True", () => {
+test ("Case: From string. True", async () => {
     prover.push();
     const realFormula1 = theories.realTheory.fromConcreteString(new ConcreteString("12.4"));
     const realFormula2 = theories.realTheory.fromConcreteString(new ConcreteString("12.5"));
@@ -88,7 +88,7 @@ test ("Case: From string. True", () => {
     prover.pop();
 });
 
-test ("Case: From string. False", () => {
+test ("Case: From string. False", async () => {
     prover.push();
     const realFormula1 = theories.realTheory.fromConcreteString(new ConcreteString("12.4"));
     const realFormula2 = theories.realTheory.fromConcreteString(new ConcreteString("12.5"));

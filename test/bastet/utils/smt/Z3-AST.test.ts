@@ -47,7 +47,7 @@ beforeAll( async (done) => {
     done();
 });
 
-test ("Collect and Substitute", () => {
+test ("Collect and Substitute", async () => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), IntegerType.instance()));
     const base = theories.boolTheory.and(
@@ -70,7 +70,7 @@ test ("Collect and Substitute", () => {
     expect(theories.stringRepresentation(result)).toEqual("(and (= x@0 0) (= y@0 42))");
 });
 
-test ("Instantiate", () => {
+test ("Instantiate", async () => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), IntegerType.instance()));
     const base = theories.boolTheory.and(
@@ -86,7 +86,7 @@ test ("Instantiate", () => {
     expect(theories.stringRepresentation(result)).toEqual("(and (= x@7 0) (= y@7 42))");
 });
 
-test ("Uninstantiate", () => {
+test ("Uninstantiate", async () => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@3"), IntegerType.instance()));
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@9"), IntegerType.instance()));
     const base = theories.boolTheory.and(

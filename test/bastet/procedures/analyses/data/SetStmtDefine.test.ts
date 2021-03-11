@@ -22,22 +22,22 @@
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import * as utils from './TestUtils'
 
-xtest("Test setstmt define-from-call 1 safe", () => {
+xtest("Test setstmt define-from-call 1 safe", async () => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-call-1_SAFE.sc"
     utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test setstmt define-from-call 1 unsafe", () => {
+xtest("Test setstmt define-from-call 1 unsafe", async () => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-call-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test setstmt define-from-expr 2 safe", () => {
+xtest("Test setstmt define-from-expr 2 safe", async () => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-expr-1_SAFE.sc"
     utils.execFixture(fixtureRelPath);
 }, utils.timeout);
 
-xtest("Test setstmt define-from-expr 2 unsafe", () => {
+xtest("Test setstmt define-from-expr 2 unsafe", async () => {
     const fixtureRelPath: string = "test/programs/language-coverage/setstmt-define-from-expr-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath);
 }, utils.timeout);
