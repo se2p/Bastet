@@ -46,19 +46,22 @@ beforeAll( async (done) => {
 }, utils.timeout);
 
 test("Must not cause an assertion in the solver",  async (done) => {
-    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
-    const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
+    try {
+        const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
+        const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
 
-    const bx = theories.boolTheory.abstractBooleanValue(x);
-    const by = theories.boolTheory.abstractBooleanValue(y);
+        const bx = theories.boolTheory.abstractBooleanValue(x);
+        const by = theories.boolTheory.abstractBooleanValue(y);
 
-    const f = theories.boolTheory.or(
-        theories.boolTheory.not(
-            theories.boolTheory.and(theories.boolTheory.equal(bx, by), bx)),
-        theories.boolTheory.falseBool()
-    );
+        const f = theories.boolTheory.or(
+            theories.boolTheory.not(
+                theories.boolTheory.and(theories.boolTheory.equal(bx, by), bx)),
+            theories.boolTheory.falseBool()
+        );
 
-    prover.assert(f);
-    expect(prover.isUnsat()).toBe(false);
-    done();
+        prover.assert(f);
+        expect(prover.isUnsat()).toBe(false);
+    } finally {
+        done();
+    }
 }, utils.timeout);

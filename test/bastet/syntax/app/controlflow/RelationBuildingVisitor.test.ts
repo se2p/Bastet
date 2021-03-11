@@ -35,11 +35,11 @@ import {CallStatement} from "../../../../../src/bastet/syntax/ast/core/statement
 import {ExpressionList} from "../../../../../src/bastet/syntax/ast/core/expressions/ExpressionList";
 import {OptionalAstNode} from "../../../../../src/bastet/syntax/ast/AstNode";
 
-describe("RelationBuildingVisitor", (done) => {
+describe("RelationBuildingVisitor", () => {
 
     const visitor = new RelationBuildingVisitor();
 
-    test("UntilQueriedConditionStatement", (done) => {
+    test("UntilQueriedConditionStatement", async (done) => {
         const boolVar = new VariableWithDataLocation(
             DataLocations.createTypedLocation(Identifier.of("v"), BooleanType.instance()));
 
@@ -53,6 +53,8 @@ describe("RelationBuildingVisitor", (done) => {
 
         expect(result.entryLocationSet.size).toEqual(1);
         expect(result.exitLocationSet.size).toEqual(1);
+
+        done();
 
     });
 

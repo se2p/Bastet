@@ -27,6 +27,7 @@ import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataL
 import {FloatType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
 import {AnalysisStatistics} from "../../../../src/bastet/procedures/analyses/AnalysisStatistics";
+import * as utils from "../../procedures/analyses/data/TestUtils";
 
 let smt: Z3SMT;
 let ctx;
@@ -39,7 +40,7 @@ beforeAll( async (done) => {
     theories = smt.createTheories(ctx);
     prover = smt.createProver(ctx, new AnalysisStatistics("Test", {}));
     done();
-});
+}, utils.timeout);
 
 test ("Case: 1 < 0", async (done) => {
     prover.push();
