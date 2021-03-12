@@ -44,16 +44,12 @@ function execFixture(fixturePath: string, done) {
 }
 
 function execute(bastet: Bastet, fixturePath: string, done) {
-    try {
-        if (fixturePath.endsWith("_SAFE.sc")) {
-            execute_explicit(bastet, fixturePath, true, done);
-        } else if (fixturePath.endsWith("_UNSAFE.sc")) {
-            execute_explicit(bastet, fixturePath, false, done);
-        } else {
-            fail("Fixture file does not fit naming scheme")
-        }
-    } finally {
-        done();
+    if (fixturePath.endsWith("_SAFE.sc")) {
+        execute_explicit(bastet, fixturePath, true, done);
+    } else if (fixturePath.endsWith("_UNSAFE.sc")) {
+        execute_explicit(bastet, fixturePath, false, done);
+    } else {
+        fail("Fixture file does not fit naming scheme")
     }
 }
 
@@ -65,11 +61,11 @@ function execute_explicit(bastet: Bastet, fixturePath: string, expectSuccess: bo
     asyncAwaitFunction().then(result => {
             const analysisResult: MultiPropertyAnalysisResult = result as MultiPropertyAnalysisResult;
             if (expectSuccess) {
-                expect(analysisResult.satisfied.size).toBeGreaterThan(0)
+                expect(analysisResult.satisfied.size).toBeGreaterThan(0);
             } else {
-                expect(analysisResult.violated.size).toBeGreaterThan(0)
+                expect(analysisResult.violated.size).toBeGreaterThan(0);
             }
-            done();
-        }
-    );
+        })
+        .catch(e => {fail("No exception expected!"); done()})
+        .finally(() => done());
 }

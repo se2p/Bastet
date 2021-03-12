@@ -22,32 +22,32 @@
 import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-xtest("Test Cos 1 safe", (done) => {
+xtest("Test Cos 1 safe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-1_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test Cos 2 safe", (done) => {
+xtest("Test Cos 2 safe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-2_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test Cos 3 safe", (done) => {
+xtest("Test Cos 3 safe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-3_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test Cos 1 unsafe", (done) => {
+xtest("Test Cos 1 unsafe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test Cos 2 unsafe", (done) => {
+xtest("Test Cos 2 unsafe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-2_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-xtest("Test Cos 3 unsafe", (done) => {
+xtest("Test Cos 3 unsafe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Cos-3_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
