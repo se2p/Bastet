@@ -1217,11 +1217,11 @@ export class TransitionRelations {
     }
 
     static establishAnalysisInvariants(tr: TransitionRelation): TransitionRelation {
-        return TransitionRelations.introduceCommonTargetLocation(
-            TransitionRelations.introduceEpsilonBetweenMergeAndBranchLocs(
-                TransitionRelations.introduceEpsilonToMergeTransitions(
-                    TransitionRelations.introduceEntryExitEpsilonTransition(
-                      TransitionRelations.eliminateEpsilons(tr)))));
+        return TransitionRelations.introduceEpsilonBetweenMergeAndBranchLocs(
+            TransitionRelations.introduceEpsilonToMergeTransitions(
+                TransitionRelations.introduceEntryExitEpsilonTransition(
+                  TransitionRelations.eliminateEpsilons(
+                      TransitionRelations.introduceCommonTargetLocation(tr)))));
     }
 
     static eliminateEpsilons(tr: TransitionRelation): TransitionRelation {
