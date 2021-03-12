@@ -25,10 +25,11 @@
 
 import {DelegatingStateVisitor} from "../AbstractStates";
 import {Set as ImmSet} from "immutable";
-import {ControlAbstractState, RelationLocation} from "./ControlAbstractDomain";
+import {ControlAbstractState} from "./ControlAbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {Preconditions} from "../../../utils/Preconditions";
 import {AbstractElement} from "../../../lattices/Lattice";
+import {RelationLocation} from "./ConcreteProgramState";
 
 /**
  * Extracts the set of control locations to that the abstract

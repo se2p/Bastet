@@ -23,7 +23,10 @@
 import {Map as ImmMap, Record as ImmRec} from "immutable"
 import {LabeledTransferRelation} from "../../../src/bastet/procedures/analyses/TransferRelation";
 import {AbstractElement} from "../../../src/bastet/lattices/Lattice";
-import {ProgramOperation} from "../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
+import {
+    ProgramOperation,
+    ProgramOperationInContext
+} from "../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../src/bastet/syntax/Concern";
 import {Preconditions} from "../../../src/bastet/utils/Preconditions";
 
@@ -65,8 +68,8 @@ export class TransferRelationMock implements LabeledTransferRelation<AbstractMoc
         return [new AbstractMockElement(fromState.stateId)];
     }
 
-    abstractSuccFor(fromState: AbstractMockElement, op: ProgramOperation, co: Concern): Iterable<AbstractMockElement> {
-        this._abstractSuccForCalls.push([fromState, op, co]);
+    abstractSuccFor(fromState: AbstractMockElement, op: ProgramOperationInContext, co: Concern): Iterable<AbstractMockElement> {
+        this._abstractSuccForCalls.push([fromState, op.op, co]);
         return [new AbstractMockElement(fromState.stateId)];
     }
 

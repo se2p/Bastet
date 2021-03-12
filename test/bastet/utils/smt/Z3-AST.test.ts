@@ -32,6 +32,7 @@ import {ConcreteNumber} from "../../../../src/bastet/procedures/domains/Concrete
 import {SMTFactory, Z3SMT} from "../../../../src/bastet/utils/smt/z3/Z3SMT";
 import {VariableCollectingVisitor, Z3Visitor} from "../../../../src/bastet/utils/smt/z3/Z3AST";
 import {Z3Theories} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
+import {AnalysisStatistics} from "../../../../src/bastet/procedures/analyses/AnalysisStatistics";
 
 let smt: Z3SMT;
 let ctx;
@@ -42,11 +43,11 @@ beforeAll( async (done) => {
     smt = await SMTFactory.createZ3();
     ctx = smt.createContext();
     theories = smt.createTheories(ctx);
-    prover = smt.createProver(ctx);
+    prover = smt.createProver(ctx, new AnalysisStatistics("Test", {}));
     done();
 });
 
-test ("Collect and Substitute", () => {
+test ("Collect and Substitute", async (done) => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), IntegerType.instance()));
     const base = theories.boolTheory.and(
@@ -67,9 +68,10 @@ test ("Collect and Substitute", () => {
     }
 
     expect(theories.stringRepresentation(result)).toEqual("(and (= x@0 0) (= y@0 42))");
+    done();
 });
 
-test ("Instantiate", () => {
+test ("Instantiate", async (done) => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), IntegerType.instance()));
     const base = theories.boolTheory.and(
@@ -83,9 +85,10 @@ test ("Instantiate", () => {
     const result = theories.instantiate(base, (s) => 7);
 
     expect(theories.stringRepresentation(result)).toEqual("(and (= x@7 0) (= y@7 42))");
+    done();
 });
 
-test ("Uninstantiate", () => {
+test ("Uninstantiate", async (done) => {
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x@3"), IntegerType.instance()));
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@9"), IntegerType.instance()));
     const base = theories.boolTheory.and(
@@ -99,4 +102,5 @@ test ("Uninstantiate", () => {
     const result = theories.instantiate(base, (s) => NaN);
 
     expect(theories.stringRepresentation(result)).toEqual("(and (= x 0) (= y 42))");
+    done();
 });

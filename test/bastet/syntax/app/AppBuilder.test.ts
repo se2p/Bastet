@@ -56,13 +56,14 @@ describe("AppBuilder", () => {
         const app: App = CodeToApp.codeToApp(code, App.empty(), {});
         const diss: App = AppBuilder.dissolveInheritance(app);
 
-        it('Results in two actors: D and C', function() {
+        it('Results in two actors: D and C', async (done) => {
             expect(diss.nonBootActors.length).toEqual(2);
             expect(diss.actorNames).toContain("D");
             expect(diss.actorNames).toContain("C");
+            done();
         });
 
-        it("copies all attributes and methods from the actors it inherits from", () => {
+        it("copies all attributes and methods from the actors it inherits from", async (done) => {
             expect(diss.getActorByName("D").methodMap.keys()).not.toContain("caesar");
             expect(diss.getActorByName("D").methodMap.keys()).toContain("anton");
             expect(diss.getActorByName("D").methodMap.keys()).not.toContain("_RUN_foo");
@@ -70,6 +71,7 @@ describe("AppBuilder", () => {
             expect(diss.getActorByName("D").methodMap.keys()).toContain("base");
             expect(diss.getActorByName("C").methodMap.keys()).toContain("assert");
             expect(diss.getActorByName("C").methodMap.keys()).toContain("base");
+            done();
         });
 
     });

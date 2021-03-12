@@ -2,7 +2,7 @@
  *   BASTET Program Analysis and Verification Framework
  *
  *   Copyright 2019 by University of Passau (uni-passau.de)
- *    
+ *
  *   Maintained by Andreas Stahlbauer (firstname@lastname.net),
  *   see the file CONTRIBUTORS.md for the list of contributors.
  *
@@ -17,7 +17,7 @@
  *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
- *   
+ *
  */
 
 import {AstNode} from "./AstNode";
@@ -76,6 +76,7 @@ import {
 import {EpsilonStatement} from "./core/statements/EpsilonStatement";
 import {ExpressionStatement} from "./core/statements/ExpressionStatement";
 import {
+    CheckFeasibilityStatement,
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
     TerminateProgramStatement,
@@ -93,12 +94,18 @@ import {
 } from "./CoreVisitor";
 import {CorePrintVisitor} from "./CorePrintVisitor";
 import {PrecisionPopStatement, PrecisionPushStatement} from "./core/Precisions";
+import {BOOTSTRAP_FINISHED_MESSAGE_MSG} from "./core/Message";
 
 export enum Action {
     DEFINE = "DEFINE",
     DECLARE = "DECLARE",
     METHOD_CALL = "METHOD_CALL",
     EPSILON = "EPSILON",
+    MOUSE_MOVE = "MOUSE_MOVE",
+    MOUSE_DOWN = "MOUSE_DOWN",
+    MOUSE_UP = "MOUSE_UP",
+    KEY_DOWN = "KEY_DOWN",
+    KEY_UP = "KEY_UP",
     MOUSE_INPUT = "MOUSE_INPUT",
     KEY_PRESSED = "KEY_PRESSED",
     INITIAL_STATE = "INITIAL_STATE",
@@ -106,22 +113,34 @@ export enum Action {
     ENTER_ATOMIC = "ENTER_ATOMIC",
     LEAVE_ATOMIC = "LEAVE_ATOMIC",
     COLLAPSED_ATOMIC = "COLLAPSED_ATOMIC",
-    REACHED_VIOLATION = "REACHED_VIOLATION"
+    REACHED_VIOLATION = "REACHED_VIOLATION",
+    ANSWER = "ANSWER"
 }
 
 export class ActionWithWeight {
     constructor(public action: Action, public weight: number) {
     }
 
+    public static readonly INITIAL_STATE = new ActionWithWeight(Action.INITIAL_STATE, 5);
     public static readonly DEFINE = new ActionWithWeight(Action.DEFINE, 1);
     public static readonly DECLARE = new ActionWithWeight(Action.DECLARE, 0);
     public static readonly METHOD_CALL = new ActionWithWeight(Action.METHOD_CALL, 2);
     public static readonly EPSILON = new ActionWithWeight(Action.EPSILON, 0);
     public static readonly MOUSE_INPUT = new ActionWithWeight(Action.MOUSE_INPUT, 2);
-    public static readonly INITIAL_STATE = new ActionWithWeight(Action.INITIAL_STATE, 2);
     public static readonly ENTER_ATOMIC = new ActionWithWeight(Action.ENTER_ATOMIC, 3);
     public static readonly LEAVE_ATOMIC = new ActionWithWeight(Action.LEAVE_ATOMIC, 3);
     public static readonly REACHED_VIOLATION = new ActionWithWeight(Action.REACHED_VIOLATION, 2);
+
+    public static isActionEpsilonLike(action: Action) {
+        return !action || [
+            Action.DEFINE,
+            Action.DECLARE,
+            Action.METHOD_CALL,
+            Action.EPSILON,
+            Action.ENTER_ATOMIC,
+            Action.LEAVE_ATOMIC,
+            Action.COLLAPSED_ATOMIC].includes(action);
+    }
 }
 
 export class ErrorWitnessActionVisitor implements CoreVisitor<ActionWithWeight>, CoreBoolExpressionVisitor<ActionWithWeight>, CoreNumberExpressionVisitor<ActionWithWeight>,
@@ -131,6 +150,10 @@ CoreNonCtrlStatementnVisitor<ActionWithWeight>{
 
     visit(node: AstNode): ActionWithWeight {
         throw new ImplementMeForException(node.constructor.name);
+    }
+
+    visitCheckFeasibilityStatement(node: CheckFeasibilityStatement): ActionWithWeight {
+        return ActionWithWeight.EPSILON;
     }
 
     visitReturnStatement(node: ReturnStatement): ActionWithWeight {
@@ -190,7 +213,9 @@ CoreNonCtrlStatementnVisitor<ActionWithWeight>{
     }
 
     visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): ActionWithWeight {
-        return ActionWithWeight.EPSILON;
+        const broadcast = node.msg.messageid.accept(this.printer);
+
+        return broadcast === `"${BOOTSTRAP_FINISHED_MESSAGE_MSG}"` ? ActionWithWeight.INITIAL_STATE : ActionWithWeight.EPSILON;
     }
 
     visitBroadcastMessageStatement(node: BroadcastMessageStatement): ActionWithWeight {

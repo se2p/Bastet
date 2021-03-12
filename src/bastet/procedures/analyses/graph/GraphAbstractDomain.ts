@@ -33,6 +33,7 @@ import {PartitionKey} from "../../algorithms/StateSet";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {AbstractionPrecision} from "../../AbstractionPrecision";
 import {AbstractDomain} from "../../domains/AbstractDomain";
+import {Optional} from "../../../utils/Optional";
 
 export type GraphStateId = number;
 
@@ -50,6 +51,8 @@ export interface GraphAbstractStateAttribs extends AbstractElement, SingletonSta
 
     orderKey: LexiKey;
 
+    wideningOf: Optional<GraphAbstractState>;
+
 }
 
 const GraphAbstractStateRecord = ImmRec({
@@ -58,7 +61,8 @@ const GraphAbstractStateRecord = ImmRec({
     wrappedState: null,
     mergeOf: ImmSet<GraphStateId>([]),
     partitionKeys: ImmSet(),
-    orderKey: new LexiKey([])
+    orderKey: new LexiKey([]),
+    wideningOf: null
 });
 
 let STATE_ID_SEQ: number = 0;
@@ -66,8 +70,9 @@ let STATE_ID_SEQ: number = 0;
 export class GraphAbstractState extends GraphAbstractStateRecord implements GraphAbstractStateAttribs, AbstractState {
 
     constructor(id: GraphStateId, preds: ImmSet<GraphStateId>, mergeOf: ImmSet<GraphStateId>, wrapped: ImmRec<any>,
-                partitionKey: ImmSet<PartitionKey>, orderKey: LexiKey) {
-        super({id: id, predecessors: preds, wrappedState: wrapped, mergeOf: mergeOf, partitionKeys: partitionKey, orderKey: orderKey});
+                partitionKey: ImmSet<PartitionKey>, orderKey: LexiKey, wideningOf: Optional<GraphAbstractState>) {
+        super({id: id, predecessors: preds, wrappedState: wrapped, mergeOf: mergeOf,
+            partitionKeys: partitionKey, orderKey: orderKey, wideningOf: wideningOf});
     }
 
     public getId(): number {
@@ -84,6 +89,14 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
 
     public getWrappedState(): AbstractState {
         return this.get('wrappedState');
+    }
+
+    public getWideningOf(): Optional<GraphAbstractState> {
+        return this.get('wideningOf');
+    }
+
+    public withWideningOf(value: Optional<GraphAbstractState>): GraphAbstractState {
+        return this.set('wideningOf', value);
     }
 
     public withPartitionKeys(keys: ImmSet<PartitionKey>): GraphAbstractState {
@@ -137,15 +150,17 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
 export class GraphAbstractStateFactory {
 
     public static withFreshID(preds: Iterable<GraphStateId>, mergeOf: Iterable<GraphStateId>, wrapped: ImmRec<any>,
-                              wrappedKeys: ImmSet<PartitionKey>, orderKey: LexiKey): GraphAbstractState {
+                              wrappedKeys: ImmSet<PartitionKey>, orderKey: LexiKey,
+                              wideningOf: Optional<GraphAbstractState>): GraphAbstractState {
         const freshId = this.freshStateID();
-        return this.withID(freshId, preds, mergeOf, wrapped, wrappedKeys, orderKey);
+        return this.withID(freshId, preds, mergeOf, wrapped, wrappedKeys, orderKey, wideningOf);
     }
 
     public static withID(id: number, preds: Iterable<GraphStateId>, mergeOf: Iterable<GraphStateId>, wrapped: ImmRec<any>,
-                              wrappedKeys: ImmSet<PartitionKey>, orderKey: LexiKey): GraphAbstractState {
+                              wrappedKeys: ImmSet<PartitionKey>, orderKey: LexiKey,
+                         wideningOf: Optional<GraphAbstractState>): GraphAbstractState {
         return new GraphAbstractState(id, ImmSet(preds), ImmSet(mergeOf)
-            .union([id]), wrapped, wrappedKeys, orderKey);
+            .union([id]), wrapped, wrappedKeys, orderKey, wideningOf);
     }
 
     public static freshStateID(): number {
@@ -165,7 +180,8 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
     constructor(wrappedLattice: Lattice<AbstractElement>) {
         this._wrappedLattice = Preconditions.checkNotUndefined(wrappedLattice);
         this._bottom = GraphAbstractStateFactory.withID(-1, [], [],
-            this._wrappedLattice.bottom(), ImmSet(), new LexiKey([]));
+            this._wrappedLattice.bottom(), ImmSet(), new LexiKey([]),
+            Optional.absent());
     }
 
     bottom(): GraphAbstractState {
@@ -177,11 +193,12 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
     }
 
     join(element1: GraphAbstractState, element2: GraphAbstractState): GraphAbstractState {
+        Preconditions.checkNotUndefined(element2.getWideningOf().isAbsent());
         return GraphAbstractStateFactory.withFreshID(
             element1.getPredecessors().union(element2.getPredecessors()),
             element1.getMergeOf().union(element2.getMergeOf()),
             this._wrappedLattice.join(element1.getWrappedState(), element2.getWrappedState()),
-            element1.getPartitionKeys(), element1.getOrderKey());
+            element1.getPartitionKeys(), element1.getOrderKey(), element1.getWideningOf());
     }
 
     meet(element1: GraphAbstractState, element2: GraphAbstractState): GraphAbstractState {
@@ -219,11 +236,19 @@ export class GraphAbstractDomain implements AbstractDomain<ConcreteElement, Grap
         return this._wrapped.concretizeOne(element.getWrappedState());
     }
 
+    enrich(element: ConcreteElement): ConcreteElement {
+        return element;
+    }
+
     widen(element: GraphAbstractState, precision: AbstractionPrecision): GraphAbstractState {
         throw new ImplementMeException();
     }
 
     get concreteDomain(): ConcreteDomain<ConcreteElement> {
+        throw new ImplementMeException();
+    }
+
+    composeSeq(e1: GraphAbstractState, e2: GraphAbstractState): GraphAbstractState {
         throw new ImplementMeException();
     }
 }

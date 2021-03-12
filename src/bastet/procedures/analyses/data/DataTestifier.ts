@@ -29,7 +29,7 @@ import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
 import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {BooleanFormula} from "../../../utils/ConjunctiveNormalForm";
+import {BooleanFormula, FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
 import {
     BranchingAssumeStatement,
     StrengtheningAssumeStatement
@@ -50,8 +50,13 @@ import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {BooleanType} from "../../../syntax/ast/core/ScratchType";
 import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
-import {getTheOnlyElement} from "../../../utils/Collections";
+import {getAtMostOneElement, getTheOnlyElement} from "../../../utils/Collections";
 import {DataTransformerVisitor} from "./DataTransformerVisitor";
+import {AbstractionState} from "../abstraction/AbstractionAbstractDomain";
+import {AbstractionStateStates} from "../abstraction/AbstractionStates";
+import {DataAbstractStates} from "./DataAbstractStates";
+import {SSAAbstractStates} from "../ssa/SSAAbstractStates";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 class BranchingAlternative {
 
@@ -122,7 +127,7 @@ class StateFormulaVisitor extends DelegatingStateVisitor<BooleanFormula> {
 
 }
 
-export class DataTestifier implements TestificationOperator<AbstractState, AbstractState> {
+export class DataTestifier implements TestificationOperator<AbstractState, AbstractState, ConcreteMemory> {
 
     protected readonly _theories: TransformerTheories<AbstractBoolean, AbstractBoolean, AbstractInteger,
         AbstractReal, AbstractFloat, AbstractString, AbstractList>;
@@ -147,20 +152,16 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
      * @param accessibility
      * @param targetState
      */
-    testifyOne(accessibility: AccessibilityRelation<AbstractState>, targetState: AbstractState): AccessibilityRelation<AbstractState> {
+    private testifyOneIncludeConcrete(accessibility: AccessibilityRelation<AbstractState>,
+                                     targetState: AbstractState): [AccessibilityRelation<AbstractState>, Iterable<[AbstractState, ConcreteMemory][]>] {
         const alternatives = this.determineBranchingAlternatives(accessibility, targetState);
-        if (alternatives.elements.length == 0) {
-            return accessibility;
-        }
 
         // Create the branching formula
         let branchingFormula: BooleanFormula = this._theories.boolTheory.trueBool();
         for (const a of alternatives.elements) {
             branchingFormula = this._theories.boolTheory.and(branchingFormula, a.branchPredicateEquiv);
-            // console.log(a.branchName, this._theories.stringRepresentation(a.branchPredicateEquiv));
         }
         Object.freeze(branchingFormula);
-        // console.log(this._theories.stringRepresentation(branchingFormula));
 
         // Extract the trace formula
         const traceFormula: BooleanFormula = this.recoverTraceFormula(accessibility, targetState);
@@ -170,14 +171,21 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
 
         // Get one satisfying assignment (model of the choiceQuery formula)
         const satAssignement: ConcreteMemory = this._domain.folDomain.concretizeOne(choiceQuery);
+        Preconditions.checkNotUndefined(satAssignement);
 
         // Testify the accessibility relation based on the model for the `choiceQuery` formula
         // - make sure to return the empty accessibility relation in case the formula is infeasible
         const result: AccessibilityRelation<AbstractState> = this.strenghtenRelation(
             accessibility, alternatives, satAssignement, targetState);
 
+        const concreteSeq: Iterable<[AbstractState, ConcreteMemory][]> = [this.buildConcreteStateSeq(result, satAssignement)];
+
         // return the result (strengthened accessibility relation)
-        return result;
+        return [result, concreteSeq];
+    }
+
+    public testifyOne(accessibility: AccessibilityRelation<AbstractState>, targetState: AbstractState): AccessibilityRelation<AbstractState> {
+        return this.testifyOneIncludeConcrete(accessibility, targetState)[0];
     }
 
     private determineBranchingAlternatives(accessibility: AccessibilityRelation<AbstractState>, targetState: AbstractState): BranchingAlternatives {
@@ -219,7 +227,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
 
         for (const start of ar.successorsOf(nextSplit)) {
             // TODO: Refactor. Redundant compared to the loop below
-            const transAssumes = this.filterAssumes(this.getTransitionLabels(ar, nextSplit, start));
+            const transAssumes = this.filterAssumes(this.getTransitionLabels(ar, nextSplit, start).map(([ts, op]) => op));
             worklist.push(new ConditionalBranch(nextSplit, start, start, transAssumes));
         }
 
@@ -230,7 +238,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
                 result.push(work);
             } else {
                 for (const succ of succs) {
-                    const transAssumes = this.filterAssumes(this.getTransitionLabels(ar, work.branchEnd, succ));
+                    const transAssumes = this.filterAssumes(this.getTransitionLabels(ar, work.branchEnd, succ).map(([ts, op]) => op));
                     worklist.push(new ConditionalBranch(nextSplit, work.branchStart, succ, work.branchAssumes.concat(transAssumes)));
                 }
             }
@@ -271,18 +279,18 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         return result;
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteMemory][]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
-        throw new ImplementMeException();
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteMemory][]> {
+        return this.testifyOneIncludeConcrete(accessibility, state)[1];
     }
 
     /**
      * Get the program operations with SCOPES and SSA indices.
      */
-    private getTransitionLabels(ar: AccessibilityRelation<AbstractState>, from: AbstractState, to: AbstractState): ProgramOperation[] {
+    private getTransitionLabels(ar: AccessibilityRelation<AbstractState>, from: AbstractState, to: AbstractState): [ThreadState, ProgramOperation][] {
         return ar.labeler().getTransitionLabel(from, to);
     }
 
@@ -317,7 +325,23 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
     }
 
     private recoverTraceFormula(accessibility: AccessibilityRelation<AbstractState>, targetState: AbstractState): BooleanFormula {
-        return targetState.accept(new StateFormulaVisitor());
+        const wideningStates: AbstractState[] = AccessibilityRelations.getWidenedSequence(accessibility, targetState);
+        const unalignedFormulas: FirstOrderFormula[] = wideningStates
+            .map(e => getTheOnlyElement(DataAbstractStates.extractFrom(e)).blockFormula);
+
+        if (unalignedFormulas.length == 1) {
+            return getTheOnlyElement(unalignedFormulas);
+        } else {
+            const alignedBlockFormulas: FirstOrderFormula[] = this.alignSsaIndices(wideningStates, unalignedFormulas);
+            return alignedBlockFormulas.reduce((f, r) => this._theories.boolTheory.and(f, r),
+                this._theories.boolTheory.trueBool());
+        }
+    }
+
+    private alignSsaIndices(wideningStateSeq: AbstractState[], blockFormulas: FirstOrderFormula[]): FirstOrderFormula[] {
+        Preconditions.checkArgument(wideningStateSeq.length == blockFormulas.length);
+        const ssaMaps = wideningStateSeq.map((e) => new Map(getTheOnlyElement(SSAAbstractStates.extractFrom(e)).getSSA()));
+        return this._theories.alignSsaIndices(blockFormulas, ssaMaps);
     }
 
     private strenghtenRelation(accessibility: AccessibilityRelation<AbstractState>,
@@ -325,7 +349,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
                                targetState: AbstractState): AccessibilityRelation<AbstractState> {
         const result = AccessibilityRelations.filterForwards(accessibility, (s1, s2) => {
             const branchName = this.createBranchName(s1, s2);
-            const assignement = satAssignement.booleanMem.get(branchName);
+            const assignement = satAssignement.booleans.get(branchName);
             if (assignement !== undefined) {
                 if (assignement.value) {
                     return true;
@@ -339,5 +363,9 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
 
         Preconditions.checkState(result.isReachable(targetState), "The target state must be reachable in the strengthened relation!");
         return result;
+    }
+
+    private buildConcreteStateSeq(result: AccessibilityRelation<AbstractState>, satAssignement: ConcreteMemory): [AbstractState, ConcreteMemory][] {
+        return AccessibilityRelations.toSequence(result).map(e => [e, satAssignement]);
     }
 }

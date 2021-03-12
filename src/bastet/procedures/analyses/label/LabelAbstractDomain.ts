@@ -31,10 +31,13 @@ import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {AbstractionPrecision} from "../../AbstractionPrecision";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 export interface LabeledTransferAttributes {
 
     from: AbstractElement,
+
+    ts: ThreadState,
 
     op: OperationId,
 
@@ -46,6 +49,8 @@ const LabeledTransferRecord = ImmRec({
 
     from: null,
 
+    ts: null,
+
     op: ProgramOperations.epsilon().ident,
 
     bigStep: -1
@@ -54,8 +59,12 @@ const LabeledTransferRecord = ImmRec({
 
 export class LabeledTransfer extends LabeledTransferRecord implements LabeledTransferAttributes {
 
-    constructor(from: AbstractElement, op: ProgramOperation, bigStep: number) {
-        super({from: from, op: op.ident, bigStep: bigStep});
+    constructor(from: AbstractElement, ts: ThreadState, op: ProgramOperation, bigStep: number) {
+        super({from: from, op: op.ident, ts: ts, bigStep: bigStep});
+    }
+
+    public getThreadState(): ThreadState {
+        return this.get('ts');
     }
 
     public getFrom(): AbstractElement {
@@ -187,11 +196,19 @@ export class LabelAbstractDomain implements AbstractDomain<ConcreteElement, Labe
         return this._wrapped.concretizeOne(element.getWrappedState());
     }
 
+    enrich(element: ConcreteElement): ConcreteElement {
+        return element;
+    }
+
     widen(element: LabelState, precision: AbstractionPrecision): LabelState {
         throw new ImplementMeException();
     }
 
     get concreteDomain(): ConcreteDomain<ConcreteElement> {
+        throw new ImplementMeException();
+    }
+
+    composeSeq(e1: LabelState, e2: LabelState): LabelState {
         throw new ImplementMeException();
     }
 }

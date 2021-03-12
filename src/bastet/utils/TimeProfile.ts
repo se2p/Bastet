@@ -70,18 +70,30 @@ export class StaticTimeProfile implements ProgramTimeProfile {
     private readonly _avgAtomicBlockProfile: OperationTimeProfile;
     private readonly _noDurationProfile: OperationTimeProfile;
 
+    private readonly _staticProfiles: OperationTimeProfile[];
+
     constructor() {
+        this._staticProfiles = [];
         this._opTimes = new Map();
-        this._avgOpProfile = new OperationTimeProfile(
+        this._avgOpProfile = this.addStaticProfile(new OperationTimeProfile(
             new NumIntervalValue(
                 new ConcreteNumber(ONE_MICSEC_IN_NSECS * 10),
-                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 1000)));
-        this._avgAtomicBlockProfile = new OperationTimeProfile(
+                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 1000))));
+        this._avgAtomicBlockProfile = this.addStaticProfile(new OperationTimeProfile(
             new NumIntervalValue(
                 new ConcreteNumber(ONE_MICSEC_IN_NSECS * 100),
-                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 10000)));
-        this._noDurationProfile = new OperationTimeProfile(
-            new NumIntervalValue(new ConcreteNumber(0), new ConcreteNumber(0)));
+                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 10000))));
+        this._noDurationProfile = this.addStaticProfile(new OperationTimeProfile(
+            new NumIntervalValue(new ConcreteNumber(0), new ConcreteNumber(0))));
+    }
+
+    private addStaticProfile(profile: OperationTimeProfile): OperationTimeProfile {
+        this._staticProfiles.push(profile);
+        return profile;
+    }
+
+    public getStaticProfiles(): OperationTimeProfile[] {
+        return this._staticProfiles.slice();
     }
 
     public widen(op: ProgramOperation, minNanos: number, maxNanos: number) {
@@ -106,6 +118,8 @@ export class StaticTimeProfile implements ProgramTimeProfile {
 }
 
 export interface ProgramTimeProfile {
+
+    getStaticProfiles(): OperationTimeProfile[];
 
     getOpProfile(op: ProgramOperation): OperationTimeProfile;
 

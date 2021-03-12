@@ -1,0 +1,391 @@
+{
+  "steps": [
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "active_graphic_half_width": 32,
+            "size": 100,
+            "active_graphic_half_height": 32,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "score": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "active_graphic_height": 64,
+            "x": -140,
+            "y": -100,
+            "active_graphic_name": "mole",
+            "direction": 90,
+            "active_graphic_width": 64,
+            "bubbleText": "!0!"
+          },
+          "name": "Mole"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 660
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "active_graphic_half_width": 32,
+            "size": 100,
+            "active_graphic_half_height": 32,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "score": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "active_graphic_height": 64,
+            "x": -140,
+            "y": -100,
+            "active_graphic_name": "mole",
+            "direction": 90,
+            "active_graphic_width": 64,
+            "bubbleText": "!0!"
+          },
+          "name": "Mole"
+        }
+      ],
+      "action": "MOUSE_MOVE",
+      "mousePosition": {
+        "x": -108
+      }
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "active_graphic_half_width": 32,
+            "size": 100,
+            "active_graphic_half_height": 32,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "score": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "active_graphic_height": 64,
+            "x": -140,
+            "y": -100,
+            "active_graphic_name": "mole",
+            "direction": 90,
+            "active_graphic_width": 64,
+            "bubbleText": "!0!"
+          },
+          "name": "Mole"
+        }
+      ],
+      "action": "MOUSE_MOVE",
+      "mousePosition": {
+        "x": -108,
+        "y": -68
+      }
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "active_graphic_half_width": 32,
+            "size": 100,
+            "active_graphic_half_height": 32,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "score": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "active_graphic_height": 64,
+            "x": -140,
+            "y": -100,
+            "active_graphic_name": "mole",
+            "direction": 90,
+            "active_graphic_width": 64,
+            "bubbleText": "!0!"
+          },
+          "name": "Mole"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 120
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "active_graphic_half_width": 32,
+            "size": 100,
+            "active_graphic_half_height": 32,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "score": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "active_graphic_height": 64,
+            "x": -140,
+            "y": -100,
+            "active_graphic_name": "mole",
+            "direction": 90,
+            "active_graphic_width": 64,
+            "bubbleText": "!0!"
+          },
+          "name": "Mole"
+        }
+      ],
+      "action": "MOUSE_DOWN"
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "active_graphic_half_width": 32,
+            "size": 100,
+            "active_graphic_half_height": 32,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "score": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "active_graphic_height": 64,
+            "x": -140,
+            "y": -100,
+            "active_graphic_name": "mole",
+            "direction": 90,
+            "active_graphic_width": 64,
+            "bubbleText": "!0!"
+          },
+          "name": "Mole"
+        }
+      ],
+      "action": "MOUSE_UP"
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "active_graphic_half_width": 32,
+            "size": 100,
+            "active_graphic_half_height": 32,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "score": 1,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "active_graphic_height": 64,
+            "x": 210,
+            "y": -100,
+            "active_graphic_name": "mole",
+            "direction": 90,
+            "active_graphic_width": 64,
+            "bubbleText": "!0!"
+          },
+          "name": "Mole"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 310
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "active_graphic_half_width": 32,
+            "size": 100,
+            "active_graphic_half_height": 32,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "score": 1,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "active_graphic_height": 64,
+            "x": 210,
+            "y": -100,
+            "active_graphic_name": "mole",
+            "direction": 90,
+            "active_graphic_width": 64,
+            "bubbleText": "!0!"
+          },
+          "name": "Mole"
+        }
+      ],
+      "action": "MOUSE_MOVE",
+      "mousePosition": {
+        "x": 178,
+        "y": -68
+      }
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "active_graphic_half_width": 32,
+            "size": 100,
+            "active_graphic_half_height": 32,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "score": 1,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "active_graphic_height": 64,
+            "x": 210,
+            "y": -100,
+            "active_graphic_name": "mole",
+            "direction": 90,
+            "active_graphic_width": 64,
+            "bubbleText": "!0!"
+          },
+          "name": "Mole"
+        }
+      ],
+      "action": "MOUSE_MOVE",
+      "mousePosition": {
+        "x": 178,
+        "y": -69
+      }
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "active_graphic_half_width": 32,
+            "size": 100,
+            "active_graphic_half_height": 32,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "score": 1,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "active_graphic_height": 64,
+            "x": 210,
+            "y": -100,
+            "active_graphic_name": "mole",
+            "direction": 90,
+            "active_graphic_width": 64,
+            "bubbleText": "!0!"
+          },
+          "name": "Mole"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 120
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "active_graphic_half_width": 32,
+            "size": 100,
+            "active_graphic_half_height": 32,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "score": 1,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "active_graphic_height": 64,
+            "x": 210,
+            "y": -100,
+            "active_graphic_name": "mole",
+            "direction": 90,
+            "active_graphic_width": 64,
+            "bubbleText": "!0!"
+          },
+          "name": "Mole"
+        }
+      ],
+      "action": "MOUSE_DOWN"
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "active_graphic_half_width": 32,
+            "size": 100,
+            "active_graphic_half_height": 32,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "score": 1,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "active_graphic_height": 64,
+            "x": 210,
+            "y": -100,
+            "active_graphic_name": "mole",
+            "direction": 90,
+            "active_graphic_width": 64,
+            "bubbleText": "!0!"
+          },
+          "name": "Mole"
+        }
+      ],
+      "action": "MOUSE_UP"
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "active_graphic_half_width": 32,
+            "size": 100,
+            "active_graphic_half_height": 32,
+            "layer": 0,
+            "STAGE_HALF_HEIGHT": 180,
+            "score": 2,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "active_graphic_height": 64,
+            "x": 210,
+            "y": -100,
+            "active_graphic_name": "mole",
+            "direction": 90,
+            "active_graphic_width": 64,
+            "bubbleText": "!0!"
+          },
+          "name": "Mole"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 10
+    }
+  ],
+  "violations": [
+    "Mole should say 'Still here' when score = 2"
+  ]
+}

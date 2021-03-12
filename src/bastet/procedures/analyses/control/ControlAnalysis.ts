@@ -27,20 +27,17 @@ import {ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnal
 import {
     ControlAbstractDomain,
     ControlAbstractState,
-    ControlConcreteState,
     IndexedThread,
-    MethodCall,
-    RelationLocation,
-    ScheduleAbstractStateFactory, ThreadId, ThreadState
+    ScheduleAbstractStateFactory
 } from "./ControlAbstractDomain";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {ControlTransferRelation} from "./ControlTransferRelation";
 import {Preconditions} from "../../../utils/Preconditions";
 import {BastetConfiguration} from "../../../utils/BastetConfiguration";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
+import {AbstractElement, AbstractState, Lattices} from "../../../lattices/Lattice";
 import {Property} from "../../../syntax/Property";
 import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
 import {AnalysisStatistics} from "../AnalysisStatistics";
@@ -54,12 +51,19 @@ import {TransitionRelation} from "../../../syntax/app/controlflow/TransitionRela
 import {ControlCoverageExaminer} from "./coverage/ControlCoverage";
 import {ControlLocationExtractor} from "./ControlUtils";
 import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
+import {Record as ImmRec, Map as ImmMap} from "immutable";
 import {ReturnStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 import {AccessibilityRelation} from "../Accessibility";
-import {ConcreteElement} from "../../domains/ConcreteElements";
+import {
+    ConcreteElement,
+    ConcretePrimitive,
+    ConcreteUnifiedMemory
+} from "../../domains/ConcreteElements";
 import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
 import {Concern} from "../../../syntax/Concern";
 import {AfterStatementMonitoringEvent} from "../../../syntax/ast/core/CoreEvent";
+import {ConcreteProgramState, MethodCall, RelationLocation, ThreadId, ThreadState} from "./ConcreteProgramState";
+import {EpsilonStatement} from "../../../syntax/ast/core/statements/EpsilonStatement";
 
 export class ControlAnalysisConfig extends BastetConfiguration {
 
@@ -77,6 +81,10 @@ export class ControlAnalysisConfig extends BastetConfiguration {
         return this.getBoolProperty('widen-on-loop-heads', false);
     }
 
+    get checkLoopUnrollingFeasibility(): boolean {
+        return this.getBoolProperty('check-feasibility-on-unrolling', true);
+    }
+
     get widenAfterEachStep(): boolean {
         return this.getBoolProperty('widen-after-each-step', false);
     }
@@ -91,13 +99,13 @@ export class ControlAnalysisConfig extends BastetConfiguration {
 
 }
 
-export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcreteState, ControlAbstractState, AbstractState>,
-    WrappingProgramAnalysis<ControlConcreteState, ControlAbstractState, AbstractState>,
+export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgramState, ControlAbstractState, AbstractState>,
+    WrappingProgramAnalysis<ConcreteProgramState, ControlAbstractState, AbstractState>,
     Unwrapper<ControlAbstractState, AbstractElement> {
 
     private readonly _config: ControlAnalysisConfig;
 
-    private readonly _abstractDomain: AbstractDomain<ControlConcreteState, ControlAbstractState>;
+    private readonly _abstractDomain: AbstractDomain<ConcreteProgramState, ControlAbstractState>;
 
     private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>;
 
@@ -120,28 +128,58 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
-        return this._transferRelation.abstractSucc(fromState);
+        const getThreadRelName = (ts: ThreadState) =>
+            this._task.getTransitionRelationById(ts.getRelationLocation().getRelationId()).name;
+        const filterRelNames = (threads: ImmSet<IndexedThread>) => {
+            return threads.map(ts => getThreadRelName(ts.threadStatus)).filter((value, key) => key !== "messageDispatcherLoop");
+        };
+
+        const result: ControlAbstractState[] = [];
+        for (const succ of this._transferRelation.abstractSucc(fromState)) {
+            const steppedToLoopRelations = filterRelNames(this.getSteppedToLoopHeadThreads(succ));
+            if (steppedToLoopRelations.size > 0 && this._config.checkLoopUnrollingFeasibility) {
+                if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Loop unrolling for " + steppedToLoopRelations.toString())) {
+                    continue;
+                }
+            }
+            result.push(succ);
+        }
+        return result;
     }
 
     createUniquePartition(): Object {
         return {id: this._seq++};
     }
 
-    getPartitionKeys(element: ControlAbstractState): ImmSet<PartitionKey> {
-        var controlPartition;
+    getControlPartition(element: ControlAbstractState): PartitionKey {
+        const steppedFor: ImmSet<ThreadId> = element.getSteppedFor();
+        const locations: ImmSet<LocationId> = ImmSet(element.getThreadStates()
+            .map((ts) => ts.getRelationLocation().getLocationId()));
+        const callstacks: ImmSet<ImmList<MethodCall>> = ImmSet(element.getThreadStates()
+            .map((ts) => ts.getCallStack()));
+        const loopstacks: ImmSet<ImmList<RelationLocation>> = ImmSet(element.getThreadStates()
+            .map((ts) => ts.getLoopStack()));
+        return new PartitionKey(ImmList([steppedFor, locations, callstacks, loopstacks]));
+    }
 
+    getStopPartitionKeys(element: ControlAbstractState): ImmSet<PartitionKey> {
+        const controlPartition = this.getControlPartition(element);
+
+        let result: ImmSet<PartitionKey> = ImmSet();
+        for (const wrappedPartition of this.wrappedAnalysis.getPartitionKeys(element.getWrappedState())) {
+            result = result.add(controlPartition.concat(wrappedPartition));
+        }
+
+        return result;
+    }
+
+    getMergePartitionKeys(element: ControlAbstractState): ImmSet<PartitionKey> {
+        var controlPartition;
         if (this.steppedToLoopHead(element)) {
             // Results in a factor 2 performance boost of the merge operation
             controlPartition = new PartitionKey(ImmList([this.createUniquePartition()]));
         } else {
-            const steppedFor: ImmSet<ThreadId> = element.getSteppedFor();
-            const locations: ImmSet<LocationId> = ImmSet(element.getThreadStates()
-                .map((ts) => ts.getRelationLocation().getLocationId()));
-            const callstacks: ImmSet<ImmList<MethodCall>> = ImmSet(element.getThreadStates()
-                .map((ts) => ts.getCallStack()));
-            const loopstacks: ImmSet<ImmList<RelationLocation>> = ImmSet(element.getThreadStates()
-                .map((ts) => ts.getLoopStack()));
-            controlPartition = new PartitionKey(ImmList([steppedFor, locations, callstacks, loopstacks]));
+            controlPartition = this.getControlPartition(element);
         }
 
         let result: ImmSet<PartitionKey> = ImmSet();
@@ -150,6 +188,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         }
 
         return result;
+    }
+
+    getPartitionKeys(element: ControlAbstractState): ImmSet<PartitionKey> {
+        return this.getStopPartitionKeys(element); // this.getMergePartitionKeys(element).union(this.getStopPartitionKeys(element));
     }
 
     join(state1: ControlAbstractState, state2: ControlAbstractState): ControlAbstractState {
@@ -186,7 +228,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
             return false;
         }
 
-        if (this.steppedToLoopHead(state1) || this.steppedToLoopHead(state2)) {
+        if (this.isWideningState(state1) || this.isWideningState(state2)) {
             // Do also consider threads that were not stepped!
             // Needed, for example, if the specification is checked after stepping on a loop head.
             return false;
@@ -286,8 +328,11 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         });
     }
 
-    getTransitionLabel(from: ControlAbstractState, to: ControlAbstractState): ProgramOperation[] {
-        let result: ProgramOperation[] = this._wrappedAnalysis.getTransitionLabel(from.getWrappedState(), to.getWrappedState());
+    getTransitionLabel(from: ControlAbstractState, to: ControlAbstractState): [ThreadState, ProgramOperation][] {
+        const result: [ThreadState, ProgramOperation][] = this._wrappedAnalysis
+            .getTransitionLabel(from.getWrappedState(), to.getWrappedState())
+            .filter(([t, o]) => !(o.ast instanceof EpsilonStatement));
+
         if (result.length > 0) {
             return result;
         }
@@ -308,7 +353,7 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
                 } else if (t == null) {
                    throw new IllegalStateException("Something is really wrong here. This seems to be a BUG") ;
                 }
-                result.push(t);
+                result.push([steppedThread, t]);
             } else {
                 const fromRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
                 const toRelation = this._task.getTransitionRelationById(toLocation.getRelationId());
@@ -318,9 +363,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
                     .filter(o => o.ast instanceof CallStatement || o.ast instanceof ReturnStatement);
                 if (calls.length > 0) {
                     const call = getTheOnlyElement(calls);
-                    result.push(call);
+                    result.push([steppedThread, call]);
                 } else {
-                    return steppedThread.getOperations().map(oid => ProgramOperation.for(oid)).toArray();
+                    const mkTuple = (t: ThreadState, o: ProgramOperation): [ThreadState, ProgramOperation] => [t, o];
+                    return steppedThread.getOperations().map(oid => mkTuple(steppedThread, ProgramOperation.for(oid))).toArray();
                 }
             }
         }
@@ -344,10 +390,13 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         throw new ImplementMeException();
     }
 
-    private steppedToLoopHead(r: ControlAbstractState) {
-        const steppedThreads = r.getSteppedFor().map((i) =>
+    private getSteppedToLoopHeadThreads(r: ControlAbstractState) {
+        return r.getSteppedFor().map((i) =>
             r.getIndexedThreadState(i)).filter((ts) => this.isThreadOnLoophead(ts.threadStatus));
+    }
 
+    private steppedToLoopHead(r: ControlAbstractState) {
+        const steppedThreads = this.getSteppedToLoopHeadThreads(r);
         return steppedThreads.size > 0;
     }
 
@@ -446,6 +495,9 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
 
         const actors = this._statistics.withContext("Actors");
         actors.put("actorOrder", this._task.actors.map(a => a.ident).toString())
+        for (const a of this._task.actors) {
+            actors.withContext(a.ident).put("scripts", Array.from(a.scripts).map((s) => s.transitions.name).toString());
+        }
     }
 
     testify(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
@@ -456,15 +508,30 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         return this._wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
-        return this._wrappedAnalysis.testifyConcrete(accessibility, state);
+    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteProgramState][]> {
+        throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
-        return this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteProgramState][]> {
+        const seq: Iterable<[AbstractState, ConcreteElement][]> = this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
+        const result: [AbstractState, ConcreteProgramState][][] = [];
+
+        // Given a sequence of concrete unified memories to goal is to build a sequence of concrete PROGRAM states
+
+        for (const s of seq) {
+            const sPrime: [AbstractState, ConcreteProgramState][] = [];
+
+            for (const [e, c] of s) {
+                sPrime.push([e, this._abstractDomain.enrich(c as ConcreteUnifiedMemory)]);
+            }
+
+            result.push(sPrime);
+        }
+
+        return result;
     }
 
-    abstractSuccFor(fromState: ControlAbstractState, op: ProgramOperation, co: Concern): Iterable<ControlAbstractState> {
+    abstractSuccFor(fromState: ControlAbstractState, op: ProgramOperationInContext, co: Concern): Iterable<ControlAbstractState> {
         throw new NotSupportedException();
     }
 
@@ -472,5 +539,12 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ControlConcret
         throw new ImplementMeException();
     }
 
+    incRef(state: ControlAbstractState) {
+        this.wrappedAnalysis.incRef(state.getWrappedState());
+    }
+
+    decRef(state: ControlAbstractState) {
+        this.wrappedAnalysis.decRef(state.getWrappedState());
+    }
 
 }

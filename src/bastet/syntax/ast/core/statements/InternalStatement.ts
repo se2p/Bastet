@@ -26,6 +26,7 @@
 import {Statement} from "./Statement";
 import {ExpressionList} from "../expressions/ExpressionList";
 import {Preconditions} from "../../../../utils/Preconditions";
+import {StringLiteral} from "../expressions/StringExpression";
 
 export interface InternalStatement {
 
@@ -43,6 +44,21 @@ export class TerminateProgramStatement extends Statement implements InternalStat
 
     constructor() {
         super([]);
+    }
+
+}
+
+export class CheckFeasibilityStatement extends Statement implements InternalStatement {
+
+    private readonly _purpose: StringLiteral;
+
+    constructor(purpose: StringLiteral) {
+        super([purpose]);
+        this._purpose = Preconditions.checkNotUndefined(purpose);
+    }
+
+    public getPurpose(): string {
+        return this._purpose.text;
     }
 
 }

@@ -12,5 +12,7 @@ new Bastet().run().then(() => process.exit(0)).catch((e) => {
     } finally {
         console.groupEnd();
     }
+    // The following exit is needed to ensure that Bastet really terminates.
+    process.exit(1);
 });
 

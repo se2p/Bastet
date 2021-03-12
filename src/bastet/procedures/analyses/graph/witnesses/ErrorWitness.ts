@@ -22,107 +22,141 @@
 
 import {Action} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
 import {Preconditions} from "../../../../utils/Preconditions";
-import {ConcretePrimitive} from "../../../domains/ConcreteElements";
-import {WitnessExporter} from "./WitnessExporter";
+import {ConcreteUnifiedMemory} from "../../../domains/ConcreteElements";
+import {DataLocationScoper} from "../../control/DataLocationScoping";
 
-export class Target {
-    private static readonly SCRATCH_TARGET_ATTRIBUTES = ["x", "y", "direction", "draggable", "rotationStyle", "visible", "size"];
+export class ErrorWitnessActor {
+
     name: string;
-    scratchAttributes: { [key: string]: string | boolean | number } = {}; //TODO add default scratch attributes
-    userDefinedAttributes: { [key: string]: string | boolean | number } = {};
 
-    removeUserDefinedAttributes(attributeToRemove: string[]) {
-        for (const attribute of attributeToRemove) {
-            if (this.userDefinedAttributes[attribute] != undefined) {
-                delete this.userDefinedAttributes[attribute];
+    variables: { [key: string]: string | boolean | number } = {}; //TODO add default scratch attributes
+
+    /**
+     * Variables that were declared inside a method
+     */
+    methodVariables: { [key: string]: string | boolean | number } = {};
+
+    removeVariables(variableNames: string[]) {
+        Object.keys(this.variables).forEach(variable => {
+            if (variableNames.includes(variable)) {
+                delete this.variables[variable];
             }
-        }
-    }
-
-    removeAttributesStartingWith(attributes: string[]) {
-        const attributesToRemove = Object.keys(this.userDefinedAttributes).filter(attribute => attributes.some(prefix => attribute.startsWith(prefix)));
-        this.removeUserDefinedAttributes(attributesToRemove);
-    }
-
-    removeActorPrefix(): void {
-        Target.removeAttributesWithTargetPrefix(this.scratchAttributes);
-        Target.removeAttributesWithTargetPrefix(this.userDefinedAttributes);
-    }
-
-    private static removeAttributesWithTargetPrefix(attributes): void {
-        Object.keys(attributes).forEach(attributeWithActorName => {
-            const {attribute} = WitnessExporter.splitTargetPrefixFromAttribute(attributeWithActorName);
-
-            const value = attributes[attributeWithActorName];
-            delete attributes[attributeWithActorName];
-            attributes[attribute] = value;
         })
     }
 
-    static fromConcretePrimitives(name: string, attributes: Map<string, ConcretePrimitive<any>>): Target {
-        const target = new Target();
-        target.name = name;
+    static fromConcreteActorState(actorName: string, actorMemory: ConcreteUnifiedMemory): ErrorWitnessActor {
+        const target = new ErrorWitnessActor();
+        target.name = actorName;
 
-        attributes.forEach((value, attribute) => {
-            if (this.isScratchAttribute(attribute)) {
-                target.scratchAttributes[attribute] = value.value;
-            } else {
-                target.userDefinedAttributes[attribute] = value.value;
-            }
-        });
+        for (const v of actorMemory.variables()) {
+            target.variables[v] = actorMemory.getValue(v).value;
+        }
 
         return target;
     }
 
-    static isScratchAttribute(name: string): boolean {
-        if (WitnessExporter.isTargetAttribute(name)) {
-            name = WitnessExporter.splitTargetPrefixFromAttribute(name).attribute;
-        }
+    isActorVariable(scopedVariableName: string): boolean {
+        const scopedVariableNameName = DataLocationScoper.rightUnwrapScope(scopedVariableName);
+        const actorName = scopedVariableNameName.prefix;
 
-        return this.SCRATCH_TARGET_ATTRIBUTES.includes(name);
+        return actorName === this.name;
+    }
+
+    clone(): ErrorWitnessActor {
+        const data = JSON.parse(JSON.stringify(this));
+        return Object.assign(new ErrorWitnessActor(), data);
     }
 }
 
-export class MousePosition {
-    readonly x: number;
-    readonly y: number;
-
-    constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
-    }
+export interface MousePosition {
+    x: number;
+    y: number;
 }
 
 export class ErrorWitnessStep {
+
     timestamp: number;
     action: Action;
+    epsilonType: Action;
     waitMicros?: number;
-    keyPressed?: number
+    keyPressed?: number;
+    answer?: string;
     actionLabel: string;
     actionTargetName: string;
     mousePosition: MousePosition;
-    targets: Target[] = [];
+    actors: ErrorWitnessActor[] = [];
 
-    isEmpty(): boolean {
-        return !this.action || this.targets.length === 0;
+    constructor(public id: number) {
     }
 
-    relevantTransition(prev: ErrorWitnessStep) {
-        this.targets = this.targets.sort((t1, t2) => t1.name.localeCompare(t2.name));
-        return !prev
-            || this.timestamp - prev.timestamp > 1000
-            || JSON.stringify(this.targets) !== JSON.stringify(prev.targets);
-    }
-
-    getUserDefinedAttributeValue(targetName: string, attribute: string): any {
-        const target = this.targets.find(t => t.name === targetName);
+    getVariableValue(targetName: string, attribute: string): any {
+        const target = this.actors.find(t => t.name === targetName);
         Preconditions.checkNotUndefined(target);
-        return target.userDefinedAttributes[attribute];
+        return target.variables[attribute];
+    }
+
+    clone(): ErrorWitnessStep {
+        const data = JSON.parse(JSON.stringify(this));
+        const clone: ErrorWitnessStep = Object.assign(new ErrorWitnessStep(this.id), data);
+        clone.actors = this.actors.map(actor => actor.clone());
+
+        return clone;
+    }
+}
+
+export interface Mock {
+    readonly forFunction: string;
+}
+
+export class ReturnValueMock<T> implements Mock {
+    readonly forFunction: string;
+    readonly returns: T[];
+    readonly index: number;
+
+    constructor(forFunction: string, returnValues: T[]) {
+        this.forFunction = forFunction;
+        this.returns = returnValues;
+        this.index = 0;
+    }
+}
+
+export class AssignmentMock implements Mock {
+    readonly forFunction: string;
+    readonly assignments: {"actor": string, "assigns": {}[], "index": number}[];
+
+    constructor(forFunction: string, assignments: {"actor": string, "assigns": {}[], "index": number}[]) {
+        this.forFunction = forFunction;
+        this.assignments = assignments;
     }
 }
 
 export class ErrorWitness {
-    programName: string;
-    violations: string[];
-    steps: ErrorWitnessStep[] = [];
+
+    private readonly _programName: string;
+    private readonly _violations: string[];
+    private readonly _steps: ErrorWitnessStep[];
+    private readonly _mocks: Mock[];
+
+    constructor(programName: string, violations: string[], steps: ErrorWitnessStep[], mocks: Mock[]) {
+        this._programName = Preconditions.checkNotUndefined(programName);
+        this._violations = Preconditions.checkNotUndefined(violations).slice();
+        this._steps = Preconditions.checkNotUndefined(steps).slice();
+        this._mocks = Preconditions.checkNotUndefined(mocks).slice();
+    }
+
+    get programName(): string {
+        return this._programName;
+    }
+
+    get violations(): string[] {
+        return this._violations;
+    }
+
+    get steps(): ErrorWitnessStep[] {
+        return this._steps;
+    }
+
+    get mocks(): Mock[] {
+        return this._mocks;
+    }
 }

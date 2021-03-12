@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BASTET task7 SAFE PredAbs" type="NodeJSConfigurationType" folderName="ASE20" application-parameters="-c config/predicate-abstraction.json -P test/programs/publications/ase20-verified/task7-elephant/task7program_SAFE.sc -S test/programs/publications/ase20-verified/task7-elephant/task7spec.sc -I src/public/library.sc" node-parameters="--require ts-node/register --max-old-space-size=8192" path-to-js-file="src/main.ts" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>

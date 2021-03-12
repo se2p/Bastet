@@ -24,7 +24,7 @@
  */
 
 import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
@@ -62,9 +62,10 @@ export class AbstractionTransferRelation implements LabeledTransferRelation<Abst
         throw new IllegalStateException("This TR is only applicable to labeled transitions");
     }
 
-    abstractSuccFor(fromState: AbstractionState, op: ProgramOperation, co: Concern): Iterable<AbstractionState> {
+    abstractSuccFor(fromState: AbstractionState, opic: ProgramOperationInContext, co: Concern): Iterable<AbstractionState> {
+        const op = opic.op;
         const result: AbstractionState[] = [];
-        for (const w of this._wrapped.abstractSuccFor(fromState.wrappedState, op, co)) {
+        for (const w of this._wrapped.abstractSuccFor(fromState.wrappedState, opic, co)) {
             const e = fromState.withWrappedState(w).withoutWideningOf();
 
             if (op.ast instanceof PrecisionPushStatement) {

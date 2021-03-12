@@ -3,7 +3,7 @@ program Mini1Program
 actor ActorA is ScratchSprite begin
     image Elefant "1.svg"
 
-    script on bootstrap do begin
+    script on bootstrap finished do begin
         define x as 0
         define y as 0
         changeActiveGraphicTo("Elefant")
@@ -14,7 +14,7 @@ end
 actor ActorB is ScratchSprite begin
     image Elefant "1.svg"
 
-    script on bootstrap do begin
+    script on bootstrap finished do begin
         define x as 1
         define y as 1
         changeActiveGraphicTo("Elefant")
@@ -26,7 +26,7 @@ actor KatzenObserver is Observer begin
     declare actor_1_id as actor
     declare actor_2_id as actor
 
-    script on bootstrap finished do begin
+    script on startup do begin
         define actor_1_id as locate actor "ActorA"
         define actor_2_id as locate actor "ActorB"
 

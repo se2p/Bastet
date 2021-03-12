@@ -28,333 +28,25 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
 import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
 import {ActorId} from "../../../syntax/app/Actor";
-import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {ConcreteDomain, ConcreteElement} from '../../domains/ConcreteElements'
+import {ConcreteDomain, ConcreteElement, ConcreteUnifiedMemory} from '../../domains/ConcreteElements'
 import {App} from "../../../syntax/app/App";
 import {AfterStatementMonitoringEvent, SingularityEvent, TerminationEvent} from "../../../syntax/ast/core/CoreEvent";
 import {Property} from "../../../syntax/Property";
-import {TransRelId} from "../../../syntax/app/controlflow/TransitionRelation";
-import {ScriptId} from "../../../syntax/app/controlflow/Script";
-import {OperationId} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Preconditions} from "../../../utils/Preconditions";
-import {DataLocation, DataLocations, TypedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
+import {DataLocation, DataLocations, VAR_SCOPING_SPLITTER} from "../../../syntax/app/controlflow/DataLocation";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {AbstractionPrecision} from "../../AbstractionPrecision";
+import {
+    ConcreteProgramState,
+    RelationLocation,
+    ThreadComputationState,
+    ThreadId,
+    ThreadState,
+    ThreadStateFactory
+} from "./ConcreteProgramState";
 
-/**
- * Current thread state that is active or becomes active if...
- */
-export enum ThreadComputationState {
-    /**
-     * ... the thread is supposed to perform a transition next.
-     */
-    THREAD_STATE_RUNNING = "R",
-
-    /**
-     * ... the thread is waiting for other threads to finish.
-     */
-    THREAD_STATE_WAIT = "W",
-    THREAD_STATE_DONE = "D",
-    THREAD_STATE_YIELD = "Y",
-    THREAD_STATE_FAILURE = "F",
-    THREAD_STATE_DISABLED = "P",
-    THREAD_STATE_UNKNOWN = "?",
-}
-
-export type ThreadId = number;
-
-export interface ControlConcreteState {
-
-}
-
-export interface RelationLocationAttributes {
-
-    /** Unique identifier of the actor */
-    actor: ActorId;
-
-    /** Unique identifier of the transition relation */
-    relation: TransRelId;
-
-    /** Unique position within the transition relation */
-    location: LocationId;
-
-}
-
-const RelationLocationRecord = ImmRec({
-    actor: "",
-    relation: 0,
-    location: 0
-});
-
-export class RelationLocation extends RelationLocationRecord implements RelationLocationAttributes {
-
-    constructor(actor: ActorId, relation: TransRelId, location: LocationId) {
-        super({actor: actor, relation: relation, location: location});
-    }
-
-    public getActorId(): ActorId {
-        return this.get('actor');
-    }
-
-    public getLocationId(): LocationId {
-        return this.get('location');
-    }
-
-    public getRelationId(): TransRelId {
-        return this.get('relation');
-    }
-
-    public withLocationId(location: LocationId): RelationLocation {
-        return this.set("location", location);
-    }
-
-    public withActorId(value: ActorId): RelationLocation {
-        return this.set("actor", value);
-    }
-
-    public withRelationId(value: TransRelId): RelationLocation {
-        return this.set("relation", value);
-    }
-
-
-    public toString() {
-        return `${this.getActorId()} ${this.getRelationId()} ${this.getLocationId()}`;
-    }
-
-}
-
-export interface MethodCallAttributes {
-
-    /**
-     * Control location from that the method has been called
-     */
-    callFrom: RelationLocation;
-
-
-    /**
-     * Control location to that the method call is supposed to
-     * return to after the method is finished
-     */
-    returnTo: RelationLocation;
-
-}
-
-const MethodCallRecord = ImmRec({
-    callFrom: new RelationLocation("", 0, 0),
-    returnTo: new RelationLocation("", 0, 0),
-});
-
-export class MethodCall extends MethodCallRecord implements MethodCallAttributes {
-
-    constructor(callFrom: RelationLocation, returnTo: RelationLocation) {
-        super({callFrom: callFrom, returnTo: returnTo});
-    }
-
-    public getCallFrom(): RelationLocation {
-        return this.get('callFrom');
-    }
-
-    public getReturnTo(): RelationLocation {
-        return this.get('returnTo');
-    }
-
-}
-
-export interface ThreadStateAttributes {
-
-    /** Unique identifier of the thread */
-    threadId: ThreadId;
-
-    /** Unique identifier of the actor */
-    actorId: ActorId;
-
-    /**
-     * Script that is executed by the thread. Attention: The script might also call methods
-     * with other transition relations. Furthermore, some transitions that become executed
-     * might have been woven dynamically.
-     */
-    scriptId: ScriptId;
-
-    /** Identifier of the control location (position in the transition system of the script) */
-    operations: ImmList<OperationId>;
-
-    /** Identifier of the control location (position in the transition system of the script) */
-    location: RelationLocation;
-
-    /** Computation state of the thread */
-    computationState: ThreadComputationState;
-
-    /** Set of threads this thread is waiting for before it can continue */
-    waitingForThreads: ImmSet<ThreadId>;
-
-    /** Set of properties for that the thread ran into a failing control location (ERROR location) */
-    failedFor: ImmSet<Property>;
-
-    /** Stack of method call and return locations to enable the inter-procedural analysis */
-    callStack: ImmList<MethodCall>;
-
-    /** Stack of loop bodies entered (represented by the loop head location) */
-    loopStack: ImmList<RelationLocation>;
-
-    /** In atomic group? */
-    inAtomicMode: number;
-
-    /** Activated by broadcast from thread */
-    activatedByThread: ThreadId;
-
-}
-
-const ThreadStateRecord = ImmRec({
-    threadId: -1,
-    scriptId: "",
-    actorId: "",
-    operations: ImmList<OperationId>(),
-    location: new RelationLocation("", 0, 0),
-    computationState: ThreadComputationState.THREAD_STATE_UNKNOWN,
-    waitingForThreads: ImmSet<ThreadId>(),
-    failedFor: ImmSet<Property>(),
-    callStack: ImmList<MethodCall>(),
-    loopStack: ImmList<RelationLocation>(),
-    inAtomicMode: 0,
-    activatedByThread: -1
-});
-
-export class ThreadState extends ThreadStateRecord implements AbstractElement, ThreadStateAttributes {
-
-    constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, operations: ImmList<OperationId>,
-                location: RelationLocation, compState: ThreadComputationState, waitingForThreads: ImmSet<ThreadId>,
-                failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, loopStack: ImmList<RelationLocation>,
-                inAtomicMode: number, activatedByThread: ThreadId) {
-        super({threadId: threadId, actorId: actorId, scriptId: scriptId, operations: operations, location: location,
-            computationState: compState, waitingForThreads: waitingForThreads, failedFor: failedFor,
-            callStack: callStack, loopStack: loopStack, inAtomicMode: inAtomicMode, activatedByThread: activatedByThread});
-    }
-
-    public getInAtomicMode(): number {
-        return this.get('inAtomicMode');
-    }
-
-    public getThreadId(): ThreadId {
-        return this.get('threadId');
-    }
-
-    public getActivatedByThread(): ThreadId {
-        return this.get('activatedByThread');
-    }
-
-    public getActorId(): ActorId {
-        return this.get('actorId');
-    }
-
-    public getScriptId(): ScriptId {
-        return this.get('scriptId');
-    }
-
-    public getOperations(): ImmList<OperationId> {
-        return this.get('operations');
-    }
-
-    public getRelationLocation(): RelationLocation {
-        return this.get('location');
-    }
-
-    public getCallStack(): ImmList<MethodCall> {
-        return this.get('callStack');
-    }
-
-    public getLoopStack(): ImmList<RelationLocation> {
-        return this.get('loopStack');
-    }
-
-    public withLocation(value: RelationLocation): ThreadState {
-        return this.set('location', value);
-    }
-
-    public withActorId(value: ActorId): ThreadState {
-        return this.set('actorId', value);
-    }
-
-    public withActivatedByThread(by: ThreadId): ThreadState {
-        return this.set('activatedByThread', by);
-    }
-
-    public getComputationState(): ThreadComputationState {
-        return this.get('computationState');
-    }
-
-    public withComputationState(value: ThreadComputationState): ThreadState {
-        if (this.getWaitingForThreads().size > 0) {
-            Preconditions.checkState(value == ThreadComputationState.THREAD_STATE_WAIT,
-                `The computation state has to be WAIT as long it is waiting for threads; clear the list of threads waited for first? (ThreadID: ${this.getThreadId()})`);
-        }
-        return this.set('computationState', value);
-    }
-
-    public getWaitingForThreads(): ImmSet<ThreadId> {
-        return this.get('waitingForThreads');
-    }
-
-    public getFailedFor(): ImmSet<Property> {
-        return this.get('failedFor');
-    }
-
-    public withWaitingForThreads(value: ImmSet<ThreadId>): ThreadState {
-        if (value.size > 0) {
-            Preconditions.checkState(this.getComputationState() == ThreadComputationState.THREAD_STATE_WAIT,
-                `Please activate the WAITING-state before assigning a non-empty list of threads to wait for. (Current status: ${this.getComputationState()}, ThreadID: ${this.getThreadId()})`);
-        }
-        return this.set('waitingForThreads', value);
-    }
-
-    public withAddedWaitingFor(waitFor: ThreadState): ThreadState {
-        return this.withWaitingForThreads(this.getWaitingForThreads().add(waitFor.threadId));
-    }
-
-    public withOperations(value: ImmList<OperationId>): ThreadState {
-        return this.set('operations', value);
-    }
-
-    public withLoopStack(value: ImmList<RelationLocation>): ThreadState {
-        return this.set('loopStack', value);
-    }
-
-    public withCallStack(value: ImmList<MethodCall>): ThreadState {
-        return this.set('callStack', value);
-    }
-
-    public withFailedFor(value: ImmSet<Property>): ThreadState {
-        return this.set('failedFor', value);
-    }
-
-    public withIncrementedAtomic(): ThreadState {
-        return this.set('inAtomicMode', this.getInAtomicMode() + 1);
-    }
-
-    public withDecrementedAtomic(): ThreadState {
-        const newValue = this.getInAtomicMode() - 1;
-        Preconditions.checkState(newValue >= 0);
-        return this.set('inAtomicMode', newValue);
-    }
-
-    withRemovedWaitingFor(threadId: ThreadId): ThreadState {
-        return this.withWaitingForThreads(this.getWaitingForThreads().remove(threadId));
-    }
-}
-
-export class ThreadStateFactory {
-
-    private static THREAD_ID_SEQ: number;
-
-    public static freshId(): number {
-        if (!ThreadStateFactory.THREAD_ID_SEQ) {
-            ThreadStateFactory.THREAD_ID_SEQ = 0;
-        }
-        return ThreadStateFactory.THREAD_ID_SEQ++;
-    }
-
-}
 
 export interface ControlAbstractStateAttributes extends AbstractElement, SingletonStateWrapper {
 
@@ -634,7 +326,7 @@ export class ControlLattice implements Lattice<ControlAbstractState> {
 
 }
 
-export class ControlAbstractDomain implements AbstractDomain<ControlConcreteState, ControlAbstractState> {
+export class ControlAbstractDomain implements AbstractDomain<ConcreteProgramState, ControlAbstractState> {
 
     private readonly _lattice: Lattice<ControlAbstractState>;
 
@@ -645,28 +337,64 @@ export class ControlAbstractDomain implements AbstractDomain<ControlConcreteStat
         this._lattice = new ControlLattice(wrapped.lattice);
     }
 
-    abstract(elements: Iterable<ControlConcreteState>): ControlAbstractState {
+    abstract(elements: Iterable<ConcreteProgramState>): ControlAbstractState {
         throw new ImplementMeException();
     }
 
-    concretize(element: ControlAbstractState): Iterable<ControlConcreteState> {
+    concretize(element: ControlAbstractState): Iterable<ConcreteProgramState> {
         throw new ImplementMeException();
     }
 
-    concretizeOne(element: ControlAbstractState): ControlConcreteState {
-        return this._wrapped.concretizeOne(element.getWrappedState());
+    concretizeOne(element: ControlAbstractState): ConcreteProgramState {
+        return this.enrich(this._wrapped.concretizeOne(element.getWrappedState()));
+    }
+
+    enrich(element: ConcreteElement): ConcreteProgramState {
+        Preconditions.checkArgument(element instanceof ConcreteUnifiedMemory);
+        const m = element as ConcreteUnifiedMemory;
+
+        const splitTargetPrefixFromAttribute = (attributeWithTargetName: string): {attribute: string, target: string} => {
+            const parts = attributeWithTargetName.split(VAR_SCOPING_SPLITTER);
+            const target = parts[0];
+            const attribute = parts.slice(1).join(VAR_SCOPING_SPLITTER);
+            return {attribute, target};
+        }
+
+        const toProgramState = (c: ConcreteUnifiedMemory): ConcreteProgramState => {
+            const actorStates: Map<string, ConcreteUnifiedMemory> = new Map();
+            let globalState: ConcreteUnifiedMemory = new ConcreteUnifiedMemory(ImmMap());
+
+            for (const k of c.variables()) {
+                const value = c.getValue(k);
+                if (k.includes(VAR_SCOPING_SPLITTER)) {
+                    const split = splitTargetPrefixFromAttribute(k);
+                    const actorMem = actorStates.get(split.target) || new ConcreteUnifiedMemory(ImmMap());
+                    actorStates.set(split.target, actorMem.withValue(split.attribute, value));
+                } else {
+                    globalState = globalState.withValue(k, value);
+                }
+            }
+
+            return new ConcreteProgramState(globalState, ImmMap(actorStates), m);
+        };
+
+        return toProgramState(m);
     }
 
     widen(element: ControlAbstractState, precision: AbstractionPrecision): ControlAbstractState {
         throw new ImplementMeException();
     }
 
-    get concreteDomain(): ConcreteDomain<ControlConcreteState> {
+    get concreteDomain(): ConcreteDomain<ConcreteProgramState> {
         throw new ImplementMeException();
     }
 
     get lattice(): Lattice<ControlAbstractState> {
         return this._lattice;
+    }
+
+    composeSeq(e1: ControlAbstractState, e2: ControlAbstractState): ControlAbstractState {
+        throw new ImplementMeException();
     }
 
 }

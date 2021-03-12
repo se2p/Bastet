@@ -30,7 +30,9 @@ import {Concretizer} from "../domains/AbstractDomain";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {Preconditions} from "../../utils/Preconditions";
 import {DirectedGraph, DirectedGraphs} from "../../utils/DirectedGraph";
-import {getTheOnlyElement} from "../../utils/Collections";
+import {getAtMostOneElement, getTheOnlyElement} from "../../utils/Collections";
+import {AbstractionStateStates} from "./abstraction/AbstractionStates";
+import {AbstractStates} from "./AbstractStates";
 
 
 /**
@@ -203,7 +205,8 @@ export class AccessibilityRelations {
         concretizer?: Concretizer<ConcreteElement, F>): AccessibilityRelation<F> {
 
         const builder = new AccessRelationBuilder<F>()
-            .setLabeler(ar.labeler()).setConcretizer(ar.concretizer());
+            .setLabeler(ar.labeler())
+            .setConcretizer(ar.concretizer());
 
         if (labeler) {
             builder.setLabeler(labeler);
@@ -263,7 +266,7 @@ export class AccessibilityRelations {
         return builder.build();
     }
 
-    public static mapToArray<F extends AbstractState>(ar: AccessibilityRelation<F>): F[] {
+    public static toSequence<F extends AbstractState>(ar: AccessibilityRelation<F>): F[] {
         const array: F[] = [];
         let state: F = getTheOnlyElement(ar.initial());
 
@@ -274,5 +277,37 @@ export class AccessibilityRelations {
         }
 
         return array;
+    }
+
+    /**
+     * Get the states along the accessibility relation for that a widening wos computed
+     * Returns the original unwidened states.
+     *
+     * @param ar
+     * @param target
+     */
+    public static getWidenedSequence(ar: AccessibilityRelation<AbstractState>, target: AbstractState): AbstractState[] {
+        const result: AbstractState[] = [];
+
+        const worklist: AbstractState[] = [];
+        worklist.push(target);
+
+        while (worklist.length > 0) {
+            const state: AbstractState = worklist.pop();
+
+            const widening = AbstractStates.wideningOf(state);
+            if (widening.isPresent()) {
+                result.push(widening.getValue());
+            } else if (state === target) {
+                // The target state is always returned, considered to be a widening state!
+                result.push(state);
+            }
+
+            for (const pred of getAtMostOneElement(ar.predecessorsOf(state))) {
+                worklist.push(pred);
+            }
+        }
+
+        return result.reverse();
     }
 }

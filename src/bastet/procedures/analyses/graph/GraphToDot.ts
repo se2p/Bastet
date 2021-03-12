@@ -26,19 +26,8 @@
 import {StateSet} from "../../algorithms/StateSet";
 import {GraphAbstractState} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
-import {
-    ProgramAnalysis,
-    ProgramAnalysisWithLabels,
-    TransitionLabelProvider,
-    TraversalOrderOperator
-} from "../ProgramAnalysis";
-import {
-    ColorByActorVisitor,
-    PaperLabelVisitor,
-    PenSizeVisitor,
-    StateColorVisitor,
-    StateLabelVisitor
-} from "../StateVisitors";
+import {ProgramAnalysis, TransitionLabelProvider, TraversalOrderOperator} from "../ProgramAnalysis";
+import {ColorByActorVisitor, PaperLabelVisitor, PenSizeVisitor,} from "../StateVisitors";
 import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
 import {App} from "../../../syntax/app/App";
 import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
@@ -78,7 +67,7 @@ export class GraphToDot  {
     }
 
     private writeState(e: GraphAbstractState) {
-        const stateLabel = GraphToDot.escapeForDot(e.accept(new StateLabelVisitor(this._task))
+        const stateLabel = GraphToDot.escapeForDot(e.accept(new PaperLabelVisitor(this._task))
             + this._traversalKeyProvider.getLexiOrderKey(e).toString());
         const stateColor = e.accept(new ColorByActorVisitor(this._task));
         const pensize = e.accept(new PenSizeVisitor(this._analysis));
@@ -96,7 +85,7 @@ export class GraphToDot  {
 
     private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
         const transLabels = GraphToDot.escapeForDot(this._transLabProvider.getTransitionLabel(from, to)
-            .map(o => this.opLabel(o)).join("\n"));
+            .map(([ts, o]) => this.opLabel(o)).join("\n"));
         this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabels}"];`);
     }
 

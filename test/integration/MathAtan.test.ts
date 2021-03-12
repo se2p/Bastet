@@ -22,22 +22,22 @@
 import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-test("Test Atan 1 safe", done => {
+test("Test Atan 1 safe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-1_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test Atan 2 safe", done => {
+test("Test Atan 2 safe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-2_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test Atan 1 unsafe", done => {
+test("Test Atan 1 unsafe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test Atan 2 unsafe", done => {
+test("Test Atan 2 unsafe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-Atan-2_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);

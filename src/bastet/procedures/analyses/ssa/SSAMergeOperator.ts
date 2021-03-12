@@ -28,6 +28,7 @@ import {SSAState} from "./SSAAbstractDomain";
 import {AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
+import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {App} from "../../../syntax/app/App";
 import {DataLocation, VersionedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
@@ -36,6 +37,7 @@ import {LabeledTransferRelation, Transfers} from "../TransferRelation";
 import {AstNode} from "../../../syntax/ast/AstNode";
 import {ProgramOperationFactory} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {ActorType} from "../../../syntax/ast/core/ScratchType";
+import {ThreadStateFactory} from "../control/ConcreteProgramState";
 
 export class SSAMergeOperator implements MergeOperator<SSAState> {
 
@@ -56,7 +58,17 @@ export class SSAMergeOperator implements MergeOperator<SSAState> {
         const state1SyncOps: AstNode[] = [];
         const state2SyncOps: AstNode[] = [];
 
-        const syncedSSA = state1.getSSA().mergeWith(
+        const keys: ImmSet<string> = ImmSet(state1.getSSA().keys()).union(state2.getSSA().keys());
+        let state1SSA = ImmMap<string, number>();
+        let state2SSA = ImmMap<string, number>();
+        for (const k of keys) {
+            // 'mergeWith' only works as expected if there are values for all keys
+            // in both maps.
+            state1SSA = state1SSA.set(k, state1.ssa.get(k) || 0);
+            state2SSA = state2SSA.set(k, state2.ssa.get(k) || 0);
+        }
+
+        const syncedSSA = state1SSA.mergeWith(
             (state1Version, state2Version, key) => {
                 const assignedDataLoc: DataLocation = this._task.typeStorage.getTypedLocation(key);
                 const mergedVersion = Math.max(state1Version, state2Version);
@@ -83,11 +95,11 @@ export class SSAMergeOperator implements MergeOperator<SSAState> {
                 }
 
                 return Math.max(state1Version, state2Version);
-            }, state2.getSSA());
+            }, state2SSA);
 
-        const state1Synced = Transfers.withIntermediateOps(this._wrappedAbstractSuccOp, state1.getWrappedState(),
+        const state1Synced = Transfers.withIntermediateOps(this._wrappedAbstractSuccOp, state1.getWrappedState(), ThreadStateFactory.dummy(),
             state1SyncOps.map(ast => ProgramOperationFactory.createFor(ast)), Concerns.highestPriorityConcern());
-        const state2Synced = Transfers.withIntermediateOps(this._wrappedAbstractSuccOp, state2.getWrappedState(),
+        const state2Synced = Transfers.withIntermediateOps(this._wrappedAbstractSuccOp, state2.getWrappedState(), ThreadStateFactory.dummy(),
             state2SyncOps.map(ast => ProgramOperationFactory.createFor(ast)), Concerns.highestPriorityConcern());
 
         Preconditions.checkArgument(state1Synced.length == 1);

@@ -36,6 +36,7 @@ import {
     BranchingAssumeStatement,
     StrengtheningAssumeStatement
 } from "../../../ast/core/statements/AssumeStatement";
+import {ThreadState} from "../../../../procedures/analyses/control/ConcreteProgramState";
 
 export type OperationId = number;
 
@@ -69,6 +70,27 @@ export abstract class ProgramOperation implements WithIdent {
 
     public static for(id: OperationId): ProgramOperation {
         return ProgramOperations.withID(id);
+    }
+
+}
+
+export class ProgramOperationInContext {
+
+    private readonly _op: ProgramOperation;
+
+    private readonly _thread: ThreadState;
+
+    constructor(op: ProgramOperation, thread: ThreadState) {
+        this._op = op;
+        this._thread = thread;
+    }
+
+    get op(): ProgramOperation {
+        return this._op;
+    }
+
+    get thread(): ThreadState {
+        return this._thread;
     }
 
 }
@@ -205,7 +227,6 @@ export class ProgramOperations {
     }
 
 }
-
 
 export class ProgramOperationFactory {
 

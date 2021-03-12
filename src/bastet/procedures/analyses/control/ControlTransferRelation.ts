@@ -25,15 +25,13 @@
 
 import {LabeledTransferRelation, TransferRelation, Transfers} from "../TransferRelation";
 import {
-    ControlAbstractState,
-    IndexedThread,
     MethodCall,
     RelationLocation,
     ThreadComputationState,
     ThreadId,
     ThreadState,
     ThreadStateFactory
-} from "./ControlAbstractDomain";
+} from "./ConcreteProgramState";
 import {AbstractElement, Lattices} from "../../../lattices/Lattice";
 import {ControlAnalysisConfig} from "./ControlAnalysis";
 import {App} from "../../../syntax/app/App";
@@ -78,7 +76,10 @@ import {ParameterDeclaration, ParameterDeclarationList} from "../../../syntax/as
 import {Expression} from "../../../syntax/ast/core/expressions/Expression";
 import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
 import {DataLocation, DataLocations} from "../../../syntax/app/controlflow/DataLocation";
-import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements/DeclarationStatement";
+import {
+    DeclareActorVariableStatement,
+    DeclareStackVariableStatement, DeclareSystemVariableStatement
+} from "../../../syntax/ast/core/statements/DeclarationStatement";
 import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
 import {
     extractStringLiteral,
@@ -120,6 +121,7 @@ import {
 import {Identifier} from "../../../syntax/ast/core/Identifier";
 import {OptionalAstNode} from "../../../syntax/ast/AstNode";
 import {
+    CheckFeasibilityStatement,
     SignalTargetReachedStatement,
     TerminateProgramStatement
 } from "../../../syntax/ast/core/statements/InternalStatement";
@@ -138,6 +140,11 @@ import {AnalysisStatistics} from "../AnalysisStatistics";
 import {incBigStep} from "../label/LabelAnalysis";
 import {EpsilonStatement} from "../../../syntax/ast/core/statements/EpsilonStatement";
 import {StopAllStatement} from "../../../syntax/ast/core/statements/TerminationStatement";
+import {ControlAbstractState, IndexedThread} from "./ControlAbstractDomain";
+import {
+    BranchingAssumeStatement,
+    StrengtheningAssumeStatement
+} from "../../../syntax/ast/core/statements/AssumeStatement";
 
 /**
  * Mimics the green-threading of the Scratch VM.
@@ -373,7 +380,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             this._wrappedTransferStats.startTimer();
             const wrappedAnalysisResults: Iterable<AbstractElement> = considerInterpretationFinished
                 ? [r.getWrappedState()]
-                : Transfers.withIntermediateOps(this._wrappedTransferRelation, r.wrappedState, ops, opsConcern);
+                : Transfers.withIntermediateOps(this._wrappedTransferRelation, r.wrappedState, threadToStep.threadStatus, ops, opsConcern);
             this._wrappedTransferStats.stopTimer();
 
             // Combine the result
@@ -585,6 +592,14 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
             return [[result.withThreadStateUpdate(threadToStep.threadIndex, (ts) =>
                 ts.withComputationState(ThreadComputationState.THREAD_STATE_FAILURE)
                     .withFailedFor(properties)), true]];
+
+        } else if (stepOp.ast instanceof CheckFeasibilityStatement) {
+            const feasible = Lattices.isFeasible(result.getWrappedState(), this._wrappedDomain.lattice, stepOp.ast.getPurpose());
+            if (!feasible) {
+                return [];
+            } else {
+                return [[result, true]];
+            }
 
         } else if (stepOp.ast instanceof BeginAtomicStatement) {
             return [[this.incrementAtomic(result, threadToStep), false]];
@@ -879,15 +894,23 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         let result: ControlAbstractState = inState;
 
         const concern = this.getStepConcern(inState);
-        const isEpsilon = step.ops.filter((o) => o.ast instanceof EpsilonStatement).length == step.ops.length;
+        const isBehaviorUnrelated = step.ops.filter((o) =>
+            o.ast instanceof EpsilonStatement
+            || o.ast instanceof BranchingAssumeStatement
+            || o.ast instanceof StrengtheningAssumeStatement
+            || o.ast instanceof BroadcastMessageStatement
+            || o.ast instanceof BroadcastAndWaitStatement
+            || o.ast instanceof DeclareActorVariableStatement
+            || o.ast instanceof DeclareStackVariableStatement
+            || o.ast instanceof DeclareSystemVariableStatement
+            || o.ast instanceof CallStatement).length > 0;
 
         //  1. Activate the specification check thread (`after statement finished`)
         //  (if the stepped thread is a program thread)
-        if (!isEpsilon) {
+        if (!isBehaviorUnrelated) {
             if (this.isProgramConcern(concern)) {
                 for (const [threadIndex, threadState] of inState.getThreadStates().entries()) {
                     const actor: Actor = this._task.getActorByName(threadState.getActorId());
-                    const isSpecificationThread = actor.isObserver;
                     const script = actor.getScript(threadState.getScriptId());
 
                     if (script.event instanceof AfterStatementMonitoringEvent) {
@@ -926,7 +949,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         // 3. Check if threads that wait for certain conditions can continue to run
         //    (assume certain conditions to hold if this accelerates the analysis without being unsound)
-        return this.runStateCheckThreads(result);
+        return this.runStateCheckThreads(result, step.steppedThread);
     }
 
     private hasNonWaitingRunnable(threads: ImmList<ThreadState>, withConcern: Concern): boolean {
@@ -937,7 +960,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return nonWaitingRunnable.size > 0;
     }
 
-    private runStateCheckThreads(state: ControlAbstractState): ControlAbstractState[] {
+    private runStateCheckThreads(state: ControlAbstractState, steppedThread: IndexedThread): ControlAbstractState[] {
         if (state.getConditionStates().size == 0) {
             return [state];
         } else {
@@ -956,7 +979,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
                 if (timeAccel.length == 1) {
                     // We can immediately accelerate in this case
                     const accelInfo = timeAccel[0];
-                    return this.checkConditionAndWakeUpIfSatisfied(getTheOnlyElement(this.accelerateTo(state, accelInfo)));
+                    return this.checkConditionAndWakeUpIfSatisfied(getTheOnlyElement(this.accelerateTo(state, accelInfo, steppedThread)));
                 }
 
                 throw new ImplementMeException();
@@ -1018,7 +1041,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
         return result.map((cs) => this.removeIrrelevantCondThreads(cs));
     }
 
-    private accelerateTo(state: ControlAbstractState, accelInfo: AccelInfo): ControlAbstractState[] {
+    private accelerateTo(state: ControlAbstractState, accelInfo: AccelInfo, steppedThread: IndexedThread): ControlAbstractState[] {
         Preconditions.checkNotUndefined(state);
         Preconditions.checkNotUndefined(accelInfo);
 
@@ -1029,8 +1052,12 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         const conditionScopeStack = this.buildScopeStack(accelInfo.actorId, accelTr.name);
 
-        const wrappedResult: [AbstractElement, boolean][] = Transfers.transferAlongTransitionSystem(this._wrappedTransferRelation,
-            state.getWrappedState(), accelTr, getTheOnlyElement(accelTr.entryLocationSet), Concerns.highestPriorityConcern(),
+        const wrappedResult: [AbstractElement, boolean][] = Transfers.transferAlongTransitionSystem(
+            this._wrappedTransferRelation,
+            state.getWrappedState(),
+            accelTr,
+            getTheOnlyElement(accelTr.entryLocationSet),
+            Concerns.highestPriorityConcern(), steppedThread.threadStatus,
             (op) => {return this.scopeOperations([op], state.getActorScopes(),
                 conditionScopeStack, conditionScopeStack)[0]});
 
@@ -1086,7 +1113,7 @@ export class ControlTransferRelation implements TransferRelation<ControlAbstract
 
         const checkResult: [AbstractElement, boolean][] = Transfers.transferAlongTransitionSystem(this._wrappedTransferRelation,
             state.getWrappedState(), script, getTheOnlyElement(script.entryLocationSet), Concerns.highestPriorityConcern(),
-            (op) => {return this.scopeOperations([op], state.getActorScopes(),
+            condThreadState, (op) => {return this.scopeOperations([op], state.getActorScopes(),
                 conditionScopeStack, conditionScopeStack)[0]});
 
         return checkResult.filter((([e, t]) => Lattices.isFeasible(e, this._wrappedDomain.lattice, "Condition Check")));

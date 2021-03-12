@@ -130,6 +130,7 @@ import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorSta
 import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
 import {ActorDestination, NamedDestination, SystemMessage, UserMessage} from "./core/Message";
 import {
+    CheckFeasibilityStatement,
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
     TerminateProgramStatement
@@ -142,6 +143,10 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
 
     visit(node: AstNode): string {
         throw new ImplementMeException();
+    }
+
+    visitCheckFeasibilityStatement(node: CheckFeasibilityStatement): string {
+        return 'feasible';
     }
 
     visitReturnStatement(node: ReturnStatement): string {

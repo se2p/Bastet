@@ -24,16 +24,33 @@ actor IOActor is RuntimeEntity begin
     /**
      * The last answer given to an `ask` block
      */
-    declare answer as string
+    declare integerAnswer as integer
+    declare askActive as boolean
 
-    script on message "ASK" () in "SYSTEM" do atomic begin
-        declare nondetStr as string
-        define answer as nondetStr
+    define atomic beginAsk() begin
+        // declare nondetStr as string
+        // define answer as nondetStr
+
+        declare nondetInt as integer
+        define integerAnswer as nondetInt
         declare inputDurationSecs as integer
         assume inputDurationSecs > 0
         assume inputDurationSecs < 30
+        define askActive as true
+        // ATTENTION/FIXME: The following wait statement should allow to interleave other threads
         wait inputDurationSecs seconds
         // UNSOUND: might wait arbitrarily long
+    end
+
+    script on bootstrap do begin
+        define askActive as false
+        define keyPressed as 0
+        define lastKeyPressed as 0
+    end
+
+    script on message "ASK" () in "SYSTEM" do begin
+        beginAsk()
+        define askActive as false
     end
 
     /**
@@ -43,21 +60,34 @@ actor IOActor is RuntimeEntity begin
     script messageDispatcherLoop on startup do begin
         // Hack as long no other dispatch handling is in place
         repeat forever begin
-            declare nondetX as integer
-            define mouseX as nondetX
+            atomic begin
+                declare nondetX as integer
+                define mouseX as nondetX
 
-            declare nondetY as integer
-            define mouseY as nondetY
+                declare nondetY as integer
+                define mouseY as nondetY
 
-            declare nondetKey as integer
-            define keyPressed as nondetKey
+                declare nondetKey as integer
+                define keyPressed as nondetKey
 
-            declare nondetDown as boolean
-            define mouseDown as nondetDown
+                declare nondetDown as boolean
+                define mouseDown as nondetDown
 
-            define mouseClicked as mouseDown and not lastMouseDown
+                define mouseClicked as mouseDown and not lastMouseDown
+            end
+
             if mouseClicked then begin
                 broadcast "CLICK" () to "SYSTEM"
+            end
+
+            if keyPressed = 37 then begin
+                broadcast "KEY_37_PRESSED" () to "SYSTEM"
+            end else if keyPressed = 38 then begin
+                broadcast "KEY_38_PRESSED" () to "SYSTEM"
+            end else if keyPressed = 39 then begin
+                broadcast "KEY_39_PRESSED" () to "SYSTEM"
+            end else if keyPressed = 40 then begin
+                broadcast "KEY_40_PRESSED" () to "SYSTEM"
             end
 
             define lastKeyPressed as keyPressed
@@ -96,7 +126,7 @@ role KeyboardIO begin
         end else if s = "ArrowLeft" or s = "Left" then begin
             define result as KEY_LEFT
         end else if s = "ArrowRight" or s = "Right" then begin
-            define result as KEY_LEFT
+            define result as KEY_RIGHT
         end else if s = "ArrowUp" or s = "Up" then begin
             define result as KEY_UP
         end else if s = "ArrowDown" or s = "Down" then begin
@@ -798,17 +828,6 @@ role RuntimeEntity is MathActor, KeyboardIO begin
 
     extern _RUNTIME_integerFromInterval (fromNum: integer, toNum: integer) returns integer
 
-    /**
-     * A random integer in the interval [from, to],
-     * that is, both end points are included.
-     */
-    extern randomIntegerBetween (intervalStart: integer, intervalEnd: integer) returns integer
-
-    /**
-     * See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
-     */
-    extern randomBetween (intervalStart: integer, intervalEnd: integer) returns integer
-
     @ Category "Operator"
     @ Block "[ceiling v] of (num)"
     @ Opcode "operator_mathop"
@@ -850,6 +869,24 @@ role RuntimeEntity is MathActor, KeyboardIO begin
     extern mathPowten(n: integer) returns integer
 
     extern label (str: string)
+
+    /**
+     * A random integer in the interval [from, to],
+     * that is, both end points are included.
+     * Only intended for internal use within this library,
+     * should not be used directly by programs that build upon the library.
+     */
+    define internalRandomBetween (intervalStart: integer, intervalEnd: integer) begin
+        assume result >= intervalStart
+        assume result <= intervalEnd
+    end returns result: integer
+
+    /**
+     * See https://en.scratch-wiki.info/wiki/Pick_Random_()_to_()_(block)
+     */
+    define randomBetween (intervalStart: integer, intervalEnd: integer) begin
+        define result as internalRandomBetween(intervalStart, intervalEnd)
+    end returns result: integer
 
     define getGraphicIdByIndex (idx: integer) begin
         define result as ""
@@ -984,11 +1021,22 @@ role RuntimeEntity is MathActor, KeyboardIO begin
          define result as keyPressed() = key
     end returns result : boolean
 
+    define atomic keyPressedByCodeNondet (key: integer) begin
+    end returns result : boolean
+
     define atomic keyPressed () begin
         declare io as actor
         define io as locate actor "IOActor"
         define result as cast (attribute "keyPressed" of io) to int
     end returns result : integer
+
+    define atomic keyPressedByCodeNondet (key: int) begin
+         define result as keyPressedNondet() = key
+    end returns result : boolean
+
+    define atomic keyPressedNondet() begin
+        // non-det (variable `result` is not initialized)
+    end returns result : int
 
     @ Category "Sensing"
     @ Block "key (string as key) pressed?"
@@ -1111,12 +1159,14 @@ role Observer is RuntimeEntity begin
         define halfWidth as cast attribute "activeGraphicHalfWidth" of obj to int
         define halfHeight as cast attribute "activeGraphicHalfHeight" of obj to int
 
-        define result as true
-        if not (mouseX() < x + halfWidth
-            or mouseX() > x - halfWidth
-            or mouseY() < y + halfHeight
-            or mouseY() > y - halfHeight) then begin
+        declare mx as integer
+        define mx as mouseX()
+        declare my as integer
+        define my as mouseY()
 
+        define result as true
+        if not (mx < x + halfWidth or mx > x - halfWidth
+                or my < y + halfHeight or my > y - halfHeight) then begin
             define result as false
         end
     end returns result : boolean
@@ -1188,6 +1238,8 @@ role ScratchEntity is RuntimeEntity begin
 
         define activeGraphicHalfWidth as getImageWidth(id) / 2
         define activeGraphicHalfHeight as getImageHeight(id) / 2
+
+        define activeGraphicIndex as getGraphicIndexById(id)
         //FIXME Set graphic pixels, this is currently not done as we do not supports lists yet
     end
 
@@ -1317,6 +1369,12 @@ role ScratchEntity is RuntimeEntity begin
         define io as locate actor "IOActor"
         define result as attribute "answer" of io
     end returns result : string
+
+    define atomic integerAnswer () begin
+        declare io as actor
+        define io as locate actor "IOActor"
+        define result as cast attribute "integerAnswer" of io to integer
+    end returns result : integer
 
     @ Category "Sensing"
     @ Block "timer"
@@ -1644,8 +1702,8 @@ role ScratchSprite is ScratchEntity begin
     @ Block "go to (random position v)"
     @ Opcode "motion_goto"
     define atomic goToRandomPosition () begin
-        define x as randomIntegerBetween(0-240, 240)
-        define y as randomIntegerBetween(0-180, 180)
+        define x as internalRandomBetween(0-240, 240)
+        define y as internalRandomBetween(0-180, 180)
     end
 
     @ Category "Motion"
@@ -2071,6 +2129,10 @@ role ScratchSprite is ScratchEntity begin
         define bubbleType as "say"
     end
 
+    define atomic say (msg: string) begin
+        sayText(msg)
+    end
+
     @ Category "Motion"
     @ Block "turn left (num) degrees"
     @ Opcode "motion_turnleft"
@@ -2113,15 +2175,11 @@ end
  */
 role ScratchStage is ScratchEntity begin
 
-    declare currentIdx as integer
-
     declare videoTransparency as integer
 
     declare videoState as string
 
     declare tempo as integer
-
-    define currentIdx as 0
 
     @ Category "Looks"
     @ Block "switch backdrop to (id v) and wait"
@@ -2135,36 +2193,24 @@ role ScratchStage is ScratchEntity begin
     end
 
     define atomic nextBackdrop () begin
-        declare idx as integer
-        define idx as getGraphicIndexById(activeGraphicName)
-        define idx as (currentIdx+1) mod getNumGraphics()
-
+        define activeGraphicIndex as (activeGraphicIndex+1) mod getNumGraphics()
         declare id as string
-        define id as getGraphicIdByIndex(currentIdx)
-
+        define id as getGraphicIdByIndex(activeGraphicIndex)
         changeActiveGraphicTo(id)
     end
 
     define atomic previousBackdrop () begin
-        declare idx as integer
-        define idx as getGraphicIndexById(activeGraphicName)
-        define idx as (currentIdx-1) mod getNumGraphics()
-
+        define activeGraphicIndex as (activeGraphicIndex-1) mod getNumGraphics()
         declare id as string
-        define id as getGraphicIdByIndex(currentIdx)
-
+        define id as getGraphicIdByIndex(activeGraphicIndex)
         changeActiveGraphicTo(id)
     end
 
     define atomic randomBackdrop () begin
-         declare idx as integer
-         define idx as getGraphicIndexById(activeGraphicName)
-         define idx as randomIntegerBetween(0, getNumGraphics()-1)
-
-         declare id as string
-         define id as getGraphicIdByIndex(currentIdx)
-
-         changeActiveGraphicTo(id)
+        define activeGraphicIndex as internalRandomBetween(0, getNumGraphics()-1)
+        declare id as string
+        define id as getGraphicIdByIndex(activeGraphicIndex)
+        changeActiveGraphicTo(id)
     end
 
 end

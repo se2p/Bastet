@@ -48,6 +48,7 @@ import {AccessibilityRelation} from "../Accessibility";
 import {MergeJoinOperator} from "../Operators";
 import {DebugAbstractDomain, DebugState} from "./DebugAbstractDomain";
 import {DebugTransferRelation} from "./DebugTransferRelation";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 
 export class DebugAnalysis<F extends AbstractState>
@@ -78,7 +79,7 @@ export class DebugAnalysis<F extends AbstractState>
         this._transfer = new DebugTransferRelation(wrappedAnalysis);
     }
 
-    getTransitionLabel(fromState: DebugState, toState: DebugState): ProgramOperation[] {
+    getTransitionLabel(fromState: DebugState, toState: DebugState): [ThreadState, ProgramOperation][] {
         return this._wrappedAnalysis.getTransitionLabel(fromState.getWrappedState(), toState.getWrappedState());
     }
 
@@ -190,11 +191,11 @@ export class DebugAnalysis<F extends AbstractState>
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<[F, ConcreteElement][]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<[F, ConcreteElement][]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
@@ -204,6 +205,14 @@ export class DebugAnalysis<F extends AbstractState>
 
     accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<F> {
         throw new ImplementMeException();
+    }
+
+    incRef(state: DebugState) {
+        this.wrappedAnalysis.incRef(state.getWrappedState());
+    }
+
+    decRef(state: DebugState) {
+        this.wrappedAnalysis.decRef(state.getWrappedState());
     }
 
 }

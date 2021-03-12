@@ -23,32 +23,31 @@ import path from "path"
 import {Bastet} from "../../../../../src/bastet/Bastet";
 import {AnalysisResult, MultiPropertyAnalysisResult} from "../../../../../src/bastet/procedures/AnalysisProcedure";
 
-let intermediateRelPath = "../../../../../src/public/library.sc";
-let intermediatePath = path.join(__dirname, intermediateRelPath);
+const intermediateRelPath = "../../../../../src/public/library.sc";
+const intermediatePath = path.join(__dirname, intermediateRelPath);
 
-let configRelPath = "../../../../../config/default.json";
-let configFilePath = path.join(__dirname, configRelPath);
+const configRelPath = "../../../../../config/default.json";
+const configFilePath = path.join(__dirname, configRelPath);
 
-let specRelPath = "../../../../specs/empty.sc";
-let specFilePath = path.join(__dirname, specRelPath);
+const ciConfigRelPath = "../../../../../config/ci.delta.json";
+const ciConfigFilePath = path.join(__dirname, ciConfigRelPath);
 
-let timeout: number = 20000;
+const specRelPath = "../../../../specs/empty.sc";
+const specFilePath = path.join(__dirname, specRelPath);
+
+let timeout: number = 20000; // in milliseconds
 export {timeout, execFixture, execute, execute_explicit};
 
 function execFixture(fixturePath: string, done) {
-    let bastet = new Bastet();
-    try {
-        execute(bastet, fixturePath, done)
-    } catch (error) {
-        done(error)
-    }
+    const bastet = new Bastet();
+    execute(bastet, fixturePath, done)
 }
 
 function execute(bastet: Bastet, fixturePath: string, done) {
     if (fixturePath.endsWith("_SAFE.sc")) {
-        execute_explicit(bastet, fixturePath, true, done)
+        execute_explicit(bastet, fixturePath, true, done);
     } else if (fixturePath.endsWith("_UNSAFE.sc")) {
-        execute_explicit(bastet, fixturePath, false, done)
+        execute_explicit(bastet, fixturePath, false, done);
     } else {
         fail("Fixture file does not fit naming scheme")
     }
@@ -56,17 +55,17 @@ function execute(bastet: Bastet, fixturePath: string, done) {
 
 function execute_explicit(bastet: Bastet, fixturePath: string, expectSuccess: boolean, done) {
     async function asyncAwaitFunction(): Promise<AnalysisResult> {
-        return await bastet.runFor([configFilePath], intermediatePath, fixturePath, specFilePath);
+        return await bastet.runFor([configFilePath, ciConfigFilePath], intermediatePath, fixturePath, specFilePath);
     }
 
     asyncAwaitFunction().then(result => {
-            let analysisResult: MultiPropertyAnalysisResult = result as MultiPropertyAnalysisResult;
+            const analysisResult: MultiPropertyAnalysisResult = result as MultiPropertyAnalysisResult;
             if (expectSuccess) {
-                expect(analysisResult.satisfied.size).toBeGreaterThan(0)
+                expect(analysisResult.satisfied.size).toBeGreaterThan(0);
             } else {
-                expect(analysisResult.violated.size).toBeGreaterThan(0)
+                expect(analysisResult.violated.size).toBeGreaterThan(0);
             }
-            done()
-        }
-    );
+        })
+        .catch(e => {fail("No exception expected!"); done()})
+        .finally(() => done());
 }

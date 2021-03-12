@@ -25,6 +25,7 @@ import {Map as ImmMap, List as ImmList, Record as ImmRec, Set as ImmSet} from "i
 import {DifferencingFrontierSet, PartitionKey} from "../../../../src/bastet/procedures/algorithms/StateSet";
 import {LexiKey} from "../../../../src/bastet/utils/Lexicographic";
 import {AbstractElement, AbstractState} from "../../../../src/bastet/lattices/Lattice";
+import {StateReferenceOperator} from "../../../../src/bastet/procedures/analyses/ProgramAnalysis";
 
 const DummyAbstractElementRecord = ImmRec({
     id: 0,
@@ -40,6 +41,14 @@ export class DummyAbstractElement extends DummyAbstractElementRecord implements 
         return this.get('id');
     }
 
+}
+
+class StateReferenceOperatorStub implements StateReferenceOperator<DummyAbstractElement> {
+    decRef(state: DummyAbstractElement) {
+    }
+
+    incRef(state: DummyAbstractElement) {
+    }
 }
 
 describe('DifferencingFrontierSet', function() {
@@ -61,7 +70,7 @@ describe('DifferencingFrontierSet', function() {
             const ka: LexiKey = keyMap[(a as DummyAbstractElement).getId()];
             const kb: LexiKey = keyMap[(b as DummyAbstractElement).getId()];
             return ka.compareTo(kb);
-        });
+        }, new StateReferenceOperatorStub());
 
         s.add(e1);
         s.add(e2);
@@ -75,7 +84,8 @@ describe('DifferencingFrontierSet', function() {
     });
 
     test('Test One Partition', function() {
-        const s = new DifferencingFrontierSet((e) => new LexiKey([1]), (a, b) => 0);
+        const s = new DifferencingFrontierSet((e) => new LexiKey([1]),
+            (a, b) => 0, new StateReferenceOperatorStub());
 
         const e1 = new DummyAbstractElement(1)
         s.add(e1);
@@ -91,7 +101,8 @@ describe('DifferencingFrontierSet', function() {
     });
 
     test('Test Two Partitions', function() {
-        const s = new DifferencingFrontierSet<DummyAbstractElement>((e) => new LexiKey([e.getId() % 2]), (a, b) => 0);
+        const s = new DifferencingFrontierSet<DummyAbstractElement>((e) => new LexiKey([e.getId() % 2]),
+            (a, b) => 0, new StateReferenceOperatorStub());
 
         const e1 = new DummyAbstractElement(1);
         const e2 = new DummyAbstractElement(2);
@@ -111,7 +122,8 @@ describe('DifferencingFrontierSet', function() {
     });
 
     test('Test Alternating Pop', function() {
-        const s = new DifferencingFrontierSet<DummyAbstractElement>((e) => new LexiKey([e.getId() % 2]), (a, b) => 0);
+        const s = new DifferencingFrontierSet<DummyAbstractElement>((e) => new LexiKey([e.getId() % 2]),
+            (a, b) => 0, new StateReferenceOperatorStub());
 
         const e1 = new DummyAbstractElement(1);
         const e2 = new DummyAbstractElement(2);

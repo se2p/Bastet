@@ -27,7 +27,11 @@
 import {LabeledTransferRelation, Transfers} from "../TransferRelation";
 import {AbstractElement} from "../../../lattices/Lattice";
 import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {ProgramOperation, ProgramOperationFactory} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {
+    ProgramOperation,
+    ProgramOperationFactory,
+    ProgramOperationInContext
+} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern, Concerns} from "../../../syntax/Concern";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ProgramTimeProfile} from "../../../utils/TimeProfile";
@@ -62,6 +66,40 @@ import {TimeState} from "./TimeAbstractDomain";
 import {BeginAtomicStatement, EndAtomicStatement} from "../../../syntax/ast/core/statements/ControlStatement";
 import instantiate = WebAssembly.instantiate;
 
+class StaticTimeIntervalDefinition {
+
+    private readonly _min: NumberExpression;
+
+    private readonly _max: NumberExpression;
+
+    private readonly _intervalVariableExpression: NumberVariableExpression;
+
+    private readonly _opTimeVariable: VariableWithDataLocation;
+
+    constructor(min: NumberExpression, max: NumberExpression, opTimeVariable: VariableWithDataLocation, intervalVariable: NumberVariableExpression) {
+        this._min = min;
+        this._max = max;
+        this._opTimeVariable = opTimeVariable;
+        this._intervalVariableExpression = intervalVariable;
+    }
+
+    get min(): NumberExpression {
+        return this._min;
+    }
+
+    get max(): NumberExpression {
+        return this._max;
+    }
+
+    get intervalVariableExpression(): NumberVariableExpression {
+        return this._intervalVariableExpression;
+    }
+
+    get opTimeVariable(): VariableWithDataLocation {
+        return this._opTimeVariable;
+    }
+}
+
 export class TimeTransferRelation implements LabeledTransferRelation<TimeState> {
 
     private readonly _task: App;
@@ -74,6 +112,8 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
     private readonly _globalMillisExpr: NumberExpression;
     private readonly _globalSecondsExpr: NumberExpression;
 
+    private readonly _staticIntervals: Map<string, StaticTimeIntervalDefinition>;
+
     constructor(task: App, timeProfile: ProgramTimeProfile, wrappedTransfer: LabeledTransferRelation<AbstractElement>) {
         this._task = Preconditions.checkNotUndefined(task);
         this._timeProfile = Preconditions.checkNotUndefined(timeProfile);
@@ -82,52 +122,70 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
         this._globalMicrosExpr = task.systemVariables.globalTimeMicrosVariable;
         this._globalMillisExpr = new DivideExpression(task.systemVariables.globalTimeMicrosVariable, IntegerLiteral.of(1000));
         this._globalSecondsExpr = new DivideExpression(task.systemVariables.globalTimeMicrosVariable, IntegerLiteral.of(1000000));
+
+        this._staticIntervals = new Map();
+
+        this.setupStaticIntervals();
+    }
+
+    private setupStaticIntervals() {
+        for (const p of this._timeProfile.getStaticProfiles()) {
+            const opTimeVariable: VariableWithDataLocation = new VariableWithDataLocation(
+                DataLocations.createTypedLocation(Identifier.freshWithPrefix("__op_time_"), IntegerType.instance()));
+            const opTimeVariableExpr: NumberVariableExpression = new NumberVariableExpression(opTimeVariable);
+
+            this._task.typeStorage.getScopeOf(opTimeVariable.qualifiedName).putVariable(opTimeVariable);
+
+            const minTimeMicrosExpr = new IntegerLiteral(Math.floor(p.nsecs.minValue.value / 1000));
+            const maxTimeMicrosExpr = new IntegerLiteral(Math.floor(p.nsecs.maxValue.value / 1000));
+
+            const itvKey = this.intervalKey(minTimeMicrosExpr.num, maxTimeMicrosExpr.num);
+            this._staticIntervals.set(itvKey, new StaticTimeIntervalDefinition(minTimeMicrosExpr, maxTimeMicrosExpr, opTimeVariable, opTimeVariableExpr));
+        }
     }
 
     abstractSucc(fromState: TimeState): Iterable<TimeState> {
         throw new IllegalStateException("Not intended to be used.");
     }
 
-    abstractSuccFor(fromState: TimeState, op: ProgramOperation, co: Concern): Iterable<TimeState> {
-        if (op.ast instanceof InitializeAnalysisStatement) {
+    abstractSuccFor(fromState: TimeState, opic: ProgramOperationInContext, co: Concern): Iterable<TimeState> {
+        if (opic.op.ast instanceof InitializeAnalysisStatement) {
             const initStmts: Statement[] = this._task.systemVariables.initStatements.elements;
-            return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(), initStmts, [op], co)
-                .map((w) => fromState.withWrappedState(w));
+
+            for (const itv of this._staticIntervals.values()) {
+                this._task.typeStorage.getScopeOf(itv.opTimeVariable.qualifiedName).putVariable(itv.opTimeVariable);
+
+                const assumeTimeMin = new NumGreaterEqualExpression(itv.opTimeVariable, itv.min);
+                const assumeTimeMax = new NumLessEqualExpression(itv.opTimeVariable, itv.max);
+
+                initStmts.push(new DeclareStackVariableStatement(itv.opTimeVariable));
+                initStmts.push(new StrengtheningAssumeStatement(assumeTimeMin));
+                initStmts.push(new StrengtheningAssumeStatement(assumeTimeMax));
+            }
+
+            return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(),
+                [].concat(initStmts), opic.thread, [opic.op], co).map((w) => fromState.withWrappedState(w));
         }
 
         let timeStatePrime = fromState;
-        if (op.ast instanceof BeginAtomicStatement) {
+        if (opic.op.ast instanceof BeginAtomicStatement) {
             timeStatePrime = timeStatePrime.withPushedBlock("block");
-        } else if (op.ast instanceof EndAtomicStatement) {
+        } else if (opic.op.ast instanceof EndAtomicStatement) {
             timeStatePrime = timeStatePrime.withPopBlock();
         }
 
-        const [minTimeMicrosExpr, maxTimeMicrosExpr, ops] = this.reinterprete(op);
+        const [minTimeMicrosExpr, maxTimeMicrosExpr, ops] = this.reinterprete(opic.op);
         let intermediateStatements: Statement[] = [];
 
         if (!this.isObserverConcern(co)) {
             if (timeStatePrime.getTimedBlockStack().isEmpty()) {
                 if (!this.isEmptyInterval(minTimeMicrosExpr, maxTimeMicrosExpr)) {
-                    const opTimeVariable: VariableWithDataLocation = new VariableWithDataLocation(
-                        DataLocations.createTypedLocation(Identifier.freshWithPrefix("__op_time_"), IntegerType.instance()));
-                    const opTimeVariableExpr: NumberVariableExpression = new NumberVariableExpression(opTimeVariable);
-
-                    this._task.typeStorage.getScopeOf(opTimeVariable.qualifiedName).putVariable(opTimeVariable);
-
-                    const assumeTimeMin = new NumGreaterEqualExpression(opTimeVariableExpr, minTimeMicrosExpr);
-                    const assumeTimeMax = new NumLessEqualExpression(opTimeVariableExpr, maxTimeMicrosExpr);
-
-                    intermediateStatements = [
-                        new DeclareStackVariableStatement(opTimeVariable),
-                        new StrengtheningAssumeStatement(assumeTimeMin),
-                        new StrengtheningAssumeStatement(assumeTimeMax),
-                        new StoreEvalResultToVariableStatement(this._task.systemVariables.globalTimeMicrosVariable,
-                            new PlusExpression(this._task.systemVariables.globalTimeMicrosVariable, opTimeVariableExpr))];
+                    intermediateStatements = this.getIntermediateStatementsFor(minTimeMicrosExpr, maxTimeMicrosExpr);
                 }
             }
         }
 
-        return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(), intermediateStatements, ops, co)
+        return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(), intermediateStatements, opic.thread, ops, co)
             .map((w) => timeStatePrime.withWrappedState(w));
     }
 
@@ -194,4 +252,31 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
         return co.equals(Concerns.defaultSpecificationConcern());
     }
 
+    private intervalKey(from: number, to: number): string {
+        return `${from}--${to}`;
+    }
+
+    private getIntermediateStatementsFor(minTimeMicrosExpr: NumberExpression, maxTimeMicrosExpr: NumberExpression) {
+        const staticKey: string = this.intervalKey((minTimeMicrosExpr as IntegerLiteral).num, (maxTimeMicrosExpr as IntegerLiteral).num);
+        const staticItv = this._staticIntervals.get(staticKey);
+        if (staticItv) {
+            return [new StoreEvalResultToVariableStatement(this._task.systemVariables.globalTimeMicrosVariable,
+                    new PlusExpression(this._task.systemVariables.globalTimeMicrosVariable, staticItv.intervalVariableExpression))];
+        } else {
+            const opTimeVariable: VariableWithDataLocation = new VariableWithDataLocation(
+                DataLocations.createTypedLocation(Identifier.freshWithPrefix("__op_time_"), IntegerType.instance()));
+            const opTimeVariableExpr: NumberVariableExpression = new NumberVariableExpression(opTimeVariable);
+
+            this._task.typeStorage.getScopeOf(opTimeVariable.qualifiedName).putVariable(opTimeVariable);
+
+            const assumeTimeMin = new NumGreaterEqualExpression(opTimeVariableExpr, minTimeMicrosExpr);
+            const assumeTimeMax = new NumLessEqualExpression(opTimeVariableExpr, maxTimeMicrosExpr);
+
+            return [new DeclareStackVariableStatement(opTimeVariable),
+                new StrengtheningAssumeStatement(assumeTimeMin),
+                new StrengtheningAssumeStatement(assumeTimeMax),
+                new StoreEvalResultToVariableStatement(this._task.systemVariables.globalTimeMicrosVariable,
+                    new PlusExpression(this._task.systemVariables.globalTimeMicrosVariable, opTimeVariableExpr))];
+        }
+    }
 }

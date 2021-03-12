@@ -36,7 +36,7 @@ import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {ProgramTimeProfile} from "../../../utils/TimeProfile";
 import {TimeTransferRelation} from "./TimeTransferRelation";
 import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {List as ImmList, Set as ImmSet} from "immutable";
@@ -44,6 +44,7 @@ import {LexiKey} from "../../../utils/Lexicographic";
 import {TimeAbstractDomain, TimeState} from "./TimeAbstractDomain";
 import {TimeMergeOperator} from "./TimeMergeOperator";
 import {AccessibilityRelation} from "../Accessibility";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 
 export class TimeAnalysis<F extends AbstractState>
@@ -77,7 +78,7 @@ export class TimeAnalysis<F extends AbstractState>
         this._transfer = new TimeTransferRelation(task, timeProfile, wrappedAnalysis);
     }
 
-    getTransitionLabel(from: TimeState, to: TimeState): ProgramOperation[] {
+    getTransitionLabel(from: TimeState, to: TimeState): [ThreadState, ProgramOperation][] {
         return this._wrappedAnalysis.getTransitionLabel(from.getWrappedState(), to.getWrappedState());
     }
 
@@ -85,7 +86,7 @@ export class TimeAnalysis<F extends AbstractState>
         return this._transfer.abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: TimeState, op: ProgramOperation, co: Concern): Iterable<TimeState> {
+    abstractSuccFor(fromState: TimeState, op: ProgramOperationInContext, co: Concern): Iterable<TimeState> {
         return this._transfer.abstractSuccFor(fromState, op, co);
     }
 
@@ -197,16 +198,24 @@ export class TimeAnalysis<F extends AbstractState>
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation< F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation< F>, state: F): Iterable<[F, ConcreteElement][]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation< F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation< F>, state: F): Iterable<[F, ConcreteElement][]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
     testifyOne(accessibility: AccessibilityRelation< F>, state: F): AccessibilityRelation< F> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
+    }
+
+    decRef(state: TimeState) {
+        this.wrappedAnalysis.decRef(state.getWrappedState());
+    }
+
+    incRef(state: TimeState) {
+        this.wrappedAnalysis.incRef(state.getWrappedState());
     }
 
 }

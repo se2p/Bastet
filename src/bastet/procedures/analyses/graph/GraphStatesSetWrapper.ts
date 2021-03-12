@@ -29,7 +29,7 @@ import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
 import {Preconditions} from "../../../utils/Preconditions";
 import {Set as ImmSet} from "immutable";
 import {AccessibilityRelation} from "../Accessibility";
-import {TransitionLabelProvider, UnavailableTransitionLabelProvider} from "../ProgramAnalysis";
+import {TransitionLabelProvider} from "../ProgramAnalysis";
 import {Concretizer, UnavailableConcretizer} from "../../domains/AbstractDomain";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 
@@ -44,19 +44,23 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
 
     private readonly _onStateToInspect: (r: GraphReachedSetWrapper<E>, e: E) => void;
 
-    constructor(frontierSet: FrontierSet<E>, partitionOp: StatePartitionOperator<E>, onStateToInspect: (r: GraphReachedSetWrapper<E>, e: E) => void) {
+    private readonly _labeler: TransitionLabelProvider<E>;
+
+    constructor(frontierSet: FrontierSet<E>, partitionOp: StatePartitionOperator<E>, 
+                onStateToInspect: (r: GraphReachedSetWrapper<E>, e: E) => void, labeler: TransitionLabelProvider<E>) {
         super(partitionOp);
         this._frontierSet = Preconditions.checkNotUndefined(frontierSet);
         this._children = new Map<GraphStateId, GraphStateId[]>();
         this._idToStateMap = new Map<GraphStateId, E>();
         this._onStateToInspect = Preconditions.checkNotUndefined(onStateToInspect);
+        this._labeler = Preconditions.checkNotUndefined(labeler);
     }
 
     public add(element: E): any {
         // A `GraphAbstractState` has only references to the parents.
         // This wrapper has to keep track of the children, too.
         for (const parentId of element.getPredecessors()) {
-            Preconditions.checkState(this._idToStateMap.has(parentId), `Parent state with id ${parentId} must exit for ${element.getId()}!`);
+            Preconditions.checkState(this._idToStateMap.has(parentId), `Parent state ${parentId} must exist for ${element.getId()}!`);
             // Above precondition check might fail, for example,
             // in case of some form of recursion that caused
             // the removal of already reached states (into that a merge was conducted).
@@ -196,7 +200,7 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
     }
 
     labeler(): TransitionLabelProvider<E> {
-        return new UnavailableTransitionLabelProvider();
+        return this._labeler;
     }
 
     concretizer(): Concretizer<ConcreteElement, E> {

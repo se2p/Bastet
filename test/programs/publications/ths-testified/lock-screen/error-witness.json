@@ -1,0 +1,179 @@
+{
+  "steps": [
+    {
+      "actors": [
+        {
+          "variables": {
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "layer": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "STAGE_HALF_HEIGHT": 180
+          },
+          "name": "Beetle"
+        }
+      ],
+      "action": "EPSILON"
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "state": 0,
+            "layer": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": false,
+            "STAGE_HALF_HEIGHT": 180
+          },
+          "name": "Beetle"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 1000121
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "state": 0,
+            "layer": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": false,
+            "STAGE_HALF_HEIGHT": 180
+          },
+          "name": "Beetle"
+        }
+      ],
+      "action": "MOUSE_MOVE",
+      "mousePosition": {
+        "x": -101
+      }
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "state": 1,
+            "layer": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": false,
+            "STAGE_HALF_HEIGHT": 180
+          },
+          "name": "Beetle"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 1000181
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "state": 1,
+            "layer": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": false,
+            "STAGE_HALF_HEIGHT": 180
+          },
+          "name": "Beetle"
+        }
+      ],
+      "action": "MOUSE_MOVE",
+      "mousePosition": {
+        "x": -1
+      }
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "state": 2,
+            "layer": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": false,
+            "STAGE_HALF_HEIGHT": 180
+          },
+          "name": "Beetle"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 1000191
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "state": 2,
+            "layer": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": false,
+            "STAGE_HALF_HEIGHT": 180
+          },
+          "name": "Beetle"
+        }
+      ],
+      "action": "MOUSE_MOVE",
+      "mousePosition": {
+        "x": 1
+      }
+    },
+    {
+      "actors": [
+        {
+          "variables": {
+            "direction": 90,
+            "STAGE_HALF_WIDTH": 240,
+            "STAGE_WIDTH": 480,
+            "color_effect_value": 0,
+            "size": 100,
+            "state": 2,
+            "layer": 0,
+            "STAGE_HEIGHT": 360,
+            "visible": true,
+            "STAGE_HALF_HEIGHT": 180
+          },
+          "name": "Beetle"
+        }
+      ],
+      "action": "WAIT",
+      "waitMicros": 250
+    }
+  ],
+  "violations": [
+    "Bug revealed!"
+  ]
+}

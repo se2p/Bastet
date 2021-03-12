@@ -42,9 +42,12 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Optional} from "../../../utils/Optional";
 import {DataAbstractStates} from "../data/DataAbstractStates";
 import {getTheOnlyElement} from "../../../utils/Collections";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 
 
 export interface AbstractionStateAttribs extends AbstractElement, SingletonStateWrapper {
+
+    blockId: number;
 
     enteringSummary: FirstOrderFormula;
 
@@ -58,6 +61,8 @@ export interface AbstractionStateAttribs extends AbstractElement, SingletonState
 
 const AbstractionStateRecord = ImmRec({
 
+    blockId: 0,
+
     enteringSummary: null,
 
     wrappedState: null,
@@ -70,8 +75,16 @@ const AbstractionStateRecord = ImmRec({
 
 export class AbstractionState extends AbstractionStateRecord implements AbstractionStateAttribs, AbstractState {
 
-    constructor(enteringSummary: FirstOrderFormula, wrappedState: AbstractElement, precision: PredicatePrecisionStack, wideningOf: Optional<AbstractionState>) {
-        super({enteringSummary: enteringSummary, precision: precision, wrappedState: wrappedState, wideningOf: wideningOf});
+    constructor(blockId: number, enteringSummary: FirstOrderFormula, wrappedState: AbstractElement, precision: PredicatePrecisionStack, wideningOf: Optional<AbstractionState>) {
+        super({blockId: blockId, enteringSummary: enteringSummary, precision: precision, wrappedState: wrappedState, wideningOf: wideningOf});
+    }
+
+    public getBlockId(): number {
+        return this.blockId;
+    }
+
+    public withFreshBlockId(): AbstractionState {
+        return this.set('blockId', BLOCK_SEQ_NO++);
     }
 
     public getEnteringSummary(): FirstOrderFormula {
@@ -137,8 +150,8 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
         this._wrappedStateLattice = Preconditions.checkNotUndefined(wrappedStateLattice);
         this._folLattice = Preconditions.checkNotUndefined(summaryLattice);
         this._precStacLattice = new PredicatePrecisionStackLattice(new PredicatePrecisionLattice(summaryLattice));
-        this._bottom = new AbstractionState(this._folLattice.bottom(), wrappedStateLattice.bottom(), this._precStacLattice.bottom(), Optional.absent());
-        this._top = new AbstractionState(this._folLattice.top(), wrappedStateLattice.top(), this._precStacLattice.top(), Optional.absent());
+        this._bottom = new AbstractionState(-3, this._folLattice.bottom(), wrappedStateLattice.bottom(), this._precStacLattice.bottom(), Optional.absent());
+        this._top = new AbstractionState(-2, this._folLattice.top(), wrappedStateLattice.top(), this._precStacLattice.top(), Optional.absent());
     }
 
     bottom(): AbstractionState {
@@ -146,6 +159,18 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
     }
 
     isIncluded(element1: AbstractionState, element2: AbstractionState): boolean {
+        if (element2 === this._top) {
+            return true;
+        } else if (element2 === this._bottom) {
+            if (element1 === this._bottom) {
+                return true;
+            }
+        }
+
+        // ATTENTION: "Stop", and with it "isIncluded", should work across blocks!
+        // To make this mathematically cleaner, a separate lattice is needed:
+        // one for the blocks only (with block id and a wrapped state), and one for the actual summary
+
         if (element1.getWideningOf().isPresent() !== element2.getWideningOf().isPresent()) {
             return false;
         } else if (element1.getWideningOf().isPresent()) {
@@ -159,6 +184,16 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
     }
 
     join(element1: AbstractionState, element2: AbstractionState): AbstractionState {
+        if (element1 === this._top || element2 === this._top) {
+            return this._top;
+        } else if (element1 === this._bottom || element2 === this._bottom) {
+            throw new ImplementMeException();
+        }
+
+        if (element1.blockId != element2.blockId) {
+            throw new IllegalArgumentException("Join across blocks not expected.");
+        }
+
         if (element1.getWideningOf().isPresent() !== element2.getWideningOf().isPresent()) {
             return this.top();
         } else if (element1.getWideningOf().isPresent()) {
@@ -190,6 +225,8 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
         return this._precStacLattice;
     }
 }
+
+var BLOCK_SEQ_NO = 0;
 
 export class AbstractionAbstractDomain implements AbstractDomain<ConcreteElement, AbstractionState> {
 
@@ -223,11 +260,51 @@ export class AbstractionAbstractDomain implements AbstractDomain<ConcreteElement
         return this._wrapped.concretizeOne(element.getWrappedState());
     }
 
+    enrich(element: ConcreteElement): ConcreteElement {
+        return element;
+    }
+
     widen(element: AbstractionState, precision: AbstractionPrecision): AbstractionState {
-        return this._abstractionFunction.computeAbstraction(element, precision).withWideningOf(element);
+        return this._abstractionFunction
+            .computeAbstraction(element, precision)
+            .withWideningOf(element)
+            .withFreshBlockId();
     }
 
     get concreteDomain(): ConcreteDomain<ConcreteElement> {
+        throw new ImplementMeException();
+    }
+
+    /**
+     * Sequential composition of two abstraction states.
+     *
+     * @param e1
+     * @param e2
+     */
+    composeSeq(e1: AbstractionState, e2: AbstractionState): AbstractionState {
+        // Case 1:
+        //      e1: a_0 > 5 and i_0 < 3
+        //      e2: a_0 > 10 and i_0 = 0
+        // Case 2:
+        //      e3: a_0 > 5 and i_0 < 3
+        //      e4: a_1 = 4
+        // Case 3:
+        //      e5: a_1 = 1 and b_1 = 2
+        //      e6: a_1 = a_0 + 1
+
+        // Not commutative:
+        //      e5 * e6 == a_1 = 1 and b_1 = 2 and a_2 = a_1 + 1
+        //      e6 * e5 == a_1 = a_0 + 1 and a_2 = 1 and b_1 = 2
+
+        // Workflow:
+        // (1) We somehow need to concretize the abstraction states
+        // (2) We somehow need to turn these into FirstOrderFormulas or Z3Formulas
+        // (3) This allows is to perform the SSA alignment
+        // (4) Finally we can conjunct the aligned formulae and return the result
+
+        const c1: ConcreteElement = this.concretizeOne(e1);
+        const c2: ConcreteElement = this.concretizeOne(e2);
+
         throw new ImplementMeException();
     }
 

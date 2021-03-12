@@ -100,6 +100,28 @@ export class AppBuilder {
         return new App(programOrigin, programNode.ident.text, actorMap, typeStorage);
     }
 
+    private static fixTypeRegistry(app: App) {
+        for (const a of app.actors) {
+            for (const m of a.scripts) {
+                for (const [from, opid, to] of m.transitions.transitions) {
+                    if (ProgramOperation.for(opid).ast instanceof DeclareStackVariableStatement) {
+                        const decl = ProgramOperation.for(opid).ast as DeclareStackVariableStatement;
+                        app.typeStorage.beginActorScope(a.ident).putTypeInformation(decl.identifier, decl.variableType);
+                    }
+                }
+            }
+            for (const m of a.methods) {
+                for (const [from, opid, to] of m.transitions.transitions) {
+                    if (ProgramOperation.for(opid).ast instanceof DeclareStackVariableStatement) {
+                        const decl = ProgramOperation.for(opid).ast as DeclareStackVariableStatement;
+                        app.typeStorage.beginActorScope(a.ident).beginMethodScope(m.ident.text).putTypeInformation(decl.identifier, decl.variableType);
+                    }
+                }
+            }
+        }
+
+    }
+
     private buildActors(programAST: ProgramDefinition): ActorMap {
         let result: ActorMap = {};
         const actorDefinitions : ActorDefinition[] = programAST.actors.elements;
@@ -128,10 +150,10 @@ export class AppBuilder {
         const acd = actorDefinition;
 
         const resources = this.buildResources(acd.resourceDefs);
-        const initScript = this.buildInitScript(acd.resourceDefs, acd.declarationStmts, acd.initStmts);
+        const initScript = this.buildInitScript(actorName, acd.resourceDefs, acd.declarationStmts, acd.initStmts);
         const methodDefs = this.buildMethodDefs(acd.methodDefs);
         const externalMethodSigs = this.buildExternalMethodSigs(acd.externalMethodDecls);
-        const scripts = this.buildScripts(acd.scriptList).concat([initScript]);
+        const scripts = [initScript].concat(this.buildScripts(acd.scriptList));
         const methods = this.buildMethods(acd.methodDefs);
         const concern = this.determineConcern(actorDefinition);
 
@@ -247,7 +269,7 @@ export class AppBuilder {
         return result;
     }
 
-    private buildInitScript(resourceListContext: ResourceDefinitionList, declarationStmtList: StatementList,
+    private buildInitScript(actorName: string, resourceListContext: ResourceDefinitionList, declarationStmtList: StatementList,
                                    stmtList: StatementList): Script {
         const visitor = new RelationBuildingVisitor();
 
@@ -267,7 +289,7 @@ export class AppBuilder {
             TransitionRelations.concat(transrelRes,
                 TransitionRelations.concat(transrelLocs, transrelSet)));
 
-        const scriptId = Identifier.freshWithPrefix("init");
+        const scriptId = Identifier.freshWithPrefix("init_" + actorName);
         return new Script(scriptId, BootstrapEvent.instance(), false, compundTransRel);
     }
 
@@ -369,7 +391,9 @@ export class AppBuilder {
             flatActors[d.ident] = d;
         }
 
-        return new App(taskModel.origin, taskModel.ident, flatActors, taskModel.typeStorage);
+        const result = new App(taskModel.origin, taskModel.ident, flatActors, taskModel.typeStorage);
+        this.fixTypeRegistry(result);
+        return result;
     }
 
     /**
@@ -436,7 +460,9 @@ export class AppBuilder {
             actorMap[actorPrime.ident] = actorPrime;
         }
 
-        return new App(taskModel.origin, taskModel.ident, actorMap, taskModel.typeStorage);
+        const result = new App(taskModel.origin, taskModel.ident, actorMap, taskModel.typeStorage);
+        this.fixTypeRegistry(result);
+        return result;
     }
 
 }

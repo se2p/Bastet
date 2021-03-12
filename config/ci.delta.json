@@ -1,0 +1,14 @@
+{
+    "MainAnalysis": {
+        "print-statistics": false,
+        "export-artifacts": false
+    },
+
+    "ReachabilityAlgorithm": {
+        "dump-graph-after-iteration": false
+    },
+
+    "GraphAnalysis": {
+        "witnessHandlers": ["DoNothing"]
+    }
+}

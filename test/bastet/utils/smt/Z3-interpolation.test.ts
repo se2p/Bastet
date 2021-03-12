@@ -30,6 +30,7 @@ import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
 import {ConcreteNumber} from "../../../../src/bastet/procedures/domains/ConcreteElements";
 import {Z3FirstOrderFormula, Z3Theories} from "../../../../src/bastet/utils/smt/z3/Z3Theories";
 import {IntegerType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
+import {AnalysisStatistics} from "../../../../src/bastet/procedures/analyses/AnalysisStatistics";
 
 
 let smt: Z3SMT;
@@ -41,11 +42,12 @@ beforeAll( async (done) => {
     smt = await SMTFactory.createZ3();
     ctx = smt.createContext();
     theories = smt.createTheories(ctx);
-    prover = smt.createProver(ctx);
+    prover = smt.createProver(ctx, new AnalysisStatistics("Test", {}));
+
     done();
 });
 
-test ("Interpolation.SafeProgram", () => {
+test ("Interpolation.SafeProgram", async (done) => {
 
     // loop-3-SAFE.sc
     /*
@@ -106,9 +108,10 @@ test ("Interpolation.SafeProgram", () => {
     expect(interpolants).toContain("(= y@3 3)");
 
     prover.pop();
+    done();
 })
 
-test("Interpolation.OnlyY", () => {
+test("Interpolation.OnlyY", async (done) => {
     prover.push();
 
     const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y@0"), IntegerType.instance()));
@@ -138,9 +141,10 @@ test("Interpolation.OnlyY", () => {
     expect(interpolantsString).toContain("(= y@0 42)");
 
     prover.pop();
+    done();
 });
 
-test ("Interpolation", () => {
+test ("Interpolation", async (done) => {
     prover.push();
 
     const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), IntegerType.instance()));
@@ -176,4 +180,5 @@ test ("Interpolation", () => {
     }
 
     prover.pop();
+    done();
 });

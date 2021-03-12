@@ -132,6 +132,7 @@ import {
 } from "../ast/core/expressions/ActorExpression";
 import {Identifier} from "../ast/core/Identifier";
 import {
+    CheckFeasibilityStatement,
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
     TerminateProgramStatement
@@ -189,6 +190,10 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     visitPrecisionPushStatement(node: PrecisionPushStatement): AstNode {
         return new PrecisionPushStatement(node.predicate.accept(this) as BooleanExpression);
+    }
+
+    visitCheckFeasibilityStatement(node: CheckFeasibilityStatement): AstNode {
+        return node;
     }
 
     visitPrecisionPopStatement(node: PrecisionPopStatement): AstNode {
@@ -689,7 +694,7 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
 
     visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): AstNode {
         return this.doForStatement(node, (() => {
-            // ATTENTION: It is importat to conduct the visit for the RHS first (for a forwards analysis)!
+            // ATTENTION: It is important to conduct the visit for the RHS first (for a forwards analysis)!
             const rhs = this.withMode(DataLocationMode.READ_FROM, () => node.toValue.accept(this)) as Expression;
             const assignedDataLoc: DataLocation = this.renameAssigned(node.variable.dataloc);
             return new StoreEvalResultToVariableStatement(new VariableWithDataLocation(assignedDataLoc), rhs);

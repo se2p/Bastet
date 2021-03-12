@@ -72,13 +72,13 @@ export class Z3AstNodeList {
         this._list = Preconditions.checkNotUndefined(list);
         this._ctx = Preconditions.checkNotUndefined(ctx);
 
-        for (let e of list) {
+        for (const e of list) {
             this._ctx.inc_ref(e);
         }
     }
 
-    public decRef() {
-        for (let e of this._list) {
+    public release() {
+        for (const e of this._list) {
             this._ctx.dec_ref(e);
         }
     }
@@ -92,11 +92,24 @@ export abstract class Z3Visitor<R> implements Z3AstVisitor<R> {
 
     protected readonly _ctx: LibZ3InContext
 
+    private readonly _visited: Map<number, R>;
+
     constructor(ctx: LibZ3InContext) {
         this._ctx = Preconditions.checkNotUndefined(ctx);
+        this._visited = new Map();
     }
 
     visit(node: Z3_ast): R {
+        let result: R = this._visited.get(node.val());
+        if (!result) {
+            result = this.visit0(node);
+            this._visited.set(node.val(), result);
+        }
+
+        return result;
+    }
+
+    visit0(node: Z3_ast): R {
         switch (this.getAstKind(node)) {
             case Z3AstKind.Z3_APP_AST:
                 return this.visitConstantOrApplication(node);
@@ -185,9 +198,11 @@ export class VariableCollectingVisitor extends Z3Visitor<ImmMap<string, Z3Formul
     visitConstantOrApplication(node: Z3_ast): ImmMap<string, Z3Formula> {
         let result = ImmMap<string, Z3Formula>([]);
         const childs = this.children(node);
-        for (let c of childs.list) {
+
+        for (const c of childs.list) {
             result = result.merge(this.visit(c));
         }
+
         if (childs.list.length == 0) {
             const decl: Z3_func_decl = this._ctx.get_app_decl(node);
             const symbol: Z3_symbol = this._ctx.get_decl_name(decl);
@@ -197,7 +212,9 @@ export class VariableCollectingVisitor extends Z3Visitor<ImmMap<string, Z3Formul
                 result = result.set(name, new Z3Formula(node));
             }
         }
-        childs.decRef();
+
+        childs.release();
+
         return result;
     }
 

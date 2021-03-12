@@ -10,7 +10,7 @@
 
     "Transformer": {
         "enable-message-dispatcher-loop": false,
-        "use-busy-waiting": false,
+        "use-busy-waiting": true,
         "use-busy-wait-until-cond": true
     },
 
@@ -28,9 +28,9 @@
     },
 
     "GraphAnalysis": {
-        "mergeIntoOperator": "StandardMergeIntoOperator",
+        "mergeIntoOperator": "NewMergeIntoOperator",
         "stopOperator": "CheckCoverage",
-        "witnessHandler": "ExportPath",
+        "witnessHandlers": ["ExportPath"],
         "graphConstructionOrder": "WaitAtMeet",
         "checkTargetFeasibility": true
     },

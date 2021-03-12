@@ -23,14 +23,38 @@
  *
  */
 
-import {Lattice} from "../../lattices/Lattice";
-import {ImmutableMap} from "../../utils/ImmutableMap";
-import {ImmutableList} from "../../utils/ImmutableList";
-import {Preconditions} from "../../utils/Preconditions";
-import {Record as ImmRec} from "immutable";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {
+    AbstractBoolean,
+    AbstractFloat,
+    AbstractInteger,
+    AbstractList, AbstractMemory,
+    AbstractNumber,
+    AbstractReal, AbstractString, AbstractStringList
+} from "./MemoryTransformer";
 
-export interface ConcreteElement {
+type float = number;
+type integer = number;
+
+import {AbstractElement, AbstractState, Lattice, AbstractElementVisitor} from "../../lattices/Lattice";
+import {Preconditions} from "../../utils/Preconditions";
+import {Record as ImmRec, Map as ImmMap} from "immutable";
+import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import {VariableWithDataLocation} from "../../syntax/ast/core/Variable";
+import {VAR_SCOPING_SPLITTER} from "../../syntax/app/controlflow/DataLocation";
+
+function containsAll<K, V>(map1: ImmMap<K, V>, map2: ImmMap<K, V>): boolean {
+    throw new ImplementMeException();
+}
+
+function joinMaps<K, V>(map1: ImmMap<K, V>, map2: ImmMap<K, V>): ImmMap<K, V> {
+    throw new ImplementMeException();
+}
+
+/**
+ * A concrete element is an abstract element, with all information (no abstraction applied).
+ */
+export interface ConcreteElement extends AbstractElement {
 
 }
 
@@ -86,24 +110,53 @@ export class ConcretePrimitive<T> extends ConcretePrimitiveValueRecord implement
 
 }
 
-export class ConcreteString extends ConcretePrimitive<string> {
+export class ConcreteString extends ConcretePrimitive<string> implements AbstractString {
 
     constructor(value: string) {
         super({value: value});
     }
 }
 
-export class ConcreteBoolean extends ConcretePrimitive<boolean> {
+export class ConcreteFloat extends ConcretePrimitive<float> implements AbstractFloat, AbstractReal {
+
+    constructor(value: float) {
+        super({value: value});
+    }
+}
+
+export class ConcreteInteger extends ConcretePrimitive<integer> implements AbstractInteger {
+
+    constructor(value: integer) {
+        super({value: value});
+    }
+}
+
+export class ConcreteBoolean extends ConcretePrimitive<boolean> implements AbstractBoolean {
 
     constructor(value: boolean) {
         super({value: value});
     }
 }
 
-export class ConcreteNumber extends ConcretePrimitive<number> {
+export class ConcreteNumber extends ConcretePrimitive<number> implements AbstractNumber {
 
     constructor(value: number) {
         super({value: value});
+    }
+}
+
+export class ConcreteList<Of extends ConcreteElement> extends ConcretePrimitive<Of> implements ConcreteElement, AbstractList {
+
+    constructor(values: Of[]) {
+        super({value: values});
+    }
+
+}
+
+export class ConcreteStringList extends ConcreteList<ConcreteString> implements AbstractStringList, AbstractList {
+
+    constructor(elements: ConcreteString[]) {
+        super(elements);
     }
 }
 
@@ -119,7 +172,7 @@ export class ConcreteNumberDomain implements ConcreteDomain<ConcreteNumber> {
         return new ConcreteNumber(attrs['value']);
     }
 
-    elementFomPrimitive(num: number): ConcreteNumber {
+    public static elementFomPrimitive(num: number): ConcreteNumber {
         return new ConcreteNumber(num);
     }
 
@@ -155,84 +208,157 @@ export class ConcreteBoundedStringDomain implements ConcreteDomain<ConcreteStrin
 
 }
 
-export class ConcreteBoundedStringListDomain implements ConcreteDomain<ConcreteStringList> {
+export interface ConcreteUnifiedMemoryAttributes {
 
-    private readonly _bound: number;
-
-    constructor(bound: number) {
-        this._bound = bound;
-    }
-
-    createElement(attrs: {}): ConcreteStringList {
-        throw new ImplementMeException();
-    }
-
-    createFrom(lst: ConcreteString[]) {
-        Preconditions.checkNotUndefined(lst);
-        return new ConcreteStringList(lst.slice(0, this._bound)); // `slice`: excluding the end
-    }
+    mem: ImmMap<string, ConcretePrimitive<any>>;
 
 }
 
+const ConcreteUnifiedMemoryRecord = ImmRec({
 
-export class ConcreteMemory implements ConcreteElement {
+    mem: ImmMap<string, ConcretePrimitive<any>>(),
 
-    private readonly _numberMem: ImmutableMap<string, ConcreteNumber>;
+});
 
-    private readonly _stringMem: ImmutableMap<string, ConcreteString>;
+export class ConcreteUnifiedMemory extends ConcreteUnifiedMemoryRecord implements ConcreteUnifiedMemoryAttributes, ConcreteElement {
 
-    private readonly _booleanMem: ImmutableMap<string, ConcreteBoolean>;
-
-    private readonly _listMem: ImmutableMap<string, ConcreteList<ConcreteString>>;
-
-    constructor(numberMem: Map<string, ConcreteNumber>, stringMem: Map<string, ConcreteString>,
-                booleanMem: Map<string, ConcreteBoolean>, listMem: Map<string, ConcreteList<ConcreteString>>) {
-        this._numberMem = ImmutableMap.copyOf(numberMem);
-        this._stringMem = ImmutableMap.copyOf(stringMem);
-        this._booleanMem = ImmutableMap.copyOf(booleanMem);
-        this._listMem = ImmutableMap.copyOf(listMem);
+    constructor(mem: ImmMap<string, ConcretePrimitive<any>>) {
+        super({mem: mem});
     }
 
-    get numberMem(): ImmutableMap<string, ConcreteNumber> {
-        return this._numberMem;
+    public variables(): Iterable<string> {
+        return this.mem.keys();
     }
 
-    get stringMem(): ImmutableMap<string, ConcreteString> {
-        return this._stringMem;
+    public getValue(variable: string): ConcretePrimitive<any> {
+        return this.mem.get(variable);
     }
 
-    get booleanMem(): ImmutableMap<string, ConcreteBoolean> {
-        return this._booleanMem;
+    public getPrimitiveValue(variable: string): (number | boolean | string | (number | boolean | string)[]) {
+        return this.mem.get(variable).value;
     }
 
-    get listMem(): ImmutableMap<string, ConcreteList<ConcreteString>> {
-        return this._listMem;
+    public withValue(forVariable: string, value: ConcretePrimitive<any>): ConcreteUnifiedMemory {
+       return new ConcreteUnifiedMemory(this.mem.set(forVariable, value));
+    }
+
+    public getSize(): number {
+        return this.mem.size;
+    }
+
+    public toConcreteMemory(): ConcreteMemory {
+        const integers: Map<string, ConcreteInteger> = new Map();
+        const floats: Map<string, ConcreteFloat> = new Map();
+        const strings: Map<string, ConcreteString> = new Map();
+        const booleans: Map<string, ConcreteBoolean> = new Map();
+        const lists: Map<string, ConcreteStringList> = new Map();
+
+        for (const [name, value] of this.mem.entries()) {
+            if (value instanceof ConcreteInteger) {
+                integers.set(name, value);
+            } else if (value instanceof ConcreteFloat) {
+                floats.set(name, value);
+            } else if (value instanceof ConcreteString) {
+                strings.set(name, value);
+            } else if (value instanceof ConcreteBoolean) {
+                booleans.set(name, value);
+            } else if (value instanceof ConcreteStringList) {
+                lists.set(name, value);
+            } else {
+                throw new IllegalArgumentException();
+            }
+        }
+
+        return new ConcreteMemory(ImmMap(integers), ImmMap(floats), ImmMap(strings), ImmMap(booleans), ImmMap(lists));
+    }
+}
+
+export interface ConcreteMemoryStateAttributes {
+
+    integers: ImmMap<string, ConcreteInteger>;
+    floats: ImmMap<string, ConcreteFloat>;
+    strings: ImmMap<string, ConcreteString>;
+    booleans: ImmMap<string, ConcreteBoolean>;
+    lists: ImmMap<string, ConcreteList<ConcreteString>>;
+
+}
+
+const ConcreteMemoryRecord = ImmRec({
+
+    integers: ImmMap<string, ConcreteInteger>(),
+    floats: ImmMap<string, ConcreteFloat>(),
+    strings: ImmMap<string, ConcreteString>(),
+    booleans: ImmMap<string, ConcreteBoolean>(),
+    lists: ImmMap<string, ConcreteStringList>()
+
+});
+
+export class ConcreteMemory extends ConcreteMemoryRecord implements ConcreteMemoryStateAttributes, ConcreteElement, AbstractState, AbstractBoolean, AbstractMemory {
+
+    constructor(integerMem: ImmMap<string, ConcreteInteger>,
+                floatMem: ImmMap<string, ConcreteFloat>,
+                stringMem: ImmMap<string, ConcreteString>,
+                booleanMem: ImmMap<string, ConcreteBoolean>,
+                listMem: ImmMap<string, ConcreteList<ConcreteString>>) {
+        super({integers: integerMem, floats: floatMem, strings: stringMem, booleans: booleanMem, lists: listMem});
+    }
+
+    public accept<R>(visitor: AbstractElementVisitor<R>): R {
+        const visitMethod: string = `visit${this.constructor.name}`;
+        if (visitor[visitMethod]) {
+            return visitor[visitMethod](this);
+        } else {
+            return visitor.visit(this);
+        }
+    }
+
+    public getIntegers(): ImmMap<string, ConcreteInteger> {
+        return this.integers;
+    }
+
+    public getFloats(): ImmMap<string, ConcreteFloat> {
+        return this.floats;
+    }
+
+    public getStrings(): ImmMap<string, ConcreteString> {
+        return this.strings;
+    }
+
+    public getBooleans(): ImmMap<string, ConcreteBoolean> {
+        return this.booleans;
+    }
+
+    public getLists(): ImmMap<string, ConcreteStringList> {
+        return this.lists;
+    }
+
+    public withIntegers(value: ImmMap<string, ConcreteInteger>): ConcreteMemory {
+        return this.set('integers', value);
+    }
+
+    public withFloats(value: ImmMap<string, ConcreteFloat>): ConcreteMemory {
+        return this.set('floats', value);
+    }
+
+    public withStrings(value: ImmMap<string, ConcreteString>): ConcreteMemory {
+        return this.set('strings', value);
+    }
+
+    public withBooleans(value: ImmMap<string, ConcreteBoolean>): ConcreteMemory {
+        return this.set('booleans', value);
+    }
+
+    public withLists(value: ImmMap<string, ConcreteList<ConcreteString>>): ConcreteMemory {
+        return this.set('lists', value);
     }
 
     getPrimitiveAttributeByName(name: string): ConcretePrimitive<any> {
-        return this._numberMem.get(name) || this._stringMem.get(name) || this._booleanMem.get(name);
-    }
-}
-
-export class ConcreteList<Of> implements ConcreteElement {
-
-    private readonly _elements: ImmutableList<Of>;
-
-    constructor(elements: Of[]) {
-        Preconditions.checkNotUndefined(elements);
-        this._elements = new ImmutableList(elements);
+        return this.integers.get(name)
+            || this.strings.get(name)
+            || this.booleans.get(name)
+            || this.lists.get(name);
     }
 
-    get elements(): ImmutableList<Of> {
-        return this._elements;
-    }
-}
-
-export class ConcreteStringList extends ConcreteList<ConcreteString> {
-
-    constructor(elements: ConcreteString[]) {
-        super(elements);
-    }
 }
 
 export class ConcreteElementFactory {
@@ -247,6 +373,190 @@ export class ConcreteElementFactory {
 
     static concreteBooleanFrom(bo: boolean): ConcreteBoolean {
         return new ConcreteBoolean(bo);
+    }
+
+}
+
+export abstract class FlatLattice<T extends ConcreteElement> implements Lattice<T> {
+
+    private readonly _top: T;
+
+    private readonly _bottom: T;
+
+    constructor(top: T, bottom: T) {
+        this._top = Preconditions.checkNotUndefined(top);
+        this._bottom = Preconditions.checkNotUndefined(bottom);
+    }
+
+    bottom(): T {
+        return this._bottom;
+    }
+
+    top(): T {
+        return this._top;
+    }
+
+    isIncluded(element1: T, element2: T): boolean {
+        if (element2 === this._top) {
+            return true;
+        }
+
+        if (element1 === this._bottom) {
+            return true;
+        }
+
+        return element1.equals(element2);
+    }
+
+    join(element1: T, element2: T): T {
+        if (element1.equals(element2)) {
+            return element1;
+        }
+
+        return this._top;
+    }
+
+    meet(element1: T, element2: T): T {
+        if (element1.equals(element2)) {
+            return element1;
+        }
+
+        return this._bottom;
+    }
+}
+
+export class FlatIntegerLattice extends FlatLattice<ConcreteInteger> {
+
+    constructor() {
+        const top = new ConcreteInteger(1234567890);
+        const bottom = new ConcreteInteger(-123456789);
+        super(top, bottom);
+    }
+
+}
+
+export class FlatFloatLattice extends FlatLattice<ConcreteFloat> {
+
+    constructor() {
+        const top = new ConcreteFloat(Math.PI);
+        const bottom = new ConcreteFloat(-Math.PI);
+        super(top, bottom);
+    }
+
+}
+
+export class FlatBooleanLattice extends FlatLattice<ConcreteBoolean> {
+
+    constructor() {
+        const top = new ConcreteBoolean(true);
+        const bottom = new ConcreteBoolean(false);
+        super(top, bottom);
+    }
+
+}
+
+export class FlatStringLattice extends FlatLattice<ConcreteString> {
+
+    constructor() {
+        const top = new ConcreteString("");
+        const bottom = new ConcreteString("");
+        super(top, bottom);
+    }
+
+}
+
+export class FlatStringListLattice extends FlatLattice<ConcreteStringList> {
+
+    constructor() {
+        const stringLattice = new FlatStringLattice();
+        const top = new ConcreteStringList([stringLattice.top()]);
+        const bottom = new ConcreteStringList([stringLattice.bottom()]);
+        super(top, bottom);
+    }
+
+}
+
+export class ConcreteMemoryLattice implements Lattice<ConcreteMemory> {
+
+    private readonly _bottom: ConcreteMemory;
+
+    private readonly _top: ConcreteMemory;
+
+    private readonly _integerLattice: Lattice<ConcreteInteger>;
+
+    private readonly _floatLattice: Lattice<ConcreteFloat>;
+
+    private readonly _booleanLattice: Lattice<ConcreteBoolean>;
+
+    private readonly _stringLattice: Lattice<ConcreteString>;
+
+    private readonly _listLattice: Lattice<ConcreteList<ConcreteString>>;
+
+    constructor() {
+        this._integerLattice = new FlatIntegerLattice();
+        this._floatLattice = new FlatFloatLattice();
+        this._booleanLattice = new FlatBooleanLattice();
+        this._stringLattice = new FlatStringLattice();
+        this._listLattice = new FlatStringListLattice();
+        this._bottom = new ConcreteMemory(ImmMap(), ImmMap(), ImmMap(), ImmMap(), ImmMap());
+        this._top = new ConcreteMemory(
+            ImmMap([['*', this._integerLattice.top()]]),
+            ImmMap([['*', this._floatLattice.top()]]),
+            ImmMap([['*', this._stringLattice.top()]]),
+            ImmMap([['*', this._booleanLattice.top()]]),
+            ImmMap([['*', this._listLattice.top()]]));
+    }
+
+    bottom(): ConcreteMemory {
+        return this._bottom;
+    }
+
+    isIncluded(element1: ConcreteMemory, element2: ConcreteMemory): boolean {
+        if (element2 === this._top) {
+            return true;
+        }
+
+        if (element1 === this._bottom) {
+            return true;
+        }
+
+        if (element2 === this._bottom) {
+            return element1 === this._bottom;
+        }
+
+        return containsAll(element1.integers, element2.integers)
+            && containsAll(element1.floats, element2.floats)
+            && containsAll(element1.strings, element2.strings)
+            && containsAll(element1.booleans, element2.booleans)
+            && containsAll(element1.lists, element2.lists);
+    }
+
+    join(element1: ConcreteMemory, element2: ConcreteMemory): ConcreteMemory {
+        if (element2 === this._top || element1 === this._top) {
+            return this._top;
+        }
+
+        if (element1 === this._bottom) {
+            return element2;
+        }
+
+        if (element2 === this._bottom) {
+            return element1;
+        }
+
+        return element1.withBooleans(joinMaps(element1.booleans, element2.booleans))
+            .withIntegers(joinMaps(element1.integers, element2.integers))
+            .withFloats(joinMaps(element1.floats, element2.floats))
+            .withStrings(joinMaps(element1.strings, element2.strings))
+            .withLists(joinMaps(element1.lists, element2.lists));
+    }
+
+    meet(element1: ConcreteMemory, element2: ConcreteMemory): ConcreteMemory {
+        throw new ImplementMeException();
+    }
+
+    top(): ConcreteMemory {
+        return this._top;
     }
 
 }

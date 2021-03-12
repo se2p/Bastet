@@ -149,6 +149,7 @@ import {
 import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpression";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {
+    CheckFeasibilityStatement,
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
     TerminateProgramStatement
@@ -511,6 +512,10 @@ export class DataTransformerVisitor<B extends AbstractBoolean,
 
     private numberTheoryFor(dl: DataLocation): NumberTheory<AbstractNumber, I, R, F, B, S> {
         return this._theories.getNumberTheoryFor(ScratchType.fromId(dl.type));
+    }
+
+    visitCheckFeasibilityStatement(node: CheckFeasibilityStatement): B {
+        return this._mem;
     }
 
     visitCallStatement(node: CallStatement): B {

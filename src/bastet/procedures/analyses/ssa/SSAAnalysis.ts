@@ -28,11 +28,16 @@ import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
-import {ConcreteElement} from "../../domains/ConcreteElements";
+import {
+    ConcreteElement,
+    ConcreteMemory,
+    ConcretePrimitive,
+    ConcreteUnifiedMemory
+} from "../../domains/ConcreteElements";
 import {LabeledTransferRelation} from "../TransferRelation";
-import {SSAAbstractDomain, SSAState} from "./SSAAbstractDomain";
+import {extractPrimitiveAttributes, SSAAbstractDomain, SSAState} from "./SSAAbstractDomain";
 import {SSATransferRelation} from "./SSATransferRelation";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {FrontierSet, PartitionKey, ReachedSet, StateSet} from "../../algorithms/StateSet";
@@ -44,6 +49,10 @@ import {SSAMergeOperator} from "./SSAMergeOperator";
 import {Map as ImmMap, Set as ImmSet} from "immutable";
 import {LexiKey} from "../../../utils/Lexicographic";
 import {AccessibilityRelation} from "../Accessibility";
+import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
+import {SSAAbstractStates} from "./SSAAbstractStates";
+import {getTheOnlyElement} from "../../../utils/Collections";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 
 export class SSAAnalysisConfig extends BastetConfiguration {
@@ -83,7 +92,7 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         this._mergeOp = new SSAMergeOperator(this._task, this.wrappedAnalysis, this.wrappedAnalysis);
     }
 
-    getTransitionLabel(from: SSAState, to: SSAState): ProgramOperation[] {
+    getTransitionLabel(from: SSAState, to: SSAState): [ThreadState, ProgramOperation][] {
         return this._wrappedAnalysis.getTransitionLabel(from.getWrappedState(), to.getWrappedState());
     }
 
@@ -91,7 +100,7 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return this._transferRelation.abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: SSAState, op: ProgramOperation, co: Concern): Iterable<SSAState> {
+    abstractSuccFor(fromState: SSAState, op: ProgramOperationInContext, co: Concern): Iterable<SSAState> {
         return this._transferRelation.abstractSuccFor(fromState, op, co);
     }
 
@@ -204,19 +213,60 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
-        const resultWithSSA = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
+        const resultWithSSA: Iterable<[AbstractState, ConcreteElement][]> = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
 
-        // TODO: Remove the SSA-Indices from the concrete elements along the path
-        throw new ImplementMeException();
+        const plus = (m1: ImmMap<string, number>, m2: ImmMap<string, number>): ImmMap<string, number> => {
+            const keys = ImmSet(m1.keys()).union(ImmSet(m2.keys()));
+            let result = m1;
+
+            for (const k of keys) {
+                const v1 = m1.get(k) || 0;
+                const v2 = m2.get(k) || 0;
+                result = result.set(k, v1 + v2);
+            }
+
+            return result;
+        };
+
+        for (const seq of resultWithSSA) {
+            const result: [AbstractState, ConcreteElement][] = [];
+            let ssaBase = this._abstractDomain.lattice.top().getSSA();
+            let ssaAligned = ssaBase;
+            for (const [e, c] of seq) {
+                if (c instanceof ConcreteMemory) {
+                    const ssaStateAtPos = getTheOnlyElement(SSAAbstractStates.extractFrom(e));
+                    if (this._abstractDomain.lattice.top() === ssaStateAtPos) {
+                        ssaBase = ssaAligned;
+                    }
+                    ssaAligned = plus(ssaBase, ssaStateAtPos.getSSA());
+                    const mem = extractPrimitiveAttributes(c, ssaAligned);
+                    result.push([e, new ConcreteUnifiedMemory(mem)]);
+                } else {
+                    throw new IllegalArgumentException();
+                }
+            }
+
+            return [result];
+        }
+
+        return [];
     }
 
     accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         throw new ImplementMeException();
+    }
+
+    incRef(state: SSAState) {
+        this.wrappedAnalysis.incRef(state.getWrappedState());
+    }
+
+    decRef(state: SSAState) {
+        this.wrappedAnalysis.decRef(state.getWrappedState());
     }
 
 }

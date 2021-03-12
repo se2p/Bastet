@@ -92,22 +92,7 @@ export class SSAState extends SSAStateRecord implements SSAStateAttribs, Abstrac
     }
 
     public getPrimitiveAttributes(memory: ConcreteMemory): ImmMap<string, ConcretePrimitive<any>> {
-        const attributes = new Map<string, ConcretePrimitive<any>>();
-
-        this.ssa.forEach((ssaIndex, attributeName) => {
-            const attributeWithIndex = `${attributeName}@${ssaIndex}`;
-
-            const attribute = memory.getPrimitiveAttributeByName(attributeWithIndex);
-
-            if (!attribute) {
-                // TODO why are attributes in SSAMap but not in memory?
-                // console.log(`${attributeWithIndex} was undefined`);
-            } else {
-                attributes.set(attributeName, attribute);
-            }
-        })
-
-        return ImmMap<string, ConcretePrimitive<any>>(attributes);
+        return extractPrimitiveAttributes(memory, this.ssa);
     }
 
     public accept<R>(visitor: AbstractElementVisitor<R>): R {
@@ -119,6 +104,24 @@ export class SSAState extends SSAStateRecord implements SSAStateAttribs, Abstrac
         }
     }
 
+}
+
+export function extractPrimitiveAttributes(memory: ConcreteMemory, ssa: ImmMap<string, number>): ImmMap<string, ConcretePrimitive<any>> {
+    const attributes = new Map<string, ConcretePrimitive<any>>();
+
+    ssa.forEach((ssaIndex, attributeName) => {
+        const attributeWithIndex = `${attributeName}@${ssaIndex}`;
+
+        const attribute = memory.getPrimitiveAttributeByName(attributeWithIndex);
+
+        if (!attribute) {
+            // TODO why are attributes in SSAMap but not in memory?
+        } else {
+            attributes.set(attributeName, attribute);
+        }
+    })
+
+    return ImmMap<string, ConcretePrimitive<any>>(attributes);
 }
 
 export class SSAStateLattice implements Lattice<SSAState> {
@@ -188,11 +191,19 @@ export class SSAAbstractDomain implements AbstractDomain<ConcreteElement, SSASta
         return this._wrapped.concretizeOne(element.getWrappedState());
     }
 
+    enrich(element: ConcreteElement): ConcreteElement {
+        throw new ImplementMeException();
+    }
+
     widen(element: SSAState, precision: AbstractionPrecision): SSAState {
         throw new ImplementMeException();
     }
 
     get concreteDomain(): ConcreteDomain<ConcreteElement> {
+        throw new ImplementMeException();
+    }
+
+    composeSeq(e1: SSAState, e2: SSAState): SSAState {
         throw new ImplementMeException();
     }
 }

@@ -28,25 +28,6 @@ import {ConcreteDomain, ConcreteElement} from "./ConcreteElements";
 import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
 import {AbstractionPrecision} from "../AbstractionPrecision";
 
-export class ConcreteNumberElement implements ConcreteElement {
-
-}
-
-export class ConcreteBoolElement implements ConcreteElement {
-
-}
-
-export class ConcreteStringElement implements ConcreteElement {
-
-}
-
-export class ConcreteListElement implements ConcreteElement {
-
-}
-
-export class ConcreteMapElement implements ConcreteElement {
-
-}
 
 /**
  * A concretizer is a function that maps an abstract element (of type `E`) to a concrete element (of type `C`).
@@ -57,6 +38,8 @@ export interface Concretizer<C extends ConcreteElement, E extends AbstractElemen
 
     concretizeOne(element: E): C;
 
+    enrich(element: ConcreteElement): C;
+
 }
 
 export class UnavailableConcretizer<C extends ConcreteElement, E extends AbstractElement> implements Concretizer<C, E> {
@@ -66,6 +49,10 @@ export class UnavailableConcretizer<C extends ConcreteElement, E extends Abstrac
     }
 
     concretizeOne(element: E): C {
+        throw new NotSupportedException();
+    }
+
+    enrich(element: ConcreteElement): C {
         throw new NotSupportedException();
     }
 
@@ -86,5 +73,14 @@ export interface AbstractDomain<C extends ConcreteElement, E extends AbstractEle
     widen(element: E, precision: AbstractionPrecision): E;
 
     concreteDomain: ConcreteDomain<C>;
+
+    /**
+     * Sequential composition of two abstract states. The exact meaning is defined by the domain.
+     *
+     * @param e1 an abstract state
+     * @param e2 another abstract state
+     * @return the sequential composition of the two given states
+     */
+    composeSeq(e1: E, e2: E): E;
 
 }

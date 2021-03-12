@@ -22,17 +22,17 @@
 import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
-test("Test radToDeg 1 safe", done => {
+test("Test radToDeg 1 safe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-radToDeg-1_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test radToDeg 2 safe", done => {
+test("Test radToDeg 2 safe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-radToDeg-2_SAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test radToDeg 1 unsafe", done => {
+test("Test radToDeg 1 unsafe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/math-radToDeg-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);

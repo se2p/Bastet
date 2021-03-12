@@ -39,7 +39,7 @@ import {App} from "../../../syntax/app/App";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
 import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Concern} from "../../../syntax/Concern";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {List as ImmList, Set as ImmSet} from "immutable";
@@ -48,12 +48,12 @@ import {AccessibilityRelation} from "../Accessibility";
 import {LabelAbstractDomain, LabelState} from "./LabelAbstractDomain";
 import {LabelTransferRelation} from "./LabelTransferRelation";
 import {MergeJoinOperator} from "../Operators";
-import {SSAState} from "../ssa/SSAAbstractDomain";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 let bigStepNumber: number = 0; // FIXME: THIS IS A HACK
 
 export function incBigStep() {
-    bigStepNumber++;
+    bigStepNumber = bigStepNumber + 1;
 }
 
 export class LabelAnalysis<F extends AbstractState>
@@ -83,20 +83,26 @@ export class LabelAnalysis<F extends AbstractState>
         this._transfer = new LabelTransferRelation(wrappedAnalysis, () => bigStepNumber);
     }
 
-    getTransitionLabel(fromState: LabelState, toState: LabelState): ProgramOperation[] {
-        const worklist: [LabelState, ProgramOperation[]][] = [];
+    getTransitionLabel(fromState: LabelState, toState: LabelState): [ThreadState, ProgramOperation][] {
+        const relevantBigSteps = new Set<number>(toState.getTransfers().map((t) => t.getBigStep()));
+
+        const worklist: [LabelState, [ThreadState, ProgramOperation][]][] = [];
         worklist.push([toState, []]);
 
-        const relevantBigSteps = new Set<number>(toState.getTransfers().map((t) => t.getBigStep()));
+        let otherwise: [ThreadState, ProgramOperation][] = [];
 
         while (worklist.length > 0) {
             const [work, workOps] = worklist.pop();
-            for (const t of work.getTransfers()) {
-                if (relevantBigSteps.has(t.getBigStep())) {
-                    const workOpsPrime = [t.getOp()].concat(workOps);
-                    const from = t.getFrom() as LabelState;
-                    if (from == fromState) {
+            for (const transfer of work.getTransfers()) {
+                if (relevantBigSteps.has(transfer.getBigStep())) {
+                    const opic: [ThreadState, ProgramOperation] = ([transfer.getThreadState(), transfer.getOp()]);
+                    const workOpsPrime: [ThreadState, ProgramOperation][] = [opic].concat(workOps);
+                    const from = transfer.getFrom() as LabelState;
+
+                    if (from === fromState) {
                         return workOpsPrime;
+                    } else if (from.getTransfers().filter(t => relevantBigSteps.has(t.getBigStep())).isEmpty()) {
+                        otherwise = workOpsPrime;
                     } else {
                         worklist.push([from, workOpsPrime]);
                     }
@@ -104,14 +110,14 @@ export class LabelAnalysis<F extends AbstractState>
             }
         }
 
-        return [];
+        return otherwise;
     }
 
     abstractSucc(fromState: LabelState): Iterable<LabelState> {
         return this._transfer.abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: LabelState, op: ProgramOperation, co: Concern): Iterable<LabelState> {
+    abstractSuccFor(fromState: LabelState, op: ProgramOperationInContext, co: Concern): Iterable<LabelState> {
         return this._transfer.abstractSuccFor(fromState, op, co);
     }
 
@@ -219,11 +225,11 @@ export class LabelAnalysis<F extends AbstractState>
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation< F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation< F>, state: F): Iterable<[F, ConcreteElement][]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation< F>, state: F): Iterable<ConcreteElement[]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation< F>, state: F): Iterable<[F, ConcreteElement][]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
@@ -233,6 +239,14 @@ export class LabelAnalysis<F extends AbstractState>
 
     accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<F> {
         throw new ImplementMeException();
+    }
+
+    incRef(state: LabelState) {
+        this.wrappedAnalysis.incRef(state.getWrappedState());
+    }
+
+    decRef(state: LabelState) {
+        this.wrappedAnalysis.decRef(state.getWrappedState());
     }
 
 }

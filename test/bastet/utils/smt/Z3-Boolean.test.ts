@@ -29,6 +29,8 @@ import {VariableWithDataLocation} from "../../../../src/bastet/syntax/ast/core/V
 import {DataLocations} from "../../../../src/bastet/syntax/app/controlflow/DataLocation";
 import {BooleanType, FloatType} from "../../../../src/bastet/syntax/ast/core/ScratchType";
 import {Identifier} from "../../../../src/bastet/syntax/ast/core/Identifier";
+import {AnalysisStatistics} from "../../../../src/bastet/procedures/analyses/AnalysisStatistics";
+import * as utils from "../../../bastet/procedures/analyses/data/TestUtils";
 
 let smt: Z3SMT;
 let ctx;
@@ -39,23 +41,27 @@ beforeAll( async (done) => {
     smt = await SMTFactory.createZ3();
     ctx = smt.createContext();
     theories = smt.createTheories(ctx);
-    prover = smt.createProver(ctx);
+    prover = smt.createProver(ctx, new AnalysisStatistics("Test", {}));
     done();
-});
+}, utils.timeout);
 
-test("Must not cause an assertion in the solver", () => {
-    const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
-    const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
+test("Must not cause an assertion in the solver",  async (done) => {
+    try {
+        const x = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("x"), BooleanType.instance()));
+        const y = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of("y"), BooleanType.instance()));
 
-    const bx = theories.boolTheory.abstractBooleanValue(x);
-    const by = theories.boolTheory.abstractBooleanValue(y);
+        const bx = theories.boolTheory.abstractBooleanValue(x);
+        const by = theories.boolTheory.abstractBooleanValue(y);
 
-    const f = theories.boolTheory.or(
-        theories.boolTheory.not(
-            theories.boolTheory.and(theories.boolTheory.equal(bx, by), bx)),
-        theories.boolTheory.falseBool()
-    );
+        const f = theories.boolTheory.or(
+            theories.boolTheory.not(
+                theories.boolTheory.and(theories.boolTheory.equal(bx, by), bx)),
+            theories.boolTheory.falseBool()
+        );
 
-    prover.assert(f);
-    expect(prover.isUnsat()).toBe(false);
-});
+        prover.assert(f);
+        expect(prover.isUnsat()).toBe(false);
+    } finally {
+        done();
+    }
+}, utils.timeout);

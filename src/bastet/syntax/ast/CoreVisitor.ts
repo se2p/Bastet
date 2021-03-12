@@ -123,6 +123,7 @@ import {
 import {ActorType, BooleanType, FloatType, IntegerType, ListType, ScratchType, StringType} from "./core/ScratchType";
 import {SystemMessage} from "./core/Message";
 import {
+    CheckFeasibilityStatement,
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
     TerminateProgramStatement
@@ -293,6 +294,8 @@ export interface CoreCtrlStatementnVisitor<R> extends CoreVisitor<R> {
 }
 
 export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
+
+    visitCheckFeasibilityStatement(node: CheckFeasibilityStatement): R;
 
     visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): R;
 

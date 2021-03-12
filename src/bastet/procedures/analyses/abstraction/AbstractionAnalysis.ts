@@ -23,14 +23,14 @@
  *
  */
 
-import {MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
+import {MergeOperator, ProgramAnalysisWithLabels, StopOperator} from "../ProgramAnalysis";
 import {AbstractDomain} from "../../domains/AbstractDomain";
 import {App} from "../../../syntax/app/App";
 import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
 import {Preconditions} from "../../../utils/Preconditions";
 import {ConcreteElement} from "../../domains/ConcreteElements";
 import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
+import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
 import {Refiner, Unwrapper} from "../Refiner";
 import {Property} from "../../../syntax/Property";
 import {FrontierSet, PartitionKey, ReachedSet, StateSet} from "../../algorithms/StateSet";
@@ -44,7 +44,7 @@ import {AccessibilityRelation} from "../Accessibility";
 import {AbstractionAbstractDomain, AbstractionState} from "./AbstractionAbstractDomain";
 import {AbstractionTransferRelation} from "./AbstractionTransferRelation";
 import {AbstractionMergeOperator} from "./AbstractionMergeOperator";
-import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
+import {FirstOrderLattice, FirstOrderSolver} from "../../domains/FirstOrderDomain";
 import {
     BooleanFormula,
     FirstOrderFormula,
@@ -60,6 +60,8 @@ import {TransformerTheories} from "../../domains/MemoryTransformer";
 import {SSAAnalysis} from "../ssa/SSAAnalysis";
 import {PredicatePrecisionLattice} from "../../AbstractionPrecision";
 import {Optional} from "../../../utils/Optional";
+import {AbstractionStopOperator} from "./AbstractionStopOperator";
+import {ThreadState} from "../control/ConcreteProgramState";
 
 
 export class AbstractionAnalysisConfig extends BastetConfiguration {
@@ -91,7 +93,11 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
     private readonly _mergeOp: MergeOperator<AbstractionState>;
 
+    private readonly _stopOp: StopOperator<AbstractionState, AbstractState>;
+
     private readonly _config: AbstractionAnalysisConfig;
+
+    private readonly _solver: FirstOrderSolver<FirstOrderFormula>;
 
     constructor(config: {}, task: App, summaryLattice: FirstOrderLattice<FirstOrderFormula>,
                 theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
@@ -118,9 +124,12 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = new AbstractionMergeOperator(this._task, this.wrappedAnalysis, this._abstractDomain.lattice);
+        this._stopOp = new AbstractionStopOperator(this._abstractDomain, this._wrappedAnalysis);
+
+        this._solver = summaryLattice.prover;
     }
 
-    getTransitionLabel(from: AbstractionState, to: AbstractionState): ProgramOperation[] {
+    getTransitionLabel(from: AbstractionState, to: AbstractionState): [ThreadState, ProgramOperation][] {
         return this._wrappedAnalysis.getTransitionLabel(from.getWrappedState(), to.getWrappedState());
     }
 
@@ -128,7 +137,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
         return this._transferRelation.abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: AbstractionState, op: ProgramOperation, co: Concern): Iterable<AbstractionState> {
+    abstractSuccFor(fromState: AbstractionState, op: ProgramOperationInContext, co: Concern): Iterable<AbstractionState> {
         return this._transferRelation.abstractSuccFor(fromState, op, co);
     }
 
@@ -145,12 +154,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     }
 
     stop(state: AbstractionState, reached: Iterable<AbstractState>, unwrapper: (AbstractState) => AbstractionState): boolean {
-        for (let r of reached) {
-            if (this._abstractDomain.lattice.isIncluded(state, unwrapper(r))) {
-                return true;
-            }
-        }
-        return false;
+        return this._stopOp.stop(state, reached, unwrapper);
     }
 
     target(state: AbstractionState): Property[] {
@@ -184,7 +188,8 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     initialStatesFor(task: App): AbstractionState[] {
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            return new AbstractionState(this._abstractDomain.lattice.folLattice.top(), w, this._abstractDomain.lattice.precStacLattice.bottom(), Optional.absent());
+            return new AbstractionState(0, this._abstractDomain.lattice.folLattice.top(), w, this._abstractDomain.lattice.precStacLattice.bottom(), Optional.absent())
+                .withFreshBlockId();
         } );
     }
 
@@ -229,26 +234,33 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     }
 
     finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
-        return this.wrappedAnalysis.finalizeResults(frontier, reached);
+        return this._wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
     testify(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {
-        return this.wrappedAnalysis.testify(accessibility, state);
+        return this._wrappedAnalysis.testify(accessibility, state);
     }
 
     testifyOne(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {
-        return this.wrappedAnalysis.testifyOne(accessibility, state);
+        return this._wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
+    testifyConcrete(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): Iterable<ConcreteElement[]> {
-        const resultWithSSA = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
+    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
+        return this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
+    }
 
-        // TODO: Remove the SSA-Indices from the concrete elements along the path
-        throw new ImplementMeException();
+    incRef(state: AbstractionState) {
+        this._wrappedAnalysis.incRef(state.getWrappedState());
+        this._solver.incRef(state.getEnteringSummary());
+    }
+
+    decRef(state: AbstractionState) {
+        this.wrappedAnalysis.decRef(state.getWrappedState());
+        this._solver.decRef(state.getEnteringSummary());
     }
 
     accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {

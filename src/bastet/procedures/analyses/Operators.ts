@@ -136,10 +136,81 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
                 this._mergeCosts.startTimer();
                 const ePrimePrimePrime: F = wrapper(this._mergeOp.merge(state, unwrapper(r)));
                 this._mergeCosts.stopTimer();
+                // console.log(`merging ${state['id']} to ${r['id']} resulting in ${ePrimePrimePrime['id']}`)
 
                 removeFromReached.add(r);
                 addToReached.add(ePrimePrimePrime);
             }
+        }
+
+        this._frontierCosts.startTimer();
+        frontier.addAll(addToReached);
+        frontier.removeAll(removeFromReached);
+        this._frontierCosts.stopTimer();
+
+        this._reachedCosts.startTimer();
+        reached.addAll(addToReached);
+        reached.removeAll(removeFromReached);
+        this._reachedCosts.stopTimer();
+
+        // SOME DEBUGGING CODE:
+        // for (const e of addToReached) {
+        //    Preconditions.checkState(reached.has(e));
+        //    Preconditions.checkState(Array.from(reached.getStateSet(wrapper(state))).filter((x => x == e)).length > 0)
+        // }
+
+        return [frontier, reached];
+    }
+
+}
+
+export class NewMergeIntoOperator<E extends AbstractElement, F extends AbstractState> implements MergeIntoOperator<E, F> {
+
+    private readonly _mergeOp: MergeOperator<E>;
+
+    private readonly _partOp: PartitionOperator<E, F>;
+
+    private readonly _stats: AnalysisStatistics;
+    private readonly _frontierCosts: AnalysisStatistics;
+    private readonly _reachedCosts: AnalysisStatistics;
+    private readonly _mergeCosts: AnalysisStatistics;
+    private readonly _shouldCosts: AnalysisStatistics;
+
+    constructor(partitionOp: PartitionOperator<E, F>, mergeOp: MergeOperator<E>, statistics: AnalysisStatistics) {
+        this._mergeOp = Preconditions.checkNotUndefined(mergeOp);
+        this._partOp = Preconditions.checkNotUndefined(partitionOp);
+
+        this._stats = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
+        this._frontierCosts = this._stats.withContext("fontier-update");
+        this._reachedCosts = this._stats.withContext("reached-update");
+        this._mergeCosts = this._stats.withContext("merge");
+        this._shouldCosts = this._stats.withContext("should");
+    }
+
+    public mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
+        const removeFromReached: Set<F> = new Set<F>();
+        const addToReached: Set<F> = new Set<F>();
+        const relevantReached: Iterable<F> = this._partOp.mergePartitionOf(state, reached);
+
+        let merged: E = unwrapper(state);
+
+        for (let r of relevantReached) {
+            this._shouldCosts.startTimer();
+            const should: boolean = this._mergeOp.shouldMerge(unwrapper(merged), unwrapper(r));
+            this._shouldCosts.stopTimer();
+
+            if (should) {
+                this._mergeCosts.startTimer();
+                merged = this._mergeOp.merge(unwrapper(merged), unwrapper(r));
+                this._mergeCosts.stopTimer();
+                // console.log(`merging ${state['id']} to ${r['id']} resulting in ${merged['id']}`)
+
+                removeFromReached.add(r);
+            }
+        }
+
+        if (state !== merged) {
+            addToReached.add(wrapper(merged));
         }
 
         this._frontierCosts.startTimer();

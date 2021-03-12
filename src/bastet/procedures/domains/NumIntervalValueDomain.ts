@@ -25,10 +25,16 @@
 
 import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {Record as ImmRec} from "immutable";
-import {ConcreteDomain, ConcreteElementFactory, ConcreteNumber, ConcreteNumberOrderLattice} from "./ConcreteElements";
+import {
+    ConcreteDomain,
+    ConcreteElement,
+    ConcreteElementFactory,
+    ConcreteNumber,
+    ConcreteNumberOrderLattice
+} from "./ConcreteElements";
 import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
-import {AbstractNumberDomain} from "./MemoryTransformer";
+import {AbstractNumber, AbstractNumberDomain} from "./MemoryTransformer";
 import {AbstractionPrecision} from "../AbstractionPrecision";
 
 export interface NumIntervalValueAttribs extends AbstractElement {
@@ -134,12 +140,20 @@ export class NumIntervalValueDomain implements AbstractNumberDomain {
         throw new ImplementMeException();
     }
 
+    enrich(element: ConcreteElement): ConcreteNumber {
+       return element as ConcreteNumber;
+    }
+
     get lattice(): Lattice<NumIntervalValue> {
         return this._lattice;
     }
 
     get concreteDomain(): ConcreteDomain<ConcreteNumber> {
         return this._concreteDomain;
+    }
+
+    composeSeq(e1: AbstractNumber, e2: AbstractNumber): AbstractNumber {
+        throw new ImplementMeException();
     }
 
 }

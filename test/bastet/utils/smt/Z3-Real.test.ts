@@ -22,6 +22,7 @@
 
 import {SMTFactory, Z3SMT} from "../../../../src/bastet/utils/smt/z3/Z3SMT";
 import {ConcreteNumber, ConcreteString} from "../../../../src/bastet/procedures/domains/ConcreteElements";
+import {AnalysisStatistics} from "../../../../src/bastet/procedures/analyses/AnalysisStatistics";
 
 let smt: Z3SMT;
 let ctx;
@@ -32,29 +33,31 @@ beforeAll( async (done) => {
     smt = await SMTFactory.createZ3();
     ctx = smt.createContext();
     theories = smt.createTheories(ctx);
-    prover = smt.createProver(ctx);
+    prover = smt.createProver(ctx, new AnalysisStatistics("Test", {}));
     done();
 });
 
-test ("Case: 1 < 0", () => {
+test ("Case: 1 < 0", async (done) => {
     prover.push();
     const falseFormula = theories.realTheory.isLessThan(theories.realTheory.one(), theories.realTheory.zero());
     prover.assert(falseFormula);
     const isUnsat: boolean = prover.isUnsat();
     expect(isUnsat).toBe(true);
     prover.pop();
+    done();
 });
 
-test ("Case: 1 > 0", () => {
+test ("Case: 1 > 0", async (done) => {
     prover.push();
     const falseFormula = theories.realTheory.isGreaterThan(theories.realTheory.one(), theories.realTheory.zero());
     prover.assert(falseFormula);
     const isUnsat: boolean = prover.isUnsat();
     expect(isUnsat).toBe(false);
     prover.pop();
+    done();
 });
 
-test ("Case: Cast real from int. True", () => {
+test ("Case: Cast real from int. True", async (done) => {
     prover.push();
     const intFormula = theories.intTheory.fromConcreteNumber(new ConcreteNumber(42));
     const realFormula = theories.realTheory.castFrom(intFormula);
@@ -63,9 +66,10 @@ test ("Case: Cast real from int. True", () => {
     const isUnsat: boolean = prover.isUnsat();
     expect(isUnsat).toBe(false);
     prover.pop();
+    done();
 });
 
-test ("Case: Cast real from int. False", () => {
+test ("Case: Cast real from int. False", async (done) => {
     prover.push();
     const intFormula = theories.intTheory.fromConcreteNumber(new ConcreteNumber(42));
     const realFormula = theories.realTheory.castFrom(intFormula);
@@ -74,9 +78,10 @@ test ("Case: Cast real from int. False", () => {
     const isUnsat: boolean = prover.isUnsat();
     expect(isUnsat).toBe(true);
     prover.pop();
+    done();
 });
 
-test ("Case: From string. True", () => {
+test ("Case: From string. True", async (done) => {
     prover.push();
     const realFormula1 = theories.realTheory.fromConcreteString(new ConcreteString("12.4"));
     const realFormula2 = theories.realTheory.fromConcreteString(new ConcreteString("12.5"));
@@ -85,9 +90,10 @@ test ("Case: From string. True", () => {
     const isUnsat: boolean = prover.isUnsat();
     expect(isUnsat).toBe(true);
     prover.pop();
+    done();
 });
 
-test ("Case: From string. False", () => {
+test ("Case: From string. False", async (done) => {
     prover.push();
     const realFormula1 = theories.realTheory.fromConcreteString(new ConcreteString("12.4"));
     const realFormula2 = theories.realTheory.fromConcreteString(new ConcreteString("12.5"));
@@ -96,4 +102,5 @@ test ("Case: From string. False", () => {
     const isUnsat: boolean = prover.isUnsat();
     expect(isUnsat).toBe(false);
     prover.pop();
+    done();
 });

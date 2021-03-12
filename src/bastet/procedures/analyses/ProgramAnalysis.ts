@@ -36,6 +36,7 @@ import {WitnessHandler} from "./WitnessHandlers";
 import {LexiKey} from "../../utils/Lexicographic";
 import {AccessibilityRelation} from "./Accessibility";
 import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
+import {ThreadState} from "./control/ConcreteProgramState";
 
 /**
  * Central program analysis component---sometimes called `state interpreter`.
@@ -49,7 +50,7 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
        TargetOperator<E>, MergeIntoOperator<E, F>,
        MergeOperator<E>, StopOperator<E, F>, WidenOperator<E, F>, PartitionOperator<E, F>,
        WitnessHandler<F>, TraversalOrderOperator<E, F>, ResultFinalization<F>,
-       TestificationOperator<E, F>, AccessibilityOperator<E, F> {
+       TestificationOperator<E, F, C>, AccessibilityOperator<E, F>, StateReferenceOperator<E> {
 
     /**
      * The abstract domain the analysis works with.
@@ -61,6 +62,25 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
      * A refiner component for abstraction precision refinement.
      */
     refiner: Refiner<F>;
+
+}
+
+export interface StateReferenceOperator<E extends AbstractElement> {
+
+    /**
+     * Increment the number of references to this state.
+     * Is intended to be called whenever a state is added to the set 'reached'.
+     *
+     * @param state
+     */
+    incRef(state: E);
+
+    /**
+     * Decrement the number of references to this state.
+     *
+     * @param state
+     */
+    decRef(state: E);
 
 }
 
@@ -117,7 +137,8 @@ export interface InitOperator<E extends AbstractElement, F extends AbstractState
  * Testification operator. The testification concept is described in the paper
  *  "Witness validation and stepwise testification across software verifiers".
  */
-export interface TestificationOperator<E extends AbstractElement, F extends AbstractState> {
+export interface TestificationOperator<E extends AbstractElement, F extends AbstractState,
+    C extends ConcreteElement> {
 
     /**
      * Refine the given accessibility relation `accessibility` such that the given
@@ -139,15 +160,15 @@ export interface TestificationOperator<E extends AbstractElement, F extends Abst
      */
     testifyOne(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation<F>;
 
-    testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]>;
+    testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<[F, C][]>;
 
     /**
-     * Guaratnees to return at most one concrete path.
+     * Guarantees to return at most one concrete path.
      *
      * @param accessibility
      * @param state
      */
-    testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<ConcreteElement[]>;
+    testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<[F, C][]>;
 
 }
 
@@ -322,13 +343,13 @@ export interface TransitionLabelProvider<E extends AbstractElement> {
      * @param from
      * @param to
      */
-    getTransitionLabel(from: E, to: E): ProgramOperation[];
+    getTransitionLabel(from: E, to: E): [ThreadState, ProgramOperation][];
 
 }
 
 export class UnavailableTransitionLabelProvider<E extends AbstractState> implements TransitionLabelProvider<E> {
 
-    getTransitionLabel(from: E, to: E): ProgramOperation[] {
+    getTransitionLabel(from: E, to: E): [ThreadState, ProgramOperation][] {
         throw new NotSupportedException();
     }
 

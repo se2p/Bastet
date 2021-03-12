@@ -25,9 +25,8 @@
 
 import {BooleanType, FloatType, IntegerType, ScratchType, StringType} from "../../syntax/ast/core/ScratchType";
 import {ConcreteBoolean, ConcreteNumber, ConcreteString, ConcreteStringList} from "./ConcreteElements";
-import {AbstractElement} from "../../lattices/Lattice";
+import {AbstractElement, Lattice} from "../../lattices/Lattice";
 import {AbstractDomain} from "./AbstractDomain";
-import {AbstractStringList} from "./StringListAbstractDomain";
 import {Variable} from "../../syntax/ast/core/Variable";
 import {Z3Formula} from "../../utils/smt/z3/Z3Theories";
 
@@ -40,6 +39,10 @@ export interface AbstractMemory extends AbstractElement {
 }
 
 export interface AbstractString extends AbstractValue {
+
+}
+
+export interface AbstractStringList extends AbstractValue {
 
 }
 
@@ -271,10 +274,6 @@ export interface AbstractBooleanDomain<E extends AbstractBoolean> extends Abstra
 }
 
 export interface AbstractStringDomain extends AbstractDomain<ConcreteString, AbstractString> {
-
-}
-
-export interface AbstractStringListDomain extends AbstractDomain<ConcreteStringList, AbstractStringList> {
 
 }
 

@@ -26,14 +26,14 @@
 
 import {
     ConcreteBoolean,
-    ConcreteDomain,
+    ConcreteDomain, ConcreteElement, ConcreteFloat, ConcreteInteger,
     ConcreteList,
     ConcreteMemory,
     ConcreteNumber,
     ConcreteString
 } from "./ConcreteElements";
 import {FirstOrderFormula} from "../../utils/ConjunctiveNormalForm";
-import {LatticeWithComplements} from "../../lattices/Lattice";
+import {LatticeWithComplements, WithReferenceCounting} from "../../lattices/Lattice";
 import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
 import {Preconditions} from "../../utils/Preconditions";
 import {BooleanTheory} from "./MemoryTransformer";
@@ -42,9 +42,13 @@ import {PerfTimer} from "../../utils/PerfTimer";
 import {AbstractDomain} from "./AbstractDomain";
 import {AbstractionPrecision} from "../AbstractionPrecision";
 import {Z3Model, Z3Vector} from "../../utils/smt/z3/Z3SMT";
+import {Z3BooleanFormula} from "../../utils/smt/z3/Z3Theories";
+import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
 
-export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F> {
+export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F>, WithReferenceCounting<F> {
+
     prover: FirstOrderSolver<F>;
+
 }
 
 export class FirstOrderDomain<F extends FirstOrderFormula>
@@ -87,39 +91,20 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
 
             console.log("Querying model")
             const model = this.solver.getModel();
-
-            const numbers = new Map<string, ConcreteNumber>();
-            const strings = new Map<string, ConcreteString>();
-            const booleans = new Map<string, ConcreteBoolean>();
-            const lists = new Map<string, ConcreteList<ConcreteString>>();
-
-            model.getConstValues().forEach(constObj => {
-                const value = constObj.getValue();
-                const name = constObj.getName();
-
-                switch (typeof value) {
-                    case 'boolean':
-                        booleans.set(name, new ConcreteBoolean(value));
-                        break;
-                    case 'number':
-                        numbers.set(name, new ConcreteNumber(value));
-                        break;
-                    case 'string':
-                        strings.set(name, new ConcreteString(value));
-                        break;
-                    default:
-                        throw new ImplementMeForException("attributes of type " + typeof value);
-                }
-            });
+            const result = model.getValueMap().toConcreteMemory();
 
             this.solver.pop();
 
-            return new ConcreteMemory(numbers, strings, booleans, lists);
+            return result;
         } finally {
             timer.stop();
             console.log(`Concretized in ${timer.lastIntervalDuration}ms`)
             console.groupEnd();
         }
+    }
+
+    enrich(element: ConcreteElement): ConcreteMemory {
+        return element as ConcreteMemory;
     }
 
     widen(element: F, precision: AbstractionPrecision): F {
@@ -132,6 +117,10 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
 
     get lattice(): FirstOrderLattice<F> {
         return this._lattice;
+    }
+
+    composeSeq(e1: F, e2: F): F {
+        throw new ImplementMeException();
     }
 
 }
@@ -179,13 +168,17 @@ export abstract class FirstOrderSolver<F extends FirstOrderFormula> {
 
     public abstract stringRepresentation(f: F): string;
 
-    public abstract allSat(abstractionProblem: F, predicates: F[]): boolean[][];
+    public abstract allSat(abstractionProblem: Z3BooleanFormula, freeVariables: [string, Z3BooleanFormula][]): boolean[][];
 
     public abstract booleanAbstraction(abstractionProblem: F, predicates: F[]): F;
 
     public abstract cartesianAbstraction(abstractionProblem: F, predicates: F[]): F;
 
     public abstract collectInterpolants(): F[];
+
+    public abstract incRef(f: F);
+
+    public abstract decRef(f: F);
 
 }
 
@@ -243,6 +236,14 @@ export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
 
     get prover(): FirstOrderSolver<F> {
         return this._prover;
+    }
+
+    decRef(element: F) {
+        this._prover.decRef(element);
+    }
+
+    incRef(element: F) {
+        this._prover.incRef(element);
     }
 
 }

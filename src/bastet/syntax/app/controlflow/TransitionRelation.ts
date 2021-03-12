@@ -23,7 +23,7 @@
  *
  */
 
-import {OperationId, ProgramOperation, ProgramOperations} from "./ops/ProgramOperation";
+import {OperationId, ProgramOperation, ProgramOperationFactory, ProgramOperations} from "./ops/ProgramOperation";
 import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
 import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
 import {ControlLocation, LocationId} from "./ControlLocation";
@@ -33,6 +33,17 @@ import {ControlDominance, DominanceMode} from "./Dominators";
 import {CorePrintVisitor} from "../../ast/CorePrintVisitor";
 import {ReturnStatement} from "../../ast/core/statements/ControlStatement";
 import {EpsilonStatement} from "../../ast/core/statements/EpsilonStatement";
+import {DeclarationStatement, DeclareStackVariableStatement} from "../../ast/core/statements/DeclarationStatement";
+import {VariableWithDataLocation} from "../../ast/core/Variable";
+import {DataLocation, DataLocations} from "./DataLocation";
+import {IntegerType} from "../../ast/core/ScratchType";
+import {Identifier} from "../../ast/core/Identifier";
+import {StoreEvalResultToVariableStatement} from "../../ast/core/statements/SetStatement";
+import {IntegerLiteral} from "../../ast/core/expressions/NumberExpression";
+import {CheckFeasibilityStatement, SignalTargetReachedStatement} from "../../ast/core/statements/InternalStatement";
+import {BranchingAssumeStatement} from "../../ast/core/statements/AssumeStatement";
+import {NumEqualsExpression} from "../../ast/core/expressions/BooleanExpression";
+import {StringLiteral} from "../../ast/core/expressions/StringExpression";
 
 const toposort = require('toposort');
 
@@ -1078,6 +1089,63 @@ export class TransitionRelations {
         return builder.build();
     }
 
+    public static introduceCommonTargetLocation(tr: TransitionRelation): TransitionRelation {
+        let numTargets = 0;
+
+        // Prefix for the transition relation that declares and initializes the target variable
+        const reachedTargetVarLoc = DataLocations.createTypedLocation(Identifier.fresh(), IntegerType.instance());
+        const reachedTargetVar = new VariableWithDataLocation(reachedTargetVarLoc);
+        const declareReachedTargetStmt = new DeclareStackVariableStatement(reachedTargetVar);
+        const initReachedTargetVarStmt = new StoreEvalResultToVariableStatement(reachedTargetVar, IntegerLiteral.zero());
+
+        const prefixRelation = TransitionRelations.forOpSeq(
+            ProgramOperationFactory.createFor(declareReachedTargetStmt),
+            ProgramOperationFactory.createFor(initReachedTargetVarStmt));
+
+        const result = TransitionRelation.builder();
+        result.addRelation(TransitionRelations.concat(prefixRelation, tr));
+
+        // The new feasibility check locations
+        const targetFeasibilityCheckLock = ControlLocation.fresh();
+        const targetAfterFeasibilityCheckLoc = ControlLocation.fresh();
+        result.addTransition(targetFeasibilityCheckLock, targetAfterFeasibilityCheckLoc,
+            ProgramOperationFactory.createFor(new CheckFeasibilityStatement(new StringLiteral("Check before reaching targets"))));
+
+        for (const [from, opId, to] of tr.transitions) {
+            const op = ProgramOperation.for(opId);
+
+            if (op.ast instanceof CheckFeasibilityStatement) {
+                // We assume that if CheckFeasibilityStatement is present,
+                // a common target was already introduced.
+                return tr;
+            }
+
+            if (op.ast instanceof SignalTargetReachedStatement) {
+                const targetIdExpr = IntegerLiteral.of(from);
+
+                // Assign instead of signal + redirect
+                result.removeTransition(from, to, opId);
+                const assignTarget = new StoreEvalResultToVariableStatement(reachedTargetVar, targetIdExpr);
+                result.addTransition(ControlLocation.for(from), targetFeasibilityCheckLock, ProgramOperationFactory.createFor(assignTarget));
+
+                // Check again after the feasibility check
+                const targetAfterAssumeLoc = ControlLocation.fresh();
+                const assumeTarget = new BranchingAssumeStatement(new NumEqualsExpression(reachedTargetVar, targetIdExpr));
+                result.addTransition(targetAfterFeasibilityCheckLoc, targetAfterAssumeLoc, ProgramOperationFactory.createFor(assumeTarget));
+                const targetTerminationLoc = ControlLocation.fresh();
+                result.addTransition(targetAfterAssumeLoc, targetTerminationLoc, op);
+
+                numTargets++;
+            }
+        }
+
+        if (numTargets == 0) {
+            return tr;
+        } else {
+            return this.eliminateEpsilons(result.build());
+        }
+    }
+
     private static buildEquivalenceClasses(tr: TransitionRelation): Map<LocationId, LocationEquivalence> {
         const result: Map<LocationId, LocationEquivalence> = new Map();
 
@@ -1150,9 +1218,10 @@ export class TransitionRelations {
 
     static establishAnalysisInvariants(tr: TransitionRelation): TransitionRelation {
         return TransitionRelations.introduceEpsilonBetweenMergeAndBranchLocs(
-                TransitionRelations.introduceEpsilonToMergeTransitions(
-                    TransitionRelations.introduceEntryExitEpsilonTransition(
-                      TransitionRelations.eliminateEpsilons(tr))));
+            TransitionRelations.introduceEpsilonToMergeTransitions(
+                TransitionRelations.introduceEntryExitEpsilonTransition(
+                  TransitionRelations.eliminateEpsilons(
+                      TransitionRelations.introduceCommonTargetLocation(tr)))));
     }
 
     static eliminateEpsilons(tr: TransitionRelation): TransitionRelation {
