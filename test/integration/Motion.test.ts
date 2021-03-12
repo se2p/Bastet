@@ -19,7 +19,6 @@
  *   limitations under the License.
  *
  */
-import {Bastet} from "../../src/bastet/Bastet";
 import * as utils from "../bastet/procedures/analyses/data/TestUtils";
 
 test("Test pointTowards 1 safe", async (done) => {
@@ -27,7 +26,7 @@ test("Test pointTowards 1 safe", async (done) => {
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test pointTowards 1 unsafe", async (done) => {
+xtest("Test pointTowards 1 unsafe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-pointTowards-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
@@ -37,7 +36,7 @@ test("Test pointTowardsPos 1 safe", async (done) => {
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test pointTowardsPos 1 unsafe", async (done) => {
+xtest("Test pointTowardsPos 1 unsafe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-pointTowards-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
@@ -47,7 +46,7 @@ test("Test moveSteps 1 safe", async (done) => {
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
 
-test("Test moveSteps 1 unsafe", async (done) => {
+xtest("Test moveSteps 1 unsafe", async (done) => {
     const fixtureRelPath: string = "test/programs/library-coverage/motion/motion-moveSteps-1_UNSAFE.sc"
     utils.execFixture(fixtureRelPath, done);
 }, utils.timeout);
