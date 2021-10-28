@@ -38,7 +38,7 @@ export interface LexiKeyAttribs extends AbstractElement {
 
 const LexiKeyRecord = ImmRec({
 
-    tuple: ImmList()
+    tuple: ImmList<LexiKeyElement>()
 
 });
 
@@ -53,7 +53,7 @@ export class LexiKey extends LexiKeyRecord implements LexiKeyAttribs {
     }
 
     public getTuple(): ImmList<LexiKeyElement> {
-        return this.get("tuple");
+        return this.get("tuple") as ImmList<LexiKeyElement>;
     }
 
     public withTuple(tuple: Iterable<LexiKeyElement>): this {
