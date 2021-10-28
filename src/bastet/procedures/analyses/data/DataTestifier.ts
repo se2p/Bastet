@@ -192,7 +192,7 @@ export class DataTestifier implements TestificationOperator<AbstractState, Abstr
         const initialState: AbstractState = getTheOnlyElement(accessibility.initial());
         const worklist: AbstractState[] = [initialState];
         const result: BranchingAlternatives = new BranchingAlternatives();
-        const visited: ImmSet<AbstractState> = ImmSet().asMutable();
+        const visited: ImmSet<AbstractState> = ImmSet<AbstractState>().asMutable();
 
         while (worklist.length > 0) {
             const work = worklist.pop();

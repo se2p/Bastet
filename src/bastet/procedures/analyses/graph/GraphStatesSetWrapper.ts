@@ -101,12 +101,12 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
         Preconditions.checkNotUndefined(element);
 
         // 1. Determine the childs to remove
-        const toRemove: ImmSet<E> = ImmSet().asMutable();
+        const toRemove: ImmSet<E> = ImmSet<E>().asMutable();
         toRemove.add(element);
 
         let hasFrontierChilds = false;
 
-        const visited: ImmSet<E> = ImmSet().asMutable();
+        const visited: ImmSet<E> = ImmSet<E>().asMutable();
         const worklist: E[] = [element];
         while (worklist.length > 0) {
             const p = worklist.pop();
@@ -131,7 +131,7 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
         }
 
         // 2. Make all parent states that will not get removed frontier states
-        const removeChildsOf: ImmSet<E> = ImmSet().asMutable();
+        const removeChildsOf: ImmSet<E> = ImmSet<E>().asMutable();
 
         // - Only if they had childs that were in the set of frontier states
         //      (it must be possible to remove infeasible parts of the ARG without causing a re-computation)

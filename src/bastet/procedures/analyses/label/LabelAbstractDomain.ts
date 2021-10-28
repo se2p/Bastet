@@ -91,7 +91,7 @@ export interface LabelStateAttributes {
 
 const LabelStateRecord = ImmRec({
 
-    transfers: ImmList(),
+    transfers: ImmList<LabeledTransfer>(),
     wrappedState: null,
 })
 

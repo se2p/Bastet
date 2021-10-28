@@ -51,7 +51,7 @@ export class ControlLocationExtractor extends DelegatingStateVisitor<ImmSet<Rela
     public visitControlAbstractState(element: ControlAbstractState): ImmSet<RelationLocation> {
         const steppedThreads = element.getSteppedFor().map((i) => element.getIndexedThreadState(i));
 
-        let result = ImmSet();
+        let result = ImmSet<RelationLocation>();
 
         for (const steppedThread of steppedThreads) {
             const relLoc: RelationLocation = steppedThread.threadStatus.getRelationLocation();

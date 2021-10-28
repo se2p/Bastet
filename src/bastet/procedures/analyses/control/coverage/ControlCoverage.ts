@@ -109,7 +109,7 @@ export class ControlCoverageExaminer {
     }
 
     private collectTaskLocs(task: App): ImmSet<RelationLocation> {
-        const result: ImmSet<RelationLocation> = ImmSet().asMutable();
+        const result: ImmSet<RelationLocation> = ImmSet<RelationLocation>().asMutable();
 
         const collectLocsFromRelation = (actor: ActorId, rel: TransitionRelation) => {
             for (const lid of rel.locationSet) {

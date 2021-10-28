@@ -122,7 +122,7 @@ export interface PredicatePrecisionStackAttributes {
 
 const PredicatePrecisionStackRecord = ImmRec({
 
-    stack: ImmList()
+    stack: ImmList<PredicatePrecision>()
 
 });
 

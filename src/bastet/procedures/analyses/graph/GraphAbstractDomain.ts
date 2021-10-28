@@ -60,7 +60,7 @@ const GraphAbstractStateRecord = ImmRec({
     predecessors: ImmSet<GraphStateId>([]),
     wrappedState: null,
     mergeOf: ImmSet<GraphStateId>([]),
-    partitionKeys: ImmSet(),
+    partitionKeys: ImmSet<PartitionKey>(),
     orderKey: new LexiKey([]),
     wideningOf: null
 });
