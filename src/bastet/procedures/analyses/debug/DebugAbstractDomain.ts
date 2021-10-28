@@ -41,7 +41,7 @@ export interface DebugStateAttributes {
 }
 
 const DebugStateRecord = ImmRec({
-    debugInfos: ImmList(),
+    debugInfos: ImmList<string>(),
     wrappedState: null,
 })
 

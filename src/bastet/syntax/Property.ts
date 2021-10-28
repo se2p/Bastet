@@ -66,7 +66,7 @@ export interface SpecificationAttributes {
 
 const SpecificationRecord = ImmRec({
 
-    properties: ImmSet()
+    properties: ImmSet<Property>()
 
 });
 
