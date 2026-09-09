@@ -23,6 +23,4 @@
  *
  */
 
-export class NotSupportedException extends Error {
-
-}
+export class NotSupportedException extends Error {}

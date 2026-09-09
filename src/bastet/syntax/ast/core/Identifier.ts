@@ -23,12 +23,11 @@
  *
  */
 
-import {AbsentAstNode, AbstractNode, OptionalAstNode, PresentAstNode} from "../AstNode";
-import {Preconditions} from "../../../utils/Preconditions";
+import { AbsentAstNode, AbstractNode, OptionalAstNode, PresentAstNode } from '../AstNode';
+import { Preconditions } from '../../../utils/Preconditions';
 
 export class Identifier extends AbstractNode {
-
-    private static readonly FRESH_PREFIX = "__tmp_";
+    private static readonly FRESH_PREFIX = '__tmp_';
 
     private readonly _name: string;
 
@@ -45,7 +44,7 @@ export class Identifier extends AbstractNode {
         return new Identifier(txt);
     }
 
-    public static optional(val: Identifier|null): OptionalAstNode<Identifier> {
+    public static optional(val: Identifier | null): OptionalAstNode<Identifier> {
         if (!val) {
             return new AbsentAstNode();
         } else {
@@ -67,11 +66,11 @@ export class Identifier extends AbstractNode {
         return new Identifier(`${prefix}${num}`);
     }
 
-    private static RESULT_IDENT: Identifier = new Identifier("result");
+    private static RESULT_IDENT: Identifier = new Identifier('result');
 
     public static resultIdentifier(): Identifier {
         if (this.RESULT_IDENT === null) {
-            this.RESULT_IDENT = new Identifier("result");
+            this.RESULT_IDENT = new Identifier('result');
         }
         return this.RESULT_IDENT;
     }
@@ -79,5 +78,4 @@ export class Identifier extends AbstractNode {
     get text(): string {
         return this._name;
     }
-
 }

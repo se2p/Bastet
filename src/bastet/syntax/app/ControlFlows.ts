@@ -23,17 +23,19 @@
  *
  */
 
-import {App} from "./App";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {Actor} from "./Actor";
-import {Preconditions} from "../../utils/Preconditions";
-import {TypeInformationStorage} from "../DeclarationScopes";
+import { App } from './App';
+import { IllegalArgumentException } from '../../core/exceptions/IllegalArgumentException';
+import { Actor } from './Actor';
+import { Preconditions } from '../../utils/Preconditions';
+import { TypeInformationStorage } from '../DeclarationScopes';
 
 export class ControlFlows {
-
-    public static unionOf(controlflow1: App, controlflow2: App, ident: string) : App {
+    public static unionOf(controlflow1: App, controlflow2: App, ident: string): App {
         const unionActors: Actor[] = controlflow1.actors.concat(controlflow2.actors);
-        const typeInfoUnion: TypeInformationStorage = TypeInformationStorage.union(controlflow1.typeStorage, controlflow2.typeStorage);
+        const typeInfoUnion: TypeInformationStorage = TypeInformationStorage.union(
+            controlflow1.typeStorage,
+            controlflow2.typeStorage
+        );
         let resultActorsMap = {};
 
         for (let a of unionActors) {
@@ -42,12 +44,16 @@ export class ControlFlows {
                     Preconditions.checkState(resultActorsMap[a.ident] === a);
                     continue;
                 }
-                throw new IllegalArgumentException("Duplicated actor name! " + a.ident);
+                throw new IllegalArgumentException('Duplicated actor name! ' + a.ident);
             }
             resultActorsMap[a.ident] = a;
         }
 
-        return new App("union_of_" + controlflow1.origin + "_and_" + controlflow2.origin, ident, resultActorsMap, typeInfoUnion);
+        return new App(
+            'union_of_' + controlflow1.origin + '_and_' + controlflow2.origin,
+            ident,
+            resultActorsMap,
+            typeInfoUnion
+        );
     }
-
 }

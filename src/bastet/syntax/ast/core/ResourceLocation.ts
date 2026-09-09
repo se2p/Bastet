@@ -23,11 +23,10 @@
  *
  */
 
-import {AbstractNode} from "../AstNode";
-import {StringLiteral} from "./expressions/StringExpression";
+import { AbstractNode } from '../AstNode';
+import { StringLiteral } from './expressions/StringExpression';
 
 export class ResourceLocation extends AbstractNode {
-
     private readonly _uri: StringLiteral;
 
     constructor(uri: StringLiteral) {
@@ -38,5 +37,4 @@ export class ResourceLocation extends AbstractNode {
     get uri(): string {
         return this._uri.text;
     }
-
 }

@@ -23,12 +23,11 @@
  *
  */
 
-import {AbstractNode, AstNode} from "../../AstNode";
-import {Expression} from "./Expression";
-import {ScratchType} from "../ScratchType";
+import { AbstractNode, AstNode } from '../../AstNode';
+import { Expression } from './Expression';
+import { ScratchType } from '../ScratchType';
 
 export class UnaryExpression<A extends AstNode> extends AbstractNode implements Expression {
-
     private readonly _operand1: A;
     private readonly _type: ScratchType;
 
@@ -45,5 +44,4 @@ export class UnaryExpression<A extends AstNode> extends AbstractNode implements 
     get expressionType(): ScratchType {
         return this._type;
     }
-
 }

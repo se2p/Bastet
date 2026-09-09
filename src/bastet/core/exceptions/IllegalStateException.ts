@@ -23,6 +23,4 @@
  *
  */
 
-export class IllegalStateException extends Error {
-
-}
+export class IllegalStateException extends Error {}

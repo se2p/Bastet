@@ -23,22 +23,21 @@
  *
  */
 
-import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {Record as ImmRec, Set as ImmSet} from "immutable"
-import {SingletonStateWrapper} from "../AbstractStates";
-import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
-import {Preconditions} from "../../../utils/Preconditions";
-import {PartitionKey} from "../../algorithms/StateSet";
-import {LexiKey} from "../../../utils/Lexicographic";
-import {AbstractionPrecision} from "../../AbstractionPrecision";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {Optional} from "../../../utils/Optional";
+import { AbstractElement, AbstractElementVisitor, AbstractState, Lattice } from '../../../lattices/Lattice';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { Record as ImmRec, Set as ImmSet } from 'immutable';
+import { SingletonStateWrapper } from '../AbstractStates';
+import { ConcreteDomain, ConcreteElement } from '../../domains/ConcreteElements';
+import { Preconditions } from '../../../utils/Preconditions';
+import { PartitionKey } from '../../algorithms/StateSet';
+import { LexiKey } from '../../../utils/Lexicographic';
+import { AbstractionPrecision } from '../../AbstractionPrecision';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { Optional } from '../../../utils/Optional';
 
 export type GraphStateId = number;
 
 export interface GraphAbstractStateAttribs extends AbstractElement, SingletonStateWrapper {
-
     id: GraphStateId;
 
     predecessors: ImmSet<GraphStateId>;
@@ -52,7 +51,6 @@ export interface GraphAbstractStateAttribs extends AbstractElement, SingletonSta
     orderKey: LexiKey;
 
     wideningOf: Optional<GraphAbstractState>;
-
 }
 
 const GraphAbstractStateRecord = ImmRec({
@@ -62,17 +60,30 @@ const GraphAbstractStateRecord = ImmRec({
     mergeOf: ImmSet<GraphStateId>([]),
     partitionKeys: ImmSet<PartitionKey>(),
     orderKey: new LexiKey([]),
-    wideningOf: null
+    wideningOf: null,
 });
 
 let STATE_ID_SEQ: number = 0;
 
 export class GraphAbstractState extends GraphAbstractStateRecord implements GraphAbstractStateAttribs, AbstractState {
-
-    constructor(id: GraphStateId, preds: ImmSet<GraphStateId>, mergeOf: ImmSet<GraphStateId>, wrapped: ImmRec<any>,
-                partitionKey: ImmSet<PartitionKey>, orderKey: LexiKey, wideningOf: Optional<GraphAbstractState>) {
-        super({id: id, predecessors: preds, wrappedState: wrapped, mergeOf: mergeOf,
-            partitionKeys: partitionKey, orderKey: orderKey, wideningOf: wideningOf});
+    constructor(
+        id: GraphStateId,
+        preds: ImmSet<GraphStateId>,
+        mergeOf: ImmSet<GraphStateId>,
+        wrapped: ImmRec<any>,
+        partitionKey: ImmSet<PartitionKey>,
+        orderKey: LexiKey,
+        wideningOf: Optional<GraphAbstractState>
+    ) {
+        super({
+            id: id,
+            predecessors: preds,
+            wrappedState: wrapped,
+            mergeOf: mergeOf,
+            partitionKeys: partitionKey,
+            orderKey: orderKey,
+            wideningOf: wideningOf,
+        });
     }
 
     public getId(): number {
@@ -146,21 +157,37 @@ export class GraphAbstractState extends GraphAbstractStateRecord implements Grap
     }
 }
 
-
 export class GraphAbstractStateFactory {
-
-    public static withFreshID(preds: Iterable<GraphStateId>, mergeOf: Iterable<GraphStateId>, wrapped: ImmRec<any>,
-                              wrappedKeys: ImmSet<PartitionKey>, orderKey: LexiKey,
-                              wideningOf: Optional<GraphAbstractState>): GraphAbstractState {
+    public static withFreshID(
+        preds: Iterable<GraphStateId>,
+        mergeOf: Iterable<GraphStateId>,
+        wrapped: ImmRec<any>,
+        wrappedKeys: ImmSet<PartitionKey>,
+        orderKey: LexiKey,
+        wideningOf: Optional<GraphAbstractState>
+    ): GraphAbstractState {
         const freshId = this.freshStateID();
         return this.withID(freshId, preds, mergeOf, wrapped, wrappedKeys, orderKey, wideningOf);
     }
 
-    public static withID(id: number, preds: Iterable<GraphStateId>, mergeOf: Iterable<GraphStateId>, wrapped: ImmRec<any>,
-                              wrappedKeys: ImmSet<PartitionKey>, orderKey: LexiKey,
-                         wideningOf: Optional<GraphAbstractState>): GraphAbstractState {
-        return new GraphAbstractState(id, ImmSet(preds), ImmSet(mergeOf)
-            .union([id]), wrapped, wrappedKeys, orderKey, wideningOf);
+    public static withID(
+        id: number,
+        preds: Iterable<GraphStateId>,
+        mergeOf: Iterable<GraphStateId>,
+        wrapped: ImmRec<any>,
+        wrappedKeys: ImmSet<PartitionKey>,
+        orderKey: LexiKey,
+        wideningOf: Optional<GraphAbstractState>
+    ): GraphAbstractState {
+        return new GraphAbstractState(
+            id,
+            ImmSet(preds),
+            ImmSet(mergeOf).union([id]),
+            wrapped,
+            wrappedKeys,
+            orderKey,
+            wideningOf
+        );
     }
 
     public static freshStateID(): number {
@@ -172,16 +199,21 @@ export class GraphAbstractStateFactory {
 }
 
 export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
-
     private readonly _wrappedLattice: Lattice<AbstractElement>;
 
     private readonly _bottom: GraphAbstractState;
 
     constructor(wrappedLattice: Lattice<AbstractElement>) {
         this._wrappedLattice = Preconditions.checkNotUndefined(wrappedLattice);
-        this._bottom = GraphAbstractStateFactory.withID(-1, [], [],
-            this._wrappedLattice.bottom(), ImmSet(), new LexiKey([]),
-            Optional.absent());
+        this._bottom = GraphAbstractStateFactory.withID(
+            -1,
+            [],
+            [],
+            this._wrappedLattice.bottom(),
+            ImmSet(),
+            new LexiKey([]),
+            Optional.absent()
+        );
     }
 
     bottom(): GraphAbstractState {
@@ -198,7 +230,10 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
             element1.getPredecessors().union(element2.getPredecessors()),
             element1.getMergeOf().union(element2.getMergeOf()),
             this._wrappedLattice.join(element1.getWrappedState(), element2.getWrappedState()),
-            element1.getPartitionKeys(), element1.getOrderKey(), element1.getWideningOf());
+            element1.getPartitionKeys(),
+            element1.getOrderKey(),
+            element1.getWideningOf()
+        );
     }
 
     meet(element1: GraphAbstractState, element2: GraphAbstractState): GraphAbstractState {
@@ -211,7 +246,6 @@ export class GraphAbstractStateLattice implements Lattice<GraphAbstractState> {
 }
 
 export class GraphAbstractDomain implements AbstractDomain<ConcreteElement, GraphAbstractState> {
-
     private readonly _lattice: GraphAbstractStateLattice;
     private readonly _wrapped: AbstractDomain<ConcreteElement, AbstractElement>;
 

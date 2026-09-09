@@ -23,17 +23,14 @@
  *
  */
 
-import {ScratchType} from "../ScratchType";
-import {AstNode} from "../../AstNode";
+import { ScratchType } from '../ScratchType';
+import { AstNode } from '../../AstNode';
 
 export interface Expression extends AstNode {
-
     expressionType: ScratchType;
-
 }
 
 export class Expressions {
-
     private static EXPRESSION_ID_SEQ: number;
     private static EXPR_TO_ID_MAP: Map<string, number>;
 
@@ -51,7 +48,7 @@ export class Expressions {
 
         const key = param.toTreeString();
         let result = Expressions.EXPR_TO_ID_MAP.get(key);
-        if (result === undefined)  {
+        if (result === undefined) {
             result = this.freshId();
             Expressions.EXPR_TO_ID_MAP.set(key, result);
         }

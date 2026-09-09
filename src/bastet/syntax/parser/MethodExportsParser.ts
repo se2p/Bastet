@@ -23,11 +23,6 @@
  *
  */
 
-export class MethodExports {
+export class MethodExports {}
 
-}
-
-export class MethodExportsParser {
-
-
-}
+export class MethodExportsParser {}

@@ -31,11 +31,10 @@
 // | 'list' type
 // | 'map' indexType ;
 
-
-import {AbstractNode} from "../AstNode";
-import {ExpressionList} from "./expressions/ExpressionList";
-import {Preconditions} from "../../../utils/Preconditions";
-import {Expression} from "./expressions/Expression";
+import { AbstractNode } from '../AstNode';
+import { ExpressionList } from './expressions/ExpressionList';
+import { Preconditions } from '../../../utils/Preconditions';
+import { Expression } from './expressions/Expression';
 
 export type ScratchTypeID = number;
 let SCRATCH_TYPE_ID_SEQ: ScratchTypeID = 0;
@@ -46,13 +45,14 @@ export function ensureEqualTypes(t1: ScratchType, t2: ScratchType): ScratchType 
 }
 
 export function ensureEqualExpressionTypes(t1: Expression, t2: Expression): ScratchType {
-    Preconditions.checkArgument(t1.expressionType == t2.expressionType,
-        `Types do not match: \n\t${t1.expressionType.toTreeString()}: ${t1.toTreeString()} and \n\t${t2.expressionType.toTreeString()}: ${t2.toTreeString()}`);
+    Preconditions.checkArgument(
+        t1.expressionType == t2.expressionType,
+        `Types do not match: \n\t${t1.expressionType.toTreeString()}: ${t1.toTreeString()} and \n\t${t2.expressionType.toTreeString()}: ${t2.toTreeString()}`
+    );
     return t1.expressionType;
 }
 
 export abstract class ScratchType extends AbstractNode {
-
     private readonly _typeId: ScratchTypeID;
 
     protected constructor(childs, typeid: ScratchTypeID) {
@@ -83,13 +83,11 @@ export abstract class ScratchType extends AbstractNode {
     }
 
     static isNumericType(type: ScratchType) {
-        return type == IntegerType.instance()
-            || type == FloatType.instance();
+        return type == IntegerType.instance() || type == FloatType.instance();
     }
 }
 
 export class VoidType extends ScratchType {
-
     private static INSTANCE: VoidType;
 
     private constructor() {
@@ -102,11 +100,9 @@ export class VoidType extends ScratchType {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class ActorType extends ScratchType {
-
     private static INSTANCE: ActorType;
 
     private constructor() {
@@ -119,11 +115,9 @@ export class ActorType extends ScratchType {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class IntegerType extends ScratchType {
-
     private static INSTANCE: IntegerType;
 
     private constructor() {
@@ -136,11 +130,9 @@ export class IntegerType extends ScratchType {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class FloatType extends ScratchType {
-
     private static INSTANCE: FloatType;
 
     private constructor() {
@@ -153,11 +145,9 @@ export class FloatType extends ScratchType {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class BooleanType extends ScratchType {
-
     private static INSTANCE: BooleanType;
 
     private constructor() {
@@ -170,11 +160,9 @@ export class BooleanType extends ScratchType {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class StringType extends ScratchType {
-
     private static INSTANCE: StringType;
 
     private constructor() {
@@ -187,11 +175,9 @@ export class StringType extends ScratchType {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class StringEnumType extends ScratchType {
-
     private readonly _values: ExpressionList;
 
     constructor(values: ExpressionList) {
@@ -206,12 +192,10 @@ export class StringEnumType extends ScratchType {
     public static withValues(values: ExpressionList): StringEnumType {
         return new StringEnumType(values);
     }
-
 }
 
 export class ListType extends ScratchType {
-
-    private static TYPE_INSTANCES: {[id:string]: ListType};
+    private static TYPE_INSTANCES: { [id: string]: ListType };
 
     private readonly _elementType: ScratchType;
 
@@ -226,10 +210,10 @@ export class ListType extends ScratchType {
         }
 
         const elementTypeName: string = elementType.constructor.name;
-        let result: ScratchType = this.TYPE_INSTANCES[elementTypeName];
+        let result: ListType = this.TYPE_INSTANCES[elementTypeName];
         if (!result) {
             result = new ListType(elementType);
-            this.TYPE_INSTANCES[elementTypeName]
+            this.TYPE_INSTANCES[elementTypeName] = result;
         }
 
         return result;
@@ -239,5 +223,3 @@ export class ListType extends ScratchType {
         return this._elementType;
     }
 }
-
-

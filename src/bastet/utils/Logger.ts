@@ -24,14 +24,12 @@
  */
 
 export enum LogLevel {
-
     ALWAYS = 0,
     TEACHING = 1,
-    DEBUG = 2
+    DEBUG = 2,
 }
 
 export interface AnalysisLogger {
-
     setLogLevel(level: LogLevel);
 
     potentialUnsound(str: string);
@@ -39,11 +37,9 @@ export interface AnalysisLogger {
     potentialIncomplete(str: string);
 
     log(...data: any);
-
 }
 
 export class ConsoleLogger implements AnalysisLogger {
-
     private _logLevel: LogLevel;
 
     constructor(logLevel: LogLevel) {
@@ -51,11 +47,11 @@ export class ConsoleLogger implements AnalysisLogger {
     }
 
     potentialIncomplete(str: string) {
-        console.warn("INCOMPLETE: " + str);
+        console.warn('INCOMPLETE: ' + str);
     }
 
     potentialUnsound(str: string) {
-        console.warn("UNSOUND: " + str);
+        console.warn('UNSOUND: ' + str);
     }
 
     log(...data: any) {
@@ -65,11 +61,9 @@ export class ConsoleLogger implements AnalysisLogger {
     setLogLevel(level: LogLevel) {
         this._logLevel = level;
     }
-
 }
 
 export class Logger {
-
     private static LOGGER: AnalysisLogger;
 
     public static defaultLogger(): AnalysisLogger {
@@ -86,6 +80,4 @@ export class Logger {
     public static potentialIncomplete(str: string) {
         Logger.defaultLogger().potentialIncomplete(str);
     }
-
 }
-

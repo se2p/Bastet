@@ -23,12 +23,11 @@
  *
  */
 
-import {Statement} from "./Statement";
-import {Expression} from "../expressions/Expression";
-import {StringExpression} from "../expressions/StringExpression";
+import { Statement } from './Statement';
+import { Expression } from '../expressions/Expression';
+import { StringExpression } from '../expressions/StringExpression';
 
 export class ChangeAttributeByStatement extends Statement {
-
     private readonly _attrib: StringExpression;
     private readonly _expr: Expression;
 

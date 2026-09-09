@@ -23,29 +23,24 @@
  *
  */
 
-import {Expression} from "./Expression";
-import {VariableWithDataLocation} from "../Variable";
-import {AbstractExpression} from "./AbstractExpression";
-import {AstNode} from "../../AstNode";
-import {ActorType} from "../ScratchType";
-import {Preconditions} from "../../../../utils/Preconditions";
-import {StringExpression} from "./StringExpression";
-import {Identifier} from "../Identifier";
+import { Expression } from './Expression';
+import { VariableWithDataLocation } from '../Variable';
+import { AbstractExpression } from './AbstractExpression';
+import { AstNode } from '../../AstNode';
+import { ActorType } from '../ScratchType';
+import { Preconditions } from '../../../../utils/Preconditions';
+import { StringExpression } from './StringExpression';
+import { Identifier } from '../Identifier';
 
-export interface ActorExpression extends Expression {
-
-}
+export interface ActorExpression extends Expression {}
 
 export class AbstractActorExpression extends AbstractExpression {
-
     constructor(childs: AstNode[]) {
         super(ActorType.instance(), childs);
     }
-
 }
 
 export class ActorVariableExpression extends AbstractActorExpression implements ActorExpression {
-
     private readonly _variable: VariableWithDataLocation;
 
     constructor(variable: VariableWithDataLocation) {
@@ -56,19 +51,15 @@ export class ActorVariableExpression extends AbstractActorExpression implements 
     get variable(): VariableWithDataLocation {
         return this._variable;
     }
-
 }
 
 export class ActorSelfExpression extends AbstractActorExpression {
-
     constructor() {
         super([]);
     }
-
 }
 
 export class LocateActorExpression extends AbstractActorExpression {
-
     private readonly _actorName: StringExpression;
 
     constructor(name: StringExpression) {
@@ -82,7 +73,6 @@ export class LocateActorExpression extends AbstractActorExpression {
 }
 
 export class StartCloneActorExpression extends AbstractActorExpression {
-
     private readonly _ofActor: ActorExpression;
 
     constructor(ofActor: ActorExpression) {
@@ -96,8 +86,7 @@ export class StartCloneActorExpression extends AbstractActorExpression {
 }
 
 export class UsherActorExpression extends AbstractActorExpression {
-
-    private readonly _actorName : StringExpression;
+    private readonly _actorName: StringExpression;
 
     private readonly _role: Identifier;
 

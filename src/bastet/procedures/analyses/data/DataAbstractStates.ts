@@ -23,12 +23,11 @@
  *
  */
 
-import {DataAbstractState} from "./DataAbstractDomain";
-import {DelegatingStateVisitor} from "../AbstractStates";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
+import { DataAbstractState } from './DataAbstractDomain';
+import { DelegatingStateVisitor } from '../AbstractStates';
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
 
 export class DataStateCollector extends DelegatingStateVisitor<DataAbstractState[]> {
-
     constructor() {
         super();
     }
@@ -40,14 +39,11 @@ export class DataStateCollector extends DelegatingStateVisitor<DataAbstractState
     protected defaultResultFor(element: AbstractElement): DataAbstractState[] {
         return [];
     }
-
 }
 
 export class DataAbstractStates {
-
     public static extractFrom(fromState: AbstractState): DataAbstractState[] {
         const visitor = new DataStateCollector();
         return fromState.accept(visitor);
     }
-
 }

@@ -23,12 +23,12 @@
  *
  */
 
-import {Refiner, Unwrapper} from "../Refiner";
-import {FrontierSet, ReachedSet} from "../../algorithms/StateSet";
-import {ImplementMeException, ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
-import {AbstractionState, AbstractionStateLattice} from "./AbstractionAbstractDomain";
-import {Preconditions} from "../../../utils/Preconditions";
+import { Refiner, Unwrapper } from '../Refiner';
+import { FrontierSet, ReachedSet } from '../../algorithms/StateSet';
+import { ImplementMeForException } from '../../../core/exceptions/ImplementMeException';
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
+import { AbstractionState, AbstractionStateLattice } from './AbstractionAbstractDomain';
+import { Preconditions } from '../../../utils/Preconditions';
 import {
     BooleanFormula,
     FirstOrderFormula,
@@ -36,25 +36,21 @@ import {
     IntegerFormula,
     ListFormula,
     RealFormula,
-    StringFormula
-} from "../../../utils/ConjunctiveNormalForm";
-import {PrecisionOperator} from "./AbstractionComputation";
-import {PrecisionRole, PredicatePrecision, PredicatePrecisionLattice} from "../../AbstractionPrecision";
-import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
-import {FirstOrderSolver} from "../../domains/FirstOrderDomain";
-import {TransformerTheories} from "../../domains/MemoryTransformer";
-import {BastetConfiguration} from "../../../utils/BastetConfiguration";
-import {getAtMostOneElement, getTheOnlyElement} from "../../../utils/Collections";
-import {AbstractionStateStates} from "./AbstractionStates";
-import {Map as ImmMap} from "immutable"
-import {SSAState} from "../ssa/SSAAbstractDomain";
-import {SSAAbstractStates} from "../ssa/SSAAbstractStates";
-import {DataAbstractStates} from "../data/DataAbstractStates";
-import {PerfTimer} from "../../../utils/PerfTimer";
-
+    StringFormula,
+} from '../../../utils/ConjunctiveNormalForm';
+import { PrecisionOperator } from './AbstractionComputation';
+import { PrecisionRole, PredicatePrecision, PredicatePrecisionLattice } from '../../AbstractionPrecision';
+import { AccessibilityRelation, AccessibilityRelations } from '../Accessibility';
+import { FirstOrderSolver } from '../../domains/FirstOrderDomain';
+import { TransformerTheories } from '../../domains/MemoryTransformer';
+import { BastetConfiguration } from '../../../utils/BastetConfiguration';
+import { getTheOnlyElement } from '../../../utils/Collections';
+import { AbstractionStateStates } from './AbstractionStates';
+import { SSAAbstractStates } from '../ssa/SSAAbstractStates';
+import { DataAbstractStates } from '../data/DataAbstractStates';
+import { PerfTimer } from '../../../utils/PerfTimer';
 
 export class AbstractionRefinerConfig extends BastetConfiguration {
-
     constructor(dict: {}) {
         super(dict, ['AbstractionRefiner']);
     }
@@ -86,13 +82,22 @@ class InterpolationSolution {
     }
 }
 
-export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOperator<AbstractionState, PredicatePrecision> {
-
+export class AbstractionRefiner
+    implements Refiner<AbstractState>, PrecisionOperator<AbstractionState, PredicatePrecision>
+{
     private readonly _unwrapper: Unwrapper<AbstractState, AbstractElement>;
 
     private readonly _lattice: AbstractionStateLattice;
     private readonly _prover: FirstOrderSolver<FirstOrderFormula>;
-    private readonly _theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
+    private readonly _theories: TransformerTheories<
+        FirstOrderFormula,
+        BooleanFormula,
+        IntegerFormula,
+        RealFormula,
+        FloatFormula,
+        StringFormula,
+        ListFormula
+    >;
     private _lastInterpolationSolution: InterpolationSolution;
 
     private _currentPrecision: PredicatePrecision;
@@ -101,8 +106,22 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
 
     private _feasibilityCheck: number;
 
-    constructor(config: {}, unwrapper: Unwrapper<AbstractState, AbstractElement>, lattice: AbstractionStateLattice, theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
-                precisionLattice: PredicatePrecisionLattice<FirstOrderFormula>, prover: FirstOrderSolver<FirstOrderFormula>) {
+    constructor(
+        config: {},
+        unwrapper: Unwrapper<AbstractState, AbstractElement>,
+        lattice: AbstractionStateLattice,
+        theories: TransformerTheories<
+            FirstOrderFormula,
+            BooleanFormula,
+            IntegerFormula,
+            RealFormula,
+            FloatFormula,
+            StringFormula,
+            ListFormula
+        >,
+        precisionLattice: PredicatePrecisionLattice<FirstOrderFormula>,
+        prover: FirstOrderSolver<FirstOrderFormula>
+    ) {
         this._config = new AbstractionRefinerConfig(config);
         this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
         this._lattice = Preconditions.checkNotUndefined(lattice);
@@ -114,11 +133,15 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
     }
 
     private neitherTrueNorFalse(f: FirstOrderFormula): boolean {
-        return !(this._theories.boolTheory.trueBool().equals(f)
-                || this._theories.boolTheory.falseBool().equals(f));
+        return !(this._theories.boolTheory.trueBool().equals(f) || this._theories.boolTheory.falseBool().equals(f));
     }
 
-    public checkIsFeasible(reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractionState>, e: AbstractState, purpose?: string): boolean {
+    public checkIsFeasible(
+        reached: ReachedSet<AbstractState>,
+        ar: AccessibilityRelation<AbstractionState>,
+        e: AbstractState,
+        purpose?: string
+    ): boolean {
         this._feasibilityCheck++;
 
         // The previous interpolation solution gets invalidated with this call
@@ -128,7 +151,10 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         // 1.1 Extract the sequence of states for that a widening was computed along the
         // given accessibility relation.
         const wideningStateSeq: AbstractionState[] = this.getBlockStateSequence(ar, e);
-        const alignedBlockFormulas: FirstOrderFormula[] = this.alignSsaIndices(wideningStateSeq, this.extractTraceBlockFormulas(wideningStateSeq));
+        const alignedBlockFormulas: FirstOrderFormula[] = this.alignSsaIndices(
+            wideningStateSeq,
+            this.extractTraceBlockFormulas(wideningStateSeq)
+        );
         alignedBlockFormulas.forEach((f) => this._prover.incRef(f));
         console.log(`Trace with ${alignedBlockFormulas.length} block formulas`);
         Preconditions.checkState(wideningStateSeq.length == alignedBlockFormulas.length);
@@ -154,21 +180,25 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
             const feasible = !this._prover.isUnsat();
 
             if (feasible) {
-                console.log("Seems to be a feasible counterexample (a real Bug?)!");
+                console.log('Seems to be a feasible counterexample (a real Bug?)!');
             } else {
-                console.log("Counterexample infeasible. Higher abstraction precision needed!");
+                console.log('Counterexample infeasible. Higher abstraction precision needed!');
 
                 // Compute interpolant
                 const interpolants: FirstOrderFormula[] = this._prover.collectInterpolants();
-                interpolants.forEach(itp => this._prover.incRef(itp));
+                interpolants.forEach((itp) => this._prover.incRef(itp));
 
                 console.group();
-                console.log(`Identified ${interpolants.filter(itp => this.neitherTrueNorFalse(itp)).length} interpolants.`)
+                console.log(
+                    `Identified ${interpolants.filter((itp) => this.neitherTrueNorFalse(itp)).length} interpolants.`
+                );
                 // interpolants.forEach((itp) => console.log("Interpolant", this._theories.stringRepresentation(itp)));
                 console.groupEnd();
 
-                Preconditions.checkState(interpolants.length > 0,
-                    "Assuming interpolants to be present for an infeasible counterexample");
+                Preconditions.checkState(
+                    interpolants.length > 0,
+                    'Assuming interpolants to be present for an infeasible counterexample'
+                );
 
                 // FIXME: check this precondition
                 // Preconditions.checkState(interpolants.length === alignedBlockFormulas.length - 1,
@@ -197,7 +227,7 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
         if (purpose) {
             console.group(`Feasibility Check (${purpose})...`);
         } else {
-            console.group("Feasibility Check...");
+            console.group('Feasibility Check...');
         }
 
         const timer = new PerfTimer(null);
@@ -208,19 +238,27 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
 
     private logRefinementStop(feasible, timer: PerfTimer) {
         timer.stop();
-        console.log(`${feasible ? "Feasible" : "Infeasible"} ${timer.lastIntervalDuration}`)
+        console.log(`${feasible ? 'Feasible' : 'Infeasible'} ${timer.lastIntervalDuration}`);
         console.groupEnd();
     }
 
-    private alignSsaIndices(wideningStateSeq: AbstractionState[], blockFormulas: FirstOrderFormula[]): FirstOrderFormula[] {
+    private alignSsaIndices(
+        wideningStateSeq: AbstractionState[],
+        blockFormulas: FirstOrderFormula[]
+    ): FirstOrderFormula[] {
         Preconditions.checkArgument(wideningStateSeq.length == blockFormulas.length);
-        const ssaMaps = wideningStateSeq.map((e) => new Map(getTheOnlyElement(SSAAbstractStates.extractFrom(e)).getSSA()));
+        const ssaMaps = wideningStateSeq.map(
+            (e) => new Map(getTheOnlyElement(SSAAbstractStates.extractFrom(e)).getSSA())
+        );
         return this._theories.alignSsaIndices(blockFormulas, ssaMaps);
     }
 
-    public refinePrecision(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>,
-                           ar: AccessibilityRelation<AbstractionState>,
-                           infeasibleState: AbstractState): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
+    public refinePrecision(
+        frontier: FrontierSet<AbstractState>,
+        reached: ReachedSet<AbstractState>,
+        ar: AccessibilityRelation<AbstractionState>,
+        infeasibleState: AbstractState
+    ): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         try {
             // TODO: welchen Teil vom ReachedSet wegwerfen?
             //  -> Man wirft den Teil weg, der infeasible ist
@@ -237,11 +275,10 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
 
             this._currentPrecision = this._lastInterpolationSolution.interpolants
                 .map((f) => new PredicatePrecision([f], PrecisionRole.INTERMEDIATE))
-                .reduce((precision, last) => this._precisionLattice.join(precision, last),
-                    this._currentPrecision);
+                .reduce((precision, last) => this._precisionLattice.join(precision, last), this._currentPrecision);
 
             if (this._config.useLazyAbstraction) {
-                throw new ImplementMeForException("Lazy abstraction not yet supported");
+                throw new ImplementMeForException('Lazy abstraction not yet supported');
             } else {
                 for (const e of ar.initial()) {
                     frontier.add(e);
@@ -265,13 +302,19 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
     }
 
     public precisionFor(state: AbstractionState): PredicatePrecision {
-        return state.getPrecision().stack.reduce((pi: PredicatePrecision, result: PredicatePrecision) =>
-            this._lattice.precStacLattice.lattice.join(pi, result), this._currentPrecision);
+        return state
+            .getPrecision()
+            .stack.reduce(
+                (pi: PredicatePrecision, result: PredicatePrecision) =>
+                    this._lattice.precStacLattice.lattice.join(pi, result),
+                this._currentPrecision
+            );
     }
 
     private getBlockStateSequence(ar: AccessibilityRelation<AbstractState>, target: AbstractState): AbstractionState[] {
-        return AccessibilityRelations.getWidenedSequence(ar, target)
-            .map(e => getTheOnlyElement(AbstractionStateStates.extractFrom(e)));
+        return AccessibilityRelations.getWidenedSequence(ar, target).map((e) =>
+            getTheOnlyElement(AbstractionStateStates.extractFrom(e))
+        );
     }
 
     private static getSingleAbstractionState(e: AbstractState): AbstractionState {
@@ -283,7 +326,9 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
 
         for (const abst of wideningStateSeq) {
             if (abst.getWideningOf().isPresent()) {
-                result.push(getTheOnlyElement(DataAbstractStates.extractFrom(abst.getWideningOf().getValue())).blockFormula);
+                result.push(
+                    getTheOnlyElement(DataAbstractStates.extractFrom(abst.getWideningOf().getValue())).blockFormula
+                );
             } else {
                 result.push(getTheOnlyElement(DataAbstractStates.extractFrom(abst)).blockFormula);
             }
@@ -297,7 +342,10 @@ export class AbstractionRefiner implements Refiner<AbstractState>, PrecisionOper
             return;
         }
 
-        const pathFormula = alignedBlockFormulas.reduce((f1, f2) => this._theories.boolTheory.and(f1, f2), this._theories.boolTheory.trueBool());
+        const pathFormula = alignedBlockFormulas.reduce(
+            (f1, f2) => this._theories.boolTheory.and(f1, f2),
+            this._theories.boolTheory.trueBool()
+        );
         const s = this._prover.stringRepresentation(pathFormula);
 
         let fs = require('fs');

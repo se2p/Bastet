@@ -23,21 +23,18 @@
  *
  */
 
-import {AbstractNode, OptionalAstNode} from "../../AstNode";
-import {Statement, StatementList} from "./Statement";
-import {BooleanExpression} from "../expressions/BooleanExpression";
-import {NumberExpression} from "../expressions/NumberExpression";
-import {VariableWithDataLocation} from "../Variable";
-import {Preconditions} from "../../../../utils/Preconditions";
+import { AbstractNode, OptionalAstNode } from '../../AstNode';
+import { Statement, StatementList } from './Statement';
+import { BooleanExpression } from '../expressions/BooleanExpression';
+import { NumberExpression } from '../expressions/NumberExpression';
+import { VariableWithDataLocation } from '../Variable';
+import { Preconditions } from '../../../../utils/Preconditions';
 
 export type BlockId = string;
 
-export interface ControlStatement extends AbstractNode {
-
-}
+export interface ControlStatement extends AbstractNode {}
 
 export class IfStatement extends Statement implements ControlStatement {
-
     private readonly _cond: BooleanExpression;
     private readonly _thenStmts: StatementList;
     private readonly _elseStmts: StatementList;
@@ -63,10 +60,8 @@ export class IfStatement extends Statement implements ControlStatement {
 }
 
 export class UntilStatement extends Statement implements ControlStatement {
-
     private readonly _cond: BooleanExpression;
     private readonly _body: StatementList;
-
 
     constructor(cond: BooleanExpression, body: StatementList) {
         super([cond, body]);
@@ -84,7 +79,6 @@ export class UntilStatement extends Statement implements ControlStatement {
 }
 
 export class UntilQueriedConditionStatement extends Statement implements ControlStatement {
-
     private readonly _untilCondition: BooleanExpression;
     private readonly _conditionQueryStatements: StatementList;
     private readonly _body: StatementList;
@@ -109,9 +103,7 @@ export class UntilQueriedConditionStatement extends Statement implements Control
     }
 }
 
-
 export class RepeatTimesStatement extends Statement implements ControlStatement {
-
     private readonly _times: NumberExpression;
     private readonly _body: StatementList;
 
@@ -131,7 +123,6 @@ export class RepeatTimesStatement extends Statement implements ControlStatement 
 }
 
 export class RepeatForeverStatement extends Statement implements ControlStatement {
-
     private readonly _body: StatementList;
 
     constructor(body: StatementList) {
@@ -145,7 +136,6 @@ export class RepeatForeverStatement extends Statement implements ControlStatemen
 }
 
 export class ReturnStatement extends Statement implements ControlStatement {
-
     private readonly _resultVariable: OptionalAstNode<VariableWithDataLocation>;
 
     constructor(resultVariable: OptionalAstNode<VariableWithDataLocation>) {
@@ -156,11 +146,9 @@ export class ReturnStatement extends Statement implements ControlStatement {
     get resultVariable(): OptionalAstNode<VariableWithDataLocation> {
         return this._resultVariable;
     }
-
 }
 
 export class BeginAtomicStatement extends Statement {
-
     private readonly _atomicIncrement: number;
 
     constructor() {
@@ -174,7 +162,6 @@ export class BeginAtomicStatement extends Statement {
 }
 
 export class EndAtomicStatement extends Statement {
-
     private readonly _atomicIncrement: number;
 
     constructor() {
@@ -186,4 +173,3 @@ export class EndAtomicStatement extends Statement {
         return this._atomicIncrement;
     }
 }
-

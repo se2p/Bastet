@@ -23,12 +23,11 @@
  *
  */
 
-import {CoreVisitor} from "./CoreVisitor";
-import {AstNode} from "./AstNode";
-import {Preconditions} from "../../utils/Preconditions";
+import { CoreVisitor } from './CoreVisitor';
+import { AstNode } from './AstNode';
+import { Preconditions } from '../../utils/Preconditions';
 
 export class AstToDotVisitor implements CoreVisitor<number> {
-
     private _dot: string[];
     private _idseq: number;
 
@@ -52,14 +51,12 @@ export class AstToDotVisitor implements CoreVisitor<number> {
 
     public writeToFile(filepath: string): void {
         let fs = require('fs');
-        fs.writeFileSync(filepath, `digraph ast {\n` + this._dot.join("\n") + `\n}\n`);
+        fs.writeFileSync(filepath, `digraph ast {\n` + this._dot.join('\n') + `\n}\n`);
     }
 
     private static escpace(text: string): string {
-        const search = "\"";
-        const replacement = "\\\"";
+        const search = '"';
+        const replacement = '\\"';
         return text.replace(new RegExp(search, 'g'), replacement);
     }
-
 }
-

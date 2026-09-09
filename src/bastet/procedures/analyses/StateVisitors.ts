@@ -23,31 +23,29 @@
  *
  */
 
+import { AbstractStateVisitor, DelegatingStateVisitor } from './AbstractStates';
+import { AbstractElement } from '../../lattices/Lattice';
+import { ControlAbstractState } from './control/ControlAbstractDomain';
+import { DataAbstractState } from './data/DataAbstractDomain';
+import { GraphAbstractState } from './graph/GraphAbstractDomain';
+import { SSAState } from './ssa/SSAAbstractDomain';
+import { App } from '../../syntax/app/App';
+import { Preconditions } from '../../utils/Preconditions';
+import { CorePrintVisitor } from '../../syntax/ast/CorePrintVisitor';
+import { TimeState } from './time/TimeAbstractDomain';
+import { ControlLocationExtractor } from './control/ControlUtils';
+import { ImplementMeForException } from '../../core/exceptions/ImplementMeException';
+import { IllegalArgumentException } from '../../core/exceptions/IllegalArgumentException';
+import { DebugState } from './debug/DebugAbstractDomain';
+import { getTheOnlyElement } from '../../utils/Collections';
+import { AbstractionState } from './abstraction/AbstractionAbstractDomain';
+import { ProgramAnalysis } from './ProgramAnalysis';
+import { ConcreteElement } from '../domains/ConcreteElements';
+import { RelationLocation, ThreadState } from './control/ConcreteProgramState';
 
-import {AbstractStateVisitor, DelegatingStateVisitor} from "./AbstractStates";
-import {AbstractElement} from "../../lattices/Lattice";
-import {ControlAbstractState} from "./control/ControlAbstractDomain";
-import {DataAbstractState} from "./data/DataAbstractDomain";
-import {GraphAbstractState} from "./graph/GraphAbstractDomain";
-import {SSAState} from "./ssa/SSAAbstractDomain";
-import {App} from "../../syntax/app/App";
-import {Preconditions} from "../../utils/Preconditions";
-import {CorePrintVisitor} from "../../syntax/ast/CorePrintVisitor";
-import {TimeState} from "./time/TimeAbstractDomain";
-import {ControlLocationExtractor} from "./control/ControlUtils";
-import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {DebugState} from "./debug/DebugAbstractDomain";
-import {getTheOnlyElement} from "../../utils/Collections";
-import {AbstractionState} from "./abstraction/AbstractionAbstractDomain";
-import {ProgramAnalysis} from "./ProgramAnalysis";
-import {ConcreteElement} from "../domains/ConcreteElements";
-import {RelationLocation, ThreadState} from "./control/ConcreteProgramState";
-
-const colormap = require('colormap')
+const colormap = require('colormap');
 
 export class PaperLabelVisitor extends DelegatingStateVisitor<string> {
-
     private readonly _task: App;
 
     constructor(task: App) {
@@ -56,7 +54,7 @@ export class PaperLabelVisitor extends DelegatingStateVisitor<string> {
     }
 
     protected defaultResultFor(element: AbstractElement): string {
-        return "";
+        return '';
     }
 
     visitGraphAbstractState(element: GraphAbstractState): string {
@@ -67,13 +65,18 @@ export class PaperLabelVisitor extends DelegatingStateVisitor<string> {
     visitControlAbstractState(element: ControlAbstractState): string {
         const v = new ControlLocationExtractor(this._task);
         const relName = (rl: RelationLocation) => this._task.getTransitionRelationById(rl.getRelationId()).name;
-        return "@ " + element.accept(v).map( rl => `${rl.getActorId()}:${relName(rl)}:${rl.getLocationId()}`).toArray().toString();
+        return (
+            '@ ' +
+            element
+                .accept(v)
+                .map((rl) => `${rl.getActorId()}:${relName(rl)}:${rl.getLocationId()}`)
+                .toArray()
+                .toString()
+        );
     }
-
 }
 
 export class StateLabelVisitor implements AbstractStateVisitor<string> {
-
     private readonly _task: App;
 
     constructor(task: App) {
@@ -82,24 +85,27 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
 
     private formatActorScriptThreadDetails(cs: ControlAbstractState, t: ThreadState, threadIndex: number): string {
         const steppedForIndices = cs.getSteppedFor();
-        const wasStepped = (i) => { return steppedForIndices.contains(i) };
+        const wasStepped = (i) => {
+            return steppedForIndices.contains(i);
+        };
 
         const actor = this._task.getActorByName(t.getActorId());
         const script = actor.getScript(t.getScriptId());
 
         const astVisitor = new CorePrintVisitor();
-        return `${wasStepped(threadIndex) ? "*" : ""}[${t.getThreadId()} a${t.getInAtomicMode()} ${t.getActorId()} ${t.getScriptId()} ${script.event.accept(astVisitor)} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()} ${t.getWaitingForThreads().join("+")} ${t.getLoopStack().toString()}]`;
+        return `${wasStepped(threadIndex) ? '*' : ''}[${t.getThreadId()} a${t.getInAtomicMode()} ${t.getActorId()} ${t.getScriptId()} ${script.event.accept(astVisitor)} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()} ${t.getWaitingForThreads().join('+')} ${t.getLoopStack().toString()}]`;
     }
 
     private formatConditionThreadDetails(cs: ControlAbstractState, t: ThreadState, threadIndex: number): string {
         const steppedForIndices = cs.getSteppedFor();
-        const wasStepped = (i) => { return steppedForIndices.contains(i) };
-        return `COND ${wasStepped(threadIndex) ? "*" : ""}[${t.getThreadId()} ${t.getActorId()} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()} ${t.getWaitingForThreads().join("+")}]`;
+        const wasStepped = (i) => {
+            return steppedForIndices.contains(i);
+        };
+        return `COND ${wasStepped(threadIndex) ? '*' : ''}[${t.getThreadId()} ${t.getActorId()} ${t.getRelationLocation().getLocationId()} ${t.getComputationState()} ${t.getWaitingForThreads().join('+')}]`;
     }
 
-
     visit(element: AbstractElement): string {
-        return "";
+        return '';
     }
 
     visitAbstractionState(element: AbstractionState): string {
@@ -107,20 +113,24 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
     }
 
     visitDebugState(element: DebugState): string {
-       return `${element.getWrappedState().accept(this)} ${element.getDebugInfos().toString()}`;
+        return `${element.getWrappedState().accept(this)} ${element.getDebugInfos().toString()}`;
     }
 
     visitControlAbstractState(element: ControlAbstractState): string {
         const steppedForIndices = element.getSteppedFor();
-        const wasStepped = (i) => { return steppedForIndices.contains(i) };
+        const wasStepped = (i) => {
+            return steppedForIndices.contains(i);
+        };
 
         const wrappedLabel: string = element.getWrappedState().accept(this);
-        const controlLabel1: string = element.getThreadStates()
+        const controlLabel1: string = element
+            .getThreadStates()
             .map((t, i) => this.formatActorScriptThreadDetails(element, t, i))
-            .join("\n");
-        const controlLabel2: string = element.getConditionStates()
+            .join('\n');
+        const controlLabel2: string = element
+            .getConditionStates()
             .map((t, i) => this.formatConditionThreadDetails(element, t, i))
-            .join("\n");
+            .join('\n');
         return `${controlLabel1}\n${controlLabel2}\n${wrappedLabel}`;
     }
 
@@ -142,27 +152,23 @@ export class StateLabelVisitor implements AbstractStateVisitor<string> {
     visitTimeState(element: TimeState): string {
         return element.getWrappedState().accept(this);
     }
-
 }
 
 export class StateColorVisitor extends DelegatingStateVisitor<string> {
-
     protected defaultResultFor(element: AbstractElement): string {
-        return "white";
+        return 'white';
     }
 
     visitControlAbstractState(element: ControlAbstractState): string {
         if (element.getIsTargetFor().size > 0) {
-            return "crimson";
+            return 'crimson';
         } else {
-            return "white";
+            return 'white';
         }
     }
-
 }
 
 export class ColorByActorVisitor extends StateColorVisitor {
-
     private readonly _task: App;
     private readonly _colors: any;
     private readonly _actorToColor: {};
@@ -174,7 +180,7 @@ export class ColorByActorVisitor extends StateColorVisitor {
             colormap: 'hsv',
             nshades: Math.max(this._task.actors.length, 16),
             format: 'hex',
-            alpha: 1
+            alpha: 1,
         });
 
         this._actorToColor = {};
@@ -193,14 +199,12 @@ export class ColorByActorVisitor extends StateColorVisitor {
             const actor = getTheOnlyElement(steppedActors);
             return this._actorToColor[actor];
         } else {
-            return "white";
+            return 'white';
         }
     }
-
 }
 
 export class PenSizeVisitor extends DelegatingStateVisitor<number> {
-
     private readonly _analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>;
 
     constructor(analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>) {
@@ -219,11 +223,9 @@ export class PenSizeVisitor extends DelegatingStateVisitor<number> {
     protected defaultResultFor(element: AbstractElement): number {
         return 1;
     }
-
 }
 
 export class SSAStateVisitor implements AbstractStateVisitor<SSAState> {
-
     visit(element: AbstractElement): SSAState {
         throw new ImplementMeForException(element.constructor.name);
     }
@@ -237,7 +239,7 @@ export class SSAStateVisitor implements AbstractStateVisitor<SSAState> {
     }
 
     visitDataAbstractState(element: DataAbstractState): SSAState {
-        throw new IllegalArgumentException("Abstract state didnt contain SSAState");
+        throw new IllegalArgumentException('Abstract state didnt contain SSAState');
     }
 
     visitGraphAbstractState(element: GraphAbstractState): SSAState {
@@ -251,5 +253,4 @@ export class SSAStateVisitor implements AbstractStateVisitor<SSAState> {
     visitTimeState(element: TimeState): SSAState {
         return element.wrappedState.accept(this);
     }
-
 }

@@ -23,14 +23,13 @@
  *
  */
 
-import {CoreVisitor} from "./CoreVisitor";
-import {List as ImmList} from "immutable"
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
-import {Preconditions} from "../../utils/Preconditions";
+import { CoreVisitor } from './CoreVisitor';
+import { List as ImmList } from 'immutable';
+import { ImplementMeException } from '../../core/exceptions/ImplementMeException';
+import { IllegalStateException } from '../../core/exceptions/IllegalStateException';
+import { Preconditions } from '../../utils/Preconditions';
 
 export interface AstNode {
-
     accept<R>(visitor: CoreVisitor<R>): R;
 
     children: AstNode[];
@@ -50,7 +49,6 @@ export interface AstNode {
 }
 
 export abstract class AbstractNode implements AstNode {
-
     private readonly _children: AstNode[];
 
     private treeString: string = null;
@@ -100,19 +98,17 @@ export abstract class AbstractNode implements AstNode {
         if (!this.treeString) {
             let result: string[] = [this.constructor.name];
             for (let c of this) {
-                result.push("{");
+                result.push('{');
                 result.push(c.toTreeString());
-                result.push("}")
+                result.push('}');
             }
-            this.treeString = result.join(" ");
+            this.treeString = result.join(' ');
         }
         return this.treeString;
     }
-
 }
 
 export abstract class OptionalAstNode<T extends AstNode> extends AbstractNode {
-
     protected constructor(childs: AstNode[]) {
         super(childs);
     }
@@ -128,11 +124,9 @@ export abstract class OptionalAstNode<T extends AstNode> extends AbstractNode {
     public abstract isPresent(): boolean;
 
     public abstract value(): T;
-
 }
 
 export class PresentAstNode<T extends AstNode> extends OptionalAstNode<T> {
-
     private readonly _node: T;
 
     constructor(node: T) {
@@ -151,11 +145,9 @@ export class PresentAstNode<T extends AstNode> extends OptionalAstNode<T> {
     value(): T {
         return this._node;
     }
-
 }
 
-export class AbsentAstNode<T extends AstNode>  extends OptionalAstNode<T> {
-
+export class AbsentAstNode<T extends AstNode> extends OptionalAstNode<T> {
     constructor() {
         super([]);
     }
@@ -167,8 +159,4 @@ export class AbsentAstNode<T extends AstNode>  extends OptionalAstNode<T> {
     value(): T {
         throw new IllegalStateException();
     }
-
 }
-
-
-

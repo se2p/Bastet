@@ -23,25 +23,22 @@
  *
  */
 
-import {GraphAbstractState} from "./GraphAbstractDomain";
-import {List as ImmList, Set as ImmSet} from "immutable"
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
-import {Preconditions} from "../../../utils/Preconditions";
-import {getTheOnlyElement} from "../../../utils/Collections";
+import { GraphAbstractState } from './GraphAbstractDomain';
+import { List as ImmList, Set as ImmSet } from 'immutable';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { GraphReachedSetWrapper } from './GraphStatesSetWrapper';
+import { Preconditions } from '../../../utils/Preconditions';
+import { getTheOnlyElement } from '../../../utils/Collections';
 
 export interface GraphPathSet {
-
     paths(): Iterable<GraphPath>;
 
     entryStates: Iterable<GraphAbstractState>;
 
     exitStates: Iterable<GraphAbstractState>;
-
 }
 
 export class GraphPath implements GraphPathSet {
-
     private readonly _states: ImmList<GraphAbstractState>;
 
     constructor(states: Iterable<GraphAbstractState>) {
@@ -54,7 +51,7 @@ export class GraphPath implements GraphPathSet {
 
     get entryStates(): Iterable<GraphAbstractState> {
         if (this._states.size > 0) {
-            return [ this._states.get(0) ];
+            return [this._states.get(0)];
         } else {
             return [];
         }
@@ -62,7 +59,7 @@ export class GraphPath implements GraphPathSet {
 
     get exitStates(): Iterable<GraphAbstractState> {
         if (this._states.size > 0) {
-            return [ this._states.get(this._states.size-1) ];
+            return [this._states.get(this._states.size - 1)];
         } else {
             return [];
         }
@@ -81,11 +78,9 @@ export class GraphPath implements GraphPathSet {
     paths(): Iterable<GraphPath> {
         return [this];
     }
-
 }
 
 export class ImplicitGraphPathSet implements GraphPathSet {
-
     /**
      * The graph path set describes a subset of paths from those
      * found in the graph described by `_in`.
@@ -107,8 +102,12 @@ export class ImplicitGraphPathSet implements GraphPathSet {
      */
     private readonly _states: ImmSet<GraphAbstractState>;
 
-    constructor(inSet: GraphReachedSetWrapper<GraphAbstractState>, entryStates: ImmSet<GraphAbstractState>,
-                exitStates: ImmSet<GraphAbstractState>, onPathsStates: ImmSet<GraphAbstractState>) {
+    constructor(
+        inSet: GraphReachedSetWrapper<GraphAbstractState>,
+        entryStates: ImmSet<GraphAbstractState>,
+        exitStates: ImmSet<GraphAbstractState>,
+        onPathsStates: ImmSet<GraphAbstractState>
+    ) {
         this._in = Preconditions.checkNotUndefined(inSet);
         this._entryStates = Preconditions.checkNotUndefined(entryStates);
         this._exitStates = Preconditions.checkNotUndefined(exitStates);
@@ -129,11 +128,9 @@ export class ImplicitGraphPathSet implements GraphPathSet {
     get exitStates(): Iterable<GraphAbstractState> {
         return this._exitStates;
     }
-
 }
 
 export class LabeledTransition<L> {
-
     private readonly _concurrentLabels: ImmList<L>;
 
     private readonly _succState: GraphAbstractState;
@@ -150,27 +147,23 @@ export class LabeledTransition<L> {
     get succState(): GraphAbstractState {
         return this._succState;
     }
-
 }
 
-export interface LabeledGraphPathSet extends GraphPathSet {
-
-
-}
+export interface LabeledGraphPathSet extends GraphPathSet {}
 
 export class LabeledGraphPath<L> extends GraphPath implements LabeledGraphPathSet {
-
     constructor(states: Iterable<GraphAbstractState>) {
         super(states);
     }
-
 }
 
 export class LabeledImplicitGraphPahtSet<L> extends ImplicitGraphPathSet implements LabeledGraphPathSet {
-
-    constructor(inSet: GraphReachedSetWrapper<GraphAbstractState>, entryStates: ImmSet<GraphAbstractState>,
-                exitStates: ImmSet<GraphAbstractState>, onPathsStates: ImmSet<GraphAbstractState>) {
+    constructor(
+        inSet: GraphReachedSetWrapper<GraphAbstractState>,
+        entryStates: ImmSet<GraphAbstractState>,
+        exitStates: ImmSet<GraphAbstractState>,
+        onPathsStates: ImmSet<GraphAbstractState>
+    ) {
         super(inSet, entryStates, exitStates, onPathsStates);
     }
-
 }

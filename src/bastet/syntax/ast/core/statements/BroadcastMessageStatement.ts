@@ -23,11 +23,10 @@
  *
  */
 
-import {Statement} from "./Statement";
-import {SystemMessage} from "../Message";
+import { Statement } from './Statement';
+import { SystemMessage } from '../Message';
 
 export abstract class AbstractBroadcastMessageStatement extends Statement {
-
     private readonly _msg: SystemMessage;
 
     constructor(msg: SystemMessage) {
@@ -38,22 +37,16 @@ export abstract class AbstractBroadcastMessageStatement extends Statement {
     get msg(): SystemMessage {
         return this._msg;
     }
-
 }
 
-
 export class BroadcastMessageStatement extends AbstractBroadcastMessageStatement {
-
     constructor(msg: SystemMessage) {
         super(msg);
     }
-
 }
 
 export class BroadcastAndWaitStatement extends AbstractBroadcastMessageStatement {
-
     constructor(msg: SystemMessage) {
         super(msg);
     }
-
 }

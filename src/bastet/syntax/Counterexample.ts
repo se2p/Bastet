@@ -23,11 +23,9 @@
  *
  */
 
-import {Set as ImmSet} from "immutable";
-import {Property} from "./Property";
+import { Set as ImmSet } from 'immutable';
+import { Property } from './Property';
 
 export interface Counterexample {
-
     violatedProperties: ImmSet<Property>;
-
 }

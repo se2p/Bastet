@@ -23,13 +23,12 @@
  *
  */
 
-import {TransitionRelation, TransitionTo} from "./TransitionRelation";
-import {LocationId} from "./ControlLocation";
-import {ProgramOperations} from "./ops/ProgramOperation";
-import {CorePrintVisitor} from "../../ast/CorePrintVisitor";
+import { TransitionRelation, TransitionTo } from './TransitionRelation';
+import { LocationId } from './ControlLocation';
+import { ProgramOperations } from './ops/ProgramOperation';
+import { CorePrintVisitor } from '../../ast/CorePrintVisitor';
 
 export class TransitionRelationToDot {
-
     public export(tr: TransitionRelation, filepath: string) {
         let output: string[] = [];
         let fs = require('fs');
@@ -43,13 +42,13 @@ export class TransitionRelationToDot {
 
         for (const loc of tr.locationSet) {
             let penwidth = 1;
-            let shape = "circle";
+            let shape = 'circle';
             if (tr.exitLocationSet.contains(loc)) {
-                shape = "doublecircle";
+                shape = 'doublecircle';
             } else if (tr.entryLocationSet.contains(loc)) {
-                shape = "invtriangle";
+                shape = 'invtriangle';
             } else if (tr.loopHeads.contains(loc)) {
-                shape = "egg";
+                shape = 'egg';
             }
 
             if (tr.loopHeads.contains(loc)) {
@@ -75,13 +74,12 @@ export class TransitionRelationToDot {
         }
 
         output.push(`}`);
-        output.push("");
+        output.push('');
 
-        fs.writeFileSync(filepath, output.join("\n"));
+        fs.writeFileSync(filepath, output.join('\n'));
     }
 
     private escapeLabel(text: string): string {
-        return text.replace(/"/g, "\\\"");
+        return text.replace(/"/g, '\\"');
     }
-
 }

@@ -29,12 +29,12 @@ import {
     StopOperator,
     TransitionLabelProvider,
     WrappingProgramAnalysis,
-} from "../ProgramAnalysis";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {GraphAbstractDomain, GraphAbstractState, GraphAbstractStateFactory} from "./GraphAbstractDomain";
-import {App} from "../../../syntax/app/App";
-import {GraphTransferRelation} from "./GraphTransferRelation";
-import {AbstractElement, AbstractState, Lattices} from "../../../lattices/Lattice";
+} from '../ProgramAnalysis';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { GraphAbstractDomain, GraphAbstractState, GraphAbstractStateFactory } from './GraphAbstractDomain';
+import { App } from '../../../syntax/app/App';
+import { GraphTransferRelation } from './GraphTransferRelation';
+import { AbstractElement, AbstractState, Lattices } from '../../../lattices/Lattice';
 import {
     CHOOSE_EITHER,
     CHOOSE_FIRST,
@@ -46,33 +46,32 @@ import {
     ReachedSet,
     StatePartitionOperator,
     StateSet,
-} from "../../algorithms/StateSet";
-import {Preconditions} from "../../../utils/Preconditions";
-import {GraphToDot} from "./GraphToDot";
-import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
-import {Property} from "../../../syntax/Property";
-import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
-import {AnalysisStatistics} from "../AnalysisStatistics";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {NewMergeIntoOperator, NoMergeIntoOperator, NoStopOperator, StandardMergeIntoOperator} from "../Operators";
-import {BastetConfiguration} from "../../../utils/BastetConfiguration";
-import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {Set as ImmSet} from "immutable";
-import {GraphContextToDot} from "./GraphContextToDot";
-import {GraphCoverCheckStopOperator} from "./GraphCoverCheckStopOperator";
-import {DummyHandler, WitnessHandler} from "../WitnessHandlers";
-import {WitnessExporter} from "./witnesses/WitnessExporter";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {LexiKey} from "../../../utils/Lexicographic";
-import {AccessibilityRelation, AccessibilityRelations} from "../Accessibility";
-import {ConcreteElement} from "../../domains/ConcreteElements";
-import {PathExporter} from "./witnesses/PathExporter";
-import {IfMergedStopOperator} from "./IfMergedStopOperator";
-import {Optional} from "../../../utils/Optional";
-import {ThreadState} from "../control/ConcreteProgramState";
+} from '../../algorithms/StateSet';
+import { Preconditions } from '../../../utils/Preconditions';
+import { GraphToDot } from './GraphToDot';
+import { Refiner, Unwrapper, WrappingRefiner } from '../Refiner';
+import { Property } from '../../../syntax/Property';
+import { GraphReachedSetWrapper } from './GraphStatesSetWrapper';
+import { AnalysisStatistics } from '../AnalysisStatistics';
+import { ProgramOperation } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { NewMergeIntoOperator, NoMergeIntoOperator, NoStopOperator, StandardMergeIntoOperator } from '../Operators';
+import { BastetConfiguration } from '../../../utils/BastetConfiguration';
+import { IllegalArgumentException } from '../../../core/exceptions/IllegalArgumentException';
+import { Set as ImmSet } from 'immutable';
+import { GraphContextToDot } from './GraphContextToDot';
+import { GraphCoverCheckStopOperator } from './GraphCoverCheckStopOperator';
+import { DummyHandler, WitnessHandler } from '../WitnessHandlers';
+import { WitnessExporter } from './witnesses/WitnessExporter';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { LexiKey } from '../../../utils/Lexicographic';
+import { AccessibilityRelation, AccessibilityRelations } from '../Accessibility';
+import { ConcreteElement } from '../../domains/ConcreteElements';
+import { PathExporter } from './witnesses/PathExporter';
+import { IfMergedStopOperator } from './IfMergedStopOperator';
+import { Optional } from '../../../utils/Optional';
+import { ThreadState } from '../control/ConcreteProgramState';
 
 export class GraphAnalysisConfig extends BastetConfiguration {
-
     constructor(dict: {}) {
         super(dict, ['GraphAnalysis']);
     }
@@ -96,13 +95,15 @@ export class GraphAnalysisConfig extends BastetConfiguration {
     get graphConstructionOrder(): string {
         return this.getStringProperty('graphConstructionOrder', 'WaitAtMeet');
     }
-
 }
 
-export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
-    Unwrapper<GraphAbstractState, AbstractElement>, StatePartitionOperator<GraphAbstractState>,
-    TransitionLabelProvider<GraphAbstractState> {
-
+export class GraphAnalysis
+    implements
+        WrappingProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
+        Unwrapper<GraphAbstractState, AbstractElement>,
+        StatePartitionOperator<GraphAbstractState>,
+        TransitionLabelProvider<GraphAbstractState>
+{
     private readonly _abstractDomain: AbstractDomain<ConcreteElement, GraphAbstractState>;
 
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any, any>;
@@ -121,14 +122,24 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
 
     private readonly _config: GraphAnalysisConfig;
 
-    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysis<any, any, any>, statistics: AnalysisStatistics) {
+    constructor(
+        config: {},
+        task: App,
+        wrappedAnalysis: ProgramAnalysis<any, any, any>,
+        statistics: AnalysisStatistics
+    ) {
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
 
         this._config = new GraphAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new GraphAbstractDomain(wrappedAnalysis.abstractDomain);
-        this._transferRelation = new GraphTransferRelation(this._wrappedAnalysis, this._wrappedAnalysis, this._wrappedAnalysis, this._statistics);
+        this._transferRelation = new GraphTransferRelation(
+            this._wrappedAnalysis,
+            this._wrappedAnalysis,
+            this._wrappedAnalysis,
+            this._statistics
+        );
 
         if (this._config.mergeIntoOperator == 'NoMergeIntoOperator') {
             this._mergeIntoOp = new NoMergeIntoOperator<GraphAbstractState, GraphAbstractState>();
@@ -137,19 +148,19 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         } else if (this._config.mergeIntoOperator == 'StandardMergeIntoOperator') {
             this._mergeIntoOp = new StandardMergeIntoOperator(this, this, this._statistics);
         } else {
-            throw new IllegalArgumentException("Illegal merge operator configuration");
+            throw new IllegalArgumentException('Illegal merge operator configuration');
         }
 
         if (this._config.stopOperator == 'CheckCoverage') {
             this._stopOp = new GraphCoverCheckStopOperator(this.wrappedAnalysis, (e) => {
-                return this.unwrap(e)
+                return this.unwrap(e);
             });
         } else if (this._config.stopOperator == 'NoStop') {
             this._stopOp = new NoStopOperator();
         } else if (this._config.stopOperator == 'IfMerged') {
             this._stopOp = new IfMergedStopOperator();
         } else {
-            throw new IllegalArgumentException("Illegal stop operator configuration");
+            throw new IllegalArgumentException('Illegal stop operator configuration');
         }
 
         this._witnessHandlers = [];
@@ -162,7 +173,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
             } else if (witnessHandler == 'ExportPath') {
                 this._witnessHandlers.push(new PathExporter(this, this));
             } else {
-                throw new IllegalArgumentException("Illegal witness handler configuration");
+                throw new IllegalArgumentException('Illegal witness handler configuration');
             }
         }
     }
@@ -178,7 +189,13 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
             if (targetFor.length > 0) {
                 // Only add feasible states (avoids to check the feasibility of the full trace, if done in the refiner)
                 if (this._config.checkTargetFeasibility) {
-                    if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Block Target Feasibility for " + targetFor.toString())) {
+                    if (
+                        !Lattices.isFeasible(
+                            succ,
+                            this._abstractDomain.lattice,
+                            'Block Target Feasibility for ' + targetFor.toString()
+                        )
+                    ) {
                         continue;
                     }
                 }
@@ -203,18 +220,30 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         Preconditions.checkArgument(state2.getWideningOf().isAbsent());
 
         return GraphAbstractStateFactory.withFreshID(
-                state1.getPredecessors().union(state2.getPredecessors()),
-                state1.getMergeOf().union(state2.getMergeOf()),
-                this._wrappedAnalysis.merge(state1.getWrappedState(), state2.getWrappedState()),
-                state1.getPartitionKeys(), state1.orderKey, state1.getWideningOf())
-            .withOrderKey(state1.orderKey);
+            state1.getPredecessors().union(state2.getPredecessors()),
+            state1.getMergeOf().union(state2.getMergeOf()),
+            this._wrappedAnalysis.merge(state1.getWrappedState(), state2.getWrappedState()),
+            state1.getPartitionKeys(),
+            state1.orderKey,
+            state1.getWideningOf()
+        ).withOrderKey(state1.orderKey);
     }
 
-    mergeInto(state: GraphAbstractState, frontier: FrontierSet<GraphAbstractState>, reached: ReachedSet<GraphAbstractState>, unwrapper: (AbstractElement) => GraphAbstractState, wrapper: (E) => AbstractElement): [FrontierSet<GraphAbstractState>, ReachedSet<GraphAbstractState>] {
+    mergeInto(
+        state: GraphAbstractState,
+        frontier: FrontierSet<GraphAbstractState>,
+        reached: ReachedSet<GraphAbstractState>,
+        unwrapper: (AbstractElement) => GraphAbstractState,
+        wrapper: (E) => AbstractElement
+    ): [FrontierSet<GraphAbstractState>, ReachedSet<GraphAbstractState>] {
         return this._mergeIntoOp.mergeInto(state, frontier, reached, unwrapper, wrapper);
     }
 
-    stop(state: GraphAbstractState, reached: Iterable<GraphAbstractState>, unwrapper: (GraphAbstractState) => GraphAbstractState): boolean {
+    stop(
+        state: GraphAbstractState,
+        reached: Iterable<GraphAbstractState>,
+        unwrapper: (GraphAbstractState) => GraphAbstractState
+    ): boolean {
         return this._stopOp.stop(state, reached, unwrapper);
     }
 
@@ -229,8 +258,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     widen(state: GraphAbstractState, reached: Iterable<GraphAbstractState>): GraphAbstractState {
         const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
         if (wrappedResult != state.getWrappedState()) {
-            return state.withWrappedState(wrappedResult)
-                .withWideningOf(Optional.of(state));
+            return state.withWrappedState(wrappedResult).withWideningOf(Optional.of(state));
         } else {
             return state;
         }
@@ -240,15 +268,26 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
             const partitionKeys = this._wrappedAnalysis.getPartitionKeys(w);
-            return GraphAbstractStateFactory.withFreshID([],[],  w, partitionKeys, new LexiKey([]),
-                Optional.absent<GraphAbstractState>());
-        } );
+            return GraphAbstractStateFactory.withFreshID(
+                [],
+                [],
+                w,
+                partitionKeys,
+                new LexiKey([]),
+                Optional.absent<GraphAbstractState>()
+            );
+        });
     }
 
     exportAnalysisResult(reachedPrime: StateSet<AbstractState>, frontierPrime: StateSet<AbstractState>) {
-        const exporter = new GraphToDot(this._task, this, this, this,
+        const exporter = new GraphToDot(
+            this._task,
+            this,
+            this,
+            this,
             reachedPrime as StateSet<GraphAbstractState>,
-            frontierPrime as StateSet<GraphAbstractState>);
+            frontierPrime as StateSet<GraphAbstractState>
+        );
 
         exporter.writeToFile(`output/reachability-graph.dot`);
     }
@@ -276,15 +315,26 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
 
     createStateSets(): [FrontierSet<GraphAbstractState>, ReachedSet<GraphAbstractState>] {
         let frontierSet;
-        if (this._config.graphConstructionOrder == "DepthFirst") {
+        if (this._config.graphConstructionOrder == 'DepthFirst') {
             frontierSet = new DefaultFrontierSet();
-        } else if (this._config.graphConstructionOrder == "WaitAtMeet") {
-            frontierSet = new DifferencingFrontierSet<GraphAbstractState>((e) => this.getLexiDiffKey(e), (e, f) => this.compareStateOrder(e, f), this);
+        } else if (this._config.graphConstructionOrder == 'WaitAtMeet') {
+            frontierSet = new DifferencingFrontierSet<GraphAbstractState>(
+                (e) => this.getLexiDiffKey(e),
+                (e, f) => this.compareStateOrder(e, f),
+                this
+            );
         } else {
-            throw new IllegalArgumentException("Invalid custruction order: " + this._config.graphConstructionOrder);
+            throw new IllegalArgumentException('Invalid custruction order: ' + this._config.graphConstructionOrder);
         }
 
-        const reachedSet = new GraphReachedSetWrapper(frontierSet, this, (r, e) => {this.onStateError(r,e)}, this);
+        const reachedSet = new GraphReachedSetWrapper(
+            frontierSet,
+            this,
+            (r, e) => {
+                this.onStateError(r, e);
+            },
+            this
+        );
         return [frontierSet, reachedSet];
     }
 
@@ -292,15 +342,24 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         return this.wrappedAnalysis['getTransitionLabel'](from.getWrappedState(), to.getWrappedState());
     }
 
-    stopPartitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {
+    stopPartitionOf(
+        ofState: GraphAbstractState,
+        reached: ReachedSet<GraphAbstractState>
+    ): Iterable<GraphAbstractState> {
         return reached.getStateSet(ofState);
     }
 
-    widenPartitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {
+    widenPartitionOf(
+        ofState: GraphAbstractState,
+        reached: ReachedSet<GraphAbstractState>
+    ): Iterable<GraphAbstractState> {
         return reached.getStateSet(ofState);
     }
 
-    mergePartitionOf(ofState: GraphAbstractState, reached: ReachedSet<GraphAbstractState>): Iterable<GraphAbstractState> {
+    mergePartitionOf(
+        ofState: GraphAbstractState,
+        reached: ReachedSet<GraphAbstractState>
+    ): Iterable<GraphAbstractState> {
         return reached.getStateSet(ofState);
     }
 
@@ -309,7 +368,7 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     }
 
     handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
-        this._witnessHandlers.forEach(h => h.handleViolatingState(reached, violating));
+        this._witnessHandlers.forEach((h) => h.handleViolatingState(reached, violating));
     }
 
     compareStateOrder(a: GraphAbstractState, b: GraphAbstractState): number {
@@ -341,25 +400,40 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
         this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState> {
+    testify(
+        accessibility: AccessibilityRelation<GraphAbstractState>,
+        state: GraphAbstractState
+    ): AccessibilityRelation<GraphAbstractState> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState> {
+    testifyOne(
+        accessibility: AccessibilityRelation<GraphAbstractState>,
+        state: GraphAbstractState
+    ): AccessibilityRelation<GraphAbstractState> {
         const reaching = AccessibilityRelations.backwardsAccessible(accessibility, state, this, this.abstractDomain);
         return this.wrappedAnalysis.testifyOne(reaching, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): Iterable<[GraphAbstractState, ConcreteElement][]> {
+    testifyConcrete(
+        accessibility: AccessibilityRelation<GraphAbstractState>,
+        state: GraphAbstractState
+    ): Iterable<[GraphAbstractState, ConcreteElement][]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<GraphAbstractState>, state: GraphAbstractState): Iterable<[GraphAbstractState, ConcreteElement][]> {
+    testifyConcreteOne(
+        accessibility: AccessibilityRelation<GraphAbstractState>,
+        state: GraphAbstractState
+    ): Iterable<[GraphAbstractState, ConcreteElement][]> {
         const reaching = AccessibilityRelations.backwardsAccessible(accessibility, state, this, this.abstractDomain);
         return this.wrappedAnalysis.testifyConcreteOne(reaching, state);
     }
 
-    accessibility(reached: ReachedSet<GraphAbstractState>, state: GraphAbstractState): AccessibilityRelation<GraphAbstractState> {
+    accessibility(
+        reached: ReachedSet<GraphAbstractState>,
+        state: GraphAbstractState
+    ): AccessibilityRelation<GraphAbstractState> {
         return reached as GraphReachedSetWrapper<GraphAbstractState>;
     }
 
@@ -370,5 +444,4 @@ export class GraphAnalysis implements WrappingProgramAnalysis<ConcreteElement, G
     decRef(state: GraphAbstractState) {
         this.wrappedAnalysis.decRef(state.getWrappedState());
     }
-
 }

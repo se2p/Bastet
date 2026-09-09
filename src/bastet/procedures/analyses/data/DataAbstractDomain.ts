@@ -23,35 +23,29 @@
  *
  */
 
-import {AbstractElementVisitor, AbstractState, LatticeWithComplements} from "../../../lattices/Lattice";
-import {Record as ImmRec} from "immutable";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
-import {ConcreteDomain, ConcreteElement, ConcreteMemory,} from "../../domains/ConcreteElements";
-import {PropositionalFormula} from "../../../utils/bdd/BDD";
-import {Preconditions} from "../../../utils/Preconditions";
-import {FirstOrderDomain, FirstOrderLattice, FirstOrderSolver} from "../../domains/FirstOrderDomain";
-import {AbstractionPrecision} from "../../AbstractionPrecision";
+import { AbstractElementVisitor, AbstractState, LatticeWithComplements } from '../../../lattices/Lattice';
+import { Record as ImmRec } from 'immutable';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { FirstOrderFormula } from '../../../utils/ConjunctiveNormalForm';
+import { ConcreteDomain, ConcreteElement, ConcreteMemory } from '../../domains/ConcreteElements';
+import { Preconditions } from '../../../utils/Preconditions';
+import { FirstOrderDomain, FirstOrderLattice, FirstOrderSolver } from '../../domains/FirstOrderDomain';
+import { AbstractionPrecision } from '../../AbstractionPrecision';
 
 export interface DataAbstractStateAttributes {
-
     blockFormula: FirstOrderFormula;
-
 }
 
 const DataAbstractStateRecord = ImmRec({
-
     blockFormula: null,
-
 });
 
 export class DataAbstractState extends DataAbstractStateRecord implements DataAbstractStateAttributes, AbstractState {
-
     blockFormula: FirstOrderFormula;
 
     constructor(blockFormula: FirstOrderFormula) {
-        super({blockFormula: blockFormula});
+        super({ blockFormula: blockFormula });
     }
 
     public withBlockFormula(value: FirstOrderFormula): DataAbstractState {
@@ -66,11 +60,9 @@ export class DataAbstractState extends DataAbstractStateRecord implements DataAb
             return visitor.visit(this);
         }
     }
-
 }
 
 export class DataAbstractStateLattice implements LatticeWithComplements<DataAbstractState> {
-
     private readonly _bottom: DataAbstractState;
 
     private readonly _top: DataAbstractState;
@@ -95,13 +87,11 @@ export class DataAbstractStateLattice implements LatticeWithComplements<DataAbst
     }
 
     join(element1: DataAbstractState, element2: DataAbstractState): DataAbstractState {
-        return element1
-            .withBlockFormula(this._folLattice.join(element1.blockFormula, element2.blockFormula));
+        return element1.withBlockFormula(this._folLattice.join(element1.blockFormula, element2.blockFormula));
     }
 
     meet(element1: DataAbstractState, element2: DataAbstractState): DataAbstractState {
-        return element1
-            .withBlockFormula(this._folLattice.meet(element1.blockFormula, element2.blockFormula));
+        return element1.withBlockFormula(this._folLattice.meet(element1.blockFormula, element2.blockFormula));
     }
 
     top(): DataAbstractState {
@@ -111,12 +101,10 @@ export class DataAbstractStateLattice implements LatticeWithComplements<DataAbst
     complement(element: DataAbstractState): DataAbstractState {
         return new DataAbstractState(this._folLattice.complement(element.blockFormula));
     }
-
 }
 
 export class DataAbstractDomain implements AbstractDomain<ConcreteMemory, DataAbstractState> {
-
-    private readonly _folDomain : FirstOrderDomain<FirstOrderFormula>;
+    private readonly _folDomain: FirstOrderDomain<FirstOrderFormula>;
     private readonly _lattice: LatticeWithComplements<DataAbstractState>;
     private readonly _solver: FirstOrderSolver<FirstOrderFormula>;
 
@@ -163,5 +151,3 @@ export class DataAbstractDomain implements AbstractDomain<ConcreteMemory, DataAb
         throw new ImplementMeException();
     }
 }
-
-

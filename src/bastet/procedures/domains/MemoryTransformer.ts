@@ -23,59 +23,35 @@
  *
  */
 
-import {BooleanType, FloatType, IntegerType, ScratchType, StringType} from "../../syntax/ast/core/ScratchType";
-import {ConcreteBoolean, ConcreteNumber, ConcreteString, ConcreteStringList} from "./ConcreteElements";
-import {AbstractElement, Lattice} from "../../lattices/Lattice";
-import {AbstractDomain} from "./AbstractDomain";
-import {Variable} from "../../syntax/ast/core/Variable";
-import {Z3Formula} from "../../utils/smt/z3/Z3Theories";
+import { BooleanType, FloatType, IntegerType, ScratchType, StringType } from '../../syntax/ast/core/ScratchType';
+import { ConcreteBoolean, ConcreteNumber, ConcreteString } from './ConcreteElements';
+import { AbstractElement } from '../../lattices/Lattice';
+import { AbstractDomain } from './AbstractDomain';
+import { Variable } from '../../syntax/ast/core/Variable';
 
-export interface AbstractValue extends AbstractElement {
+export interface AbstractValue extends AbstractElement {}
 
-}
+export interface AbstractMemory extends AbstractElement {}
 
-export interface AbstractMemory extends AbstractElement {
+export interface AbstractString extends AbstractValue {}
 
-}
+export interface AbstractStringList extends AbstractValue {}
 
-export interface AbstractString extends AbstractValue {
+export interface AbstractBoolean extends AbstractValue {}
 
-}
+export interface AbstractNumber extends AbstractValue {}
 
-export interface AbstractStringList extends AbstractValue {
+export interface AbstractFloat extends AbstractNumber {}
 
-}
+export interface AbstractInteger extends AbstractNumber {}
 
-export interface AbstractBoolean extends AbstractValue {
+export interface AbstractReal extends AbstractNumber {}
 
-}
+export interface AbstractList extends AbstractValue {}
 
-export interface AbstractNumber extends AbstractValue {
-
-}
-
-export interface AbstractFloat extends AbstractNumber {
-
-}
-
-export interface AbstractInteger extends AbstractNumber {
-
-}
-
-export interface AbstractReal extends AbstractNumber {
-
-}
-
-export interface AbstractList extends AbstractValue {
-
-}
-
-export interface AbstractMap extends AbstractValue {
-
-}
+export interface AbstractMap extends AbstractValue {}
 
 export class IdentifiableMemoryCell {
-
     private readonly _type: ScratchType;
     private readonly _name: string;
 
@@ -93,50 +69,43 @@ export class IdentifiableMemoryCell {
     }
 }
 
-
 export class BooleanVariable extends IdentifiableMemoryCell {
-
     constructor(name: string) {
         super(BooleanType.instance(), name);
     }
 }
 
 export class StringVariable extends IdentifiableMemoryCell {
-
     constructor(name: string) {
         super(StringType.instance(), name);
     }
 }
 
 export class IntegerVariable extends IdentifiableMemoryCell {
-
     constructor(name: string) {
         super(IntegerType.instance(), name);
     }
 }
 
 export class FloatVariable extends IdentifiableMemoryCell {
-
     constructor(name: string) {
         super(FloatType.instance(), name);
     }
 }
 
-export class MapVariable {
+export class MapVariable {}
 
-}
+export class ListVariable {}
 
-export class ListVariable {
+export interface ListTheory<L extends AbstractList> {}
 
-}
-
-export interface ListTheory<L extends AbstractList> {
-
-}
-
-export interface StringTheory<S extends AbstractString, B extends AbstractBoolean, I extends AbstractInteger,
-    R extends AbstractReal, F extends AbstractFloat> {
-
+export interface StringTheory<
+    S extends AbstractString,
+    B extends AbstractBoolean,
+    I extends AbstractInteger,
+    R extends AbstractReal,
+    F extends AbstractFloat,
+> {
     fromConcrete(str: ConcreteString): S;
 
     toFloat(from: S): F;
@@ -168,11 +137,9 @@ export interface StringTheory<S extends AbstractString, B extends AbstractBoolea
     lengthOf(str: S): I;
 
     ifThenElse(cond: B, thenResult: S, elseResult: S): S;
-
 }
 
 export interface StringTheoryAssumes {
-
     assumeStringGreaterThan(s1: AbstractString, s2: AbstractString): AbstractString;
 
     assumeIsStringLessThan(s1: AbstractString, s2: AbstractString): AbstractString;
@@ -180,11 +147,9 @@ export interface StringTheoryAssumes {
     assumeIsStringEqualTo(s1: AbstractString, s2: AbstractString): AbstractString;
 
     assumeIsStringContained(s: AbstractString, containedIn: AbstractString): AbstractString;
-
 }
 
 export interface StringTheoryQueries {
-
     queryIsStringGreaterThan(s1: AbstractString, s2: AbstractString): AbstractBoolean;
 
     queryIsStringLessThan(s1: AbstractString, s2: AbstractString): AbstractBoolean;
@@ -192,12 +157,16 @@ export interface StringTheoryQueries {
     queryIsStringEqualTo(s1: AbstractString, s2: AbstractString): AbstractBoolean;
 
     queryIsStringContained(s: AbstractString, containedIn: AbstractString): AbstractBoolean;
-
 }
 
-export interface NumberTheory<N extends AbstractNumber, I extends AbstractInteger, R extends AbstractReal,
-    F extends AbstractFloat, B extends AbstractBoolean, S extends AbstractString> {
-
+export interface NumberTheory<
+    N extends AbstractNumber,
+    I extends AbstractInteger,
+    R extends AbstractReal,
+    F extends AbstractFloat,
+    B extends AbstractBoolean,
+    S extends AbstractString,
+> {
     castFrom(from: AbstractNumber): N;
 
     fromConcreteNumber(str: ConcreteNumber): N;
@@ -245,40 +214,44 @@ export interface NumberTheory<N extends AbstractNumber, I extends AbstractIntege
     isNumberEqualTo(s1: N, s2: N): B;
 
     ifThenElse(cond: B, thenResult: N, elseResult: N): N;
-
 }
 
-export interface RealTheory<N extends AbstractReal, I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
-    B extends AbstractBoolean, S extends AbstractString> extends NumberTheory<N, I, R, F, B, S> {
+export interface RealTheory<
+    N extends AbstractReal,
+    I extends AbstractInteger,
+    R extends AbstractReal,
+    F extends AbstractFloat,
+    B extends AbstractBoolean,
+    S extends AbstractString,
+> extends NumberTheory<N, I, R, F, B, S> {}
 
-}
+export interface FloatTheory<
+    N extends AbstractFloat,
+    I extends AbstractInteger,
+    R extends AbstractReal,
+    F extends AbstractFloat,
+    B extends AbstractBoolean,
+    S extends AbstractString,
+> extends NumberTheory<N, I, R, F, B, S> {}
 
-export interface FloatTheory<N extends AbstractFloat, I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
-    B extends AbstractBoolean, S extends AbstractString> extends NumberTheory<N, I, R, F, B, S> {
-
-}
-
-export interface IntegerTheory<N extends AbstractInteger, I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
-    B extends AbstractBoolean, S extends AbstractString> extends NumberTheory<N, I, R, F, B, S> {
-
+export interface IntegerTheory<
+    N extends AbstractInteger,
+    I extends AbstractInteger,
+    R extends AbstractReal,
+    F extends AbstractFloat,
+    B extends AbstractBoolean,
+    S extends AbstractString,
+> extends NumberTheory<N, I, R, F, B, S> {
     modulo(op1: N, op2: N): N;
-
 }
 
-export interface AbstractNumberDomain extends AbstractDomain<ConcreteNumber, AbstractNumber> {
+export interface AbstractNumberDomain extends AbstractDomain<ConcreteNumber, AbstractNumber> {}
 
-}
+export interface AbstractBooleanDomain<E extends AbstractBoolean> extends AbstractDomain<ConcreteBoolean, E> {}
 
-export interface AbstractBooleanDomain<E extends AbstractBoolean> extends AbstractDomain<ConcreteBoolean, E> {
-
-}
-
-export interface AbstractStringDomain extends AbstractDomain<ConcreteString, AbstractString> {
-
-}
+export interface AbstractStringDomain extends AbstractDomain<ConcreteString, AbstractString> {}
 
 export interface BooleanTheory<B extends AbstractBoolean> {
-
     fromBoolean(value: boolean): B;
 
     fromConcreteBoolean(str: ConcreteBoolean): B;
@@ -304,11 +277,9 @@ export interface BooleanTheory<B extends AbstractBoolean> {
     equal(op1: B, op2: B): B;
 
     implies(op1: B, op2: B): B;
-
 }
 
 export interface TheoryIndependent<E extends AbstractElement> {
-
     simplify(element: E): E;
 
     stringRepresentation(element: E): string;
@@ -318,14 +289,17 @@ export interface TheoryIndependent<E extends AbstractElement> {
     instantiate(formula: E, indexFn: (name: string, oldIndex: number) => number): E;
 
     alignSsaIndices(blockFormulas: E[], ssaOffsets: Map<string, number>[]): E[];
-
 }
 
-export interface AbstractTheories<M extends AbstractMemory, B extends AbstractBoolean,
-    I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
-    S extends AbstractString, L extends AbstractList>
-    extends TheoryIndependent<M> {
-
+export interface AbstractTheories<
+    M extends AbstractMemory,
+    B extends AbstractBoolean,
+    I extends AbstractInteger,
+    R extends AbstractReal,
+    F extends AbstractFloat,
+    S extends AbstractString,
+    L extends AbstractList,
+> extends TheoryIndependent<M> {
     boolTheory: BooleanTheory<B>;
 
     intTheory: IntegerTheory<I, I, R, F, B, S>;
@@ -339,13 +313,16 @@ export interface AbstractTheories<M extends AbstractMemory, B extends AbstractBo
     listTheory: ListTheory<L>;
 
     getNumberTheoryOf(e: AbstractNumber): NumberTheory<AbstractNumber, I, R, F, B, S>;
-
 }
 
-export interface TransformerTheories<M extends AbstractMemory, B extends AbstractBoolean,
-    I extends AbstractInteger, R extends AbstractReal, F extends AbstractFloat,
-    S extends AbstractString, L extends AbstractList>
-    extends AbstractTheories<M, B, I, R, F, S, L> {
-
+export interface TransformerTheories<
+    M extends AbstractMemory,
+    B extends AbstractBoolean,
+    I extends AbstractInteger,
+    R extends AbstractReal,
+    F extends AbstractFloat,
+    S extends AbstractString,
+    L extends AbstractList,
+> extends AbstractTheories<M, B, I, R, F, S, L> {
     getNumberTheoryFor(t: ScratchType): NumberTheory<AbstractNumber, I, R, F, B, S>;
 }

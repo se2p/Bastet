@@ -23,33 +23,25 @@
  *
  */
 
-import {Lattice} from "./Lattice";
-import {ImplementMeException} from "../core/exceptions/ImplementMeException";
-import {Record as ImmRec, Set as ImmSet} from "immutable";
-
+import { Lattice } from './Lattice';
+import { ImplementMeException } from '../core/exceptions/ImplementMeException';
+import { Record as ImmRec, Set as ImmSet } from 'immutable';
 
 export class PowersetAttributes {
-
     elements: ImmSet<any>;
-
 }
 
-const PowersetRecord =  ImmRec({
-
-    elements: ImmSet([])
-
+const PowersetRecord = ImmRec({
+    elements: ImmSet([]),
 });
 
 export class PowersetElement extends PowersetRecord {
-
     constructor(elements: ImmSet<any>) {
-        super({elements: elements});
+        super({ elements: elements });
     }
-
 }
 
 export class PowersetLattice implements Lattice<PowersetElement> {
-
     bottom(): PowersetElement {
         throw new ImplementMeException();
     }
@@ -69,5 +61,4 @@ export class PowersetLattice implements Lattice<PowersetElement> {
     top(): PowersetElement {
         throw new ImplementMeException();
     }
-
 }

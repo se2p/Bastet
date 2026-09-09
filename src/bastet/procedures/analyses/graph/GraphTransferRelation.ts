@@ -23,25 +23,28 @@
  *
  */
 
-import {TransferRelation} from "../TransferRelation";
-import {GraphAbstractState, GraphAbstractStateFactory} from "./GraphAbstractDomain";
-import {Preconditions} from "../../../utils/Preconditions";
-import {AbstractSuccOperator, TraversalOrderOperator} from "../ProgramAnalysis";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
-import {StatePartitionOperator} from "../../algorithms/StateSet";
-import {LexiKey} from "../../../utils/Lexicographic";
-import {AnalysisStatistics} from "../AnalysisStatistics";
-import {Optional} from "../../../utils/Optional";
+import { TransferRelation } from '../TransferRelation';
+import { GraphAbstractState, GraphAbstractStateFactory } from './GraphAbstractDomain';
+import { Preconditions } from '../../../utils/Preconditions';
+import { AbstractSuccOperator, TraversalOrderOperator } from '../ProgramAnalysis';
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
+import { StatePartitionOperator } from '../../algorithms/StateSet';
+import { LexiKey } from '../../../utils/Lexicographic';
+import { AnalysisStatistics } from '../AnalysisStatistics';
+import { Optional } from '../../../utils/Optional';
 
 export class GraphTransferRelation implements TransferRelation<GraphAbstractState> {
-
     private readonly _wrappedAbstractSucc: AbstractSuccOperator<AbstractElement>;
     private readonly _wrappedPartitionOp: StatePartitionOperator<AbstractElement>;
     private readonly _traversalOp: TraversalOrderOperator<AbstractElement, AbstractState>;
     private readonly _stats: AnalysisStatistics;
 
-    constructor(wrappedAbstractSucc: AbstractSuccOperator<AbstractElement>, wrappedPartitionOp: StatePartitionOperator<AbstractElement>,
-                traversalOp: TraversalOrderOperator<AbstractElement, AbstractState>, statistics: AnalysisStatistics) {
+    constructor(
+        wrappedAbstractSucc: AbstractSuccOperator<AbstractElement>,
+        wrappedPartitionOp: StatePartitionOperator<AbstractElement>,
+        traversalOp: TraversalOrderOperator<AbstractElement, AbstractState>,
+        statistics: AnalysisStatistics
+    ) {
         this._wrappedAbstractSucc = Preconditions.checkNotUndefined(wrappedAbstractSucc);
         this._wrappedPartitionOp = Preconditions.checkNotUndefined(wrappedPartitionOp);
         this._traversalOp = Preconditions.checkNotUndefined(traversalOp);
@@ -58,8 +61,15 @@ export class GraphTransferRelation implements TransferRelation<GraphAbstractStat
             const newStateId = GraphAbstractStateFactory.freshStateID();
             const partitionKeys = this._wrappedPartitionOp.getPartitionKeys(w);
             const orderKey = this._traversalOp.getLexiOrderKey(w).concat(new LexiKey([-newStateId])); // Prefer older states;
-            const succState = GraphAbstractStateFactory.withID(newStateId, [fromState.id], [], w,
-                partitionKeys, orderKey, Optional.absent<GraphAbstractState>());
+            const succState = GraphAbstractStateFactory.withID(
+                newStateId,
+                [fromState.id],
+                [],
+                w,
+                partitionKeys,
+                orderKey,
+                Optional.absent<GraphAbstractState>()
+            );
 
             // console.log(`${fromState.getId()} ---> ${succState.getId()}`);
             result.push(succState);
@@ -67,5 +77,4 @@ export class GraphTransferRelation implements TransferRelation<GraphAbstractStat
 
         return result;
     }
-
 }

@@ -23,10 +23,9 @@
  *
  */
 
-import {ImmutableList} from "./ImmutableList";
+import { ImmutableList } from './ImmutableList';
 
 export class Lists {
-
     static immutableCopyOf<E>(elements: E[]): ImmutableList<E> {
         return new ImmutableList(elements);
     }

@@ -23,10 +23,9 @@
  *
  */
 
-import {ParserRuleContext, Token} from "antlr4ts";
+import { ParserRuleContext, Token } from 'antlr4ts';
 
 export class ParsingException extends Error {
-
     private readonly _node: ParserRuleContext;
 
     private readonly _cause: string;
@@ -51,8 +50,7 @@ export class ParsingException extends Error {
         if (token && token.line) {
             return `(line ${token.line}, pos ${token.charPositionInLine})`;
         } else {
-            return "(line unknown)";
+            return '(line unknown)';
         }
     }
-
 }

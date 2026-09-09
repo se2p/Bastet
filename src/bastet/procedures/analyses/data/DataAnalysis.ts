@@ -23,27 +23,16 @@
  *
  */
 
-import {MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
-import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {App} from "../../../syntax/app/App";
-import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {DataTransferRelation} from "./DataTransferRelation";
-import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
-import {Preconditions} from "../../../utils/Preconditions";
-import {
-    AbstractNumber,
-    AbstractTheories,
-    BooleanTheory,
-    FloatTheory,
-    IntegerTheory,
-    ListTheory,
-    NumberTheory,
-    RealTheory,
-    StringTheory,
-    TransformerTheories
-} from "../../domains/MemoryTransformer";
+import { MergeOperator, ProgramAnalysisWithLabels } from '../ProgramAnalysis';
+import { DataAbstractDomain, DataAbstractState } from './DataAbstractDomain';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { App } from '../../../syntax/app/App';
+import { LabeledTransferRelation } from '../TransferRelation';
+import { ProgramOperation, ProgramOperationInContext } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { DataTransferRelation } from './DataTransferRelation';
+import { ConcreteMemory } from '../../domains/ConcreteElements';
+import { Preconditions } from '../../../utils/Preconditions';
+import { AbstractTheories, TransformerTheories } from '../../domains/MemoryTransformer';
 import {
     BooleanFormula,
     FirstOrderFormula,
@@ -51,31 +40,28 @@ import {
     IntegerFormula,
     ListFormula,
     RealFormula,
-    StringFormula
-} from "../../../utils/ConjunctiveNormalForm";
-import {PropositionalFormula} from "../../../utils/bdd/BDD";
-import {AbstractElement, AbstractState, LatticeWithComplements} from "../../../lattices/Lattice";
-import {Refiner} from "../Refiner";
-import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, ReachedSet, StateSet} from "../../algorithms/StateSet";
-import {AnalysisStatistics} from "../AnalysisStatistics";
-import {Concern} from "../../../syntax/Concern";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {BastetConfiguration} from "../../../utils/BastetConfiguration";
-import {StandardMergeOperatorFactory} from "../Operators";
-import {List as ImmList, Set as ImmSet} from "immutable";
-import {LexiKey} from "../../../utils/Lexicographic";
-import {AccessibilityRelation} from "../Accessibility";
-import {DataTestifier} from "./DataTestifier";
-import {FirstOrderLattice, FirstOrderSolver} from "../../domains/FirstOrderDomain";
-import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
-import {DataRefiner} from "./DataRefiner";
-import {Theories} from "./DataTransformerTheories";
-import {ThreadState} from "../control/ConcreteProgramState";
-
+    StringFormula,
+} from '../../../utils/ConjunctiveNormalForm';
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
+import { Refiner } from '../Refiner';
+import { Property } from '../../../syntax/Property';
+import { FrontierSet, PartitionKey, ReachedSet, StateSet } from '../../algorithms/StateSet';
+import { AnalysisStatistics } from '../AnalysisStatistics';
+import { Concern } from '../../../syntax/Concern';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { BastetConfiguration } from '../../../utils/BastetConfiguration';
+import { StandardMergeOperatorFactory } from '../Operators';
+import { List as ImmList, Set as ImmSet } from 'immutable';
+import { LexiKey } from '../../../utils/Lexicographic';
+import { AccessibilityRelation } from '../Accessibility';
+import { DataTestifier } from './DataTestifier';
+import { FirstOrderLattice, FirstOrderSolver } from '../../domains/FirstOrderDomain';
+import { NotSupportedException } from '../../../core/exceptions/NotSupportedException';
+import { DataRefiner } from './DataRefiner';
+import { Theories } from './DataTransformerTheories';
+import { ThreadState } from '../control/ConcreteProgramState';
 
 export class DataAnalysisConfig extends BastetConfiguration {
-
     constructor(dict: {}) {
         super(dict, ['DataAnalysis']);
     }
@@ -85,15 +71,24 @@ export class DataAnalysisConfig extends BastetConfiguration {
     }
 
     get encodeFloatsAs(): string {
-        return this.getStringProperty('encode-floats-as', "Reals");
+        return this.getStringProperty('encode-floats-as', 'Reals');
     }
-
 }
 
-export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState, AbstractState>,
-    LabeledTransferRelation<DataAbstractState> {
-
-    private readonly _theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
+export class DataAnalysis
+    implements
+        ProgramAnalysisWithLabels<ConcreteMemory, DataAbstractState, AbstractState>,
+        LabeledTransferRelation<DataAbstractState>
+{
+    private readonly _theories: TransformerTheories<
+        FirstOrderFormula,
+        BooleanFormula,
+        IntegerFormula,
+        RealFormula,
+        FloatFormula,
+        StringFormula,
+        ListFormula
+    >;
 
     private readonly _abstractDomain: DataAbstractDomain;
 
@@ -111,9 +106,20 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
 
     private readonly _solver: FirstOrderSolver<FirstOrderFormula>;
 
-    constructor(config:{}, folLattice: FirstOrderLattice<FirstOrderFormula>,
-                theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
-                statistics: AnalysisStatistics) {
+    constructor(
+        config: {},
+        folLattice: FirstOrderLattice<FirstOrderFormula>,
+        theories: AbstractTheories<
+            FirstOrderFormula,
+            BooleanFormula,
+            IntegerFormula,
+            RealFormula,
+            FloatFormula,
+            StringFormula,
+            ListFormula
+        >,
+        statistics: AnalysisStatistics
+    ) {
         Preconditions.checkNotUndefined(folLattice);
 
         this._config = new DataAnalysisConfig(config);
@@ -151,7 +157,11 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return this._abstractDomain.lattice.join(state1, state2);
     }
 
-    stop(state: DataAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => DataAbstractState): boolean {
+    stop(
+        state: DataAbstractState,
+        reached: Iterable<AbstractElement>,
+        unwrapper: (AbstractElement) => DataAbstractState
+    ): boolean {
         for (const r of reached) {
             if (unwrapper(r).equals(state)) {
                 return true;
@@ -176,7 +186,11 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return [this._abstractDomain.lattice.top()];
     }
 
-    abstractSuccFor(fromState: DataAbstractState, op: ProgramOperationInContext, co: Concern): Iterable<DataAbstractState> {
+    abstractSuccFor(
+        fromState: DataAbstractState,
+        op: ProgramOperationInContext,
+        co: Concern
+    ): Iterable<DataAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
         return this._transferRelation.abstractSuccFor(fromState, op, co);
@@ -194,7 +208,13 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         throw new ImplementMeException();
     }
 
-    mergeInto(state: DataAbstractState, frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>, unwrapper: (AbstractElement) => DataAbstractState, wrapper: (E) => AbstractElement): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
+    mergeInto(
+        state: DataAbstractState,
+        frontier: FrontierSet<AbstractState>,
+        reached: ReachedSet<AbstractState>,
+        unwrapper: (AbstractElement) => DataAbstractState,
+        wrapper: (E) => AbstractElement
+    ): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         throw new ImplementMeException();
     }
 
@@ -234,26 +254,45 @@ export class DataAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, D
         return new LexiKey([]);
     }
 
-    finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
-    }
+    finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {}
 
-    testify(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
+    testify(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): AccessibilityRelation<AbstractState> {
         return this._testifier.testify(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteMemory][]> {
+    testifyConcrete(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): Iterable<[AbstractState, ConcreteMemory][]> {
         return this._testifier.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteMemory][]> {
+    testifyConcreteOne(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): Iterable<[AbstractState, ConcreteMemory][]> {
         return this._testifier.testifyConcreteOne(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
+    testifyOne(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): AccessibilityRelation<AbstractState> {
         return this._testifier.testifyOne(accessibility, state);
     }
 
-    get theories(): TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula> {
+    get theories(): TransformerTheories<
+        FirstOrderFormula,
+        BooleanFormula,
+        IntegerFormula,
+        RealFormula,
+        FloatFormula,
+        StringFormula,
+        ListFormula
+    > {
         return this._theories;
     }
 

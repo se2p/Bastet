@@ -23,16 +23,15 @@
  *
  */
 
-import {AbstractNode} from "../AstNode";
-import {AstNodeList} from "../AstNodeList";
-import {Identifier} from "./Identifier";
-import {ResourceDefinitionList} from "./ResourceDefinition";
-import {MethodDefinitionList, MethodSignatureList} from "./MethodDefinition";
-import {ScriptDefinitionList} from "./ScriptDefinition";
-import {StatementList} from "./statements/Statement";
+import { AbstractNode } from '../AstNode';
+import { AstNodeList } from '../AstNodeList';
+import { Identifier } from './Identifier';
+import { ResourceDefinitionList } from './ResourceDefinition';
+import { MethodDefinitionList, MethodSignatureList } from './MethodDefinition';
+import { ScriptDefinitionList } from './ScriptDefinition';
+import { StatementList } from './statements/Statement';
 
 export abstract class ActorMode extends AbstractNode {
-
     static concrete(): ActorMode {
         return ConcreteActorMode.instance();
     }
@@ -40,11 +39,9 @@ export abstract class ActorMode extends AbstractNode {
     static role(): ActorMode {
         return ActorRoleMode.instance();
     }
-
 }
 
 export class ConcreteActorMode extends ActorMode {
-
     private static INSTANCE: ConcreteActorMode;
 
     private constructor() {
@@ -60,7 +57,6 @@ export class ConcreteActorMode extends ActorMode {
 }
 
 export class ActorRoleMode extends ActorMode {
-
     private static INSTANCE: ActorRoleMode;
 
     private constructor() {
@@ -76,15 +72,12 @@ export class ActorRoleMode extends ActorMode {
 }
 
 export class InheritsFromList extends AstNodeList<Identifier> {
-
     constructor(elements: Identifier[]) {
         super(elements);
     }
-
 }
 
 export class ActorDefinition extends AbstractNode {
-
     /** The name of the actor based on which it can be identified or addressed */
     private readonly _mode: ActorMode;
     private readonly _ident: Identifier;
@@ -96,13 +89,28 @@ export class ActorDefinition extends AbstractNode {
     private readonly _externalMethodDecls: MethodSignatureList;
     private readonly _scriptList: ScriptDefinitionList;
 
-    constructor(mode: ActorMode, ident: Identifier, inheritsFrom: InheritsFromList,
-                resourceDefs: ResourceDefinitionList, declarationStmts: StatementList,
-                initStmts: StatementList, methodDefs: MethodDefinitionList,
-                externalMethodDecls: MethodSignatureList,
-                scriptList: ScriptDefinitionList) {
-        super([mode, ident, inheritsFrom, resourceDefs, declarationStmts,
-            initStmts, methodDefs, externalMethodDecls, scriptList]);
+    constructor(
+        mode: ActorMode,
+        ident: Identifier,
+        inheritsFrom: InheritsFromList,
+        resourceDefs: ResourceDefinitionList,
+        declarationStmts: StatementList,
+        initStmts: StatementList,
+        methodDefs: MethodDefinitionList,
+        externalMethodDecls: MethodSignatureList,
+        scriptList: ScriptDefinitionList
+    ) {
+        super([
+            mode,
+            ident,
+            inheritsFrom,
+            resourceDefs,
+            declarationStmts,
+            initStmts,
+            methodDefs,
+            externalMethodDecls,
+            scriptList,
+        ]);
         this._mode = mode;
         this._ident = ident;
         this._inheritsFrom = inheritsFrom;
@@ -152,9 +160,7 @@ export class ActorDefinition extends AbstractNode {
 }
 
 export class ActorDefinitionList extends AstNodeList<ActorDefinition> {
-
     constructor(elements: ActorDefinition[]) {
         super(elements);
     }
-
 }

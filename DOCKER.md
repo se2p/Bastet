@@ -11,7 +11,7 @@ where `68d1728` is the current version of the Git repository.
 
 ## Running the Docker Image
 
-Run 
+Run
 
 ```
 docker run \
@@ -31,5 +31,4 @@ or `docker save bastet:68d1728 | bzip2 > bastet-docker.tar.bz2`
 
 `docker load -i bastet-docker.tar`
 
-or `bunzip2 bastet-docker.tar.bz | docker load` 
-
+or `bunzip2 bastet-docker.tar.bz | docker load`

@@ -23,17 +23,15 @@
  *
  */
 
-import {AbstractElement, AbstractState} from "../../lattices/Lattice";
-import {ConcreteElement} from "../domains/ConcreteElements";
-import {TransitionLabelProvider} from "./ProgramAnalysis";
-import {Concretizer} from "../domains/AbstractDomain";
-import {Map as ImmMap, Set as ImmSet} from "immutable";
-import {Preconditions} from "../../utils/Preconditions";
-import {DirectedGraph, DirectedGraphs} from "../../utils/DirectedGraph";
-import {getAtMostOneElement, getTheOnlyElement} from "../../utils/Collections";
-import {AbstractionStateStates} from "./abstraction/AbstractionStates";
-import {AbstractStates} from "./AbstractStates";
-
+import { AbstractState } from '../../lattices/Lattice';
+import { ConcreteElement } from '../domains/ConcreteElements';
+import { TransitionLabelProvider } from './ProgramAnalysis';
+import { Concretizer } from '../domains/AbstractDomain';
+import { Map as ImmMap, Set as ImmSet } from 'immutable';
+import { Preconditions } from '../../utils/Preconditions';
+import { DirectedGraph, DirectedGraphs } from '../../utils/DirectedGraph';
+import { getAtMostOneElement, getTheOnlyElement } from '../../utils/Collections';
+import { AbstractStates } from './AbstractStates';
 
 /**
  * The accessibility relation of an abstract reachability graph
@@ -43,9 +41,7 @@ import {AbstractStates} from "./AbstractStates";
  * In the coarsest relation, each state is reachable
  * directly from each other state.
  */
-export interface AccessibilityRelation<F extends AbstractState>
-    extends DirectedGraph<F> {
-
+export interface AccessibilityRelation<F extends AbstractState> extends DirectedGraph<F> {
     /**
      * Initial states.
      */
@@ -76,11 +72,9 @@ export interface AccessibilityRelation<F extends AbstractState>
     labeler(): TransitionLabelProvider<F>;
 
     concretizer(): Concretizer<ConcreteElement, F>;
-
 }
 
 export class DefaultAccessRelation<F extends AbstractState> implements AccessibilityRelation<F> {
-
     private readonly _labeler: TransitionLabelProvider<F>;
 
     private readonly _concretizer: Concretizer<ConcreteElement, F>;
@@ -91,8 +85,13 @@ export class DefaultAccessRelation<F extends AbstractState> implements Accessibi
 
     private readonly _sucss: ImmMap<F, ImmSet<F>>;
 
-    constructor(labeler: TransitionLabelProvider<F>, concretizer: Concretizer<ConcreteElement, F>,
-                initial: ImmSet<F>, preds: ImmMap<F, ImmSet<F>>, succs: ImmMap<F, ImmSet<F>>) {
+    constructor(
+        labeler: TransitionLabelProvider<F>,
+        concretizer: Concretizer<ConcreteElement, F>,
+        initial: ImmSet<F>,
+        preds: ImmMap<F, ImmSet<F>>,
+        succs: ImmMap<F, ImmSet<F>>
+    ) {
         this._labeler = Preconditions.checkNotUndefined(labeler);
         this._concretizer = Preconditions.checkNotUndefined(concretizer);
         this._initial = Preconditions.checkNotUndefined(initial);
@@ -126,8 +125,11 @@ export class DefaultAccessRelation<F extends AbstractState> implements Accessibi
     }
 
     toString(): string {
-        return DirectedGraphs.dumpToString(this, (v) => v.toString(),
-            (v1, v2) => ``);
+        return DirectedGraphs.dumpToString(
+            this,
+            (v) => v.toString(),
+            (v1, v2) => ``
+        );
     }
 
     concretizer(): Concretizer<ConcreteElement, F> {
@@ -137,11 +139,9 @@ export class DefaultAccessRelation<F extends AbstractState> implements Accessibi
     labeler(): TransitionLabelProvider<F> {
         return this._labeler;
     }
-
 }
 
 export class AccessRelationBuilder<F extends AbstractState> {
-
     private readonly _initial: Set<F>;
 
     private readonly _successorsOf: Map<F, ImmSet<F>>;
@@ -189,24 +189,24 @@ export class AccessRelationBuilder<F extends AbstractState> {
     }
 
     public build(): AccessibilityRelation<F> {
-        return new DefaultAccessRelation(this._lbl, this._ctc,
+        return new DefaultAccessRelation(
+            this._lbl,
+            this._ctc,
             ImmSet(this._initial),
             ImmMap(this._predecessorsOf.entries()),
-            ImmMap(this._successorsOf.entries()));
+            ImmMap(this._successorsOf.entries())
+        );
     }
-
 }
 
 export class AccessibilityRelations {
-
     public static backwardsAccessible<F extends AbstractState>(
-        ar: AccessibilityRelation<F>, state: F,
+        ar: AccessibilityRelation<F>,
+        state: F,
         labeler?: TransitionLabelProvider<F>,
-        concretizer?: Concretizer<ConcreteElement, F>): AccessibilityRelation<F> {
-
-        const builder = new AccessRelationBuilder<F>()
-            .setLabeler(ar.labeler())
-            .setConcretizer(ar.concretizer());
+        concretizer?: Concretizer<ConcreteElement, F>
+    ): AccessibilityRelation<F> {
+        const builder = new AccessRelationBuilder<F>().setLabeler(ar.labeler()).setConcretizer(ar.concretizer());
 
         if (labeler) {
             builder.setLabeler(labeler);
@@ -223,7 +223,7 @@ export class AccessibilityRelations {
         while (worklist.length > 0) {
             const work = worklist.pop();
             visited.add(work);
-            const preds = ar.predecessorsOf(work)
+            const preds = ar.predecessorsOf(work);
             if (preds.length == 0) {
                 builder.addInitial(work);
             } else {
@@ -240,19 +240,22 @@ export class AccessibilityRelations {
     }
 
     public static filterForwards<F extends AbstractState>(
-        ar: AccessibilityRelation<F>, filter: (s1: F, s2: F) => boolean) {
-        const builder = new AccessRelationBuilder()
-            .setConcretizer(ar.concretizer())
-            .setLabeler(ar.labeler());
+        ar: AccessibilityRelation<F>,
+        filter: (s1: F, s2: F) => boolean
+    ) {
+        const builder = new AccessRelationBuilder().setConcretizer(ar.concretizer()).setLabeler(ar.labeler());
 
         const worklist: F[] = [];
-        Array.from(ar.initial()).forEach((e) => {worklist.push(e); builder.addInitial(e)});
+        Array.from(ar.initial()).forEach((e) => {
+            worklist.push(e);
+            builder.addInitial(e);
+        });
         const visited: Set<F> = new Set();
 
         while (worklist.length > 0) {
             const work = worklist.pop();
             visited.add(work);
-            const succs = ar.successorsOf(work)
+            const succs = ar.successorsOf(work);
             for (const succ of succs) {
                 if (filter(work, succ)) {
                     builder.addTransition(work, succ);

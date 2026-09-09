@@ -23,29 +23,25 @@
  *
  */
 
-import {MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
-import {ValueAbstractDomain, ValueAbstractState} from "./ValueAbstractDomain";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {App} from "../../../syntax/app/App";
-import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {ValueTransferRelation} from "./ValueTransferRelation";
-import {ConcreteElement, ConcreteMemory} from "../../domains/ConcreteElements";
-import {Preconditions} from "../../../utils/Preconditions";
+import { MergeOperator, ProgramAnalysisWithLabels } from '../ProgramAnalysis';
+import { ValueAbstractDomain, ValueAbstractState } from './ValueAbstractDomain';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { App } from '../../../syntax/app/App';
+import { LabeledTransferRelation } from '../TransferRelation';
+import { ProgramOperation, ProgramOperationInContext } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { ValueTransferRelation } from './ValueTransferRelation';
+import { ConcreteMemory } from '../../domains/ConcreteElements';
+import { Preconditions } from '../../../utils/Preconditions';
 import {
-    AbstractBoolean, AbstractFloat, AbstractInteger, AbstractList,
+    AbstractBoolean,
+    AbstractFloat,
+    AbstractInteger,
+    AbstractList,
     AbstractMemory,
-    AbstractNumber, AbstractReal, AbstractString,
-    AbstractTheories,
-    BooleanTheory,
-    FloatTheory,
-    IntegerTheory,
-    ListTheory,
-    NumberTheory,
-    RealTheory,
-    StringTheory,
-    TransformerTheories
-} from "../../domains/MemoryTransformer";
+    AbstractReal,
+    AbstractString,
+    TransformerTheories,
+} from '../../domains/MemoryTransformer';
 import {
     BooleanFormula,
     FirstOrderFormula,
@@ -53,28 +49,25 @@ import {
     IntegerFormula,
     ListFormula,
     RealFormula,
-    StringFormula
-} from "../../../utils/ConjunctiveNormalForm";
-import {PropositionalFormula} from "../../../utils/bdd/BDD";
-import {AbstractElement, AbstractState, LatticeWithComplements} from "../../../lattices/Lattice";
-import {Refiner} from "../Refiner";
-import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, ReachedSet, StateSet} from "../../algorithms/StateSet";
-import {AnalysisStatistics} from "../AnalysisStatistics";
-import {Concern} from "../../../syntax/Concern";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {BastetConfiguration} from "../../../utils/BastetConfiguration";
-import {StandardMergeOperatorFactory} from "../Operators";
-import {List as ImmList, Set as ImmSet} from "immutable";
-import {LexiKey} from "../../../utils/Lexicographic";
-import {AccessibilityRelation} from "../Accessibility";
-import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
-import {ValueRefiner} from "./ValueRefiner";
-import {ThreadState} from "../control/ConcreteProgramState";
-
+    StringFormula,
+} from '../../../utils/ConjunctiveNormalForm';
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
+import { Refiner } from '../Refiner';
+import { Property } from '../../../syntax/Property';
+import { FrontierSet, PartitionKey, ReachedSet, StateSet } from '../../algorithms/StateSet';
+import { AnalysisStatistics } from '../AnalysisStatistics';
+import { Concern } from '../../../syntax/Concern';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { BastetConfiguration } from '../../../utils/BastetConfiguration';
+import { StandardMergeOperatorFactory } from '../Operators';
+import { List as ImmList, Set as ImmSet } from 'immutable';
+import { LexiKey } from '../../../utils/Lexicographic';
+import { AccessibilityRelation } from '../Accessibility';
+import { NotSupportedException } from '../../../core/exceptions/NotSupportedException';
+import { ValueRefiner } from './ValueRefiner';
+import { ThreadState } from '../control/ConcreteProgramState';
 
 export class DataAnalysisConfig extends BastetConfiguration {
-
     constructor(dict: {}) {
         super(dict, ['DataAnalysis']);
     }
@@ -84,15 +77,24 @@ export class DataAnalysisConfig extends BastetConfiguration {
     }
 
     get encodeFloatsAs(): string {
-        return this.getStringProperty('encode-floats-as', "Reals");
+        return this.getStringProperty('encode-floats-as', 'Reals');
     }
-
 }
 
-export class ValueAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, ValueAbstractState, AbstractState>,
-    LabeledTransferRelation<ValueAbstractState> {
-
-    private readonly _theories: TransformerTheories<AbstractMemory, AbstractBoolean, AbstractInteger, AbstractReal, AbstractFloat, AbstractString, AbstractList>;
+export class ValueAnalysis
+    implements
+        ProgramAnalysisWithLabels<ConcreteMemory, ValueAbstractState, AbstractState>,
+        LabeledTransferRelation<ValueAbstractState>
+{
+    private readonly _theories: TransformerTheories<
+        AbstractMemory,
+        AbstractBoolean,
+        AbstractInteger,
+        AbstractReal,
+        AbstractFloat,
+        AbstractString,
+        AbstractList
+    >;
 
     private readonly _abstractDomain: ValueAbstractDomain;
 
@@ -106,7 +108,7 @@ export class ValueAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
 
     private readonly _refiner: ValueRefiner;
 
-    constructor(config:{}, statistics: AnalysisStatistics) {
+    constructor(config: {}, statistics: AnalysisStatistics) {
         this._config = new DataAnalysisConfig(config);
         this._abstractDomain = new ValueAbstractDomain();
         this._transferRelation = new ValueTransferRelation(this._abstractDomain);
@@ -138,7 +140,11 @@ export class ValueAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         return this._abstractDomain.lattice.join(state1, state2);
     }
 
-    stop(state: ValueAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => ValueAbstractState): boolean {
+    stop(
+        state: ValueAbstractState,
+        reached: Iterable<AbstractElement>,
+        unwrapper: (AbstractElement) => ValueAbstractState
+    ): boolean {
         for (const r of reached) {
             if (unwrapper(r).equals(state)) {
                 return true;
@@ -163,7 +169,11 @@ export class ValueAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         return [this._abstractDomain.lattice.top()];
     }
 
-    abstractSuccFor(fromState: ValueAbstractState, op: ProgramOperationInContext, co: Concern): Iterable<ValueAbstractState> {
+    abstractSuccFor(
+        fromState: ValueAbstractState,
+        op: ProgramOperationInContext,
+        co: Concern
+    ): Iterable<ValueAbstractState> {
         Preconditions.checkNotUndefined(fromState);
         Preconditions.checkNotUndefined(op);
         return this._transferRelation.abstractSuccFor(fromState, op, co);
@@ -181,7 +191,13 @@ export class ValueAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         throw new ImplementMeException();
     }
 
-    mergeInto(state: ValueAbstractState, frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>, unwrapper: (AbstractElement) => ValueAbstractState, wrapper: (E) => AbstractElement): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
+    mergeInto(
+        state: ValueAbstractState,
+        frontier: FrontierSet<AbstractState>,
+        reached: ReachedSet<AbstractState>,
+        unwrapper: (AbstractElement) => ValueAbstractState,
+        wrapper: (E) => AbstractElement
+    ): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         throw new ImplementMeException();
     }
 
@@ -221,31 +237,49 @@ export class ValueAnalysis implements ProgramAnalysisWithLabels<ConcreteMemory, 
         return new LexiKey([]);
     }
 
-    finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {
-    }
+    finalizeResults(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>) {}
 
-    testify(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
+    testify(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): AccessibilityRelation<AbstractState> {
         throw new ImplementMeException();
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteMemory][]> {
+    testifyConcrete(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): Iterable<[AbstractState, ConcreteMemory][]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteMemory][]> {
+    testifyConcreteOne(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): Iterable<[AbstractState, ConcreteMemory][]> {
         throw new ImplementMeException();
     }
 
-    testifyOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
+    testifyOne(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): AccessibilityRelation<AbstractState> {
         throw new ImplementMeException();
     }
 
-    get theories(): TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula> {
+    get theories(): TransformerTheories<
+        FirstOrderFormula,
+        BooleanFormula,
+        IntegerFormula,
+        RealFormula,
+        FloatFormula,
+        StringFormula,
+        ListFormula
+    > {
         return this._theories;
     }
 
-    incRef(state: ValueAbstractState) {
-    }
+    incRef(state: ValueAbstractState) {}
 
     decRef(state: ValueAbstractState) {
         // this._solver.decRef(state.blockFormula);

@@ -23,13 +23,12 @@
  *
  */
 
-import {StopOperator} from "../ProgramAnalysis";
-import {AbstractionAbstractDomain, AbstractionState} from "./AbstractionAbstractDomain";
-import {AbstractState} from "../../../lattices/Lattice";
-import {Preconditions} from "../../../utils/Preconditions";
+import { StopOperator } from '../ProgramAnalysis';
+import { AbstractionAbstractDomain, AbstractionState } from './AbstractionAbstractDomain';
+import { AbstractState } from '../../../lattices/Lattice';
+import { Preconditions } from '../../../utils/Preconditions';
 
 export class AbstractionStopOperator implements StopOperator<AbstractionState, AbstractState> {
-
     private readonly _wrapped: StopOperator<AbstractState, AbstractState>;
     private readonly _domain: AbstractionAbstractDomain;
 
@@ -42,7 +41,9 @@ export class AbstractionStopOperator implements StopOperator<AbstractionState, A
         for (let r of reached) {
             const state2: AbstractionState = unwrapper(r);
             if (state1.getWideningOf().isPresent() && state2.getWideningOf().isPresent()) {
-                if (this._domain.lattice.folLattice.isIncluded(state1.getEnteringSummary(), state2.getEnteringSummary())) {
+                if (
+                    this._domain.lattice.folLattice.isIncluded(state1.getEnteringSummary(), state2.getEnteringSummary())
+                ) {
                     return true;
                 }
             }
@@ -50,5 +51,4 @@ export class AbstractionStopOperator implements StopOperator<AbstractionState, A
 
         return false;
     }
-
 }

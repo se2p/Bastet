@@ -23,11 +23,10 @@
  *
  */
 
-import {Statement} from "./Statement";
-import {Expression} from "../expressions/Expression";
+import { Statement } from './Statement';
+import { Expression } from '../expressions/Expression';
 
 export class ExpressionStatement extends Statement {
-
     private readonly _expression: Expression;
 
     constructor(expression: Expression) {

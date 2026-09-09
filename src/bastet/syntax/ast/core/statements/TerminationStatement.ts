@@ -23,32 +23,24 @@
  *
  */
 
-import {Statement} from "./Statement";
+import { Statement } from './Statement';
 
-export interface TerminationStatement  {
-
-}
+export interface TerminationStatement {}
 
 export class StopAllStatement extends Statement implements TerminationStatement {
-
     constructor() {
         super([]);
     }
-
 }
 
-export class StopThisStatement extends Statement implements  TerminationStatement {
-
+export class StopThisStatement extends Statement implements TerminationStatement {
     constructor() {
         super([]);
     }
-
 }
 
-export class DeleteThisCloneStatement extends Statement implements  TerminationStatement {
-
+export class DeleteThisCloneStatement extends Statement implements TerminationStatement {
     constructor() {
         super([]);
     }
-
 }

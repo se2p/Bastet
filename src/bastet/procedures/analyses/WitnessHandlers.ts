@@ -23,18 +23,14 @@
  *
  */
 
-
-import {AbstractState} from "../../lattices/Lattice";
-import {ReachedSet} from "../algorithms/StateSet";
+import { AbstractState } from '../../lattices/Lattice';
+import { ReachedSet } from '../algorithms/StateSet';
 
 export interface WitnessHandler<E extends AbstractState> {
-
     handleViolatingState(reached: ReachedSet<E>, violating: E);
-
 }
 
 export class DummyHandler<E extends AbstractState> implements WitnessHandler<E> {
-
     handleViolatingState(reached: ReachedSet<E>, violating: E) {
         // Do nothing
     }
@@ -42,5 +38,4 @@ export class DummyHandler<E extends AbstractState> implements WitnessHandler<E> 
     public static create<E extends AbstractState>(): DummyHandler<E> {
         return new DummyHandler<E>();
     }
-
 }

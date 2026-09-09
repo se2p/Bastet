@@ -23,15 +23,14 @@
  *
  */
 
-import {Actor} from "./Actor";
-import {TransitionRelationToDot} from "./controlflow/TransitionRelationToDot";
-import {App} from "./App";
-import * as fs from "fs";
+import { Actor } from './Actor';
+import { TransitionRelationToDot } from './controlflow/TransitionRelationToDot';
+import { App } from './App';
+import * as fs from 'fs';
 
 export class AppToDot {
-
     public exportApp(app: App, subfolder: string) {
-        fs.mkdirSync('output/' + subfolder, { recursive: true })
+        fs.mkdirSync('output/' + subfolder, { recursive: true });
 
         for (const actor of app.actors) {
             // Export scripts
@@ -59,5 +58,4 @@ export class AppToDot {
             toDotWriter.export(s.transitions, target);
         }
     }
-
 }

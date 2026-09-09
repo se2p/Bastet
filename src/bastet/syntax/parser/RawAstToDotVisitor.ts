@@ -23,11 +23,10 @@
  *
  */
 
-import {LeilaVisitor} from "./grammar/LeilaVisitor";
-import {ErrorNode, ParseTree, RuleNode, TerminalNode} from "antlr4ts/tree";
+import { LeilaVisitor } from './grammar/LeilaVisitor';
+import { ErrorNode, ParseTree, RuleNode, TerminalNode } from 'antlr4ts/tree';
 
 export class RawAstToDotVisitor implements LeilaVisitor<void> {
-
     private _dot: string[];
     private _idseq: number;
 
@@ -41,14 +40,14 @@ export class RawAstToDotVisitor implements LeilaVisitor<void> {
     }
 
     visitChildren(node: RuleNode): void {
-        const nodeNo = node["nodeNo"] || 0;
+        const nodeNo = node['nodeNo'] || 0;
         this._dot.push(`    ${nodeNo} [label="${node.constructor.name}"];`);
 
         let i = 0;
         while (i < node.childCount) {
             const child = node.getChild(i);
-            child["nodeNo"] = this._idseq++;
-            let childNo = child["nodeNo"];
+            child['nodeNo'] = this._idseq++;
+            let childNo = child['nodeNo'];
             this._dot.push(`    ${nodeNo} -> ${childNo};`);
             child.accept(this);
             i = i + 1;
@@ -70,14 +69,12 @@ export class RawAstToDotVisitor implements LeilaVisitor<void> {
 
     public writeToFile(filepath: string): void {
         let fs = require('fs');
-        fs.writeFileSync(filepath, `digraph ast {\n` + this._dot.join("\n") + `\n}\n`);
+        fs.writeFileSync(filepath, `digraph ast {\n` + this._dot.join('\n') + `\n}\n`);
     }
 
     private static escpace(text: string): string {
-        const search = "\"";
-        const replacement = "\\\"";
+        const search = '"';
+        const replacement = '\\"';
         return text.replace(new RegExp(search, 'g'), replacement);
     }
-
 }
-

@@ -23,52 +23,45 @@
  *
  */
 
-import {ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
+import { ProgramAnalysisWithLabels, WrappingProgramAnalysis } from '../ProgramAnalysis';
 import {
     ControlAbstractDomain,
     ControlAbstractState,
     IndexedThread,
-    ScheduleAbstractStateFactory
-} from "./ControlAbstractDomain";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {App} from "../../../syntax/app/App";
-import {ControlTransferRelation} from "./ControlTransferRelation";
-import {Preconditions} from "../../../utils/Preconditions";
-import {BastetConfiguration} from "../../../utils/BastetConfiguration";
-import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
-import {AbstractElement, AbstractState, Lattices} from "../../../lattices/Lattice";
-import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
-import {AnalysisStatistics} from "../AnalysisStatistics";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {List as ImmList, Set as ImmSet} from "immutable";
-import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {LexiKey} from "../../../utils/Lexicographic";
-import {getTheOnlyElement} from "../../../utils/Collections";
-import {TransitionRelation} from "../../../syntax/app/controlflow/TransitionRelation";
-import {ControlCoverageExaminer} from "./coverage/ControlCoverage";
-import {ControlLocationExtractor} from "./ControlUtils";
-import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
-import {Record as ImmRec, Map as ImmMap} from "immutable";
-import {ReturnStatement} from "../../../syntax/ast/core/statements/ControlStatement";
-import {AccessibilityRelation} from "../Accessibility";
-import {
-    ConcreteElement,
-    ConcretePrimitive,
-    ConcreteUnifiedMemory
-} from "../../domains/ConcreteElements";
-import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
-import {Concern} from "../../../syntax/Concern";
-import {AfterStatementMonitoringEvent} from "../../../syntax/ast/core/CoreEvent";
-import {ConcreteProgramState, MethodCall, RelationLocation, ThreadId, ThreadState} from "./ConcreteProgramState";
-import {EpsilonStatement} from "../../../syntax/ast/core/statements/EpsilonStatement";
+    ScheduleAbstractStateFactory,
+} from './ControlAbstractDomain';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { App } from '../../../syntax/app/App';
+import { ControlTransferRelation } from './ControlTransferRelation';
+import { Preconditions } from '../../../utils/Preconditions';
+import { BastetConfiguration } from '../../../utils/BastetConfiguration';
+import { ProgramOperation, ProgramOperationInContext } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { Refiner, Unwrapper, WrappingRefiner } from '../Refiner';
+import { AbstractElement, AbstractState, Lattices } from '../../../lattices/Lattice';
+import { Property } from '../../../syntax/Property';
+import { FrontierSet, PartitionKey, ReachedSet } from '../../algorithms/StateSet';
+import { AnalysisStatistics } from '../AnalysisStatistics';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { List as ImmList, Set as ImmSet } from 'immutable';
+import { LocationId } from '../../../syntax/app/controlflow/ControlLocation';
+import { IllegalStateException } from '../../../core/exceptions/IllegalStateException';
+import { LexiKey } from '../../../utils/Lexicographic';
+import { getTheOnlyElement } from '../../../utils/Collections';
+import { TransitionRelation } from '../../../syntax/app/controlflow/TransitionRelation';
+import { ControlCoverageExaminer } from './coverage/ControlCoverage';
+import { CallStatement } from '../../../syntax/ast/core/statements/CallStatement';
+import { ReturnStatement } from '../../../syntax/ast/core/statements/ControlStatement';
+import { AccessibilityRelation } from '../Accessibility';
+import { ConcreteElement, ConcreteUnifiedMemory } from '../../domains/ConcreteElements';
+import { NotSupportedException } from '../../../core/exceptions/NotSupportedException';
+import { Concern } from '../../../syntax/Concern';
+import { AfterStatementMonitoringEvent } from '../../../syntax/ast/core/CoreEvent';
+import { ConcreteProgramState, MethodCall, RelationLocation, ThreadId, ThreadState } from './ConcreteProgramState';
+import { EpsilonStatement } from '../../../syntax/ast/core/statements/EpsilonStatement';
 
 export class ControlAnalysisConfig extends BastetConfiguration {
-
     constructor(dict: {}) {
-        super(dict, ["ControlAnalysis"]);
+        super(dict, ['ControlAnalysis']);
     }
 
     get aggregateAtomicTransitions(): boolean {
@@ -96,13 +89,14 @@ export class ControlAnalysisConfig extends BastetConfiguration {
     get widenBeforeFunctionCall(): boolean {
         return this.getBoolProperty('widen-after-function-call', false);
     }
-
 }
 
-export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgramState, ControlAbstractState, AbstractState>,
-    WrappingProgramAnalysis<ConcreteProgramState, ControlAbstractState, AbstractState>,
-    Unwrapper<ControlAbstractState, AbstractElement> {
-
+export class ControlAnalysis
+    implements
+        ProgramAnalysisWithLabels<ConcreteProgramState, ControlAbstractState, AbstractState>,
+        WrappingProgramAnalysis<ConcreteProgramState, ControlAbstractState, AbstractState>,
+        Unwrapper<ControlAbstractState, AbstractElement>
+{
     private readonly _config: ControlAnalysisConfig;
 
     private readonly _abstractDomain: AbstractDomain<ConcreteProgramState, ControlAbstractState>;
@@ -117,28 +111,46 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
 
     private _seq: number = 0;
 
-    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>, statistics: AnalysisStatistics) {
+    constructor(
+        config: {},
+        task: App,
+        wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>,
+        statistics: AnalysisStatistics
+    ) {
         this._config = new ControlAnalysisConfig(config);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
         this._abstractDomain = new ControlAbstractDomain(wrappedAnalysis.abstractDomain);
-        this._transferRelation = new ControlTransferRelation(this._config, task, this.wrappedAnalysis,
-            this._wrappedAnalysis.abstractDomain, this._statistics);
+        this._transferRelation = new ControlTransferRelation(
+            this._config,
+            task,
+            this.wrappedAnalysis,
+            this._wrappedAnalysis.abstractDomain,
+            this._statistics
+        );
     }
 
     abstractSucc(fromState: ControlAbstractState): Iterable<ControlAbstractState> {
         const getThreadRelName = (ts: ThreadState) =>
             this._task.getTransitionRelationById(ts.getRelationLocation().getRelationId()).name;
         const filterRelNames = (threads: ImmSet<IndexedThread>) => {
-            return threads.map(ts => getThreadRelName(ts.threadStatus)).filter((value, key) => key !== "messageDispatcherLoop");
+            return threads
+                .map((ts) => getThreadRelName(ts.threadStatus))
+                .filter((value, key) => key !== 'messageDispatcherLoop');
         };
 
         const result: ControlAbstractState[] = [];
         for (const succ of this._transferRelation.abstractSucc(fromState)) {
             const steppedToLoopRelations = filterRelNames(this.getSteppedToLoopHeadThreads(succ));
             if (steppedToLoopRelations.size > 0 && this._config.checkLoopUnrollingFeasibility) {
-                if (!Lattices.isFeasible(succ, this._abstractDomain.lattice, "Loop unrolling for " + steppedToLoopRelations.toString())) {
+                if (
+                    !Lattices.isFeasible(
+                        succ,
+                        this._abstractDomain.lattice,
+                        'Loop unrolling for ' + steppedToLoopRelations.toString()
+                    )
+                ) {
                     continue;
                 }
             }
@@ -148,17 +160,20 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
     }
 
     createUniquePartition(): Object {
-        return {id: this._seq++};
+        return { id: this._seq++ };
     }
 
     getControlPartition(element: ControlAbstractState): PartitionKey {
         const steppedFor: ImmSet<ThreadId> = element.getSteppedFor();
-        const locations: ImmSet<LocationId> = ImmSet(element.getThreadStates()
-            .map((ts) => ts.getRelationLocation().getLocationId()));
-        const callstacks: ImmSet<ImmList<MethodCall>> = ImmSet(element.getThreadStates()
-            .map((ts) => ts.getCallStack()));
-        const loopstacks: ImmSet<ImmList<RelationLocation>> = ImmSet(element.getThreadStates()
-            .map((ts) => ts.getLoopStack()));
+        const locations: ImmSet<LocationId> = ImmSet(
+            element.getThreadStates().map((ts) => ts.getRelationLocation().getLocationId())
+        );
+        const callstacks: ImmSet<ImmList<MethodCall>> = ImmSet(
+            element.getThreadStates().map((ts) => ts.getCallStack())
+        );
+        const loopstacks: ImmSet<ImmList<RelationLocation>> = ImmSet(
+            element.getThreadStates().map((ts) => ts.getLoopStack())
+        );
         return new PartitionKey(ImmList([steppedFor, locations, callstacks, loopstacks]));
     }
 
@@ -203,10 +218,14 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
             return false;
         }
 
-        const steppedLocations1 = state1.getSteppedFor().map((i) =>
-            state1.getIndexedThreadState(i)).map((ts) => ts.threadStatus.getRelationLocation());
-        const steppedLocations2 = state2.getSteppedFor().map((i) =>
-            state2.getIndexedThreadState(i)).map((ts) => ts.threadStatus.getRelationLocation());
+        const steppedLocations1 = state1
+            .getSteppedFor()
+            .map((i) => state1.getIndexedThreadState(i))
+            .map((ts) => ts.threadStatus.getRelationLocation());
+        const steppedLocations2 = state2
+            .getSteppedFor()
+            .map((i) => state2.getIndexedThreadState(i))
+            .map((ts) => ts.threadStatus.getRelationLocation());
 
         if (!steppedLocations1.equals(steppedLocations2)) {
             return false;
@@ -243,11 +262,21 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
             .withIsTargetFor(state1.getIsTargetFor().union(state2.getIsTargetFor()));
     }
 
-    mergeInto(state: ControlAbstractState, frontier: FrontierSet<ControlAbstractState>, reached: ReachedSet<ControlAbstractState>, unwrapper: (AbstractElement) => ControlAbstractState, wrapper: (E) => AbstractElement): [FrontierSet<ControlAbstractState>, ReachedSet<ControlAbstractState>] {
+    mergeInto(
+        state: ControlAbstractState,
+        frontier: FrontierSet<ControlAbstractState>,
+        reached: ReachedSet<ControlAbstractState>,
+        unwrapper: (AbstractElement) => ControlAbstractState,
+        wrapper: (E) => AbstractElement
+    ): [FrontierSet<ControlAbstractState>, ReachedSet<ControlAbstractState>] {
         throw new ImplementMeException();
     }
 
-    stop(state: ControlAbstractState, reached: Iterable<AbstractElement>, unwrapper: (AbstractElement) => ControlAbstractState): boolean {
+    stop(
+        state: ControlAbstractState,
+        reached: Iterable<AbstractElement>,
+        unwrapper: (AbstractElement) => ControlAbstractState
+    ): boolean {
         // TODO: Rewrite this?
         for (const r of reached) {
             const cs = unwrapper(r);
@@ -278,8 +307,8 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
     }
 
     isWideningState(state: ControlAbstractState): boolean {
-        const isWideningState = this._config.widenAfterEachStep
-            || (this._config.widenOnLoopHeads && this.steppedToLoopHead(state));
+        const isWideningState =
+            this._config.widenAfterEachStep || (this._config.widenOnLoopHeads && this.steppedToLoopHead(state));
 
         if (this._config.widenAfterFunctionReturn || this._config.widenBeforeFunctionCall) {
             throw new ImplementMeException();
@@ -293,9 +322,9 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
             const wrappedResult = this._wrappedAnalysis.widen(state.getWrappedState(), reached);
             if (wrappedResult != state.getWrappedState()) {
                 // Also the control state has to be widened (get rid of loop stacks)
-                let result = state
+                let result = state;
                 for (let steppedIx of state.getSteppedFor()) {
-                   result = result.withThreadStateUpdate(steppedIx, (ts) => ts.withLoopStack(ImmList()));
+                    result = result.withThreadStateUpdate(steppedIx, (ts) => ts.withLoopStack(ImmList()));
                 }
                 return result.withWrappedState(wrappedResult);
             } else {
@@ -347,26 +376,32 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
 
             if (fromLocation.getRelationId() == toLocation.getRelationId()) {
                 const withinRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
-                const t = withinRelation.transitionBetween(fromLocation.getLocationId(), toLocation.getLocationId())
+                const t = withinRelation.transitionBetween(fromLocation.getLocationId(), toLocation.getLocationId());
                 if (t == null && fromLocation.getLocationId() == toLocation.getLocationId()) {
-                    throw new IllegalStateException("Conducted stuttering transition not known in the transition relation");
+                    throw new IllegalStateException(
+                        'Conducted stuttering transition not known in the transition relation'
+                    );
                 } else if (t == null) {
-                   throw new IllegalStateException("Something is really wrong here. This seems to be a BUG") ;
+                    throw new IllegalStateException('Something is really wrong here. This seems to be a BUG');
                 }
                 result.push([steppedThread, t]);
             } else {
                 const fromRelation = this._task.getTransitionRelationById(fromLocation.getRelationId());
                 const toRelation = this._task.getTransitionRelationById(toLocation.getRelationId());
 
-                const calls = fromRelation.transitionsFrom(fromLocation.getLocationId())
-                    .map(t => ProgramOperation.for(t.opId))
-                    .filter(o => o.ast instanceof CallStatement || o.ast instanceof ReturnStatement);
+                const calls = fromRelation
+                    .transitionsFrom(fromLocation.getLocationId())
+                    .map((t) => ProgramOperation.for(t.opId))
+                    .filter((o) => o.ast instanceof CallStatement || o.ast instanceof ReturnStatement);
                 if (calls.length > 0) {
                     const call = getTheOnlyElement(calls);
                     result.push([steppedThread, call]);
                 } else {
                     const mkTuple = (t: ThreadState, o: ProgramOperation): [ThreadState, ProgramOperation] => [t, o];
-                    return steppedThread.getOperations().map(oid => mkTuple(steppedThread, ProgramOperation.for(oid))).toArray();
+                    return steppedThread
+                        .getOperations()
+                        .map((oid) => mkTuple(steppedThread, ProgramOperation.for(oid)))
+                        .toArray();
                 }
             }
         }
@@ -391,8 +426,10 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
     }
 
     private getSteppedToLoopHeadThreads(r: ControlAbstractState) {
-        return r.getSteppedFor().map((i) =>
-            r.getIndexedThreadState(i)).filter((ts) => this.isThreadOnLoophead(ts.threadStatus));
+        return r
+            .getSteppedFor()
+            .map((i) => r.getIndexedThreadState(i))
+            .filter((ts) => this.isThreadOnLoophead(ts.threadStatus));
     }
 
     private steppedToLoopHead(r: ControlAbstractState) {
@@ -455,13 +492,13 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
             let activationLexiKey: LexiKey;
             const activatedBy = steppedA.threadStatus.getActivatedByThread();
             if (activatedBy > -1) {
-                const activatedByThread = getTheOnlyElement(ofState.threadStates.filter(
-                    (ts) => ts.threadId == activatedBy));
+                const activatedByThread = getTheOnlyElement(
+                    ofState.threadStates.filter((ts) => ts.threadId == activatedBy)
+                );
                 activationLexiKey = this.getThreadLexiOrderKey(activatedByThread);
             } else {
                 activationLexiKey = new LexiKey([]);
             }
-
 
             // We use a Max-Priority-Queue. Larger elements are prefered but we
             // want to process elements with the smaller wait-at-meet order first:
@@ -487,33 +524,53 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
 
         const examiner = new ControlCoverageExaminer();
         const coverage = examiner.determineCoverageOf(this._task, reached);
-        const covStats = this._statistics.withContext("Coverage");
-        covStats.put("coveredLocationsPercent", coverage.controlCoveragePercent);
-        covStats.put("coveredLocationsAbs", coverage.coveredControlLocationsAbs);
-        covStats.put("uncoveredLocationsAbs", coverage.uncoveredControlLocationsAbs);
-        covStats.put("uncoveredPerLocationAbs", coverage.numberOfUncoveredPerRelation);
+        const covStats = this._statistics.withContext('Coverage');
+        covStats.put('coveredLocationsPercent', coverage.controlCoveragePercent);
+        covStats.put('coveredLocationsAbs', coverage.coveredControlLocationsAbs);
+        covStats.put('uncoveredLocationsAbs', coverage.uncoveredControlLocationsAbs);
+        covStats.put('uncoveredPerLocationAbs', coverage.numberOfUncoveredPerRelation);
 
-        const actors = this._statistics.withContext("Actors");
-        actors.put("actorOrder", this._task.actors.map(a => a.ident).toString())
+        const actors = this._statistics.withContext('Actors');
+        actors.put('actorOrder', this._task.actors.map((a) => a.ident).toString());
         for (const a of this._task.actors) {
-            actors.withContext(a.ident).put("scripts", Array.from(a.scripts).map((s) => s.transitions.name).toString());
+            actors.withContext(a.ident).put(
+                'scripts',
+                Array.from(a.scripts)
+                    .map((s) => s.transitions.name)
+                    .toString()
+            );
         }
     }
 
-    testify(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
+    testify(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): AccessibilityRelation<AbstractState> {
         return this._wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
+    testifyOne(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): AccessibilityRelation<AbstractState> {
         return this._wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteProgramState][]> {
+    testifyConcrete(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): Iterable<[AbstractState, ConcreteProgramState][]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteProgramState][]> {
-        const seq: Iterable<[AbstractState, ConcreteElement][]> = this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
+    testifyConcreteOne(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): Iterable<[AbstractState, ConcreteProgramState][]> {
+        const seq: Iterable<[AbstractState, ConcreteElement][]> = this._wrappedAnalysis.testifyConcreteOne(
+            accessibility,
+            state
+        );
         const result: [AbstractState, ConcreteProgramState][][] = [];
 
         // Given a sequence of concrete unified memories to goal is to build a sequence of concrete PROGRAM states
@@ -531,7 +588,11 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
         return result;
     }
 
-    abstractSuccFor(fromState: ControlAbstractState, op: ProgramOperationInContext, co: Concern): Iterable<ControlAbstractState> {
+    abstractSuccFor(
+        fromState: ControlAbstractState,
+        op: ProgramOperationInContext,
+        co: Concern
+    ): Iterable<ControlAbstractState> {
         throw new NotSupportedException();
     }
 
@@ -546,5 +607,4 @@ export class ControlAnalysis implements ProgramAnalysisWithLabels<ConcreteProgra
     decRef(state: ControlAbstractState) {
         this.wrappedAnalysis.decRef(state.getWrappedState());
     }
-
 }

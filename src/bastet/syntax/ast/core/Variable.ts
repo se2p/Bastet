@@ -23,26 +23,23 @@
  *
  */
 
-import {ScratchType} from "./ScratchType";
-import {Identifier} from "./Identifier";
-import {AbstractExpression} from "./expressions/AbstractExpression";
-import {DataLocation} from "../../app/controlflow/DataLocation";
-import {Preconditions} from "../../../utils/Preconditions";
-import {AbstractNode} from "../AstNode";
+import { ScratchType } from './ScratchType';
+import { Identifier } from './Identifier';
+import { AbstractExpression } from './expressions/AbstractExpression';
+import { DataLocation } from '../../app/controlflow/DataLocation';
+import { Preconditions } from '../../../utils/Preconditions';
+import { AbstractNode } from '../AstNode';
 
 export interface Variable {
-
     identifier: Identifier;
 
     variableType: ScratchType;
 
     qualifiedName: string;
-
 }
 
 export class QualifiedVariableName extends AbstractNode {
-
-    private readonly _qualifiedName : string;
+    private readonly _qualifiedName: string;
 
     constructor(qualifiedName: string) {
         super([]);
@@ -52,11 +49,9 @@ export class QualifiedVariableName extends AbstractNode {
     toTreeString(): string {
         return this._qualifiedName;
     }
-
 }
 
 export class VariableExpression extends AbstractExpression {
-
     private readonly _variable: VariableWithDataLocation;
 
     constructor(variable: VariableWithDataLocation) {
@@ -67,11 +62,9 @@ export class VariableExpression extends AbstractExpression {
     get variable(): VariableWithDataLocation {
         return this._variable;
     }
-
 }
 
 export class VariableWithDataLocation extends AbstractExpression implements Variable {
-
     private readonly _dataloc: DataLocation;
 
     private readonly _identifier: Identifier;
@@ -104,4 +97,3 @@ export class VariableWithDataLocation extends AbstractExpression implements Vari
         return this.qualifiedName;
     }
 }
-

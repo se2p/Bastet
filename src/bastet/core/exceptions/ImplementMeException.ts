@@ -24,17 +24,13 @@
  */
 
 export class ImplementMeException extends Error {
-
     constructor() {
-        super("Not yet implemented. Implement me!");
+        super('Not yet implemented. Implement me!');
     }
-
 }
 
 export class ImplementMeForException extends Error {
-
     constructor(forCase: string) {
         super(`Not yet implemented for ${forCase}. Implement me!`);
     }
-
 }

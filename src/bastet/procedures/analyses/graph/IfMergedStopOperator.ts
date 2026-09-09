@@ -23,16 +23,21 @@
  *
  */
 
-import {AbstractState} from "../../../lattices/Lattice";
-import {StopOperator} from "../ProgramAnalysis";
-import {GraphAbstractState} from "./GraphAbstractDomain";
+import { AbstractState } from '../../../lattices/Lattice';
+import { StopOperator } from '../ProgramAnalysis';
+import { GraphAbstractState } from './GraphAbstractDomain';
 
-export class IfMergedStopOperator<F extends AbstractState> implements StopOperator<GraphAbstractState, GraphAbstractState> {
+export class IfMergedStopOperator<F extends AbstractState> implements StopOperator<
+    GraphAbstractState,
+    GraphAbstractState
+> {
+    constructor() {}
 
-    constructor() {
-    }
-
-    stop(state: GraphAbstractState, reached: Iterable<GraphAbstractState>, unwrapper: (GraphAbstractState) => GraphAbstractState): boolean {
+    stop(
+        state: GraphAbstractState,
+        reached: Iterable<GraphAbstractState>,
+        unwrapper: (GraphAbstractState) => GraphAbstractState
+    ): boolean {
         for (const r of reached) {
             if (r.getMergeOf().contains(state.getId())) {
                 return true;
@@ -41,5 +46,4 @@ export class IfMergedStopOperator<F extends AbstractState> implements StopOperat
 
         return false;
     }
-
 }

@@ -23,11 +23,10 @@
  *
  */
 
-import {Statement} from "./Statement";
-import {BooleanExpression} from "../expressions/BooleanExpression";
+import { Statement } from './Statement';
+import { BooleanExpression } from '../expressions/BooleanExpression';
 
 export class WaitUntilStatement extends Statement {
-
     private readonly _cond: BooleanExpression;
 
     constructor(cond: BooleanExpression) {

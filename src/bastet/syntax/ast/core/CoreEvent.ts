@@ -23,25 +23,19 @@
  *
  */
 
-import {AbstractNode} from "../AstNode";
-import {StringExpression} from "./expressions/StringExpression";
-import {BooleanExpression} from "./expressions/BooleanExpression";
-import {StatementList} from "./statements/Statement";
-import {BOOTSTRAP_FINISHED_MESSAGE, BOOTSTRAP_MESSAGE, GREENFLAG_MESSAGE, SYSTEM_NAMESPACE_NAME} from "./Message";
-import {ParameterDeclarationList} from "./ParameterDeclaration";
+import { AbstractNode } from '../AstNode';
+import { StringExpression } from './expressions/StringExpression';
+import { BooleanExpression } from './expressions/BooleanExpression';
+import { StatementList } from './statements/Statement';
+import { BOOTSTRAP_FINISHED_MESSAGE, BOOTSTRAP_MESSAGE, GREENFLAG_MESSAGE, SYSTEM_NAMESPACE_NAME } from './Message';
+import { ParameterDeclarationList } from './ParameterDeclaration';
 
+export abstract class CoreEvent extends AbstractNode {}
 
-export abstract class CoreEvent extends AbstractNode {
-
-}
-
-export abstract class MessageNamespace extends AbstractNode {
-
-}
+export abstract class MessageNamespace extends AbstractNode {}
 
 export class QualifiedMessageNamespace extends MessageNamespace {
-
-    private readonly _namespaceName : StringExpression;
+    private readonly _namespaceName: StringExpression;
 
     constructor(namespaceName: StringExpression) {
         super([namespaceName]);
@@ -56,14 +50,12 @@ export class QualifiedMessageNamespace extends MessageNamespace {
 const SYS_NS = new QualifiedMessageNamespace(SYSTEM_NAMESPACE_NAME);
 
 export class UnqualifiedMessageNamespace extends MessageNamespace {
-
     constructor() {
         super([]);
     }
 }
 
 export class MessageReceivedEvent extends CoreEvent {
-
     private readonly _namespace: MessageNamespace;
     private readonly _message: StringExpression;
     private readonly _acceptedPayload: ParameterDeclarationList;
@@ -89,9 +81,12 @@ export class MessageReceivedEvent extends CoreEvent {
 }
 
 export class BootstrapEvent extends MessageReceivedEvent {
-
     private constructor() {
-        super(new QualifiedMessageNamespace(SYSTEM_NAMESPACE_NAME), BOOTSTRAP_MESSAGE.messageid, ParameterDeclarationList.empty());
+        super(
+            new QualifiedMessageNamespace(SYSTEM_NAMESPACE_NAME),
+            BOOTSTRAP_MESSAGE.messageid,
+            ParameterDeclarationList.empty()
+        );
     }
 
     private static INSTANCE: BootstrapEvent;
@@ -102,11 +97,9 @@ export class BootstrapEvent extends MessageReceivedEvent {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class StartupEvent extends MessageReceivedEvent {
-
     private constructor() {
         super(SYS_NS, GREENFLAG_MESSAGE.messageid, ParameterDeclarationList.empty());
     }
@@ -119,11 +112,9 @@ export class StartupEvent extends MessageReceivedEvent {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class NeverEvent extends CoreEvent {
-
     private constructor() {
         super([]);
     }
@@ -136,14 +127,12 @@ export class NeverEvent extends CoreEvent {
         }
         return this.INSTANCE;
     }
-
 }
 
 /**
  * The Big Bang.
  */
 export class SingularityEvent extends CoreEvent {
-
     private constructor() {
         super([]);
     }
@@ -156,11 +145,9 @@ export class SingularityEvent extends CoreEvent {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class TerminationEvent extends CoreEvent {
-
     private constructor() {
         super([]);
     }
@@ -173,11 +160,9 @@ export class TerminationEvent extends CoreEvent {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class RenderedMonitoringEvent extends CoreEvent {
-
     private constructor() {
         super([]);
     }
@@ -190,11 +175,9 @@ export class RenderedMonitoringEvent extends CoreEvent {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class AfterBootstrapMonitoringEvent extends MessageReceivedEvent {
-
     private constructor() {
         super(SYS_NS, BOOTSTRAP_FINISHED_MESSAGE.messageid, ParameterDeclarationList.empty());
     }
@@ -207,11 +190,9 @@ export class AfterBootstrapMonitoringEvent extends MessageReceivedEvent {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class AfterStatementMonitoringEvent extends CoreEvent {
-
     private constructor() {
         super([]);
     }
@@ -224,11 +205,9 @@ export class AfterStatementMonitoringEvent extends CoreEvent {
         }
         return AfterStatementMonitoringEvent.INSTANCE;
     }
-
 }
 
 export class UserInputDispatchEvent extends CoreEvent {
-
     private constructor() {
         super([]);
     }
@@ -241,11 +220,9 @@ export class UserInputDispatchEvent extends CoreEvent {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class CloneStartEvent extends CoreEvent {
-
     private constructor() {
         super([]);
     }
@@ -258,11 +235,9 @@ export class CloneStartEvent extends CoreEvent {
         }
         return this.INSTANCE;
     }
-
 }
 
 export class ConditionReachedEvent extends CoreEvent {
-
     /**
      * A sequence of statements that are used to compute
      * the boolean expression.
@@ -294,6 +269,3 @@ export class ConditionReachedEvent extends CoreEvent {
         return this._cond;
     }
 }
-
-
-

@@ -23,21 +23,18 @@
  *
  */
 
-import {PerfTimer} from "./PerfTimer";
-import {Preconditions} from "./Preconditions";
+import { PerfTimer } from './PerfTimer';
+import { Preconditions } from './Preconditions';
 
 export interface Budget {
-
     isExhausted(): boolean;
 
     beginBudget();
 
     raiseIfExhausted();
-
 }
 
 export class BudgetExhaustedException extends Error {
-
     private readonly _budget: Budget;
 
     constructor(message: string, budget: Budget) {
@@ -48,24 +45,19 @@ export class BudgetExhaustedException extends Error {
     get budget(): Budget {
         return this._budget;
     }
-
 }
 
 export class InfiniteBudget implements Budget {
-
     public isExhausted(): boolean {
         return false;
     }
 
-    public beginBudget() {
-    }
+    public beginBudget() {}
 
-    public raiseIfExhausted() {
-    }
+    public raiseIfExhausted() {}
 }
 
 export class WallTimeDurationBudget implements Budget {
-
     private readonly _durationMSecs: number;
 
     private readonly _consumed: PerfTimer;
@@ -85,16 +77,15 @@ export class WallTimeDurationBudget implements Budget {
 
     public raiseIfExhausted() {
         if (this.isExhausted()) {
-            throw new BudgetExhaustedException("The time budget has been exhausted!", this);
+            throw new BudgetExhaustedException('The time budget has been exhausted!', this);
         }
     }
-
 }
 
 var budgetStack: Budget[] = [];
 
 export function getActiveBudget(): Budget {
-    return budgetStack[budgetStack.length-1];
+    return budgetStack[budgetStack.length - 1];
 }
 
 export function pushActiveBudget(budget: Budget) {

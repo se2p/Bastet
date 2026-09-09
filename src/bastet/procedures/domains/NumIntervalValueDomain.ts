@@ -23,38 +23,33 @@
  *
  */
 
-import {AbstractElement, Lattice} from "../../lattices/Lattice";
-import {Record as ImmRec} from "immutable";
+import { AbstractElement, Lattice } from '../../lattices/Lattice';
+import { Record as ImmRec } from 'immutable';
 import {
     ConcreteDomain,
     ConcreteElement,
     ConcreteElementFactory,
     ConcreteNumber,
-    ConcreteNumberOrderLattice
-} from "./ConcreteElements";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {Preconditions} from "../../utils/Preconditions";
-import {AbstractNumber, AbstractNumberDomain} from "./MemoryTransformer";
-import {AbstractionPrecision} from "../AbstractionPrecision";
+    ConcreteNumberOrderLattice,
+} from './ConcreteElements';
+import { ImplementMeException } from '../../core/exceptions/ImplementMeException';
+import { Preconditions } from '../../utils/Preconditions';
+import { AbstractNumber, AbstractNumberDomain } from './MemoryTransformer';
+import { AbstractionPrecision } from '../AbstractionPrecision';
 
 export interface NumIntervalValueAttribs extends AbstractElement {
-
     minValue: ConcreteNumber;
     maxValue: ConcreteNumber;
-
 }
 
 const NumIntervalValueRecord = ImmRec({
-
     minValue: ConcreteElementFactory.concreteNumberFrom(0),
-    maxValue: ConcreteElementFactory.concreteNumberFrom(0)
-
+    maxValue: ConcreteElementFactory.concreteNumberFrom(0),
 });
 
 export class NumIntervalValue extends NumIntervalValueRecord implements NumIntervalValueAttribs {
-
     constructor(min: ConcreteNumber, max: ConcreteNumber) {
-        super({minValue: min, maxValue: max});
+        super({ minValue: min, maxValue: max });
     }
 
     get isEmpty(): boolean {
@@ -63,13 +58,13 @@ export class NumIntervalValue extends NumIntervalValueRecord implements NumInter
 }
 
 export class NumIntervalLattice implements Lattice<NumIntervalValue> {
-
     private readonly _concreteElementLattice: ConcreteNumberOrderLattice;
 
     constructor() {
         this._concreteElementLattice = new ConcreteNumberOrderLattice(
             new ConcreteNumber(Number.NEGATIVE_INFINITY),
-            new ConcreteNumber(Number.POSITIVE_INFINITY));
+            new ConcreteNumber(Number.POSITIVE_INFINITY)
+        );
     }
 
     bottom(): NumIntervalValue {
@@ -103,7 +98,6 @@ export class NumIntervalLattice implements Lattice<NumIntervalValue> {
 }
 
 export class NumIntervalValueDomain implements AbstractNumberDomain {
-
     private readonly _lattice: NumIntervalLattice;
     private readonly _concreteDomain: ConcreteDomain<ConcreteNumber>;
     private readonly _concreteValuelattice: Lattice<ConcreteNumber>;
@@ -141,7 +135,7 @@ export class NumIntervalValueDomain implements AbstractNumberDomain {
     }
 
     enrich(element: ConcreteElement): ConcreteNumber {
-       return element as ConcreteNumber;
+        return element as ConcreteNumber;
     }
 
     get lattice(): Lattice<NumIntervalValue> {
@@ -155,5 +149,4 @@ export class NumIntervalValueDomain implements AbstractNumberDomain {
     composeSeq(e1: AbstractNumber, e2: AbstractNumber): AbstractNumber {
         throw new ImplementMeException();
     }
-
 }

@@ -23,23 +23,20 @@
  *
  */
 
-import {AbstractElement, AbstractElementVisitor, AbstractState} from "../../lattices/Lattice";
-import {GraphAbstractState} from "./graph/GraphAbstractDomain";
-import {ControlAbstractState} from "./control/ControlAbstractDomain";
-import {SSAState} from "./ssa/SSAAbstractDomain";
-import {DataAbstractState} from "./data/DataAbstractDomain";
-import {TimeState} from "./time/TimeAbstractDomain";
-import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
-import {Optional} from "../../utils/Optional";
+import { AbstractElement, AbstractElementVisitor, AbstractState } from '../../lattices/Lattice';
+import { GraphAbstractState } from './graph/GraphAbstractDomain';
+import { ControlAbstractState } from './control/ControlAbstractDomain';
+import { SSAState } from './ssa/SSAAbstractDomain';
+import { DataAbstractState } from './data/DataAbstractDomain';
+import { TimeState } from './time/TimeAbstractDomain';
+import { ImplementMeForException } from '../../core/exceptions/ImplementMeException';
+import { Optional } from '../../utils/Optional';
 
 export interface SingletonStateWrapper {
-
     wrappedState: AbstractElement;
-
 }
 
 export class DelegatingStateVisitor<T> implements AbstractElementVisitor<T> {
-
     visit(element: AbstractElement): T {
         if (element['wrappedState']) {
             return element['wrappedState'].accept(this);
@@ -51,11 +48,9 @@ export class DelegatingStateVisitor<T> implements AbstractElementVisitor<T> {
     protected defaultResultFor(element: AbstractElement): T {
         throw new ImplementMeForException(element.constructor.name);
     }
-
 }
 
 export interface AbstractStateVisitor<T> extends AbstractElementVisitor<T> {
-
     visit(element: AbstractElement): T;
 
     visitGraphAbstractState(element: GraphAbstractState): T;
@@ -67,11 +62,9 @@ export interface AbstractStateVisitor<T> extends AbstractElementVisitor<T> {
     visitDataAbstractState(element: DataAbstractState): T;
 
     visitTimeState(element: TimeState): T;
-
 }
 
 export class AbstractStates {
-
     public static extractStateId(e: AbstractState): number {
         if (e instanceof GraphAbstractState) {
             return e.getId();
@@ -98,5 +91,4 @@ export class AbstractStates {
             throw new ImplementMeForException(e.constructor.name);
         }
     }
-
 }

@@ -23,27 +23,27 @@
  *
  */
 
-import {OperationId, ProgramOperation, ProgramOperationFactory, ProgramOperations} from "./ops/ProgramOperation";
-import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {ControlLocation, LocationId} from "./ControlLocation";
-import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
-import {Preconditions} from "../../../utils/Preconditions";
-import {ControlDominance, DominanceMode} from "./Dominators";
-import {CorePrintVisitor} from "../../ast/CorePrintVisitor";
-import {ReturnStatement} from "../../ast/core/statements/ControlStatement";
-import {EpsilonStatement} from "../../ast/core/statements/EpsilonStatement";
-import {DeclarationStatement, DeclareStackVariableStatement} from "../../ast/core/statements/DeclarationStatement";
-import {VariableWithDataLocation} from "../../ast/core/Variable";
-import {DataLocation, DataLocations} from "./DataLocation";
-import {IntegerType} from "../../ast/core/ScratchType";
-import {Identifier} from "../../ast/core/Identifier";
-import {StoreEvalResultToVariableStatement} from "../../ast/core/statements/SetStatement";
-import {IntegerLiteral} from "../../ast/core/expressions/NumberExpression";
-import {CheckFeasibilityStatement, SignalTargetReachedStatement} from "../../ast/core/statements/InternalStatement";
-import {BranchingAssumeStatement} from "../../ast/core/statements/AssumeStatement";
-import {NumEqualsExpression} from "../../ast/core/expressions/BooleanExpression";
-import {StringLiteral} from "../../ast/core/expressions/StringExpression";
+import { OperationId, ProgramOperation, ProgramOperationFactory, ProgramOperations } from './ops/ProgramOperation';
+import { IllegalArgumentException } from '../../../core/exceptions/IllegalArgumentException';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { ControlLocation, LocationId } from './ControlLocation';
+import { List as ImmList, Map as ImmMap, Set as ImmSet } from 'immutable';
+import { Preconditions } from '../../../utils/Preconditions';
+import { ControlDominance, DominanceMode } from './Dominators';
+import { CorePrintVisitor } from '../../ast/CorePrintVisitor';
+import { ReturnStatement } from '../../ast/core/statements/ControlStatement';
+import { EpsilonStatement } from '../../ast/core/statements/EpsilonStatement';
+import { DeclareStackVariableStatement } from '../../ast/core/statements/DeclarationStatement';
+import { VariableWithDataLocation } from '../../ast/core/Variable';
+import { DataLocations } from './DataLocation';
+import { IntegerType } from '../../ast/core/ScratchType';
+import { Identifier } from '../../ast/core/Identifier';
+import { StoreEvalResultToVariableStatement } from '../../ast/core/statements/SetStatement';
+import { IntegerLiteral } from '../../ast/core/expressions/NumberExpression';
+import { CheckFeasibilityStatement, SignalTargetReachedStatement } from '../../ast/core/statements/InternalStatement';
+import { BranchingAssumeStatement } from '../../ast/core/statements/AssumeStatement';
+import { NumEqualsExpression } from '../../ast/core/expressions/BooleanExpression';
+import { StringLiteral } from '../../ast/core/expressions/StringExpression';
 
 const toposort = require('toposort');
 
@@ -51,13 +51,10 @@ export type TargetId = LocationId;
 export type SourceId = LocationId;
 
 export interface WithTransitionRelation {
-
     transitions: TransitionRelation;
-
 }
 
 export class TransitionRelationBuilder {
-
     private readonly _transitions: Map<LocationId, Map<LocationId, Set<OperationId>>>;
 
     private readonly _locations: Map<LocationId, ControlLocation>;
@@ -70,7 +67,7 @@ export class TransitionRelationBuilder {
 
     private _hasNoLoop: boolean;
 
-    private _name : string;
+    private _name: string;
 
     public constructor() {
         this._entryLocations = new Set();
@@ -181,7 +178,11 @@ export class TransitionRelationBuilder {
         // Add all transitions
         for (let from of input.locationSet) {
             for (const t of input.transitionsFrom(from)) {
-                this.addTransition(ControlLocation.for(from), ControlLocation.for(t.target), ProgramOperation.for(t.opId));
+                this.addTransition(
+                    ControlLocation.for(from),
+                    ControlLocation.for(t.target),
+                    ProgramOperation.for(t.opId)
+                );
             }
         }
 
@@ -206,7 +207,7 @@ export class TransitionRelationBuilder {
         }
 
         let transitions: TransitionTable = ImmMap();
-        for(let [fromID, fwdTargetMap] of this._transitions.entries()) {
+        for (let [fromID, fwdTargetMap] of this._transitions.entries()) {
             let fromMap: ImmMap<LocationId, ImmSet<OperationId>> = ImmMap();
             for (let [targetID, fwdTransOps] of fwdTargetMap.entries()) {
                 const ops = ImmSet(fwdTransOps.values());
@@ -242,7 +243,6 @@ export class TransitionRelationBuilder {
 export type TransitionTable = ImmMap<LocationId, ImmMap<LocationId, ImmSet<OperationId>>>;
 
 export class TransitionTo {
-
     private readonly _opId: OperationId;
 
     private readonly _target: LocationId;
@@ -262,7 +262,6 @@ export class TransitionTo {
 }
 
 export class Transition extends TransitionTo {
-
     private readonly _source: LocationId;
 
     constructor(from: LocationId, op: OperationId, to: LocationId) {
@@ -278,7 +277,6 @@ export class Transition extends TransitionTo {
 export type TransRelId = number;
 
 export class TransitionLoop {
-
     private readonly _loopHead: LocationId;
 
     private readonly _bodyNodes: ImmSet<LocationId>;
@@ -311,7 +309,6 @@ export class TransitionLoop {
 }
 
 export class TransitionRelation {
-
     private readonly _ident: TransRelId;
 
     private readonly _name: string;
@@ -346,9 +343,14 @@ export class TransitionRelation {
 
     private _transFromCache: Map<LocationId, Array<TransitionTo>>;
 
-    constructor(transitions: TransitionTable, locations: ImmSet<LocationId>,
-                entryLocs: ImmSet<LocationId>, exitLocs: ImmSet<LocationId>,
-                loopHeads?: ImmSet<LocationId>, name?: string) {
+    constructor(
+        transitions: TransitionTable,
+        locations: ImmSet<LocationId>,
+        entryLocs: ImmSet<LocationId>,
+        exitLocs: ImmSet<LocationId>,
+        loopHeads?: ImmSet<LocationId>,
+        name?: string
+    ) {
         TransitionRelation.TRANS_REL_ID_SEQ = (TransitionRelation.TRANS_REL_ID_SEQ || 0) + 1;
         this._ident = TransitionRelation.TRANS_REL_ID_SEQ;
 
@@ -377,10 +379,12 @@ export class TransitionRelation {
         let lines: string[] = [];
         for (let fromId of this._locations) {
             for (let t of this.transitionsFrom(fromId)) {
-                lines.push(`(${fromId}) ${ProgramOperations.withID(t.opId).ast.accept(new CorePrintVisitor())} (${t.target})`);
+                lines.push(
+                    `(${fromId}) ${ProgramOperations.withID(t.opId).ast.accept(new CorePrintVisitor())} (${t.target})`
+                );
             }
         }
-        return lines.join("\n");
+        return lines.join('\n');
     }
 
     get name(): string {
@@ -394,7 +398,7 @@ export class TransitionRelation {
 
         let builder = new TransitionRelationBuilder();
 
-        for(let [fromID, fwdTargetMap] of this._transitions.entries()) {
+        for (let [fromID, fwdTargetMap] of this._transitions.entries()) {
             for (let [targetID, fwdTransOps] of fwdTargetMap.entries()) {
                 for (let opID of fwdTransOps) {
                     let fromLocation = ControlLocation.for(fromID);
@@ -477,7 +481,11 @@ export class TransitionRelation {
             }
 
             // Inner loops first
-            const sorted = toposort(loopDominates).reverse().filter(l => {return l != null} );
+            const sorted = toposort(loopDominates)
+                .reverse()
+                .filter((l) => {
+                    return l != null;
+                });
             for (const loopHead of sorted) {
                 const bodyNodes: Set<LocationId> = new Set();
                 const nestedIn: Set<TransitionLoop> = new Set();
@@ -569,7 +577,7 @@ export class TransitionRelation {
         const result: Set<LocationId> = new Set();
 
         const visited: Set<LocationId> = new Set();
-        const worklist: Array<LocationId>  = new Array<LocationId>();
+        const worklist: Array<LocationId> = new Array<LocationId>();
 
         worklist.push(of);
         while (worklist.length > 0) {
@@ -666,7 +674,7 @@ export class TransitionRelation {
     private computeNaturalLoopHeads(): ImmSet<LocationId> {
         const result = new Set<LocationId>();
 
-        this.getBackEdges().forEach(t => {
+        this.getBackEdges().forEach((t) => {
             if (this.dominance.isDominatedBy(t.source, t.target)) {
                 result.add(t.target);
             }
@@ -746,10 +754,14 @@ export class TransitionRelation {
         const sortedHeads = this.loopHeads.sort((headA, headB) => {
             const enteringAmax = this.transitionsTo(headA)
                 .map((v) => this.getReversePostOrderOf(v.target))
-                .reduce((prev, curr) => {return Math.max(prev, curr)}, 0);
+                .reduce((prev, curr) => {
+                    return Math.max(prev, curr);
+                }, 0);
             const enteringBmax = this.transitionsTo(headB)
                 .map((v) => this.getReversePostOrderOf(v.target))
-                .reduce((prev, curr) => {return Math.max(prev, curr)}, 0);
+                .reduce((prev, curr) => {
+                    return Math.max(prev, curr);
+                }, 0);
 
             if (enteringAmax > enteringBmax) {
                 return +1;
@@ -769,7 +781,6 @@ export class TransitionRelation {
 }
 
 export class LocationEquivalence {
-
     private _classid: LocationId;
     private readonly _equivalent: Set<LocationId>;
 
@@ -801,11 +812,17 @@ export class LocationEquivalence {
 }
 
 export class TransitionRelations {
-
     static named(tr: TransitionRelation, name: string): TransitionRelation {
         Preconditions.checkNotUndefined(tr);
         Preconditions.checkNotEmpty(name);
-        return new TransitionRelation(tr.transitionTable, tr.locationSet, tr.entryLocationSet, tr.exitLocationSet, tr.loopHeads, name);
+        return new TransitionRelation(
+            tr.transitionTable,
+            tr.locationSet,
+            tr.entryLocationSet,
+            tr.exitLocationSet,
+            tr.loopHeads,
+            name
+        );
     }
 
     /**
@@ -835,7 +852,12 @@ export class TransitionRelations {
         return new TransitionRelation(tx, locs, entryLocs, exitLocs);
     }
 
-    private static addTransition(tx: TransitionTable, from: LocationId, to: LocationId, op: ProgramOperation): TransitionTable {
+    private static addTransition(
+        tx: TransitionTable,
+        from: LocationId,
+        to: LocationId,
+        op: ProgramOperation
+    ): TransitionTable {
         Preconditions.checkNotUndefined(tx);
         Preconditions.checkNotUndefined(from);
         Preconditions.checkNotUndefined(to);
@@ -873,7 +895,11 @@ export class TransitionRelations {
         return result;
     }
 
-    static branching(thenCaseGuarded: TransitionRelation, elseCaseGuarded: TransitionRelation, resultExitLoc: ControlLocation): TransitionRelation {
+    static branching(
+        thenCaseGuarded: TransitionRelation,
+        elseCaseGuarded: TransitionRelation,
+        resultExitLoc: ControlLocation
+    ): TransitionRelation {
         let builder = TransitionRelation.builder()
             .addAllTransitionsOf(thenCaseGuarded)
             .addAllTransitionsOf(elseCaseGuarded);
@@ -890,9 +916,7 @@ export class TransitionRelations {
             builder.addTransition(ControlLocation.for(cexit), resultExitLoc, ProgramOperations.epsilon());
         }
 
-        return builder.addExitLocation(resultExitLoc)
-            .addEntryLocation(resultEntryLoc)
-            .build();
+        return builder.addExitLocation(resultExitLoc).addEntryLocation(resultEntryLoc).build();
     }
 
     static forkTransitions(caseOneGuarded: TransitionRelation, caseTwoGuarded: TransitionRelation): TransitionRelation {
@@ -932,9 +956,7 @@ export class TransitionRelations {
         let fromLocs: ImmSet<LocationId> = tr.exitLocationSet;
         for (let from of fromLocs) {
             tx = this.addTransition(tx, from, goto.ident, op);
-            exitLocs = exitLocs
-                .remove(from)
-                .add(goto.ident);
+            exitLocs = exitLocs.remove(from).add(goto.ident);
         }
 
         return new TransitionRelation(tx, locs, entryLocs, exitLocs);
@@ -942,10 +964,10 @@ export class TransitionRelations {
 
     static concatOpTr(loc: ControlLocation, op: ProgramOperation, tr: TransitionRelation): TransitionRelation {
         if (tr.locationSet.has(loc.ident)) {
-            throw new IllegalArgumentException("Circular references not yet supported! Implement me");
+            throw new IllegalArgumentException('Circular references not yet supported! Implement me');
         }
         if (tr.entryLocationSet.has(loc.ident)) {
-            throw new IllegalArgumentException("Circular references not yet supported! Implement me");
+            throw new IllegalArgumentException('Circular references not yet supported! Implement me');
         }
 
         let locs = tr.locationSet.add(loc.ident);
@@ -965,11 +987,12 @@ export class TransitionRelations {
         return new TransitionRelation(tx, locs, entryLocs, exitLocs);
     }
 
-    static concatAndGoto(headRelation: TransitionRelation, loopBody: TransitionRelation, loopHead: ControlLocation): TransitionRelation {
-        return this.concatTrOpGoto(
-            this.concat(headRelation, loopBody),
-            ProgramOperations.epsilon(),
-            loopHead);
+    static concatAndGoto(
+        headRelation: TransitionRelation,
+        loopBody: TransitionRelation,
+        loopHead: ControlLocation
+    ): TransitionRelation {
+        return this.concatTrOpGoto(this.concat(headRelation, loopBody), ProgramOperations.epsilon(), loopHead);
     }
 
     static singleTransition(from: ControlLocation, to: ControlLocation, op: ProgramOperation): TransitionRelation {
@@ -1049,9 +1072,13 @@ export class TransitionRelations {
 
         // Exit location
         for (const loc of tr.exitLocations) {
-            const entering = tr.transitionsTo(loc.ident).filter((t) =>
-                (!(ProgramOperation.for(t.opId).ast instanceof EpsilonStatement)
-                && !(ProgramOperation.for(t.opId).ast instanceof ReturnStatement)));
+            const entering = tr
+                .transitionsTo(loc.ident)
+                .filter(
+                    (t) =>
+                        !(ProgramOperation.for(t.opId).ast instanceof EpsilonStatement) &&
+                        !(ProgramOperation.for(t.opId).ast instanceof ReturnStatement)
+                );
             if (entering.length > 0) {
                 builder.removeExitLocation(loc);
                 const newExit = ControlLocation.fresh();
@@ -1096,11 +1123,15 @@ export class TransitionRelations {
         const reachedTargetVarLoc = DataLocations.createTypedLocation(Identifier.fresh(), IntegerType.instance());
         const reachedTargetVar = new VariableWithDataLocation(reachedTargetVarLoc);
         const declareReachedTargetStmt = new DeclareStackVariableStatement(reachedTargetVar);
-        const initReachedTargetVarStmt = new StoreEvalResultToVariableStatement(reachedTargetVar, IntegerLiteral.zero());
+        const initReachedTargetVarStmt = new StoreEvalResultToVariableStatement(
+            reachedTargetVar,
+            IntegerLiteral.zero()
+        );
 
         const prefixRelation = TransitionRelations.forOpSeq(
             ProgramOperationFactory.createFor(declareReachedTargetStmt),
-            ProgramOperationFactory.createFor(initReachedTargetVarStmt));
+            ProgramOperationFactory.createFor(initReachedTargetVarStmt)
+        );
 
         const result = TransitionRelation.builder();
         result.addRelation(TransitionRelations.concat(prefixRelation, tr));
@@ -1108,8 +1139,13 @@ export class TransitionRelations {
         // The new feasibility check locations
         const targetFeasibilityCheckLock = ControlLocation.fresh();
         const targetAfterFeasibilityCheckLoc = ControlLocation.fresh();
-        result.addTransition(targetFeasibilityCheckLock, targetAfterFeasibilityCheckLoc,
-            ProgramOperationFactory.createFor(new CheckFeasibilityStatement(new StringLiteral("Check before reaching targets"))));
+        result.addTransition(
+            targetFeasibilityCheckLock,
+            targetAfterFeasibilityCheckLoc,
+            ProgramOperationFactory.createFor(
+                new CheckFeasibilityStatement(new StringLiteral('Check before reaching targets'))
+            )
+        );
 
         for (const [from, opId, to] of tr.transitions) {
             const op = ProgramOperation.for(opId);
@@ -1126,12 +1162,22 @@ export class TransitionRelations {
                 // Assign instead of signal + redirect
                 result.removeTransition(from, to, opId);
                 const assignTarget = new StoreEvalResultToVariableStatement(reachedTargetVar, targetIdExpr);
-                result.addTransition(ControlLocation.for(from), targetFeasibilityCheckLock, ProgramOperationFactory.createFor(assignTarget));
+                result.addTransition(
+                    ControlLocation.for(from),
+                    targetFeasibilityCheckLock,
+                    ProgramOperationFactory.createFor(assignTarget)
+                );
 
                 // Check again after the feasibility check
                 const targetAfterAssumeLoc = ControlLocation.fresh();
-                const assumeTarget = new BranchingAssumeStatement(new NumEqualsExpression(reachedTargetVar, targetIdExpr));
-                result.addTransition(targetAfterFeasibilityCheckLoc, targetAfterAssumeLoc, ProgramOperationFactory.createFor(assumeTarget));
+                const assumeTarget = new BranchingAssumeStatement(
+                    new NumEqualsExpression(reachedTargetVar, targetIdExpr)
+                );
+                result.addTransition(
+                    targetAfterFeasibilityCheckLoc,
+                    targetAfterAssumeLoc,
+                    ProgramOperationFactory.createFor(assumeTarget)
+                );
                 const targetTerminationLoc = ControlLocation.fresh();
                 result.addTransition(targetAfterAssumeLoc, targetTerminationLoc, op);
 
@@ -1178,8 +1224,7 @@ export class TransitionRelations {
         return result;
     }
 
-    private static getDirClosure(l: LocationId,
-                                 nextOp: (l) => Array<TransitionTo>): Set<LocationId> {
+    private static getDirClosure(l: LocationId, nextOp: (l) => Array<TransitionTo>): Set<LocationId> {
         const result: Set<LocationId> = new Set();
 
         // Forwards reachable
@@ -1220,8 +1265,10 @@ export class TransitionRelations {
         return TransitionRelations.introduceEpsilonBetweenMergeAndBranchLocs(
             TransitionRelations.introduceEpsilonToMergeTransitions(
                 TransitionRelations.introduceEntryExitEpsilonTransition(
-                  TransitionRelations.eliminateEpsilons(
-                      TransitionRelations.introduceCommonTargetLocation(tr)))));
+                    TransitionRelations.eliminateEpsilons(TransitionRelations.introduceCommonTargetLocation(tr))
+                )
+            )
+        );
     }
 
     static eliminateEpsilons(tr: TransitionRelation): TransitionRelation {
@@ -1261,5 +1308,4 @@ export class TransitionRelations {
 
         return builder.build();
     }
-
 }

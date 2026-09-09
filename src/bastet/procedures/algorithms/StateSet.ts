@@ -23,30 +23,27 @@
  *
  */
 
-import {AbstractElement} from "../../lattices/Lattice";
-import {Preconditions} from "../../utils/Preconditions";
-import {List as ImmList, Map as ImmMap, OrderedSet, Record as ImmRec, Set as ImmSet} from "immutable";
-import {getTheOnlyElement} from "../../utils/Collections";
-import {Heap} from 'heap-js';
-import {LexiKey} from "../../utils/Lexicographic";
-import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {StateReferenceOperator} from "../analyses/ProgramAnalysis";
+import { AbstractElement } from '../../lattices/Lattice';
+import { Preconditions } from '../../utils/Preconditions';
+import { List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet } from 'immutable';
+import { getTheOnlyElement } from '../../utils/Collections';
+import { Heap } from 'heap-js';
+import { LexiKey } from '../../utils/Lexicographic';
+import { IllegalStateException } from '../../core/exceptions/IllegalStateException';
+import { ImplementMeException } from '../../core/exceptions/ImplementMeException';
+import { StateReferenceOperator } from '../analyses/ProgramAnalysis';
 
 export interface PartitionKeyAttribs extends AbstractElement {
-
     key: ImmList<any>;
-
 }
 
 const PartitionKeyRecord = ImmRec({
-    key: ImmList()
+    key: ImmList(),
 });
 
 export class PartitionKey extends PartitionKeyRecord implements PartitionKeyAttribs {
-
     constructor(partitionKey: ImmList<any>) {
-        super({key: partitionKey});
+        super({ key: partitionKey });
     }
 
     public getKey(): ImmList<any> {
@@ -56,11 +53,9 @@ export class PartitionKey extends PartitionKeyRecord implements PartitionKeyAttr
     public concat(other: PartitionKey): PartitionKey {
         return this.set('key', this.getKey().concat(other.getKey()));
     }
-
 }
 
 export interface StateSet<E extends AbstractElement> {
-
     isEmpty(): boolean;
 
     [Symbol.iterator](): IterableIterator<E>;
@@ -75,11 +70,10 @@ export interface StateSet<E extends AbstractElement> {
 
     getSize(): number;
 
-    has(element: E): boolean
+    has(element: E): boolean;
 }
 
 export interface ReachedSet<E extends AbstractElement> extends StateSet<E> {
-
     isRootState(element: E): boolean;
 
     addRootSates(elements: Iterable<E>);
@@ -89,17 +83,13 @@ export interface ReachedSet<E extends AbstractElement> extends StateSet<E> {
     getStateSet(inPartitionOf: E): Iterable<E>;
 
     getAddedLast(): E[];
-
 }
 
 export interface FrontierSet<E extends AbstractElement> extends StateSet<E> {
-
     peek(): E;
-
 }
 
 export abstract class AbstractAnalysisStateSet<E extends AbstractElement> {
-
     abstract isEmpty(): boolean;
 
     abstract getStateSet(inPartitionOf: E): Iterable<E>;
@@ -109,7 +99,7 @@ export abstract class AbstractAnalysisStateSet<E extends AbstractElement> {
     abstract remove(element: E);
 
     removeAll(elements: Iterable<E>) {
-        for (let e of elements){
+        for (let e of elements) {
             this.remove(e);
         }
     }
@@ -121,7 +111,7 @@ export abstract class AbstractAnalysisStateSet<E extends AbstractElement> {
     abstract getRootStates(): Set<E>;
 
     addAll(elements: Iterable<E>) {
-        for (let e of elements){
+        for (let e of elements) {
             this.add(e);
         }
     }
@@ -131,13 +121,11 @@ export abstract class AbstractAnalysisStateSet<E extends AbstractElement> {
     abstract getAddedLast(): E[];
 
     abstract getSize(): number;
-
 }
 
-export type PartitionKeyElement = string|number|boolean;
+export type PartitionKeyElement = string | number | boolean;
 
 export interface StatePartitionOperator<E extends AbstractElement> {
-
     /**
      * Get the set of partitions (their identifiers) into that a given element
      * should be mapped (the term partition is misused here since
@@ -146,7 +134,6 @@ export interface StatePartitionOperator<E extends AbstractElement> {
      * @param element
      */
     getPartitionKeys(element: E): ImmSet<PartitionKey>;
-
 }
 
 export type SinglePartitionKeyFunction<E extends AbstractElement> = (E) => LexiKey;
@@ -154,21 +141,16 @@ export type SinglePartitionKeyFunction<E extends AbstractElement> = (E) => LexiK
 export type StateOrderingFunction<E extends AbstractElement> = (a: E, b: E) => number;
 
 export interface SingleStatePartitionOperator<E extends AbstractElement> {
-
     getPartitionKey(element: E): LexiKey;
-
 }
 
 export class NoPartitioningOperator<E extends AbstractElement> implements StatePartitionOperator<E> {
-
     getPartitionKeys(element: E): ImmSet<PartitionKey> {
         return ImmSet([new PartitionKey(ImmList())]);
     }
-
 }
 
 export class PartitionedOrderedSet<E extends AbstractElement> {
-
     private _size: number;
 
     private _keyOperator: StatePartitionOperator<E>;
@@ -236,11 +218,9 @@ export class PartitionedOrderedSet<E extends AbstractElement> {
     public [Symbol.iterator](): IterableIterator<E> {
         return this._elements[Symbol.iterator]();
     }
-
 }
 
 export class DifferencingFrontierSet<E extends AbstractElement> implements FrontierSet<E> {
-
     private _size: number;
 
     private _diffKeyOperator: SinglePartitionKeyFunction<E>;
@@ -257,9 +237,11 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
 
     private _lastPartitionIndex: number;
 
-    constructor(diffKeyOperator: SinglePartitionKeyFunction<E>, 
-                intraPartitionComparator: StateOrderingFunction<E>,
-                refCountOperator: StateReferenceOperator<E>) {
+    constructor(
+        diffKeyOperator: SinglePartitionKeyFunction<E>,
+        intraPartitionComparator: StateOrderingFunction<E>,
+        refCountOperator: StateReferenceOperator<E>
+    ) {
         this._diffKeyOperator = Preconditions.checkNotUndefined(diffKeyOperator);
         this._intraPartitionComparator = Preconditions.checkNotUndefined(intraPartitionComparator);
         this._refCountOperator = Preconditions.checkNotUndefined(refCountOperator);
@@ -271,9 +253,9 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
     }
 
     private compareKeys(l1: LexiKey, l2: LexiKey): number {
-       Preconditions.checkNotUndefined(l1);
-       Preconditions.checkNotUndefined(l2);
-       return l1.compareTo(l2);
+        Preconditions.checkNotUndefined(l1);
+        Preconditions.checkNotUndefined(l2);
+        return l1.compareTo(l2);
     }
 
     private getPartitionKey(element: E): LexiKey {
@@ -367,7 +349,7 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
 
     peek(): E {
         if (this.isEmpty()) {
-            throw new IllegalStateException("No elements to peek");
+            throw new IllegalStateException('No elements to peek');
         }
 
         if (this._nextPartitions.isEmpty()) {
@@ -384,7 +366,7 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
     pop(): E {
         const result = this.peek();
         this.remove(result);
-        return result
+        return result;
     }
 
     removeAll(elements: Iterable<E>) {
@@ -406,7 +388,6 @@ export class DifferencingFrontierSet<E extends AbstractElement> implements Front
     public [Symbol.iterator](): IterableIterator<E> {
         return this._elements[Symbol.iterator]();
     }
-
 }
 
 export const CHOOSE_EITHER: number = 0;
@@ -414,17 +395,16 @@ export const CHOOSE_SECOND: number = +1;
 export const CHOOSE_FIRST: number = -1;
 
 export interface StateOrderComparator<E extends AbstractElement> {
-
     compareStateOrder(a: E, b: E): number;
-
 }
 
 export class PriorityFrontierSet<E extends AbstractElement> implements FrontierSet<E> {
-
     private readonly _elements: Heap<E>;
 
     constructor(comparator: StateOrderingFunction<E>) {
-        this._elements = new Heap((a, b) => {return comparator(a, b)});
+        this._elements = new Heap((a, b) => {
+            return comparator(a, b);
+        });
     }
 
     public [Symbol.iterator](): IterableIterator<E> {
@@ -446,7 +426,7 @@ export class PriorityFrontierSet<E extends AbstractElement> implements FrontierS
     }
 
     getSize(): number {
-        return this._elements.length
+        return this._elements.length;
     }
 
     isEmpty(): boolean {
@@ -466,13 +446,14 @@ export class PriorityFrontierSet<E extends AbstractElement> implements FrontierS
             this.remove(e);
         }
     }
-
 }
 
-export enum PeekMode { PeekFirstAdded, PeekLastAdded};
+export enum PeekMode {
+    PeekFirstAdded,
+    PeekLastAdded,
+}
 
 export class DefaultFrontierSet<E extends AbstractElement> implements FrontierSet<E> {
-
     private readonly _elements: Set<E>;
 
     private readonly _peekMode: PeekMode;
@@ -525,14 +506,12 @@ export class DefaultFrontierSet<E extends AbstractElement> implements FrontierSe
             this.remove(e);
         }
     }
-
 }
 
 /**
  * Ordered by insertion time.
  */
 export class DefaultAnalysisStateSet<E extends AbstractElement> extends AbstractAnalysisStateSet<E> {
-
     private _states: PartitionedOrderedSet<E>;
 
     private _root: Set<E>;
@@ -593,4 +572,3 @@ export class DefaultAnalysisStateSet<E extends AbstractElement> extends Abstract
         return this._states.size;
     }
 }
-

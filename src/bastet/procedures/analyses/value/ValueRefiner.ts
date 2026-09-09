@@ -23,26 +23,29 @@
  *
  */
 
-
-import {Refiner} from "../Refiner";
-import {AbstractState, Lattices, LatticeWithComplements} from "../../../lattices/Lattice";
-import {FrontierSet, ReachedSet} from "../../algorithms/StateSet";
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {ValueAbstractState} from "./ValueAbstractDomain";
-import { Preconditions } from "../../../utils/Preconditions";
-import {AccessibilityRelation} from "../Accessibility";
-import {ValueAbstractStates} from "./ValueAbstractStates";
-import {getTheOnlyElement} from "../../../utils/Collections";
+import { Refiner } from '../Refiner';
+import { AbstractState, Lattices, LatticeWithComplements } from '../../../lattices/Lattice';
+import { FrontierSet, ReachedSet } from '../../algorithms/StateSet';
+import { IllegalStateException } from '../../../core/exceptions/IllegalStateException';
+import { ValueAbstractState } from './ValueAbstractDomain';
+import { Preconditions } from '../../../utils/Preconditions';
+import { AccessibilityRelation } from '../Accessibility';
+import { ValueAbstractStates } from './ValueAbstractStates';
+import { getTheOnlyElement } from '../../../utils/Collections';
 
 export class ValueRefiner implements Refiner<AbstractState> {
-
     private readonly _lattice: LatticeWithComplements<ValueAbstractState>;
 
     constructor(lattice: LatticeWithComplements<ValueAbstractState>) {
         this._lattice = lattice;
     }
 
-    checkIsFeasible(reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractState>, fullState: AbstractState, purpose: string = null): boolean {
+    checkIsFeasible(
+        reached: ReachedSet<AbstractState>,
+        ar: AccessibilityRelation<AbstractState>,
+        fullState: AbstractState,
+        purpose: string = null
+    ): boolean {
         Preconditions.checkNotUndefined(reached);
         Preconditions.checkNotUndefined(fullState);
 
@@ -50,8 +53,12 @@ export class ValueRefiner implements Refiner<AbstractState> {
         return Lattices.isFeasible(dataState, this._lattice, purpose);
     }
 
-    refinePrecision(frontier: FrontierSet<AbstractState>, reached: ReachedSet<AbstractState>, ar: AccessibilityRelation<AbstractState>, infeasibleState: ValueAbstractState): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
-        throw new IllegalStateException("This refiner does not support precision refinement!");
+    refinePrecision(
+        frontier: FrontierSet<AbstractState>,
+        reached: ReachedSet<AbstractState>,
+        ar: AccessibilityRelation<AbstractState>,
+        infeasibleState: ValueAbstractState
+    ): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
+        throw new IllegalStateException('This refiner does not support precision refinement!');
     }
-
 }

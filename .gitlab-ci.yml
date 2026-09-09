@@ -1,27 +1,37 @@
-image: node:14
+image: node:24
+
+before_script:
+    - corepack enable
+    - pnpm config set store-dir .pnpm-store
 
 stages:
-  - build
-  - test
+    - build
+    - test
 
 cache:
-  paths:
-    - node_modules/
+    paths:
+        - .pnpm-store/
 
 install_dependencies:
-  stage: build
-  script:
-    - npm install -D typescript@4.1.2
-    - npm install
-    - mkdir -p output/static
-  artifacts:
-    paths:
-      - node_modules/
+    stage: build
+    script:
+        - pnpm install --frozen-lockfile
+        - mkdir -p output/static
+    artifacts:
+        paths:
+            - node_modules/
 
-testing_testing:
-  stage: test
-  script:
-    - npm install -D typescript@4.1.2
-    - npm install
-    - npm test
-    - mkdir -p output/static
+testing_fast:
+    stage: test
+    script:
+        - pnpm run build-no-lint
+        - pnpm run test:fast
+        - mkdir -p output/static
+
+testing_slow:
+    stage: test
+    script:
+        - pnpm run build-no-lint
+        - pnpm run test:slow
+        - pnpm run test:slow:deadline
+        - mkdir -p output/static

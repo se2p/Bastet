@@ -32,28 +32,30 @@ import {
     Z3_sort,
     Z3_symbol,
 } from './libz3';
-import {Preconditions} from "../../Preconditions";
-import {WasmJSInstance} from "./WasmInstance";
-import {Z3BooleanFormula, Z3FirstOrderFormula, Z3FirstOrderLattice, Z3Formula, Z3Theories} from "./Z3Theories";
-import {FirstOrderSolver} from "../../../procedures/domains/FirstOrderDomain";
-import {Sint32, Uint32} from "./ctypes";
-import {BooleanTheory} from "../../../procedures/domains/MemoryTransformer";
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {BastetConfiguration} from "../../BastetConfiguration";
-import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
-import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
-import {Identifier} from "../../../syntax/ast/core/Identifier";
-import {BooleanType} from "../../../syntax/ast/core/ScratchType";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {AnalysisStatistics} from "../../../procedures/analyses/AnalysisStatistics";
-import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
+import { Preconditions } from '../../Preconditions';
+import { WasmJSInstance } from './WasmInstance';
+import { Z3BooleanFormula, Z3FirstOrderFormula, Z3FirstOrderLattice, Z3Formula, Z3Theories } from './Z3Theories';
+import { FirstOrderSolver } from '../../../procedures/domains/FirstOrderDomain';
+import { Sint32, Uint32 } from './ctypes';
+import { BooleanTheory } from '../../../procedures/domains/MemoryTransformer';
+import { IllegalStateException } from '../../../core/exceptions/IllegalStateException';
+import { BastetConfiguration } from '../../BastetConfiguration';
+import { IllegalArgumentException } from '../../../core/exceptions/IllegalArgumentException';
+import { VariableWithDataLocation } from '../../../syntax/ast/core/Variable';
+import { DataLocations } from '../../../syntax/app/controlflow/DataLocation';
+import { Identifier } from '../../../syntax/ast/core/Identifier';
+import { BooleanType } from '../../../syntax/ast/core/ScratchType';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { AnalysisStatistics } from '../../../procedures/analyses/AnalysisStatistics';
+import { Map as ImmMap } from 'immutable';
 import {
-    ConcreteBoolean, ConcreteFloat,
+    ConcreteBoolean,
+    ConcreteFloat,
     ConcreteInteger,
     ConcretePrimitive,
-    ConcreteString, ConcreteUnifiedMemory
-} from "../../../procedures/domains/ConcreteElements";
+    ConcreteString,
+    ConcreteUnifiedMemory,
+} from '../../../procedures/domains/ConcreteElements';
 
 export var PreModule = {
     print: function (text) {
@@ -65,14 +67,13 @@ export var PreModule = {
     },
 
     locateFile: function (path, scriptDir) {
-        return "dist/src/lib/z3/libz3.so.wasm";
+        return 'dist/src/lib/z3/libz3.so.wasm';
     },
 
-    postRun: function () {
-    },
+    postRun: function () {},
 
     instantiateWasm: function (importObject, callback) {
-        const filename = this.locateFile("", "");
+        const filename = this.locateFile('', '');
 
         const fs = require('fs');
         const buffer = fs.readFileSync(filename);
@@ -84,7 +85,7 @@ export var PreModule = {
                     theAsmModule = asmModule;
                     return WebAssembly.instantiate(asmModule, importObject);
                 })
-                .catch((reason => console.log(reason)))
+                .catch((reason) => console.log(reason))
                 .then((asmInstance) => callback(asmInstance, theAsmModule))
                 .catch((reason) => console.log(reason));
         })();
@@ -94,38 +95,41 @@ export var PreModule = {
 
     onRuntimeInitialized: function () {
         global['Module']['onSolverInitDone']();
-    }
+    },
 };
 
 global['Module'] = PreModule;
 
 export class SMTFactory {
+    private static instancePromise: Promise<Z3SMT>;
 
-    public static async createZ3(): Promise<Z3SMT> {
+    public static createZ3(): Promise<Z3SMT> {
+        if (!this.instancePromise) {
+            this.instancePromise = this.initializeZ3().catch((error) => {
+                this.instancePromise = null;
+                throw error;
+            });
+        }
+        return this.instancePromise;
+    }
+
+    private static async initializeZ3(): Promise<Z3SMT> {
         try {
-            require("../../../../lib/z3/libz3.so.js");
+            require('../../../../lib/z3/libz3.so.js');
         } catch (e) {
-            throw new IllegalStateException("Initialization of Z3 failed: " + e);
+            throw new IllegalStateException('Initialization of Z3 failed: ' + e);
         }
 
-        let solverInitPromise = new Promise((resolve, reject) => {
-            global['Module']['onSolverInitDone'] = () => {
-                resolve('Success');
-            };
-
-        });
-
-        let solverInitTimeout = new Promise((resolve, reject) => {
-            setTimeout(_ => {
-                resolve('Success');
+        await new Promise<void>((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                reject(new IllegalStateException('Initialization of Z3 timed out'));
             }, 15000);
-        });
 
-        await Promise.race([solverInitPromise, solverInitTimeout])
-            .then((value) => {
-            })
-            .catch((reason) => {
-            });
+            global['Module']['onSolverInitDone'] = () => {
+                clearTimeout(timeout);
+                resolve();
+            };
+        });
 
         return new Z3SMT(global['Module']);
     }
@@ -139,7 +143,6 @@ const Z3_UNSATISFIABLE = -1;
 const Z3_SATISFIABLE = 1;
 
 export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
-
     private _model: Z3Model;
 
     private readonly _ctx: LibZ3InContext;
@@ -157,10 +160,10 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         this._solver = this._ctx.mk_solver();
         this._ctx.solver_inc_ref(this._solver);
         this._theories = Preconditions.checkNotUndefined(theories);
-        this._stats = Preconditions.checkNotUndefined(stats).withContext("SMT");
-        this._statBoolPredAbs = this._stats.withContext("bool-pred-abs");
-        this._statBoolPredAbsSetup = this._statBoolPredAbs.withContext("setup");
-        this._statBoolPredAbsAllSat = this._statBoolPredAbs.withContext("all-sat");
+        this._stats = Preconditions.checkNotUndefined(stats).withContext('SMT');
+        this._statBoolPredAbs = this._stats.withContext('bool-pred-abs');
+        this._statBoolPredAbsSetup = this._statBoolPredAbs.withContext('setup');
+        this._statBoolPredAbsAllSat = this._statBoolPredAbs.withContext('all-sat');
     }
 
     private solve(): number {
@@ -217,8 +220,10 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
 
     // FIXME: memory leaks! Have to increment and decrement the reference counters!
     private buildInterpolationProblem(seq: Z3BooleanFormula[]): Z3Formula {
-        Preconditions.checkArgument(seq.length > 1,
-            `Only got ${seq.length} formula(s) but there should have been at least 2`);
+        Preconditions.checkArgument(
+            seq.length > 1,
+            `Only got ${seq.length} formula(s) but there should have been at least 2`
+        );
 
         const interpolationPoints: Z3_ast[] = [];
         for (const formula of seq.reverse()) {
@@ -228,14 +233,21 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         }
 
         const trueBool: Z3_ast = this._theories.boolTheory.trueBool().getAST();
-        const conjunction = interpolationPoints.reduce((x, y) => this._ctx.mk_interpolant(
-            this._theories.boolTheory.and(new Z3BooleanFormula(x), new Z3BooleanFormula(y)).getAST()), trueBool);
+        const conjunction = interpolationPoints.reduce(
+            (x, y) =>
+                this._ctx.mk_interpolant(
+                    this._theories.boolTheory.and(new Z3BooleanFormula(x), new Z3BooleanFormula(y)).getAST()
+                ),
+            trueBool
+        );
         return new Z3BooleanFormula(conjunction);
     }
 
     private buildInterpolationProblem2(seq: Z3BooleanFormula[]): Z3Formula {
-        Preconditions.checkArgument(seq.length > 1,
-            `Only got ${seq.length} formula(s) but there should have been at least 2`);
+        Preconditions.checkArgument(
+            seq.length > 1,
+            `Only got ${seq.length} formula(s) but there should have been at least 2`
+        );
 
         const interpolationPoints: Z3_ast[] = [];
         for (const formula of seq) {
@@ -245,8 +257,10 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         }
 
         const trueBool = this._theories.boolTheory.trueBool().getAST();
-        const conjunction = interpolationPoints.reduce((x, y) =>
-            this._theories.boolTheory.and(new Z3BooleanFormula(x), new Z3BooleanFormula(y)).getAST(), trueBool);
+        const conjunction = interpolationPoints.reduce(
+            (x, y) => this._theories.boolTheory.and(new Z3BooleanFormula(x), new Z3BooleanFormula(y)).getAST(),
+            trueBool
+        );
         return new Z3BooleanFormula(conjunction);
     }
 
@@ -327,20 +341,25 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
 
         for (let i = 0; i < abstrPrec.length; i++) {
             const varName = `__v_${i}`;
-            const varData = new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of(varName), BooleanType.instance()));
+            const varData = new VariableWithDataLocation(
+                DataLocations.createTypedLocation(Identifier.of(varName), BooleanType.instance())
+            );
             result.push([varName, theories.boolTheory.abstractBooleanValue(varData)]);
         }
 
         return result;
     }
 
-    formWithVariable(formula: Z3BooleanFormula, predicates: Z3BooleanFormula[], varMap: [string, Z3BooleanFormula][]): Z3BooleanFormula {
+    formWithVariable(
+        formula: Z3BooleanFormula,
+        predicates: Z3BooleanFormula[],
+        varMap: [string, Z3BooleanFormula][]
+    ): Z3BooleanFormula {
         const theories = new Z3Theories(this._ctx);
 
         let result = formula;
         varMap.forEach(([varName, varFormula], index) => {
-            result = theories.boolTheory.and(result,
-                theories.boolTheory.equal(predicates[index], varFormula));
+            result = theories.boolTheory.and(result, theories.boolTheory.equal(predicates[index], varFormula));
         });
 
         return result;
@@ -403,7 +422,7 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
                 }
                 newFormula = this.boolTermAnd(newFormula, helpForm, theories);
                 j++;
-            })
+            });
             this.assert(theories.boolTheory.not(newFormula));
             i++;
         }
@@ -433,7 +452,10 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         return this.truthTableToSummaryFormula(retTable, predicates);
     }
 
-    cartesianAbstraction(abstractionProblem: Z3FirstOrderFormula, predicates: Z3FirstOrderFormula[]): Z3FirstOrderFormula {
+    cartesianAbstraction(
+        abstractionProblem: Z3FirstOrderFormula,
+        predicates: Z3FirstOrderFormula[]
+    ): Z3FirstOrderFormula {
         throw new ImplementMeException();
     }
 
@@ -441,12 +463,12 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         const theories = new Z3Theories(this._ctx);
         let result = theories.boolTheory.falseBool();
 
-        retTable.forEach(row => {
+        retTable.forEach((row) => {
             let form;
             for (let i = 0; i < row.length; i++) {
                 const value = row[i];
                 let term = predicates[i];
-                if(!value) {
+                if (!value) {
                     term = theories.boolTheory.not(term);
                 }
                 form = this.boolTermAnd(form, term, theories);
@@ -457,22 +479,30 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
         return result;
     }
 
-    private boolTermAnd(baseForm: Z3BooleanFormula | null, addForm: Z3BooleanFormula, theories: Z3Theories): Z3BooleanFormula {
-        let retTerm : Z3BooleanFormula;
+    private boolTermAnd(
+        baseForm: Z3BooleanFormula | null,
+        addForm: Z3BooleanFormula,
+        theories: Z3Theories
+    ): Z3BooleanFormula {
+        let retTerm: Z3BooleanFormula;
         if (baseForm == null) {
             retTerm = addForm;
         } else {
-            retTerm = theories.boolTheory.and(baseForm, addForm)
+            retTerm = theories.boolTheory.and(baseForm, addForm);
         }
         return retTerm;
     }
 
-    private boolTermOr(baseForm: Z3BooleanFormula | null, addForm: Z3BooleanFormula, theories: Z3Theories): Z3BooleanFormula {
-        let retTerm : Z3BooleanFormula;
+    private boolTermOr(
+        baseForm: Z3BooleanFormula | null,
+        addForm: Z3BooleanFormula,
+        theories: Z3Theories
+    ): Z3BooleanFormula {
+        let retTerm: Z3BooleanFormula;
         if (baseForm == null) {
             retTerm = addForm;
         } else {
-            retTerm = theories.boolTheory.or(baseForm, addForm)
+            retTerm = theories.boolTheory.or(baseForm, addForm);
         }
         return retTerm;
     }
@@ -487,7 +517,6 @@ export class Z3ProverEnvironment extends FirstOrderSolver<Z3FirstOrderFormula> {
 }
 
 export class Z3Vector {
-
     private readonly _ctx: LibZ3InContext;
 
     private readonly _v: Z3_ast_vector;
@@ -523,11 +552,9 @@ export class Z3Vector {
         }
         return result;
     }
-
 }
 
 export class Z3Model {
-
     private readonly _ctx: LibZ3InContext;
 
     private readonly _model: Z3_model;
@@ -555,16 +582,16 @@ export class Z3Model {
         const sortString: string = ctx.sort_to_string(sort);
 
         switch (sortString) {
-            case "String":
+            case 'String':
                 return new ConcreteString(ctx.get_string(constInterp));
-            case "Int":
+            case 'Int':
                 return new ConcreteInteger(parseInt(ctx.get_numeral_string(constInterp)));
-            case "Bool":
+            case 'Bool':
                 return new ConcreteBoolean(Z3_L_TRUE == ctx.get_bool_value(constInterp).val());
-            case "Real":
+            case 'Real':
                 return new ConcreteFloat(parseFloat(ctx.get_numeral_string(constInterp)));
             default:
-                throw new IllegalStateException(`Unknown const type '${sortString}'`)
+                throw new IllegalStateException(`Unknown const type '${sortString}'`);
         }
     }
 
@@ -582,7 +609,10 @@ export class Z3Model {
             const valueMap = new Map<string, ConcretePrimitive<any>>();
             for (let index = 0; index < this.getNumConst(); index++) {
                 const constDecl: Z3_func_decl = this._ctx.model_get_const_decl(this._model, new Uint32(index));
-                valueMap.set(this.getConstName(this._ctx, constDecl), this.getConstValue(this._ctx, constDecl, this._model));
+                valueMap.set(
+                    this.getConstName(this._ctx, constDecl),
+                    this.getConstValue(this._ctx, constDecl, this._model)
+                );
             }
             this._valueMap = new ConcreteUnifiedMemory(ImmMap(valueMap));
         }
@@ -598,7 +628,6 @@ export class Z3Model {
 type Z3VariableAssignment = string | number | boolean;
 
 export class SolverConfig extends BastetConfiguration {
-
     constructor(dict: {}) {
         super(dict, ['Solver']);
     }
@@ -606,11 +635,9 @@ export class SolverConfig extends BastetConfiguration {
     get encodeAllNumbersAsFloats(): boolean {
         return this.getBoolProperty('encode-all-numbers-as-floats', true);
     }
-
 }
 
 export class Z3SMT extends LibZ3NonContext {
-
     private _module: WasmJSInstance;
 
     constructor(z3mod: WasmJSInstance) {
@@ -621,9 +648,9 @@ export class Z3SMT extends LibZ3NonContext {
     public createContext(): LibZ3InContext {
         const cfg = this.mk_config();
         // this.set_param_value(cfg, "timeout", "60000"); // Timeout in milliseconds (the Z3 WASM must be recompiled with PTHREADS enabled)
-        this.set_param_value(cfg, "proof", "true"); // No proof generation (sufficient for BMC)
-        this.set_param_value(cfg, "unsat_core", "true"); // No unsat-core generation (sufficient for BMC)
-        this.set_param_value(cfg, "model", "true"); // Create models
+        this.set_param_value(cfg, 'proof', 'true'); // No proof generation (sufficient for BMC)
+        this.set_param_value(cfg, 'unsat_core', 'true'); // No unsat-core generation (sufficient for BMC)
+        this.set_param_value(cfg, 'model', 'true'); // Create models
 
         const ctx = this.mk_context(cfg);
         return new LibZ3InContext(this._wasmInstance, ctx);
@@ -637,8 +664,10 @@ export class Z3SMT extends LibZ3NonContext {
         return new Z3Theories(ctx);
     }
 
-    public createLattice(prover: Z3ProverEnvironment, boolTheory: BooleanTheory<Z3FirstOrderFormula>): Z3FirstOrderLattice {
+    public createLattice(
+        prover: Z3ProverEnvironment,
+        boolTheory: BooleanTheory<Z3FirstOrderFormula>
+    ): Z3FirstOrderLattice {
         return new Z3FirstOrderLattice(boolTheory, prover);
     }
-
 }

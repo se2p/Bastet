@@ -23,9 +23,9 @@
  *
  */
 
-import {ErrorNode, ParseTree, RuleNode, TerminalNode} from "antlr4ts/tree";
-import {LeilaVisitor} from "../parser/grammar/LeilaVisitor";
-import {AbsentAstNode, AstNode, OptionalAstNode, PresentAstNode} from "../ast/AstNode";
+import { ErrorNode, ParseTree, RuleNode, TerminalNode } from 'antlr4ts/tree';
+import { LeilaVisitor } from '../parser/grammar/LeilaVisitor';
+import { AbsentAstNode, AstNode, OptionalAstNode, PresentAstNode } from '../ast/AstNode';
 import {
     ActorComponentsDefinitionContext,
     ActorDefinitionContext,
@@ -40,8 +40,9 @@ import {
     AfterBootstrapMonitoringEventContext,
     AfterStatementMonitoringEventContext,
     AnonymousScriptIdentContext,
-    AssumeStatementContext, AtomicBlockContext,
-    AtomicMethodContext, BlockModeContext,
+    AssumeStatementContext,
+    AtomicBlockContext,
+    AtomicMethodContext,
     BoolAndExpressionContext,
     BoolAsStringExpressionContext,
     BoolCallStatementExpressionContext,
@@ -127,7 +128,9 @@ import {
     NumVariableExpressionContext,
     ParameterContext,
     ParameterListContext,
-    ParameterListPlainContext, PrecisionPopStatementContext, PrecisionPushStatementContext,
+    ParameterListPlainContext,
+    PrecisionPopStatementContext,
+    PrecisionPushStatementContext,
     PrimitiveContext,
     ProgramContext,
     PureElseContext,
@@ -155,7 +158,8 @@ import {
     StoreCallResultStatementContext,
     StoreEvalResultStatementContext,
     StrContainsExpressionContext,
-    StrIdentExpressionContext, StringAsBoolExpressionContext,
+    StrIdentExpressionContext,
+    StringAsBoolExpressionContext,
     StringAttributeOfExpressionContext,
     StringCallStatementExpressionContext,
     StringLiteralExpressionContext,
@@ -176,19 +180,19 @@ import {
     VariableContext,
     VoidReturnDefinitionContext,
     WaitSecsStatementContext,
-    WaitUntilStatementContext
-} from "../parser/grammar/LeilaParser";
-import {ProgramDefinition} from "../ast/core/ModuleDefinition";
-import {Identifier} from "../ast/core/Identifier";
+    WaitUntilStatementContext,
+} from '../parser/grammar/LeilaParser';
+import { ProgramDefinition } from '../ast/core/ModuleDefinition';
+import { Identifier } from '../ast/core/Identifier';
 import {
     ActorDefinition,
     ActorDefinitionList,
     ActorMode,
     ActorRoleMode,
     ConcreteActorMode,
-    InheritsFromList
-} from "../ast/core/ActorDefinition";
-import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
+    InheritsFromList,
+} from '../ast/core/ActorDefinition';
+import { ImplementMeException, ImplementMeForException } from '../../core/exceptions/ImplementMeException';
 import {
     IthLetterOfStringExpression,
     IthStringItemOfExpression,
@@ -196,34 +200,34 @@ import {
     StringAttributeOfExpression,
     StringExpression,
     StringLiteral,
-    StringVariableExpression
-} from "../ast/core/expressions/StringExpression";
-import {ResourceLocation} from "../ast/core/ResourceLocation";
+    StringVariableExpression,
+} from '../ast/core/expressions/StringExpression';
+import { ResourceLocation } from '../ast/core/ResourceLocation';
 import {
     ImageResourceType,
     ResourceDefinition,
     ResourceDefinitionList,
     ResourceType,
-    SoundResourceType
-} from "../ast/core/ResourceDefinition";
-import {Statement, StatementList, StatementLists} from "../ast/core/statements/Statement";
+    SoundResourceType,
+} from '../ast/core/ResourceDefinition';
+import { Statement, StatementList, StatementLists } from '../ast/core/statements/Statement';
 import {
     ExternMethodDeclaration,
     MethodDefinition,
     MethodDefinitionList,
     MethodDefinitions,
     MethodSignature,
-    ResultDeclaration
-} from "../ast/core/MethodDefinition";
-import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
+    ResultDeclaration,
+} from '../ast/core/MethodDefinition';
+import { ScriptDefinition, ScriptDefinitionList } from '../ast/core/ScriptDefinition';
 import {
     DeclareActorVariableStatement,
-    DeclareStackVariableStatement
-} from "../ast/core/statements/DeclarationStatement";
-import {StoreEvalResultToVariableStatement} from "../ast/core/statements/SetStatement";
-import {Expression} from "../ast/core/expressions/Expression";
-import {ExpressionList} from "../ast/core/expressions/ExpressionList";
-import {ParameterDeclaration, ParameterDeclarationList} from "../ast/core/ParameterDeclaration";
+    DeclareStackVariableStatement,
+} from '../ast/core/statements/DeclarationStatement';
+import { StoreEvalResultToVariableStatement } from '../ast/core/statements/SetStatement';
+import { Expression } from '../ast/core/expressions/Expression';
+import { ExpressionList } from '../ast/core/expressions/ExpressionList';
+import { ParameterDeclaration, ParameterDeclarationList } from '../ast/core/ParameterDeclaration';
 import {
     ActorType,
     BooleanType,
@@ -233,8 +237,8 @@ import {
     ScratchType,
     StringEnumType,
     StringType,
-    VoidType
-} from "../ast/core/ScratchType";
+    VoidType,
+} from '../ast/core/ScratchType';
 import {
     AfterBootstrapMonitoringEvent,
     AfterStatementMonitoringEvent,
@@ -247,15 +251,16 @@ import {
     NeverEvent,
     QualifiedMessageNamespace,
     StartupEvent,
-    UnqualifiedMessageNamespace
-} from "../ast/core/CoreEvent";
-import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
+    UnqualifiedMessageNamespace,
+} from '../ast/core/CoreEvent';
+import { IllegalStateException } from '../../core/exceptions/IllegalStateException';
 import {
-    BeginAtomicStatement, EndAtomicStatement,
+    BeginAtomicStatement,
+    EndAtomicStatement,
     IfStatement,
     RepeatForeverStatement,
-    UntilQueriedConditionStatement
-} from "../ast/core/statements/ControlStatement";
+    UntilQueriedConditionStatement,
+} from '../ast/core/statements/ControlStatement';
 import {
     BooleanExpression,
     BooleanLiteral,
@@ -269,8 +274,8 @@ import {
     StrContainsExpression,
     StrEqualsExpression,
     StrGreaterThanExpression,
-    StrLessThanExpression
-} from "../ast/core/expressions/BooleanExpression";
+    StrLessThanExpression,
+} from '../ast/core/expressions/BooleanExpression';
 import {
     DivideExpression,
     FloatLiteral,
@@ -283,49 +288,48 @@ import {
     MultiplyExpression,
     NumberExpression,
     NumberVariableExpression,
-    PlusExpression
-} from "../ast/core/expressions/NumberExpression";
-import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
-import {ExpressionStatement} from "../ast/core/statements/ExpressionStatement";
+    PlusExpression,
+} from '../ast/core/expressions/NumberExpression';
+import { EpsilonStatement } from '../ast/core/statements/EpsilonStatement';
+import { ExpressionStatement } from '../ast/core/statements/ExpressionStatement';
 import {
     AddElementToStatement,
     DeleteAllFromStatement,
     DeleteIthFromStatement,
     InsertAtStatement,
-    ReplaceElementAtStatement
-} from "../ast/core/statements/ListStatement";
-import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
-import {CallStatement} from "../ast/core/statements/CallStatement";
-import {CreateCloneOfStatement} from "../ast/core/statements/CreateCloneOfStatement";
+    ReplaceElementAtStatement,
+} from '../ast/core/statements/ListStatement';
+import { BroadcastAndWaitStatement, BroadcastMessageStatement } from '../ast/core/statements/BroadcastMessageStatement';
+import { CallStatement } from '../ast/core/statements/CallStatement';
+import { CreateCloneOfStatement } from '../ast/core/statements/CreateCloneOfStatement';
 import {
     DeleteThisCloneStatement,
     StopAllStatement,
-    StopThisStatement
-} from "../ast/core/statements/TerminationStatement";
-import {ActorDestination, NamedDestination, SystemMessage, UserMessage} from "../ast/core/Message";
-import {StopOthersInActorStatement} from "../ast/core/statements/StopOthersInActorStatement";
-import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
-import {Preconditions} from "../../utils/Preconditions";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {App} from "../app/App";
-import {VariableExpression, VariableWithDataLocation} from "../ast/core/Variable";
-import {DataLocations, VAR_SCOPING_SPLITTER} from "../app/controlflow/DataLocation";
-import {StrengtheningAssumeStatement} from "../ast/core/statements/AssumeStatement";
-import {MethodIdentifiers} from "../app/controlflow/MethodIdentifiers";
-import {BastetConfiguration} from "../../utils/BastetConfiguration";
-import {ParsingException} from "../../core/exceptions/ParsingException";
-import {ParserRuleContext} from "antlr4ts";
-import {CastExpression} from "../ast/core/expressions/CastExpression";
-import {ActorExpression, ActorSelfExpression, LocateActorExpression} from "../ast/core/expressions/ActorExpression";
-import {DeclarationScopeType, ScopeTypeInformation, TypeInformationStorage} from "../DeclarationScopes";
-import {LookupTransformer} from "./LookupTransformer";
-import {SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
-import {PrecisionPopStatement, PrecisionPushStatement} from "../ast/core/Precisions";
+    StopThisStatement,
+} from '../ast/core/statements/TerminationStatement';
+import { ActorDestination, NamedDestination, SystemMessage, UserMessage } from '../ast/core/Message';
+import { StopOthersInActorStatement } from '../ast/core/statements/StopOthersInActorStatement';
+import { WaitUntilStatement } from '../ast/core/statements/WaitUntilStatement';
+import { Preconditions } from '../../utils/Preconditions';
+import { IllegalArgumentException } from '../../core/exceptions/IllegalArgumentException';
+import { App } from '../app/App';
+import { VariableExpression, VariableWithDataLocation } from '../ast/core/Variable';
+import { DataLocations, VAR_SCOPING_SPLITTER } from '../app/controlflow/DataLocation';
+import { StrengtheningAssumeStatement } from '../ast/core/statements/AssumeStatement';
+import { MethodIdentifiers } from '../app/controlflow/MethodIdentifiers';
+import { BastetConfiguration } from '../../utils/BastetConfiguration';
+import { ParsingException } from '../../core/exceptions/ParsingException';
+import { ParserRuleContext } from 'antlr4ts';
+import { CastExpression } from '../ast/core/expressions/CastExpression';
+import { ActorExpression, ActorSelfExpression, LocateActorExpression } from '../ast/core/expressions/ActorExpression';
+import { DeclarationScopeType, ScopeTypeInformation, TypeInformationStorage } from '../DeclarationScopes';
+import { LookupTransformer } from './LookupTransformer';
+import { SignalTargetReachedStatement } from '../ast/core/statements/InternalStatement';
+import { PrecisionPopStatement, PrecisionPushStatement } from '../ast/core/Precisions';
 
 const toposort = require('toposort');
 
 export class TransformerConfig extends BastetConfiguration {
-
     constructor(dict: {}) {
         super(dict, ['Transformer']);
     }
@@ -341,11 +345,9 @@ export class TransformerConfig extends BastetConfiguration {
     get enableMessageDispatcherLoop(): boolean {
         return this.getBoolProperty('enable-message-dispatcher-loop', true);
     }
-
 }
 
 class TTransformerResult<T extends AstNode> {
-
     private readonly _statementsToPrepend: StatementList;
     private readonly _node: T;
 
@@ -374,18 +376,14 @@ class TTransformerResult<T extends AstNode> {
     public static withNode<T extends AstNode>(node: T): TTransformerResult<T> {
         return new TTransformerResult(StatementList.empty(), node);
     }
-
 }
 
-export class TransformerResult extends TTransformerResult<AstNode> {
-
-}
+export class TransformerResult extends TTransformerResult<AstNode> {}
 
 const STATEMENT_MATCHER = /(?<method>[A-Za-z0-9_]*)StatementContext/;
 const EXPRESSION_MATCHER = /(?<method>[A-Za-z0-9_]*)ExpressionContext/;
 
 class TransformerResultList<E extends AstNode> {
-
     private readonly _statementsToPrepend: StatementList;
     private readonly _nodeList: E[];
 
@@ -404,19 +402,22 @@ class TransformerResultList<E extends AstNode> {
 }
 
 class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
-
     private readonly _methodLibrary: App;
     private readonly _typeStack: Array<ScratchType>;
     private readonly _config: TransformerConfig;
     private readonly _typeStorage: TypeInformationStorage;
 
     private _currentActor: Identifier;
-    private _actorScope : boolean;
+    private _actorScope: boolean;
     private _activeDeclarationScope: ScopeTypeInformation;
     private _filePath: string;
 
-    constructor(config: TransformerConfig, methodLibrary: App,
-                typeInformationStorage: TypeInformationStorage, filePath: string) {
+    constructor(
+        config: TransformerConfig,
+        methodLibrary: App,
+        typeInformationStorage: TypeInformationStorage,
+        filePath: string
+    ) {
         this._config = Preconditions.checkNotUndefined(config);
         this._methodLibrary = Preconditions.checkNotUndefined(methodLibrary);
         this._typeStorage = Preconditions.checkNotUndefined(typeInformationStorage);
@@ -437,7 +438,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
     private getArgumentNodes(ctx: RuleNode): RuleNode[] {
         let result: RuleNode[] = [];
-        for (let i = 0; i<ctx.childCount; i++) {
+        for (let i = 0; i < ctx.childCount; i++) {
             const child = ctx.getChild(i);
             if (!(child instanceof TerminalNode)) {
                 result.push(child as RuleNode);
@@ -459,7 +460,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
                 return this.produceVariableFromIdentifier(result.node);
             }
 
-            throw new IllegalArgumentException("Operands must always be expressions!");
+            throw new IllegalArgumentException('Operands must always be expressions!');
         }
 
         return result;
@@ -481,9 +482,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         const ident: AstNode = ctx.ident().accept(this).node;
         const actors: AstNode = ctx.actorDefinitionList().accept(this).node;
 
-        return TransformerResult.withNode(new ProgramDefinition(
-            ident as Identifier,
-            actors as ActorDefinitionList));
+        return TransformerResult.withNode(new ProgramDefinition(ident as Identifier, actors as ActorDefinitionList));
     }
 
     public visitIdentExpression(ctx: IdentExpressionContext): TransformerResult {
@@ -531,7 +530,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return TransformerResult.withNode(new ResourceLocation(new StringLiteral(ctx.String().text)));
     }
 
-    private optionalIdentifier(ctx: IdentContext|null): OptionalAstNode<Identifier> {
+    private optionalIdentifier(ctx: IdentContext | null): OptionalAstNode<Identifier> {
         if (ctx) {
             const id = ctx.accept(this).node;
             return new PresentAstNode(id as Identifier);
@@ -544,10 +543,13 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         const identTr = ctx.ident().accept(this);
         const paramsTr = ctx.parameterList().accept(this);
         const resultTr = ctx.externMethodResultDeclaration().accept(this);
-        return TransformerResult.withNode(new ExternMethodDeclaration(
-            identTr.nodeOnly() as Identifier,
-            paramsTr.nodeOnly() as ParameterDeclarationList,
-            resultTr.nodeOnly() as ResultDeclaration));
+        return TransformerResult.withNode(
+            new ExternMethodDeclaration(
+                identTr.nodeOnly() as Identifier,
+                paramsTr.nodeOnly() as ParameterDeclarationList,
+                resultTr.nodeOnly() as ResultDeclaration
+            )
+        );
     }
 
     public visitExternMethodResultDeclaration(ctx: ExternMethodResultDeclarationContext): TransformerResult {
@@ -557,19 +559,21 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     public visitExternFunctionReturnDefinition(ctx: ExternFunctionReturnDefinitionContext): TransformerResult {
         const resultType = ctx.type().accept(this).nodeOnly() as ScratchType;
         const resultVar = new VariableWithDataLocation(
-            DataLocations.createTypedLocation(Identifier.resultIdentifier(), resultType));
+            DataLocations.createTypedLocation(Identifier.resultIdentifier(), resultType)
+        );
         return TransformerResult.withNode(new ResultDeclaration(resultVar));
     }
 
     public visitExternVoidReturnDefinition(ctx: ExternVoidReturnDefinitionContext): TransformerResult {
         const resultType = VoidType.instance();
         const resultVar = new VariableWithDataLocation(
-            DataLocations.createTypedLocation(Identifier.resultIdentifier(), resultType));
+            DataLocations.createTypedLocation(Identifier.resultIdentifier(), resultType)
+        );
         return TransformerResult.withNode(new ResultDeclaration(resultVar));
     }
 
     private toMethodDef(ctx: MethodDefinitionContext): FullMethodDefinitionContext {
-        return ctx as FullMethodDefinitionContext ;
+        return ctx as FullMethodDefinitionContext;
     }
 
     private precollectMethodSignatures(actorIdent: Identifier, ctx: MethodDefinitionListContext) {
@@ -590,23 +594,27 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
                     this._activeDeclarationScope = this._activeDeclarationScope.endScope();
                 }
 
-                this._activeDeclarationScope.putMethod(new MethodSignature(
-                    identTr.nodeOnly(),
-                    paramsTr.node as ParameterDeclarationList,
-                    resultTr.nodeOnly(),
-                    false));
-
+                this._activeDeclarationScope.putMethod(
+                    new MethodSignature(
+                        identTr.nodeOnly(),
+                        paramsTr.node as ParameterDeclarationList,
+                        resultTr.nodeOnly(),
+                        false
+                    )
+                );
             } else if (md instanceof ExternMethodDefinitionContext) {
                 const identTr = md.ident().accept(this);
                 const paramsTr = md.parameterList().accept(this);
                 const resultTr = md.externMethodResultDeclaration().accept(this);
 
-                this._activeDeclarationScope.putMethod(new MethodSignature(
-                    identTr.nodeOnly(),
-                    paramsTr.node as ParameterDeclarationList,
-                    resultTr.nodeOnly(),
-                    true
-                ));
+                this._activeDeclarationScope.putMethod(
+                    new MethodSignature(
+                        identTr.nodeOnly(),
+                        paramsTr.node as ParameterDeclarationList,
+                        resultTr.nodeOnly(),
+                        true
+                    )
+                );
             }
         }
     }
@@ -645,7 +653,8 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
             if (!inheritesFrom.isEmpty()) {
                 for (let id of inheritesFrom.elements) {
                     const inheritsFromName = id.text;
-                    const baseActorTypeInfos: ScopeTypeInformation = this._typeStorage.beginActorScope(inheritsFromName);
+                    const baseActorTypeInfos: ScopeTypeInformation =
+                        this._typeStorage.beginActorScope(inheritsFromName);
                     if (!baseActorTypeInfos) {
                         throw new IllegalStateException(`Type infos for ${inheritsFromName} missing`);
                     }
@@ -669,17 +678,46 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
                 initStatements = StatementLists.concat(initStatements, resouceDefs.statementsToPrepend);
 
                 if (resouceDefs.node.children.length > 0) {
-                    const graphicPixelLookup = LookupTransformer.buildGrapicPixelLookup(this._currentActor, resouceDefs, this._filePath, this._activeDeclarationScope);
+                    const graphicPixelLookup = LookupTransformer.buildGrapicPixelLookup(
+                        this._currentActor,
+                        resouceDefs,
+                        this._filePath,
+                        this._activeDeclarationScope
+                    );
                     runtimeMethods.push(graphicPixelLookup);
-                    const idByIndexLookup = LookupTransformer.buildIdByIndexLookup(this._currentActor, resouceDefs, this._filePath, this._activeDeclarationScope);
+                    const idByIndexLookup = LookupTransformer.buildIdByIndexLookup(
+                        this._currentActor,
+                        resouceDefs,
+                        this._filePath,
+                        this._activeDeclarationScope
+                    );
                     runtimeMethods.push(idByIndexLookup);
-                    const indexByIdLookup = LookupTransformer.buildIndexByIdLookup(this._currentActor, resouceDefs, this._filePath, this._activeDeclarationScope);
+                    const indexByIdLookup = LookupTransformer.buildIndexByIdLookup(
+                        this._currentActor,
+                        resouceDefs,
+                        this._filePath,
+                        this._activeDeclarationScope
+                    );
                     runtimeMethods.push(indexByIdLookup);
-                    const numGraphics = LookupTransformer.buildGetNumGraphics(this._currentActor, resouceDefs, this._filePath);
+                    const numGraphics = LookupTransformer.buildGetNumGraphics(
+                        this._currentActor,
+                        resouceDefs,
+                        this._filePath
+                    );
                     runtimeMethods.push(numGraphics);
-                    const imageHeight = LookupTransformer.buildGetImageHeightLookup(this._currentActor, resouceDefs, this._filePath, this._activeDeclarationScope);
+                    const imageHeight = LookupTransformer.buildGetImageHeightLookup(
+                        this._currentActor,
+                        resouceDefs,
+                        this._filePath,
+                        this._activeDeclarationScope
+                    );
                     runtimeMethods.push(imageHeight);
-                    const imageWidth = LookupTransformer.buildGetImageWidthLookup(this._currentActor, resouceDefs, this._filePath, this._activeDeclarationScope);
+                    const imageWidth = LookupTransformer.buildGetImageWidthLookup(
+                        this._currentActor,
+                        resouceDefs,
+                        this._filePath,
+                        this._activeDeclarationScope
+                    );
                     runtimeMethods.push(imageWidth);
                 }
                 // Variable declarations and initializations
@@ -692,7 +730,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
             // Method declarations and definitions
             const methods = ctx.actorComponentsDefinition().methodDefinitionList().accept(this);
             Preconditions.checkState(methods.statementsToPrepend.elements.length == 0);
-            methods.nodeOnly()
+            methods.nodeOnly();
 
             // Script definitions
             const scripts = ctx.actorComponentsDefinition().scriptList().accept(this);
@@ -704,7 +742,8 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
             initStatements = StatementLists.concat(initStatements, inits.node as StatementList);
 
             const updatedMethodDefList: MethodDefinitionList = new MethodDefinitionList(
-                runtimeMethods.concat((methods.node as MethodDefinitions).getFullMethodDefinitions().elements));
+                runtimeMethods.concat((methods.node as MethodDefinitions).getFullMethodDefinitions().elements)
+            );
 
             const result = new ActorDefinition(
                 actorMode,
@@ -715,10 +754,10 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
                 initStatements,
                 updatedMethodDefList,
                 methods.nodeOnly<MethodDefinitions>().getExternalMethods(),
-                scripts.node as ScriptDefinitionList);
+                scripts.node as ScriptDefinitionList
+            );
 
             return TransformerResult.withNode(result);
-
         } finally {
             this._activeDeclarationScope = this._activeDeclarationScope.endScope();
         }
@@ -727,15 +766,15 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     private buildActorInheritanceRelation(ctx: ActorDefinitionListContext): Array<[string, string]> {
         let result = new Array<[string, string]>();
         for (let e of ctx.actorDefinition()) {
-           const adc: ActorDefinitionContext = e as ActorDefinitionContext;
-           const actorName = adc.ident().text;
-           if (adc.inheritsFrom().ident().length == 0) {
+            const adc: ActorDefinitionContext = e as ActorDefinitionContext;
+            const actorName = adc.ident().text;
+            if (adc.inheritsFrom().ident().length == 0) {
                 result.push([actorName, null]);
-           } else {
-               for (let id of adc.inheritsFrom().ident()) {
-                   result.push([actorName, id.text]);
-               }
-           }
+            } else {
+                for (let id of adc.inheritsFrom().ident()) {
+                    result.push([actorName, id.text]);
+                }
+            }
         }
         return result;
     }
@@ -748,7 +787,10 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         // on the ordering of the files (ensures that there are no cycles).
         const noInherit = dependencies.filter(([_, f]) => f == null);
         if (noInherit.length == 0) {
-            var toOrder = ctx.actorDefinition().map(a => a.ident().text).slice();
+            var toOrder = ctx
+                .actorDefinition()
+                .map((a) => a.ident().text)
+                .slice();
             if (toOrder.length > 0) {
                 var prev = toOrder[0];
                 toOrder = toOrder.slice(1, toOrder.length);
@@ -769,7 +811,8 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
             nameToActorMap[acd.ident().text] = acd;
         }
 
-        return sorted.filter((n) => n != null)
+        return sorted
+            .filter((n) => n != null)
             .filter((name) => nameToActorMap[name])
             .map((name) => nameToActorMap[name]);
     }
@@ -779,14 +822,17 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return new TransformerResult(actorDefs.statementsToPrepend, new ActorDefinitionList(actorDefs.nodeList));
     }
 
-    public visitResource(ctx: ResourceContext) : TransformerResult {
-        return TransformerResult.withNode(new ResourceDefinition(
-            ctx.resourceType().accept(this).node as ResourceType,
-            ctx.ident().accept(this).node as Identifier,
-            ctx.resourceLocator().accept(this).node as ResourceLocation));
+    public visitResource(ctx: ResourceContext): TransformerResult {
+        return TransformerResult.withNode(
+            new ResourceDefinition(
+                ctx.resourceType().accept(this).node as ResourceType,
+                ctx.ident().accept(this).node as Identifier,
+                ctx.resourceLocator().accept(this).node as ResourceLocation
+            )
+        );
     }
 
-    public visitResourceList(ctx: ResourceListContext) : TransformerResult {
+    public visitResourceList(ctx: ResourceListContext): TransformerResult {
         const defs = this.buildArrayFrom<ResourceDefinition>(ctx.resource());
         return new TransformerResult(defs.statementsToPrepend, new ResourceDefinitionList(defs.nodeList));
     }
@@ -801,11 +847,11 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return false;
     }
 
-    visitMethodDefinition(ctx: MethodDefinitionContext) : TransformerResult {
+    visitMethodDefinition(ctx: MethodDefinitionContext): TransformerResult {
         return this.visitSingleChild(ctx);
     }
 
-    public visitFullMethodDefinition(ctx: FullMethodDefinitionContext) : TransformerResult {
+    public visitFullMethodDefinition(ctx: FullMethodDefinitionContext): TransformerResult {
         const methodIdent: Identifier = ctx.ident().accept(this).nodeOnly() as Identifier;
 
         const isAtomic = this.parseIsAtomic(ctx);
@@ -813,24 +859,28 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         this._activeDeclarationScope = this._activeDeclarationScope.beginMethodScope(methodIdent.text);
         try {
             const resultDeclaration = ctx.methodResultDeclaration().accept(this).nodeOnly() as ResultDeclaration;
-            return TransformerResult.withNode(new MethodDefinition(
-                methodIdent,
-                ctx.parameterList().accept(this).nodeOnly() as ParameterDeclarationList,
-                ctx.stmtList().accept(this).nodeOnly() as StatementList,
-                resultDeclaration, isAtomic));
+            return TransformerResult.withNode(
+                new MethodDefinition(
+                    methodIdent,
+                    ctx.parameterList().accept(this).nodeOnly() as ParameterDeclarationList,
+                    ctx.stmtList().accept(this).nodeOnly() as StatementList,
+                    resultDeclaration,
+                    isAtomic
+                )
+            );
         } finally {
             this._activeDeclarationScope = this._activeDeclarationScope.endScope();
         }
     }
 
-    public visitMethodDefinitionList(ctx: MethodDefinitionListContext) : TransformerResult {
+    public visitMethodDefinitionList(ctx: MethodDefinitionListContext): TransformerResult {
         const external: ExternMethodDeclaration[] = [];
         const full: MethodDefinition[] = [];
 
         for (const mdef of ctx.methodDefinition()) {
             const mtr = mdef.accept(this);
             if (mtr.nodeOnly() instanceof ExternMethodDeclaration) {
-               external.push(mtr.nodeOnly());
+                external.push(mtr.nodeOnly());
             } else if (mtr.nodeOnly() instanceof MethodDefinition) {
                 full.push(mtr.nodeOnly());
             } else {
@@ -841,7 +891,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return new TransformerResult(StatementList.empty(), new MethodDefinitions(full, external));
     }
 
-    public visitFunctionReturnDefinition(ctx: FunctionReturnDefinitionContext) : TransformerResult {
+    public visitFunctionReturnDefinition(ctx: FunctionReturnDefinitionContext): TransformerResult {
         const ident = ctx.ident().accept(this).nodeOnly() as Identifier;
         const resultType = ctx.type().accept(this).nodeOnly() as ScratchType;
         const resultVar = new VariableWithDataLocation(DataLocations.createTypedLocation(ident, resultType));
@@ -858,18 +908,20 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return TransformerResult.withNode(ResultDeclaration.void());
     }
 
-    public visitDeclarationStmtList(ctx: DeclarationStmtListContext) : TransformerResult {
+    public visitDeclarationStmtList(ctx: DeclarationStmtListContext): TransformerResult {
         const decls = this.buildArrayFrom<Statement>(ctx.declarationStmt());
         return new TransformerResult(decls.statementsToPrepend, new StatementList(decls.nodeList));
     }
 
-    public visitSetStatement(ctx: SetStatementContext) : TransformerResult {
+    public visitSetStatement(ctx: SetStatementContext): TransformerResult {
         return ctx.setStmt().accept(this);
     }
 
-    public visitSetStmtList(ctx: SetStmtListContext) : TransformerResult {
+    public visitSetStmtList(ctx: SetStmtListContext): TransformerResult {
         const stmts = this.buildArrayFrom<Statement>(ctx.setStmt());
-        return TransformerResult.withNode(StatementLists.concat(stmts.statementsToPrepend, new StatementList(stmts.nodeList)));
+        return TransformerResult.withNode(
+            StatementLists.concat(stmts.statementsToPrepend, new StatementList(stmts.nodeList))
+        );
     }
 
     private parseIsRestart(ctx: ScriptContext): boolean {
@@ -883,7 +935,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     visitAnonymousScriptIdent(ctx: AnonymousScriptIdentContext): TransformerResult {
-        const scriptIdent = Identifier.freshWithPrefix("script");
+        const scriptIdent = Identifier.freshWithPrefix('script');
         return TransformerResult.withNode(scriptIdent);
     }
 
@@ -892,26 +944,36 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return TransformerResult.withNode(scriptIdent);
     }
 
-    public visitScript(ctx: ScriptContext) : TransformerResult {
+    public visitScript(ctx: ScriptContext): TransformerResult {
         const scriptIdent: Identifier = ctx.scriptIdent().accept(this).nodeOnly<Identifier>();
         this._activeDeclarationScope = this._activeDeclarationScope.beginMethodScope(scriptIdent.text);
         try {
-            return TransformerResult.withNode(new ScriptDefinition(scriptIdent,
-                ctx.event().accept(this).nodeOnly() as CoreEvent,
-                ctx.stmtList().accept(this).nodeOnly() as StatementList,
-                this.parseIsRestart(ctx)));
+            return TransformerResult.withNode(
+                new ScriptDefinition(
+                    scriptIdent,
+                    ctx.event().accept(this).nodeOnly() as CoreEvent,
+                    ctx.stmtList().accept(this).nodeOnly() as StatementList,
+                    this.parseIsRestart(ctx)
+                )
+            );
         } finally {
             this._activeDeclarationScope = this._activeDeclarationScope.endScope();
         }
     }
 
-    public visitScriptList(ctx: ScriptListContext) : TransformerResult {
+    public visitScriptList(ctx: ScriptListContext): TransformerResult {
         const defs = this.buildArrayFrom<ScriptDefinition>(ctx.script());
-        return new TransformerResult(defs.statementsToPrepend,
-            new ScriptDefinitionList(defs.nodeList.filter((s) => s.ident.text != "messageDispatcherLoop" || this._config.enableMessageDispatcherLoop)));
+        return new TransformerResult(
+            defs.statementsToPrepend,
+            new ScriptDefinitionList(
+                defs.nodeList.filter(
+                    (s) => s.ident.text != 'messageDispatcherLoop' || this._config.enableMessageDispatcherLoop
+                )
+            )
+        );
     }
 
-    public visitExpressionList(ctx: ExpressionListContext) : TransformerResult {
+    public visitExpressionList(ctx: ExpressionListContext): TransformerResult {
         const elems = this.buildExpressionArrayFrom<Expression>(ctx.expressionListPlain().expression());
         return new TransformerResult(elems.statementsToPrepend, new ExpressionList(elems.nodeList));
     }
@@ -961,20 +1023,20 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
             }
 
             return TransformerResult.withNode(result);
-
         } catch (e) {
-           if (e.constructor.name == "ParsingException") {
-               throw e;
-           } else {
-               throw new ParsingException(e.message, ctx);
-           }
+            if (e.constructor.name == 'ParsingException') {
+                throw e;
+            } else {
+                throw new ParsingException(e.message, ctx);
+            }
         }
     }
 
     public visitStmtListPlain(ctx: StmtListPlainContext): TransformerResult {
         const elems = this.buildArrayFrom<Statement>(ctx.stmt());
         return TransformerResult.withNode(
-            StatementLists.concat(elems.statementsToPrepend, new StatementList(elems.nodeList)));
+            StatementLists.concat(elems.statementsToPrepend, new StatementList(elems.nodeList))
+        );
     }
 
     public visitBooleanType(ctx: BooleanTypeContext): TransformerResult {
@@ -982,7 +1044,9 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     public visitEnumType(ctx: EnumTypeContext): TransformerResult {
-        return TransformerResult.withNode(StringEnumType.withValues(ctx.expressionListPlain().accept(this).nodeOnly() as ExpressionList));
+        return TransformerResult.withNode(
+            StringEnumType.withValues(ctx.expressionListPlain().accept(this).nodeOnly() as ExpressionList)
+        );
     }
 
     public visitFloatingPointType(ctx: FloatingPointTypeContext): TransformerResult {
@@ -1001,23 +1065,27 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return TransformerResult.withNode(ListType.withElementType(ctx.type().accept(this).nodeOnly() as ScratchType));
     }
 
-    public visitActorType (ctx: ActorTypeContext): TransformerResult {
+    public visitActorType(ctx: ActorTypeContext): TransformerResult {
         return TransformerResult.withNode(ActorType.instance());
     }
 
-    public visitActorComponentsDefinition (ctx: ActorComponentsDefinitionContext): TransformerResult {
-        throw new IllegalStateException("Not expected to be needed.");
+    public visitActorComponentsDefinition(ctx: ActorComponentsDefinitionContext): TransformerResult {
+        throw new IllegalStateException('Not expected to be needed.');
     }
 
-    public visitUntilStmt (ctx: UntilStmtContext): TransformerResult {
+    public visitUntilStmt(ctx: UntilStmtContext): TransformerResult {
         const cond: TransformerResult = this.ensureType(ctx, BooleanType.instance(), ctx.boolExpr().accept(this));
         const body: TransformerResult = ctx.stmtList().accept(this);
         return TransformerResult.withNode(
-            new UntilQueriedConditionStatement(cond.node as BooleanExpression,
-                cond.statementsToPrepend, body.nodeOnly<StatementList>()));
+            new UntilQueriedConditionStatement(
+                cond.node as BooleanExpression,
+                cond.statementsToPrepend,
+                body.nodeOnly<StatementList>()
+            )
+        );
     }
 
-    private statementListFrom(ctx: StmtListContext|undefined) {
+    private statementListFrom(ctx: StmtListContext | undefined) {
         if (ctx) {
             return ctx.accept(this).nodeOnly() as StatementList;
         } else {
@@ -1025,21 +1093,22 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         }
     }
 
-    public visitEmptyElseCase (ctx: EmptyElseCaseContext): TransformerResult {
+    public visitEmptyElseCase(ctx: EmptyElseCaseContext): TransformerResult {
         return TransformerResult.withNode(new StatementList([]));
     }
 
-    public visitPureElse (ctx: PureElseContext): TransformerResult {
+    public visitPureElse(ctx: PureElseContext): TransformerResult {
         return ctx.stmtList().accept(this);
     }
 
-    public visitElseIfCase (ctx: ElseIfCaseContext): TransformerResult {
+    public visitElseIfCase(ctx: ElseIfCaseContext): TransformerResult {
         const ifTr = ctx.ifStmt().accept(this);
         return TransformerResult.withNode(
-            StatementLists.concat(ifTr.statementsToPrepend, new StatementList([ifTr.node as Statement])));
+            StatementLists.concat(ifTr.statementsToPrepend, new StatementList([ifTr.node as Statement]))
+        );
     }
 
-    public visitIfStmt (ctx: IfStmtContext): TransformerResult {
+    public visitIfStmt(ctx: IfStmtContext): TransformerResult {
         const cond: TransformerResult = this.ensureType(ctx, BooleanType.instance(), ctx.boolExpr().accept(this));
 
         const elseCaseTr = ctx.elseCase().accept(this);
@@ -1049,26 +1118,30 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
             new IfStatement(
                 cond.node as BooleanExpression,
                 ctx.stmtList().accept(this).nodeOnly() as StatementList,
-                elseCaseTr.nodeOnly() as StatementList));
+                elseCaseTr.nodeOnly() as StatementList
+            )
+        );
     }
 
-    public visitRepeatForeverStmt (ctx: RepeatForeverStmtContext): TransformerResult {
+    public visitRepeatForeverStmt(ctx: RepeatForeverStmtContext): TransformerResult {
         return TransformerResult.withNode(
-            new RepeatForeverStatement(
-                ctx.stmtList().accept(this).nodeOnly() as StatementList));
+            new RepeatForeverStatement(ctx.stmtList().accept(this).nodeOnly() as StatementList)
+        );
     }
 
     /**
      * Replaces a `RepeatTimesStatement` by an `UntilQueriedConditionStatement`
      */
-    public visitRepeatTimesStmt (ctx: RepeatTimesStmtContext): TransformerResult {
+    public visitRepeatTimesStmt(ctx: RepeatTimesStmtContext): TransformerResult {
         // Semantics: Evaluate the expression once, and use the
         //      resulting number (constant) as the number of repetitions to conduct.
         let prepend: StatementList = StatementList.empty();
 
         // Declare and initialize a counter variable
         const counterIdent: Identifier = Identifier.fresh();
-        const counterVar = new VariableWithDataLocation(DataLocations.createTypedLocation(counterIdent, IntegerType.instance()));
+        const counterVar = new VariableWithDataLocation(
+            DataLocations.createTypedLocation(counterIdent, IntegerType.instance())
+        );
         const counterVarExpr = new NumberVariableExpression(counterVar);
         const declarationStmt = new DeclareStackVariableStatement(counterVar);
         const initStmt: Statement = new StoreEvalResultToVariableStatement(counterVar, IntegerLiteral.of(0));
@@ -1077,7 +1150,10 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         this._activeDeclarationScope.putVariable(counterVar);
 
         // Statement to increase the loop counter
-        const counterIncStmt = new StoreEvalResultToVariableStatement(counterVar, new PlusExpression(counterVar, new IntegerLiteral(1)));
+        const counterIncStmt = new StoreEvalResultToVariableStatement(
+            counterVar,
+            new PlusExpression(counterVar, new IntegerLiteral(1))
+        );
 
         // Determine the number of iterations
         const timesTr: TransformerResult = ctx.numExpr().accept(this);
@@ -1086,26 +1162,27 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
         // Build the loop
         const untilCond = new NegationExpression(new NumLessThanExpression(counterVarExpr, times));
-        const loopBody = StatementLists.concat(ctx.stmtList().accept(this).nodeOnly<StatementList>(),
-                    StatementList.from([counterIncStmt]));
+        const loopBody = StatementLists.concat(
+            ctx.stmtList().accept(this).nodeOnly<StatementList>(),
+            StatementList.from([counterIncStmt])
+        );
         const untilStatement = new UntilQueriedConditionStatement(untilCond, StatementList.empty(), loopBody);
 
         return new TransformerResult(prepend, untilStatement);
     }
 
-    public visitNumBrackets(ctx: NumBracketsContext) : TransformerResult {
+    public visitNumBrackets(ctx: NumBracketsContext): TransformerResult {
         return ctx.numExpr().accept(this);
     }
 
-    public visitNumDivExpression(ctx: NumDivExpressionContext) : TransformerResult {
+    public visitNumDivExpression(ctx: NumDivExpressionContext): TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
 
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new DivideExpression(
-                tr1.node as NumberExpression,
-                tr2.node as NumberExpression));
+            new DivideExpression(tr1.node as NumberExpression, tr2.node as NumberExpression)
+        );
     }
 
     private assertEqualOperandTypes(context: RuleNode, op1: TransformerResult, op2: TransformerResult): ScratchType {
@@ -1118,13 +1195,15 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
         if (!(type1 == type2)) {
             console.log(context);
-            throw new IllegalArgumentException(`Types are not equal: ${type1.toTreeString()} vs ${type2.toTreeString()}`);
+            throw new IllegalArgumentException(
+                `Types are not equal: ${type1.toTreeString()} vs ${type2.toTreeString()}`
+            );
         }
 
         return type1;
     }
 
-    public visitEqualsExpression(ctx: EqualsExpressionContext) : TransformerResult {
+    public visitEqualsExpression(ctx: EqualsExpressionContext): TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
         this.assertEqualOperandTypes(ctx, tr1, tr2);
@@ -1132,23 +1211,20 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         if (ScratchType.isNumericType((tr1.node as Expression).expressionType)) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-                new NumEqualsExpression(
-                    tr1.node as NumberExpression,
-                    tr2.node as NumberExpression));
-
-        } if ((tr1.node as Expression).expressionType == StringType.instance()) {
+                new NumEqualsExpression(tr1.node as NumberExpression, tr2.node as NumberExpression)
+            );
+        }
+        if ((tr1.node as Expression).expressionType == StringType.instance()) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-                new StrEqualsExpression(
-                    tr1.node as StringExpression,
-                    tr2.node as StringExpression));
-
+                new StrEqualsExpression(tr1.node as StringExpression, tr2.node as StringExpression)
+            );
         } else {
             throw new ImplementMeException();
         }
     }
 
-    public visitGreaterThanExpression(ctx: GreaterThanExpressionContext) : TransformerResult {
+    public visitGreaterThanExpression(ctx: GreaterThanExpressionContext): TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
         this.assertEqualOperandTypes(ctx, tr1, tr2);
@@ -1156,23 +1232,19 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         if (ScratchType.isNumericType((tr1.node as Expression).expressionType)) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-                new NumGreaterThanExpression(
-                    tr1.node as NumberExpression,
-                    tr2.node as NumberExpression));
-
+                new NumGreaterThanExpression(tr1.node as NumberExpression, tr2.node as NumberExpression)
+            );
         } else if ((tr1.node as Expression).expressionType == StringType.instance()) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-                new StrGreaterThanExpression(
-                    tr1.node as StringExpression,
-                    tr2.node as StringExpression));
-
+                new StrGreaterThanExpression(tr1.node as StringExpression, tr2.node as StringExpression)
+            );
         } else {
             throw new ImplementMeException();
         }
     }
 
-    public visitGreaterEqualExpression(ctx: GreaterEqualExpressionContext) : TransformerResult {
+    public visitGreaterEqualExpression(ctx: GreaterEqualExpressionContext): TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
         this.assertEqualOperandTypes(ctx, tr1, tr2);
@@ -1180,19 +1252,16 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         if (ScratchType.isNumericType((tr1.node as Expression).expressionType)) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-                new NumGreaterEqualExpression(
-                    tr1.node as NumberExpression,
-                    tr2.node as NumberExpression));
-
+                new NumGreaterEqualExpression(tr1.node as NumberExpression, tr2.node as NumberExpression)
+            );
         } else if ((tr1.node as Expression).expressionType == StringType.instance()) {
-            throw new ImplementMeException()
-
+            throw new ImplementMeException();
         } else {
             throw new ImplementMeException();
         }
     }
 
-    public visitLessEqualExpression(ctx: LessThanExpressionContext) : TransformerResult {
+    public visitLessEqualExpression(ctx: LessThanExpressionContext): TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
         this.assertEqualOperandTypes(ctx, tr1, tr2);
@@ -1200,18 +1269,16 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         if (ScratchType.isNumericType((tr1.node as Expression).expressionType)) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-                new NumLessEqualExpression(
-                    tr1.node as NumberExpression,
-                    tr2.node as NumberExpression));
-
+                new NumLessEqualExpression(tr1.node as NumberExpression, tr2.node as NumberExpression)
+            );
         } else if ((tr1.node as Expression).expressionType == StringType.instance()) {
-            throw new ImplementMeException()
+            throw new ImplementMeException();
         } else {
             throw new ImplementMeException();
         }
     }
 
-    public visitLessThanExpression(ctx: LessThanExpressionContext) : TransformerResult {
+    public visitLessThanExpression(ctx: LessThanExpressionContext): TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
         this.assertEqualOperandTypes(ctx, tr1, tr2);
@@ -1219,70 +1286,63 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         if (ScratchType.isNumericType((tr1.node as Expression).expressionType)) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-                new NumLessThanExpression(
-                    tr1.node as NumberExpression,
-                    tr2.node as NumberExpression));
-
+                new NumLessThanExpression(tr1.node as NumberExpression, tr2.node as NumberExpression)
+            );
         } else if ((tr1.node as Expression).expressionType == StringType.instance()) {
             return new TransformerResult(
                 StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-                new StrLessThanExpression(
-                    tr1.node as StringExpression,
-                    tr2.node as StringExpression));
+                new StrLessThanExpression(tr1.node as StringExpression, tr2.node as StringExpression)
+            );
         } else {
             throw new ImplementMeException();
         }
     }
 
-    public visitNumLiteralExpression(ctx: NumLiteralExpressionContext) : TransformerResult {
+    public visitNumLiteralExpression(ctx: NumLiteralExpressionContext): TransformerResult {
         return ctx.number().accept(this);
     }
 
-    public visitNumMinusExpression(ctx: NumMinusExpressionContext) : TransformerResult {
+    public visitNumMinusExpression(ctx: NumMinusExpressionContext): TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new MinusExpression(
-                tr1.node as NumberExpression,
-                tr2.node as NumberExpression));
+            new MinusExpression(tr1.node as NumberExpression, tr2.node as NumberExpression)
+        );
     }
 
-    public visitNumModExpression(ctx: NumModExpressionContext) : TransformerResult {
+    public visitNumModExpression(ctx: NumModExpressionContext): TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new ModuloExpression(
-                tr1.node as NumberExpression,
-                tr2.node as NumberExpression));
+            new ModuloExpression(tr1.node as NumberExpression, tr2.node as NumberExpression)
+        );
     }
 
-    public visitNumMulExpression(ctx: NumMulExpressionContext) : TransformerResult {
+    public visitNumMulExpression(ctx: NumMulExpressionContext): TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new MultiplyExpression(
-                tr1.node as NumberExpression,
-                tr2.node as NumberExpression));
+            new MultiplyExpression(tr1.node as NumberExpression, tr2.node as NumberExpression)
+        );
     }
 
-    public visitNumPlusExpression(ctx: NumPlusExpressionContext) : TransformerResult {
+    public visitNumPlusExpression(ctx: NumPlusExpressionContext): TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new PlusExpression(
-                tr1.node as NumberExpression,
-                tr2.node as NumberExpression));
+            new PlusExpression(tr1.node as NumberExpression, tr2.node as NumberExpression)
+        );
     }
 
-    public visitNumVariableExpression(ctx: NumVariableExpressionContext) : TransformerResult {
+    public visitNumVariableExpression(ctx: NumVariableExpressionContext): TransformerResult {
         return ctx.variable().accept(this);
     }
 
-    public visitNumber(ctx: NumberContext) : TransformerResult {
+    public visitNumber(ctx: NumberContext): TransformerResult {
         return this.visitSingleChild(ctx);
     }
 
@@ -1294,9 +1354,14 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return TransformerResult.withNode(IntegerLiteral.fromString(ctx.IntegerLiteral().text));
     }
 
-    private declareFreshBooleanVariable(value: boolean, addInit: boolean): TTransformerResult<BooleanVariableExpression> {
+    private declareFreshBooleanVariable(
+        value: boolean,
+        addInit: boolean
+    ): TTransformerResult<BooleanVariableExpression> {
         const resultVarIdent: Identifier = Identifier.fresh();
-        const resultVar = new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, BooleanType.instance()));
+        const resultVar = new VariableWithDataLocation(
+            DataLocations.createTypedLocation(resultVarIdent, BooleanType.instance())
+        );
         const resultVarExpr = new BooleanVariableExpression(resultVar);
         const declareVarStmt = new DeclareStackVariableStatement(resultVar);
         const initStmt: Statement = new StoreEvalResultToVariableStatement(resultVar, BooleanLiteral.from(value));
@@ -1312,19 +1377,25 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return new TTransformerResult(prepend, resultVarExpr);
     }
 
-    private evaluateIntoBooleanVariable(varExpr: BooleanVariableExpression, expr: ParserRuleContext): TTransformerResult<BooleanVariableExpression> {
-        const tr1: TransformerResult = this.ensureType(expr, BooleanType.instance(),expr.accept(this));
+    private evaluateIntoBooleanVariable(
+        varExpr: BooleanVariableExpression,
+        expr: ParserRuleContext
+    ): TTransformerResult<BooleanVariableExpression> {
+        const tr1: TransformerResult = this.ensureType(expr, BooleanType.instance(), expr.accept(this));
 
         let prepend: StatementList = StatementList.empty();
         prepend = StatementLists.concat(prepend, tr1.statementsToPrepend);
 
-        const initStmt: Statement = new StoreEvalResultToVariableStatement(varExpr.variable, tr1.node as BooleanExpression);
+        const initStmt: Statement = new StoreEvalResultToVariableStatement(
+            varExpr.variable,
+            tr1.node as BooleanExpression
+        );
         prepend = StatementLists.concat(prepend, StatementList.from([initStmt]));
 
         return new TTransformerResult(prepend, varExpr);
     }
 
-    public visitBoolAndExpression(ctx: BoolAndExpressionContext) : TransformerResult {
+    public visitBoolAndExpression(ctx: BoolAndExpressionContext): TransformerResult {
         // Goal: Evaluate the second argument only if the first evaluates to true
         let prepend = StatementList.empty();
 
@@ -1347,23 +1418,27 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return new TransformerResult(prepend, varTr.node);
     }
 
-    public visitBoolToIntExpression(ctx: BoolToIntExpressionContext) : TransformerResult {
+    public visitBoolToIntExpression(ctx: BoolToIntExpressionContext): TransformerResult {
         const exprTr: TransformerResult = ctx.boolExpr().accept(this);
-        return new TransformerResult(exprTr.statementsToPrepend,
-            new CastExpression(exprTr.node as Expression, IntegerType.instance()));
+        return new TransformerResult(
+            exprTr.statementsToPrepend,
+            new CastExpression(exprTr.node as Expression, IntegerType.instance())
+        );
     }
 
-    public visitBoolAsStringExpression(ctx: BoolAsStringExpressionContext) : TransformerResult {
+    public visitBoolAsStringExpression(ctx: BoolAsStringExpressionContext): TransformerResult {
         const exprTr: TransformerResult = ctx.boolExpr().accept(this);
-        return new TransformerResult(exprTr.statementsToPrepend,
-            new CastExpression(exprTr.node as Expression, StringType.instance()));
+        return new TransformerResult(
+            exprTr.statementsToPrepend,
+            new CastExpression(exprTr.node as Expression, StringType.instance())
+        );
     }
 
-    public visitBoolLiteralExpression(ctx: BoolLiteralExpressionContext) : TransformerResult {
+    public visitBoolLiteralExpression(ctx: BoolLiteralExpressionContext): TransformerResult {
         return TransformerResult.withNode(BooleanLiteral.fromString(ctx.Boolean().text));
     }
 
-    public visitBoolOrExpression(ctx: BoolOrExpressionContext) : TransformerResult {
+    public visitBoolOrExpression(ctx: BoolOrExpressionContext): TransformerResult {
         // Goal: Evaluate the second argument only if the first evaluates to FALSE
         let prepend = StatementList.empty();
 
@@ -1380,94 +1455,110 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         // res
 
         prepend = StatementLists.concat(prepend, tr1eval.statementsToPrepend);
-        const ifOp1: Statement = new IfStatement(new NegationExpression(varTr.node), tr2eval.statementsToPrepend, StatementList.empty());
+        const ifOp1: Statement = new IfStatement(
+            new NegationExpression(varTr.node),
+            tr2eval.statementsToPrepend,
+            StatementList.empty()
+        );
         prepend = StatementLists.concat(prepend, StatementList.from([ifOp1]));
 
         return new TransformerResult(prepend, varTr.node);
     }
 
-    public visitBoolParanthExpression(ctx: BoolParanthExpressionContext) : TransformerResult {
+    public visitBoolParanthExpression(ctx: BoolParanthExpressionContext): TransformerResult {
         return ctx.boolExpr().accept(this);
     }
 
-    public visitBoolVariableExpression(ctx: BoolVariableExpressionContext) : TransformerResult {
+    public visitBoolVariableExpression(ctx: BoolVariableExpressionContext): TransformerResult {
         return ctx.variable().accept(this);
     }
 
-    private constructBinaryOp(ctx: RuleNode, constr: new (n1:AstNode, n2:AstNode) => AstNode) : TransformerResult {
+    private constructBinaryOp(ctx: RuleNode, constr: new (n1: AstNode, n2: AstNode) => AstNode): TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new constr(tr1.node, tr2.node));
+            new constr(tr1.node, tr2.node)
+        );
     }
 
-    public visitStrContainsExpression(ctx: StrContainsExpressionContext) : TransformerResult {
+    public visitStrContainsExpression(ctx: StrContainsExpressionContext): TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new StrContainsExpression(
-                tr1.node as StringExpression,
-                tr2.node as StringExpression));
+            new StrContainsExpression(tr1.node as StringExpression, tr2.node as StringExpression)
+        );
     }
 
-    public visitAddElementToStatement(ctx: AddElementToStatementContext) : TransformerResult {
+    public visitAddElementToStatement(ctx: AddElementToStatementContext): TransformerResult {
         const exprTr = ctx.stringExpr().accept(this);
-        return new TransformerResult(exprTr.statementsToPrepend, new AddElementToStatement(
-            ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation,
-            exprTr.node as StringExpression));
+        return new TransformerResult(
+            exprTr.statementsToPrepend,
+            new AddElementToStatement(
+                ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation,
+                exprTr.node as StringExpression
+            )
+        );
     }
 
-    public visitBroadcastAndWaitStatement(ctx: BroadcastAndWaitStatementContext) : TransformerResult {
-        const exprTr = ctx.message().accept(this);
-        return new TransformerResult(exprTr.statementsToPrepend,
-            new BroadcastAndWaitStatement(exprTr.node as SystemMessage));
-    }
-
-    public visitBroadcastMessageStatement(ctx: BroadcastMessageStatementContext) : TransformerResult {
+    public visitBroadcastAndWaitStatement(ctx: BroadcastAndWaitStatementContext): TransformerResult {
         const exprTr = ctx.message().accept(this);
         return new TransformerResult(
             exprTr.statementsToPrepend,
-            new BroadcastMessageStatement(exprTr.node as SystemMessage));
+            new BroadcastAndWaitStatement(exprTr.node as SystemMessage)
+        );
     }
 
-    public visitCallStmt(ctx: CallStmtContext) : TransformerResult {
+    public visitBroadcastMessageStatement(ctx: BroadcastMessageStatementContext): TransformerResult {
+        const exprTr = ctx.message().accept(this);
+        return new TransformerResult(
+            exprTr.statementsToPrepend,
+            new BroadcastMessageStatement(exprTr.node as SystemMessage)
+        );
+    }
+
+    public visitCallStmt(ctx: CallStmtContext): TransformerResult {
         const exprTr = ctx.expressionList().accept(this);
         const calledMethodId = ctx.ident().accept(this).nodeOnly() as Identifier;
 
         if (calledMethodId.text == MethodIdentifiers._RUNTIME_signalFailure) {
-           return new TransformerResult(exprTr.statementsToPrepend,
-               new SignalTargetReachedStatement(exprTr.node as ExpressionList));
+            return new TransformerResult(
+                exprTr.statementsToPrepend,
+                new SignalTargetReachedStatement(exprTr.node as ExpressionList)
+            );
         } else {
             return new TransformerResult(
                 exprTr.statementsToPrepend,
                 new CallStatement(
                     calledMethodId,
                     exprTr.node as ExpressionList,
-                    OptionalAstNode.absent<VariableWithDataLocation>()));
+                    OptionalAstNode.absent<VariableWithDataLocation>()
+                )
+            );
         }
     }
 
-    public visitCloneStartEvent(ctx: CloneStartEventContext) : TransformerResult {
+    public visitCloneStartEvent(ctx: CloneStartEventContext): TransformerResult {
         return TransformerResult.withNode(CloneStartEvent.instance());
     }
 
-    public visitConditionReachedEvent(ctx: ConditionReachedEventContext) : TransformerResult {
+    public visitConditionReachedEvent(ctx: ConditionReachedEventContext): TransformerResult {
         const exprTr = ctx.boolExpr().accept(this);
         return TransformerResult.withNode(
-            new ConditionReachedEvent(exprTr.statementsToPrepend,
-                exprTr.node as BooleanExpression));
+            new ConditionReachedEvent(exprTr.statementsToPrepend, exprTr.node as BooleanExpression)
+        );
     }
 
-    public visitCreateCloneOfStatement(ctx: CreateCloneOfStatementContext) : TransformerResult {
+    public visitCreateCloneOfStatement(ctx: CreateCloneOfStatementContext): TransformerResult {
         const strTr = ctx.stringExpr().accept(this);
         return new TransformerResult(
             strTr.statementsToPrepend,
-            new CreateCloneOfStatement(strTr.node as StringExpression));
+            new CreateCloneOfStatement(strTr.node as StringExpression)
+        );
     }
 
-    public visitDeclareVariable(ctx: DeclareVariableContext) : TransformerResult {
+    public visitDeclareVariable(ctx: DeclareVariableContext): TransformerResult {
         const type = ctx.type().accept(this).nodeOnly() as ScratchType;
         const ident = ctx.ident().accept(this).nodeOnly() as Identifier;
 
@@ -1477,121 +1568,134 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         this._activeDeclarationScope.putVariable(variable);
 
         if (this._actorScope) {
-            return TransformerResult.withNode(
-                new DeclareActorVariableStatement(variable));
+            return TransformerResult.withNode(new DeclareActorVariableStatement(variable));
         } else {
-            return TransformerResult.withNode(
-                new DeclareStackVariableStatement(variable));
+            return TransformerResult.withNode(new DeclareStackVariableStatement(variable));
         }
     }
 
     public visitAssumeStatement(ctx: AssumeStatementContext): TransformerResult {
         const exprTr = ctx.boolExpr().accept(this);
-        return new TransformerResult(exprTr.statementsToPrepend,
-            new StrengtheningAssumeStatement(exprTr.node as BooleanExpression));
+        return new TransformerResult(
+            exprTr.statementsToPrepend,
+            new StrengtheningAssumeStatement(exprTr.node as BooleanExpression)
+        );
     }
 
-    public visitDefaultBoolExpression(ctx: DefaultBoolExpressionContext) : TransformerResult {
+    public visitDefaultBoolExpression(ctx: DefaultBoolExpressionContext): TransformerResult {
         return ctx.boolExpr().accept(this);
     }
 
-    public visitDefaultNumExpr(ctx: DefaultNumExprContext) : TransformerResult {
+    public visitDefaultNumExpr(ctx: DefaultNumExprContext): TransformerResult {
         return ctx.numExpr().accept(this);
     }
 
-    public visitDefaultStringExpression(ctx: DefaultStringExpressionContext) : TransformerResult {
+    public visitDefaultStringExpression(ctx: DefaultStringExpressionContext): TransformerResult {
         return ctx.stringExpr().accept(this);
     }
 
-    public visitDeleteAllFromStatement(ctx: DeleteAllFromStatementContext) : TransformerResult {
+    public visitDeleteAllFromStatement(ctx: DeleteAllFromStatementContext): TransformerResult {
         return TransformerResult.withNode(
-            new DeleteAllFromStatement(ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation));
+            new DeleteAllFromStatement(ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation)
+        );
     }
 
-    public visitDeleteIthFromStatement(ctx: DeleteIthFromStatementContext) : TransformerResult {
+    public visitDeleteIthFromStatement(ctx: DeleteIthFromStatementContext): TransformerResult {
         const numTr = ctx.numExpr().accept(this);
         return new TransformerResult(
             numTr.statementsToPrepend,
-            new DeleteIthFromStatement(ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation,
-                numTr.node as NumberExpression));
+            new DeleteIthFromStatement(
+                ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation,
+                numTr.node as NumberExpression
+            )
+        );
     }
 
-    public visitDeleteThisClone(ctx: DeleteThisCloneContext) : TransformerResult {
+    public visitDeleteThisClone(ctx: DeleteThisCloneContext): TransformerResult {
         return TransformerResult.withNode(new DeleteThisCloneStatement());
     }
 
-    public visitEpsilonStatement(ctx: EpsilonStatementContext) : TransformerResult {
+    public visitEpsilonStatement(ctx: EpsilonStatementContext): TransformerResult {
         return TransformerResult.withNode(new EpsilonStatement());
     }
 
-    public visitExpressionStmt(ctx: ExpressionStmtContext) : TransformerResult {
+    public visitExpressionStmt(ctx: ExpressionStmtContext): TransformerResult {
         const tr = ctx.expression().accept(this);
-        return new TransformerResult(tr.statementsToPrepend,
-            new ExpressionStatement(tr.node as Expression));
+        return new TransformerResult(tr.statementsToPrepend, new ExpressionStatement(tr.node as Expression));
     }
 
-    public visitIndexOfExpression(ctx: IndexOfExpressionContext) : TransformerResult {
+    public visitIndexOfExpression(ctx: IndexOfExpressionContext): TransformerResult {
         const tr = ctx.expression().accept(this);
-        return new TransformerResult(tr.statementsToPrepend,
-            new IndexOfExpression(tr.node as Expression,
-                ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation));
+        return new TransformerResult(
+            tr.statementsToPrepend,
+            new IndexOfExpression(
+                tr.node as Expression,
+                ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation
+            )
+        );
     }
 
-    public visitInheritsFrom(ctx: InheritsFromContext) : TransformerResult {
+    public visitInheritsFrom(ctx: InheritsFromContext): TransformerResult {
         const inheritFromList: Identifier[] = this.buildArrayFrom<Identifier>(ctx.ident()).nodeList;
         return TransformerResult.withNode(new InheritsFromList(inheritFromList));
     }
 
-    public visitInsertAtStatement(ctx: InsertAtStatementContext) : TransformerResult {
+    public visitInsertAtStatement(ctx: InsertAtStatementContext): TransformerResult {
         const numTr = ctx.numExpr().accept(this);
         const strTr = ctx.stringExpr().accept(this);
         return new TransformerResult(
             StatementLists.concat(numTr.statementsToPrepend, strTr.statementsToPrepend),
-            new InsertAtStatement(ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation,
+            new InsertAtStatement(
+                ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation,
                 numTr.node as NumberExpression,
-                strTr.node as StringExpression));
+                strTr.node as StringExpression
+            )
+        );
     }
 
-    public visitIthLetterOfStringExpression(ctx: IthLetterOfStringExpressionContext) : TransformerResult {
+    public visitIthLetterOfStringExpression(ctx: IthLetterOfStringExpressionContext): TransformerResult {
         const numTr = ctx.numExpr().accept(this);
         const strTr = ctx.stringExpr().accept(this);
         return new TransformerResult(
             StatementLists.concat(numTr.statementsToPrepend, strTr.statementsToPrepend),
-            new IthLetterOfStringExpression(
-                numTr.node as NumberExpression,
-                strTr.node as StringExpression));
+            new IthLetterOfStringExpression(numTr.node as NumberExpression, strTr.node as StringExpression)
+        );
     }
 
-    public visitIthStringItemOfExpression(ctx: IthStringItemOfExpressionContext) : TransformerResult {
+    public visitIthStringItemOfExpression(ctx: IthStringItemOfExpressionContext): TransformerResult {
         const numTr = ctx.numExpr().accept(this);
         return new TransformerResult(
             numTr.statementsToPrepend,
             new IthStringItemOfExpression(
                 numTr.node as NumberExpression,
-                ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation));
+                ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation
+            )
+        );
     }
 
-    public visitJoinStringsExpression(ctx: JoinStringsExpressionContext) : TransformerResult {
+    public visitJoinStringsExpression(ctx: JoinStringsExpressionContext): TransformerResult {
         const tr1 = this.parseOperand1(ctx);
         const tr2 = this.parseOperand2(ctx);
         return new TransformerResult(
             StatementLists.concat(tr1.statementsToPrepend, tr2.statementsToPrepend),
-            new JoinStringsExpression(tr1.node as StringExpression, tr2.node as StringExpression));
+            new JoinStringsExpression(tr1.node as StringExpression, tr2.node as StringExpression)
+        );
     }
 
-    public visitUserMessage(ctx: UserMessageContext) : TransformerResult {
+    public visitUserMessage(ctx: UserMessageContext): TransformerResult {
         const strTr = ctx.stringExpr().accept(this);
-        return new TransformerResult(strTr.statementsToPrepend,
-            new UserMessage(strTr.node as StringExpression));
+        return new TransformerResult(strTr.statementsToPrepend, new UserMessage(strTr.node as StringExpression));
     }
 
-    public visitActorSelfExpression(ctx: ActorSelfExpressionContext) : TransformerResult {
+    public visitActorSelfExpression(ctx: ActorSelfExpressionContext): TransformerResult {
         return new TransformerResult(StatementList.empty(), new ActorSelfExpression());
     }
 
     public visitQualifiedNamespace(ctx: QualifiedNamespaceContext): TransformerResult {
-        return new TransformerResult(StatementList.empty(),
-            new QualifiedMessageNamespace(new StringLiteral(this.unquote(ctx.String().text))));
+        return new TransformerResult(
+            StatementList.empty(),
+            new QualifiedMessageNamespace(new StringLiteral(this.unquote(ctx.String().text)))
+        );
     }
 
     public visitUnqualifiedNamespace(ctx: UnqualifiedNamespaceContext): TransformerResult {
@@ -1600,89 +1704,102 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
     public visitNamedMessageDestination(ctx: NamedMessageDestinationContext): TransformerResult {
         const namespace = new StringLiteral(this.unquote(ctx.String().text));
-        return new TransformerResult(StatementList.empty(),
-            new NamedDestination(namespace as StringLiteral));
+        return new TransformerResult(StatementList.empty(), new NamedDestination(namespace as StringLiteral));
     }
 
     public visitActorMessageDestination(ctx: ActorMessageDestinationContext): TransformerResult {
         const actorExprTr = ctx.actorExpr().accept(this);
-        return new TransformerResult(actorExprTr.statementsToPrepend,
-            new ActorDestination(actorExprTr.node as ActorExpression));
+        return new TransformerResult(
+            actorExprTr.statementsToPrepend,
+            new ActorDestination(actorExprTr.node as ActorExpression)
+        );
     }
 
-    public visitSystemMessage(ctx: SystemMessageContext) : TransformerResult {
+    public visitSystemMessage(ctx: SystemMessageContext): TransformerResult {
         const messageIdTr = ctx.stringExpr().accept(this);
         const destinationTr = ctx.messageDestination().accept(this);
         const payloadTr = ctx.expressionList().accept(this);
         return new TransformerResult(
-            StatementLists.concat(StatementLists.concat(messageIdTr.statementsToPrepend, payloadTr.statementsToPrepend), destinationTr.statementsToPrepend),
-            new SystemMessage(destinationTr.node as NamedDestination, messageIdTr.node as StringExpression,
-                payloadTr.node as ExpressionList));
+            StatementLists.concat(
+                StatementLists.concat(messageIdTr.statementsToPrepend, payloadTr.statementsToPrepend),
+                destinationTr.statementsToPrepend
+            ),
+            new SystemMessage(
+                destinationTr.node as NamedDestination,
+                messageIdTr.node as StringExpression,
+                payloadTr.node as ExpressionList
+            )
+        );
     }
 
-    public visitLengthOfListExpression(ctx: LengthOfListExpressionContext) : TransformerResult {
+    public visitLengthOfListExpression(ctx: LengthOfListExpressionContext): TransformerResult {
         const variableWithDataLocation = new VariableWithDataLocation(
             DataLocations.createTypedLocation(
                 ctx.variable().accept(this).node as Identifier,
-                ListType.withElementType(StringType.instance())));
+                ListType.withElementType(StringType.instance())
+            )
+        );
         return TransformerResult.withNode(new LengthOfListExpression(variableWithDataLocation));
     }
 
-    public visitLengthOfStringExpression(ctx: LengthOfStringExpressionContext) : TransformerResult {
+    public visitLengthOfStringExpression(ctx: LengthOfStringExpressionContext): TransformerResult {
         const tr = this.ensureType(ctx, StringType.instance(), ctx.stringExpr().accept(this));
         return new TransformerResult(tr.statementsToPrepend, new LengthOfStringExpression(tr.node as StringExpression));
     }
 
-    public visitListVariableExpression(ctx: ListVariableExpressionContext) : TransformerResult {
+    public visitListVariableExpression(ctx: ListVariableExpressionContext): TransformerResult {
         return ctx.variable().accept(this);
     }
 
-    public visitListWithElementsExpression(ctx: ListWithElementsExpressionContext) : TransformerResult {
+    public visitListWithElementsExpression(ctx: ListWithElementsExpressionContext): TransformerResult {
         return ctx.expressionListPlain().accept(this);
     }
 
-    public visitMessageReceivedEvent(ctx: MessageReceivedEventContext) : TransformerResult {
+    public visitMessageReceivedEvent(ctx: MessageReceivedEventContext): TransformerResult {
         const messageIdTr = ctx.stringExpr().accept(this);
         const msgNamespaceTr = ctx.messageNamespace().accept(this);
         const paramsTr = ctx.parameterList().accept(this);
         return new TransformerResult(
-            StatementLists.concat(StatementLists.concat(messageIdTr.statementsToPrepend, msgNamespaceTr.statementsToPrepend), paramsTr.statementsToPrepend),
+            StatementLists.concat(
+                StatementLists.concat(messageIdTr.statementsToPrepend, msgNamespaceTr.statementsToPrepend),
+                paramsTr.statementsToPrepend
+            ),
             new MessageReceivedEvent(
                 msgNamespaceTr.node as MessageNamespace,
                 messageIdTr.node as StringExpression,
-                paramsTr.node as ParameterDeclarationList));
+                paramsTr.node as ParameterDeclarationList
+            )
+        );
     }
 
-    public visitNegatedBoolExpression(ctx: NegatedBoolExpressionContext) : TransformerResult {
+    public visitNegatedBoolExpression(ctx: NegatedBoolExpressionContext): TransformerResult {
         const tr = this.parseOperand1(ctx);
-        return new TransformerResult(
-            tr.statementsToPrepend,
-            new NegationExpression(tr.node as BooleanExpression));
+        return new TransformerResult(tr.statementsToPrepend, new NegationExpression(tr.node as BooleanExpression));
     }
 
-    public visitNeverEvent(ctx: NeverEventContext) : TransformerResult {
+    public visitNeverEvent(ctx: NeverEventContext): TransformerResult {
         return TransformerResult.withNode(NeverEvent.instance());
     }
 
-    public visitBootstrapEvent(ctx: BootstrapEventContext) : TransformerResult {
+    public visitBootstrapEvent(ctx: BootstrapEventContext): TransformerResult {
         return TransformerResult.withNode(BootstrapEvent.instance());
     }
 
-    public visitAfterBootstrapMonitoringEvent(ctx: AfterBootstrapMonitoringEventContext) : TransformerResult {
+    public visitAfterBootstrapMonitoringEvent(ctx: AfterBootstrapMonitoringEventContext): TransformerResult {
         return TransformerResult.withNode(AfterBootstrapMonitoringEvent.instance());
     }
 
-    public visitAfterStatementMonitoringEvent(ctx: AfterStatementMonitoringEventContext) : TransformerResult {
+    public visitAfterStatementMonitoringEvent(ctx: AfterStatementMonitoringEventContext): TransformerResult {
         return TransformerResult.withNode(AfterStatementMonitoringEvent.instance());
     }
 
-    public visitNumAsStringExpression(ctx: NumAsStringExpressionContext) : TransformerResult {
+    public visitNumAsStringExpression(ctx: NumAsStringExpressionContext): TransformerResult {
         const tr = ctx.numExpr().accept(this);
         const cast = new CastExpression(tr.node as NumberExpression, StringType.instance());
         return new TransformerResult(tr.statementsToPrepend, cast);
     }
 
-    public visitParameter(ctx: ParameterContext) : TransformerResult {
+    public visitParameter(ctx: ParameterContext): TransformerResult {
         const ident: Identifier = ctx.ident().accept(this).nodeOnly() as Identifier;
         const type: ScratchType = ctx.type().accept(this).node as ScratchType;
 
@@ -1691,7 +1808,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return TransformerResult.withNode(new ParameterDeclaration(ident, type));
     }
 
-    public visitReplaceElementAtStatement(ctx: ReplaceElementAtStatementContext) : TransformerResult {
+    public visitReplaceElementAtStatement(ctx: ReplaceElementAtStatementContext): TransformerResult {
         const strTr = ctx.stringExpr().accept(this);
         const numTr = ctx.numExpr().accept(this);
         return new TransformerResult(
@@ -1699,7 +1816,9 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
             new ReplaceElementAtStatement(
                 ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation,
                 numTr.node as NumberExpression,
-                strTr.node as StringExpression));
+                strTr.node as StringExpression
+            )
+        );
     }
 
     public visitSoundResource(ctx: SoundResourceContext): TransformerResult {
@@ -1710,7 +1829,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return TransformerResult.withNode(ImageResourceType.instance());
     }
 
-    public visitStoreEvalResultStatement(ctx: StoreEvalResultStatementContext) : TransformerResult {
+    public visitStoreEvalResultStatement(ctx: StoreEvalResultStatementContext): TransformerResult {
         const variable = ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation;
         const varType = ScratchType.fromId(variable.dataloc.type);
         const exprTr = this.ensureType(ctx, varType, ctx.expression().accept(this));
@@ -1719,30 +1838,33 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
         return new TransformerResult(
             exprTr.statementsToPrepend,
-            new StoreEvalResultToVariableStatement(variable, exprTr.node as Expression));
+            new StoreEvalResultToVariableStatement(variable, exprTr.node as Expression)
+        );
     }
 
-    public visitStoreCallResultStatement(ctx: StoreCallResultStatementContext) : TransformerResult {
+    public visitStoreCallResultStatement(ctx: StoreCallResultStatementContext): TransformerResult {
         const exprListTr = ctx.callStmt().expressionList().expressionListPlain().accept(this);
         const methodIdent = ctx.callStmt().ident().accept(this).nodeOnly() as Identifier;
         const toVar = ctx.variable().accept(this).nodeOnly() as VariableWithDataLocation;
-        return new TransformerResult(exprListTr.statementsToPrepend,
-            new CallStatement(methodIdent, exprListTr.node as ExpressionList, OptionalAstNode.with(toVar)));
+        return new TransformerResult(
+            exprListTr.statementsToPrepend,
+            new CallStatement(methodIdent, exprListTr.node as ExpressionList, OptionalAstNode.with(toVar))
+        );
     }
 
-    public visitStartupEvent(ctx: StartupEventContext) : TransformerResult {
+    public visitStartupEvent(ctx: StartupEventContext): TransformerResult {
         return TransformerResult.withNode(StartupEvent.instance());
     }
 
-    public visitStopAll(ctx: StopAllContext) : TransformerResult {
+    public visitStopAll(ctx: StopAllContext): TransformerResult {
         return TransformerResult.withNode(new StopAllStatement());
     }
 
-    public visitStopOthersInActorStatement(ctx: StopOthersInActorStatementContext) : TransformerResult {
+    public visitStopOthersInActorStatement(ctx: StopOthersInActorStatementContext): TransformerResult {
         return TransformerResult.withNode(new StopOthersInActorStatement());
     }
 
-    public visitStopThis(ctx: StopThisContext) : TransformerResult {
+    public visitStopThis(ctx: StopThisContext): TransformerResult {
         return TransformerResult.withNode(new StopThisStatement());
     }
 
@@ -1756,7 +1878,8 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
         return new TransformerResult(
             tr.statementsToPrepend,
-            new CastExpression(tr.node as Expression, BooleanType.instance()));
+            new CastExpression(tr.node as Expression, BooleanType.instance())
+        );
     }
 
     public visitStringAsBoolExpression(ctx: StringAsBoolExpressionContext): TransformerResult {
@@ -1765,19 +1888,21 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
         return new TransformerResult(
             tr.statementsToPrepend,
-            new CastExpression(tr.node as Expression, BooleanType.instance()));
+            new CastExpression(tr.node as Expression, BooleanType.instance())
+        );
     }
 
-    public visitStringToIntExpression(ctx: StringToIntExpressionContext) : TransformerResult {
+    public visitStringToIntExpression(ctx: StringToIntExpressionContext): TransformerResult {
         const tr = ctx.stringExpr().accept(this);
         Preconditions.checkArgument(!(tr.node instanceof Identifier));
 
         return new TransformerResult(
             tr.statementsToPrepend,
-            new CastExpression(tr.node as Expression, IntegerType.instance()));
+            new CastExpression(tr.node as Expression, IntegerType.instance())
+        );
     }
 
-    public visitStringToFloatExpression(ctx: StringToFloatExpressionContext) : TransformerResult {
+    public visitStringToFloatExpression(ctx: StringToFloatExpressionContext): TransformerResult {
         const tr = ctx.stringExpr().accept(this);
         Preconditions.checkArgument(!(tr.node instanceof Identifier));
         const cast = new CastExpression(tr.node as Expression, FloatType.instance());
@@ -1789,107 +1914,123 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return new TransformerResult(tr.statementsToPrepend, cast);
     }
 
-    public visitNumToFloatExpression(ctx: NumToFloatExpressionContext) : TransformerResult {
+    public visitNumToFloatExpression(ctx: NumToFloatExpressionContext): TransformerResult {
         const tr = ctx.numExpr().accept(this);
         Preconditions.checkArgument(!(tr.node instanceof Identifier));
 
         return new TransformerResult(
             tr.statementsToPrepend,
-            new CastExpression(tr.node as Expression, FloatType.instance()));
+            new CastExpression(tr.node as Expression, FloatType.instance())
+        );
     }
 
-    public visitNumToIntExpression(ctx: NumToIntExpressionContext) : TransformerResult {
+    public visitNumToIntExpression(ctx: NumToIntExpressionContext): TransformerResult {
         const tr = ctx.numExpr().accept(this);
         Preconditions.checkArgument(!(tr.node instanceof Identifier));
 
         return new TransformerResult(
             tr.statementsToPrepend,
-            new CastExpression(tr.node as Expression, IntegerType.instance()));
+            new CastExpression(tr.node as Expression, IntegerType.instance())
+        );
     }
 
     public visitLocateActorExpression(ctx: LocateActorExpressionContext): TransformerResult {
         const nameTr = ctx.stringExpr().accept(this);
-        return new TransformerResult(nameTr.statementsToPrepend, new LocateActorExpression(nameTr.node as StringExpression));
+        return new TransformerResult(
+            nameTr.statementsToPrepend,
+            new LocateActorExpression(nameTr.node as StringExpression)
+        );
     }
 
     public visitActorVariableExpression(ctx: ActorVariableExpressionContext): TransformerResult {
         return ctx.variable().accept(this);
     }
 
-    public visitStringAttributeOfExpression(ctx: StringAttributeOfExpressionContext) : TransformerResult {
+    public visitStringAttributeOfExpression(ctx: StringAttributeOfExpressionContext): TransformerResult {
         const trAttribute = this.ensureType(ctx, StringType.instance(), ctx.stringExpr().accept(this));
         const trActor = this.ensureType(ctx, ActorType.instance(), ctx.actorExpr().accept(this));
 
         return new TransformerResult(
             StatementLists.concat(trAttribute.statementsToPrepend, trActor.statementsToPrepend),
-            new StringAttributeOfExpression(trAttribute.node as StringExpression,
-                trActor.node as ActorExpression));
+            new StringAttributeOfExpression(trAttribute.node as StringExpression, trActor.node as ActorExpression)
+        );
     }
 
     public unquote(str: string): string {
         return str.replace(/^"(.*)"$/, '$1');
     }
 
-    public visitStringLiteralExpression(ctx: StringLiteralExpressionContext) : TransformerResult {
+    public visitStringLiteralExpression(ctx: StringLiteralExpressionContext): TransformerResult {
         return TransformerResult.withNode(StringLiteral.from(this.unquote(ctx.text)));
     }
 
-    public visitStringVariableExpression(ctx: StringVariableExpressionContext) : TransformerResult {
+    public visitStringVariableExpression(ctx: StringVariableExpressionContext): TransformerResult {
         // Do not StringVariableExpression here!! (but a type-independent variable)
         // (to deal with ambiguities in the parsing process)
         return ctx.variable().accept(this);
     }
 
-    public visitTimerExpression(ctx: TimerExpressionContext) : TransformerResult {
+    public visitTimerExpression(ctx: TimerExpressionContext): TransformerResult {
         let prepend: StatementList = StatementList.empty();
 
         const resultVarIdent: Identifier = Identifier.fresh();
-        const resultVar = new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, IntegerType.instance()));
+        const resultVar = new VariableWithDataLocation(
+            DataLocations.createTypedLocation(resultVarIdent, IntegerType.instance())
+        );
         const resultVarExpr = this.createVariableExpression(IntegerType.instance(), resultVarIdent);
         const declarationStmt = new DeclareStackVariableStatement(resultVar);
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
 
         this._activeDeclarationScope.putVariable(resultVar);
 
-        const storeCallResultStmt = new CallStatement(Identifier.of(MethodIdentifiers._RUNTIME_timerValue),
-            new ExpressionList([]), OptionalAstNode.with(resultVar));
+        const storeCallResultStmt = new CallStatement(
+            Identifier.of(MethodIdentifiers._RUNTIME_timerValue),
+            new ExpressionList([]),
+            OptionalAstNode.with(resultVar)
+        );
         prepend = StatementLists.concat(prepend, StatementList.from([storeCallResultStmt]));
 
         return new TransformerResult(prepend, resultVarExpr);
     }
 
-    public visitUnspecifiedBoolExpression(ctx: UnspecifiedBoolExpressionContext) : TransformerResult {
+    public visitUnspecifiedBoolExpression(ctx: UnspecifiedBoolExpressionContext): TransformerResult {
         const counterIdent: Identifier = Identifier.fresh();
-        const nondetVar = new VariableWithDataLocation(DataLocations.createTypedLocation(counterIdent, BooleanType.instance()));
+        const nondetVar = new VariableWithDataLocation(
+            DataLocations.createTypedLocation(counterIdent, BooleanType.instance())
+        );
         const nondetVarExpr = new BooleanVariableExpression(nondetVar);
         const declarationStmt = new DeclareStackVariableStatement(nondetVar);
         const prepend: StatementList = StatementList.from([declarationStmt]);
         return new TransformerResult(prepend, nondetVarExpr);
     }
 
-    public visitUnspecifiedExpr(ctx: UnspecifiedExprContext) : TransformerResult {
+    public visitUnspecifiedExpr(ctx: UnspecifiedExprContext): TransformerResult {
         throw new ImplementMeException();
     }
 
-    public visitUnspecifiedNumExpr(ctx: UnspecifiedNumExprContext) : TransformerResult {
+    public visitUnspecifiedNumExpr(ctx: UnspecifiedNumExprContext): TransformerResult {
         const counterIdent: Identifier = Identifier.fresh();
-        const nondetVar = new VariableWithDataLocation(DataLocations.createTypedLocation(counterIdent, IntegerType.instance()));
+        const nondetVar = new VariableWithDataLocation(
+            DataLocations.createTypedLocation(counterIdent, IntegerType.instance())
+        );
         const nondetVarExpr = new VariableExpression(nondetVar);
         const declarationStmt = new DeclareStackVariableStatement(nondetVar);
         const prepend: StatementList = StatementList.from([declarationStmt]);
         return new TransformerResult(prepend, nondetVarExpr);
     }
 
-    public visitUnspecifiedStringExpression(ctx: UnspecifiedStringExpressionContext) : TransformerResult {
+    public visitUnspecifiedStringExpression(ctx: UnspecifiedStringExpressionContext): TransformerResult {
         const counterIdent: Identifier = Identifier.fresh();
-        const nondetVar = new VariableWithDataLocation(DataLocations.createTypedLocation(counterIdent, StringType.instance()));
+        const nondetVar = new VariableWithDataLocation(
+            DataLocations.createTypedLocation(counterIdent, StringType.instance())
+        );
         const nondetVarExpr = new VariableExpression(nondetVar);
         const declarationStmt = new DeclareStackVariableStatement(nondetVar);
         const prepend: StatementList = StatementList.from([declarationStmt]);
         return new TransformerResult(prepend, nondetVarExpr);
     }
 
-    public visitVariable(ctx: VariableContext) : TransformerResult {
+    public visitVariable(ctx: VariableContext): TransformerResult {
         const varIdent = new Identifier(ctx.text);
         return this.produceVariableFromIdentifier(varIdent);
     }
@@ -1907,19 +2048,26 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         Preconditions.checkArgument(ctx.ident().length == 2);
         const actorName = ctx.ident()[0].text;
         const attributeIdent: Identifier = ctx.ident()[1].accept(this).nodeOnly();
-        const attributeType = this._typeStorage.getSystemScope().getChildScope(actorName, DeclarationScopeType.ACTOR).getTypeOf(attributeIdent);
+        const attributeType = this._typeStorage
+            .getSystemScope()
+            .getChildScope(actorName, DeclarationScopeType.ACTOR)
+            .getTypeOf(attributeIdent);
 
         const qualifiedIdent = new Identifier(`${actorName}${VAR_SCOPING_SPLITTER}${attributeIdent.text}`);
-        return TransformerResult.withNode(new VariableWithDataLocation(DataLocations.createTypedLocation(qualifiedIdent, attributeType)));
+        return TransformerResult.withNode(
+            new VariableWithDataLocation(DataLocations.createTypedLocation(qualifiedIdent, attributeType))
+        );
     }
 
     private produceVariableFromIdentifier(varIdent: Identifier): TransformerResult {
         const varType = this.getTypeOf(varIdent);
         Preconditions.checkNotUndefined(varType);
-        return TransformerResult.withNode(new VariableWithDataLocation(DataLocations.createTypedLocation(varIdent, varType)));
+        return TransformerResult.withNode(
+            new VariableWithDataLocation(DataLocations.createTypedLocation(varIdent, varType))
+        );
     }
 
-    public visitWaitSecsStatement(ctx: WaitSecsStatementContext) : TransformerResult {
+    public visitWaitSecsStatement(ctx: WaitSecsStatementContext): TransformerResult {
         const secondsTr = ctx.numExpr().accept(this);
 
         const methodToCall: string = this._config.useBusyWaiting
@@ -1928,30 +2076,38 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
         return new TransformerResult(
             secondsTr.statementsToPrepend,
-            new CallStatement(Identifier.of(methodToCall),
-                new ExpressionList([secondsTr.node as Expression]), OptionalAstNode.absent()));
+            new CallStatement(
+                Identifier.of(methodToCall),
+                new ExpressionList([secondsTr.node as Expression]),
+                OptionalAstNode.absent()
+            )
+        );
     }
 
     public visitResetTimerStatement(ctx: ResetTimerStatementContext): TransformerResult {
         const methodToCall = MethodIdentifiers._RUNTIME_resetTimer;
         return TransformerResult.withNode(
-            new CallStatement(Identifier.of(methodToCall),
-                new ExpressionList([]), OptionalAstNode.absent()));
+            new CallStatement(Identifier.of(methodToCall), new ExpressionList([]), OptionalAstNode.absent())
+        );
     }
 
-    public visitWaitUntilStatement(ctx: WaitUntilStatementContext) : TransformerResult {
+    public visitWaitUntilStatement(ctx: WaitUntilStatementContext): TransformerResult {
         const condTr = ctx.boolExpr().accept(this);
 
         if (this._config.busyWaitUntilCond) {
             return new TransformerResult(
                 condTr.statementsToPrepend,
-                new CallStatement(Identifier.of(MethodIdentifiers._BUSY_WAIT_waitUntil),
-                    new ExpressionList([condTr.node as Expression]), OptionalAstNode.absent()));
-
+                new CallStatement(
+                    Identifier.of(MethodIdentifiers._BUSY_WAIT_waitUntil),
+                    new ExpressionList([condTr.node as Expression]),
+                    OptionalAstNode.absent()
+                )
+            );
         } else {
             return new TransformerResult(
                 condTr.statementsToPrepend,
-                new WaitUntilStatement(condTr.node as BooleanExpression));
+                new WaitUntilStatement(condTr.node as BooleanExpression)
+            );
         }
     }
 
@@ -1959,7 +2115,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         throw new ImplementMeForException(tree.constructor.name);
     }
 
-    private identifyProcedureCall(node: RuleNode) : string|null {
+    private identifyProcedureCall(node: RuleNode): string | null {
         let result: string = node.constructor.name;
         const stmtMatch = STATEMENT_MATCHER.exec(result);
         if (stmtMatch) {
@@ -1968,7 +2124,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         return null;
     }
 
-    private identifyFunctionCall(node: RuleNode) : string|null {
+    private identifyFunctionCall(node: RuleNode): string | null {
         let result: string = node.constructor.name;
         const exprMatch = EXPRESSION_MATCHER.exec(result);
         if (exprMatch) {
@@ -1978,7 +2134,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         }
     }
 
-    private identifyIntermediateMethodName(node: RuleNode) : string|null {
+    private identifyIntermediateMethodName(node: RuleNode): string | null {
         let result: string = node.constructor.name;
         const stmtMatch = STATEMENT_MATCHER.exec(result);
         if (stmtMatch) {
@@ -1995,9 +2151,11 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
     private toCamelCase(str: string): string {
         // https://stackoverflow.com/questions/2970525/converting-any-string-into-camel-case
-        return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function(word, index) {
-            return index == 0 ? word.toLowerCase() : word.toUpperCase();
-        }).replace(/\s+/g, '');
+        return str
+            .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
+                return index == 0 ? word.toLowerCase() : word.toUpperCase();
+            })
+            .replace(/\s+/g, '');
     }
 
     private createVariableExpression(type: ScratchType, ident: Identifier): Expression {
@@ -2005,19 +2163,15 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         const variable = new VariableWithDataLocation(dataLoc);
 
         // FIXME: Magic strings
-        if (type.constructor.name == "NumberType") {
+        if (type.constructor.name == 'NumberType') {
             return new NumberVariableExpression(variable);
-
-        } else if (type.constructor.name == "FloatType") {
+        } else if (type.constructor.name == 'FloatType') {
             return new NumberVariableExpression(variable);
-
-        } else if (type.constructor.name == "IntegerType") {
+        } else if (type.constructor.name == 'IntegerType') {
             return new NumberVariableExpression(variable);
-
-        } else if (type.constructor.name == "StringType") {
+        } else if (type.constructor.name == 'StringType') {
             return new StringVariableExpression(variable);
-
-        } else if (type.constructor.name == "BooleanType") {
+        } else if (type.constructor.name == 'BooleanType') {
             return new BooleanVariableExpression(variable);
         }
 
@@ -2031,7 +2185,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     private childsAsExpressionList(node: RuleNode): TTransformerResult<ExpressionList> {
         let prepend: StatementList = StatementList.empty();
         let result: Expression[] = [];
-        for (let i = 0; i<node.childCount; i++) {
+        for (let i = 0; i < node.childCount; i++) {
             const child = node.getChild(i);
             if (!(child instanceof TerminalNode)) {
                 const childTr: TransformerResult = child.accept(this);
@@ -2039,8 +2193,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
                 result.push(childTr.node as Expression);
             }
         }
-        return new TTransformerResult(prepend,
-            new ExpressionList(result));
+        return new TTransformerResult(prepend, new ExpressionList(result));
     }
 
     private determineResultType(node: RuleNode): ScratchType {
@@ -2063,7 +2216,7 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     private hasErrorChilds(node: RuleNode) {
-        for (let i = 0; i<node.childCount; i++) {
+        for (let i = 0; i < node.childCount; i++) {
             const child = node.getChild(i);
             if (child instanceof ErrorNode) {
                 return true;
@@ -2078,10 +2231,10 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         }
 
         if (ctx.childCount > 0) {
-            throw new IllegalArgumentException(ctx.constructor.name + " not a single-child node!");
+            throw new IllegalArgumentException(ctx.constructor.name + ' not a single-child node!');
         }
 
-        throw new IllegalArgumentException(ctx.constructor.name + " is a terminal node!");
+        throw new IllegalArgumentException(ctx.constructor.name + ' is a terminal node!');
     }
 
     private transformCallStatementToVariable(ctx: CallStmtContext): TransformerResult {
@@ -2094,7 +2247,9 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         const resultVarType: ScratchType = methodSig.returns.type;
 
         const resultVarIdent: Identifier = Identifier.fresh();
-        const resultVar = new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, resultVarType));
+        const resultVar = new VariableWithDataLocation(
+            DataLocations.createTypedLocation(resultVarIdent, resultVarType)
+        );
         const resultVarExpr = this.createVariableExpression(resultVarType, resultVarIdent);
         const declarationStmt = new DeclareStackVariableStatement(resultVar);
         prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
@@ -2102,8 +2257,11 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
         this._activeDeclarationScope.putVariable(resultVar);
 
         const argsTr = ctx.expressionList().accept(this);
-        const storeCallResultStmt = new CallStatement(methodIdent,
-            argsTr.node as ExpressionList, OptionalAstNode.with(resultVar));
+        const storeCallResultStmt = new CallStatement(
+            methodIdent,
+            argsTr.node as ExpressionList,
+            OptionalAstNode.with(resultVar)
+        );
         prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
         prepend = StatementLists.concat(prepend, StatementList.from([storeCallResultStmt]));
 
@@ -2124,7 +2282,10 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
     visitPrecisionPushStatement(ctx: PrecisionPushStatementContext): TransformerResult {
         const exprTr = ctx.boolExpr().accept(this);
-        return new TransformerResult(exprTr.statementsToPrepend, new PrecisionPushStatement(exprTr.node as BooleanExpression));
+        return new TransformerResult(
+            exprTr.statementsToPrepend,
+            new PrecisionPushStatement(exprTr.node as BooleanExpression)
+        );
     }
 
     visitPrecisionPopStatement(ctx: PrecisionPopStatementContext): TransformerResult {
@@ -2139,7 +2300,9 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 
                 const resultVarIdent: Identifier = Identifier.fresh();
                 const resultVarType = this.determineResultType(node);
-                const resultVar = new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, resultVarType));
+                const resultVar = new VariableWithDataLocation(
+                    DataLocations.createTypedLocation(resultVarIdent, resultVarType)
+                );
                 const resultVarExpr = this.createVariableExpression(resultVarType, resultVarIdent);
                 const declarationStmt = new DeclareStackVariableStatement(resultVar);
                 prepend = StatementLists.concat(prepend, StatementList.from([declarationStmt]));
@@ -2147,12 +2310,20 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
                 const argsTr: TTransformerResult<ExpressionList> = this.childsAsExpressionList(node);
                 prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
 
-                prepend = StatementLists.concat(prepend, StatementList.from([
-                    new CallStatement(
-                        Identifier.of(functionCandidateName),
-                        argsTr.node,
-                        OptionalAstNode.with(new VariableWithDataLocation(DataLocations.createTypedLocation(resultVarIdent, resultVarType))))
-                ]));
+                prepend = StatementLists.concat(
+                    prepend,
+                    StatementList.from([
+                        new CallStatement(
+                            Identifier.of(functionCandidateName),
+                            argsTr.node,
+                            OptionalAstNode.with(
+                                new VariableWithDataLocation(
+                                    DataLocations.createTypedLocation(resultVarIdent, resultVarType)
+                                )
+                            )
+                        ),
+                    ])
+                );
 
                 return new TransformerResult(prepend, resultVarExpr);
             }
@@ -2166,11 +2337,10 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
                 const argsTr: TTransformerResult<ExpressionList> = this.childsAsExpressionList(node);
                 prepend = StatementLists.concat(prepend, argsTr.statementsToPrepend);
 
-                return new TransformerResult(prepend,
-                    new CallStatement(
-                        Identifier.of(procedureCandidateName),
-                        argsTr.node,
-                        OptionalAstNode.absent()));
+                return new TransformerResult(
+                    prepend,
+                    new CallStatement(Identifier.of(procedureCandidateName), argsTr.node, OptionalAstNode.absent())
+                );
             }
         }
 
@@ -2178,33 +2348,44 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
     }
 
     visitErrorNode(node: ErrorNode): TransformerResult {
-        throw new ImplementMeForException("ErrorNode");
+        throw new ImplementMeForException('ErrorNode');
     }
 
     visitTerminal(node: TerminalNode): TransformerResult {
-        throw new ImplementMeForException("TerminalNode");
+        throw new ImplementMeForException('TerminalNode');
     }
 
-    private ensureType0(context: ParserRuleContext, varType: ScratchType, transformerResult: TransformerResult): TransformerResult {
+    private ensureType0(
+        context: ParserRuleContext,
+        varType: ScratchType,
+        transformerResult: TransformerResult
+    ): TransformerResult {
         if (transformerResult.node['expressionType'] == varType) {
             return transformerResult;
-
         } else if (transformerResult.node instanceof Identifier) {
-            const varExpr = new VariableWithDataLocation(DataLocations.createTypedLocation(transformerResult.node, varType));
+            const varExpr = new VariableWithDataLocation(
+                DataLocations.createTypedLocation(transformerResult.node, varType)
+            );
             return new TransformerResult(transformerResult.statementsToPrepend, varExpr);
-
         } else {
             throw new ParsingException(`Type ${varType.toTreeString()} expected.`, context);
         }
     }
 
-    private ensureType(context: ParserRuleContext, varType: ScratchType, transformerResult: TransformerResult): TransformerResult {
+    private ensureType(
+        context: ParserRuleContext,
+        varType: ScratchType,
+        transformerResult: TransformerResult
+    ): TransformerResult {
         const result = this.ensureType0(context, varType, transformerResult);
 
         if (result.node instanceof VariableWithDataLocation) {
             const declaredType: ScratchType = this.getTypeOf(result.node.identifier);
             if (declaredType.typeId != varType.typeId) {
-                throw new ParsingException(`Expected type ${varType.toTreeString()} differs from declared ${declaredType.toTreeString()}`, context);
+                throw new ParsingException(
+                    `Expected type ${varType.toTreeString()} differs from declared ${declaredType.toTreeString()}`,
+                    context
+                );
             }
         }
 
@@ -2213,12 +2394,15 @@ class ToIntermediateVisitor implements LeilaVisitor<TransformerResult> {
 }
 
 export class ToIntermediateTransformer {
-
-    transform(methodLib: App, origin: RuleNode, typeInformationStorage: TypeInformationStorage,
-              config: {}, filePath: string): AstNode {
+    transform(
+        methodLib: App,
+        origin: RuleNode,
+        typeInformationStorage: TypeInformationStorage,
+        config: {},
+        filePath: string
+    ): AstNode {
         const transformerConfig = new TransformerConfig(config);
         const visitor = new ToIntermediateVisitor(transformerConfig, methodLib, typeInformationStorage, filePath);
         return origin.accept(visitor).nodeOnly();
     }
-
 }

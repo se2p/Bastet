@@ -23,33 +23,29 @@
  *
  */
 
-
-import {GraphPath} from "../GraphPath";
-import {Property} from "../../../../syntax/Property";
-import {Set as ImmSet} from "immutable";
-import {Counterexample} from "../../../../syntax/Counterexample";
-
+import { GraphPath } from '../GraphPath';
+import { Property } from '../../../../syntax/Property';
+import { Set as ImmSet } from 'immutable';
+import { Counterexample } from '../../../../syntax/Counterexample';
 
 /**
  * Witness for the violation of a safety property (a finite path in the reachability graph).
  */
 export class GraphSafetyCounterexample implements Counterexample {
+    private readonly _path: GraphPath;
 
-   private readonly _path: GraphPath;
+    private readonly _violatedProperties: ImmSet<Property>;
 
-   private readonly _violatedProperties: ImmSet<Property>;
+    constructor(path: GraphPath, violatedProperties: Iterable<Property>) {
+        this._path = path;
+        this._violatedProperties = ImmSet(violatedProperties);
+    }
 
-   constructor(path: GraphPath, violatedProperties: Iterable<Property>) {
-      this._path = path;
-      this._violatedProperties = ImmSet(violatedProperties);
-   }
+    get path(): GraphPath {
+        return this._path;
+    }
 
-   get path(): GraphPath {
-      return this._path;
-   }
-
-   get violatedProperties(): ImmSet<Property> {
-      return this._violatedProperties;
-   }
-
+    get violatedProperties(): ImmSet<Property> {
+        return this._violatedProperties;
+    }
 }

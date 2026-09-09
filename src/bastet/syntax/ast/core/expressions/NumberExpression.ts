@@ -23,38 +23,34 @@
  *
  */
 
-import {Expression} from "./Expression";
-import {AbstractExpression} from "./AbstractExpression";
-import {ensureEqualExpressionTypes, FloatType, IntegerType} from "../ScratchType";
-import {AstNode} from "../../AstNode";
-import {StringExpression} from "./StringExpression";
-import {BinaryExpression} from "./BinaryExpression";
-import {VariableExpression, VariableWithDataLocation} from "../Variable";
+import { Expression } from './Expression';
+import { AbstractExpression } from './AbstractExpression';
+import { ensureEqualExpressionTypes, FloatType, IntegerType } from '../ScratchType';
+import { AstNode } from '../../AstNode';
+import { StringExpression } from './StringExpression';
+import { BinaryExpression } from './BinaryExpression';
+import { VariableExpression, VariableWithDataLocation } from '../Variable';
 
 export type NumericType = FloatType | IntegerType;
 
-export interface NumberExpression extends Expression {
-
-}
+export interface NumberExpression extends Expression {}
 
 export class AbstractNumberExpression extends AbstractExpression implements NumberExpression {
-
     constructor(numericType: NumericType, childs: AstNode[]) {
         super(numericType, childs);
     }
-
 }
 
-export class BinaryNumberExpression extends BinaryExpression<NumberExpression, NumberExpression> implements NumberExpression {
-
+export class BinaryNumberExpression
+    extends BinaryExpression<NumberExpression, NumberExpression>
+    implements NumberExpression
+{
     constructor(op1: NumberExpression, op2: NumberExpression) {
         super(ensureEqualExpressionTypes(op1, op2), op1, op2);
     }
-
 }
 
 export class NumberLiteral {
-
     public static fromIntString(str: string): IntegerLiteral {
         return new IntegerLiteral(parseInt(str));
     }
@@ -62,11 +58,9 @@ export class NumberLiteral {
     public static fromFloatString(str: string): FloatLiteral {
         return new FloatLiteral(parseFloat(str));
     }
-
 }
 
 export class FloatLiteral extends AbstractNumberExpression {
-
     private readonly _floatLiteral: number;
 
     constructor(num: number) {
@@ -101,11 +95,9 @@ export class FloatLiteral extends AbstractNumberExpression {
     public static fromString(str: string): FloatLiteral {
         return new FloatLiteral(parseFloat(str));
     }
-
 }
 
 export class IntegerLiteral extends AbstractNumberExpression {
-
     private readonly _intLiteral: number;
 
     constructor(num: number) {
@@ -140,26 +132,21 @@ export class IntegerLiteral extends AbstractNumberExpression {
     public static fromString(str: string): IntegerLiteral {
         return new IntegerLiteral(parseInt(str));
     }
-
 }
 
 export class NumberVariableExpression extends VariableExpression implements NumberExpression {
-
     constructor(variable: VariableWithDataLocation) {
         super(variable);
     }
 }
 
 export class TimerExpression extends AbstractNumberExpression {
-
     constructor() {
         super(IntegerType.instance(), []);
     }
-
 }
 
 export class LengthOfStringExpression extends AbstractNumberExpression {
-
     private readonly _str: StringExpression;
 
     constructor(str: StringExpression) {
@@ -173,7 +160,6 @@ export class LengthOfStringExpression extends AbstractNumberExpression {
 }
 
 export class LengthOfListExpression extends AbstractNumberExpression {
-
     private readonly _listVar: VariableWithDataLocation;
 
     constructor(listVar: VariableWithDataLocation) {
@@ -184,11 +170,9 @@ export class LengthOfListExpression extends AbstractNumberExpression {
     get listVar(): VariableWithDataLocation {
         return this._listVar;
     }
-
 }
 
 export class IndexOfExpression extends AbstractNumberExpression {
-
     private readonly _variable: VariableWithDataLocation;
     private readonly _expr: Expression;
 
@@ -208,7 +192,6 @@ export class IndexOfExpression extends AbstractNumberExpression {
 }
 
 export class PickRandomFromExpression extends AbstractNumberExpression {
-
     private readonly _from: NumberExpression;
     private readonly _to: NumberExpression;
 
@@ -228,7 +211,6 @@ export class PickRandomFromExpression extends AbstractNumberExpression {
 }
 
 export class RoundExpression extends AbstractNumberExpression {
-
     private readonly _num: NumberExpression;
 
     constructor(num: NumberExpression) {
@@ -242,40 +224,31 @@ export class RoundExpression extends AbstractNumberExpression {
 }
 
 export class MultiplyExpression extends BinaryNumberExpression {
-
     constructor(op1: NumberExpression, op2: NumberExpression) {
         super(op1, op2);
     }
-
 }
 
 export class DivideExpression extends BinaryNumberExpression {
-
     constructor(op1: NumberExpression, op2: NumberExpression) {
         super(op1, op2);
     }
 }
 
 export class ModuloExpression extends BinaryNumberExpression {
-
     constructor(op1: NumberExpression, op2: NumberExpression) {
         super(op1, op2);
     }
-
 }
 
 export class PlusExpression extends BinaryNumberExpression {
-
     constructor(op1: NumberExpression, op2: NumberExpression) {
         super(op1, op2);
     }
-
 }
 
 export class MinusExpression extends BinaryNumberExpression {
-
     constructor(op1: NumberExpression, op2: NumberExpression) {
         super(op1, op2);
     }
-
 }

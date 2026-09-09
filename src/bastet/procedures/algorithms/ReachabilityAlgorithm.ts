@@ -23,26 +23,25 @@
  *
  */
 
-import {AbstractState} from "../../lattices/Lattice";
-import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
-import {FrontierSet, ReachedSet} from "./StateSet";
-import {Preconditions} from "../../utils/Preconditions";
-import {ConcreteElement} from "../domains/ConcreteElements";
-import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
-import {BastetConfiguration} from "../../utils/BastetConfiguration";
-import {ExportFunction, resolveResultExportFunction} from "../analyses/Analyses";
-import {AnalysisAlgorithm} from "./Algorithm";
-import {StatsAnalysis} from "../analyses/stats/StatsAnalysis";
-import {getActiveBudget} from "../../utils/Budgets";
+import { AbstractState } from '../../lattices/Lattice';
+import { ProgramAnalysis } from '../analyses/ProgramAnalysis';
+import { FrontierSet, ReachedSet } from './StateSet';
+import { Preconditions } from '../../utils/Preconditions';
+import { ConcreteElement } from '../domains/ConcreteElements';
+import { AnalysisStatistics } from '../analyses/AnalysisStatistics';
+import { BastetConfiguration } from '../../utils/BastetConfiguration';
+import { ExportFunction, resolveResultExportFunction } from '../analyses/Analyses';
+import { AnalysisAlgorithm } from './Algorithm';
+import { StatsAnalysis } from '../analyses/stats/StatsAnalysis';
+import { getActiveBudget } from '../../utils/Budgets';
 
 const { performance } = require('perf_hooks');
 
-export const STAT_KEY_REACH_ITERATIONS = "iterations";
-export const STAT_KEY_REACH_REACHED = "reachedStates";
-export const STAT_KEY_REACH_FRONTIER = "frontierStates";
+export const STAT_KEY_REACH_ITERATIONS = 'iterations';
+export const STAT_KEY_REACH_REACHED = 'reachedStates';
+export const STAT_KEY_REACH_FRONTIER = 'frontierStates';
 
 export class ReachabilityAlgorithmConfig extends BastetConfiguration {
-
     constructor(dict: {}) {
         super(dict, ['ReachabilityAlgorithm']);
     }
@@ -50,7 +49,6 @@ export class ReachabilityAlgorithmConfig extends BastetConfiguration {
     get dumpGraphAfterIteration(): boolean {
         return this.getBoolProperty('dump-graph-after-iteration', false);
     }
-
 }
 
 /**
@@ -58,8 +56,10 @@ export class ReachabilityAlgorithmConfig extends BastetConfiguration {
  * reachability algorithm that can be found in the CPA framework;
  * nevertheless, our implementation has important differences.
  */
-export class ReachabilityAlgorithm<C extends ConcreteElement, E extends AbstractState> implements AnalysisAlgorithm<C, E> {
-
+export class ReachabilityAlgorithm<C extends ConcreteElement, E extends AbstractState> implements AnalysisAlgorithm<
+    C,
+    E
+> {
     private readonly _analysis: ProgramAnalysis<C, E, E>;
     private readonly _statistics: AnalysisStatistics;
     private readonly _config: ReachabilityAlgorithmConfig;
@@ -118,7 +118,13 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
                 const ePrimePrime: E = this._analysis.widen(ePrime, this._analysis.widenPartitionOf(ePrime, reached));
 
                 // MERGE: If desired, merge certain states
-                [frontier, reached] = this._analysis.mergeInto(ePrimePrime, frontier, reached, (s) => s, (s) => s);
+                [frontier, reached] = this._analysis.mergeInto(
+                    ePrimePrime,
+                    frontier,
+                    reached,
+                    (s) => s,
+                    (s) => s
+                );
 
                 this.algorithmMonitoringHook(frontier, reached);
 
@@ -127,7 +133,9 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
 
                 // STOP: Check for coverage (fixed point iteration)
                 const checkStopFor: E = ePrimePrime; // TODO: How does this interact with the 'merge' above
-                if (!this._analysis.stop(checkStopFor, this._analysis.stopPartitionOf(checkStopFor, reached), (s) => s)) {
+                if (
+                    !this._analysis.stop(checkStopFor, this._analysis.stopPartitionOf(checkStopFor, reached), (s) => s)
+                ) {
                     frontier.add(checkStopFor);
                     reached.add(checkStopFor);
 
@@ -161,10 +169,16 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
             const timeForSucc = statAnalysis.succStats.contextTimer.totalDuration;
             const timeForMerge = statAnalysis.mergeIntoStats.contextTimer.totalDuration;
 
-            const rn = function(num: number) { return num.toFixed(3); }
-            const ms = function(num: number) { return `${num.toFixed(2)}ms`; }
+            const rn = function (num: number) {
+                return num.toFixed(3);
+            };
+            const ms = function (num: number) {
+                return `${num.toFixed(2)}ms`;
+            };
 
-            console.log(`Reached ${reached.getSize()} states, ${frontier.getSize()} in frontier, succ ${ms(timeForSucc - this._lastTimeForSucc)}, merge ${ms(timeForMerge - this._lastTimeForMerge)}, stop ${ms(timeForStop - this._lastTimeForStop)}, widen ${ms(timeForWiden - this._lastTimeForWiden)}, heap ${rn(process.memoryUsage().heapUsed / 1024 / 1024)}`);
+            console.log(
+                `Reached ${reached.getSize()} states, ${frontier.getSize()} in frontier, succ ${ms(timeForSucc - this._lastTimeForSucc)}, merge ${ms(timeForMerge - this._lastTimeForMerge)}, stop ${ms(timeForStop - this._lastTimeForStop)}, widen ${ms(timeForWiden - this._lastTimeForWiden)}, heap ${rn(process.memoryUsage().heapUsed / 1024 / 1024)}`
+            );
 
             this._lastOutputTime = performance.now();
             this._lastTimeForWiden = timeForWiden;
@@ -183,5 +197,4 @@ export class ReachabilityAlgorithm<C extends ConcreteElement, E extends Abstract
             }
         }
     }
-
 }

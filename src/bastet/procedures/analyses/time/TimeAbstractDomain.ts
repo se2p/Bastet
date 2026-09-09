@@ -23,53 +23,47 @@
  *
  */
 
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {List as ImmList, Record as ImmRec} from "immutable"
-import {SingletonStateWrapper} from "../AbstractStates";
-import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
-import {Preconditions} from "../../../utils/Preconditions";
-import {BlockId} from "../../../syntax/ast/core/statements/ControlStatement";
-import {AbstractionPrecision} from "../../AbstractionPrecision";
-
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { AbstractElement, AbstractElementVisitor, AbstractState, Lattice } from '../../../lattices/Lattice';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { List as ImmList, Record as ImmRec } from 'immutable';
+import { SingletonStateWrapper } from '../AbstractStates';
+import { ConcreteDomain, ConcreteElement } from '../../domains/ConcreteElements';
+import { Preconditions } from '../../../utils/Preconditions';
+import { BlockId } from '../../../syntax/ast/core/statements/ControlStatement';
+import { AbstractionPrecision } from '../../AbstractionPrecision';
 
 export interface TimeStateAttribs extends AbstractElement, SingletonStateWrapper {
-
     timedBlockStack: ImmList<BlockId>;
 
     wrappedState: AbstractState;
-
 }
 
 const TimeStateRecord = ImmRec({
-
     timedBlockStack: ImmList<BlockId>(),
 
-    wrappedState: null
-
+    wrappedState: null,
 });
 
 export class TimeState extends TimeStateRecord implements TimeStateAttribs, AbstractState {
-
     constructor(timedBlockStack: ImmList<BlockId>, wrapped: AbstractElement) {
-        super({timedBlockStack: timedBlockStack, wrappedState: wrapped});
+        super({ timedBlockStack: timedBlockStack, wrappedState: wrapped });
     }
 
     public getTimedBlockStack(): ImmList<BlockId> {
-        return this.get("timedBlockStack");
+        return this.get('timedBlockStack');
     }
 
     public withTimedBlockStack(value: ImmList<BlockId>): TimeState {
-        return this.set("timedBlockStack", value);
+        return this.set('timedBlockStack', value);
     }
 
     public getWrappedState(): AbstractState {
-        return this.get("wrappedState");
+        return this.get('wrappedState');
     }
 
     public withWrappedState(wrapped: AbstractElement): TimeState {
-        return this.set("wrappedState", wrapped);
+        return this.set('wrappedState', wrapped);
     }
 
     withPushedBlock(block: BlockId) {
@@ -88,11 +82,9 @@ export class TimeState extends TimeStateRecord implements TimeStateAttribs, Abst
             return visitor.visit(this);
         }
     }
-
 }
 
 export class TimeStateLattice implements Lattice<TimeState> {
-
     private readonly _wrappedStateLattice: Lattice<AbstractElement>;
 
     private readonly _bottom: TimeState;
@@ -119,7 +111,8 @@ export class TimeStateLattice implements Lattice<TimeState> {
         }
 
         return element1.withWrappedState(
-            this._wrappedStateLattice.join(element1.getWrappedState(), element2.getWrappedState()));
+            this._wrappedStateLattice.join(element1.getWrappedState(), element2.getWrappedState())
+        );
     }
 
     meet(element1: TimeState, element2: TimeState): TimeState {
@@ -132,7 +125,6 @@ export class TimeStateLattice implements Lattice<TimeState> {
 }
 
 export class TimeAbstractDomain implements AbstractDomain<ConcreteElement, TimeState> {
-
     private readonly _lattice: TimeStateLattice;
     private readonly _wrapped: AbstractDomain<ConcreteElement, AbstractElement>;
 

@@ -23,36 +23,36 @@
  *
  */
 
-import {ProgramAnalysis, ProgramAnalysisWithLabels, WrappingProgramAnalysis} from "../ProgramAnalysis";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
-import {Preconditions} from "../../../utils/Preconditions";
-import {AnalysisStatistics} from "../AnalysisStatistics";
-import {ConcreteElement} from "../../domains/ConcreteElements";
-import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
-import {App} from "../../../syntax/app/App";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
-import {ProgramTimeProfile} from "../../../utils/TimeProfile";
-import {TimeTransferRelation} from "./TimeTransferRelation";
-import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {Concern} from "../../../syntax/Concern";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {List as ImmList, Set as ImmSet} from "immutable";
-import {LexiKey} from "../../../utils/Lexicographic";
-import {TimeAbstractDomain, TimeState} from "./TimeAbstractDomain";
-import {TimeMergeOperator} from "./TimeMergeOperator";
-import {AccessibilityRelation} from "../Accessibility";
-import {ThreadState} from "../control/ConcreteProgramState";
-
+import { ProgramAnalysis, ProgramAnalysisWithLabels, WrappingProgramAnalysis } from '../ProgramAnalysis';
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
+import { Preconditions } from '../../../utils/Preconditions';
+import { AnalysisStatistics } from '../AnalysisStatistics';
+import { ConcreteElement } from '../../domains/ConcreteElements';
+import { Property } from '../../../syntax/Property';
+import { FrontierSet, PartitionKey, ReachedSet } from '../../algorithms/StateSet';
+import { App } from '../../../syntax/app/App';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { Refiner, Unwrapper, WrappingRefiner } from '../Refiner';
+import { ProgramTimeProfile } from '../../../utils/TimeProfile';
+import { TimeTransferRelation } from './TimeTransferRelation';
+import { LabeledTransferRelation } from '../TransferRelation';
+import { ProgramOperation, ProgramOperationInContext } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { Concern } from '../../../syntax/Concern';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { List as ImmList, Set as ImmSet } from 'immutable';
+import { LexiKey } from '../../../utils/Lexicographic';
+import { TimeAbstractDomain, TimeState } from './TimeAbstractDomain';
+import { TimeMergeOperator } from './TimeMergeOperator';
+import { AccessibilityRelation } from '../Accessibility';
+import { ThreadState } from '../control/ConcreteProgramState';
 
 export class TimeAnalysis<F extends AbstractState>
-    implements WrappingProgramAnalysis<ConcreteElement, TimeState, F>,
+    implements
+        WrappingProgramAnalysis<ConcreteElement, TimeState, F>,
         ProgramAnalysisWithLabels<ConcreteElement, TimeState, F>,
         Unwrapper<TimeState, AbstractElement>,
-        LabeledTransferRelation<TimeState> {
-
+        LabeledTransferRelation<TimeState>
+{
     private readonly _abstractDomain: TimeAbstractDomain;
 
     private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>;
@@ -67,8 +67,12 @@ export class TimeAnalysis<F extends AbstractState>
 
     private readonly _task: App;
 
-    constructor(task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>, statistics: AnalysisStatistics,
-                timeProfile: ProgramTimeProfile) {
+    constructor(
+        task: App,
+        wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>,
+        statistics: AnalysisStatistics,
+        timeProfile: ProgramTimeProfile
+    ) {
         this._task = Preconditions.checkNotUndefined(task);
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
@@ -94,10 +98,10 @@ export class TimeAnalysis<F extends AbstractState>
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
             return new TimeState(ImmList([]), w);
-        } );
+        });
     }
 
-    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation< F> {
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<F> {
         throw new ImplementMeException();
     }
 
@@ -154,7 +158,13 @@ export class TimeAnalysis<F extends AbstractState>
         return e.getWrappedState();
     }
 
-    mergeInto(state: TimeState, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => TimeState, wrapper: (TimeState) => F): [FrontierSet<F>, ReachedSet<F>] {
+    mergeInto(
+        state: TimeState,
+        frontier: FrontierSet<F>,
+        reached: ReachedSet<F>,
+        unwrapper: (F) => TimeState,
+        wrapper: (TimeState) => F
+    ): [FrontierSet<F>, ReachedSet<F>] {
         throw new ImplementMeException();
     }
 
@@ -194,19 +204,19 @@ export class TimeAnalysis<F extends AbstractState>
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation< F>, state: F): AccessibilityRelation< F> {
+    testify(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation<F> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation< F>, state: F): Iterable<[F, ConcreteElement][]> {
+    testifyConcrete(accessibility: AccessibilityRelation<F>, state: F): Iterable<[F, ConcreteElement][]> {
         return this.wrappedAnalysis.testifyConcrete(accessibility, state);
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation< F>, state: F): Iterable<[F, ConcreteElement][]> {
+    testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<[F, ConcreteElement][]> {
         return this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation< F>, state: F): AccessibilityRelation< F> {
+    testifyOne(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation<F> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 
@@ -217,5 +227,4 @@ export class TimeAnalysis<F extends AbstractState>
     incRef(state: TimeState) {
         this.wrappedAnalysis.incRef(state.getWrappedState());
     }
-
 }

@@ -23,9 +23,9 @@
  *
  */
 
-import {AbstractState, Lattice} from "../../../lattices/Lattice";
-import {AbstractionPrecision, PredicatePrecision, PredicatePrecisionLattice} from "../../AbstractionPrecision";
-import {AbstractionState} from "./AbstractionAbstractDomain";
+import { AbstractState, Lattice } from '../../../lattices/Lattice';
+import { AbstractionPrecision, PredicatePrecision, PredicatePrecisionLattice } from '../../AbstractionPrecision';
+import { AbstractionState } from './AbstractionAbstractDomain';
 import {
     BooleanFormula,
     FirstOrderFormula,
@@ -33,43 +33,56 @@ import {
     IntegerFormula,
     ListFormula,
     RealFormula,
-    StringFormula
-} from "../../../utils/ConjunctiveNormalForm";
-import {Preconditions} from "../../../utils/Preconditions";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {FirstOrderSolver} from "../../domains/FirstOrderDomain";
-import {AbstractTheories} from "../../domains/MemoryTransformer";
-import {SSAState} from "../ssa/SSAAbstractDomain";
-import {DataAbstractStates} from "../data/DataAbstractStates";
-import {getTheOnlyElement} from "../../../utils/Collections";
-import {SSAAbstractStates} from "../ssa/SSAAbstractStates";
-import {BlockSummary} from "./BlockSummary";
+    StringFormula,
+} from '../../../utils/ConjunctiveNormalForm';
+import { Preconditions } from '../../../utils/Preconditions';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { FirstOrderSolver } from '../../domains/FirstOrderDomain';
+import { AbstractTheories } from '../../domains/MemoryTransformer';
+import { SSAState } from '../ssa/SSAAbstractDomain';
+import { DataAbstractStates } from '../data/DataAbstractStates';
+import { getTheOnlyElement } from '../../../utils/Collections';
+import { SSAAbstractStates } from '../ssa/SSAAbstractStates';
 
 export interface AbstractionComputation<E extends AbstractState, P extends AbstractionPrecision> {
-
     computeAbstraction(of: E, withPrecision: P): E;
-
 }
 
 export interface PrecisionOperator<E extends AbstractState, P extends AbstractionPrecision> {
-
     precisionFor(state: E): P;
 }
 
 export abstract class PredicateAbstraction implements AbstractionComputation<AbstractionState, PredicatePrecision> {
-
     protected readonly _precLattice: PredicatePrecisionLattice<FirstOrderFormula>;
 
     protected readonly _stateToSummarizeLattice: Lattice<SSAState>;
 
-    protected readonly _prover: FirstOrderSolver<FirstOrderFormula>
+    protected readonly _prover: FirstOrderSolver<FirstOrderFormula>;
 
-    private readonly _theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
+    private readonly _theories: AbstractTheories<
+        FirstOrderFormula,
+        BooleanFormula,
+        IntegerFormula,
+        RealFormula,
+        FloatFormula,
+        StringFormula,
+        ListFormula
+    >;
 
     constructor(
-        theories: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
+        theories: AbstractTheories<
+            FirstOrderFormula,
+            BooleanFormula,
+            IntegerFormula,
+            RealFormula,
+            FloatFormula,
+            StringFormula,
+            ListFormula
+        >,
         prover: FirstOrderSolver<FirstOrderFormula>,
-        precLattice: PredicatePrecisionLattice<FirstOrderFormula>, stateToSummarizeLattice: Lattice<SSAState>) {
+        precLattice: PredicatePrecisionLattice<FirstOrderFormula>,
+        stateToSummarizeLattice: Lattice<SSAState>
+    ) {
         this._precLattice = Preconditions.checkNotUndefined(precLattice);
         this._stateToSummarizeLattice = Preconditions.checkNotUndefined(stateToSummarizeLattice);
         this._theories = Preconditions.checkNotUndefined(theories);
@@ -80,7 +93,7 @@ export abstract class PredicateAbstraction implements AbstractionComputation<Abs
         return getTheOnlyElement(DataAbstractStates.extractFrom(fromState)).blockFormula;
     }
 
-    protected instantiatePred(predicate: FirstOrderFormula, ssa: SSAState) : FirstOrderFormula {
+    protected instantiatePred(predicate: FirstOrderFormula, ssa: SSAState): FirstOrderFormula {
         const fnGetIndex = (name: string) => {
             return ssa.getIndex(name);
         };
@@ -99,7 +112,7 @@ export abstract class PredicateAbstraction implements AbstractionComputation<Abs
      * @param formula
      * @protected
      */
-    protected instantiateAsSummary(formula: FirstOrderFormula) : FirstOrderFormula {
+    protected instantiateAsSummary(formula: FirstOrderFormula): FirstOrderFormula {
         Preconditions.checkNotUndefined(formula);
         return this._theories.instantiate(formula, (v) => 0);
     }
@@ -116,15 +129,18 @@ export abstract class PredicateAbstraction implements AbstractionComputation<Abs
     }
 
     abstract computeAbstraction(of: AbstractionState, withPrecision: PredicatePrecision): AbstractionState;
-
 }
 
 export class BooleanPredicateAbstraction extends PredicateAbstraction {
-
     computeAbstraction(of: AbstractionState, withPrecision: PredicatePrecision): AbstractionState {
         const abstractionProblem: FirstOrderFormula = this.constructAbstractionProblem(of);
-        const instantiatedPredicates: FirstOrderFormula[] = this.instantiatePrecisionFor(of, withPrecision.predicates.toArray());
-        const newSummary: FirstOrderFormula = this.instantiateAsSummary(this._prover.booleanAbstraction(abstractionProblem, instantiatedPredicates));
+        const instantiatedPredicates: FirstOrderFormula[] = this.instantiatePrecisionFor(
+            of,
+            withPrecision.predicates.toArray()
+        );
+        const newSummary: FirstOrderFormula = this.instantiateAsSummary(
+            this._prover.booleanAbstraction(abstractionProblem, instantiatedPredicates)
+        );
 
         // console.log("-ABST-PROB----------");
         // console.log(this._prover.stringRepresentation(abstractionProblem));
@@ -133,17 +149,15 @@ export class BooleanPredicateAbstraction extends PredicateAbstraction {
         // console.log(">>>");
         // console.log(this._prover.stringRepresentation(newSummary));
 
-        return of.withEnteringSummary(newSummary)
+        return of
+            .withEnteringSummary(newSummary)
             .withWrappedState(this._stateToSummarizeLattice.top())
             .withWideningOf(of);
     }
-
 }
 
 export class CartesianPredicateAbstraction extends PredicateAbstraction {
-
     computeAbstraction(of: AbstractionState, withPrecision: PredicatePrecision): AbstractionState {
         throw new ImplementMeException();
     }
-
 }

@@ -23,17 +23,17 @@
  *
  */
 
-import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {AbstractElement} from "../../../lattices/Lattice";
-import {Preconditions} from "../../../utils/Preconditions";
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {Concern} from "../../../syntax/Concern";
-import {AbstractionAbstractDomain, AbstractionState} from "./AbstractionAbstractDomain";
-import {PrecisionPushStatement} from "../../../syntax/ast/core/Precisions";
-import {BooleanExpression} from "../../../syntax/ast/core/expressions/BooleanExpression";
-import {DataBoolExpressionVisitor} from "../data/DataTransformerVisitor";
-import {TransformerTheories} from "../../domains/MemoryTransformer";
+import { LabeledTransferRelation } from '../TransferRelation';
+import { ProgramOperationInContext } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { AbstractElement } from '../../../lattices/Lattice';
+import { Preconditions } from '../../../utils/Preconditions';
+import { IllegalStateException } from '../../../core/exceptions/IllegalStateException';
+import { Concern } from '../../../syntax/Concern';
+import { AbstractionAbstractDomain, AbstractionState } from './AbstractionAbstractDomain';
+import { PrecisionPushStatement } from '../../../syntax/ast/core/Precisions';
+import { BooleanExpression } from '../../../syntax/ast/core/expressions/BooleanExpression';
+import { DataBoolExpressionVisitor } from '../data/DataTransformerVisitor';
+import { TransformerTheories } from '../../domains/MemoryTransformer';
 import {
     BooleanFormula,
     FirstOrderFormula,
@@ -41,28 +41,42 @@ import {
     IntegerFormula,
     ListFormula,
     RealFormula,
-    StringFormula
-} from "../../../utils/ConjunctiveNormalForm";
-import {PrecisionRole, PredicatePrecision} from "../../AbstractionPrecision";
+    StringFormula,
+} from '../../../utils/ConjunctiveNormalForm';
+import { PrecisionRole, PredicatePrecision } from '../../AbstractionPrecision';
 
 export class AbstractionTransferRelation implements LabeledTransferRelation<AbstractionState> {
-
     private readonly _wrapped: LabeledTransferRelation<AbstractElement>;
     private readonly _theories: any;
     private readonly _domain: AbstractionAbstractDomain;
 
-    constructor(wrappedTr: LabeledTransferRelation<AbstractElement>, abstractDomain: AbstractionAbstractDomain,
-                theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
+    constructor(
+        wrappedTr: LabeledTransferRelation<AbstractElement>,
+        abstractDomain: AbstractionAbstractDomain,
+        theories: TransformerTheories<
+            FirstOrderFormula,
+            BooleanFormula,
+            IntegerFormula,
+            RealFormula,
+            FloatFormula,
+            StringFormula,
+            ListFormula
+        >
+    ) {
         this._wrapped = Preconditions.checkNotUndefined(wrappedTr);
         this._domain = Preconditions.checkNotUndefined(abstractDomain);
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
     abstractSucc(fromState: AbstractionState): Iterable<AbstractionState> {
-        throw new IllegalStateException("This TR is only applicable to labeled transitions");
+        throw new IllegalStateException('This TR is only applicable to labeled transitions');
     }
 
-    abstractSuccFor(fromState: AbstractionState, opic: ProgramOperationInContext, co: Concern): Iterable<AbstractionState> {
+    abstractSuccFor(
+        fromState: AbstractionState,
+        opic: ProgramOperationInContext,
+        co: Concern
+    ): Iterable<AbstractionState> {
         const op = opic.op;
         const result: AbstractionState[] = [];
         for (const w of this._wrapped.abstractSuccFor(fromState.wrappedState, opic, co)) {

@@ -23,23 +23,18 @@
  *
  */
 
+import { AbstractElement } from '../lattices/Lattice';
+import { List as ImmList, Record as ImmRec } from 'immutable';
+import { ImplementMeForException } from '../core/exceptions/ImplementMeException';
 
-import {AbstractElement} from "../lattices/Lattice";
-import {List as ImmList, Record as ImmRec} from "immutable";
-import {ImplementMeForException} from "../core/exceptions/ImplementMeException";
-
-export type LexiKeyElement = LexiKey | number | string ;
+export type LexiKeyElement = LexiKey | number | string;
 
 export interface LexiKeyAttribs extends AbstractElement {
-
     tuple: ImmList<LexiKeyElement>;
-
 }
 
 const LexiKeyRecord = ImmRec({
-
-    tuple: ImmList<LexiKeyElement>()
-
+    tuple: ImmList<LexiKeyElement>(),
 });
 
 export const OTHER_LARGER = +1;
@@ -47,17 +42,16 @@ export const THIS_LARGER = -1;
 export const NEITHER_LARGER = 0;
 
 export class LexiKey extends LexiKeyRecord implements LexiKeyAttribs {
-
     constructor(tuple: Iterable<LexiKeyElement>) {
-        super({tuple: ImmList(tuple)});
+        super({ tuple: ImmList(tuple) });
     }
 
     public getTuple(): ImmList<LexiKeyElement> {
-        return this.get("tuple") as ImmList<LexiKeyElement>;
+        return this.get('tuple') as ImmList<LexiKeyElement>;
     }
 
     public withTuple(tuple: Iterable<LexiKeyElement>): this {
-        return this.set("tuple", ImmList(tuple));
+        return this.set('tuple', ImmList(tuple));
     }
 
     public concat(key: LexiKey): LexiKey {
@@ -80,7 +74,7 @@ export class LexiKey extends LexiKeyRecord implements LexiKeyAttribs {
         }
 
         if (this.getTuple().size < otherTuple.size) {
-            return THIS_LARGER
+            return THIS_LARGER;
         } else {
             return NEITHER_LARGER;
         }
@@ -102,7 +96,6 @@ export class LexiKey extends LexiKeyRecord implements LexiKeyAttribs {
             } else {
                 return NEITHER_LARGER;
             }
-
         } else if (typeA == 'string') {
             const result = (a as string).localeCompare(b as string);
             if (result > 0) {
@@ -112,13 +105,10 @@ export class LexiKey extends LexiKeyRecord implements LexiKeyAttribs {
             } else {
                 return NEITHER_LARGER;
             }
-
         } else if (a instanceof LexiKey) {
             return (a as LexiKey).compareTo(b as LexiKey);
-
         } else {
             throw new ImplementMeForException(a.constructor.name);
         }
     }
-
 }

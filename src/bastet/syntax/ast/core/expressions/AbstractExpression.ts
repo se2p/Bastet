@@ -23,12 +23,11 @@
  *
  */
 
-import {Expression, Expressions} from "./Expression";
-import {AbstractNode, AstNode} from "../../AstNode";
-import {ScratchType} from "../ScratchType";
+import { Expression, Expressions } from './Expression';
+import { AbstractNode, AstNode } from '../../AstNode';
+import { ScratchType } from '../ScratchType';
 
 export abstract class AbstractExpression extends AbstractNode implements Expression {
-
     private readonly _expressionType: ScratchType;
     private _refId: number;
 
@@ -47,5 +46,4 @@ export abstract class AbstractExpression extends AbstractNode implements Express
         }
         return this._refId;
     }
-
 }

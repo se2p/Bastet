@@ -23,12 +23,12 @@
  *
  */
 
-import {CoreVisitor} from "./CoreVisitor";
-import {AstNode} from "./AstNode";
-import {BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
-import {CorePrintVisitor} from "./CorePrintVisitor";
-import {StringExpression, StringLiteral} from "./core/expressions/StringExpression";
-import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
+import { CoreVisitor } from './CoreVisitor';
+import { AstNode } from './AstNode';
+import { BroadcastMessageStatement } from './core/statements/BroadcastMessageStatement';
+import { CorePrintVisitor } from './CorePrintVisitor';
+import { StringExpression, StringLiteral } from './core/expressions/StringExpression';
+import { ImplementMeForException } from '../../core/exceptions/ImplementMeException';
 
 export interface Broadcast {
     id: string;
@@ -47,8 +47,8 @@ export class BroadcastVisitor implements CoreVisitor<Broadcast> {
         }
 
         return {
-          id: idNode.text,
-          destination: node.msg.destination.accept(new CorePrintVisitor())
+            id: idNode.text,
+            destination: node.msg.destination.accept(new CorePrintVisitor()),
         };
     }
 }

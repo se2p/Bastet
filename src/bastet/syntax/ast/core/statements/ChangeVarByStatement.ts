@@ -23,12 +23,11 @@
  *
  */
 
-import {Statement} from "./Statement";
-import {Expression} from "../expressions/Expression";
-import {Variable} from "../Variable";
+import { Statement } from './Statement';
+import { Expression } from '../expressions/Expression';
+import { Variable } from '../Variable';
 
 export class ChangeVarByStatement extends Statement {
-
     private readonly _variable: Variable;
     private readonly _value: Expression;
 

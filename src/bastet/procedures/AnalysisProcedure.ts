@@ -23,26 +23,21 @@
  *
  */
 
-import {App} from "../syntax/app/App";
-import {Set as ImmSet} from "immutable";
-import {Property} from "../syntax/Property";
-import {Preconditions} from "../utils/Preconditions";
-import {AnalysisStatistics} from "./analyses/AnalysisStatistics";
+import { App } from '../syntax/app/App';
+import { Set as ImmSet } from 'immutable';
+import { Property } from '../syntax/Property';
+import { Preconditions } from '../utils/Preconditions';
+import { AnalysisStatistics } from './analyses/AnalysisStatistics';
 
 export interface AnalysisProcedure {
-
-    run(task: App) : Promise<AnalysisResult>;
-
+    run(task: App): Promise<AnalysisResult>;
 }
 
 export interface AnalysisResult {
-
     statistics: AnalysisStatistics;
-
 }
 
 export class NullAnalysisResult implements AnalysisResult {
-
     private _statistics: AnalysisStatistics;
 
     constructor(stats: AnalysisStatistics) {
@@ -55,7 +50,6 @@ export class NullAnalysisResult implements AnalysisResult {
 }
 
 export class MultiPropertyAnalysisResult {
-
     private readonly _satisfied: ImmSet<Property>;
 
     private readonly _violated: ImmSet<Property>;
@@ -64,7 +58,12 @@ export class MultiPropertyAnalysisResult {
 
     private readonly _statistics: AnalysisStatistics;
 
-    constructor(satisfied: ImmSet<Property>, violated: ImmSet<Property>, unknown: ImmSet<Property>, statistics: AnalysisStatistics) {
+    constructor(
+        satisfied: ImmSet<Property>,
+        violated: ImmSet<Property>,
+        unknown: ImmSet<Property>,
+        statistics: AnalysisStatistics
+    ) {
         this._satisfied = Preconditions.checkNotUndefined(satisfied);
         this._violated = Preconditions.checkNotUndefined(violated);
         this._unknown = Preconditions.checkNotUndefined(unknown);

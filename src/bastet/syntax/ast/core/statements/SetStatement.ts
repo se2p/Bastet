@@ -23,24 +23,21 @@
  *
  */
 
-
-import {Statement} from "./Statement";
-import {Expression} from "../expressions/Expression";
-import {StringExpression} from "../expressions/StringExpression";
-import {Identifier} from "../Identifier";
-import {VariableWithDataLocation} from "../Variable";
-import {AstNode} from "../../AstNode";
-import {Preconditions} from "../../../../utils/Preconditions";
+import { Statement } from './Statement';
+import { Expression } from '../expressions/Expression';
+import { StringExpression } from '../expressions/StringExpression';
+import { Identifier } from '../Identifier';
+import { VariableWithDataLocation } from '../Variable';
+import { AstNode } from '../../AstNode';
+import { Preconditions } from '../../../../utils/Preconditions';
 
 export abstract class SetStatement extends Statement {
-
     constructor(childs: AstNode[]) {
         super(childs);
     }
 }
 
 export class SetAttributeToStatement extends SetStatement {
-
     private readonly _attrib: StringExpression;
     private readonly _toValue: Expression;
 
@@ -60,7 +57,6 @@ export class SetAttributeToStatement extends SetStatement {
 }
 
 export class SetAttributeOfToStatement extends SetStatement {
-
     private readonly _attrib: StringExpression;
     private readonly _ofEntity: Identifier;
     private readonly _toValue: Expression;
@@ -86,7 +82,6 @@ export class SetAttributeOfToStatement extends SetStatement {
 }
 
 export class StoreEvalResultToVariableStatement extends SetStatement {
-
     private readonly _variable: VariableWithDataLocation;
     private readonly _toValue: Expression;
 
@@ -104,5 +99,3 @@ export class StoreEvalResultToVariableStatement extends SetStatement {
         return this._toValue;
     }
 }
-
-

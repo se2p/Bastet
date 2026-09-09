@@ -23,50 +23,44 @@
  *
  */
 
-import {MergeOperator, ProgramAnalysisWithLabels} from "../ProgramAnalysis";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {App} from "../../../syntax/app/App";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
-import {Preconditions} from "../../../utils/Preconditions";
-import {
-    ConcreteElement,
-    ConcreteMemory,
-    ConcretePrimitive,
-    ConcreteUnifiedMemory
-} from "../../domains/ConcreteElements";
-import {LabeledTransferRelation} from "../TransferRelation";
-import {extractPrimitiveAttributes, SSAAbstractDomain, SSAState} from "./SSAAbstractDomain";
-import {SSATransferRelation} from "./SSATransferRelation";
-import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
-import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, ReachedSet, StateSet} from "../../algorithms/StateSet";
-import {AnalysisStatistics} from "../AnalysisStatistics";
-import {Concern} from "../../../syntax/Concern";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {BastetConfiguration} from "../../../utils/BastetConfiguration";
-import {SSAMergeOperator} from "./SSAMergeOperator";
-import {Map as ImmMap, Set as ImmSet} from "immutable";
-import {LexiKey} from "../../../utils/Lexicographic";
-import {AccessibilityRelation} from "../Accessibility";
-import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {SSAAbstractStates} from "./SSAAbstractStates";
-import {getTheOnlyElement} from "../../../utils/Collections";
-import {ThreadState} from "../control/ConcreteProgramState";
-
+import { MergeOperator, ProgramAnalysisWithLabels } from '../ProgramAnalysis';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { App } from '../../../syntax/app/App';
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
+import { Preconditions } from '../../../utils/Preconditions';
+import { ConcreteElement, ConcreteMemory, ConcreteUnifiedMemory } from '../../domains/ConcreteElements';
+import { LabeledTransferRelation } from '../TransferRelation';
+import { extractPrimitiveAttributes, SSAAbstractDomain, SSAState } from './SSAAbstractDomain';
+import { SSATransferRelation } from './SSATransferRelation';
+import { ProgramOperation, ProgramOperationInContext } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { Refiner, Unwrapper, WrappingRefiner } from '../Refiner';
+import { Property } from '../../../syntax/Property';
+import { FrontierSet, PartitionKey, ReachedSet, StateSet } from '../../algorithms/StateSet';
+import { AnalysisStatistics } from '../AnalysisStatistics';
+import { Concern } from '../../../syntax/Concern';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { BastetConfiguration } from '../../../utils/BastetConfiguration';
+import { SSAMergeOperator } from './SSAMergeOperator';
+import { Map as ImmMap, Set as ImmSet } from 'immutable';
+import { LexiKey } from '../../../utils/Lexicographic';
+import { AccessibilityRelation } from '../Accessibility';
+import { IllegalArgumentException } from '../../../core/exceptions/IllegalArgumentException';
+import { SSAAbstractStates } from './SSAAbstractStates';
+import { getTheOnlyElement } from '../../../utils/Collections';
+import { ThreadState } from '../control/ConcreteProgramState';
 
 export class SSAAnalysisConfig extends BastetConfiguration {
-
     constructor(dict: {}) {
         super(dict, ['SSAAnalysis']);
     }
-
 }
 
-export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, SSAState, AbstractState>,
-    LabeledTransferRelation<SSAState>,
-    Unwrapper<SSAState, AbstractElement> {
-
+export class SSAAnalysis
+    implements
+        ProgramAnalysisWithLabels<ConcreteElement, SSAState, AbstractState>,
+        LabeledTransferRelation<SSAState>,
+        Unwrapper<SSAState, AbstractElement>
+{
     private readonly _abstractDomain: AbstractDomain<ConcreteElement, SSAState>;
 
     private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, AbstractState, AbstractState>;
@@ -81,7 +75,12 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
 
     private readonly _config: SSAAnalysisConfig;
 
-    constructor(config: {}, task: App, wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>, statistics: AnalysisStatistics) {
+    constructor(
+        config: {},
+        task: App,
+        wrappedAnalysis: ProgramAnalysisWithLabels<any, any, AbstractState>,
+        statistics: AnalysisStatistics
+    ) {
         this._config = new SSAAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
@@ -157,15 +156,20 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
             return new SSAState(ImmMap({}), w);
-        } );
+        });
     }
 
     createStateSets(): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         return this.wrappedAnalysis.createStateSets();
     }
 
-    mergeInto(state: SSAState, frontier: StateSet<AbstractState>, reached: ReachedSet<AbstractState>,
-              unwrapper: (F) => SSAState, wrapper: (E) => AbstractState): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
+    mergeInto(
+        state: SSAState,
+        frontier: StateSet<AbstractState>,
+        reached: ReachedSet<AbstractState>,
+        unwrapper: (F) => SSAState,
+        wrapper: (E) => AbstractState
+    ): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         throw new ImplementMeException();
     }
 
@@ -205,20 +209,35 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
+    testify(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): AccessibilityRelation<AbstractState> {
         return this.wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
+    testifyOne(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): AccessibilityRelation<AbstractState> {
         return this.wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
+    testifyConcrete(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): Iterable<[AbstractState, ConcreteElement][]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
-        const resultWithSSA: Iterable<[AbstractState, ConcreteElement][]> = this.wrappedAnalysis.testifyConcreteOne(accessibility, state);
+    testifyConcreteOne(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): Iterable<[AbstractState, ConcreteElement][]> {
+        const resultWithSSA: Iterable<[AbstractState, ConcreteElement][]> = this.wrappedAnalysis.testifyConcreteOne(
+            accessibility,
+            state
+        );
 
         const plus = (m1: ImmMap<string, number>, m2: ImmMap<string, number>): ImmMap<string, number> => {
             const keys = ImmSet(m1.keys()).union(ImmSet(m2.keys()));
@@ -268,5 +287,4 @@ export class SSAAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, S
     decRef(state: SSAState) {
         this.wrappedAnalysis.decRef(state.getWrappedState());
     }
-
 }

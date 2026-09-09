@@ -26,6 +26,6 @@
 export function rethrow(withPrefixMsg: string, re: Error) {
     const e: Error = new Error(`${withPrefixMsg} ${re.message}`);
     e['original'] = re;
-    e.stack = e.stack.split('\n').slice(0,2).join('\n') + '\n' + re.stack;
-    throw e
+    e.stack = e.stack.split('\n').slice(0, 2).join('\n') + '\n' + re.stack;
+    throw e;
 }

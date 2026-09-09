@@ -24,7 +24,6 @@
  */
 
 export interface DirectedGraph<V> {
-
     initial(): Iterable<V>;
 
     /**
@@ -48,13 +47,14 @@ export interface DirectedGraph<V> {
      * graph relation? (overapproximation!)
      */
     isReachable(node: V): boolean;
-
 }
 
 export class DirectedGraphs {
-
-    public static dumpToString<V>(graph: DirectedGraph<V>,
-                                  nodeLabeling: (v: V) => string, transLabeling: (v1: V, v2: V) => string) {
+    public static dumpToString<V>(
+        graph: DirectedGraph<V>,
+        nodeLabeling: (v: V) => string,
+        transLabeling: (v1: V, v2: V) => string
+    ) {
         const result: string[] = [];
         const worklist = [];
         const visited: Set<any> = new Set();
@@ -71,7 +71,6 @@ export class DirectedGraphs {
             }
         }
 
-        return result.join("\n");
+        return result.join('\n');
     }
-
 }

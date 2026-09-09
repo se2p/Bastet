@@ -23,17 +23,16 @@
  *
  */
 
-import {IllegalArgumentException} from "../core/exceptions/IllegalArgumentException";
-import {IllegalStateException} from "../core/exceptions/IllegalStateException";
+import { IllegalArgumentException } from '../core/exceptions/IllegalArgumentException';
+import { IllegalStateException } from '../core/exceptions/IllegalStateException';
 
 export class Preconditions {
-
     public static checkArgument(condition: boolean, message?: string) {
         if (!condition) {
             if (message) {
                 throw new IllegalArgumentException(message);
             } else {
-                throw new IllegalArgumentException("Illegal argument!");
+                throw new IllegalArgumentException('Illegal argument!');
             }
         }
     }
@@ -46,13 +45,10 @@ export class Preconditions {
      * @param obj
      */
     public static checkIsDic<E>(v: E): E {
-        const isDict: boolean = typeof v==='object'
-            && v!==null
-            && !(v instanceof Array)
-            && !(v instanceof Date);
+        const isDict: boolean = typeof v === 'object' && v !== null && !(v instanceof Array) && !(v instanceof Date);
 
         if (!isDict) {
-            throw new IllegalArgumentException("The given object is not a dictionary!");
+            throw new IllegalArgumentException('The given object is not a dictionary!');
         }
 
         return v;
@@ -63,7 +59,7 @@ export class Preconditions {
             if (message) {
                 throw new IllegalStateException(message);
             } else {
-                throw new IllegalStateException("Illegal state!");
+                throw new IllegalStateException('Illegal state!');
             }
         }
     }
@@ -73,7 +69,7 @@ export class Preconditions {
             if (message) {
                 throw new IllegalArgumentException(message);
             } else {
-                throw new IllegalArgumentException("String must not be empty");
+                throw new IllegalArgumentException('String must not be empty');
             }
         }
 
@@ -87,13 +83,13 @@ export class Preconditions {
                 return obj;
             }
 
-           if (message) {
-               throw new IllegalArgumentException(message);
-           } else {
-               throw new IllegalArgumentException("Reference must not be undefined.");
-           }
-       }
+            if (message) {
+                throw new IllegalArgumentException(message);
+            } else {
+                throw new IllegalArgumentException('Reference must not be undefined.');
+            }
+        }
 
-       return obj;
+        return obj;
     }
 }

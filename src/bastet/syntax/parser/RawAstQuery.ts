@@ -23,12 +23,11 @@
  *
  */
 
-import {ErrorNode, ParseTree, RuleNode, TerminalNode} from "antlr4ts/tree";
-import {LeilaVisitor} from "./grammar/LeilaVisitor";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import { ErrorNode, ParseTree, RuleNode, TerminalNode } from 'antlr4ts/tree';
+import { LeilaVisitor } from './grammar/LeilaVisitor';
+import { ImplementMeException } from '../../core/exceptions/ImplementMeException';
 
 class QueringVisitor implements LeilaVisitor<RuleNode[]> {
-
     private readonly pred: (RuleNode) => boolean;
 
     constructor(pred: (RuleNode) => boolean) {
@@ -45,7 +44,7 @@ class QueringVisitor implements LeilaVisitor<RuleNode[]> {
         if (this.pred(node)) {
             result.push(node);
         } else {
-            for (let i=0; i<node.childCount; i++) {
+            for (let i = 0; i < node.childCount; i++) {
                 const child = node.getChild(i);
                 result = result.concat(child.accept(this));
             }
@@ -61,14 +60,11 @@ class QueringVisitor implements LeilaVisitor<RuleNode[]> {
     visitTerminal(node: TerminalNode): RuleNode[] {
         return [];
     }
-
 }
 
 export class RawAstQuery {
-
     public static queryFor(pred: (RuleNode) => boolean, on: RuleNode): RuleNode[] {
         const visitor = new QueringVisitor(pred);
         return on.accept(visitor);
     }
-
 }

@@ -23,11 +23,10 @@
  *
  */
 
-import {MergeOperator} from "../ProgramAnalysis";
-import {TimeState} from "./TimeAbstractDomain";
+import { MergeOperator } from '../ProgramAnalysis';
+import { TimeState } from './TimeAbstractDomain';
 
 export class TimeMergeOperator implements MergeOperator<TimeState> {
-
     private readonly _wrappedMergeOp: MergeOperator<any>;
 
     constructor(wrappedMergeOp: MergeOperator<any>) {
@@ -40,9 +39,9 @@ export class TimeMergeOperator implements MergeOperator<TimeState> {
     }
 
     shouldMerge(state1: TimeState, state2: TimeState): boolean {
-        return state1.getTimedBlockStack().equals(state2.getTimedBlockStack())
-            && this._wrappedMergeOp.shouldMerge(state1.getWrappedState(), state2.getWrappedState());
+        return (
+            state1.getTimedBlockStack().equals(state2.getTimedBlockStack()) &&
+            this._wrappedMergeOp.shouldMerge(state1.getWrappedState(), state2.getWrappedState())
+        );
     }
-
-
 }

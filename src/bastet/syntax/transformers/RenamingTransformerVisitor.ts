@@ -30,10 +30,10 @@ import {
     CoreNonCtrlStatementnVisitor,
     CoreNumberExpressionVisitor,
     CoreStringExpressionVisitor,
-    CoreVisitor
-} from "../ast/CoreVisitor";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {WaitUntilStatement} from "../ast/core/statements/WaitUntilStatement";
+    CoreVisitor,
+} from '../ast/CoreVisitor';
+import { ImplementMeException } from '../../core/exceptions/ImplementMeException';
+import { WaitUntilStatement } from '../ast/core/statements/WaitUntilStatement';
 import {
     DivideExpression,
     FloatLiteral,
@@ -49,8 +49,8 @@ import {
     PickRandomFromExpression,
     PlusExpression,
     RoundExpression,
-    TimerExpression
-} from "../ast/core/expressions/NumberExpression";
+    TimerExpression,
+} from '../ast/core/expressions/NumberExpression';
 import {
     BoolAsStringExpression,
     IthLetterOfStringExpression,
@@ -61,8 +61,8 @@ import {
     StringAttributeOfExpression,
     StringExpression,
     StringLiteral,
-    StringVariableExpression
-} from "../ast/core/expressions/StringExpression";
+    StringVariableExpression,
+} from '../ast/core/expressions/StringExpression';
 import {
     AndExpression,
     BooleanExpression,
@@ -78,89 +78,87 @@ import {
     StrContainsExpression,
     StrEqualsExpression,
     StrGreaterThanExpression,
-    StrLessThanExpression
-} from "../ast/core/expressions/BooleanExpression";
+    StrLessThanExpression,
+} from '../ast/core/expressions/BooleanExpression';
 import {
     SetAttributeOfToStatement,
     SetAttributeToStatement,
-    StoreEvalResultToVariableStatement
-} from "../ast/core/statements/SetStatement";
+    StoreEvalResultToVariableStatement,
+} from '../ast/core/statements/SetStatement';
 import {
     DeleteThisCloneStatement,
     StopAllStatement,
-    StopThisStatement
-} from "../ast/core/statements/TerminationStatement";
-import {StopOthersInActorStatement} from "../ast/core/statements/StopOthersInActorStatement";
-import {ResetTimerStatement} from "../ast/core/statements/ResetTimerStatement";
+    StopThisStatement,
+} from '../ast/core/statements/TerminationStatement';
+import { StopOthersInActorStatement } from '../ast/core/statements/StopOthersInActorStatement';
+import { ResetTimerStatement } from '../ast/core/statements/ResetTimerStatement';
 import {
     AddElementToStatement,
     DeleteAllFromStatement,
     DeleteIthFromStatement,
     InsertAtStatement,
-    ReplaceElementAtStatement
-} from "../ast/core/statements/ListStatement";
-import {ExpressionListExpression, ListVariableExpression} from "../ast/core/expressions/ListExpression";
-import {ExpressionStatement} from "../ast/core/statements/ExpressionStatement";
-import {EpsilonStatement} from "../ast/core/statements/EpsilonStatement";
+    ReplaceElementAtStatement,
+} from '../ast/core/statements/ListStatement';
+import { ExpressionListExpression, ListVariableExpression } from '../ast/core/expressions/ListExpression';
+import { ExpressionStatement } from '../ast/core/statements/ExpressionStatement';
+import { EpsilonStatement } from '../ast/core/statements/EpsilonStatement';
 import {
     DeclareActorVariableStatement,
     DeclareAttributeStatement,
     DeclareStackVariableStatement,
-    DeclareSystemVariableStatement
-} from "../ast/core/statements/DeclarationStatement";
-import {CreateCloneOfStatement} from "../ast/core/statements/CreateCloneOfStatement";
-import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
-import {AbsentAstNode, AstNode, OptionalAstNode, PresentAstNode} from "../ast/AstNode";
-import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
-import {DataLocation} from "../app/controlflow/DataLocation";
-import {Expression} from "../ast/core/expressions/Expression";
-import {VariableWithDataLocation} from "../ast/core/Variable";
-import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "../ast/core/statements/AssumeStatement";
-import {CallStatement} from "../ast/core/statements/CallStatement";
-import {ExpressionList} from "../ast/core/expressions/ExpressionList";
-import {Statement} from "../ast/core/statements/Statement";
-import {BeginAtomicStatement, EndAtomicStatement, ReturnStatement} from "../ast/core/statements/ControlStatement";
-import {SystemMessage, UserMessage} from "../ast/core/Message";
-import {CastExpression} from "../ast/core/expressions/CastExpression";
+    DeclareSystemVariableStatement,
+} from '../ast/core/statements/DeclarationStatement';
+import { CreateCloneOfStatement } from '../ast/core/statements/CreateCloneOfStatement';
+import { BroadcastAndWaitStatement, BroadcastMessageStatement } from '../ast/core/statements/BroadcastMessageStatement';
+import { AbsentAstNode, AstNode, OptionalAstNode, PresentAstNode } from '../ast/AstNode';
+import { IllegalStateException } from '../../core/exceptions/IllegalStateException';
+import { DataLocation } from '../app/controlflow/DataLocation';
+import { Expression } from '../ast/core/expressions/Expression';
+import { VariableWithDataLocation } from '../ast/core/Variable';
+import { BranchingAssumeStatement, StrengtheningAssumeStatement } from '../ast/core/statements/AssumeStatement';
+import { CallStatement } from '../ast/core/statements/CallStatement';
+import { ExpressionList } from '../ast/core/expressions/ExpressionList';
+import { Statement } from '../ast/core/statements/Statement';
+import { BeginAtomicStatement, EndAtomicStatement, ReturnStatement } from '../ast/core/statements/ControlStatement';
+import { SystemMessage, UserMessage } from '../ast/core/Message';
+import { CastExpression } from '../ast/core/expressions/CastExpression';
 import {
     ActorExpression,
     ActorSelfExpression,
     ActorVariableExpression,
     LocateActorExpression,
     StartCloneActorExpression,
-    UsherActorExpression
-} from "../ast/core/expressions/ActorExpression";
-import {Identifier} from "../ast/core/Identifier";
+    UsherActorExpression,
+} from '../ast/core/expressions/ActorExpression';
+import { Identifier } from '../ast/core/Identifier';
 import {
     CheckFeasibilityStatement,
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
-    TerminateProgramStatement
-} from "../ast/core/statements/InternalStatement";
-import {PrecisionPopStatement, PrecisionPushStatement} from "../ast/core/Precisions";
+    TerminateProgramStatement,
+} from '../ast/core/statements/InternalStatement';
+import { PrecisionPopStatement, PrecisionPushStatement } from '../ast/core/Precisions';
 
 export enum DataLocationMode {
-
     UNKNOWN,
     READ_FROM,
-    ASSINGED_TO
-
+    ASSINGED_TO,
 }
 
 export interface DataLocationRenamer {
-
     renameUsage(dataLoc: DataLocation, usageMode: DataLocationMode, inContextOf: Statement): DataLocation;
-
 }
 
-export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
-    CoreNonCtrlStatementnVisitor<AstNode>,
-    CoreNumberExpressionVisitor<AstNode>,
-    CoreBoolExpressionVisitor<AstNode>,
-    CoreStringExpressionVisitor<AstNode>,
-    CoreActorExpressionVisitor<AstNode>,
-    CoreListExpressionVisitor<AstNode> {
-
+export class RenamingTransformerVisitor
+    implements
+        CoreVisitor<AstNode>,
+        CoreNonCtrlStatementnVisitor<AstNode>,
+        CoreNumberExpressionVisitor<AstNode>,
+        CoreBoolExpressionVisitor<AstNode>,
+        CoreStringExpressionVisitor<AstNode>,
+        CoreActorExpressionVisitor<AstNode>,
+        CoreListExpressionVisitor<AstNode>
+{
     private readonly _renamer: DataLocationRenamer;
 
     protected _activeStatement: Statement;
@@ -173,7 +171,9 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     private transformBeforeException() {
-        throw new IllegalStateException("Statements on list must have been translated before to assignments of transformed list expressions");
+        throw new IllegalStateException(
+            'Statements on list must have been translated before to assignments of transformed list expressions'
+        );
     }
 
     visit(node: AstNode): AstNode {
@@ -181,7 +181,7 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitExpressionList(node: ExpressionList): AstNode {
-        return new ExpressionList(node.elements.map(e => e.accept(this) as Expression));
+        return new ExpressionList(node.elements.map((e) => e.accept(this) as Expression));
     }
 
     visitSignalTargetReachedStatement(node: SignalTargetReachedStatement): AstNode {
@@ -313,7 +313,7 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitCallStatement(node: CallStatement): AstNode {
-        return this.doForStatement(node, (() => {
+        return this.doForStatement(node, () => {
             const argExprs = [];
             for (const a of node.args) {
                 argExprs.push(a.accept(this) as Expression);
@@ -329,32 +329,31 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
             }
 
             return new CallStatement(node.calledMethod, args, assignResultTo);
-        }));
+        });
     }
 
     visitStrengtheningAssumeStatement(node: StrengtheningAssumeStatement): AstNode {
-        return this.doForStatement(node, (() => {
+        return this.doForStatement(node, () => {
             return new StrengtheningAssumeStatement(node.condition.accept(this) as BooleanExpression);
-        }));
+        });
     }
 
     visitBranchingAssumeStatement(node: BranchingAssumeStatement): AstNode {
-        return this.doForStatement(node, (() => {
+        return this.doForStatement(node, () => {
             return new BranchingAssumeStatement(node.condition.accept(this) as BooleanExpression);
-        }));
+        });
     }
 
     visitDivideExpression(node: DivideExpression): AstNode {
         return new DivideExpression(
             node.operand1.accept(this) as NumberExpression,
-            node.operand2.accept(this) as NumberExpression);
+            node.operand2.accept(this) as NumberExpression
+        );
     }
 
     visitIndexOfExpression(node: IndexOfExpression): AstNode {
         const readDataLoc: DataLocation = this.renameRead(node.variable.dataloc);
-        return new IndexOfExpression(
-            node.expr.accept(this) as Expression,
-            new VariableWithDataLocation(readDataLoc));
+        return new IndexOfExpression(node.expr.accept(this) as Expression, new VariableWithDataLocation(readDataLoc));
     }
 
     visitLengthOListExpression(node: LengthOfListExpression): AstNode {
@@ -368,19 +367,22 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     visitMinusExpression(node: MinusExpression): AstNode {
         return new MinusExpression(
             node.operand1.accept(this) as NumberExpression,
-            node.operand2.accept(this) as NumberExpression);
+            node.operand2.accept(this) as NumberExpression
+        );
     }
 
     visitModuloExpression(node: ModuloExpression): AstNode {
         return new ModuloExpression(
             node.operand1.accept(this) as NumberExpression,
-            node.operand2.accept(this) as NumberExpression);
+            node.operand2.accept(this) as NumberExpression
+        );
     }
 
     visitMultiplyExpression(node: MultiplyExpression): AstNode {
         return new MultiplyExpression(
             node.operand1.accept(this) as NumberExpression,
-            node.operand2.accept(this) as NumberExpression);
+            node.operand2.accept(this) as NumberExpression
+        );
     }
 
     visitIntegerLiteral(node: IntegerLiteral): AstNode {
@@ -397,14 +399,17 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitPickRandomFromExpression(node: PickRandomFromExpression): AstNode {
-        return new PickRandomFromExpression(node.from.accept(this) as NumberExpression,
-            node.to.accept(this) as NumberExpression);
+        return new PickRandomFromExpression(
+            node.from.accept(this) as NumberExpression,
+            node.to.accept(this) as NumberExpression
+        );
     }
 
     visitPlusExpression(node: PlusExpression): AstNode {
         return new PlusExpression(
             node.operand1.accept(this) as NumberExpression,
-            node.operand2.accept(this) as NumberExpression);
+            node.operand2.accept(this) as NumberExpression
+        );
     }
 
     visitRoundExpression(node: RoundExpression): AstNode {
@@ -416,8 +421,10 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitAndExpression(node: AndExpression): AstNode {
-        return new AndExpression(node.operand1.accept(this) as BooleanExpression,
-            node.operand2.accept(this) as BooleanExpression);
+        return new AndExpression(
+            node.operand1.accept(this) as BooleanExpression,
+            node.operand2.accept(this) as BooleanExpression
+        );
     }
 
     visitBooleanLiteral(node: BooleanLiteral): AstNode {
@@ -434,57 +441,73 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitNumEqualsExpression(node: NumEqualsExpression): AstNode {
-        return new NumEqualsExpression(node.operand1.accept(this) as NumberExpression,
-            node.operand2.accept(this) as NumberExpression);
+        return new NumEqualsExpression(
+            node.operand1.accept(this) as NumberExpression,
+            node.operand2.accept(this) as NumberExpression
+        );
     }
 
     visitNumGreaterThanExpression(node: NumGreaterThanExpression): AstNode {
-        return new NumGreaterThanExpression(node.operand1.accept(this) as NumberExpression,
-            node.operand2.accept(this) as NumberExpression);
+        return new NumGreaterThanExpression(
+            node.operand1.accept(this) as NumberExpression,
+            node.operand2.accept(this) as NumberExpression
+        );
     }
 
     visitNumGreaterEqualExpression(node: NumGreaterEqualExpression): AstNode {
-        return new NumGreaterEqualExpression(node.operand1.accept(this) as NumberExpression,
-            node.operand2.accept(this) as NumberExpression);
+        return new NumGreaterEqualExpression(
+            node.operand1.accept(this) as NumberExpression,
+            node.operand2.accept(this) as NumberExpression
+        );
     }
 
     visitNumLessThanExpression(node: NumLessThanExpression): AstNode {
-        return new NumLessThanExpression(node.operand1.accept(this) as NumberExpression,
-            node.operand2.accept(this) as NumberExpression);
+        return new NumLessThanExpression(
+            node.operand1.accept(this) as NumberExpression,
+            node.operand2.accept(this) as NumberExpression
+        );
     }
 
     visitNumLessEqualExpression(node: NumLessEqualExpression): AstNode {
-        return new NumLessEqualExpression(node.operand1.accept(this) as NumberExpression,
-            node.operand2.accept(this) as NumberExpression);
+        return new NumLessEqualExpression(
+            node.operand1.accept(this) as NumberExpression,
+            node.operand2.accept(this) as NumberExpression
+        );
     }
 
     visitOrExpression(node: OrExpression): AstNode {
-        return new OrExpression(node.operand1.accept(this) as BooleanExpression,
-            node.operand2.accept(this) as BooleanExpression);
+        return new OrExpression(
+            node.operand1.accept(this) as BooleanExpression,
+            node.operand2.accept(this) as BooleanExpression
+        );
     }
 
     visitStrContainsExpression(node: StrContainsExpression): AstNode {
         return new StrContainsExpression(
             node.operand1.accept(this) as StringExpression,
-            node.operand2.accept(this) as StringExpression);
+            node.operand2.accept(this) as StringExpression
+        );
     }
 
     visitStrEqualsExpression(node: StrEqualsExpression): AstNode {
         return new StrEqualsExpression(
             node.operand1.accept(this) as StringExpression,
-            node.operand2.accept(this) as StringExpression);
+            node.operand2.accept(this) as StringExpression
+        );
     }
 
     visitStrGreaterThanExpression(node: StrGreaterThanExpression): AstNode {
         return new StrGreaterThanExpression(
             node.operand1.accept(this) as StringExpression,
-            node.operand2.accept(this) as StringExpression);
+            node.operand2.accept(this) as StringExpression
+        );
     }
 
     visitStrLessThanExpression(node: StrLessThanExpression): AstNode {
         return new StrLessThanExpression(
             node.operand1.accept(this) as StringExpression,
-            node.operand2.accept(this) as StringExpression);
+            node.operand2.accept(this) as StringExpression
+        );
     }
 
     visitExpressionListExpression(node: ExpressionListExpression): AstNode {
@@ -502,19 +525,22 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     visitIthLetterOfStringExpression(node: IthLetterOfStringExpression): AstNode {
         return new IthLetterOfStringExpression(
             node.index.accept(this) as NumberExpression,
-            node.strExpr.accept(this) as StringExpression);
+            node.strExpr.accept(this) as StringExpression
+        );
     }
 
     visitIthStringItemOfExpression(node: IthStringItemOfExpression): AstNode {
         return new IthStringItemOfExpression(
             node.index.accept(this) as NumberExpression,
-            node.ofVariable.accept(this) as VariableWithDataLocation)
+            node.ofVariable.accept(this) as VariableWithDataLocation
+        );
     }
 
     visitJoinStringsExpression(node: JoinStringsExpression): AstNode {
         return new JoinStringsExpression(
             node.operand1.accept(this) as StringExpression,
-            node.operand2.accept(this) as StringExpression);
+            node.operand2.accept(this) as StringExpression
+        );
     }
 
     visitNumAsStringExpression(node: NumAsStringExpression): AstNode {
@@ -564,10 +590,9 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): AstNode {
-        return this.doForStatement(node, (() => {
-            return new BroadcastAndWaitStatement(
-                node.msg.accept(this) as SystemMessage);
-        }));
+        return this.doForStatement(node, () => {
+            return new BroadcastAndWaitStatement(node.msg.accept(this) as SystemMessage);
+        });
     }
 
     visitUserMessage(node: UserMessage): AstNode {
@@ -575,16 +600,17 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitSystemMessage(node: SystemMessage): AstNode {
-       return new SystemMessage(node.destination,
-           node.messageid.accept(this) as StringExpression,
-           node.payload.accept(this) as ExpressionList) ;
+        return new SystemMessage(
+            node.destination,
+            node.messageid.accept(this) as StringExpression,
+            node.payload.accept(this) as ExpressionList
+        );
     }
 
     visitBroadcastMessageStatement(node: BroadcastMessageStatement): AstNode {
-        return this.doForStatement(node, (() => {
-            return new BroadcastMessageStatement(
-                node.msg.accept(this) as SystemMessage);
-        }));
+        return this.doForStatement(node, () => {
+            return new BroadcastMessageStatement(node.msg.accept(this) as SystemMessage);
+        });
     }
 
     visitActorSelfExpression(node: ActorSelfExpression): AstNode {
@@ -605,9 +631,10 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitUsherActorExpression(node: UsherActorExpression): AstNode {
-       return new UsherActorExpression(
-           node.actorName.accept(this) as StringExpression,
-           node.role.accept(this) as Identifier);
+        return new UsherActorExpression(
+            node.actorName.accept(this) as StringExpression,
+            node.role.accept(this) as Identifier
+        );
     }
 
     visitCreateCloneOfStatement(node: CreateCloneOfStatement): AstNode {
@@ -627,10 +654,9 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitExpressionStatement(node: ExpressionStatement): AstNode {
-        return this.doForStatement(node, (() => {
-            return new ExpressionStatement(
-                node.expression.accept(this) as Expression);
-        }));
+        return this.doForStatement(node, () => {
+            return new ExpressionStatement(node.expression.accept(this) as Expression);
+        });
     }
 
     visitStopAllStatement(node: StopAllStatement): AstNode {
@@ -649,10 +675,9 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitWaitUntilStatement(node: WaitUntilStatement): AstNode {
-        return this.doForStatement(node, (() => {
-            return new WaitUntilStatement(
-                node.cond.accept(this) as BooleanExpression);
-        }));
+        return this.doForStatement(node, () => {
+            return new WaitUntilStatement(node.cond.accept(this) as BooleanExpression);
+        });
     }
 
     visitDeclareAttributeStatement(node: DeclareAttributeStatement): AstNode {
@@ -660,24 +685,24 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitDeclareActorVariableStatement(node: DeclareActorVariableStatement): AstNode {
-        return this.doForStatement(node, (() => {
+        return this.doForStatement(node, () => {
             const renamedDataLoc: DataLocation = this.renameDeclaration(node.variable.dataloc);
             return new DeclareActorVariableStatement(new VariableWithDataLocation(renamedDataLoc));
-        }));
+        });
     }
 
     visitDeclareStackVariableStatement(node: DeclareStackVariableStatement): AstNode {
-        return this.doForStatement(node, (() => {
+        return this.doForStatement(node, () => {
             const renamedDataLoc: DataLocation = this.renameDeclaration(node.variable.dataloc);
             return new DeclareStackVariableStatement(new VariableWithDataLocation(renamedDataLoc));
-        }));
+        });
     }
 
     visitDeclareSystemVariableStatement(node: DeclareSystemVariableStatement): AstNode {
-        return this.doForStatement(node, (() => {
+        return this.doForStatement(node, () => {
             const renamedDataLoc: DataLocation = this.renameDeclaration(node.variable.dataloc);
             return new DeclareSystemVariableStatement(new VariableWithDataLocation(renamedDataLoc));
-        }));
+        });
     }
 
     visitSetAttributeOfToStatement(node: SetAttributeOfToStatement): AstNode {
@@ -693,19 +718,17 @@ export class RenamingTransformerVisitor implements CoreVisitor<AstNode>,
     }
 
     visitStoreEvalResultToVariableStatement(node: StoreEvalResultToVariableStatement): AstNode {
-        return this.doForStatement(node, (() => {
+        return this.doForStatement(node, () => {
             // ATTENTION: It is important to conduct the visit for the RHS first (for a forwards analysis)!
             const rhs = this.withMode(DataLocationMode.READ_FROM, () => node.toValue.accept(this)) as Expression;
             const assignedDataLoc: DataLocation = this.renameAssigned(node.variable.dataloc);
             return new StoreEvalResultToVariableStatement(new VariableWithDataLocation(assignedDataLoc), rhs);
-        }));
+        });
     }
 
     visitResetTimerStatement(node: ResetTimerStatement): AstNode {
-        return this.doForStatement(node, (() => {
+        return this.doForStatement(node, () => {
             throw new ImplementMeException();
-        }));
+        });
     }
 }
-
-

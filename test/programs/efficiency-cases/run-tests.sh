@@ -19,7 +19,7 @@ mkdir -p "output/test-results/"
 
 if [ -z $BASTET_NO_BUILD ]
 then
-    npm run build
+    pnpm run build
 fi
 
 grep_statistic () {

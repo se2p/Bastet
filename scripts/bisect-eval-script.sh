@@ -15,8 +15,8 @@ grep_statistic () {
     cat $RESULT_FILE | grep $CONTEXT -A 5 | grep "$IDENT" | cut -d":" -f2 | cut -d"," -f1
 }
 
-npm install
-if ! npm run build-no-lint
+pnpm install --frozen-lockfile
+if ! pnpm run build-no-lint
 then
     exit 125
 fi
@@ -40,5 +40,4 @@ else
     echo "Seems fine."
     exit 0
 fi
-
 

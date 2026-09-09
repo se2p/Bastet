@@ -24,7 +24,6 @@
  */
 
 export class ImmutableSet<E> implements ReadonlySet<E> {
-
     private readonly _elements: Set<E>;
 
     constructor(elements: Iterable<E>) {
@@ -35,11 +34,11 @@ export class ImmutableSet<E> implements ReadonlySet<E> {
         return this._elements.size;
     }
 
-    public [Symbol.iterator](): IterableIterator<E> {
+    public [Symbol.iterator](): SetIterator<E> {
         return this._elements[Symbol.iterator]();
     }
 
-    public entries(): IterableIterator<[E, E]> {
+    public entries(): SetIterator<[E, E]> {
         return this._elements.entries();
     }
 
@@ -51,16 +50,15 @@ export class ImmutableSet<E> implements ReadonlySet<E> {
         return this._elements.has(value);
     }
 
-    public keys(): IterableIterator<E> {
+    public keys(): SetIterator<E> {
         return this._elements.keys();
     }
 
-    public values(): IterableIterator<E> {
+    public values(): SetIterator<E> {
         return this._elements.values();
     }
 
     static copyOf<E>(entries: Set<E>) {
         return new ImmutableSet(entries);
     }
-
 }

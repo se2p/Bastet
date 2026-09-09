@@ -23,37 +23,25 @@
  *
  */
 
+import { ConcreteDomain, ConcreteElement, ConcreteMemory } from './ConcreteElements';
+import { FirstOrderFormula } from '../../utils/ConjunctiveNormalForm';
+import { LatticeWithComplements, WithReferenceCounting } from '../../lattices/Lattice';
+import { ImplementMeException } from '../../core/exceptions/ImplementMeException';
+import { Preconditions } from '../../utils/Preconditions';
+import { BooleanTheory } from './MemoryTransformer';
+import { IllegalArgumentException } from '../../core/exceptions/IllegalArgumentException';
+import { PerfTimer } from '../../utils/PerfTimer';
+import { AbstractDomain } from './AbstractDomain';
+import { AbstractionPrecision } from '../AbstractionPrecision';
+import { Z3Model, Z3Vector } from '../../utils/smt/z3/Z3SMT';
+import { Z3BooleanFormula } from '../../utils/smt/z3/Z3Theories';
 
-import {
-    ConcreteBoolean,
-    ConcreteDomain, ConcreteElement, ConcreteFloat, ConcreteInteger,
-    ConcreteList,
-    ConcreteMemory,
-    ConcreteNumber,
-    ConcreteString
-} from "./ConcreteElements";
-import {FirstOrderFormula} from "../../utils/ConjunctiveNormalForm";
-import {LatticeWithComplements, WithReferenceCounting} from "../../lattices/Lattice";
-import {ImplementMeException, ImplementMeForException} from "../../core/exceptions/ImplementMeException";
-import {Preconditions} from "../../utils/Preconditions";
-import {BooleanTheory} from "./MemoryTransformer";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {PerfTimer} from "../../utils/PerfTimer";
-import {AbstractDomain} from "./AbstractDomain";
-import {AbstractionPrecision} from "../AbstractionPrecision";
-import {Z3Model, Z3Vector} from "../../utils/smt/z3/Z3SMT";
-import {Z3BooleanFormula} from "../../utils/smt/z3/Z3Theories";
-import {List as ImmList, Map as ImmMap, Set as ImmSet} from "immutable"
-
-export interface FirstOrderLattice<F extends FirstOrderFormula> extends LatticeWithComplements<F>, WithReferenceCounting<F> {
-
+export interface FirstOrderLattice<F extends FirstOrderFormula>
+    extends LatticeWithComplements<F>, WithReferenceCounting<F> {
     prover: FirstOrderSolver<F>;
-
 }
 
-export class FirstOrderDomain<F extends FirstOrderFormula>
-    implements AbstractDomain<ConcreteMemory, F> {
-
+export class FirstOrderDomain<F extends FirstOrderFormula> implements AbstractDomain<ConcreteMemory, F> {
     private readonly _lattice: FirstOrderLattice<F>;
 
     constructor(lattice: FirstOrderLattice<F>) {
@@ -82,14 +70,14 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
 
             // TODO: Use a generic FirstOrderModel type instead of Z3Model
 
-            console.log("Checking satisfiability")
+            console.log('Checking satisfiability');
             // (This involves a call to the solver's `check` method, which has
             // to be called before we are allowed to query a model.)
             if (!this.solver.isSat()) {
-                throw new IllegalArgumentException("Model only available for satisfiable formula!");
+                throw new IllegalArgumentException('Model only available for satisfiable formula!');
             }
 
-            console.log("Querying model")
+            console.log('Querying model');
             const model = this.solver.getModel();
             const result = model.getValueMap().toConcreteMemory();
 
@@ -98,7 +86,7 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
             return result;
         } finally {
             timer.stop();
-            console.log(`Concretized in ${timer.lastIntervalDuration}ms`)
+            console.log(`Concretized in ${timer.lastIntervalDuration}ms`);
             console.groupEnd();
         }
     }
@@ -122,11 +110,9 @@ export class FirstOrderDomain<F extends FirstOrderFormula>
     composeSeq(e1: F, e2: F): F {
         throw new ImplementMeException();
     }
-
 }
 
 export abstract class FirstOrderSolver<F extends FirstOrderFormula> {
-
     /**
      * Create a backtracking point.
      */
@@ -168,7 +154,10 @@ export abstract class FirstOrderSolver<F extends FirstOrderFormula> {
 
     public abstract stringRepresentation(f: F): string;
 
-    public abstract allSat(abstractionProblem: Z3BooleanFormula, freeVariables: [string, Z3BooleanFormula][]): boolean[][];
+    public abstract allSat(
+        abstractionProblem: Z3BooleanFormula,
+        freeVariables: [string, Z3BooleanFormula][]
+    ): boolean[][];
 
     public abstract booleanAbstraction(abstractionProblem: F, predicates: F[]): F;
 
@@ -179,12 +168,9 @@ export abstract class FirstOrderSolver<F extends FirstOrderFormula> {
     public abstract incRef(f: F);
 
     public abstract decRef(f: F);
-
 }
 
-export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
-    implements FirstOrderLattice<F> {
-
+export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula> implements FirstOrderLattice<F> {
     private readonly _boolTheory: BooleanTheory<F>;
     private readonly _prover: FirstOrderSolver<F>;
 
@@ -205,8 +191,7 @@ export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
         try {
             // UNSAT a  <=>  a lessOrEqual ⊥
             // NOT true OR false  <=>  false OR false
-            const implication = this.complement(this.join(
-                this.complement(element1), element2));
+            const implication = this.complement(this.join(this.complement(element1), element2));
             this._prover.assert(implication);
             return this._prover.isUnsat();
         } finally {
@@ -245,5 +230,4 @@ export abstract class SMTFirstOrderLattice<F extends FirstOrderFormula>
     incRef(element: F) {
         this._prover.incRef(element);
     }
-
 }

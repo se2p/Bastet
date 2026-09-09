@@ -23,23 +23,23 @@
  *
  */
 
-import {LabeledTransferRelation} from "../TransferRelation";
-import {SSAState} from "./SSAAbstractDomain";
+import { LabeledTransferRelation } from '../TransferRelation';
+import { SSAState } from './SSAAbstractDomain';
 import {
     AssumeOperation,
     ProgramOperation,
-    ProgramOperationFactory, ProgramOperationInContext,
-    RawOperation
-} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {AbstractElement} from "../../../lattices/Lattice";
-import {Preconditions} from "../../../utils/Preconditions";
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {SSAssigner, SSATransformerVisitor} from "./SSATransformerVisitor";
-import {BooleanExpression} from "../../../syntax/ast/core/expressions/BooleanExpression";
-import {Concern} from "../../../syntax/Concern";
+    ProgramOperationFactory,
+    ProgramOperationInContext,
+    RawOperation,
+} from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { AbstractElement } from '../../../lattices/Lattice';
+import { Preconditions } from '../../../utils/Preconditions';
+import { IllegalStateException } from '../../../core/exceptions/IllegalStateException';
+import { SSAssigner, SSATransformerVisitor } from './SSATransformerVisitor';
+import { BooleanExpression } from '../../../syntax/ast/core/expressions/BooleanExpression';
+import { Concern } from '../../../syntax/Concern';
 
 export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
-
     private readonly _wrapped: LabeledTransferRelation<AbstractElement>;
 
     constructor(wrappedTr: LabeledTransferRelation<AbstractElement>) {
@@ -47,7 +47,7 @@ export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
     }
 
     abstractSucc(fromState: SSAState): Iterable<SSAState> {
-        throw new IllegalStateException("This TR is only applicable to labeled transitions");
+        throw new IllegalStateException('This TR is only applicable to labeled transitions');
     }
 
     abstractSuccFor(fromState: SSAState, opic: ProgramOperationInContext, co: Concern): Iterable<SSAState> {
@@ -56,17 +56,23 @@ export class SSATransferRelation implements LabeledTransferRelation<SSAState> {
 
         let opPrime: ProgramOperation;
         if (opic.op instanceof AssumeOperation) {
-            opPrime = ProgramOperationFactory.createAssumeOpFrom(opic.op.expression.accept(visitor) as BooleanExpression, opic.op.assumeType);
+            opPrime = ProgramOperationFactory.createAssumeOpFrom(
+                opic.op.expression.accept(visitor) as BooleanExpression,
+                opic.op.assumeType
+            );
         } else {
             opPrime = new RawOperation(opic.op.ast.accept(visitor));
         }
 
         const result: SSAState[] = [];
-        for (const w of this._wrapped.abstractSuccFor(fromState.wrappedState, new ProgramOperationInContext(opPrime, opic.thread), co)) {
+        for (const w of this._wrapped.abstractSuccFor(
+            fromState.wrappedState,
+            new ProgramOperationInContext(opPrime, opic.thread),
+            co
+        )) {
             result.push(ssasigner.ssa.withWrappedState(w));
         }
 
         return result;
     }
-
 }

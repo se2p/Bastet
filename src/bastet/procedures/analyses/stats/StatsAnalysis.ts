@@ -23,24 +23,23 @@
  *
  */
 
-import {ProgramAnalysis, WrappingProgramAnalysis} from "../ProgramAnalysis";
-import {AbstractState} from "../../../lattices/Lattice";
-import {Preconditions} from "../../../utils/Preconditions";
-import {AnalysisStatistics} from "../AnalysisStatistics";
-import {ConcreteElement} from "../../domains/ConcreteElements";
-import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
-import {App} from "../../../syntax/app/App";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {Refiner, Unwrapper} from "../Refiner";
-import {Set as ImmSet} from "immutable";
-import {LexiKey} from "../../../utils/Lexicographic";
-import {AccessibilityRelation} from "../Accessibility";
-
+import { ProgramAnalysis, WrappingProgramAnalysis } from '../ProgramAnalysis';
+import { AbstractState } from '../../../lattices/Lattice';
+import { Preconditions } from '../../../utils/Preconditions';
+import { AnalysisStatistics } from '../AnalysisStatistics';
+import { ConcreteElement } from '../../domains/ConcreteElements';
+import { Property } from '../../../syntax/Property';
+import { FrontierSet, PartitionKey, ReachedSet } from '../../algorithms/StateSet';
+import { App } from '../../../syntax/app/App';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { Refiner, Unwrapper } from '../Refiner';
+import { Set as ImmSet } from 'immutable';
+import { LexiKey } from '../../../utils/Lexicographic';
+import { AccessibilityRelation } from '../Accessibility';
 
 export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F extends AbstractState>
-    implements WrappingProgramAnalysis<C, E, F>, Unwrapper<E, E> {
-
+    implements WrappingProgramAnalysis<C, E, F>, Unwrapper<E, E>
+{
     private readonly _wrappedAnalysis: ProgramAnalysis<any, any, F>;
 
     private readonly _statistics: AnalysisStatistics;
@@ -56,15 +55,15 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
 
     constructor(wrappedAnalysis: ProgramAnalysis<any, any, F>, statistics: AnalysisStatistics) {
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(wrappedAnalysis.constructor.name);
-        this._succStats = this._statistics.withContext("abstractSucc");
-        this._widenStats = this._statistics.withContext("widening");
-        this._stopStats = this._statistics.withContext("stop");
-        this._mergeStats = this._statistics.withContext("merge");
-        this._mergeIntoStats = this._statistics.withContext("mergeInto");
-        this._joinStats = this._statistics.withContext("join");
-        this._targetStats = this._statistics.withContext("target");
-        this._testifyStats = this._statistics.withContext("testify");
-        this._otherStats = this._statistics.withContext("other");
+        this._succStats = this._statistics.withContext('abstractSucc');
+        this._widenStats = this._statistics.withContext('widening');
+        this._stopStats = this._statistics.withContext('stop');
+        this._mergeStats = this._statistics.withContext('merge');
+        this._mergeIntoStats = this._statistics.withContext('mergeInto');
+        this._joinStats = this._statistics.withContext('join');
+        this._targetStats = this._statistics.withContext('target');
+        this._testifyStats = this._statistics.withContext('testify');
+        this._otherStats = this._statistics.withContext('other');
 
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
     }
@@ -81,8 +80,8 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         });
     }
 
-    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation< F> {
-       return this._wrappedAnalysis.accessibility(reached, state);
+    accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<F> {
+        return this._wrappedAnalysis.accessibility(reached, state);
     }
 
     merge(state1: E, state2: E): E {
@@ -103,9 +102,21 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         });
     }
 
-    mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
+    mergeInto(
+        state: E,
+        frontier: FrontierSet<F>,
+        reached: ReachedSet<F>,
+        unwrapper: (F) => E,
+        wrapper: (E) => F
+    ): [FrontierSet<F>, ReachedSet<F>] {
         return this._mergeIntoStats.runWithTimer(() => {
-            return this._wrappedAnalysis.mergeInto(state, frontier, reached, (e) => this.unwrap(unwrapper(e)), (e) => e);
+            return this._wrappedAnalysis.mergeInto(
+                state,
+                frontier,
+                reached,
+                (e) => this.unwrap(unwrapper(e)),
+                (e) => e
+            );
         });
     }
 
@@ -217,7 +228,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         return this.wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation< F> {
+    testify(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation<F> {
         return this._testifyStats.runWithTimer(() => {
             return this.wrappedAnalysis.testify(accessibility, state);
         });
@@ -235,7 +246,7 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
         });
     }
 
-    testifyOne(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation< F> {
+    testifyOne(accessibility: AccessibilityRelation<F>, state: F): AccessibilityRelation<F> {
         return this._testifyStats.runWithTimer(() => {
             return this.wrappedAnalysis.testifyOne(accessibility, state);
         });
@@ -248,6 +259,4 @@ export class StatsAnalysis<C extends ConcreteElement, E extends AbstractState, F
     decRef(state: E) {
         this.wrappedAnalysis.decRef(state);
     }
-
 }
-

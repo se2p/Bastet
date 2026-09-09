@@ -23,17 +23,14 @@
  *
  */
 
-import {AbstractNode} from "../AstNode";
-import {AstNodeList} from "../AstNodeList";
-import {Identifier} from "./Identifier";
-import {ResourceLocation} from "./ResourceLocation";
+import { AbstractNode } from '../AstNode';
+import { AstNodeList } from '../AstNodeList';
+import { Identifier } from './Identifier';
+import { ResourceLocation } from './ResourceLocation';
 
-export abstract class ResourceType extends AbstractNode {
-
-}
+export abstract class ResourceType extends AbstractNode {}
 
 export class SoundResourceType extends ResourceType {
-
     constructor() {
         super([]);
     }
@@ -46,7 +43,6 @@ export class SoundResourceType extends ResourceType {
 }
 
 export class ImageResourceType extends ResourceType {
-
     constructor() {
         super([]);
     }
@@ -56,11 +52,9 @@ export class ImageResourceType extends ResourceType {
     public static instance(): ImageResourceType {
         return this.INSTANCE;
     }
-
 }
 
 export class ResourceDefinition extends AbstractNode {
-
     private readonly _resourceType: ResourceType;
     private readonly _ident: Identifier;
     private readonly _resourceLocator: ResourceLocation;
@@ -86,9 +80,7 @@ export class ResourceDefinition extends AbstractNode {
 }
 
 export class ResourceDefinitionList extends AstNodeList<ResourceDefinition> {
-
     constructor(elements: ResourceDefinition[]) {
         super(elements);
     }
-
 }

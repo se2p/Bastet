@@ -23,31 +23,34 @@
  *
  */
 
-import {MergeOperator} from "../ProgramAnalysis";
-import {SSAState} from "./SSAAbstractDomain";
-import {AbstractState} from "../../../lattices/Lattice";
-import {Preconditions} from "../../../utils/Preconditions";
-import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
-import {Map as ImmMap, Set as ImmSet} from "immutable";
-import {App} from "../../../syntax/app/App";
-import {DataLocation, VersionedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
-import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
-import {Concerns} from "../../../syntax/Concern";
-import {LabeledTransferRelation, Transfers} from "../TransferRelation";
-import {AstNode} from "../../../syntax/ast/AstNode";
-import {ProgramOperationFactory} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {ActorType} from "../../../syntax/ast/core/ScratchType";
-import {ThreadStateFactory} from "../control/ConcreteProgramState";
+import { MergeOperator } from '../ProgramAnalysis';
+import { SSAState } from './SSAAbstractDomain';
+import { AbstractState } from '../../../lattices/Lattice';
+import { Preconditions } from '../../../utils/Preconditions';
+import { StoreEvalResultToVariableStatement } from '../../../syntax/ast/core/statements/SetStatement';
+import { Map as ImmMap, Set as ImmSet } from 'immutable';
+import { App } from '../../../syntax/app/App';
+import { DataLocation, VersionedDataLocation } from '../../../syntax/app/controlflow/DataLocation';
+import { VariableWithDataLocation } from '../../../syntax/ast/core/Variable';
+import { Concerns } from '../../../syntax/Concern';
+import { LabeledTransferRelation, Transfers } from '../TransferRelation';
+import { AstNode } from '../../../syntax/ast/AstNode';
+import { ProgramOperationFactory } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { ActorType } from '../../../syntax/ast/core/ScratchType';
+import { ThreadStateFactory } from '../control/ConcreteProgramState';
 
 export class SSAMergeOperator implements MergeOperator<SSAState> {
-
     private readonly _task: App;
 
     private readonly _wrappedMergeOp: MergeOperator<AbstractState>;
 
     private readonly _wrappedAbstractSuccOp: LabeledTransferRelation<any>;
 
-    constructor(task: App, wrappedMergeOp: MergeOperator<AbstractState>, wrappedAbstractSuccOp: LabeledTransferRelation<any>) {
+    constructor(
+        task: App,
+        wrappedMergeOp: MergeOperator<AbstractState>,
+        wrappedAbstractSuccOp: LabeledTransferRelation<any>
+    ) {
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedMergeOp = Preconditions.checkNotUndefined(wrappedMergeOp);
         this._wrappedAbstractSuccOp = Preconditions.checkNotUndefined(wrappedAbstractSuccOp);
@@ -68,39 +71,61 @@ export class SSAMergeOperator implements MergeOperator<SSAState> {
             state2SSA = state2SSA.set(k, state2.ssa.get(k) || 0);
         }
 
-        const syncedSSA = state1SSA.mergeWith(
-            (state1Version, state2Version, key) => {
-                const assignedDataLoc: DataLocation = this._task.typeStorage.getTypedLocation(key);
-                const mergedVersion = Math.max(state1Version, state2Version);
+        const syncedSSA = state1SSA.mergeWith((state1Version, state2Version, key) => {
+            const assignedDataLoc: DataLocation = this._task.typeStorage.getTypedLocation(key);
+            const mergedVersion = Math.max(state1Version, state2Version);
 
-                if (assignedDataLoc.type == ActorType.instance().typeId) {
-                    return state1Version;
-                }
+            if (assignedDataLoc.type == ActorType.instance().typeId) {
+                return state1Version;
+            }
 
-                if (state1Version > state2Version) {
-                    const oldVersion = state2Version;
-                    const oldVariable = new VersionedDataLocation(assignedDataLoc.ident, assignedDataLoc.type, oldVersion);
-                    const newVariable = new VersionedDataLocation(assignedDataLoc.ident, assignedDataLoc.type, mergedVersion);
-                    state2SyncOps.push(new StoreEvalResultToVariableStatement(
+            if (state1Version > state2Version) {
+                const oldVersion = state2Version;
+                const oldVariable = new VersionedDataLocation(assignedDataLoc.ident, assignedDataLoc.type, oldVersion);
+                const newVariable = new VersionedDataLocation(
+                    assignedDataLoc.ident,
+                    assignedDataLoc.type,
+                    mergedVersion
+                );
+                state2SyncOps.push(
+                    new StoreEvalResultToVariableStatement(
                         new VariableWithDataLocation(newVariable),
-                        new VariableWithDataLocation(oldVariable)));
-
-                } else if (state2Version > state1Version) {
-                    const oldVersion = state1Version;
-                    const oldVariable = new VersionedDataLocation(assignedDataLoc.ident, assignedDataLoc.type, oldVersion);
-                    const newVariable = new VersionedDataLocation(assignedDataLoc.ident, assignedDataLoc.type, mergedVersion);
-                    state1SyncOps.push(new StoreEvalResultToVariableStatement(
+                        new VariableWithDataLocation(oldVariable)
+                    )
+                );
+            } else if (state2Version > state1Version) {
+                const oldVersion = state1Version;
+                const oldVariable = new VersionedDataLocation(assignedDataLoc.ident, assignedDataLoc.type, oldVersion);
+                const newVariable = new VersionedDataLocation(
+                    assignedDataLoc.ident,
+                    assignedDataLoc.type,
+                    mergedVersion
+                );
+                state1SyncOps.push(
+                    new StoreEvalResultToVariableStatement(
                         new VariableWithDataLocation(newVariable),
-                        new VariableWithDataLocation(oldVariable)));
-                }
+                        new VariableWithDataLocation(oldVariable)
+                    )
+                );
+            }
 
-                return Math.max(state1Version, state2Version);
-            }, state2SSA);
+            return Math.max(state1Version, state2Version);
+        }, state2SSA);
 
-        const state1Synced = Transfers.withIntermediateOps(this._wrappedAbstractSuccOp, state1.getWrappedState(), ThreadStateFactory.dummy(),
-            state1SyncOps.map(ast => ProgramOperationFactory.createFor(ast)), Concerns.highestPriorityConcern());
-        const state2Synced = Transfers.withIntermediateOps(this._wrappedAbstractSuccOp, state2.getWrappedState(), ThreadStateFactory.dummy(),
-            state2SyncOps.map(ast => ProgramOperationFactory.createFor(ast)), Concerns.highestPriorityConcern());
+        const state1Synced = Transfers.withIntermediateOps(
+            this._wrappedAbstractSuccOp,
+            state1.getWrappedState(),
+            ThreadStateFactory.dummy(),
+            state1SyncOps.map((ast) => ProgramOperationFactory.createFor(ast)),
+            Concerns.highestPriorityConcern()
+        );
+        const state2Synced = Transfers.withIntermediateOps(
+            this._wrappedAbstractSuccOp,
+            state2.getWrappedState(),
+            ThreadStateFactory.dummy(),
+            state2SyncOps.map((ast) => ProgramOperationFactory.createFor(ast)),
+            Concerns.highestPriorityConcern()
+        );
 
         Preconditions.checkArgument(state1Synced.length == 1);
         Preconditions.checkArgument(state2Synced.length == 1);
@@ -113,5 +138,4 @@ export class SSAMergeOperator implements MergeOperator<SSAState> {
     shouldMerge(state1: SSAState, state2: SSAState): boolean {
         return this._wrappedMergeOp.shouldMerge(state1.getWrappedState(), state2.getWrappedState());
     }
-
 }

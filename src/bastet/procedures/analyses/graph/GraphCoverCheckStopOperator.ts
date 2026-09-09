@@ -23,13 +23,15 @@
  *
  */
 
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
-import {StopOperator} from "../ProgramAnalysis";
-import {GraphAbstractState} from "./GraphAbstractDomain";
-import {Preconditions} from "../../../utils/Preconditions";
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
+import { StopOperator } from '../ProgramAnalysis';
+import { GraphAbstractState } from './GraphAbstractDomain';
+import { Preconditions } from '../../../utils/Preconditions';
 
-export class GraphCoverCheckStopOperator<F extends AbstractState> implements StopOperator<GraphAbstractState, GraphAbstractState> {
-
+export class GraphCoverCheckStopOperator<F extends AbstractState> implements StopOperator<
+    GraphAbstractState,
+    GraphAbstractState
+> {
     private readonly _wrappedStopOp: StopOperator<any, any>;
     private readonly _unwrapper: (GraphAbstractState) => AbstractElement;
 
@@ -38,7 +40,11 @@ export class GraphCoverCheckStopOperator<F extends AbstractState> implements Sto
         this._unwrapper = Preconditions.checkNotUndefined(unwrapper);
     }
 
-    stop(state: GraphAbstractState, reached: Iterable<GraphAbstractState>, unwrapper: (GraphAbstractState) => GraphAbstractState): boolean {
+    stop(
+        state: GraphAbstractState,
+        reached: Iterable<GraphAbstractState>,
+        unwrapper: (GraphAbstractState) => GraphAbstractState
+    ): boolean {
         for (const r of reached) {
             if (r.getMergeOf().contains(state.getId())) {
                 return true;
@@ -47,5 +53,4 @@ export class GraphCoverCheckStopOperator<F extends AbstractState> implements Sto
 
         return this._wrappedStopOp.stop(state.getWrappedState(), reached, this._unwrapper);
     }
-
 }

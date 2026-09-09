@@ -23,14 +23,13 @@
  *
  */
 
-import {Preconditions} from "../../utils/Preconditions";
-import {PerfTimer} from "../../utils/PerfTimer";
+import { Preconditions } from '../../utils/Preconditions';
+import { PerfTimer } from '../../utils/PerfTimer';
 
 export class AnalysisStatistics {
-
     private readonly _name: string;
 
-    private readonly _statisticsTree : {};
+    private readonly _statisticsTree: {};
 
     private readonly _contextTimer: PerfTimer;
 
@@ -86,7 +85,6 @@ export class AnalysisStatistics {
     }
 
     public stringifyToJSON(): string {
-        return JSON.stringify(this._statisticsTree, null, "    ");
+        return JSON.stringify(this._statisticsTree, null, '    ');
     }
-
 }

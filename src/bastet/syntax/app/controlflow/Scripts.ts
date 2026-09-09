@@ -23,14 +23,13 @@
  *
  */
 
-import {Script, ScriptId} from "./Script";
-import {TransitionRelations} from "./TransitionRelation";
-import {Preconditions} from "../../../utils/Preconditions";
-import {NeverEvent} from "../../ast/core/CoreEvent";
-import {Identifier} from "../../ast/core/Identifier";
+import { Script, ScriptId } from './Script';
+import { TransitionRelations } from './TransitionRelation';
+import { Preconditions } from '../../../utils/Preconditions';
+import { NeverEvent } from '../../ast/core/CoreEvent';
+import { Identifier } from '../../ast/core/Identifier';
 
 export class Scripts {
-
     private static SCRIPT_ID_SEQ: number;
 
     public static freshScriptId(): ScriptId {
@@ -48,18 +47,22 @@ export class Scripts {
      * @param script1
      * @param script2
      */
-    public static concat(script1: Script, script2: Script) : Script {
+    public static concat(script1: Script, script2: Script): Script {
         Preconditions.checkArgument(script1.event === script2.event);
         const newTR = TransitionRelations.concat(script1.transitions, script2.transitions);
-        return new Script(Identifier.freshWithPrefix("concat"), script1.event, script1.restartOnTriggered, newTR);
+        return new Script(Identifier.freshWithPrefix('concat'), script1.event, script1.restartOnTriggered, newTR);
     }
 
     private static EMPTY_SCRIPT: Script;
 
     static empty() {
         if (!Scripts.EMPTY_SCRIPT) {
-            Scripts.EMPTY_SCRIPT = new Script(Identifier.freshWithPrefix("empty"),
-                NeverEvent.instance(), false, TransitionRelations.epsilon());
+            Scripts.EMPTY_SCRIPT = new Script(
+                Identifier.freshWithPrefix('empty'),
+                NeverEvent.instance(),
+                false,
+                TransitionRelations.epsilon()
+            );
         }
         return Scripts.EMPTY_SCRIPT;
     }

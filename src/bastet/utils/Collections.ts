@@ -23,35 +23,34 @@
  *
  */
 
-
-import {IllegalArgumentException} from "../core/exceptions/IllegalArgumentException";
+import { IllegalArgumentException } from '../core/exceptions/IllegalArgumentException';
 
 export function getTheOnlyElement<E>(it: Iterable<E>): E {
-   let result: E = null;
+    let result: E = null;
 
-   for (const r of it) {
-      if (result) {
-         throw new IllegalArgumentException("Iterable with more than one element");
-      } else {
-         result = r;
-      }
-   }
+    for (const r of it) {
+        if (result) {
+            throw new IllegalArgumentException('Iterable with more than one element');
+        } else {
+            result = r;
+        }
+    }
 
-   return result;
+    return result;
 }
 
 export function getAtMostOneElement<E>(it: Iterable<E>): E[] {
-   for (const r of it) {
-      return [r];
-   }
+    for (const r of it) {
+        return [r];
+    }
 
-   return [];
+    return [];
 }
 
 export function getTheNextElement<E>(it: Iterable<E>): E {
-   for (const r of it) {
-      return r;
-   }
+    for (const r of it) {
+        return r;
+    }
 
-   return null;
+    return null;
 }

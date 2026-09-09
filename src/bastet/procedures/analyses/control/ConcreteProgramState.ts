@@ -23,21 +23,20 @@
  *
  */
 
-
-import {Optional} from "../../../utils/Optional";
-import {ConcreteElement, ConcretePrimitiveValue, ConcreteUnifiedMemory} from "../../domains/ConcreteElements";
-import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
-import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {ActorId} from "../../../syntax/app/Actor";
-import {TransRelId} from "../../../syntax/app/controlflow/TransitionRelation";
-import {LocationId} from "../../../syntax/app/controlflow/ControlLocation";
-import {ScriptId} from "../../../syntax/app/controlflow/Script";
-import {OperationId} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {Property} from "../../../syntax/Property";
-import {AbstractElement} from "../../../lattices/Lattice";
-import {Preconditions} from "../../../utils/Preconditions";
-import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
-import {VAR_SCOPING_SPLITTER} from "../../../syntax/app/controlflow/DataLocation";
+import { Optional } from '../../../utils/Optional';
+import { ConcreteElement, ConcretePrimitiveValue, ConcreteUnifiedMemory } from '../../domains/ConcreteElements';
+import { List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet } from 'immutable';
+import { IllegalArgumentException } from '../../../core/exceptions/IllegalArgumentException';
+import { ActorId } from '../../../syntax/app/Actor';
+import { TransRelId } from '../../../syntax/app/controlflow/TransitionRelation';
+import { LocationId } from '../../../syntax/app/controlflow/ControlLocation';
+import { ScriptId } from '../../../syntax/app/controlflow/Script';
+import { OperationId } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { Property } from '../../../syntax/Property';
+import { AbstractElement } from '../../../lattices/Lattice';
+import { Preconditions } from '../../../utils/Preconditions';
+import { VariableWithDataLocation } from '../../../syntax/ast/core/Variable';
+import { VAR_SCOPING_SPLITTER } from '../../../syntax/app/controlflow/DataLocation';
 
 /**
  * Current thread state that is active or becomes active if...
@@ -46,23 +45,22 @@ export enum ThreadComputationState {
     /**
      * ... the thread is supposed to perform a transition next.
      */
-    THREAD_STATE_RUNNING = "R",
+    THREAD_STATE_RUNNING = 'R',
 
     /**
      * ... the thread is waiting for other threads to finish.
      */
-    THREAD_STATE_WAIT = "W",
-    THREAD_STATE_DONE = "D",
-    THREAD_STATE_YIELD = "Y",
-    THREAD_STATE_FAILURE = "F",
-    THREAD_STATE_DISABLED = "P",
-    THREAD_STATE_UNKNOWN = "?",
+    THREAD_STATE_WAIT = 'W',
+    THREAD_STATE_DONE = 'D',
+    THREAD_STATE_YIELD = 'Y',
+    THREAD_STATE_FAILURE = 'F',
+    THREAD_STATE_DISABLED = 'P',
+    THREAD_STATE_UNKNOWN = '?',
 }
 
 export type ThreadId = number;
 
 export interface RelationLocationAttributes {
-
     /** Unique identifier of the actor */
     actor: ActorId;
 
@@ -71,19 +69,17 @@ export interface RelationLocationAttributes {
 
     /** Unique position within the transition relation */
     location: LocationId;
-
 }
 
 const RelationLocationRecord = ImmRec({
-    actor: "",
+    actor: '',
     relation: 0,
-    location: 0
+    location: 0,
 });
 
 export class RelationLocation extends RelationLocationRecord implements RelationLocationAttributes {
-
     constructor(actor: ActorId, relation: TransRelId, location: LocationId) {
-        super({actor: actor, relation: relation, location: location});
+        super({ actor: actor, relation: relation, location: location });
     }
 
     public getActorId(): ActorId {
@@ -99,49 +95,43 @@ export class RelationLocation extends RelationLocationRecord implements Relation
     }
 
     public withLocationId(location: LocationId): RelationLocation {
-        return this.set("location", location);
+        return this.set('location', location);
     }
 
     public withActorId(value: ActorId): RelationLocation {
-        return this.set("actor", value);
+        return this.set('actor', value);
     }
 
     public withRelationId(value: TransRelId): RelationLocation {
-        return this.set("relation", value);
+        return this.set('relation', value);
     }
-
 
     public toString() {
         return `${this.getActorId()} ${this.getRelationId()} ${this.getLocationId()}`;
     }
-
 }
 
 export interface MethodCallAttributes {
-
     /**
      * Control location from that the method has been called
      */
     callFrom: RelationLocation;
-
 
     /**
      * Control location to that the method call is supposed to
      * return to after the method is finished
      */
     returnTo: RelationLocation;
-
 }
 
 const MethodCallRecord = ImmRec({
-    callFrom: new RelationLocation("", 0, 0),
-    returnTo: new RelationLocation("", 0, 0),
+    callFrom: new RelationLocation('', 0, 0),
+    returnTo: new RelationLocation('', 0, 0),
 });
 
 export class MethodCall extends MethodCallRecord implements MethodCallAttributes {
-
     constructor(callFrom: RelationLocation, returnTo: RelationLocation) {
-        super({callFrom: callFrom, returnTo: returnTo});
+        super({ callFrom: callFrom, returnTo: returnTo });
     }
 
     public getCallFrom(): RelationLocation {
@@ -151,11 +141,9 @@ export class MethodCall extends MethodCallRecord implements MethodCallAttributes
     public getReturnTo(): RelationLocation {
         return this.get('returnTo');
     }
-
 }
 
 export interface ThreadStateAttributes {
-
     /** Unique identifier of the thread */
     threadId: ThreadId;
 
@@ -195,33 +183,52 @@ export interface ThreadStateAttributes {
 
     /** Activated by broadcast from thread */
     activatedByThread: ThreadId;
-
 }
 
 const ThreadStateRecord = ImmRec({
     threadId: -1,
-    scriptId: "",
-    actorId: "",
+    scriptId: '',
+    actorId: '',
     operations: ImmList<OperationId>(),
-    location: new RelationLocation("", 0, 0),
+    location: new RelationLocation('', 0, 0),
     computationState: ThreadComputationState.THREAD_STATE_UNKNOWN,
     waitingForThreads: ImmSet<ThreadId>(),
     failedFor: ImmSet<Property>(),
     callStack: ImmList<MethodCall>(),
     loopStack: ImmList<RelationLocation>(),
     inAtomicMode: 0,
-    activatedByThread: -1
+    activatedByThread: -1,
 });
 
 export class ThreadState extends ThreadStateRecord implements AbstractElement, ThreadStateAttributes {
-
-    constructor(threadId: ThreadId, actorId: ActorId, scriptId: ScriptId, operations: ImmList<OperationId>,
-                location: RelationLocation, compState: ThreadComputationState, waitingForThreads: ImmSet<ThreadId>,
-                failedFor: ImmSet<Property>, callStack: ImmList<MethodCall>, loopStack: ImmList<RelationLocation>,
-                inAtomicMode: number, activatedByThread: ThreadId) {
-        super({threadId: threadId, actorId: actorId, scriptId: scriptId, operations: operations, location: location,
-            computationState: compState, waitingForThreads: waitingForThreads, failedFor: failedFor,
-            callStack: callStack, loopStack: loopStack, inAtomicMode: inAtomicMode, activatedByThread: activatedByThread});
+    constructor(
+        threadId: ThreadId,
+        actorId: ActorId,
+        scriptId: ScriptId,
+        operations: ImmList<OperationId>,
+        location: RelationLocation,
+        compState: ThreadComputationState,
+        waitingForThreads: ImmSet<ThreadId>,
+        failedFor: ImmSet<Property>,
+        callStack: ImmList<MethodCall>,
+        loopStack: ImmList<RelationLocation>,
+        inAtomicMode: number,
+        activatedByThread: ThreadId
+    ) {
+        super({
+            threadId: threadId,
+            actorId: actorId,
+            scriptId: scriptId,
+            operations: operations,
+            location: location,
+            computationState: compState,
+            waitingForThreads: waitingForThreads,
+            failedFor: failedFor,
+            callStack: callStack,
+            loopStack: loopStack,
+            inAtomicMode: inAtomicMode,
+            activatedByThread: activatedByThread,
+        });
     }
 
     public getInAtomicMode(): number {
@@ -278,8 +285,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     public withComputationState(value: ThreadComputationState): ThreadState {
         if (this.getWaitingForThreads().size > 0) {
-            Preconditions.checkState(value == ThreadComputationState.THREAD_STATE_WAIT,
-                `The computation state has to be WAIT as long it is waiting for threads; clear the list of threads waited for first? (ThreadID: ${this.getThreadId()})`);
+            Preconditions.checkState(
+                value == ThreadComputationState.THREAD_STATE_WAIT,
+                `The computation state has to be WAIT as long it is waiting for threads; clear the list of threads waited for first? (ThreadID: ${this.getThreadId()})`
+            );
         }
         return this.set('computationState', value);
     }
@@ -294,8 +303,10 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
 
     public withWaitingForThreads(value: ImmSet<ThreadId>): ThreadState {
         if (value.size > 0) {
-            Preconditions.checkState(this.getComputationState() == ThreadComputationState.THREAD_STATE_WAIT,
-                `Please activate the WAITING-state before assigning a non-empty list of threads to wait for. (Current status: ${this.getComputationState()}, ThreadID: ${this.getThreadId()})`);
+            Preconditions.checkState(
+                this.getComputationState() == ThreadComputationState.THREAD_STATE_WAIT,
+                `Please activate the WAITING-state before assigning a non-empty list of threads to wait for. (Current status: ${this.getComputationState()}, ThreadID: ${this.getThreadId()})`
+            );
         }
         return this.set('waitingForThreads', value);
     }
@@ -333,11 +344,9 @@ export class ThreadState extends ThreadStateRecord implements AbstractElement, T
     withRemovedWaitingFor(threadId: ThreadId): ThreadState {
         return this.withWaitingForThreads(this.getWaitingForThreads().remove(threadId));
     }
-
 }
 
 export class ThreadStateFactory {
-
     private static THREAD_ID_SEQ: number;
 
     private static DUMMY: ThreadState;
@@ -350,37 +359,50 @@ export class ThreadStateFactory {
     }
 
     public static dummy(): ThreadState {
-       if (!ThreadStateFactory.DUMMY) {
-           ThreadStateFactory.DUMMY = new ThreadState(-2, "DUMMY", "DUMMY",
-               ImmList(), null, ThreadComputationState.THREAD_STATE_UNKNOWN, ImmSet(), ImmSet(), ImmList(), ImmList(), 0, -2);
-       }
-       return ThreadStateFactory.DUMMY;
+        if (!ThreadStateFactory.DUMMY) {
+            ThreadStateFactory.DUMMY = new ThreadState(
+                -2,
+                'DUMMY',
+                'DUMMY',
+                ImmList(),
+                null,
+                ThreadComputationState.THREAD_STATE_UNKNOWN,
+                ImmSet(),
+                ImmSet(),
+                ImmList(),
+                ImmList(),
+                0,
+                -2
+            );
+        }
+        return ThreadStateFactory.DUMMY;
     }
-
 }
 
 export interface ConcreteProgramStateAttributes {
-
     enrichedFrom: Optional<ConcreteUnifiedMemory>;
 
     globalState: ConcreteUnifiedMemory;
 
     actorStates: ImmMap<string, ConcreteUnifiedMemory>;
-
 }
 
 const ConcreteProgramStateRecord = ImmRec({
-
     enrichedFrom: Optional.absent<ConcreteUnifiedMemory>(),
     globalState: null,
-    actorStates: null
-
+    actorStates: null,
 });
 
-export class ConcreteProgramState extends ConcreteProgramStateRecord implements ConcreteProgramStateAttributes, ConcreteElement {
-
-    constructor(globalState: ConcreteUnifiedMemory, actorStates: ImmMap<string, ConcreteUnifiedMemory>, enrichedFrom?: ConcreteUnifiedMemory) {
-        super({globalState: globalState, actorStates: actorStates, enrichedFrom: Optional.of(enrichedFrom)});
+export class ConcreteProgramState
+    extends ConcreteProgramStateRecord
+    implements ConcreteProgramStateAttributes, ConcreteElement
+{
+    constructor(
+        globalState: ConcreteUnifiedMemory,
+        actorStates: ImmMap<string, ConcreteUnifiedMemory>,
+        enrichedFrom?: ConcreteUnifiedMemory
+    ) {
+        super({ globalState: globalState, actorStates: actorStates, enrichedFrom: Optional.of(enrichedFrom) });
     }
 
     public getActorMemory(actor: string): ConcreteUnifiedMemory {
@@ -406,9 +428,11 @@ export class ConcreteProgramState extends ConcreteProgramStateRecord implements 
         }
 
         // Step 2: Retrieve the concrete value for the given variable.
-        if (parts.length === 2) { // global variable (no actor name)
+        if (parts.length === 2) {
+            // global variable (no actor name)
             return this.globalState.getValue(parts.join(VAR_SCOPING_SPLITTER));
-        } else if (parts.length === 3) { // scoped variable, actor name is present
+        } else if (parts.length === 3) {
+            // scoped variable, actor name is present
             const actorName = parts[0];
             const scriptAndVarName = parts.slice(1, parts.length).join(VAR_SCOPING_SPLITTER);
             return this.getActorMemory(actorName).getValue(scriptAndVarName);

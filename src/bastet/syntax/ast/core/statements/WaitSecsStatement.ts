@@ -23,11 +23,10 @@
  *
  */
 
-import {Statement} from "./Statement";
-import {NumberExpression} from "../expressions/NumberExpression";
+import { Statement } from './Statement';
+import { NumberExpression } from '../expressions/NumberExpression';
 
 export class WaitSecsStatement extends Statement {
-
     private readonly _secs: NumberExpression;
 
     constructor(secs: NumberExpression) {

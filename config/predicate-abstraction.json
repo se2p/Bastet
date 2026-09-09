@@ -1,5 +1,4 @@
 {
-
     "output-dir": "./output/",
 
     "MainAnalysis": {
@@ -35,8 +34,7 @@
         "checkTargetFeasibility": true
     },
 
-    "MultiPropertyAlgorithm" : {
+    "MultiPropertyAlgorithm": {
         "budget-total-walltime-secs": -1
     }
-
 }

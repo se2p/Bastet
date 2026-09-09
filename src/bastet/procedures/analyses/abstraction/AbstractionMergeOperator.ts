@@ -23,14 +23,13 @@
  *
  */
 
-import {MergeOperator} from "../ProgramAnalysis";
-import {AbstractState} from "../../../lattices/Lattice";
-import {Preconditions} from "../../../utils/Preconditions";
-import {App} from "../../../syntax/app/App";
-import {AbstractionState, AbstractionStateLattice} from "./AbstractionAbstractDomain";
+import { MergeOperator } from '../ProgramAnalysis';
+import { AbstractState } from '../../../lattices/Lattice';
+import { Preconditions } from '../../../utils/Preconditions';
+import { App } from '../../../syntax/app/App';
+import { AbstractionState, AbstractionStateLattice } from './AbstractionAbstractDomain';
 
 export class AbstractionMergeOperator implements MergeOperator<AbstractionState> {
-
     private readonly _task: App;
 
     private readonly _wrappedMergeOp: MergeOperator<AbstractState>;
@@ -65,5 +64,4 @@ export class AbstractionMergeOperator implements MergeOperator<AbstractionState>
 
         return state1.getEnteringSummary().equals(state2.getEnteringSummary());
     }
-
 }

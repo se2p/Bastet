@@ -23,12 +23,11 @@
  *
  */
 
-import {DelegatingStateVisitor} from "../AbstractStates";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
-import {ValueAbstractState} from "./ValueAbstractDomain";
+import { DelegatingStateVisitor } from '../AbstractStates';
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
+import { ValueAbstractState } from './ValueAbstractDomain';
 
 export class ValueStateCollector extends DelegatingStateVisitor<ValueAbstractState[]> {
-
     constructor() {
         super();
     }
@@ -40,14 +39,11 @@ export class ValueStateCollector extends DelegatingStateVisitor<ValueAbstractSta
     protected defaultResultFor(element: AbstractElement): ValueAbstractState[] {
         return [];
     }
-
 }
 
 export class ValueAbstractStates {
-
     public static extractFrom(fromState: AbstractState): ValueAbstractState[] {
         const visitor = new ValueStateCollector();
         return fromState.accept(visitor);
     }
-
 }

@@ -23,13 +23,10 @@
  *
  */
 
-
-import {Statement} from "./Statement";
+import { Statement } from './Statement';
 
 export class StopOthersInActorStatement extends Statement {
-
     constructor() {
         super([]);
     }
-
 }

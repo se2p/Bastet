@@ -23,18 +23,18 @@
  *
  */
 
-import {Expression} from "./Expression";
-import {AstNode} from "../../AstNode";
-import {AbstractExpression} from "./AbstractExpression";
-import {StringType} from "../ScratchType";
-import {NumberExpression} from "./NumberExpression";
-import {BooleanExpression} from "./BooleanExpression";
-import {Identifier} from "../Identifier";
-import {BinaryExpression} from "./BinaryExpression";
-import {VariableExpression, VariableWithDataLocation} from "../Variable";
-import {Preconditions} from "../../../../utils/Preconditions";
-import {IllegalArgumentException} from "../../../../core/exceptions/IllegalArgumentException";
-import {ActorExpression} from "./ActorExpression";
+import { Expression } from './Expression';
+import { AstNode } from '../../AstNode';
+import { AbstractExpression } from './AbstractExpression';
+import { StringType } from '../ScratchType';
+import { NumberExpression } from './NumberExpression';
+import { BooleanExpression } from './BooleanExpression';
+import { Identifier } from '../Identifier';
+import { BinaryExpression } from './BinaryExpression';
+import { VariableExpression, VariableWithDataLocation } from '../Variable';
+import { Preconditions } from '../../../../utils/Preconditions';
+import { IllegalArgumentException } from '../../../../core/exceptions/IllegalArgumentException';
+import { ActorExpression } from './ActorExpression';
 
 export function extractStringLiteral(expression: StringExpression): string {
     Preconditions.checkNotUndefined(expression);
@@ -43,23 +43,20 @@ export function extractStringLiteral(expression: StringExpression): string {
         return expression.text;
     }
 
-    throw new IllegalArgumentException("Unsupported expression type for string literal extraction: " + expression.constructor.name);
+    throw new IllegalArgumentException(
+        'Unsupported expression type for string literal extraction: ' + expression.constructor.name
+    );
 }
 
-export interface StringExpression extends Expression {
-
-}
+export interface StringExpression extends Expression {}
 
 export abstract class AbstractStringExpression extends AbstractExpression implements StringExpression {
-
     protected constructor(childs: AstNode[]) {
         super(StringType.instance(), childs);
     }
-
 }
 
 export class StringLiteral extends AbstractStringExpression {
-
     private readonly _text: string;
 
     constructor(text: string) {
@@ -81,14 +78,12 @@ export class StringLiteral extends AbstractStringExpression {
 }
 
 export class StringVariableExpression extends VariableExpression {
-
     constructor(variable: VariableWithDataLocation) {
         super(variable);
     }
 }
 
 export class NumAsStringExpression extends AbstractStringExpression {
-
     private readonly _num: NumberExpression;
 
     constructor(num: NumberExpression) {
@@ -101,7 +96,6 @@ export class NumAsStringExpression extends AbstractStringExpression {
 }
 
 export class BoolAsStringExpression extends AbstractStringExpression {
-
     private readonly _bool: BooleanExpression;
 
     constructor(bool: BooleanExpression) {
@@ -115,7 +109,6 @@ export class BoolAsStringExpression extends AbstractStringExpression {
 }
 
 export class StringAttributeOfExpression extends AbstractStringExpression {
-
     private readonly _attribute: StringExpression;
     private readonly _ofEntity: ActorExpression;
 
@@ -135,7 +128,6 @@ export class StringAttributeOfExpression extends AbstractStringExpression {
 }
 
 export class ResourceAttributeOfExpression extends AbstractStringExpression {
-
     private readonly _attribute: StringExpression;
     private readonly _ofResource: Identifier;
 
@@ -154,16 +146,16 @@ export class ResourceAttributeOfExpression extends AbstractStringExpression {
     }
 }
 
-export class JoinStringsExpression extends BinaryExpression<StringExpression, StringExpression> implements StringExpression {
-
+export class JoinStringsExpression
+    extends BinaryExpression<StringExpression, StringExpression>
+    implements StringExpression
+{
     constructor(op1: StringExpression, op2: StringExpression) {
         super(StringType.instance(), op1, op2);
     }
-
 }
 
 export class IthLetterOfStringExpression extends AbstractStringExpression {
-
     private readonly _index: NumberExpression;
     private readonly _strExpr: StringExpression;
 
@@ -183,7 +175,6 @@ export class IthLetterOfStringExpression extends AbstractStringExpression {
 }
 
 export class IthStringItemOfExpression extends AbstractStringExpression {
-
     private readonly _index: NumberExpression;
     private readonly _ofVariable: VariableWithDataLocation;
 
@@ -201,4 +192,3 @@ export class IthStringItemOfExpression extends AbstractStringExpression {
         return this._ofVariable;
     }
 }
-

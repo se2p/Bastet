@@ -23,24 +23,28 @@
  *
  */
 
-import {ImplementMeException} from "../core/exceptions/ImplementMeException";
-import {Preconditions} from "./Preconditions";
+import { Preconditions } from './Preconditions';
 
-import {NodeSystemLayer} from "./SystemLayer";
-import * as _ from "lodash";
+import { NodeSystemLayer } from './SystemLayer';
+import * as _ from 'lodash';
 
-export function mergeConfigFilesToJson(files: string[]): {} {
-    let result: {} = {};
-    for (const f of files) {
-        const sl = new NodeSystemLayer();
-        const j: {} = sl.readFileAsJson(f);
-        result = _.merge(result, j);
+/**
+ * @returns the contents of the given JSON files, merged.
+ */
+export function loadJsonFilesMerged(filePaths: string[]): {} {
+    const systemLayer = new NodeSystemLayer();
+    let result = {};
+    for (const filePath of filePaths) {
+        const jsonData = systemLayer.readFileAsJson(filePath);
+        result = _.merge(result, jsonData);
     }
     return result;
 }
 
+/**
+ * The configuration of the analysis framework as typed string-to-value mapping.
+ */
 export class BastetConfiguration {
-
     private readonly dict: {};
 
     private readonly scope: string[];
@@ -48,10 +52,6 @@ export class BastetConfiguration {
     constructor(dict: {}, scope: string[]) {
         this.dict = Preconditions.checkNotUndefined(dict);
         this.scope = Preconditions.checkNotUndefined(scope);
-    }
-
-    public static loadFromFile(filename: string): BastetConfiguration {
-        throw new ImplementMeException();
     }
 
     public getProperty(name: string, def?: any): any {
@@ -89,5 +89,4 @@ export class BastetConfiguration {
     public getNumberListProperty(name: string, def?: number[]): number[] {
         return this.getProperty(name, def) as number[];
     }
-
 }

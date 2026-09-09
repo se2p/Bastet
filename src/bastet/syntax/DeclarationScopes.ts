@@ -23,42 +23,39 @@
  *
  */
 
-import {VariableDeclaration} from "./ast/core/statements/DeclarationStatement";
-import {Identifier} from "./ast/core/Identifier";
-import {ScratchType} from "./ast/core/ScratchType";
-import {IllegalArgumentException} from "../core/exceptions/IllegalArgumentException";
-import {Preconditions} from "../utils/Preconditions";
-import {MethodSignature} from "./ast/core/MethodDefinition";
-import {VariableWithDataLocation} from "./ast/core/Variable";
-import {DataLocation, DataLocations, VAR_SCOPING_SPLITTER} from "./app/controlflow/DataLocation";
-import {List as ImmList} from "immutable";
-import {ImplementMeException} from "../core/exceptions/ImplementMeException";
-import {IllegalStateException} from "../core/exceptions/IllegalStateException";
+import { VariableDeclaration } from './ast/core/statements/DeclarationStatement';
+import { Identifier } from './ast/core/Identifier';
+import { ScratchType } from './ast/core/ScratchType';
+import { IllegalArgumentException } from '../core/exceptions/IllegalArgumentException';
+import { Preconditions } from '../utils/Preconditions';
+import { MethodSignature } from './ast/core/MethodDefinition';
+import { VariableWithDataLocation } from './ast/core/Variable';
+import { DataLocation, DataLocations, VAR_SCOPING_SPLITTER } from './app/controlflow/DataLocation';
+import { List as ImmList } from 'immutable';
+import { ImplementMeException } from '../core/exceptions/ImplementMeException';
+import { IllegalStateException } from '../core/exceptions/IllegalStateException';
 
 export enum DeclarationScopeType {
     UNDECLARED,
     SYSTEM,
     ACTOR,
-    METHOD
+    METHOD,
 }
 
 export interface TypeInformationProvider {
-
     getDeclarationScope(usageScope: ImmList<string>, dataLocation: DataLocation): DeclarationScopeType;
 
     reduceToDeclarationScope(usageScope: ImmList<string>, dataLocation: DataLocation): ImmList<string>;
-
 }
 
 export abstract class ScopeTreeNode<T extends ScopeTreeNode<any>> {
-
     private readonly _parentScope: T;
 
     private readonly _scopeLevelName: string;
 
     private readonly _scopeType: DeclarationScopeType;
 
-    private readonly _childs: {[id: string]: T};
+    private readonly _childs: { [id: string]: T };
 
     constructor(parentScope: T, scopeLevelName: string, scopeType: DeclarationScopeType) {
         this._parentScope = parentScope;
@@ -111,10 +108,9 @@ export abstract class ScopeTreeNode<T extends ScopeTreeNode<any>> {
 }
 
 export class ScopeTypeInformation extends ScopeTreeNode<ScopeTypeInformation> {
+    private readonly _variables: { [id: string]: VariableDeclaration };
 
-    private readonly _variables: {[id: string]: VariableDeclaration};
-
-    private readonly _methods: {[id: string]: MethodSignature};
+    private readonly _methods: { [id: string]: MethodSignature };
 
     constructor(parent: ScopeTypeInformation, scopeLevelName: string, scopeType: DeclarationScopeType) {
         super(parent, scopeLevelName, scopeType);
@@ -126,7 +122,7 @@ export class ScopeTypeInformation extends ScopeTreeNode<ScopeTypeInformation> {
         this._variables[v.identifier.text] = v;
     }
 
-    get variables(): {[id: string]: VariableDeclaration} {
+    get variables(): { [id: string]: VariableDeclaration } {
         return this._variables;
     }
 
@@ -144,7 +140,7 @@ export class ScopeTypeInformation extends ScopeTreeNode<ScopeTypeInformation> {
             if (this.hasParent()) {
                 return this.parentScope.getMethodSignature(ident);
             } else {
-                throw new IllegalArgumentException("No method signature for the given identifier: " + ident.text);
+                throw new IllegalArgumentException('No method signature for the given identifier: ' + ident.text);
             }
         }
         return result;
@@ -154,7 +150,7 @@ export class ScopeTypeInformation extends ScopeTreeNode<ScopeTypeInformation> {
         return this.beginScope(ident, DeclarationScopeType.METHOD);
     }
 
-    get methods(): {[id: string]: MethodSignature} {
+    get methods(): { [id: string]: MethodSignature } {
         return this._methods;
     }
 
@@ -173,7 +169,9 @@ export class ScopeTypeInformation extends ScopeTreeNode<ScopeTypeInformation> {
             if (this.hasParent()) {
                 return this.parentScope.getTypeOf(ident);
             } else {
-                throw new IllegalArgumentException(`Variable "${ident.text}" and it's type are unknown. Declaration missing?`);
+                throw new IllegalArgumentException(
+                    `Variable "${ident.text}" and it's type are unknown. Declaration missing?`
+                );
             }
         }
 
@@ -235,15 +233,13 @@ export class ScopeTypeInformation extends ScopeTreeNode<ScopeTypeInformation> {
             this.findChild(c).dump();
         }
     }
-
 }
 
 export class TypeInformationStorage implements TypeInformationProvider {
-
     private readonly _systemScope: ScopeTypeInformation;
 
     constructor() {
-        this._systemScope =  new ScopeTypeInformation(null, "system", DeclarationScopeType.SYSTEM);
+        this._systemScope = new ScopeTypeInformation(null, 'system', DeclarationScopeType.SYSTEM);
     }
 
     public addAllFrom(infos: TypeInformationStorage) {
@@ -278,8 +274,8 @@ export class TypeInformationStorage implements TypeInformationProvider {
     }
 
     reduceToDeclarationScope(usageScope: ImmList<string>, dataLocation: DataLocation): ImmList<string> {
-        Preconditions.checkArgument(usageScope.size > 0, "At least the ACTOR must be given");
-        Preconditions.checkArgument(usageScope.size < 3, "The active scope most consist at most of ACTOR+METHOD");
+        Preconditions.checkArgument(usageScope.size > 0, 'At least the ACTOR must be given');
+        Preconditions.checkArgument(usageScope.size < 3, 'The active scope most consist at most of ACTOR+METHOD');
 
         let systemScopeType: ScratchType;
         let actorScopeType: ScratchType;
@@ -302,15 +298,14 @@ export class TypeInformationStorage implements TypeInformationProvider {
 
         if (methodScopeType) {
             return usageScope.slice(0, 2);
-
         } else if (actorScopeType) {
             return usageScope.slice(0, 1);
-
         } else if (systemScopeType) {
             return usageScope.slice(0, 0);
-
         } else {
-            throw new IllegalArgumentException(`Type of entity ${ident.text} is not declared. Make sure to register the variable in the TypeStorage.`);
+            throw new IllegalArgumentException(
+                `Type of entity ${ident.text} is not declared. Make sure to register the variable in the TypeStorage.`
+            );
         }
     }
 
@@ -333,19 +328,16 @@ export class TypeInformationStorage implements TypeInformationProvider {
         if (splitted.length == 1) {
             // var1
             return this._systemScope;
-
         } else if (splitted.length == 2) {
             // var1@Actor1
             const actorId = splitted[1];
             return this._systemScope.getChildScope(actorId, DeclarationScopeType.ACTOR);
-
         } else if (splitted.length == 3) {
             // var1@method1@Actor1
             const methodId = splitted[1];
             const actorId = splitted[2];
             const actorScope = this._systemScope.getChildScope(actorId, DeclarationScopeType.ACTOR);
             return actorScope.getChildScope(methodId, DeclarationScopeType.METHOD);
-
         } else {
             throw new IllegalStateException();
         }

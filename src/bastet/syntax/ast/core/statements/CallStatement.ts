@@ -23,21 +23,24 @@
  *
  */
 
-import {Statement} from "./Statement";
-import {Identifier} from "../Identifier";
-import {ExpressionList} from "../expressions/ExpressionList";
-import {OptionalAstNode} from "../../AstNode";
-import {VariableWithDataLocation} from "../Variable";
+import { Statement } from './Statement';
+import { Identifier } from '../Identifier';
+import { ExpressionList } from '../expressions/ExpressionList';
+import { OptionalAstNode } from '../../AstNode';
+import { VariableWithDataLocation } from '../Variable';
 
 export class CallStatement extends Statement {
-
     private readonly _calledMethod: Identifier;
 
     private readonly _args: ExpressionList;
 
     private readonly _assignResultTo: OptionalAstNode<VariableWithDataLocation>;
 
-    constructor(calledMethod: Identifier, args: ExpressionList, assignResultTo: OptionalAstNode<VariableWithDataLocation>) {
+    constructor(
+        calledMethod: Identifier,
+        args: ExpressionList,
+        assignResultTo: OptionalAstNode<VariableWithDataLocation>
+    ) {
         super([calledMethod, args, assignResultTo]);
         this._calledMethod = calledMethod;
         this._args = args;

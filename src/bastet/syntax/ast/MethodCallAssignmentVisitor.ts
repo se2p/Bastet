@@ -23,10 +23,10 @@
  *
  */
 
-import {CallStatement} from "./core/statements/CallStatement";
-import {CoreVisitor} from "./CoreVisitor";
-import {AstNode} from "./AstNode";
-import {CorePrintVisitor} from "./CorePrintVisitor";
+import { CallStatement } from './core/statements/CallStatement';
+import { CoreVisitor } from './CoreVisitor';
+import { AstNode } from './AstNode';
+import { CorePrintVisitor } from './CorePrintVisitor';
 
 export interface Assignment {
     variable: string;
@@ -44,7 +44,7 @@ export class MethodCallAssignmentVisitor implements CoreVisitor<Assignment> {
             return {
                 variable: node.assignResultTo.value().accept(new CorePrintVisitor()),
                 method: node.calledMethod.text,
-                methodParameters: node.args.elements.map(element => element.accept(new CorePrintVisitor()))
+                methodParameters: node.args.elements.map((element) => element.accept(new CorePrintVisitor())),
             };
         }
 

@@ -23,18 +23,17 @@
  *
  */
 
-import {StateSet} from "../../algorithms/StateSet";
-import {GraphAbstractState} from "./GraphAbstractDomain";
-import {Preconditions} from "../../../utils/Preconditions";
-import {ProgramAnalysis, TransitionLabelProvider, TraversalOrderOperator} from "../ProgramAnalysis";
-import {ColorByActorVisitor, PaperLabelVisitor, PenSizeVisitor,} from "../StateVisitors";
-import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
-import {App} from "../../../syntax/app/App";
-import {AssumeOperation, ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {ConcreteElement} from "../../domains/ConcreteElements";
+import { StateSet } from '../../algorithms/StateSet';
+import { GraphAbstractState } from './GraphAbstractDomain';
+import { Preconditions } from '../../../utils/Preconditions';
+import { ProgramAnalysis, TransitionLabelProvider, TraversalOrderOperator } from '../ProgramAnalysis';
+import { ColorByActorVisitor, PaperLabelVisitor, PenSizeVisitor } from '../StateVisitors';
+import { CorePrintVisitor } from '../../../syntax/ast/CorePrintVisitor';
+import { App } from '../../../syntax/app/App';
+import { AssumeOperation, ProgramOperation } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { ConcreteElement } from '../../domains/ConcreteElements';
 
-export class GraphToDot  {
-
+export class GraphToDot {
     private readonly _task: App;
     private readonly _analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>;
 
@@ -46,14 +45,16 @@ export class GraphToDot  {
     private _transLabProvider: TransitionLabelProvider<GraphAbstractState>;
     private _traversalKeyProvider: TraversalOrderOperator<GraphAbstractState, GraphAbstractState>;
 
-    private _frontierIndicatorSeq: number
+    private _frontierIndicatorSeq: number;
 
-    constructor(task: App,
-                analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
-                transLabProvider: TransitionLabelProvider<GraphAbstractState>,
-                traversalKeyProvider: TraversalOrderOperator<GraphAbstractState, GraphAbstractState>,
-                reached: StateSet<GraphAbstractState>,
-                frontier: StateSet<GraphAbstractState>) {
+    constructor(
+        task: App,
+        analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
+        transLabProvider: TransitionLabelProvider<GraphAbstractState>,
+        traversalKeyProvider: TraversalOrderOperator<GraphAbstractState, GraphAbstractState>,
+        reached: StateSet<GraphAbstractState>,
+        frontier: StateSet<GraphAbstractState>
+    ) {
         this._task = Preconditions.checkNotUndefined(task);
         this._analysis = Preconditions.checkNotUndefined(analysis);
         this._transLabProvider = Preconditions.checkNotUndefined(transLabProvider);
@@ -67,25 +68,32 @@ export class GraphToDot  {
     }
 
     private writeState(e: GraphAbstractState) {
-        const stateLabel = GraphToDot.escapeForDot(e.accept(new PaperLabelVisitor(this._task))
-            + this._traversalKeyProvider.getLexiOrderKey(e).toString());
+        const stateLabel = GraphToDot.escapeForDot(
+            e.accept(new PaperLabelVisitor(this._task)) + this._traversalKeyProvider.getLexiOrderKey(e).toString()
+        );
         const stateColor = e.accept(new ColorByActorVisitor(this._task));
         const pensize = e.accept(new PenSizeVisitor(this._analysis));
-        const shape = this._analysis.target(e).length > 0? "doubleoctagon" : "box";
-        this._dot.push(`    ${e.getId()} [label="${stateLabel}" shape="${shape}" penwidth=${pensize} color="black" fillcolor="${stateColor}"];`);
+        const shape = this._analysis.target(e).length > 0 ? 'doubleoctagon' : 'box';
+        this._dot.push(
+            `    ${e.getId()} [label="${stateLabel}" shape="${shape}" penwidth=${pensize} color="black" fillcolor="${stateColor}"];`
+        );
     }
 
     private opLabel(op: ProgramOperation): string {
         const visitor = new CorePrintVisitor();
         if (op instanceof AssumeOperation) {
-            return `[ ${op.ast.accept(visitor)} ]`
+            return `[ ${op.ast.accept(visitor)} ]`;
         }
         return op.ast.accept(visitor);
     }
 
     private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
-        const transLabels = GraphToDot.escapeForDot(this._transLabProvider.getTransitionLabel(from, to)
-            .map(([ts, o]) => this.opLabel(o)).join("\n"));
+        const transLabels = GraphToDot.escapeForDot(
+            this._transLabProvider
+                .getTransitionLabel(from, to)
+                .map(([ts, o]) => this.opLabel(o))
+                .join('\n')
+        );
         this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabels}"];`);
     }
 
@@ -117,17 +125,15 @@ export class GraphToDot  {
     public writeToFile(filepath: string): void {
         this.export();
         let fs = require('fs');
-        fs.writeFileSync(filepath, `digraph ReachabilityGraph {\n`
-            + this._headerdot.join("\n")
-            + this._dot.join("\n")
-            + `\n}\n`);
+        fs.writeFileSync(
+            filepath,
+            `digraph ReachabilityGraph {\n` + this._headerdot.join('\n') + this._dot.join('\n') + `\n}\n`
+        );
     }
 
     private static escapeForDot(text: string): string {
-        const search = "\"";
-        const replacement = "\\\"";
+        const search = '"';
+        const replacement = '\\"';
         return text.replace(new RegExp(search, 'g'), replacement);
     }
-
 }
-

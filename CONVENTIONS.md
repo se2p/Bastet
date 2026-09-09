@@ -10,5 +10,4 @@ using typedoc: https://typedoc.org/guides/doccomments/
 
 ## Modules
 
--  Do not use namespaces in modules 
-
+- Do not use namespaces in modules

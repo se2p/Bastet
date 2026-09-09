@@ -1,0 +1,59 @@
+/*
+ *   BASTET Program Analysis and Verification Framework
+ *
+ *   Copyright 2019 by University of Passau (uni-passau.de)
+ *
+ *   Maintained by Andreas Stahlbauer (firstname@lastname.net),
+ *   see the file CONTRIBUTORS.md for the list of contributors.
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ *
+ */
+import { test } from 'node:test';
+import * as utils from '../bastet/procedures/analyses/data/TestUtils';
+import path from 'path';
+
+const predicateConfig = path.join(__dirname, '../../config/predicate-abstraction.json');
+const ciConfig = path.join(__dirname, '../../config/ci.delta.json');
+const defaultConfig = path.join(__dirname, '../../config/default.json');
+const minimalMotionLibrary = path.join(__dirname, '../programs/library-coverage/motion/minimal-library.sc');
+
+test('Test pointTowards 1 safe', { timeout: utils.timeout }, async () => {
+    const fixtureRelPath: string = 'test/programs/library-coverage/motion/motion-pointTowards-1_SAFE.sc';
+    await utils.execFixture(fixtureRelPath);
+});
+
+test('Test pointTowards 1 unsafe', { timeout: utils.timeout }, async () => {
+    const fixtureRelPath: string = 'test/programs/library-coverage/motion/motion-pointTowards-1_UNSAFE.sc';
+    await utils.execFixture(fixtureRelPath, [defaultConfig, ciConfig], minimalMotionLibrary);
+});
+
+test('Test pointTowardsPos 1 safe', { timeout: utils.timeout }, async () => {
+    const fixtureRelPath: string = 'test/programs/library-coverage/motion/motion-pointTowardsPos-1_SAFE.sc';
+    await utils.execFixture(fixtureRelPath);
+});
+
+test('Test pointTowardsPos 1 unsafe', { timeout: utils.timeout }, async () => {
+    const fixtureRelPath: string = 'test/programs/library-coverage/motion/motion-pointTowardsPos-1_UNSAFE.sc';
+    await utils.execFixture(fixtureRelPath);
+});
+
+test('Test moveSteps 1 safe', { timeout: utils.timeout }, async () => {
+    const fixtureRelPath: string = 'test/programs/library-coverage/motion/motion-moveSteps-1_SAFE.sc';
+    await utils.execFixture(fixtureRelPath);
+});
+
+test('Test moveSteps 1 unsafe', { timeout: utils.timeout }, async () => {
+    const fixtureRelPath: string = 'test/programs/library-coverage/motion/motion-moveSteps-1_UNSAFE.sc';
+    await utils.execFixture(fixtureRelPath);
+});

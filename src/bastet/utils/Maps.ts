@@ -23,17 +23,16 @@
  *
  */
 
-import {WithIdent} from "./WithIdent";
-import {ImmutableMap} from "./ImmutableMap";
-import {IllegalArgumentException} from "../core/exceptions/IllegalArgumentException";
+import { WithIdent } from './WithIdent';
+import { ImmutableMap } from './ImmutableMap';
+import { IllegalArgumentException } from '../core/exceptions/IllegalArgumentException';
 
 export class Maps {
-
     /**
      * @returns the values of the map `inputMap`
      */
-    public static values<T>(inputMap: { [id: string] : T; }) : T[] {
-        return Object.keys(inputMap).map(k => inputMap[k]);
+    public static values<T>(inputMap: { [id: string]: T }): T[] {
+        return Object.keys(inputMap).map((k) => inputMap[k]);
     }
 
     /**
@@ -46,8 +45,8 @@ export class Maps {
      *
      * @param elements
      */
-    public static createMap<T extends WithIdent> (elements: T[]): { [id: string] : T; } {
-        let result : { [id: string] : T; } = {};
+    public static createMap<T extends WithIdent>(elements: T[]): { [id: string]: T } {
+        let result: { [id: string]: T } = {};
         for (let e of elements) {
             result[e.ident] = e;
         }
@@ -63,26 +62,26 @@ export class Maps {
      * @param map2
      * @returns the merged map
      */
-    public static mergeMaps<V> (map1: { [id: string] : V; }, map2: { [id: string] : V; }): { [id: string] : V; } {
-        let result : { [id: string] : V; } = {};
+    public static mergeMaps<V>(map1: { [id: string]: V }, map2: { [id: string]: V }): { [id: string]: V } {
+        let result: { [id: string]: V } = {};
         for (let key in map1) {
             result[key] = map1[key];
         }
         for (let key in map2) {
             if (result[key]) {
-                throw new IllegalArgumentException("Merge only supports unique entries!");
+                throw new IllegalArgumentException('Merge only supports unique entries!');
             }
             result[key] = map2[key];
         }
         return result;
     }
 
-    public static mergeImmutableMaps<K,V> (map1: ImmutableMap<K, V>, map2: ImmutableMap<K, V>): ImmutableMap<K, V> {
+    public static mergeImmutableMaps<K, V>(map1: ImmutableMap<K, V>, map2: ImmutableMap<K, V>): ImmutableMap<K, V> {
         let result = new Map<K, V>(map1.entries());
 
-        map2.forEach((v,k) => {
+        map2.forEach((v, k) => {
             if (result.has(k)) {
-                throw new IllegalArgumentException("Merge only supports unique entries!");
+                throw new IllegalArgumentException('Merge only supports unique entries!');
             }
             result.set(k, map2.get(k));
         });
@@ -95,7 +94,7 @@ export class Maps {
      *
      * @param The dictionary to create the map from.
      */
-    static immutableCopyOf<V>(map: {[id: string]: V}): ImmutableMap<string, V> {
+    static immutableCopyOf<V>(map: { [id: string]: V }): ImmutableMap<string, V> {
         return ImmutableMap.copyOfStringMap(map);
     }
 }

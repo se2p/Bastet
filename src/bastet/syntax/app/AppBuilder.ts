@@ -23,51 +23,50 @@
  *
  */
 
-import {Actor, ActorMap, Actors} from "./Actor";
-import {App} from "./App";
-import {AppResource, AppResourceMap} from "./AppResource";
-import {Script} from "./controlflow/Script";
-import {DataLocations} from "./controlflow/DataLocation";
-import {ScratchType} from "../ast/core/ScratchType";
-import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
-import {TransitionRelation, TransitionRelations} from "./controlflow/TransitionRelation";
-import {AstNode, OptionalAstNode} from "../ast/AstNode";
-import {Preconditions} from "../../utils/Preconditions";
-import {ProgramDefinition} from "../ast/core/ModuleDefinition";
-import {ActorDefinition, ConcreteActorMode} from "../ast/core/ActorDefinition";
+import { Actor, ActorMap, Actors } from './Actor';
+import { App } from './App';
+import { AppResource, AppResourceMap } from './AppResource';
+import { Script } from './controlflow/Script';
+import { DataLocations } from './controlflow/DataLocation';
+import { ScratchType } from '../ast/core/ScratchType';
+import { RelationBuildingVisitor } from './controlflow/RelationBuildingVisitor';
+import { TransitionRelation, TransitionRelations } from './controlflow/TransitionRelation';
+import { AstNode, OptionalAstNode } from '../ast/AstNode';
+import { Preconditions } from '../../utils/Preconditions';
+import { ProgramDefinition } from '../ast/core/ModuleDefinition';
+import { ActorDefinition, ConcreteActorMode } from '../ast/core/ActorDefinition';
 import {
     AfterBootstrapMonitoringEvent,
     AfterStatementMonitoringEvent,
     BootstrapEvent,
-    CoreEvent
-} from "../ast/core/CoreEvent";
-import {ScriptDefinition, ScriptDefinitionList} from "../ast/core/ScriptDefinition";
+    CoreEvent,
+} from '../ast/core/CoreEvent';
+import { ScriptDefinition, ScriptDefinitionList } from '../ast/core/ScriptDefinition';
 import {
     MethodDefinition,
     MethodDefinitionList,
     MethodDefinitionMap,
     MethodSignatureList,
-    MethodSignatureMap
-} from "../ast/core/MethodDefinition";
-import {ResourceDefinitionList} from "../ast/core/ResourceDefinition";
-import {StatementList} from "../ast/core/statements/Statement";
-import {IllegalStateException} from "../../core/exceptions/IllegalStateException";
-import {Maps} from "../../utils/Maps";
-import {Lists} from "../../utils/Lists";
-import {Method} from "./controlflow/Method";
-import {DeclareStackVariableStatement} from "../ast/core/statements/DeclarationStatement";
-import {Identifier} from "../ast/core/Identifier";
-import {VariableWithDataLocation} from "../ast/core/Variable";
-import {ReturnStatement} from "../ast/core/statements/ControlStatement";
-import {TypeInformationStorage} from "../DeclarationScopes";
-import {Concern, Concerns} from "../Concern";
-import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
-import {ImmutableMap} from "../../utils/ImmutableMap";
-import {ImmutableList} from "../../utils/ImmutableList";
-import {CallStatement} from "../ast/core/statements/CallStatement";
+    MethodSignatureMap,
+} from '../ast/core/MethodDefinition';
+import { ResourceDefinitionList } from '../ast/core/ResourceDefinition';
+import { StatementList } from '../ast/core/statements/Statement';
+import { IllegalStateException } from '../../core/exceptions/IllegalStateException';
+import { Maps } from '../../utils/Maps';
+import { Lists } from '../../utils/Lists';
+import { Method } from './controlflow/Method';
+import { DeclareStackVariableStatement } from '../ast/core/statements/DeclarationStatement';
+import { Identifier } from '../ast/core/Identifier';
+import { VariableWithDataLocation } from '../ast/core/Variable';
+import { ReturnStatement } from '../ast/core/statements/ControlStatement';
+import { TypeInformationStorage } from '../DeclarationScopes';
+import { Concern, Concerns } from '../Concern';
+import { ProgramOperation } from './controlflow/ops/ProgramOperation';
+import { ImmutableMap } from '../../utils/ImmutableMap';
+import { ImmutableList } from '../../utils/ImmutableList';
+import { CallStatement } from '../ast/core/statements/CallStatement';
 
 export class AppBuilder {
-
     private readonly _library: App;
     private _knownActors: ActorMap;
 
@@ -87,9 +86,7 @@ export class AppBuilder {
      * @param ast: The syntax tree.
      * @param actorNamePrefix: A prefix to add to the name of all actors.
      */
-    public buildFromSyntaxTree(programOrigin: string, ast: AstNode,
-                               typeStorage: TypeInformationStorage): App {
-
+    public buildFromSyntaxTree(programOrigin: string, ast: AstNode, typeStorage: TypeInformationStorage): App {
         Preconditions.checkArgument(ast instanceof ProgramDefinition);
         const programNode: ProgramDefinition = ast as ProgramDefinition;
         const actorMap: ActorMap = this.buildActors(programNode);
@@ -114,17 +111,19 @@ export class AppBuilder {
                 for (const [from, opid, to] of m.transitions.transitions) {
                     if (ProgramOperation.for(opid).ast instanceof DeclareStackVariableStatement) {
                         const decl = ProgramOperation.for(opid).ast as DeclareStackVariableStatement;
-                        app.typeStorage.beginActorScope(a.ident).beginMethodScope(m.ident.text).putTypeInformation(decl.identifier, decl.variableType);
+                        app.typeStorage
+                            .beginActorScope(a.ident)
+                            .beginMethodScope(m.ident.text)
+                            .putTypeInformation(decl.identifier, decl.variableType);
                     }
                 }
             }
         }
-
     }
 
     private buildActors(programAST: ProgramDefinition): ActorMap {
         let result: ActorMap = {};
-        const actorDefinitions : ActorDefinition[] = programAST.actors.elements;
+        const actorDefinitions: ActorDefinition[] = programAST.actors.elements;
 
         for (let actorDefinition of actorDefinitions) {
             const actor: Actor = this.buildActor(actorDefinition);
@@ -166,15 +165,29 @@ export class AppBuilder {
             inheritsFromActors.push(a);
         }
 
-        return new Actor(actorDefinition.mode, actorName, inheritsFromActors, [],
-            concern, resources, methodDefs, externalMethodSigs, scripts, methods);
+        return new Actor(
+            actorDefinition.mode,
+            actorName,
+            inheritsFromActors,
+            [],
+            concern,
+            resources,
+            methodDefs,
+            externalMethodSigs,
+            scripts,
+            methods
+        );
     }
 
     private determineConcern(actorDef: ActorDefinition): Concern {
         Preconditions.checkNotUndefined(actorDef);
 
-        const isSpecificationActor = actorDef.scriptList.elements.find((sd) => sd.event instanceof AfterStatementMonitoringEvent
-            || sd.event instanceof AfterBootstrapMonitoringEvent) != null;
+        const isSpecificationActor =
+            actorDef.scriptList.elements.find(
+                (sd) =>
+                    sd.event instanceof AfterStatementMonitoringEvent ||
+                    sd.event instanceof AfterBootstrapMonitoringEvent
+            ) != null;
 
         if (isSpecificationActor) {
             return Concerns.defaultSpecificationConcern();
@@ -198,7 +211,8 @@ export class AppBuilder {
                 const resultVarIdent: Identifier = m.returns.ident;
                 const resultVarType: ScratchType = m.returns.type;
                 const resultVar: VariableWithDataLocation = new VariableWithDataLocation(
-                    DataLocations.createTypedLocation(resultVarIdent, resultVarType));
+                    DataLocations.createTypedLocation(resultVarIdent, resultVarType)
+                );
                 const declarationStmt = new DeclareStackVariableStatement(resultVar);
                 const dclStmtList = StatementList.from([declarationStmt]);
                 resultVariable = OptionalAstNode.with(resultVar);
@@ -239,11 +253,11 @@ export class AppBuilder {
             const event = script.event;
             const visitor = new RelationBuildingVisitor();
             const transRelation = TransitionRelations.named(
-                TransitionRelations.establishAnalysisInvariants(
-                    script.stmtList.accept(visitor)), scriptId.text);
+                TransitionRelations.establishAnalysisInvariants(script.stmtList.accept(visitor)),
+                scriptId.text
+            );
 
-            result.push(new Script(scriptId, event,
-                this.shouldRestartOnEvent(script, event), transRelation));
+            result.push(new Script(scriptId, event, this.shouldRestartOnEvent(script, event), transRelation));
         }
 
         return result;
@@ -269,8 +283,12 @@ export class AppBuilder {
         return result;
     }
 
-    private buildInitScript(actorName: string, resourceListContext: ResourceDefinitionList, declarationStmtList: StatementList,
-                                   stmtList: StatementList): Script {
+    private buildInitScript(
+        actorName: string,
+        resourceListContext: ResourceDefinitionList,
+        declarationStmtList: StatementList,
+        stmtList: StatementList
+    ): Script {
         const visitor = new RelationBuildingVisitor();
 
         let transrelRes: TransitionRelation;
@@ -286,10 +304,10 @@ export class AppBuilder {
         const transrelLocs: TransitionRelation = declarationStmtList.accept(visitor);
         const transrelSet: TransitionRelation = stmtList.accept(visitor);
         const compundTransRel = TransitionRelations.establishAnalysisInvariants(
-            TransitionRelations.concat(transrelRes,
-                TransitionRelations.concat(transrelLocs, transrelSet)));
+            TransitionRelations.concat(transrelRes, TransitionRelations.concat(transrelLocs, transrelSet))
+        );
 
-        const scriptId = Identifier.freshWithPrefix("init_" + actorName);
+        const scriptId = Identifier.freshWithPrefix('init_' + actorName);
         return new Script(scriptId, BootstrapEvent.instance(), false, compundTransRel);
     }
 
@@ -320,7 +338,7 @@ export class AppBuilder {
             const work = worklist.pop();
             result = this.concatActors(result, work);
             if (handled.has(work.ident)) {
-                throw new IllegalStateException("Cycle in the inheritance relation?");
+                throw new IllegalStateException('Cycle in the inheritance relation?');
             } else {
                 handled.add(work.ident);
                 for (const copyFrom of work.inheritFrom) {
@@ -342,27 +360,29 @@ export class AppBuilder {
         //      inheriting actors?
         const resources = Maps.mergeImmutableMaps(dominating.resourceMap, secondary.resourceMap);
 
-        const methodDefMap: Map<string, MethodDefinition> = new Map()
-        dominating.methodMap.forEach((v,k) => {
-           methodDefMap.set(k, v)
+        const methodDefMap: Map<string, MethodDefinition> = new Map();
+        dominating.methodMap.forEach((v, k) => {
+            methodDefMap.set(k, v);
         });
-        secondary.methodMap.forEach((v,k) => {
+        secondary.methodMap.forEach((v, k) => {
             if (!methodDefMap.has(k)) {
-                methodDefMap.set(k, v)
+                methodDefMap.set(k, v);
             }
         });
-        const methodDefinitions: ImmutableMap<string, MethodDefinition> = new ImmutableMap<string, MethodDefinition>(methodDefMap.entries())
+        const methodDefinitions: ImmutableMap<string, MethodDefinition> = new ImmutableMap<string, MethodDefinition>(
+            methodDefMap.entries()
+        );
 
         let methodMap: Map<string, Method> = new Map<string, Method>();
         for (let method of dominating.methods) {
-            methodMap.set(method.ident.text, method)
+            methodMap.set(method.ident.text, method);
         }
         for (let method of secondary.methods) {
             if (!methodMap.has(method.ident.text)) {
-                methodMap.set(method.ident.text,method)
+                methodMap.set(method.ident.text, method);
             }
         }
-        const methods = new ImmutableList(Array.from(methodMap.values()))
+        const methods = new ImmutableList(Array.from(methodMap.values()));
         const externalMethods = Maps.mergeImmutableMaps(dominating.externalMethodMap, secondary.externalMethodMap);
         const scripts = Lists.concatImmutableLists(secondary.scripts, dominating.scripts); // first execute the old scripts, then the new ones (since the old might contain initializers)
 
@@ -373,17 +393,24 @@ export class AppBuilder {
             concern = Concerns.defaultSpecificationConcern();
         }
 
-        return new Actor(dominating.actorMode, dominating.ident, [], [secondary].concat(Array.from(secondary.dissolvedFrom)),
-            concern, resources.createMutable(),
-            methodDefinitions.createMutable(), externalMethods.createMutable(),
-            scripts.createMutable(), methods.createMutable());
+        return new Actor(
+            dominating.actorMode,
+            dominating.ident,
+            [],
+            [secondary].concat(Array.from(secondary.dissolvedFrom)),
+            concern,
+            resources.createMutable(),
+            methodDefinitions.createMutable(),
+            externalMethods.createMutable(),
+            scripts.createMutable(),
+            methods.createMutable()
+        );
     }
 
     public static dissolveInheritance(taskModel: App): App {
         const ab = new AppBuilder(App.empty());
 
-        const concreteActors: Actor[] = taskModel
-            .actors.filter((a) => a.actorMode == ConcreteActorMode.instance());
+        const concreteActors: Actor[] = taskModel.actors.filter((a) => a.actorMode == ConcreteActorMode.instance());
 
         const flatActors: ActorMap = {};
         for (const a of concreteActors) {
@@ -433,7 +460,10 @@ export class AppBuilder {
                 calledMethods.add(ext);
             }
 
-            Preconditions.checkNotUndefined(actor.inheritFrom.length == 0, "Please dissolve the inheritance relation before!");
+            Preconditions.checkNotUndefined(
+                actor.inheritFrom.length == 0,
+                'Please dissolve the inheritance relation before!'
+            );
             for (const script of actor.scripts) {
                 collectFromTransitions(script.transitions);
             }
@@ -453,9 +483,18 @@ export class AppBuilder {
                 }
             }
 
-            const actorPrime = new Actor(actor.actorMode, actor.ident, actor.inheritFrom.createMutable(),
-                actor.dissolvedFrom.createMutable(), actor.concern, actor.resourceMap.createMutable(),
-                methodDefsPrime, actor.externalMethodMap.createMutable(), actor.scripts.createMutable(), methodsPrime);
+            const actorPrime = new Actor(
+                actor.actorMode,
+                actor.ident,
+                actor.inheritFrom.createMutable(),
+                actor.dissolvedFrom.createMutable(),
+                actor.concern,
+                actor.resourceMap.createMutable(),
+                methodDefsPrime,
+                actor.externalMethodMap.createMutable(),
+                actor.scripts.createMutable(),
+                methodsPrime
+            );
 
             actorMap[actorPrime.ident] = actorPrime;
         }
@@ -464,5 +503,4 @@ export class AppBuilder {
         this.fixTypeRegistry(result);
         return result;
     }
-
 }

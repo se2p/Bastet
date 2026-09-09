@@ -23,11 +23,10 @@
  *
  */
 
-import {Statement} from "./Statement";
-import {StringExpression} from "../expressions/StringExpression";
+import { Statement } from './Statement';
+import { StringExpression } from '../expressions/StringExpression';
 
 export class CreateCloneOfStatement extends Statement {
-
     private readonly _cloneOf: StringExpression;
 
     constructor(cloneOf: StringExpression) {

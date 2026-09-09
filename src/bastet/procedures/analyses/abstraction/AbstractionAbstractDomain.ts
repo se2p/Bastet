@@ -23,30 +23,28 @@
  *
  */
 
-import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {Record as ImmRec} from "immutable"
-import {SingletonStateWrapper} from "../AbstractStates";
-import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
-import {Preconditions} from "../../../utils/Preconditions";
-import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
-import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
+import { AbstractElement, AbstractElementVisitor, AbstractState, Lattice } from '../../../lattices/Lattice';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { Record as ImmRec } from 'immutable';
+import { SingletonStateWrapper } from '../AbstractStates';
+import { ConcreteDomain, ConcreteElement } from '../../domains/ConcreteElements';
+import { Preconditions } from '../../../utils/Preconditions';
+import { FirstOrderFormula } from '../../../utils/ConjunctiveNormalForm';
+import { FirstOrderLattice } from '../../domains/FirstOrderDomain';
 import {
     AbstractionPrecision,
     PredicatePrecisionLattice,
     PredicatePrecisionStack,
-    PredicatePrecisionStackLattice
-} from "../../AbstractionPrecision";
-import {AbstractionComputation} from "./AbstractionComputation";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {Optional} from "../../../utils/Optional";
-import {DataAbstractStates} from "../data/DataAbstractStates";
-import {getTheOnlyElement} from "../../../utils/Collections";
-import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-
+    PredicatePrecisionStackLattice,
+} from '../../AbstractionPrecision';
+import { AbstractionComputation } from './AbstractionComputation';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { Optional } from '../../../utils/Optional';
+import { DataAbstractStates } from '../data/DataAbstractStates';
+import { getTheOnlyElement } from '../../../utils/Collections';
+import { IllegalArgumentException } from '../../../core/exceptions/IllegalArgumentException';
 
 export interface AbstractionStateAttribs extends AbstractElement, SingletonStateWrapper {
-
     blockId: number;
 
     enteringSummary: FirstOrderFormula;
@@ -55,12 +53,10 @@ export interface AbstractionStateAttribs extends AbstractElement, SingletonState
 
     precision: PredicatePrecisionStack;
 
-    wideningOf: Optional<AbstractionState>
-
+    wideningOf: Optional<AbstractionState>;
 }
 
 const AbstractionStateRecord = ImmRec({
-
     blockId: 0,
 
     enteringSummary: null,
@@ -69,14 +65,24 @@ const AbstractionStateRecord = ImmRec({
 
     precision: null,
 
-    wideningOf: null
-
+    wideningOf: null,
 });
 
 export class AbstractionState extends AbstractionStateRecord implements AbstractionStateAttribs, AbstractState {
-
-    constructor(blockId: number, enteringSummary: FirstOrderFormula, wrappedState: AbstractElement, precision: PredicatePrecisionStack, wideningOf: Optional<AbstractionState>) {
-        super({blockId: blockId, enteringSummary: enteringSummary, precision: precision, wrappedState: wrappedState, wideningOf: wideningOf});
+    constructor(
+        blockId: number,
+        enteringSummary: FirstOrderFormula,
+        wrappedState: AbstractElement,
+        precision: PredicatePrecisionStack,
+        wideningOf: Optional<AbstractionState>
+    ) {
+        super({
+            blockId: blockId,
+            enteringSummary: enteringSummary,
+            precision: precision,
+            wrappedState: wrappedState,
+            wideningOf: wideningOf,
+        });
     }
 
     public getBlockId(): number {
@@ -88,27 +94,27 @@ export class AbstractionState extends AbstractionStateRecord implements Abstract
     }
 
     public getEnteringSummary(): FirstOrderFormula {
-        return this.get("enteringSummary");
+        return this.get('enteringSummary');
     }
 
     public getPrecision(): PredicatePrecisionStack {
-        return this.get("precision");
+        return this.get('precision');
     }
 
     public getWrappedState(): AbstractState {
-        return this.get("wrappedState");
+        return this.get('wrappedState');
     }
 
     public withEnteringSummary(summary: FirstOrderFormula): AbstractionState {
-        return this.set("enteringSummary", Preconditions.checkNotUndefined(summary));
+        return this.set('enteringSummary', Preconditions.checkNotUndefined(summary));
     }
 
     public withWrappedState(wrapped: AbstractElement): AbstractionState {
-        return this.set("wrappedState", Preconditions.checkNotUndefined(wrapped));
+        return this.set('wrappedState', Preconditions.checkNotUndefined(wrapped));
     }
 
     public withPrecision(prec: PredicatePrecisionStack): AbstractionState {
-        return this.set("precision", prec);
+        return this.set('precision', prec);
     }
 
     public withoutWideningOf(): AbstractionState {
@@ -131,11 +137,9 @@ export class AbstractionState extends AbstractionStateRecord implements Abstract
             return visitor.visit(this);
         }
     }
-
 }
 
 export class AbstractionStateLattice implements Lattice<AbstractionState> {
-
     private readonly _wrappedStateLattice: Lattice<AbstractElement>;
 
     private readonly _folLattice: FirstOrderLattice<FirstOrderFormula>;
@@ -150,8 +154,20 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
         this._wrappedStateLattice = Preconditions.checkNotUndefined(wrappedStateLattice);
         this._folLattice = Preconditions.checkNotUndefined(summaryLattice);
         this._precStacLattice = new PredicatePrecisionStackLattice(new PredicatePrecisionLattice(summaryLattice));
-        this._bottom = new AbstractionState(-3, this._folLattice.bottom(), wrappedStateLattice.bottom(), this._precStacLattice.bottom(), Optional.absent());
-        this._top = new AbstractionState(-2, this._folLattice.top(), wrappedStateLattice.top(), this._precStacLattice.top(), Optional.absent());
+        this._bottom = new AbstractionState(
+            -3,
+            this._folLattice.bottom(),
+            wrappedStateLattice.bottom(),
+            this._precStacLattice.bottom(),
+            Optional.absent()
+        );
+        this._top = new AbstractionState(
+            -2,
+            this._folLattice.top(),
+            wrappedStateLattice.top(),
+            this._precStacLattice.top(),
+            Optional.absent()
+        );
     }
 
     bottom(): AbstractionState {
@@ -178,8 +194,10 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
         } else {
             const blockFormula1 = getTheOnlyElement(DataAbstractStates.extractFrom(element1)).blockFormula;
             const blockFormula2 = getTheOnlyElement(DataAbstractStates.extractFrom(element2)).blockFormula;
-            return this._folLattice.isIncluded(this._folLattice.meet(element1.getEnteringSummary(), blockFormula1),
-                this._folLattice.meet(element2.getEnteringSummary(), blockFormula2));
+            return this._folLattice.isIncluded(
+                this._folLattice.meet(element1.getEnteringSummary(), blockFormula1),
+                this._folLattice.meet(element2.getEnteringSummary(), blockFormula2)
+            );
         }
     }
 
@@ -191,7 +209,7 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
         }
 
         if (element1.blockId != element2.blockId) {
-            throw new IllegalArgumentException("Join across blocks not expected.");
+            throw new IllegalArgumentException('Join across blocks not expected.');
         }
 
         if (element1.getWideningOf().isPresent() !== element2.getWideningOf().isPresent()) {
@@ -201,7 +219,9 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
         } else {
             return element1
                 .withEnteringSummary(this._folLattice.join(element1.enteringSummary, element2.enteringSummary))
-                .withWrappedState(this._wrappedStateLattice.join(element1.getWrappedState(), element2.getWrappedState()));
+                .withWrappedState(
+                    this._wrappedStateLattice.join(element1.getWrappedState(), element2.getWrappedState())
+                );
         }
     }
 
@@ -229,15 +249,17 @@ export class AbstractionStateLattice implements Lattice<AbstractionState> {
 var BLOCK_SEQ_NO = 0;
 
 export class AbstractionAbstractDomain implements AbstractDomain<ConcreteElement, AbstractionState> {
-
     private readonly _lattice: AbstractionStateLattice;
 
     private readonly _wrapped: AbstractDomain<ConcreteElement, AbstractElement>;
 
     private readonly _abstractionFunction: AbstractionComputation<AbstractionState, AbstractionPrecision>;
 
-    constructor(wrapped: AbstractDomain<ConcreteElement, AbstractElement>, summaryLattice: FirstOrderLattice<FirstOrderFormula>,
-                abstractionFunction: AbstractionComputation<AbstractionState, AbstractionPrecision>) {
+    constructor(
+        wrapped: AbstractDomain<ConcreteElement, AbstractElement>,
+        summaryLattice: FirstOrderLattice<FirstOrderFormula>,
+        abstractionFunction: AbstractionComputation<AbstractionState, AbstractionPrecision>
+    ) {
         Preconditions.checkNotUndefined(wrapped);
         this._lattice = new AbstractionStateLattice(summaryLattice, wrapped.lattice);
         this._wrapped = Preconditions.checkNotUndefined(wrapped);
@@ -307,5 +329,4 @@ export class AbstractionAbstractDomain implements AbstractDomain<ConcreteElement
 
         throw new ImplementMeException();
     }
-
 }

@@ -23,51 +23,49 @@
  *
  */
 
-
-import {LabeledTransferRelation, Transfers} from "../TransferRelation";
-import {AbstractElement} from "../../../lattices/Lattice";
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
+import { LabeledTransferRelation, Transfers } from '../TransferRelation';
+import { AbstractElement } from '../../../lattices/Lattice';
+import { IllegalStateException } from '../../../core/exceptions/IllegalStateException';
 import {
     ProgramOperation,
     ProgramOperationFactory,
-    ProgramOperationInContext
-} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {Concern, Concerns} from "../../../syntax/Concern";
-import {Preconditions} from "../../../utils/Preconditions";
-import {ProgramTimeProfile} from "../../../utils/TimeProfile";
-import {DeclareStackVariableStatement} from "../../../syntax/ast/core/statements/DeclarationStatement";
-import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
-import {Statement} from "../../../syntax/ast/core/statements/Statement";
-import {StrengtheningAssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
-import {StoreEvalResultToVariableStatement} from "../../../syntax/ast/core/statements/SetStatement";
+    ProgramOperationInContext,
+} from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { Concern, Concerns } from '../../../syntax/Concern';
+import { Preconditions } from '../../../utils/Preconditions';
+import { ProgramTimeProfile } from '../../../utils/TimeProfile';
+import { DeclareStackVariableStatement } from '../../../syntax/ast/core/statements/DeclarationStatement';
+import { VariableWithDataLocation } from '../../../syntax/ast/core/Variable';
+import { Statement } from '../../../syntax/ast/core/statements/Statement';
+import { StrengtheningAssumeStatement } from '../../../syntax/ast/core/statements/AssumeStatement';
+import { StoreEvalResultToVariableStatement } from '../../../syntax/ast/core/statements/SetStatement';
 import {
     DivideExpression,
     IntegerLiteral,
     MinusExpression,
     NumberExpression,
     NumberVariableExpression,
-    PlusExpression
-} from "../../../syntax/ast/core/expressions/NumberExpression";
+    PlusExpression,
+} from '../../../syntax/ast/core/expressions/NumberExpression';
 import {
     NumGreaterEqualExpression,
-    NumLessEqualExpression
-} from "../../../syntax/ast/core/expressions/BooleanExpression";
-import {DataLocations} from "../../../syntax/app/controlflow/DataLocation";
-import {Identifier} from "../../../syntax/ast/core/Identifier";
-import {CallStatement} from "../../../syntax/ast/core/statements/CallStatement";
-import {MethodIdentifiers} from "../../../syntax/app/controlflow/MethodIdentifiers";
-import {App} from "../../../syntax/app/App";
+    NumLessEqualExpression,
+} from '../../../syntax/ast/core/expressions/BooleanExpression';
+import { DataLocations } from '../../../syntax/app/controlflow/DataLocation';
+import { Identifier } from '../../../syntax/ast/core/Identifier';
+import { CallStatement } from '../../../syntax/ast/core/statements/CallStatement';
+import { MethodIdentifiers } from '../../../syntax/app/controlflow/MethodIdentifiers';
+import { App } from '../../../syntax/app/App';
 import {
     InitializeAnalysisStatement,
-    TerminateProgramStatement
-} from "../../../syntax/ast/core/statements/InternalStatement";
-import {IntegerType} from "../../../syntax/ast/core/ScratchType";
-import {TimeState} from "./TimeAbstractDomain";
-import {BeginAtomicStatement, EndAtomicStatement} from "../../../syntax/ast/core/statements/ControlStatement";
+    TerminateProgramStatement,
+} from '../../../syntax/ast/core/statements/InternalStatement';
+import { IntegerType } from '../../../syntax/ast/core/ScratchType';
+import { TimeState } from './TimeAbstractDomain';
+import { BeginAtomicStatement, EndAtomicStatement } from '../../../syntax/ast/core/statements/ControlStatement';
 import instantiate = WebAssembly.instantiate;
 
 class StaticTimeIntervalDefinition {
-
     private readonly _min: NumberExpression;
 
     private readonly _max: NumberExpression;
@@ -76,7 +74,12 @@ class StaticTimeIntervalDefinition {
 
     private readonly _opTimeVariable: VariableWithDataLocation;
 
-    constructor(min: NumberExpression, max: NumberExpression, opTimeVariable: VariableWithDataLocation, intervalVariable: NumberVariableExpression) {
+    constructor(
+        min: NumberExpression,
+        max: NumberExpression,
+        opTimeVariable: VariableWithDataLocation,
+        intervalVariable: NumberVariableExpression
+    ) {
         this._min = min;
         this._max = max;
         this._opTimeVariable = opTimeVariable;
@@ -101,7 +104,6 @@ class StaticTimeIntervalDefinition {
 }
 
 export class TimeTransferRelation implements LabeledTransferRelation<TimeState> {
-
     private readonly _task: App;
 
     private readonly _wrappedTransfer: LabeledTransferRelation<AbstractElement>;
@@ -120,8 +122,14 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
         this._wrappedTransfer = Preconditions.checkNotUndefined(wrappedTransfer);
 
         this._globalMicrosExpr = task.systemVariables.globalTimeMicrosVariable;
-        this._globalMillisExpr = new DivideExpression(task.systemVariables.globalTimeMicrosVariable, IntegerLiteral.of(1000));
-        this._globalSecondsExpr = new DivideExpression(task.systemVariables.globalTimeMicrosVariable, IntegerLiteral.of(1000000));
+        this._globalMillisExpr = new DivideExpression(
+            task.systemVariables.globalTimeMicrosVariable,
+            IntegerLiteral.of(1000)
+        );
+        this._globalSecondsExpr = new DivideExpression(
+            task.systemVariables.globalTimeMicrosVariable,
+            IntegerLiteral.of(1000000)
+        );
 
         this._staticIntervals = new Map();
 
@@ -131,7 +139,8 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
     private setupStaticIntervals() {
         for (const p of this._timeProfile.getStaticProfiles()) {
             const opTimeVariable: VariableWithDataLocation = new VariableWithDataLocation(
-                DataLocations.createTypedLocation(Identifier.freshWithPrefix("__op_time_"), IntegerType.instance()));
+                DataLocations.createTypedLocation(Identifier.freshWithPrefix('__op_time_'), IntegerType.instance())
+            );
             const opTimeVariableExpr: NumberVariableExpression = new NumberVariableExpression(opTimeVariable);
 
             this._task.typeStorage.getScopeOf(opTimeVariable.qualifiedName).putVariable(opTimeVariable);
@@ -140,12 +149,20 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
             const maxTimeMicrosExpr = new IntegerLiteral(Math.floor(p.nsecs.maxValue.value / 1000));
 
             const itvKey = this.intervalKey(minTimeMicrosExpr.num, maxTimeMicrosExpr.num);
-            this._staticIntervals.set(itvKey, new StaticTimeIntervalDefinition(minTimeMicrosExpr, maxTimeMicrosExpr, opTimeVariable, opTimeVariableExpr));
+            this._staticIntervals.set(
+                itvKey,
+                new StaticTimeIntervalDefinition(
+                    minTimeMicrosExpr,
+                    maxTimeMicrosExpr,
+                    opTimeVariable,
+                    opTimeVariableExpr
+                )
+            );
         }
     }
 
     abstractSucc(fromState: TimeState): Iterable<TimeState> {
-        throw new IllegalStateException("Not intended to be used.");
+        throw new IllegalStateException('Not intended to be used.');
     }
 
     abstractSuccFor(fromState: TimeState, opic: ProgramOperationInContext, co: Concern): Iterable<TimeState> {
@@ -163,13 +180,19 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
                 initStmts.push(new StrengtheningAssumeStatement(assumeTimeMax));
             }
 
-            return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(),
-                [].concat(initStmts), opic.thread, [opic.op], co).map((w) => fromState.withWrappedState(w));
+            return Transfers.withIntermediateTransfersBefore(
+                this._wrappedTransfer,
+                fromState.getWrappedState(),
+                [].concat(initStmts),
+                opic.thread,
+                [opic.op],
+                co
+            ).map((w) => fromState.withWrappedState(w));
         }
 
         let timeStatePrime = fromState;
         if (opic.op.ast instanceof BeginAtomicStatement) {
-            timeStatePrime = timeStatePrime.withPushedBlock("block");
+            timeStatePrime = timeStatePrime.withPushedBlock('block');
         } else if (opic.op.ast instanceof EndAtomicStatement) {
             timeStatePrime = timeStatePrime.withPopBlock();
         }
@@ -185,8 +208,14 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
             }
         }
 
-        return Transfers.withIntermediateTransfersBefore(this._wrappedTransfer, fromState.getWrappedState(), intermediateStatements, opic.thread, ops, co)
-            .map((w) => timeStatePrime.withWrappedState(w));
+        return Transfers.withIntermediateTransfersBefore(
+            this._wrappedTransfer,
+            fromState.getWrappedState(),
+            intermediateStatements,
+            opic.thread,
+            ops,
+            co
+        ).map((w) => timeStatePrime.withWrappedState(w));
     }
 
     private reinterprete(op: ProgramOperation): [NumberExpression, NumberExpression, ProgramOperation[]] {
@@ -194,27 +223,71 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
             if (op.ast.assignResultTo.isPresent()) {
                 const assignTo: VariableWithDataLocation = op.ast.assignResultTo.value();
                 if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_seconds) {
-                    return [IntegerLiteral.zero(), IntegerLiteral.zero(),
-                        [op, ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo, this._globalSecondsExpr))]];
-
+                    return [
+                        IntegerLiteral.zero(),
+                        IntegerLiteral.zero(),
+                        [
+                            op,
+                            ProgramOperationFactory.createFor(
+                                new StoreEvalResultToVariableStatement(assignTo, this._globalSecondsExpr)
+                            ),
+                        ],
+                    ];
                 } else if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_millis) {
-                    return [IntegerLiteral.zero(), IntegerLiteral.zero(),
-                        [op, ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo, this._globalMillisExpr))]];
-
+                    return [
+                        IntegerLiteral.zero(),
+                        IntegerLiteral.zero(),
+                        [
+                            op,
+                            ProgramOperationFactory.createFor(
+                                new StoreEvalResultToVariableStatement(assignTo, this._globalMillisExpr)
+                            ),
+                        ],
+                    ];
                 } else if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_micros) {
-                    return [IntegerLiteral.zero(), IntegerLiteral.zero(),
-                        [op, ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo, this._globalMicrosExpr))]];
-
+                    return [
+                        IntegerLiteral.zero(),
+                        IntegerLiteral.zero(),
+                        [
+                            op,
+                            ProgramOperationFactory.createFor(
+                                new StoreEvalResultToVariableStatement(assignTo, this._globalMicrosExpr)
+                            ),
+                        ],
+                    ];
                 } else if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_timerValue) {
-                    return [IntegerLiteral.zero(), IntegerLiteral.zero(),
-                        [op, ProgramOperationFactory.createFor(new StoreEvalResultToVariableStatement(assignTo,
-                            new MinusExpression(this._task.systemVariables.globalTimeMicrosVariable, this._task.systemVariables.globalTimeResetMicrosVariable)))]];
+                    return [
+                        IntegerLiteral.zero(),
+                        IntegerLiteral.zero(),
+                        [
+                            op,
+                            ProgramOperationFactory.createFor(
+                                new StoreEvalResultToVariableStatement(
+                                    assignTo,
+                                    new MinusExpression(
+                                        this._task.systemVariables.globalTimeMicrosVariable,
+                                        this._task.systemVariables.globalTimeResetMicrosVariable
+                                    )
+                                )
+                            ),
+                        ],
+                    ];
                 }
             } else {
                 if (op.ast.calledMethod.text == MethodIdentifiers._RUNTIME_resetTimer) {
-                    return [IntegerLiteral.zero(), IntegerLiteral.zero(),
-                        [op, ProgramOperationFactory.createFor(
-                            new StoreEvalResultToVariableStatement(this._task.systemVariables.globalTimeResetMicrosVariable, this._task.systemVariables.globalTimeMicrosVariable))]];
+                    return [
+                        IntegerLiteral.zero(),
+                        IntegerLiteral.zero(),
+                        [
+                            op,
+                            ProgramOperationFactory.createFor(
+                                new StoreEvalResultToVariableStatement(
+                                    this._task.systemVariables.globalTimeResetMicrosVariable,
+                                    this._task.systemVariables.globalTimeMicrosVariable
+                                )
+                            ),
+                        ],
+                    ];
                 }
             }
 
@@ -231,16 +304,17 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
             return [new IntegerLiteral(0), maxMicros];
         } else {
             const profile = this._timeProfile.getOpProfile(op);
-            return [new IntegerLiteral(Math.floor(profile.nsecs.minValue.value / 1000)),
-                new IntegerLiteral(Math.ceil(profile.nsecs.maxValue.value / 1000))];
+            return [
+                new IntegerLiteral(Math.floor(profile.nsecs.minValue.value / 1000)),
+                new IntegerLiteral(Math.ceil(profile.nsecs.maxValue.value / 1000)),
+            ];
         }
     }
 
     private isEmptyInterval(minTimeExpr: NumberExpression, maxTimeExpr: NumberExpression) {
         Preconditions.checkArgument(minTimeExpr instanceof IntegerLiteral);
         Preconditions.checkArgument(maxTimeExpr instanceof IntegerLiteral);
-        if ((minTimeExpr as IntegerLiteral).num == 0
-            && (maxTimeExpr as IntegerLiteral).num == 0) {
+        if ((minTimeExpr as IntegerLiteral).num == 0 && (maxTimeExpr as IntegerLiteral).num == 0) {
             return true;
         }
 
@@ -257,14 +331,25 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
     }
 
     private getIntermediateStatementsFor(minTimeMicrosExpr: NumberExpression, maxTimeMicrosExpr: NumberExpression) {
-        const staticKey: string = this.intervalKey((minTimeMicrosExpr as IntegerLiteral).num, (maxTimeMicrosExpr as IntegerLiteral).num);
+        const staticKey: string = this.intervalKey(
+            (minTimeMicrosExpr as IntegerLiteral).num,
+            (maxTimeMicrosExpr as IntegerLiteral).num
+        );
         const staticItv = this._staticIntervals.get(staticKey);
         if (staticItv) {
-            return [new StoreEvalResultToVariableStatement(this._task.systemVariables.globalTimeMicrosVariable,
-                    new PlusExpression(this._task.systemVariables.globalTimeMicrosVariable, staticItv.intervalVariableExpression))];
+            return [
+                new StoreEvalResultToVariableStatement(
+                    this._task.systemVariables.globalTimeMicrosVariable,
+                    new PlusExpression(
+                        this._task.systemVariables.globalTimeMicrosVariable,
+                        staticItv.intervalVariableExpression
+                    )
+                ),
+            ];
         } else {
             const opTimeVariable: VariableWithDataLocation = new VariableWithDataLocation(
-                DataLocations.createTypedLocation(Identifier.freshWithPrefix("__op_time_"), IntegerType.instance()));
+                DataLocations.createTypedLocation(Identifier.freshWithPrefix('__op_time_'), IntegerType.instance())
+            );
             const opTimeVariableExpr: NumberVariableExpression = new NumberVariableExpression(opTimeVariable);
 
             this._task.typeStorage.getScopeOf(opTimeVariable.qualifiedName).putVariable(opTimeVariable);
@@ -272,11 +357,15 @@ export class TimeTransferRelation implements LabeledTransferRelation<TimeState> 
             const assumeTimeMin = new NumGreaterEqualExpression(opTimeVariableExpr, minTimeMicrosExpr);
             const assumeTimeMax = new NumLessEqualExpression(opTimeVariableExpr, maxTimeMicrosExpr);
 
-            return [new DeclareStackVariableStatement(opTimeVariable),
+            return [
+                new DeclareStackVariableStatement(opTimeVariable),
                 new StrengtheningAssumeStatement(assumeTimeMin),
                 new StrengtheningAssumeStatement(assumeTimeMax),
-                new StoreEvalResultToVariableStatement(this._task.systemVariables.globalTimeMicrosVariable,
-                    new PlusExpression(this._task.systemVariables.globalTimeMicrosVariable, opTimeVariableExpr))];
+                new StoreEvalResultToVariableStatement(
+                    this._task.systemVariables.globalTimeMicrosVariable,
+                    new PlusExpression(this._task.systemVariables.globalTimeMicrosVariable, opTimeVariableExpr)
+                ),
+            ];
         }
     }
 }

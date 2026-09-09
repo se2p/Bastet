@@ -23,33 +23,31 @@
  *
  */
 
-import {SingletonStateWrapper} from "../AbstractStates";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
-import {List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
-import {ActorId} from "../../../syntax/app/Actor";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {ConcreteDomain, ConcreteElement, ConcreteUnifiedMemory} from '../../domains/ConcreteElements'
-import {App} from "../../../syntax/app/App";
-import {AfterStatementMonitoringEvent, SingularityEvent, TerminationEvent} from "../../../syntax/ast/core/CoreEvent";
-import {Property} from "../../../syntax/Property";
-import {Preconditions} from "../../../utils/Preconditions";
-import {DataLocation, DataLocations, VAR_SCOPING_SPLITTER} from "../../../syntax/app/controlflow/DataLocation";
-import {ActorType} from "../../../syntax/ast/core/ScratchType";
-import {Identifier} from "../../../syntax/ast/core/Identifier";
-import {AbstractionPrecision} from "../../AbstractionPrecision";
+import { SingletonStateWrapper } from '../AbstractStates';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { AbstractElement, AbstractElementVisitor, AbstractState, Lattice } from '../../../lattices/Lattice';
+import { List as ImmList, Map as ImmMap, Record as ImmRec, Set as ImmSet } from 'immutable';
+import { ActorId } from '../../../syntax/app/Actor';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { ConcreteDomain, ConcreteElement, ConcreteUnifiedMemory } from '../../domains/ConcreteElements';
+import { App } from '../../../syntax/app/App';
+import { AfterStatementMonitoringEvent, SingularityEvent, TerminationEvent } from '../../../syntax/ast/core/CoreEvent';
+import { Property } from '../../../syntax/Property';
+import { Preconditions } from '../../../utils/Preconditions';
+import { DataLocation, DataLocations, VAR_SCOPING_SPLITTER } from '../../../syntax/app/controlflow/DataLocation';
+import { ActorType } from '../../../syntax/ast/core/ScratchType';
+import { Identifier } from '../../../syntax/ast/core/Identifier';
+import { AbstractionPrecision } from '../../AbstractionPrecision';
 import {
     ConcreteProgramState,
     RelationLocation,
     ThreadComputationState,
     ThreadId,
     ThreadState,
-    ThreadStateFactory
-} from "./ConcreteProgramState";
-
+    ThreadStateFactory,
+} from './ConcreteProgramState';
 
 export interface ControlAbstractStateAttributes extends AbstractElement, SingletonStateWrapper {
-
     /** Set of properties for that the abstract state is a target state (computed, for faster lookup) */
     isTargetFor: ImmSet<Property>;
 
@@ -73,11 +71,9 @@ export interface ControlAbstractStateAttributes extends AbstractElement, Singlet
 
     /** Actor scopes */
     actorScopes: ImmMap<DataLocation, ActorId>;
-
 }
 
 const ControlAbstractStateRecord = ImmRec({
-
     threadStates: ImmList<ThreadState>([]),
 
     conditionStates: ImmList<ThreadState>([]),
@@ -91,11 +87,9 @@ const ControlAbstractStateRecord = ImmRec({
     actorScopes: ImmMap<DataLocation, ActorId>(),
 
     isTargetFor: ImmSet<Property>(),
-
 });
 
 export class IndexedThread {
-
     private readonly _threadStatus: ThreadState;
 
     private readonly _threadIndex: number;
@@ -112,22 +106,30 @@ export class IndexedThread {
     get threadIndex(): number {
         return this._threadIndex;
     }
-
 }
 
 /**
  * A state with SHARED MEMORY
  */
 export class ControlAbstractState extends ControlAbstractStateRecord implements AbstractState {
-
-    constructor(threadStates: ImmList<ThreadState>, conditionStates: ImmList<ThreadState>,
-                wrappedState: AbstractElement, isTargetFor: ImmSet<Property>,
-                steppedThreadIndices: ImmSet<number>, lastSteppedNonObserverThreadIndices: ImmSet<number>,
-                actorScopes: ImmMap<DataLocation, ActorId>) {
-        super({threadStates: threadStates, conditionStates: conditionStates, wrappedState: wrappedState,
+    constructor(
+        threadStates: ImmList<ThreadState>,
+        conditionStates: ImmList<ThreadState>,
+        wrappedState: AbstractElement,
+        isTargetFor: ImmSet<Property>,
+        steppedThreadIndices: ImmSet<number>,
+        lastSteppedNonObserverThreadIndices: ImmSet<number>,
+        actorScopes: ImmMap<DataLocation, ActorId>
+    ) {
+        super({
+            threadStates: threadStates,
+            conditionStates: conditionStates,
+            wrappedState: wrappedState,
             isTargetFor: isTargetFor,
-            steppedThreadIndices: steppedThreadIndices, lastSteppedNonObserverThreadIndices: lastSteppedNonObserverThreadIndices,
-            actorScopes: actorScopes});
+            steppedThreadIndices: steppedThreadIndices,
+            lastSteppedNonObserverThreadIndices: lastSteppedNonObserverThreadIndices,
+            actorScopes: actorScopes,
+        });
     }
 
     public getIndexedThreadState(atIndex: number): IndexedThread {
@@ -145,27 +147,27 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
     }
 
     public getThreadStates(): ImmList<ThreadState> {
-        return this.get("threadStates");
+        return this.get('threadStates');
     }
 
     public getConditionStates(): ImmList<ThreadState> {
-        return this.get("conditionStates");
+        return this.get('conditionStates');
     }
 
     public getWrappedState(): AbstractState {
-        return this.get("wrappedState");
+        return this.get('wrappedState');
     }
 
     public getIsTargetFor(): ImmSet<Property> {
-        return this.get("isTargetFor");
+        return this.get('isTargetFor');
     }
 
     public getSteppedFor(): ImmSet<number> {
-        return this.get("steppedThreadIndices");
+        return this.get('steppedThreadIndices');
     }
 
     public getLastSteppedNonObserverThreadIndices(): ImmSet<number> {
-        return this.get("lastSteppedNonObserverThreadIndices");
+        return this.get('lastSteppedNonObserverThreadIndices');
     }
 
     public getActorScopes(): ImmMap<DataLocation, ActorId> {
@@ -185,7 +187,7 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
     }
 
     public withLastSteppedNonObserverThreadIndices(indices: Iterable<number>): ControlAbstractState {
-        return this.set("lastSteppedNonObserverThreadIndices", ImmSet(indices));
+        return this.set('lastSteppedNonObserverThreadIndices', ImmSet(indices));
     }
 
     public withIsTargetFor(targetFor: Iterable<Property>): ControlAbstractState {
@@ -193,7 +195,7 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
     }
 
     public withThreadState(threadIndex: number, setStateTo: ThreadState): ControlAbstractState {
-       return this.set('threadStates', this.getThreadStates().set(threadIndex, setStateTo));
+        return this.set('threadStates', this.getThreadStates().set(threadIndex, setStateTo));
     }
 
     public withThreadStates(threadList: ImmList<ThreadState>): ControlAbstractState {
@@ -212,7 +214,10 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
         return this.set('conditionStates', threadStateList);
     }
 
-    public withThreadStateUpdate(threadIndex: number, updateFn: (ts: ThreadState) => ThreadState): ControlAbstractState {
+    public withThreadStateUpdate(
+        threadIndex: number,
+        updateFn: (ts: ThreadState) => ThreadState
+    ): ControlAbstractState {
         const toUpdate = this.getThreadStates().get(threadIndex);
         return this.withThreadState(threadIndex, updateFn(toUpdate));
     }
@@ -228,7 +233,6 @@ export class ControlAbstractState extends ControlAbstractStateRecord implements 
 }
 
 export class ScheduleAbstractStateFactory {
-
     static createInitialState(task: App, wrappedState: ImmRec<any>, isTarget) {
         let singular = false;
         let threads = ImmList<ThreadState>([]);
@@ -236,7 +240,10 @@ export class ScheduleAbstractStateFactory {
         let actors = ImmMap<DataLocation, ActorId>();
 
         for (const actor of task.actors) {
-            actors = actors.set(DataLocations.createTypedLocation(Identifier.of(actor.ident), ActorType.instance()), actor.ident);
+            actors = actors.set(
+                DataLocations.createTypedLocation(Identifier.of(actor.ident), ActorType.instance()),
+                actor.ident
+            );
             for (const script of actor.scripts) {
                 if (script.transitions.transitionTable.size == 0) {
                     // Ignore empty scripts. We assume that there are
@@ -251,14 +258,12 @@ export class ScheduleAbstractStateFactory {
                     Preconditions.checkState(!singular);
                     threadState = ThreadComputationState.THREAD_STATE_RUNNING;
                     singular = true;
-
                 } else if (script.event instanceof AfterStatementMonitoringEvent) {
                     // This is a hack that would not be needed if threads would
                     // be scheduled by concern.
                     // The idea is that monitoring the program should be started
                     // if the program is fully initialized.
                     threadState = ThreadComputationState.THREAD_STATE_DISABLED;
-
                 } else if (script.event instanceof TerminationEvent) {
                     // Will be activated if no other thread has ops to execute
                     threadState = ThreadComputationState.THREAD_STATE_DISABLED;
@@ -266,8 +271,22 @@ export class ScheduleAbstractStateFactory {
 
                 for (const locId of script.transitions.entryLocationSet) {
                     const loc: RelationLocation = new RelationLocation(actor.ident, script.transitions.ident, locId);
-                    threads = threads.push(new ThreadState(threadId, actor.ident, script.id, ImmList(),
-                        loc, threadState, ImmSet(), ImmSet(), ImmList(), ImmList(), 0, -1));
+                    threads = threads.push(
+                        new ThreadState(
+                            threadId,
+                            actor.ident,
+                            script.id,
+                            ImmList(),
+                            loc,
+                            threadState,
+                            ImmSet(),
+                            ImmSet(),
+                            ImmList(),
+                            ImmList(),
+                            0,
+                            -1
+                        )
+                    );
                 }
             }
         }
@@ -277,14 +296,21 @@ export class ScheduleAbstractStateFactory {
 }
 
 export class ControlLattice implements Lattice<ControlAbstractState> {
-
     private readonly _wrapped: Lattice<AbstractElement>;
 
     private readonly _bottom: ControlAbstractState;
 
     constructor(wrapped: Lattice<AbstractElement>) {
         this._wrapped = Preconditions.checkNotUndefined(wrapped);
-        this._bottom = new ControlAbstractState(ImmList(), ImmList(), this._wrapped.bottom(), ImmSet(), ImmSet(), ImmSet(), ImmMap());
+        this._bottom = new ControlAbstractState(
+            ImmList(),
+            ImmList(),
+            this._wrapped.bottom(),
+            ImmSet(),
+            ImmSet(),
+            ImmSet(),
+            ImmMap()
+        );
     }
 
     bottom(): ControlAbstractState {
@@ -323,11 +349,9 @@ export class ControlLattice implements Lattice<ControlAbstractState> {
     top(): ControlAbstractState {
         throw new ImplementMeException();
     }
-
 }
 
 export class ControlAbstractDomain implements AbstractDomain<ConcreteProgramState, ControlAbstractState> {
-
     private readonly _lattice: Lattice<ControlAbstractState>;
 
     private readonly _wrapped: AbstractDomain<ConcreteElement, AbstractElement>;
@@ -353,12 +377,14 @@ export class ControlAbstractDomain implements AbstractDomain<ConcreteProgramStat
         Preconditions.checkArgument(element instanceof ConcreteUnifiedMemory);
         const m = element as ConcreteUnifiedMemory;
 
-        const splitTargetPrefixFromAttribute = (attributeWithTargetName: string): {attribute: string, target: string} => {
+        const splitTargetPrefixFromAttribute = (
+            attributeWithTargetName: string
+        ): { attribute: string; target: string } => {
             const parts = attributeWithTargetName.split(VAR_SCOPING_SPLITTER);
             const target = parts[0];
             const attribute = parts.slice(1).join(VAR_SCOPING_SPLITTER);
-            return {attribute, target};
-        }
+            return { attribute, target };
+        };
 
         const toProgramState = (c: ConcreteUnifiedMemory): ConcreteProgramState => {
             const actorStates: Map<string, ConcreteUnifiedMemory> = new Map();
@@ -396,5 +422,4 @@ export class ControlAbstractDomain implements AbstractDomain<ConcreteProgramStat
     composeSeq(e1: ControlAbstractState, e2: ControlAbstractState): ControlAbstractState {
         throw new ImplementMeException();
     }
-
 }

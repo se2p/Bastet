@@ -20,13 +20,12 @@
  *
  */
 
-import {Action} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
-import {Preconditions} from "../../../../utils/Preconditions";
-import {ConcreteUnifiedMemory} from "../../../domains/ConcreteElements";
-import {DataLocationScoper} from "../../control/DataLocationScoping";
+import { Action } from '../../../../syntax/ast/ErrorWitnessActionVisitor';
+import { Preconditions } from '../../../../utils/Preconditions';
+import { ConcreteUnifiedMemory } from '../../../domains/ConcreteElements';
+import { DataLocationScoper } from '../../control/DataLocationScoping';
 
 export class ErrorWitnessActor {
-
     name: string;
 
     variables: { [key: string]: string | boolean | number } = {}; //TODO add default scratch attributes
@@ -37,11 +36,11 @@ export class ErrorWitnessActor {
     methodVariables: { [key: string]: string | boolean | number } = {};
 
     removeVariables(variableNames: string[]) {
-        Object.keys(this.variables).forEach(variable => {
+        Object.keys(this.variables).forEach((variable) => {
             if (variableNames.includes(variable)) {
                 delete this.variables[variable];
             }
-        })
+        });
     }
 
     static fromConcreteActorState(actorName: string, actorMemory: ConcreteUnifiedMemory): ErrorWitnessActor {
@@ -74,7 +73,6 @@ export interface MousePosition {
 }
 
 export class ErrorWitnessStep {
-
     timestamp: number;
     action: Action;
     epsilonType: Action;
@@ -86,11 +84,10 @@ export class ErrorWitnessStep {
     mousePosition: MousePosition;
     actors: ErrorWitnessActor[] = [];
 
-    constructor(public id: number) {
-    }
+    constructor(public id: number) {}
 
     getVariableValue(targetName: string, attribute: string): any {
-        const target = this.actors.find(t => t.name === targetName);
+        const target = this.actors.find((t) => t.name === targetName);
         Preconditions.checkNotUndefined(target);
         return target.variables[attribute];
     }
@@ -98,7 +95,7 @@ export class ErrorWitnessStep {
     clone(): ErrorWitnessStep {
         const data = JSON.parse(JSON.stringify(this));
         const clone: ErrorWitnessStep = Object.assign(new ErrorWitnessStep(this.id), data);
-        clone.actors = this.actors.map(actor => actor.clone());
+        clone.actors = this.actors.map((actor) => actor.clone());
 
         return clone;
     }
@@ -122,16 +119,15 @@ export class ReturnValueMock<T> implements Mock {
 
 export class AssignmentMock implements Mock {
     readonly forFunction: string;
-    readonly assignments: {"actor": string, "assigns": {}[], "index": number}[];
+    readonly assignments: { actor: string; assigns: {}[]; index: number }[];
 
-    constructor(forFunction: string, assignments: {"actor": string, "assigns": {}[], "index": number}[]) {
+    constructor(forFunction: string, assignments: { actor: string; assigns: {}[]; index: number }[]) {
         this.forFunction = forFunction;
         this.assignments = assignments;
     }
 }
 
 export class ErrorWitness {
-
     private readonly _programName: string;
     private readonly _violations: string[];
     private readonly _steps: ErrorWitnessStep[];

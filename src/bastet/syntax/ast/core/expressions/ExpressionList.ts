@@ -23,11 +23,10 @@
  *
  */
 
-import {AstNodeList} from "../../AstNodeList";
-import {Expression} from "./Expression";
+import { AstNodeList } from '../../AstNodeList';
+import { Expression } from './Expression';
 
 export class ExpressionList extends AstNodeList<Expression> {
-
     constructor(elements: Expression[]) {
         super(elements);
     }
@@ -40,5 +39,4 @@ export class ExpressionList extends AstNodeList<Expression> {
         }
         return ExpressionList.EMPTY;
     }
-
 }

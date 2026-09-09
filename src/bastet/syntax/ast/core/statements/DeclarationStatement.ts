@@ -23,31 +23,26 @@
  *
  */
 
-import {Statement} from "./Statement";
-import {Identifier} from "../Identifier";
-import {ScratchType} from "../ScratchType";
-import {StringExpression} from "../expressions/StringExpression";
-import {VariableWithDataLocation} from "../Variable";
-import {Preconditions} from "../../../../utils/Preconditions";
-import {AstNode} from "../../AstNode";
+import { Statement } from './Statement';
+import { Identifier } from '../Identifier';
+import { ScratchType } from '../ScratchType';
+import { StringExpression } from '../expressions/StringExpression';
+import { VariableWithDataLocation } from '../Variable';
+import { Preconditions } from '../../../../utils/Preconditions';
+import { AstNode } from '../../AstNode';
 
 export abstract class DeclarationStatement extends Statement {
-
     constructor(childs: AstNode[]) {
         super(childs);
     }
-
 }
 
 export interface VariableDeclaration {
-
     identifier: Identifier;
     variableType: ScratchType;
-
 }
 
 export abstract class DeclareVariableStatement extends DeclarationStatement implements VariableDeclaration {
-
     private readonly _variable: VariableWithDataLocation;
 
     constructor(variable: VariableWithDataLocation) {
@@ -70,34 +65,27 @@ export abstract class DeclareVariableStatement extends DeclarationStatement impl
 }
 
 export class DeclareStackVariableStatement extends DeclareVariableStatement {
-
     constructor(variable: VariableWithDataLocation) {
         Preconditions.checkNotUndefined(variable);
         super(variable);
     }
-
 }
 
 export class DeclareActorVariableStatement extends DeclareVariableStatement {
-
     constructor(variable: VariableWithDataLocation) {
         Preconditions.checkNotUndefined(variable);
         super(variable);
     }
-
 }
 
 export class DeclareSystemVariableStatement extends DeclareVariableStatement {
-
     constructor(variable: VariableWithDataLocation) {
         Preconditions.checkNotUndefined(variable);
         super(variable);
     }
-
 }
 
 export class DeclareAttributeStatement extends DeclarationStatement {
-
     private readonly _attribute: StringExpression;
     private readonly _attributeType: ScratchType;
 
@@ -114,6 +102,4 @@ export class DeclareAttributeStatement extends DeclarationStatement {
     get attribute(): StringExpression {
         return this._attribute;
     }
-
 }
-

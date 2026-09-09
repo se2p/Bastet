@@ -24,7 +24,6 @@
  */
 
 export class ImmutableList<E> implements Iterable<E> {
-
     private readonly _list: Array<E>;
 
     constructor(items: E[]) {

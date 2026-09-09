@@ -23,28 +23,28 @@
  *
  */
 
-import {MergeOperator, ProgramAnalysisWithLabels, StopOperator} from "../ProgramAnalysis";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {App} from "../../../syntax/app/App";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
-import {Preconditions} from "../../../utils/Preconditions";
-import {ConcreteElement} from "../../domains/ConcreteElements";
-import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation, ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {Refiner, Unwrapper} from "../Refiner";
-import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, ReachedSet, StateSet} from "../../algorithms/StateSet";
-import {AnalysisStatistics} from "../AnalysisStatistics";
-import {Concern} from "../../../syntax/Concern";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {BastetConfiguration} from "../../../utils/BastetConfiguration";
-import {Set as ImmSet} from "immutable";
-import {LexiKey} from "../../../utils/Lexicographic";
-import {AccessibilityRelation} from "../Accessibility";
-import {AbstractionAbstractDomain, AbstractionState} from "./AbstractionAbstractDomain";
-import {AbstractionTransferRelation} from "./AbstractionTransferRelation";
-import {AbstractionMergeOperator} from "./AbstractionMergeOperator";
-import {FirstOrderLattice, FirstOrderSolver} from "../../domains/FirstOrderDomain";
+import { MergeOperator, ProgramAnalysisWithLabels, StopOperator } from '../ProgramAnalysis';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { App } from '../../../syntax/app/App';
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
+import { Preconditions } from '../../../utils/Preconditions';
+import { ConcreteElement } from '../../domains/ConcreteElements';
+import { LabeledTransferRelation } from '../TransferRelation';
+import { ProgramOperation, ProgramOperationInContext } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { Refiner, Unwrapper } from '../Refiner';
+import { Property } from '../../../syntax/Property';
+import { FrontierSet, PartitionKey, ReachedSet, StateSet } from '../../algorithms/StateSet';
+import { AnalysisStatistics } from '../AnalysisStatistics';
+import { Concern } from '../../../syntax/Concern';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { BastetConfiguration } from '../../../utils/BastetConfiguration';
+import { Set as ImmSet } from 'immutable';
+import { LexiKey } from '../../../utils/Lexicographic';
+import { AccessibilityRelation } from '../Accessibility';
+import { AbstractionAbstractDomain, AbstractionState } from './AbstractionAbstractDomain';
+import { AbstractionTransferRelation } from './AbstractionTransferRelation';
+import { AbstractionMergeOperator } from './AbstractionMergeOperator';
+import { FirstOrderLattice, FirstOrderSolver } from '../../domains/FirstOrderDomain';
 import {
     BooleanFormula,
     FirstOrderFormula,
@@ -52,33 +52,33 @@ import {
     IntegerFormula,
     ListFormula,
     RealFormula,
-    StringFormula
-} from "../../../utils/ConjunctiveNormalForm";
-import {AbstractionRefiner} from "./AbstractionRefiner";
-import {BooleanPredicateAbstraction, PredicateAbstraction} from "./AbstractionComputation";
-import {TransformerTheories} from "../../domains/MemoryTransformer";
-import {SSAAnalysis} from "../ssa/SSAAnalysis";
-import {PredicatePrecisionLattice} from "../../AbstractionPrecision";
-import {Optional} from "../../../utils/Optional";
-import {AbstractionStopOperator} from "./AbstractionStopOperator";
-import {ThreadState} from "../control/ConcreteProgramState";
-
+    StringFormula,
+} from '../../../utils/ConjunctiveNormalForm';
+import { AbstractionRefiner } from './AbstractionRefiner';
+import { BooleanPredicateAbstraction, PredicateAbstraction } from './AbstractionComputation';
+import { TransformerTheories } from '../../domains/MemoryTransformer';
+import { SSAAnalysis } from '../ssa/SSAAnalysis';
+import { PredicatePrecisionLattice } from '../../AbstractionPrecision';
+import { Optional } from '../../../utils/Optional';
+import { AbstractionStopOperator } from './AbstractionStopOperator';
+import { ThreadState } from '../control/ConcreteProgramState';
 
 export class AbstractionAnalysisConfig extends BastetConfiguration {
-
     constructor(dict: {}) {
         super(dict, ['AbstractionAnalysis']);
     }
 
     get abstractionType(): string {
-        return this.getStringProperty('abstraction-type', "boolean").toLowerCase();
+        return this.getStringProperty('abstraction-type', 'boolean').toLowerCase();
     }
 }
 
-export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteElement, AbstractionState, AbstractState>,
-    LabeledTransferRelation<AbstractionState>,
-    Unwrapper<AbstractionState, AbstractElement> {
-
+export class AbstractionAnalysis
+    implements
+        ProgramAnalysisWithLabels<ConcreteElement, AbstractionState, AbstractState>,
+        LabeledTransferRelation<AbstractionState>,
+        Unwrapper<AbstractionState, AbstractElement>
+{
     private readonly _abstractDomain: AbstractionAbstractDomain;
 
     private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, AbstractState, AbstractState>;
@@ -99,28 +99,54 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
 
     private readonly _solver: FirstOrderSolver<FirstOrderFormula>;
 
-    constructor(config: {}, task: App, summaryLattice: FirstOrderLattice<FirstOrderFormula>,
-                theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>,
-                wrappedAnalysis: SSAAnalysis,
-                statistics: AnalysisStatistics) {
+    constructor(
+        config: {},
+        task: App,
+        summaryLattice: FirstOrderLattice<FirstOrderFormula>,
+        theories: TransformerTheories<
+            FirstOrderFormula,
+            BooleanFormula,
+            IntegerFormula,
+            RealFormula,
+            FloatFormula,
+            StringFormula,
+            ListFormula
+        >,
+        wrappedAnalysis: SSAAnalysis,
+        statistics: AnalysisStatistics
+    ) {
         this._config = new AbstractionAnalysisConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAnalysis = Preconditions.checkNotUndefined(wrappedAnalysis);
 
         let abstractionComp: PredicateAbstraction;
-        if (this._config.abstractionType == "boolean") {
-            abstractionComp = new BooleanPredicateAbstraction(theories, summaryLattice.prover,
-                new PredicatePrecisionLattice<FirstOrderFormula>(summaryLattice), wrappedAnalysis.abstractDomain.lattice);
-        } else if (this._config.abstractionType == "cartesian") {
+        if (this._config.abstractionType == 'boolean') {
+            abstractionComp = new BooleanPredicateAbstraction(
+                theories,
+                summaryLattice.prover,
+                new PredicatePrecisionLattice<FirstOrderFormula>(summaryLattice),
+                wrappedAnalysis.abstractDomain.lattice
+            );
+        } else if (this._config.abstractionType == 'cartesian') {
             throw new ImplementMeException();
         } else {
             throw new ImplementMeException();
         }
 
-        this._abstractDomain = new AbstractionAbstractDomain(wrappedAnalysis.abstractDomain, summaryLattice, abstractionComp);
+        this._abstractDomain = new AbstractionAbstractDomain(
+            wrappedAnalysis.abstractDomain,
+            summaryLattice,
+            abstractionComp
+        );
         this._transferRelation = new AbstractionTransferRelation(wrappedAnalysis, this._abstractDomain, theories);
-        this._refiner = new AbstractionRefiner(config, this, this._abstractDomain.lattice, theories,
-            this._abstractDomain.lattice.precStacLattice.lattice, summaryLattice.prover);
+        this._refiner = new AbstractionRefiner(
+            config,
+            this,
+            this._abstractDomain.lattice,
+            theories,
+            this._abstractDomain.lattice.precStacLattice.lattice,
+            summaryLattice.prover
+        );
 
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
         this._mergeOp = new AbstractionMergeOperator(this._task, this.wrappedAnalysis, this._abstractDomain.lattice);
@@ -137,7 +163,11 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
         return this._transferRelation.abstractSucc(fromState);
     }
 
-    abstractSuccFor(fromState: AbstractionState, op: ProgramOperationInContext, co: Concern): Iterable<AbstractionState> {
+    abstractSuccFor(
+        fromState: AbstractionState,
+        op: ProgramOperationInContext,
+        co: Concern
+    ): Iterable<AbstractionState> {
         return this._transferRelation.abstractSuccFor(fromState, op, co);
     }
 
@@ -153,7 +183,11 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
         return this._mergeOp.merge(state1, state2);
     }
 
-    stop(state: AbstractionState, reached: Iterable<AbstractState>, unwrapper: (AbstractState) => AbstractionState): boolean {
+    stop(
+        state: AbstractionState,
+        reached: Iterable<AbstractState>,
+        unwrapper: (AbstractState) => AbstractionState
+    ): boolean {
         return this._stopOp.stop(state, reached, unwrapper);
     }
 
@@ -188,16 +222,27 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
     initialStatesFor(task: App): AbstractionState[] {
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
-            return new AbstractionState(0, this._abstractDomain.lattice.folLattice.top(), w, this._abstractDomain.lattice.precStacLattice.bottom(), Optional.absent())
-                .withFreshBlockId();
-        } );
+            return new AbstractionState(
+                0,
+                this._abstractDomain.lattice.folLattice.top(),
+                w,
+                this._abstractDomain.lattice.precStacLattice.bottom(),
+                Optional.absent()
+            ).withFreshBlockId();
+        });
     }
 
     createStateSets(): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         return this.wrappedAnalysis.createStateSets();
     }
 
-    mergeInto(state: AbstractionState, frontier: StateSet<AbstractState>, reached: ReachedSet<AbstractState>, unwrapper: (AbstractState) => AbstractionState, wrapper: (E) => AbstractState): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
+    mergeInto(
+        state: AbstractionState,
+        frontier: StateSet<AbstractState>,
+        reached: ReachedSet<AbstractState>,
+        unwrapper: (AbstractState) => AbstractionState,
+        wrapper: (E) => AbstractState
+    ): [FrontierSet<AbstractState>, ReachedSet<AbstractState>] {
         throw new ImplementMeException();
     }
 
@@ -237,19 +282,31 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
         return this._wrappedAnalysis.finalizeResults(frontier, reached);
     }
 
-    testify(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {
+    testify(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): AccessibilityRelation<AbstractState> {
         return this._wrappedAnalysis.testify(accessibility, state);
     }
 
-    testifyOne(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {
+    testifyOne(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): AccessibilityRelation<AbstractState> {
         return this._wrappedAnalysis.testifyOne(accessibility, state);
     }
 
-    testifyConcrete(accessibility: AccessibilityRelation< AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
+    testifyConcrete(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): Iterable<[AbstractState, ConcreteElement][]> {
         throw new ImplementMeException();
     }
 
-    testifyConcreteOne(accessibility: AccessibilityRelation<AbstractState>, state: AbstractState): Iterable<[AbstractState, ConcreteElement][]> {
+    testifyConcreteOne(
+        accessibility: AccessibilityRelation<AbstractState>,
+        state: AbstractState
+    ): Iterable<[AbstractState, ConcreteElement][]> {
         return this._wrappedAnalysis.testifyConcreteOne(accessibility, state);
     }
 
@@ -263,8 +320,7 @@ export class AbstractionAnalysis implements ProgramAnalysisWithLabels<ConcreteEl
         this._solver.decRef(state.getEnteringSummary());
     }
 
-    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation< AbstractState> {
+    accessibility(reached: ReachedSet<AbstractState>, state: AbstractState): AccessibilityRelation<AbstractState> {
         throw new ImplementMeException();
     }
-
 }

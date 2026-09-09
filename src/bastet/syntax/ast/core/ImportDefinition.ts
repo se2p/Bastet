@@ -23,13 +23,12 @@
  *
  */
 
-import {AbstractNode, AstNode} from "../AstNode";
-import {AstNodeList} from "../AstNodeList";
-import {Identifier} from "./Identifier";
-import {ResourceLocation} from "./ResourceLocation";
+import { AbstractNode, AstNode } from '../AstNode';
+import { AstNodeList } from '../AstNodeList';
+import { Identifier } from './Identifier';
+import { ResourceLocation } from './ResourceLocation';
 
 export class ImportDefinition extends AbstractNode {
-
     private readonly _toImport: ImportSelector;
     private readonly _importFrom: ResourceLocation;
 
@@ -38,36 +37,27 @@ export class ImportDefinition extends AbstractNode {
         this._toImport = toImport;
         this._importFrom = importFrom;
     }
-
 }
 
-export interface ImportSelector extends AstNode {
-
-}
+export interface ImportSelector extends AstNode {}
 
 export class ImportSelectedActor extends AbstractNode implements ImportSelector {
-
     private readonly _actorIdent: Identifier;
 
     constructor(actorIdent: Identifier) {
-        super([actorIdent] );
+        super([actorIdent]);
         this._actorIdent = actorIdent;
     }
-
 }
 
 export class ImportAllActors extends AbstractNode implements ImportSelector {
-
     constructor() {
         super([]);
     }
-
 }
 
 export class ImportDefinitionList extends AstNodeList<ImportDefinition> {
-
     constructor(elements: ImportDefinition[]) {
         super(elements);
     }
-
 }

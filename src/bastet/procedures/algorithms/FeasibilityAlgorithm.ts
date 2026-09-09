@@ -23,22 +23,24 @@
  *
  */
 
-import {ConcreteElement} from "../domains/ConcreteElements";
-import {AbstractState} from "../../lattices/Lattice";
-import {FrontierSet, ReachedSet} from "./StateSet";
-import {CEGARAlgorithm} from "./CEGARAlgorithm";
-import {AccessibilityRelation} from "../analyses/Accessibility";
+import { ConcreteElement } from '../domains/ConcreteElements';
+import { AbstractState } from '../../lattices/Lattice';
+import { FrontierSet, ReachedSet } from './StateSet';
+import { CEGARAlgorithm } from './CEGARAlgorithm';
+import { AccessibilityRelation } from '../analyses/Accessibility';
 
 /**
  * A simple variant of CEGAR that does assume an analysis that operates at
  * full precision and does not rely on precision refinement.
  */
-export class FeasibilityAlgorithm<C extends ConcreteElement, E extends AbstractState>
-    extends CEGARAlgorithm<C, E> {
-
-    protected eliminateInfeasibleState(frontier: FrontierSet<E>, reached: ReachedSet<E>, ar: AccessibilityRelation<E>, targetState: E): [FrontierSet<E>, ReachedSet<E>] {
+export class FeasibilityAlgorithm<C extends ConcreteElement, E extends AbstractState> extends CEGARAlgorithm<C, E> {
+    protected eliminateInfeasibleState(
+        frontier: FrontierSet<E>,
+        reached: ReachedSet<E>,
+        ar: AccessibilityRelation<E>,
+        targetState: E
+    ): [FrontierSet<E>, ReachedSet<E>] {
         reached.remove(targetState);
         return [frontier, reached];
     }
-
 }

@@ -23,12 +23,11 @@
  *
  */
 
-import {TransitionRelation, TransitionRelations, WithTransitionRelation} from "./TransitionRelation";
-import {CoreEvent} from "../../ast/core/CoreEvent";
-import {Preconditions} from "../../../utils/Preconditions";
-import {LocationId} from "./ControlLocation";
-import {Identifier} from "../../ast/core/Identifier";
-
+import { TransitionRelation, TransitionRelations, WithTransitionRelation } from './TransitionRelation';
+import { CoreEvent } from '../../ast/core/CoreEvent';
+import { Preconditions } from '../../../utils/Preconditions';
+import { LocationId } from './ControlLocation';
+import { Identifier } from '../../ast/core/Identifier';
 
 export type ScriptId = string;
 
@@ -37,7 +36,6 @@ export type ScriptId = string;
  * of a program or a fraction of a program.
  */
 export class Script implements WithTransitionRelation {
-
     /** A unique identifier of this script */
     private readonly _id: Identifier;
 
@@ -79,5 +77,4 @@ export class Script implements WithTransitionRelation {
         Preconditions.checkState(this.transitions.entryLocationSet.size === 1);
         return this.transitions.entryLocationSet.values().next().value;
     }
-
 }

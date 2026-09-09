@@ -23,25 +23,25 @@
  *
  */
 
-import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
+import { ImplementMeForException } from '../../core/exceptions/ImplementMeException';
 import {
     CoreBoolExpressionVisitor,
     CoreNonCtrlStatementnVisitor,
     CoreNumberExpressionVisitor,
     CoreVisitor,
-} from "./CoreVisitor";
-import {CorePrintVisitor} from "./CorePrintVisitor";
-import {AstNode} from "./AstNode";
-import {ActorVariableExpression, LocateActorExpression} from "./core/expressions/ActorExpression";
-import {BeginAtomicStatement, EndAtomicStatement, ReturnStatement} from "./core/statements/ControlStatement";
-import {CallStatement} from "./core/statements/CallStatement";
+} from './CoreVisitor';
+import { CorePrintVisitor } from './CorePrintVisitor';
+import { AstNode } from './AstNode';
+import { ActorVariableExpression, LocateActorExpression } from './core/expressions/ActorExpression';
+import { BeginAtomicStatement, EndAtomicStatement, ReturnStatement } from './core/statements/ControlStatement';
+import { CallStatement } from './core/statements/CallStatement';
 import {
     AddElementToStatement,
     DeleteAllFromStatement,
     DeleteIthFromStatement,
     InsertAtStatement,
     ReplaceElementAtStatement,
-} from "./core/statements/ListStatement";
+} from './core/statements/ListStatement';
 import {
     AndExpression,
     BooleanLiteral,
@@ -57,18 +57,18 @@ import {
     StrEqualsExpression,
     StrGreaterThanExpression,
     StrLessThanExpression,
-} from "./core/expressions/BooleanExpression";
-import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/AssumeStatement";
-import {StringLiteral, StringVariableExpression} from "./core/expressions/StringExpression";
-import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
-import {CastExpression} from "./core/expressions/CastExpression";
-import {CreateCloneOfStatement} from "./core/statements/CreateCloneOfStatement";
+} from './core/expressions/BooleanExpression';
+import { BranchingAssumeStatement, StrengtheningAssumeStatement } from './core/statements/AssumeStatement';
+import { StringLiteral, StringVariableExpression } from './core/expressions/StringExpression';
+import { BroadcastAndWaitStatement, BroadcastMessageStatement } from './core/statements/BroadcastMessageStatement';
+import { CastExpression } from './core/expressions/CastExpression';
+import { CreateCloneOfStatement } from './core/statements/CreateCloneOfStatement';
 import {
     DeclareActorVariableStatement,
     DeclareStackVariableStatement,
     DeclareSystemVariableStatement,
-} from "./core/statements/DeclarationStatement";
-import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
+} from './core/statements/DeclarationStatement';
+import { DeleteThisCloneStatement, StopAllStatement, StopThisStatement } from './core/statements/TerminationStatement';
 import {
     DivideExpression,
     FloatLiteral,
@@ -82,34 +82,31 @@ import {
     NumberVariableExpression,
     PlusExpression,
     TimerExpression,
-} from "./core/expressions/NumberExpression";
-import {EpsilonStatement} from "./core/statements/EpsilonStatement";
-import {ExpressionStatement} from "./core/statements/ExpressionStatement";
+} from './core/expressions/NumberExpression';
+import { EpsilonStatement } from './core/statements/EpsilonStatement';
+import { ExpressionStatement } from './core/statements/ExpressionStatement';
 import {
     CheckFeasibilityStatement,
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
     TerminateProgramStatement,
-} from "./core/statements/InternalStatement";
-import {BinaryExpression} from "./core/expressions/BinaryExpression";
-import {ResetTimerStatement} from "./core/statements/ResetTimerStatement";
-import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
-import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
-import {VariableWithDataLocation} from "./core/Variable";
-import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
-import {DataLocationScoper} from "../../procedures/analyses/control/DataLocationScoping";
-import {VAR_SCOPING_SPLITTER} from "../app/controlflow/DataLocation";
-import {PrecisionPopStatement, PrecisionPushStatement} from "./core/Precisions";
+} from './core/statements/InternalStatement';
+import { BinaryExpression } from './core/expressions/BinaryExpression';
+import { ResetTimerStatement } from './core/statements/ResetTimerStatement';
+import { StopOthersInActorStatement } from './core/statements/StopOthersInActorStatement';
+import { StoreEvalResultToVariableStatement } from './core/statements/SetStatement';
+import { VariableWithDataLocation } from './core/Variable';
+import { WaitUntilStatement } from './core/statements/WaitUntilStatement';
+import { DataLocationScoper } from '../../procedures/analyses/control/DataLocationScoping';
+import { VAR_SCOPING_SPLITTER } from '../app/controlflow/DataLocation';
+import { PrecisionPopStatement, PrecisionPushStatement } from './core/Precisions';
 
 export class MethodValueReadEvent {
-
-    constructor(public readonly readFrom: string) {
-
-    }
+    constructor(public readonly readFrom: string) {}
 
     combine(other: MethodValueReadEvent): MethodValueReadEvent {
         if (this.readFrom !== undefined && other.readFrom !== undefined && this.readFrom !== other.readFrom) {
-            throw new ImplementMeForException("a binary expression using two different mouse alias variables");
+            throw new ImplementMeForException('a binary expression using two different mouse alias variables');
         } else {
             return new MethodValueReadEvent(this.readFrom ? this.readFrom : other.readFrom);
         }
@@ -122,11 +119,14 @@ export class MethodValueReadEvent {
  * then a MethodValueReadEvent is returned.
  * The event specifies the name of the variable where the return value of the method was initially assigned to.
  */
-export class MethodValueReadVisitor implements CoreVisitor<MethodValueReadEvent>, CoreBoolExpressionVisitor<MethodValueReadEvent>, CoreNumberExpressionVisitor<MethodValueReadEvent>,
-    CoreNonCtrlStatementnVisitor<MethodValueReadEvent>{
-
-    constructor(private readonly methodNames: string[]) {
-    }
+export class MethodValueReadVisitor
+    implements
+        CoreVisitor<MethodValueReadEvent>,
+        CoreBoolExpressionVisitor<MethodValueReadEvent>,
+        CoreNumberExpressionVisitor<MethodValueReadEvent>,
+        CoreNonCtrlStatementnVisitor<MethodValueReadEvent>
+{
+    constructor(private readonly methodNames: string[]) {}
 
     private readonly nothingReadEvent = new MethodValueReadEvent(undefined);
     private readonly printVisitor = new CorePrintVisitor();
@@ -161,7 +161,7 @@ export class MethodValueReadVisitor implements CoreVisitor<MethodValueReadEvent>
                 const unwrappedVariable = DataLocationScoper.rightUnwrapScope(assignResultToName);
                 // Increase the SSA index by 1 since the actual value will be saved to the variable with the next index
                 const nextSSAIndex = Number(unwrappedVariable.suffix) + 1;
-                const variableName = `${unwrappedVariable.prefix}${VAR_SCOPING_SPLITTER}${nextSSAIndex}`
+                const variableName = `${unwrappedVariable.prefix}${VAR_SCOPING_SPLITTER}${nextSSAIndex}`;
 
                 this.attributeAlias.push(assignResultToName);
                 this.usageToAttributeAlias.set(variableName, assignResultToName);
@@ -350,7 +350,7 @@ export class MethodValueReadVisitor implements CoreVisitor<MethodValueReadEvent>
 
         return op1Event.combine(op2Event);
     }
-        visitPrecisionPushStatement(node: PrecisionPushStatement): MethodValueReadEvent {
+    visitPrecisionPushStatement(node: PrecisionPushStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
 
@@ -427,5 +427,4 @@ export class MethodValueReadVisitor implements CoreVisitor<MethodValueReadEvent>
     visitWaitUntilStatement(node: WaitUntilStatement): MethodValueReadEvent {
         return this.nothingReadEvent;
     }
-
 }

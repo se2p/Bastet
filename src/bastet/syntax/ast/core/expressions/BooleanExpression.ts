@@ -23,48 +23,42 @@
  *
  */
 
-import {Expression} from "./Expression";
-import {AbstractExpression} from "./AbstractExpression";
-import {AstNode} from "../../AstNode";
-import {BooleanType} from "../ScratchType";
-import {BinaryExpression} from "./BinaryExpression";
-import {UnaryExpression} from "./UnaryExpression";
-import {StringExpression} from "./StringExpression";
-import {NumberExpression} from "./NumberExpression";
-import {VariableExpression, VariableWithDataLocation} from "../Variable";
+import { Expression } from './Expression';
+import { AbstractExpression } from './AbstractExpression';
+import { AstNode } from '../../AstNode';
+import { BooleanType } from '../ScratchType';
+import { BinaryExpression } from './BinaryExpression';
+import { UnaryExpression } from './UnaryExpression';
+import { StringExpression } from './StringExpression';
+import { NumberExpression } from './NumberExpression';
+import { VariableExpression, VariableWithDataLocation } from '../Variable';
 
 export type BooleanLiteralExpression = BooleanExpression;
 
-export interface BooleanExpression extends Expression {
-
-}
+export interface BooleanExpression extends Expression {}
 
 export class AbstractBooleanExpression extends AbstractExpression implements BooleanExpression {
-
     constructor(childs: AstNode[]) {
         super(BooleanType.instance(), childs);
     }
-
 }
 
 export class UnaryBoolExpression extends UnaryExpression<BooleanExpression> implements BooleanExpression {
-
     constructor(op1: BooleanExpression) {
         super(BooleanType.instance(), op1);
     }
-
 }
 
-export class BinaryBoolExpression extends BinaryExpression<BooleanExpression, BooleanExpression> implements BooleanExpression {
-
+export class BinaryBoolExpression
+    extends BinaryExpression<BooleanExpression, BooleanExpression>
+    implements BooleanExpression
+{
     constructor(op1: BooleanExpression, op2: BooleanExpression) {
         super(BooleanType.instance(), op1, op2);
     }
-
 }
 
 export class BooleanLiteral extends AbstractBooleanExpression {
-
     private readonly _value: boolean;
 
     constructor(literal: boolean) {
@@ -103,12 +97,12 @@ export class BooleanLiteral extends AbstractBooleanExpression {
     }
 
     public static fromString(text: string): BooleanLiteral {
-        switch(text.toLowerCase()) {
-            case "true":
-            case "1":
-            case "yes":
-            case "on":
-            case "t":
+        switch (text.toLowerCase()) {
+            case 'true':
+            case '1':
+            case 'yes':
+            case 'on':
+            case 't':
                 return BooleanLiteral.true();
             default:
                 return BooleanLiteral.false();
@@ -117,23 +111,20 @@ export class BooleanLiteral extends AbstractBooleanExpression {
 
     toTreeString(): string {
         if (this._value) {
-            return "true";
+            return 'true';
         } else {
-            return "false";
+            return 'false';
         }
     }
-
 }
 
 export class BooleanVariableExpression extends VariableExpression implements BooleanExpression {
-
     constructor(variable: VariableWithDataLocation) {
         super(variable);
     }
 }
 
 export class NegationExpression extends AbstractBooleanExpression {
-
     private readonly _negate: BooleanExpression;
 
     constructor(negate: BooleanExpression) {
@@ -147,79 +138,93 @@ export class NegationExpression extends AbstractBooleanExpression {
 }
 
 export class AndExpression extends BinaryBoolExpression {
-
     constructor(op1: BooleanExpression, op2: BooleanExpression) {
         super(op1, op2);
     }
 }
 
 export class OrExpression extends BinaryBoolExpression {
-
     constructor(op1: BooleanExpression, op2: BooleanExpression) {
         super(op1, op2);
     }
 }
 
-export class StrGreaterThanExpression extends BinaryExpression<StringExpression, StringExpression> implements BooleanExpression {
-
+export class StrGreaterThanExpression
+    extends BinaryExpression<StringExpression, StringExpression>
+    implements BooleanExpression
+{
     constructor(op1: StringExpression, op2: StringExpression) {
         super(BooleanType.instance(), op1, op2);
     }
 }
 
-export class StrLessThanExpression extends BinaryExpression<StringExpression, StringExpression> implements BooleanExpression {
-
+export class StrLessThanExpression
+    extends BinaryExpression<StringExpression, StringExpression>
+    implements BooleanExpression
+{
     constructor(op1: StringExpression, op2: StringExpression) {
         super(BooleanType.instance(), op1, op2);
     }
 }
 
-export class StrEqualsExpression extends BinaryExpression<StringExpression, StringExpression> implements BooleanExpression {
-
+export class StrEqualsExpression
+    extends BinaryExpression<StringExpression, StringExpression>
+    implements BooleanExpression
+{
     constructor(op1: StringExpression, op2: StringExpression) {
         super(BooleanType.instance(), op1, op2);
     }
 }
 
-export class NumGreaterThanExpression extends BinaryExpression<NumberExpression, NumberExpression> implements BooleanExpression {
-
-    constructor(op1: NumberExpression, op2: NumberExpression) {
-        super(BooleanType.instance(), op1, op2);
-    }
-
-}
-
-export class NumGreaterEqualExpression extends BinaryExpression<NumberExpression, NumberExpression> implements BooleanExpression {
-
-    constructor(op1: NumberExpression, op2: NumberExpression) {
-        super(BooleanType.instance(), op1, op2);
-    }
-
-}
-
-export class NumLessThanExpression extends BinaryExpression<NumberExpression, NumberExpression> implements BooleanExpression {
-
+export class NumGreaterThanExpression
+    extends BinaryExpression<NumberExpression, NumberExpression>
+    implements BooleanExpression
+{
     constructor(op1: NumberExpression, op2: NumberExpression) {
         super(BooleanType.instance(), op1, op2);
     }
 }
 
-export class NumLessEqualExpression extends BinaryExpression<NumberExpression, NumberExpression> implements BooleanExpression {
-
+export class NumGreaterEqualExpression
+    extends BinaryExpression<NumberExpression, NumberExpression>
+    implements BooleanExpression
+{
     constructor(op1: NumberExpression, op2: NumberExpression) {
         super(BooleanType.instance(), op1, op2);
     }
 }
 
-export class NumEqualsExpression extends BinaryExpression<NumberExpression, NumberExpression> implements BooleanExpression {
-
+export class NumLessThanExpression
+    extends BinaryExpression<NumberExpression, NumberExpression>
+    implements BooleanExpression
+{
     constructor(op1: NumberExpression, op2: NumberExpression) {
         super(BooleanType.instance(), op1, op2);
     }
 }
 
-export class StrContainsExpression extends BinaryExpression<StringExpression, StringExpression> implements BooleanExpression {
+export class NumLessEqualExpression
+    extends BinaryExpression<NumberExpression, NumberExpression>
+    implements BooleanExpression
+{
+    constructor(op1: NumberExpression, op2: NumberExpression) {
+        super(BooleanType.instance(), op1, op2);
+    }
+}
 
+export class NumEqualsExpression
+    extends BinaryExpression<NumberExpression, NumberExpression>
+    implements BooleanExpression
+{
+    constructor(op1: NumberExpression, op2: NumberExpression) {
+        super(BooleanType.instance(), op1, op2);
+    }
+}
+
+export class StrContainsExpression
+    extends BinaryExpression<StringExpression, StringExpression>
+    implements BooleanExpression
+{
     constructor(op1: StringExpression, op2: StringExpression) {
         super(BooleanType.instance(), op1, op2);
     }

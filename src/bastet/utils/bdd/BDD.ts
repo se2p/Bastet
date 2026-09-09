@@ -20,24 +20,20 @@
  *
  */
 
-import {List as ImmList, Record as ImmRec} from "immutable"
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {Preconditions} from "../Preconditions";
-import {AbstractElement, LatticeWithComplements} from "../../lattices/Lattice";
+import { List as ImmList, Record as ImmRec } from 'immutable';
+import { ImplementMeException } from '../../core/exceptions/ImplementMeException';
+import { Preconditions } from '../Preconditions';
+import { AbstractElement, LatticeWithComplements } from '../../lattices/Lattice';
 
-export interface PropositionalFormula extends AbstractElement {
-
-}
+export interface PropositionalFormula extends AbstractElement {}
 
 export class BDDLibraryFactory {
-
     public static async createBDDLib(): Promise<BDDLibrary> {
         return new BDDLibrary();
     }
 }
 
 export class BDDLattice implements LatticeWithComplements<BDD> {
-
     private readonly _bottom: BDD;
     private readonly _top: BDD;
 
@@ -90,11 +86,9 @@ export class BDDLattice implements LatticeWithComplements<BDD> {
 
         throw new ImplementMeException();
     }
-
 }
 
 export class BDDLibrary {
-
     private readonly _lattice: LatticeWithComplements<PropositionalFormula>;
 
     constructor() {
@@ -102,13 +96,11 @@ export class BDDLibrary {
     }
 
     get lattice(): LatticeWithComplements<PropositionalFormula> {
-       return this._lattice;
+        return this._lattice;
     }
-
 }
 
 export interface BDDAttributes {
-
     /**
      * The BDD can have multiple rood notes (each
      * without incoming edges). One root node is formalized as p*.
@@ -118,9 +110,7 @@ export interface BDDAttributes {
 }
 
 const BDDRecord = ImmRec({
-
-    _roots: ImmList([])
-
+    _roots: ImmList([]),
 });
 
 /**
@@ -130,9 +120,8 @@ const BDDRecord = ImmRec({
  * This is our implementation of their approach.
  */
 export class BDD extends BDDRecord implements BDDAttributes {
-
     constructor(roots: ImmList<BDDEdge>) {
-        super({_roots: roots});
+        super({ _roots: roots });
     }
 
     /**
@@ -150,7 +139,11 @@ export class BDD extends BDDRecord implements BDDAttributes {
     }
 
     get rootNodes(): BDDNode[] {
-        return [ ...this.roots.map((e) => { return e.targetNode; }) ];
+        return [
+            ...this.roots.map((e) => {
+                return e.targetNode;
+            }),
+        ];
     }
 
     get zeroNode(): BDDNode {
@@ -177,11 +170,10 @@ export enum ReductionRule {
     S = 1,
     L0 = 2,
     H0 = 3,
-    X = 4
+    X = 4,
 }
 
 export interface BDDEdgeAttributes {
-
     /** Reduction rule */
     _rule: ReductionRule;
 
@@ -193,21 +185,17 @@ export interface BDDEdgeAttributes {
 
     /** It is a long edge if levels are skipped */
     isLongeEdge(): boolean;
-
 }
 
 const BDDEdgeRecord = ImmRec({
-
     _rule: ReductionRule.UNDEFINED,
 
-    _targetNode: null
-
+    _targetNode: null,
 });
 
 export class BDDEdge extends BDDEdgeRecord implements BDDEdgeAttributes {
-
     constructor(rule: ReductionRule, targetNode: BDDNode) {
-        super({_rule: rule, _targetNode: targetNode});
+        super({ _rule: rule, _targetNode: targetNode });
     }
 
     get rule(): ReductionRule {
@@ -228,7 +216,6 @@ export class BDDEdge extends BDDEdgeRecord implements BDDEdgeAttributes {
 }
 
 export interface BDDNodeAttributes {
-
     _level: number;
 
     _nodeRole: NodeRole;
@@ -246,29 +233,24 @@ export interface BDDNodeAttributes {
     getTrueEdge(): BDDEdge;
 
     getFalseEdge(): BDDEdge;
-
 }
 
 export enum NodeRole {
     INTERMEDIATE = 0,
     TRUE = 1,
-    FALSE = 2
+    FALSE = 2,
 }
 
-
 const BDDNodeRecord = ImmRec({
-
     _level: -1,
     _nodeRole: 0,
     _falseEdge: null,
-    _trueEdge: null
-
+    _trueEdge: null,
 });
 
 export class BDDNode extends BDDNodeRecord implements BDDNodeAttributes {
-
     constructor(level: ReductionRule, trueEdge: BDDEdge, falseEdge: BDDEdge, nodeRole: NodeRole) {
-        super({_level: level, _trueEdge: trueEdge, _falseEdge: falseEdge, _nodeRole: nodeRole});
+        super({ _level: level, _trueEdge: trueEdge, _falseEdge: falseEdge, _nodeRole: nodeRole });
     }
 
     get level(): number {
@@ -294,11 +276,9 @@ export class BDDNode extends BDDNodeRecord implements BDDNodeAttributes {
     leavingEdges(): Iterable<BDDEdge> {
         return [this.getFalseEdge(), this.getTrueEdge()];
     }
-
 }
 
 export class BDDNodes {
-
     private static TRUE_NODE: BDDNode;
     private static FALSE_NODE: BDDNode;
 
@@ -315,31 +295,29 @@ export class BDDNodes {
         }
         return this.FALSE_NODE;
     }
-
 }
 
-export function isDuplicat(node: BDDNode, ofNode: BDDNode) : boolean {
+export function isDuplicat(node: BDDNode, ofNode: BDDNode): boolean {
     throw new ImplementMeException();
 }
 
-export function isRedundant(node: BDDNode) : boolean {
+export function isRedundant(node: BDDNode): boolean {
     throw new ImplementMeException();
 }
 
-export function isHighZero(node: BDDNode) : boolean {
+export function isHighZero(node: BDDNode): boolean {
     throw new ImplementMeException();
 }
 
-export function isLowZero(node: BDDNode) : boolean {
+export function isLowZero(node: BDDNode): boolean {
     throw new ImplementMeException();
 }
 
-export function isReduced(bdd: BDD) : boolean {
+export function isReduced(bdd: BDD): boolean {
     throw new ImplementMeException();
 }
 
 export class BDDReducer {
-
     private _bdd: BDD;
     private _zeroNode: BDDNode;
     private _trueNode: BDDNode;
@@ -398,7 +376,12 @@ export class BDDReducer {
                         // Replace all <k',q> edges with <k', d'>
                         this.replaceEdgesWithBy(kP, q, kP, dP);
 
-                        const checkRules: Set<ReductionRule> = new Set([ReductionRule.L0, ReductionRule.H0, ReductionRule.X, ReductionRule.S]);
+                        const checkRules: Set<ReductionRule> = new Set([
+                            ReductionRule.L0,
+                            ReductionRule.H0,
+                            ReductionRule.X,
+                            ReductionRule.S,
+                        ]);
                         checkRules.delete(kP);
                         for (const rule of checkRules) {
                             if (hasEdge(rule, q)) {
@@ -421,7 +404,6 @@ export class BDDReducer {
                                 this.replaceShortEdgesWithBy(rule, q, ReductionRule.S, qP);
                             }
                         }
-
                     }
                 }
                 worklist.delete(q);
@@ -463,5 +445,4 @@ export class BDDReducer {
     private replaceLongEdgesWithBy(rule: ReductionRule, q: BDDNode, rule2: ReductionRule, qP: void) {
         throw new ImplementMeException();
     }
-
 }

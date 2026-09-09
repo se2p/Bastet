@@ -23,17 +23,15 @@
  *
  */
 
-
-import {AbstractBoolean, AbstractBooleanDomain, BooleanTheory} from './MemoryTransformer'
-import {AbstractElement, Lattice} from "../../lattices/Lattice";
-import {ConcreteBoolean, ConcreteDomain, ConcreteElement} from './ConcreteElements'
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {Record as ImmRec} from "immutable";
-import {Variable} from "../../syntax/ast/core/Variable";
-import {AbstractionPrecision} from "../AbstractionPrecision";
+import { AbstractBoolean, AbstractBooleanDomain, BooleanTheory } from './MemoryTransformer';
+import { AbstractElement, Lattice } from '../../lattices/Lattice';
+import { ConcreteBoolean, ConcreteDomain, ConcreteElement } from './ConcreteElements';
+import { ImplementMeException } from '../../core/exceptions/ImplementMeException';
+import { Record as ImmRec } from 'immutable';
+import { Variable } from '../../syntax/ast/core/Variable';
+import { AbstractionPrecision } from '../AbstractionPrecision';
 
 export class FlatBoolLattice implements Lattice<FlatBooleanValue> {
-
     private readonly _bottom: FlatBooleanValue;
     private readonly _top: FlatBooleanValue;
 
@@ -78,29 +76,25 @@ export class FlatBoolLattice implements Lattice<FlatBooleanValue> {
 }
 
 export interface FlatBooleanValueAttributes extends AbstractBoolean {
-
     hasTrue: boolean;
     hasFalse: boolean;
-
 }
 
 const FlatBooleanValueRecord = ImmRec({
-
     hasTrue: false,
-    hasFalse: false
-
+    hasFalse: false,
 });
 
-export class FlatBooleanValue extends FlatBooleanValueRecord implements FlatBooleanValueAttributes, AbstractBoolean, AbstractElement {
-
+export class FlatBooleanValue
+    extends FlatBooleanValueRecord
+    implements FlatBooleanValueAttributes, AbstractBoolean, AbstractElement
+{
     constructor(hasTrue: boolean, hasFalse: boolean) {
-        super({hasTrue: hasTrue, hasFalse: hasFalse});
+        super({ hasTrue: hasTrue, hasFalse: hasFalse });
     }
-
 }
 
 export class FlatBooleanValueTheory implements BooleanTheory<FlatBooleanValue> {
-
     private readonly _dom: FlatBooleanValueDomain;
 
     private readonly _true: FlatBooleanValue;
@@ -175,7 +169,7 @@ export class FlatBooleanValueTheory implements BooleanTheory<FlatBooleanValue> {
 
     fromBoolean(value: boolean): FlatBooleanValue {
         if (value) {
-            return this.trueBool()
+            return this.trueBool();
         } else {
             return this.falseBool();
         }
@@ -184,16 +178,11 @@ export class FlatBooleanValueTheory implements BooleanTheory<FlatBooleanValue> {
      * Logical XOR operator for FlatBooleanValue. Returns if either op1 or op2 is true and not both.
      */
     xor(op1: FlatBooleanValue, op2: FlatBooleanValue): FlatBooleanValue {
-        return this.and(
-            this.or(op1, op2),
-            this.not(this.and(op1, op2))
-        );
+        return this.and(this.or(op1, op2), this.not(this.and(op1, op2)));
     }
-
 }
 
 export class FlatBooleanValueDomain implements AbstractBooleanDomain<FlatBooleanValue> {
-
     private readonly _concreteDomain: ConcreteDomain<ConcreteBoolean>;
     private readonly _lattice: FlatBoolLattice;
 
@@ -233,5 +222,4 @@ export class FlatBooleanValueDomain implements AbstractBooleanDomain<FlatBoolean
     composeSeq(e1: FlatBooleanValue, e2: FlatBooleanValue): FlatBooleanValue {
         throw new ImplementMeException();
     }
-
 }

@@ -23,24 +23,22 @@
  *
  */
 
+import { TypeInformationStorage } from '../DeclarationScopes';
+import { Preconditions } from '../../utils/Preconditions';
+import { VariableWithDataLocation } from '../ast/core/Variable';
+import { DataLocations } from './controlflow/DataLocation';
+import { Identifier } from '../ast/core/Identifier';
+import { BooleanType, IntegerType } from '../ast/core/ScratchType';
+import { StatementList } from '../ast/core/statements/Statement';
+import { DeclareSystemVariableStatement } from '../ast/core/statements/DeclarationStatement';
+import { StoreEvalResultToVariableStatement } from '../ast/core/statements/SetStatement';
+import { IntegerLiteral } from '../ast/core/expressions/NumberExpression';
+import { BooleanLiteral } from '../ast/core/expressions/BooleanExpression';
 
-import {TypeInformationStorage} from "../DeclarationScopes";
-import {Preconditions} from "../../utils/Preconditions";
-import {VariableWithDataLocation} from "../ast/core/Variable";
-import {DataLocations} from "./controlflow/DataLocation";
-import {Identifier} from "../ast/core/Identifier";
-import {BooleanType, IntegerType} from "../ast/core/ScratchType";
-import {StatementList} from "../ast/core/statements/Statement";
-import {DeclareSystemVariableStatement} from "../ast/core/statements/DeclarationStatement";
-import {StoreEvalResultToVariableStatement} from "../ast/core/statements/SetStatement";
-import {IntegerLiteral} from "../ast/core/expressions/NumberExpression";
-import {BooleanLiteral} from "../ast/core/expressions/BooleanExpression";
-
-export const GLOBAL_TIME_MICROS_VAR: string = "__global_time_micros";
-export const GLOBAL_TIME_RESET_MICROS_VAR: string = "__global_reset_micros";
+export const GLOBAL_TIME_MICROS_VAR: string = '__global_time_micros';
+export const GLOBAL_TIME_RESET_MICROS_VAR: string = '__global_reset_micros';
 
 export class SystemVariables {
-
     private readonly _threadWaitUntilMicrosVariable: VariableWithDataLocation;
 
     private readonly _globalTimeMicrosVariable: VariableWithDataLocation;
@@ -55,20 +53,30 @@ export class SystemVariables {
         Preconditions.checkNotUndefined(registerTo);
 
         this._threadWaitUntilMicrosVariable = new VariableWithDataLocation(
-            DataLocations.createTypedLocation(new Identifier("__wait_until_micros"), IntegerType.instance()));
-        registerTo.getScopeOf(this._threadWaitUntilMicrosVariable.qualifiedName).putVariable(this._threadWaitUntilMicrosVariable);
+            DataLocations.createTypedLocation(new Identifier('__wait_until_micros'), IntegerType.instance())
+        );
+        registerTo
+            .getScopeOf(this._threadWaitUntilMicrosVariable.qualifiedName)
+            .putVariable(this._threadWaitUntilMicrosVariable);
 
         this._programTerminatedVariable = new VariableWithDataLocation(
-            DataLocations.createTypedLocation(new Identifier("__terminated"), BooleanType.instance()));
-        registerTo.getScopeOf(this._programTerminatedVariable.qualifiedName).putVariable(this._programTerminatedVariable);
+            DataLocations.createTypedLocation(new Identifier('__terminated'), BooleanType.instance())
+        );
+        registerTo
+            .getScopeOf(this._programTerminatedVariable.qualifiedName)
+            .putVariable(this._programTerminatedVariable);
 
         this._globalTimeMicrosVariable = new VariableWithDataLocation(
-            DataLocations.createTypedLocation(new Identifier(GLOBAL_TIME_MICROS_VAR), IntegerType.instance()));
+            DataLocations.createTypedLocation(new Identifier(GLOBAL_TIME_MICROS_VAR), IntegerType.instance())
+        );
         registerTo.getScopeOf(this._globalTimeMicrosVariable.qualifiedName).putVariable(this._globalTimeMicrosVariable);
 
         this._globalTimeResetMicrosVariable = new VariableWithDataLocation(
-            DataLocations.createTypedLocation(new Identifier(GLOBAL_TIME_RESET_MICROS_VAR), IntegerType.instance()));
-        registerTo.getScopeOf(this._globalTimeResetMicrosVariable.qualifiedName).putVariable(this._globalTimeResetMicrosVariable);
+            DataLocations.createTypedLocation(new Identifier(GLOBAL_TIME_RESET_MICROS_VAR), IntegerType.instance())
+        );
+        registerTo
+            .getScopeOf(this._globalTimeResetMicrosVariable.qualifiedName)
+            .putVariable(this._globalTimeResetMicrosVariable);
 
         this._initStatements = new StatementList([
             new DeclareSystemVariableStatement(this.threadWaitUntilMicrosVariable),
@@ -77,7 +85,7 @@ export class SystemVariables {
             new DeclareSystemVariableStatement(this.globalTimeMicrosVariable),
             new StoreEvalResultToVariableStatement(this.globalTimeMicrosVariable, IntegerLiteral.of(0)),
             new DeclareSystemVariableStatement(this.globalTimeResetMicrosVariable),
-            new StoreEvalResultToVariableStatement(this.globalTimeResetMicrosVariable, IntegerLiteral.of(0))
+            new StoreEvalResultToVariableStatement(this.globalTimeResetMicrosVariable, IntegerLiteral.of(0)),
         ]);
     }
 

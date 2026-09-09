@@ -23,33 +23,36 @@
  *
  */
 
-
-import {AbstractState} from "../../lattices/Lattice";
-import {ConcreteElement} from "../domains/ConcreteElements";
-import {Property} from "../../syntax/Property";
-import {App} from "../../syntax/app/App";
-import {Set as ImmSet} from "immutable";
-import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
-import {AnalysisAlgorithm} from "./Algorithm";
-import {Preconditions} from "../../utils/Preconditions";
-import {FrontierSet, ReachedSet} from "./StateSet";
-import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
-import {BastetConfiguration} from "../../utils/BastetConfiguration";
+import { AbstractState } from '../../lattices/Lattice';
+import { ConcreteElement } from '../domains/ConcreteElements';
+import { Property } from '../../syntax/Property';
+import { App } from '../../syntax/app/App';
+import { Set as ImmSet } from 'immutable';
+import { ProgramAnalysis } from '../analyses/ProgramAnalysis';
+import { AnalysisAlgorithm } from './Algorithm';
+import { Preconditions } from '../../utils/Preconditions';
+import { FrontierSet, ReachedSet } from './StateSet';
+import { AnalysisStatistics } from '../analyses/AnalysisStatistics';
+import { BastetConfiguration } from '../../utils/BastetConfiguration';
 import {
     Budget,
     BudgetExhaustedException,
     InfiniteBudget,
     popActiveBudget,
     pushActiveBudget,
-    WallTimeDurationBudget
-} from "../../utils/Budgets";
+    WallTimeDurationBudget,
+} from '../../utils/Budgets';
 
-export type ResultCallback = (violated: ImmSet<Property>, satisfied: ImmSet<Property>, unknown: ImmSet<Property>, stats: AnalysisStatistics) => void;
+export type ResultCallback = (
+    violated: ImmSet<Property>,
+    satisfied: ImmSet<Property>,
+    unknown: ImmSet<Property>,
+    stats: AnalysisStatistics
+) => void;
 
-export const STAT_KEY_MPA_ITERATIONS = "iterations";
+export const STAT_KEY_MPA_ITERATIONS = 'iterations';
 
 export class MultiPropertyAlgorithmConfig extends BastetConfiguration {
-
     constructor(dict: {}) {
         super(dict, ['MultiPropertyAlgorithm']);
     }
@@ -59,9 +62,8 @@ export class MultiPropertyAlgorithmConfig extends BastetConfiguration {
     }
 
     get totalWallTimeLimitSecs(): number {
-       return this.getNumberProperty("budget-total-walltime-secs", -1);
+        return this.getNumberProperty('budget-total-walltime-secs', -1);
     }
-
 }
 
 /**
@@ -70,8 +72,10 @@ export class MultiPropertyAlgorithmConfig extends BastetConfiguration {
  *
  * Inspired by the work by Apel etal. (2016) on "On-The-Fly Decomposition of Specifications in Software Model Checking."
  */
-export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends AbstractState> implements AnalysisAlgorithm<C, E>{
-
+export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends AbstractState> implements AnalysisAlgorithm<
+    C,
+    E
+> {
     private readonly _task: App;
 
     private readonly _properties: ImmSet<Property>;
@@ -88,7 +92,14 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
 
     private readonly _algorithmBudget: Budget;
 
-    constructor(config: {}, task: App, algorithm: AnalysisAlgorithm<C, E>, analysis: ProgramAnalysis<C, E, E>, stats: AnalysisStatistics, resultCallback: ResultCallback) {
+    constructor(
+        config: {},
+        task: App,
+        algorithm: AnalysisAlgorithm<C, E>,
+        analysis: ProgramAnalysis<C, E, E>,
+        stats: AnalysisStatistics,
+        resultCallback: ResultCallback
+    ) {
         this._config = new MultiPropertyAlgorithmConfig(config);
         this._task = Preconditions.checkNotUndefined(task);
         this._wrappedAlgorithm = Preconditions.checkNotUndefined(algorithm);
@@ -108,7 +119,7 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
         let violated: ImmSet<Property> = ImmSet();
         let satisfied: ImmSet<Property> = ImmSet();
         let unknown: ImmSet<Property> = this._properties;
-        Preconditions.checkArgument(unknown.size > 0, "There must be at least one property to check.");
+        Preconditions.checkArgument(unknown.size > 0, 'There must be at least one property to check.');
 
         this._algorithmBudget.beginBudget();
         pushActiveBudget(this._algorithmBudget);
@@ -146,16 +157,14 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
                 // Termination without resource exhaustion (reached a fixed point)
                 satisfied = unknown.subtract(violated);
                 unknown = unknown.subtract(satisfied);
-
             } catch (e) {
                 if (e instanceof BudgetExhaustedException) {
                     // Do not stop the flow of the analysis in case the budget was exhausted
-                    console.log("The analysis terminated because of budget exhaustion!");
+                    console.log('The analysis terminated because of budget exhaustion!');
                 } else {
                     throw e;
                 }
             }
-
         } finally {
             this._statistics.contextTimer.stop();
             popActiveBudget(this._algorithmBudget);
@@ -164,5 +173,4 @@ export class MultiPropertyAlgorithm<C extends ConcreteElement, E extends Abstrac
 
         return [frontier, reached];
     }
-
 }

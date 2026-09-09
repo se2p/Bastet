@@ -23,20 +23,19 @@
  *
  */
 
-import {WithIdent} from "../../../utils/WithIdent";
+import { WithIdent } from '../../../utils/WithIdent';
 
 export type LocationId = number;
 
 export class ControlLocation implements WithIdent {
-
-    private readonly _id: LocationId
+    private readonly _id: LocationId;
 
     private constructor(id: LocationId) {
-        this._id = id
+        this._id = id;
     }
 
     get ident() {
-        return this._id
+        return this._id;
     }
 
     private static locations: Map<LocationId, ControlLocation> = new Map();
@@ -95,5 +94,4 @@ export class ControlLocation implements WithIdent {
     public static setFreshLocationIdOffset(offset: LocationId): void {
         ControlLocation.locationSequence = Math.max(offset, ControlLocation.locationSequence);
     }
-
 }

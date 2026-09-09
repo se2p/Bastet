@@ -23,22 +23,21 @@
  *
  */
 
-import {Actor, ActorId, ActorMap} from './Actor'
-import {Maps} from "../../utils/Maps";
-import {MethodDefinition, MethodDefinitionList} from "../ast/core/MethodDefinition";
-import {Preconditions} from "../../utils/Preconditions";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {Set as ImmSet} from "immutable";
-import {Properties, Property} from "../Property";
-import {TransitionRelation, TransRelId} from "./controlflow/TransitionRelation";
-import {TypeInformationStorage} from "../DeclarationScopes";
-import {Script} from "./controlflow/Script";
-import {SignalTargetReachedStatement} from "../ast/core/statements/InternalStatement";
-import {BooleanExpression} from "../ast/core/expressions/BooleanExpression";
-import {SystemVariables} from "./SystemVariables";
+import { Actor, ActorId, ActorMap } from './Actor';
+import { Maps } from '../../utils/Maps';
+import { MethodDefinition, MethodDefinitionList } from '../ast/core/MethodDefinition';
+import { Preconditions } from '../../utils/Preconditions';
+import { IllegalArgumentException } from '../../core/exceptions/IllegalArgumentException';
+import { Set as ImmSet } from 'immutable';
+import { Properties, Property } from '../Property';
+import { TransitionRelation, TransRelId } from './controlflow/TransitionRelation';
+import { TypeInformationStorage } from '../DeclarationScopes';
+import { Script } from './controlflow/Script';
+import { SignalTargetReachedStatement } from '../ast/core/statements/InternalStatement';
+import { BooleanExpression } from '../ast/core/expressions/BooleanExpression';
+import { SystemVariables } from './SystemVariables';
 
 export class App {
-
     private readonly _origin: string;
 
     private readonly _ident: string;
@@ -105,8 +104,9 @@ export class App {
 
         for (const a of this.actors) {
             for (const s of a.scripts) {
-                a.transitivelyPresent(s.transitions, (s) => s instanceof SignalTargetReachedStatement)
-                    .forEach((cs) => signaled.add(cs as SignalTargetReachedStatement));
+                a.transitivelyPresent(s.transitions, (s) => s instanceof SignalTargetReachedStatement).forEach((cs) =>
+                    signaled.add(cs as SignalTargetReachedStatement)
+                );
             }
         }
 
@@ -147,10 +147,10 @@ export class App {
     private static EMPTY_APP: App = null;
 
     public static empty(): App {
-       if (App.EMPTY_APP == null) {
-           App.EMPTY_APP = new App("", "empty", {}, new TypeInformationStorage());
-       }
-       return App.EMPTY_APP;
+        if (App.EMPTY_APP == null) {
+            App.EMPTY_APP = new App('', 'empty', {}, new TypeInformationStorage());
+        }
+        return App.EMPTY_APP;
     }
 
     getConditionCheckScript(actor: Actor, condition: BooleanExpression): Script {
@@ -173,6 +173,4 @@ export class App {
 
         return result;
     }
-
 }
-

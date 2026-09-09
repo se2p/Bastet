@@ -23,11 +23,10 @@
  *
  */
 
-import {AbstractNode, AstNode} from "./AstNode";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
+import { AbstractNode, AstNode } from './AstNode';
+import { IllegalArgumentException } from '../../core/exceptions/IllegalArgumentException';
 
 export class AstNodeList<E extends AstNode> extends AbstractNode {
-
     private readonly _elements: E[];
 
     constructor(elements: E[]) {
@@ -45,7 +44,7 @@ export class AstNodeList<E extends AstNode> extends AbstractNode {
 
     public getIth(index: number): E {
         if (index >= this._elements.length) {
-            throw new IllegalArgumentException("Element index out of bounds!");
+            throw new IllegalArgumentException('Element index out of bounds!');
         }
         return this._elements[index];
     }
@@ -53,5 +52,4 @@ export class AstNodeList<E extends AstNode> extends AbstractNode {
     [Symbol.iterator](): IterableIterator<E> {
         return this._elements[Symbol.iterator]();
     }
-
 }

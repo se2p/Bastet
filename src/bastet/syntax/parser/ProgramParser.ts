@@ -23,12 +23,10 @@
  *
  */
 
-import {ProgramContext} from "./grammar/LeilaParser";
+import { ProgramContext } from './grammar/LeilaParser';
 
 export interface ProgramParser {
-
     parseFile(filepath: string): ProgramContext;
 
     parseSource(basename: string, sourcecode: string): ProgramContext;
-
 }

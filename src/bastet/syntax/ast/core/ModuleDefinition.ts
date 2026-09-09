@@ -23,12 +23,11 @@
  *
  */
 
-import {AbstractNode} from "../AstNode";
-import {Identifier} from "./Identifier";
-import {ActorDefinitionList} from "./ActorDefinition";
+import { AbstractNode } from '../AstNode';
+import { Identifier } from './Identifier';
+import { ActorDefinitionList } from './ActorDefinition';
 
 export class ProgramDefinition extends AbstractNode {
-
     private readonly _ident: Identifier;
     private readonly _actors: ActorDefinitionList;
 
@@ -45,5 +44,4 @@ export class ProgramDefinition extends AbstractNode {
     get actors(): ActorDefinitionList {
         return this._actors;
     }
-
 }

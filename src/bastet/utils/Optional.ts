@@ -23,25 +23,20 @@
  *
  */
 
-import {AbstractElement} from "../lattices/Lattice";
-import {Record as ImmRec} from "immutable";
+import { AbstractElement } from '../lattices/Lattice';
+import { Record as ImmRec } from 'immutable';
 
 export interface OptionalAttribs<T extends AbstractElement> extends AbstractElement {
-
     value?: T;
-
 }
 
 const OptionalRecord = ImmRec({
-
     value: null,
-
 });
 
 export class Optional<T extends AbstractElement> extends OptionalRecord implements OptionalAttribs<T>, AbstractElement {
-
     constructor(value: T) {
-        super({value: value});
+        super({ value: value });
     }
 
     public getValue(): T {
@@ -65,7 +60,7 @@ export class Optional<T extends AbstractElement> extends OptionalRecord implemen
     }
 
     public static absent<T extends AbstractElement>(): Optional<T> {
-       return new Optional(null);
+        return new Optional(null);
     }
 
     public static of<T extends AbstractElement>(value: T): Optional<T> {
@@ -74,5 +69,4 @@ export class Optional<T extends AbstractElement> extends OptionalRecord implemen
         }
         return new Optional(value);
     }
-
 }

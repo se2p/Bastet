@@ -26,32 +26,72 @@
 import {
     AbstractNumber,
     AbstractTheories,
-    BooleanTheory, FloatTheory, IntegerTheory, ListTheory, NumberTheory,
-    RealTheory, StringTheory,
-    TransformerTheories
-} from "../../domains/MemoryTransformer";
+    BooleanTheory,
+    FloatTheory,
+    IntegerTheory,
+    ListTheory,
+    NumberTheory,
+    RealTheory,
+    StringTheory,
+    TransformerTheories,
+} from '../../domains/MemoryTransformer';
 import {
     BooleanFormula,
     FirstOrderFormula,
     FloatFormula,
-    IntegerFormula, ListFormula,
-    RealFormula, StringFormula
-} from "../../../utils/ConjunctiveNormalForm";
-import {Preconditions} from "../../../utils/Preconditions";
-import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {FloatType, IntegerType, ScratchType} from "../../../syntax/ast/core/ScratchType";
+    IntegerFormula,
+    ListFormula,
+    RealFormula,
+    StringFormula,
+} from '../../../utils/ConjunctiveNormalForm';
+import { Preconditions } from '../../../utils/Preconditions';
+import { IllegalArgumentException } from '../../../core/exceptions/IllegalArgumentException';
+import { FloatType, IntegerType, ScratchType } from '../../../syntax/ast/core/ScratchType';
 
-export class Theories implements TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula> {
+export class Theories implements TransformerTheories<
+    FirstOrderFormula,
+    BooleanFormula,
+    IntegerFormula,
+    RealFormula,
+    FloatFormula,
+    StringFormula,
+    ListFormula
+> {
+    private readonly _wrapped: AbstractTheories<
+        FirstOrderFormula,
+        BooleanFormula,
+        IntegerFormula,
+        RealFormula,
+        FloatFormula,
+        StringFormula,
+        ListFormula
+    >;
 
-    private readonly _wrapped: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
+    private readonly _encodeFloatsAs: RealTheory<
+        AbstractNumber,
+        IntegerFormula,
+        RealFormula,
+        FloatFormula,
+        BooleanFormula,
+        StringFormula
+    >;
 
-    private readonly _encodeFloatsAs: RealTheory<AbstractNumber, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula>;
-
-    constructor(encodeFloatsAs: string, wrapped: AbstractTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
+    constructor(
+        encodeFloatsAs: string,
+        wrapped: AbstractTheories<
+            FirstOrderFormula,
+            BooleanFormula,
+            IntegerFormula,
+            RealFormula,
+            FloatFormula,
+            StringFormula,
+            ListFormula
+        >
+    ) {
         this._wrapped = Preconditions.checkNotUndefined(wrapped);
-        if (encodeFloatsAs.toUpperCase() == "REALS") {
+        if (encodeFloatsAs.toUpperCase() == 'REALS') {
             this._encodeFloatsAs = this._wrapped.realTheory;
-        } else if (encodeFloatsAs.toUpperCase() == "FLOATS") {
+        } else if (encodeFloatsAs.toUpperCase() == 'FLOATS') {
             this._encodeFloatsAs = this._wrapped.floatTheory;
         } else {
             throw new IllegalArgumentException();
@@ -62,11 +102,25 @@ export class Theories implements TransformerTheories<FirstOrderFormula, BooleanF
         return this._wrapped.boolTheory;
     }
 
-    get floatTheory(): FloatTheory<FloatFormula, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
+    get floatTheory(): FloatTheory<
+        FloatFormula,
+        IntegerFormula,
+        RealFormula,
+        FloatFormula,
+        BooleanFormula,
+        StringFormula
+    > {
         return this._wrapped.floatTheory;
     }
 
-    get intTheory(): IntegerTheory<IntegerFormula, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
+    get intTheory(): IntegerTheory<
+        IntegerFormula,
+        IntegerFormula,
+        RealFormula,
+        FloatFormula,
+        BooleanFormula,
+        StringFormula
+    > {
         return this._wrapped.intTheory;
     }
 
@@ -74,7 +128,14 @@ export class Theories implements TransformerTheories<FirstOrderFormula, BooleanF
         return this._wrapped.listTheory;
     }
 
-    get realTheory(): RealTheory<RealFormula, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
+    get realTheory(): RealTheory<
+        RealFormula,
+        IntegerFormula,
+        RealFormula,
+        FloatFormula,
+        BooleanFormula,
+        StringFormula
+    > {
         return this._wrapped.realTheory;
     }
 
@@ -82,17 +143,21 @@ export class Theories implements TransformerTheories<FirstOrderFormula, BooleanF
         return this._wrapped.stringTheory;
     }
 
-    getNumberTheoryFor(t: ScratchType): NumberTheory<AbstractNumber, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
+    getNumberTheoryFor(
+        t: ScratchType
+    ): NumberTheory<AbstractNumber, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
         if (t == IntegerType.instance()) {
             return this.intTheory;
         } else if (t == FloatType.instance()) {
             return this._encodeFloatsAs;
         }
 
-        throw new IllegalArgumentException("Unknown number type to map theory to");
+        throw new IllegalArgumentException('Unknown number type to map theory to');
     }
 
-    getNumberTheoryOf(e: AbstractNumber): NumberTheory<AbstractNumber, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
+    getNumberTheoryOf(
+        e: AbstractNumber
+    ): NumberTheory<AbstractNumber, IntegerFormula, RealFormula, FloatFormula, BooleanFormula, StringFormula> {
         return this._wrapped.getNumberTheoryOf(e);
     }
 
@@ -115,5 +180,4 @@ export class Theories implements TransformerTheories<FirstOrderFormula, BooleanF
     uninstantiate(formula: FirstOrderFormula): FirstOrderFormula {
         return this._wrapped.uninstantiate(formula);
     }
-
 }

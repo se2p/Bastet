@@ -23,16 +23,16 @@
  *
  */
 
-import {ProgramOperation} from "../../../../syntax/app/controlflow/ops/ProgramOperation";
-import {ErrorWitnessStep} from "./ErrorWitness";
-import {MethodValueReadVisitor} from "../../../../syntax/ast/MethodValueReadVisitor";
-import {Assignment, MethodCallAssignmentVisitor} from "../../../../syntax/ast/MethodCallAssignmentVisitor";
-import {Preconditions} from "../../../../utils/Preconditions";
-import {DataLocationScoper} from "../../control/DataLocationScoping";
-import {Action} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
-import {Broadcast, BroadcastVisitor} from "../../../../syntax/ast/BroadcastVisitor";
-import {ThreadState} from "../../control/ConcreteProgramState";
-import {VAR_SCOPING_SPLITTER} from "../../../../syntax/app/controlflow/DataLocation";
+import { ProgramOperation } from '../../../../syntax/app/controlflow/ops/ProgramOperation';
+import { ErrorWitnessStep } from './ErrorWitness';
+import { MethodValueReadVisitor } from '../../../../syntax/ast/MethodValueReadVisitor';
+import { Assignment, MethodCallAssignmentVisitor } from '../../../../syntax/ast/MethodCallAssignmentVisitor';
+import { Preconditions } from '../../../../utils/Preconditions';
+import { DataLocationScoper } from '../../control/DataLocationScoping';
+import { Action } from '../../../../syntax/ast/ErrorWitnessActionVisitor';
+import { Broadcast, BroadcastVisitor } from '../../../../syntax/ast/BroadcastVisitor';
+import { ThreadState } from '../../control/ConcreteProgramState';
+import { VAR_SCOPING_SPLITTER } from '../../../../syntax/app/controlflow/DataLocation';
 
 export interface ActionExtractor {
     /**
@@ -47,7 +47,7 @@ export interface ActionExtractor {
      * @param step
      * @param successors
      */
-    setActionForStep(step: ErrorWitnessStep, successors: ErrorWitnessStep[]): ErrorWitnessStep|void;
+    setActionForStep(step: ErrorWitnessStep, successors: ErrorWitnessStep[]): ErrorWitnessStep | void;
 }
 
 export abstract class BroadcastActionExtractor implements ActionExtractor {
@@ -60,8 +60,9 @@ export abstract class BroadcastActionExtractor implements ActionExtractor {
     }
 
     processOperations(operations: [ThreadState, ProgramOperation][], step: ErrorWitnessStep): void {
-        const broadcasts = operations.map(([ts, operation]) => operation.ast.accept(this._broadcastVisitor))
-            .filter(broadcast => broadcast && broadcast.id === this._broadcast);
+        const broadcasts = operations
+            .map(([ts, operation]) => operation.ast.accept(this._broadcastVisitor))
+            .filter((broadcast) => broadcast && broadcast.id === this._broadcast);
         this._stepToBroadcasts.set(step.id, broadcasts);
     }
 
@@ -69,7 +70,6 @@ export abstract class BroadcastActionExtractor implements ActionExtractor {
 }
 
 export class SpriteClickBroadcastActionExtractor extends BroadcastActionExtractor {
-
     constructor() {
         super('SPRITE_CLICK');
     }
@@ -88,7 +88,6 @@ export class SpriteClickBroadcastActionExtractor extends BroadcastActionExtracto
 }
 
 export abstract class QueryMethodActionExtractor implements ActionExtractor {
-
     private readonly _actionMethodNames: string[];
     private readonly _visitor: MethodValueReadVisitor;
     private readonly _stepToAssignments: Map<number, Assignment[]> = new Map<number, Assignment[]>();
@@ -118,7 +117,7 @@ export abstract class QueryMethodActionExtractor implements ActionExtractor {
 
         const assignments = operations
             .map(([ts, op]) => op.ast.accept(new MethodCallAssignmentVisitor()))
-            .filter(a => a !== undefined);
+            .filter((a) => a !== undefined);
         this._stepToAssignments.set(step.id, assignments);
     }
 
@@ -127,14 +126,24 @@ export abstract class QueryMethodActionExtractor implements ActionExtractor {
             const assignments = this._stepToAssignments.get(step.id);
             Preconditions.checkNotUndefined(assignments);
 
-            const assignmentWithReadEvent = assignments.find(assignment => this._actionMethodNames.includes(assignment.method) && this._actionMethodReadFrom.includes(assignment.variable));
+            const assignmentWithReadEvent = assignments.find(
+                (assignment) =>
+                    this._actionMethodNames.includes(assignment.method) &&
+                    this._actionMethodReadFrom.includes(assignment.variable)
+            );
 
             if (assignmentWithReadEvent) {
-                const variableNameWithoutSSA = DataLocationScoper.rightUnwrapScope(assignmentWithReadEvent.variable).prefix;
+                const variableNameWithoutSSA = DataLocationScoper.rightUnwrapScope(
+                    assignmentWithReadEvent.variable
+                ).prefix;
                 // The value is only defined in the next step
-                const variableValue = this.getFirstDefinedVariableValue(variableNameWithoutSSA, successors, step.actionTargetName);
+                const variableValue = this.getFirstDefinedVariableValue(
+                    variableNameWithoutSSA,
+                    successors,
+                    step.actionTargetName
+                );
 
-                Preconditions.checkState(variableValue !== undefined, `Unknown variable '${variableNameWithoutSSA}'`)
+                Preconditions.checkState(variableValue !== undefined, `Unknown variable '${variableNameWithoutSSA}'`);
 
                 this.setActionForStepInternal(step, variableValue, assignmentWithReadEvent);
             }
@@ -145,8 +154,10 @@ export abstract class QueryMethodActionExtractor implements ActionExtractor {
         // We unscope the variable (by removing the actor name at the very beginning).
         const unscopedVariableName = variableName.split(VAR_SCOPING_SPLITTER).slice(1).join(VAR_SCOPING_SPLITTER);
 
-        Preconditions.checkState(variableName.split(VAR_SCOPING_SPLITTER)[0] === targetName,
-            `Variable ${variableName} should have been in scope of ${targetName}`);
+        Preconditions.checkState(
+            variableName.split(VAR_SCOPING_SPLITTER)[0] === targetName,
+            `Variable ${variableName} should have been in scope of ${targetName}`
+        );
 
         for (const step of steps) {
             const value = step.getVariableValue(targetName, unscopedVariableName);

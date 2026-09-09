@@ -23,142 +23,122 @@
  *
  */
 
-import {ScratchType, ScratchTypeID, VoidType} from "../../ast/core/ScratchType";
-import {Record as ImmRec} from "immutable";
-import {Identifier} from "../../ast/core/Identifier";
-import {Preconditions} from "../../../utils/Preconditions";
+import { ScratchType, ScratchTypeID, VoidType } from '../../ast/core/ScratchType';
+import { Record as ImmRec } from 'immutable';
+import { Identifier } from '../../ast/core/Identifier';
+import { Preconditions } from '../../../utils/Preconditions';
 
 export type DataLocationID = string;
 
-export type DataLocationMap = { [id:string]: TypedDataLocation } ;
+export type DataLocationMap = { [id: string]: TypedDataLocation };
 
-export const VAR_SCOPING_SPLITTER = "@";
+export const VAR_SCOPING_SPLITTER = '@';
 
 export interface DataLocation {
-
     type: ScratchTypeID;
 
     ident: string;
 
     qualifiedName: string;
-
 }
 
 export interface TypedDataLocationAttributes {
-
     type: ScratchTypeID;
 
     ident: string;
 
     qualifiedName: string;
-
 }
 
 export interface StaticDataLocationAttributes extends TypedDataLocationAttributes {
-
     version: number;
-
 }
 
 const TypedDataLocationRecord = ImmRec({
-
     type: 0,
 
-    ident: "",
+    ident: '',
 
-    qualifiedName: ""
-
+    qualifiedName: '',
 });
 
 const VersionedDataLocationRecord = ImmRec({
-
     type: 0,
 
-    ident: "",
+    ident: '',
 
-    qualifiedName: "",
+    qualifiedName: '',
 
-    version: 0
-
+    version: 0,
 });
 
 export class TypedDataLocation extends TypedDataLocationRecord implements TypedDataLocationAttributes {
-
     constructor(ident: string, type: ScratchTypeID) {
-        super({ident: ident, qualifiedName: ident, type: type});
+        super({ ident: ident, qualifiedName: ident, type: type });
     }
 
     public getIdent(): string {
-        return this.get("ident");
+        return this.get('ident');
     }
 
     public getQualifiedName(): string {
-        return this.get("qualifiedName");
+        return this.get('qualifiedName');
     }
 
     public getType(): ScratchTypeID {
-        return this.get("type");
+        return this.get('type');
     }
 
     private static VOID_LOCATION;
 
     static void(): DataLocation {
         if (!TypedDataLocation.VOID_LOCATION) {
-            TypedDataLocation.VOID_LOCATION = new TypedDataLocation("void", VoidType.instance().typeId);
+            TypedDataLocation.VOID_LOCATION = new TypedDataLocation('void', VoidType.instance().typeId);
         }
         return this.VOID_LOCATION;
     }
-
 }
 
 export class VersionedDataLocation extends VersionedDataLocationRecord implements StaticDataLocationAttributes {
-
     constructor(ident: string, type: ScratchTypeID, version: number) {
-        const qualifiedName = `${ident}${VAR_SCOPING_SPLITTER}${version}`
-        super({ident: ident, qualifiedName: qualifiedName, type: type, version: version});
+        const qualifiedName = `${ident}${VAR_SCOPING_SPLITTER}${version}`;
+        super({ ident: ident, qualifiedName: qualifiedName, type: type, version: version });
     }
 
     public getIdent(): string {
-        return this.get("ident");
+        return this.get('ident');
     }
 
     public getType(): ScratchTypeID {
-        return this.get("type");
+        return this.get('type');
     }
 
     public getVersion(): number {
-        return this.get("version");
+        return this.get('version');
     }
 
     public getQualifiedName(): string {
-        return this.get("qualifiedName");
+        return this.get('qualifiedName');
     }
-
 }
 
 /**
  * Might add actor-specific prefixes.
  */
 export interface DataLocationMapper {
-
     mapDataLocation(loc: DataLocation): DataLocation;
-
 }
 
 export class DummyDataLocationMapper implements DataLocationMapper {
-
     mapDataLocation(loc: DataLocation): DataLocation {
         return loc;
     }
-
 }
 
 export class DataLocations {
-
     public static createTypedLocation(id: Identifier, type: ScratchType) {
         Preconditions.checkNotUndefined(id);
         Preconditions.checkNotUndefined(type);
         return new TypedDataLocation(id.text, type.typeId);
     }
-
 }

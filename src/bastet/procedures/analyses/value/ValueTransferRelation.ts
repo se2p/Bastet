@@ -23,43 +23,51 @@
  *
  */
 
-import {LabeledTransferRelation} from "../TransferRelation";
-import {ValueAbstractDomain, ValueAbstractState} from "./ValueAbstractDomain";
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {
-    AssumeOperation,
-    ProgramOperation,
-    ProgramOperationInContext
-} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {TransformerTheories} from "../../domains/MemoryTransformer";
-import {Preconditions} from "../../../utils/Preconditions";
-import {AstNode} from "../../../syntax/ast/AstNode";
-import {StrengtheningAssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
-import {Concern} from "../../../syntax/Concern";
+import { LabeledTransferRelation } from '../TransferRelation';
+import { ValueAbstractDomain, ValueAbstractState } from './ValueAbstractDomain';
+import { IllegalStateException } from '../../../core/exceptions/IllegalStateException';
+import { AssumeOperation, ProgramOperationInContext } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { TransformerTheories } from '../../domains/MemoryTransformer';
+import { Preconditions } from '../../../utils/Preconditions';
+import { AstNode } from '../../../syntax/ast/AstNode';
+import { StrengtheningAssumeStatement } from '../../../syntax/ast/core/statements/AssumeStatement';
+import { Concern } from '../../../syntax/Concern';
 import {
     ConcreteBoolean,
     ConcreteFloat,
     ConcreteInteger,
     ConcreteMemory,
-    ConcreteString, ConcreteStringList
-} from "../../domains/ConcreteElements";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
+    ConcreteString,
+    ConcreteStringList,
+} from '../../domains/ConcreteElements';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
 
 export class ValueTransferRelation implements LabeledTransferRelation<ValueAbstractState> {
-
     private readonly _abstDomain: ValueAbstractDomain;
 
-    private readonly _theories: TransformerTheories<ConcreteMemory, ConcreteBoolean, ConcreteInteger, ConcreteFloat, ConcreteFloat, ConcreteString, ConcreteStringList>;
+    private readonly _theories: TransformerTheories<
+        ConcreteMemory,
+        ConcreteBoolean,
+        ConcreteInteger,
+        ConcreteFloat,
+        ConcreteFloat,
+        ConcreteString,
+        ConcreteStringList
+    >;
 
     constructor(abstDomain: ValueAbstractDomain) {
         this._abstDomain = Preconditions.checkNotUndefined(abstDomain);
     }
 
     public abstractSucc(fromState: ValueAbstractState): Iterable<ValueAbstractState> {
-        throw new IllegalStateException("Only the labelled transfer is supported by this transfer relation");
+        throw new IllegalStateException('Only the labelled transfer is supported by this transfer relation');
     }
 
-    public abstractSuccFor(fromState: ValueAbstractState, opic: ProgramOperationInContext, co: Concern): Iterable<ValueAbstractState> {
+    public abstractSuccFor(
+        fromState: ValueAbstractState,
+        opic: ProgramOperationInContext,
+        co: Concern
+    ): Iterable<ValueAbstractState> {
         let ast: AstNode;
         if (opic.op instanceof AssumeOperation) {
             const assume = opic.op as AssumeOperation;
@@ -76,5 +84,4 @@ export class ValueTransferRelation implements LabeledTransferRelation<ValueAbstr
         // return [ast.accept(visitor)];
         throw new ImplementMeException();
     }
-
 }

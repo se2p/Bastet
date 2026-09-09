@@ -27,21 +27,22 @@ import {
     AbstractBoolean,
     AbstractFloat,
     AbstractInteger,
-    AbstractList, AbstractMemory,
+    AbstractList,
+    AbstractMemory,
     AbstractNumber,
-    AbstractReal, AbstractString, AbstractStringList
-} from "./MemoryTransformer";
+    AbstractReal,
+    AbstractString,
+    AbstractStringList,
+} from './MemoryTransformer';
 
 type float = number;
 type integer = number;
 
-import {AbstractElement, AbstractState, Lattice, AbstractElementVisitor} from "../../lattices/Lattice";
-import {Preconditions} from "../../utils/Preconditions";
-import {Record as ImmRec, Map as ImmMap} from "immutable";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {VariableWithDataLocation} from "../../syntax/ast/core/Variable";
-import {VAR_SCOPING_SPLITTER} from "../../syntax/app/controlflow/DataLocation";
+import { AbstractElement, AbstractState, Lattice, AbstractElementVisitor } from '../../lattices/Lattice';
+import { Preconditions } from '../../utils/Preconditions';
+import { Record as ImmRec, Map as ImmMap } from 'immutable';
+import { ImplementMeException } from '../../core/exceptions/ImplementMeException';
+import { IllegalArgumentException } from '../../core/exceptions/IllegalArgumentException';
 
 function containsAll<K, V>(map1: ImmMap<K, V>, map2: ImmMap<K, V>): boolean {
     throw new ImplementMeException();
@@ -54,12 +55,9 @@ function joinMaps<K, V>(map1: ImmMap<K, V>, map2: ImmMap<K, V>): ImmMap<K, V> {
 /**
  * A concrete element is an abstract element, with all information (no abstraction applied).
  */
-export interface ConcreteElement extends AbstractElement {
-
-}
+export interface ConcreteElement extends AbstractElement {}
 
 export class ConcreteNumberOrderLattice implements Lattice<ConcreteNumber> {
-
     private readonly _bottom: ConcreteNumber;
     private readonly _top: ConcreteNumber;
 
@@ -87,87 +85,72 @@ export class ConcreteNumberOrderLattice implements Lattice<ConcreteNumber> {
     top(): ConcreteNumber {
         return this._top;
     }
-
 }
 
 export interface ConcretePrimitiveValue<T> extends ConcreteElement {
-
     value: T;
-
 }
 
 const ConcretePrimitiveValueRecord = ImmRec({
-
     value: null,
-
 });
 
 export class ConcretePrimitive<T> extends ConcretePrimitiveValueRecord implements ConcretePrimitiveValue<T> {
-
     constructor(args: any = {}) {
         super(Object.assign({}, args, {}));
     }
-
 }
 
 export class ConcreteString extends ConcretePrimitive<string> implements AbstractString {
-
     constructor(value: string) {
-        super({value: value});
+        super({ value: value });
     }
 }
 
 export class ConcreteFloat extends ConcretePrimitive<float> implements AbstractFloat, AbstractReal {
-
     constructor(value: float) {
-        super({value: value});
+        super({ value: value });
     }
 }
 
 export class ConcreteInteger extends ConcretePrimitive<integer> implements AbstractInteger {
-
     constructor(value: integer) {
-        super({value: value});
+        super({ value: value });
     }
 }
 
 export class ConcreteBoolean extends ConcretePrimitive<boolean> implements AbstractBoolean {
-
     constructor(value: boolean) {
-        super({value: value});
+        super({ value: value });
     }
 }
 
 export class ConcreteNumber extends ConcretePrimitive<number> implements AbstractNumber {
-
     constructor(value: number) {
-        super({value: value});
+        super({ value: value });
     }
 }
 
-export class ConcreteList<Of extends ConcreteElement> extends ConcretePrimitive<Of> implements ConcreteElement, AbstractList {
-
+export class ConcreteList<Of extends ConcreteElement>
+    extends ConcretePrimitive<Of>
+    implements ConcreteElement, AbstractList
+{
     constructor(values: Of[]) {
-        super({value: values});
+        super({ value: values });
     }
-
 }
 
 export class ConcreteStringList extends ConcreteList<ConcreteString> implements AbstractStringList, AbstractList {
-
     constructor(elements: ConcreteString[]) {
         super(elements);
     }
 }
 
 export interface ConcreteDomain<T extends ConcreteElement> {
-
     createElement(attrs: {}): T;
-
 }
 
 export class ConcreteNumberDomain implements ConcreteDomain<ConcreteNumber> {
-
     createElement(attrs: {}): ConcreteNumber {
         return new ConcreteNumber(attrs['value']);
     }
@@ -175,11 +158,9 @@ export class ConcreteNumberDomain implements ConcreteDomain<ConcreteNumber> {
     public static elementFomPrimitive(num: number): ConcreteNumber {
         return new ConcreteNumber(num);
     }
-
 }
 
 export class ConcreteBooleanDomain implements ConcreteDomain<ConcreteBoolean> {
-
     createElement(attrs: {}): ConcreteBoolean {
         return new ConcreteBoolean(attrs['value']);
     }
@@ -187,11 +168,9 @@ export class ConcreteBooleanDomain implements ConcreteDomain<ConcreteBoolean> {
     elementFomPrimitive(val: boolean): ConcreteBoolean {
         return new ConcreteBoolean(val);
     }
-
 }
 
 export class ConcreteBoundedStringDomain implements ConcreteDomain<ConcreteString> {
-
     private readonly _bound: number;
 
     constructor(bound: number) {
@@ -205,25 +184,22 @@ export class ConcreteBoundedStringDomain implements ConcreteDomain<ConcreteStrin
     createFrom(str: string): ConcreteString {
         return new ConcreteString(str.substr(0, this._bound));
     }
-
 }
 
 export interface ConcreteUnifiedMemoryAttributes {
-
     mem: ImmMap<string, ConcretePrimitive<any>>;
-
 }
 
 const ConcreteUnifiedMemoryRecord = ImmRec({
-
     mem: ImmMap<string, ConcretePrimitive<any>>(),
-
 });
 
-export class ConcreteUnifiedMemory extends ConcreteUnifiedMemoryRecord implements ConcreteUnifiedMemoryAttributes, ConcreteElement {
-
+export class ConcreteUnifiedMemory
+    extends ConcreteUnifiedMemoryRecord
+    implements ConcreteUnifiedMemoryAttributes, ConcreteElement
+{
     constructor(mem: ImmMap<string, ConcretePrimitive<any>>) {
-        super({mem: mem});
+        super({ mem: mem });
     }
 
     public variables(): Iterable<string> {
@@ -234,12 +210,12 @@ export class ConcreteUnifiedMemory extends ConcreteUnifiedMemoryRecord implement
         return this.mem.get(variable);
     }
 
-    public getPrimitiveValue(variable: string): (number | boolean | string | (number | boolean | string)[]) {
+    public getPrimitiveValue(variable: string): number | boolean | string | (number | boolean | string)[] {
         return this.mem.get(variable).value;
     }
 
     public withValue(forVariable: string, value: ConcretePrimitive<any>): ConcreteUnifiedMemory {
-       return new ConcreteUnifiedMemory(this.mem.set(forVariable, value));
+        return new ConcreteUnifiedMemory(this.mem.set(forVariable, value));
     }
 
     public getSize(): number {
@@ -274,33 +250,33 @@ export class ConcreteUnifiedMemory extends ConcreteUnifiedMemoryRecord implement
 }
 
 export interface ConcreteMemoryStateAttributes {
-
     integers: ImmMap<string, ConcreteInteger>;
     floats: ImmMap<string, ConcreteFloat>;
     strings: ImmMap<string, ConcreteString>;
     booleans: ImmMap<string, ConcreteBoolean>;
     lists: ImmMap<string, ConcreteList<ConcreteString>>;
-
 }
 
 const ConcreteMemoryRecord = ImmRec({
-
     integers: ImmMap<string, ConcreteInteger>(),
     floats: ImmMap<string, ConcreteFloat>(),
     strings: ImmMap<string, ConcreteString>(),
     booleans: ImmMap<string, ConcreteBoolean>(),
-    lists: ImmMap<string, ConcreteStringList>()
-
+    lists: ImmMap<string, ConcreteStringList>(),
 });
 
-export class ConcreteMemory extends ConcreteMemoryRecord implements ConcreteMemoryStateAttributes, ConcreteElement, AbstractState, AbstractBoolean, AbstractMemory {
-
-    constructor(integerMem: ImmMap<string, ConcreteInteger>,
-                floatMem: ImmMap<string, ConcreteFloat>,
-                stringMem: ImmMap<string, ConcreteString>,
-                booleanMem: ImmMap<string, ConcreteBoolean>,
-                listMem: ImmMap<string, ConcreteList<ConcreteString>>) {
-        super({integers: integerMem, floats: floatMem, strings: stringMem, booleans: booleanMem, lists: listMem});
+export class ConcreteMemory
+    extends ConcreteMemoryRecord
+    implements ConcreteMemoryStateAttributes, ConcreteElement, AbstractState, AbstractBoolean, AbstractMemory
+{
+    constructor(
+        integerMem: ImmMap<string, ConcreteInteger>,
+        floatMem: ImmMap<string, ConcreteFloat>,
+        stringMem: ImmMap<string, ConcreteString>,
+        booleanMem: ImmMap<string, ConcreteBoolean>,
+        listMem: ImmMap<string, ConcreteList<ConcreteString>>
+    ) {
+        super({ integers: integerMem, floats: floatMem, strings: stringMem, booleans: booleanMem, lists: listMem });
     }
 
     public accept<R>(visitor: AbstractElementVisitor<R>): R {
@@ -353,16 +329,11 @@ export class ConcreteMemory extends ConcreteMemoryRecord implements ConcreteMemo
     }
 
     getPrimitiveAttributeByName(name: string): ConcretePrimitive<any> {
-        return this.integers.get(name)
-            || this.strings.get(name)
-            || this.booleans.get(name)
-            || this.lists.get(name);
+        return this.integers.get(name) || this.strings.get(name) || this.booleans.get(name) || this.lists.get(name);
     }
-
 }
 
 export class ConcreteElementFactory {
-
     static concreteStringFrom(str: string): ConcreteString {
         return new ConcreteString(str);
     }
@@ -374,11 +345,9 @@ export class ConcreteElementFactory {
     static concreteBooleanFrom(bo: boolean): ConcreteBoolean {
         return new ConcreteBoolean(bo);
     }
-
 }
 
 export abstract class FlatLattice<T extends ConcreteElement> implements Lattice<T> {
-
     private readonly _top: T;
 
     private readonly _bottom: T;
@@ -426,58 +395,47 @@ export abstract class FlatLattice<T extends ConcreteElement> implements Lattice<
 }
 
 export class FlatIntegerLattice extends FlatLattice<ConcreteInteger> {
-
     constructor() {
         const top = new ConcreteInteger(1234567890);
         const bottom = new ConcreteInteger(-123456789);
         super(top, bottom);
     }
-
 }
 
 export class FlatFloatLattice extends FlatLattice<ConcreteFloat> {
-
     constructor() {
         const top = new ConcreteFloat(Math.PI);
         const bottom = new ConcreteFloat(-Math.PI);
         super(top, bottom);
     }
-
 }
 
 export class FlatBooleanLattice extends FlatLattice<ConcreteBoolean> {
-
     constructor() {
         const top = new ConcreteBoolean(true);
         const bottom = new ConcreteBoolean(false);
         super(top, bottom);
     }
-
 }
 
 export class FlatStringLattice extends FlatLattice<ConcreteString> {
-
     constructor() {
-        const top = new ConcreteString("");
-        const bottom = new ConcreteString("");
+        const top = new ConcreteString('');
+        const bottom = new ConcreteString('');
         super(top, bottom);
     }
-
 }
 
 export class FlatStringListLattice extends FlatLattice<ConcreteStringList> {
-
     constructor() {
         const stringLattice = new FlatStringLattice();
         const top = new ConcreteStringList([stringLattice.top()]);
         const bottom = new ConcreteStringList([stringLattice.bottom()]);
         super(top, bottom);
     }
-
 }
 
 export class ConcreteMemoryLattice implements Lattice<ConcreteMemory> {
-
     private readonly _bottom: ConcreteMemory;
 
     private readonly _top: ConcreteMemory;
@@ -504,7 +462,8 @@ export class ConcreteMemoryLattice implements Lattice<ConcreteMemory> {
             ImmMap([['*', this._floatLattice.top()]]),
             ImmMap([['*', this._stringLattice.top()]]),
             ImmMap([['*', this._booleanLattice.top()]]),
-            ImmMap([['*', this._listLattice.top()]]));
+            ImmMap([['*', this._listLattice.top()]])
+        );
     }
 
     bottom(): ConcreteMemory {
@@ -524,11 +483,13 @@ export class ConcreteMemoryLattice implements Lattice<ConcreteMemory> {
             return element1 === this._bottom;
         }
 
-        return containsAll(element1.integers, element2.integers)
-            && containsAll(element1.floats, element2.floats)
-            && containsAll(element1.strings, element2.strings)
-            && containsAll(element1.booleans, element2.booleans)
-            && containsAll(element1.lists, element2.lists);
+        return (
+            containsAll(element1.integers, element2.integers) &&
+            containsAll(element1.floats, element2.floats) &&
+            containsAll(element1.strings, element2.strings) &&
+            containsAll(element1.booleans, element2.booleans) &&
+            containsAll(element1.lists, element2.lists)
+        );
     }
 
     join(element1: ConcreteMemory, element2: ConcreteMemory): ConcreteMemory {
@@ -544,7 +505,8 @@ export class ConcreteMemoryLattice implements Lattice<ConcreteMemory> {
             return element1;
         }
 
-        return element1.withBooleans(joinMaps(element1.booleans, element2.booleans))
+        return element1
+            .withBooleans(joinMaps(element1.booleans, element2.booleans))
             .withIntegers(joinMaps(element1.integers, element2.integers))
             .withFloats(joinMaps(element1.floats, element2.floats))
             .withStrings(joinMaps(element1.strings, element2.strings))
@@ -558,6 +520,4 @@ export class ConcreteMemoryLattice implements Lattice<ConcreteMemory> {
     top(): ConcreteMemory {
         return this._top;
     }
-
 }
-

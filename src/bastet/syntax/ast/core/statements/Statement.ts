@@ -23,27 +23,22 @@
  *
  */
 
-import {AbstractNode, AstNode} from "../../AstNode";
-import {AstNodeList} from "../../AstNodeList";
+import { AbstractNode, AstNode } from '../../AstNode';
+import { AstNodeList } from '../../AstNodeList';
 
 export abstract class Statement extends AbstractNode {
-
     constructor(childs: AstNode[]) {
         super(childs);
     }
-
 }
 
 export class StatementLists {
-
     public static concat(list1: StatementList, list2: StatementList): StatementList {
         return new StatementList(list1.elements.concat(list2.elements));
     }
-
 }
 
 export class StatementList extends AstNodeList<Statement> {
-
     private readonly _isAtomic: boolean;
 
     constructor(elements: Statement[], isAtomic: boolean = false) {
@@ -66,16 +61,13 @@ export class StatementList extends AstNodeList<Statement> {
     }
 }
 
-export interface NonPreemptive {
-
-}
+export interface NonPreemptive {}
 
 /**
  * The execution of the statements in supposed to be not interleaved
  * with other statements from other scripts.
  */
 export class NonPreemptiveBlockStatement extends AbstractNode implements Statement, NonPreemptive {
-
     private readonly _statements: StatementList;
 
     constructor(statements: StatementList) {
@@ -86,7 +78,6 @@ export class NonPreemptiveBlockStatement extends AbstractNode implements Stateme
     get statements(): StatementList {
         return this._statements;
     }
-
 }
 
 /**
@@ -95,9 +86,7 @@ export class NonPreemptiveBlockStatement extends AbstractNode implements Stateme
  * the machine and READ the SAME DATA, also from VOLATILE variables!
  */
 export class SingleStepBlockStatement extends NonPreemptiveBlockStatement {
-
     constructor(statements: StatementList) {
         super(statements);
     }
-
 }

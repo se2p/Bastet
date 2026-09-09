@@ -23,37 +23,30 @@
  *
  */
 
-import {Record as ImmRec} from "immutable";
-import { IllegalArgumentException } from "../core/exceptions/IllegalArgumentException";
-import {PerfTimer} from "../utils/PerfTimer";
+import { Record as ImmRec } from 'immutable';
+import { IllegalArgumentException } from '../core/exceptions/IllegalArgumentException';
+import { PerfTimer } from '../utils/PerfTimer';
 
 /**
  * Common interface for all lattice elements.
  */
-export interface AbstractElement extends ImmRec<any> {
-
-}
+export interface AbstractElement extends ImmRec<any> {}
 
 /**
  * A visitor for {@link AbstractElement}s.
  */
 export interface AbstractElementVisitor<T> {
-
     visit(element: AbstractElement): T;
-
 }
 
 /**
  * A lattice element that implements the visitor pattern.
  */
 export interface AbstractState extends AbstractElement {
-
     accept<T>(visitor: AbstractElementVisitor<T>): T;
-
 }
 
 export interface WithReferenceCounting<E extends AbstractElement> {
-
     /**
      * Increment the number of references to this element.
      *
@@ -77,7 +70,6 @@ export interface WithReferenceCounting<E extends AbstractElement> {
  *  - In addition, if the lattice is bounded, there exists a greatest element (top) and a least element (bottom).
  */
 export interface Lattice<E extends AbstractElement> {
-
     /**
      * The lattice's inclusion relation (is-less-or-equal).
      * @param element1
@@ -108,7 +100,6 @@ export interface Lattice<E extends AbstractElement> {
      * Returns the top element of the lattice.
      */
     top(): E;
-
 }
 
 /**
@@ -119,20 +110,17 @@ export interface Lattice<E extends AbstractElement> {
  * ```
  */
 export interface LatticeWithComplements<E extends AbstractElement> extends Lattice<E> {
-
     /**
      * Returns the complement of the given element.
      * @param element the element for which to return its complement
      */
     complement(element: E): E;
-
 }
 
 /**
  * Utility class for working with {@link Lattice}s.
  */
 export class Lattices {
-
     private static isFeasible0<E extends AbstractElement>(element: E, inLattice: Lattice<E>) {
         return !inLattice.isIncluded(element, inLattice.bottom());
     }
@@ -142,7 +130,7 @@ export class Lattices {
         if (purpose) {
             console.group(`Feasibility Check (${purpose})...`);
         } else {
-            console.group("Feasibility Check...");
+            console.group('Feasibility Check...');
         }
 
         const timer = new PerfTimer(null);
@@ -151,15 +139,13 @@ export class Lattices {
             try {
                 isFeasible = this.isFeasible0(element, inLattice);
                 return isFeasible;
-            } catch(e) {
+            } catch (e) {
                 throw new IllegalArgumentException(`Checking feasibility for "${purpose}" failed: ${e.toString()}`);
             }
         } finally {
             timer.stop();
-            console.log(`${isFeasible ? "Feasible" : "Infeasible"} ${timer.lastIntervalDuration}`)
+            console.log(`${isFeasible ? 'Feasible' : 'Infeasible'} ${timer.lastIntervalDuration}`);
             console.groupEnd();
         }
-
     }
-
 }

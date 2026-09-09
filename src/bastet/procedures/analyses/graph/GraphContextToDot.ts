@@ -23,17 +23,16 @@
  *
  */
 
-import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
-import {Preconditions} from "../../../utils/Preconditions";
-import {ProgramAnalysis, TransitionLabelProvider} from "../ProgramAnalysis";
-import {PenSizeVisitor, StateColorVisitor, StateLabelVisitor} from "../StateVisitors";
-import {CorePrintVisitor} from "../../../syntax/ast/CorePrintVisitor";
-import {App} from "../../../syntax/app/App";
-import {GraphReachedSetWrapper} from "./GraphStatesSetWrapper";
-import {ConcreteElement} from "../../domains/ConcreteElements";
+import { GraphAbstractState, GraphStateId } from './GraphAbstractDomain';
+import { Preconditions } from '../../../utils/Preconditions';
+import { ProgramAnalysis, TransitionLabelProvider } from '../ProgramAnalysis';
+import { PenSizeVisitor, StateColorVisitor, StateLabelVisitor } from '../StateVisitors';
+import { CorePrintVisitor } from '../../../syntax/ast/CorePrintVisitor';
+import { App } from '../../../syntax/app/App';
+import { GraphReachedSetWrapper } from './GraphStatesSetWrapper';
+import { ConcreteElement } from '../../domains/ConcreteElements';
 
-export class GraphContextToDot  {
-
+export class GraphContextToDot {
     private readonly _task: App;
     private readonly _analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>;
     private readonly _reached: GraphReachedSetWrapper<GraphAbstractState>;
@@ -42,10 +41,12 @@ export class GraphContextToDot  {
     private _headerdot: any[];
     private _dot: string[];
 
-    constructor(task: App,
-                analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
-                transLabProvider: TransitionLabelProvider<GraphAbstractState>,
-                reached: GraphReachedSetWrapper<GraphAbstractState>) {
+    constructor(
+        task: App,
+        analysis: ProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
+        transLabProvider: TransitionLabelProvider<GraphAbstractState>,
+        reached: GraphReachedSetWrapper<GraphAbstractState>
+    ) {
         this._task = Preconditions.checkNotUndefined(task);
         this._analysis = Preconditions.checkNotUndefined(analysis);
         this._transLabProvider = Preconditions.checkNotUndefined(transLabProvider);
@@ -58,13 +59,19 @@ export class GraphContextToDot  {
         const stateLabel = GraphContextToDot.escapeForDot(e.accept(new StateLabelVisitor(this._task)));
         const stateColor = e.accept(new StateColorVisitor());
         const pensize = e.accept(new PenSizeVisitor(this._analysis));
-        this._dot.push(`    ${e.getId()} [label="${stateLabel}" penwidth=${pensize} color="black" fillcolor="${stateColor}"];`);
+        this._dot.push(
+            `    ${e.getId()} [label="${stateLabel}" penwidth=${pensize} color="black" fillcolor="${stateColor}"];`
+        );
     }
 
     private writeTransition(from: GraphAbstractState, to: GraphAbstractState) {
         const visitor = new CorePrintVisitor();
-        const transLabels = GraphContextToDot.escapeForDot(this._transLabProvider.getTransitionLabel(from, to)
-            .map(([ts, o]) => o.ast.accept(visitor)).join(";"));
+        const transLabels = GraphContextToDot.escapeForDot(
+            this._transLabProvider
+                .getTransitionLabel(from, to)
+                .map(([ts, o]) => o.ast.accept(visitor))
+                .join(';')
+        );
         this._dot.push(`    ${from.getId()} -> ${to.getId()} [label="${transLabels}"];`);
     }
 
@@ -75,9 +82,10 @@ export class GraphContextToDot  {
         const contextStateIDs: Set<GraphStateId> = new Set<GraphStateId>();
 
         for (const e of this._reached) {
-            const inContext: boolean = e.getId() == contextOf
-                || e.getPredecessors().contains(contextOf)
-                || this._reached.getChildrenOf(contextOf).has(contextOf);
+            const inContext: boolean =
+                e.getId() == contextOf ||
+                e.getPredecessors().contains(contextOf) ||
+                this._reached.getChildrenOf(contextOf).has(contextOf);
             idToStateMap.set(e.getId(), e);
             if (inContext) {
                 contextStateIDs.add(e.getId());
@@ -99,17 +107,15 @@ export class GraphContextToDot  {
     public writeContextToFile(filepath: string, contextOf: GraphStateId): void {
         this.export(contextOf);
         let fs = require('fs');
-        fs.writeFileSync(filepath, `digraph ReachabilityGraph {\n`
-            + this._headerdot.join("\n")
-            + this._dot.join("\n")
-            + `\n}\n`);
+        fs.writeFileSync(
+            filepath,
+            `digraph ReachabilityGraph {\n` + this._headerdot.join('\n') + this._dot.join('\n') + `\n}\n`
+        );
     }
 
     private static escapeForDot(text: string): string {
-        const search = "\"";
-        const replacement = "\\\"";
+        const search = '"';
+        const replacement = '\\"';
         return text.replace(new RegExp(search, 'g'), replacement);
     }
-
 }
-

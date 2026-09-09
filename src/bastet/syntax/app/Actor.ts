@@ -23,44 +23,49 @@
  *
  */
 
-import {AppResource, AppResourceMap} from "./AppResource";
-import {Script, ScriptId} from "./controlflow/Script";
-import {Maps} from "../../utils/Maps";
-import {Lists} from "../../utils/Lists";
-import {ImmutableList} from "../../utils/ImmutableList";
-import {ImmutableMap} from "../../utils/ImmutableMap";
-import {MethodDefinition, MethodDefinitionMap, MethodSignature, MethodSignatureMap} from "../ast/core/MethodDefinition";
-import {ActorMode} from "../ast/core/ActorDefinition";
-import {Preconditions} from "../../utils/Preconditions";
-import {Method} from "./controlflow/Method";
+import { AppResource, AppResourceMap } from './AppResource';
+import { Script, ScriptId } from './controlflow/Script';
+import { Maps } from '../../utils/Maps';
+import { Lists } from '../../utils/Lists';
+import { ImmutableList } from '../../utils/ImmutableList';
+import { ImmutableMap } from '../../utils/ImmutableMap';
+import {
+    MethodDefinition,
+    MethodDefinitionMap,
+    MethodSignature,
+    MethodSignatureMap,
+} from '../ast/core/MethodDefinition';
+import { ActorMode } from '../ast/core/ActorDefinition';
+import { Preconditions } from '../../utils/Preconditions';
+import { Method } from './controlflow/Method';
 import {
     AfterStatementMonitoringEvent,
     NeverEvent,
     RenderedMonitoringEvent,
     SingularityEvent,
-    TerminationEvent
-} from "../ast/core/CoreEvent";
-import {TransitionRelation, TransitionRelations, TransRelId} from "./controlflow/TransitionRelation";
-import {BOOTSTRAP_FINISHED_MESSAGE, BOOTSTRAP_MESSAGE, GREENFLAG_MESSAGE} from "../ast/core/Message";
-import {StatementList} from "../ast/core/statements/Statement";
-import {RelationBuildingVisitor} from "./controlflow/RelationBuildingVisitor";
-import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "../ast/core/statements/BroadcastMessageStatement";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {Concern, Concerns} from "../Concern";
-import {ProgramOperation} from "./controlflow/ops/ProgramOperation";
-import {CallStatement} from "../ast/core/statements/CallStatement";
-import {Identifier} from "../ast/core/Identifier";
+    TerminationEvent,
+} from '../ast/core/CoreEvent';
+import { TransitionRelation, TransitionRelations, TransRelId } from './controlflow/TransitionRelation';
+import { BOOTSTRAP_FINISHED_MESSAGE, BOOTSTRAP_MESSAGE, GREENFLAG_MESSAGE } from '../ast/core/Message';
+import { StatementList } from '../ast/core/statements/Statement';
+import { RelationBuildingVisitor } from './controlflow/RelationBuildingVisitor';
+import { BroadcastAndWaitStatement, BroadcastMessageStatement } from '../ast/core/statements/BroadcastMessageStatement';
+import { IllegalArgumentException } from '../../core/exceptions/IllegalArgumentException';
+import { Concern, Concerns } from '../Concern';
+import { ProgramOperation } from './controlflow/ops/ProgramOperation';
+import { CallStatement } from '../ast/core/statements/CallStatement';
+import { Identifier } from '../ast/core/Identifier';
 import {
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
-    TerminateProgramStatement
-} from "../ast/core/statements/InternalStatement";
-import {BooleanExpression} from "../ast/core/expressions/BooleanExpression";
-import {IfStatement} from "../ast/core/statements/ControlStatement";
-import {ExpressionList} from "../ast/core/expressions/ExpressionList";
-import {AstNode} from "../ast/AstNode";
+    TerminateProgramStatement,
+} from '../ast/core/statements/InternalStatement';
+import { BooleanExpression } from '../ast/core/expressions/BooleanExpression';
+import { IfStatement } from '../ast/core/statements/ControlStatement';
+import { ExpressionList } from '../ast/core/expressions/ExpressionList';
+import { AstNode } from '../ast/AstNode';
 
-export type ActorMap = { [id:string]: Actor } ;
+export type ActorMap = { [id: string]: Actor };
 
 export type ActorId = string;
 
@@ -68,7 +73,6 @@ export type ActorId = string;
  * Represents an actor.
  */
 export class Actor {
-
     /** An actor can inherit methods or members from another actor. */
     private readonly _inheritFrom: ImmutableList<Actor>;
 
@@ -112,15 +116,20 @@ export class Actor {
     /** Map from transition relation identifiers to the corresponding transition relation */
     private readonly _transRelMap: ImmutableMap<TransRelId, TransitionRelation>;
 
-    constructor(mode: ActorMode, ident: ActorId, inheritFrom: Actor[],
-                dissolvedFrom: Actor[], concern: Concern,
-                resources: AppResourceMap,
-                methodDefs: MethodDefinitionMap,
-                externalMethods: MethodSignatureMap,
-                scripts: Script[], methods: Method[]) {
-
+    constructor(
+        mode: ActorMode,
+        ident: ActorId,
+        inheritFrom: Actor[],
+        dissolvedFrom: Actor[],
+        concern: Concern,
+        resources: AppResourceMap,
+        methodDefs: MethodDefinitionMap,
+        externalMethods: MethodSignatureMap,
+        scripts: Script[],
+        methods: Method[]
+    ) {
         Preconditions.checkNotUndefined(inheritFrom);
-        Preconditions.checkArgument(typeof ident == "string");
+        Preconditions.checkArgument(typeof ident == 'string');
 
         this._actorMode = Preconditions.checkNotUndefined(mode);
         this._ident = Preconditions.checkNotUndefined(ident);
@@ -262,20 +271,21 @@ export class Actor {
     public getConditionCheckScript(cond: BooleanExpression): Script {
         Preconditions.checkNotUndefined(cond);
         const ifConditionReached: StatementList = new StatementList([
-            new SignalTargetReachedStatement(new ExpressionList([]))]);
+            new SignalTargetReachedStatement(new ExpressionList([])),
+        ]);
         const ifNotReached: StatementList = new StatementList([]);
         const statements: StatementList = new StatementList([new IfStatement(cond, ifConditionReached, ifNotReached)]);
 
         // TODO: Register the script to the actor. Have a cache?
         const transitions = TransitionRelations.eliminateEpsilons(statements.accept(new RelationBuildingVisitor()));
-        return new Script(Identifier.freshWithPrefix("cond"), NeverEvent.instance(), false, transitions);
+        return new Script(Identifier.freshWithPrefix('cond'), NeverEvent.instance(), false, transitions);
     }
 
     public transitivelyPresent(from: TransitionRelation, filter: (s: AstNode) => boolean): Set<AstNode> {
         const calls = new Set<CallStatement>();
         const result = new Set<AstNode>();
 
-        const addToResult = function(a: Actor, tr: TransitionRelation) {
+        const addToResult = function (a: Actor, tr: TransitionRelation) {
             for (const l of tr.locationSet) {
                 for (const ts of tr.transitionsFrom(l)) {
                     const opAst: AstNode = ProgramOperation.for(ts.opId).ast;
@@ -303,7 +313,6 @@ export class Actor {
 }
 
 export class Actors {
-
     private static _DEFAULT_BOOTSTRAPPER: Actor;
     private static _DEFAULT_TERMINATOR: Actor;
 
@@ -316,14 +325,27 @@ export class Actors {
                 new BroadcastMessageStatement(GREENFLAG_MESSAGE),
             ]);
             const visitor: RelationBuildingVisitor = new RelationBuildingVisitor();
-            const bootstrapTransitions: TransitionRelation =
-                TransitionRelations.eliminateEpsilons(bootstrapStmts.accept(visitor));
-            const bootstrapScript: Script = new Script(Identifier.freshWithPrefix("bootscript"),
-                SingularityEvent.instance(), false, bootstrapTransitions);
-            Actors._DEFAULT_BOOTSTRAPPER = new Actor(ActorMode.concrete(), "__BOOT", [], [],
+            const bootstrapTransitions: TransitionRelation = TransitionRelations.eliminateEpsilons(
+                bootstrapStmts.accept(visitor)
+            );
+            const bootstrapScript: Script = new Script(
+                Identifier.freshWithPrefix('bootscript'),
+                SingularityEvent.instance(),
+                false,
+                bootstrapTransitions
+            );
+            Actors._DEFAULT_BOOTSTRAPPER = new Actor(
+                ActorMode.concrete(),
+                '__BOOT',
+                [],
+                [],
                 Concerns.highestPriorityConcern(),
-                {},  {}, {},
-                [bootstrapScript], []);
+                {},
+                {},
+                {},
+                [bootstrapScript],
+                []
+            );
         }
 
         return Actors._DEFAULT_BOOTSTRAPPER;
@@ -334,19 +356,27 @@ export class Actors {
             // ATTENTION: Assumed to be a 'program concern'!
             const termStmts = new StatementList([new TerminateProgramStatement()]);
             const visitor: RelationBuildingVisitor = new RelationBuildingVisitor();
-            const transitions: TransitionRelation =
-                TransitionRelations.eliminateEpsilons(termStmts.accept(visitor));
-            const script: Script = new Script(Identifier.freshWithPrefix("termscript"),
-                TerminationEvent.instance(), false, transitions);
-            Actors._DEFAULT_TERMINATOR = new Actor(ActorMode.concrete(), "__TERMINATOR", [], [],
+            const transitions: TransitionRelation = TransitionRelations.eliminateEpsilons(termStmts.accept(visitor));
+            const script: Script = new Script(
+                Identifier.freshWithPrefix('termscript'),
+                TerminationEvent.instance(),
+                false,
+                transitions
+            );
+            Actors._DEFAULT_TERMINATOR = new Actor(
+                ActorMode.concrete(),
+                '__TERMINATOR',
+                [],
+                [],
                 Concerns.defaultProgramConcern(),
-                {}, {}, {},
-                [script], []);
+                {},
+                {},
+                {},
+                [script],
+                []
+            );
         }
 
         return Actors._DEFAULT_TERMINATOR;
     }
-
 }
-
-

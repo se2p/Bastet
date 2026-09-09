@@ -23,11 +23,10 @@
  *
  */
 
-import {ControlLocation} from './ControlLocation'
-import {ProgramOperation} from './ops/ProgramOperation'
+import { ControlLocation } from './ControlLocation';
+import { ProgramOperation } from './ops/ProgramOperation';
 
 export default class ControlTransition {
-
     private readonly _fromLocation: ControlLocation;
 
     private readonly _toLocation: ControlLocation;
@@ -41,15 +40,14 @@ export default class ControlTransition {
     }
 
     get from() {
-        return this._fromLocation
+        return this._fromLocation;
     }
 
     get to() {
-        return this._toLocation
+        return this._toLocation;
     }
 
     get op() {
-        return this._operation
+        return this._operation;
     }
-
 }

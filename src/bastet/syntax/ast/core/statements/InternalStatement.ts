@@ -23,33 +23,26 @@
  *
  */
 
-import {Statement} from "./Statement";
-import {ExpressionList} from "../expressions/ExpressionList";
-import {Preconditions} from "../../../../utils/Preconditions";
-import {StringLiteral} from "../expressions/StringExpression";
+import { Statement } from './Statement';
+import { ExpressionList } from '../expressions/ExpressionList';
+import { Preconditions } from '../../../../utils/Preconditions';
+import { StringLiteral } from '../expressions/StringExpression';
 
-export interface InternalStatement {
-
-}
+export interface InternalStatement {}
 
 export class InitializeAnalysisStatement extends Statement implements InternalStatement {
-
     constructor() {
         super([]);
     }
-
 }
 
 export class TerminateProgramStatement extends Statement implements InternalStatement {
-
     constructor() {
         super([]);
     }
-
 }
 
 export class CheckFeasibilityStatement extends Statement implements InternalStatement {
-
     private readonly _purpose: StringLiteral;
 
     constructor(purpose: StringLiteral) {
@@ -60,11 +53,9 @@ export class CheckFeasibilityStatement extends Statement implements InternalStat
     public getPurpose(): string {
         return this._purpose.text;
     }
-
 }
 
 export class SignalTargetReachedStatement extends Statement implements InternalStatement {
-
     private readonly _targetCharacteristics: ExpressionList;
 
     constructor(targetCharacteristics: ExpressionList) {

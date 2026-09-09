@@ -23,39 +23,32 @@
  *
  */
 
-import {
-    ProgramAnalysis,
-    ProgramAnalysisWithLabels,
-    TransitionLabelProvider,
-    WrappingProgramAnalysis
-} from "../ProgramAnalysis";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
-import {Preconditions} from "../../../utils/Preconditions";
-import {AnalysisStatistics} from "../AnalysisStatistics";
-import {ConcreteElement} from "../../domains/ConcreteElements";
-import {Property} from "../../../syntax/Property";
-import {FrontierSet, PartitionKey, ReachedSet} from "../../algorithms/StateSet";
-import {App} from "../../../syntax/app/App";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {Refiner, Unwrapper, WrappingRefiner} from "../Refiner";
-import {LabeledTransferRelation} from "../TransferRelation";
-import {ProgramOperation} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {Concern} from "../../../syntax/Concern";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {List as ImmList, Set as ImmSet} from "immutable";
-import {LexiKey} from "../../../utils/Lexicographic";
-import {AccessibilityRelation} from "../Accessibility";
-import {MergeJoinOperator} from "../Operators";
-import {DebugAbstractDomain, DebugState} from "./DebugAbstractDomain";
-import {DebugTransferRelation} from "./DebugTransferRelation";
-import {ThreadState} from "../control/ConcreteProgramState";
-
+import { ProgramAnalysisWithLabels, TransitionLabelProvider, WrappingProgramAnalysis } from '../ProgramAnalysis';
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
+import { Preconditions } from '../../../utils/Preconditions';
+import { AnalysisStatistics } from '../AnalysisStatistics';
+import { ConcreteElement } from '../../domains/ConcreteElements';
+import { Property } from '../../../syntax/Property';
+import { FrontierSet, PartitionKey, ReachedSet } from '../../algorithms/StateSet';
+import { App } from '../../../syntax/app/App';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { Refiner, Unwrapper, WrappingRefiner } from '../Refiner';
+import { ProgramOperation } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { List as ImmList, Set as ImmSet } from 'immutable';
+import { LexiKey } from '../../../utils/Lexicographic';
+import { AccessibilityRelation } from '../Accessibility';
+import { MergeJoinOperator } from '../Operators';
+import { DebugAbstractDomain, DebugState } from './DebugAbstractDomain';
+import { DebugTransferRelation } from './DebugTransferRelation';
+import { ThreadState } from '../control/ConcreteProgramState';
 
 export class DebugAnalysis<F extends AbstractState>
-    implements WrappingProgramAnalysis<ConcreteElement, DebugState, F>,
+    implements
+        WrappingProgramAnalysis<ConcreteElement, DebugState, F>,
         TransitionLabelProvider<DebugState>,
-        Unwrapper<DebugState, AbstractElement> {
-
+        Unwrapper<DebugState, AbstractElement>
+{
     private readonly _abstractDomain: DebugAbstractDomain;
 
     private readonly _wrappedAnalysis: ProgramAnalysisWithLabels<any, any, F>;
@@ -91,7 +84,7 @@ export class DebugAnalysis<F extends AbstractState>
         Preconditions.checkArgument(task === this._task);
         return this._wrappedAnalysis.initialStatesFor(task).map((w) => {
             return new DebugState(ImmList([]), w);
-        } );
+        });
     }
 
     join(state1: DebugState, state2: DebugState): DebugState {
@@ -147,7 +140,13 @@ export class DebugAnalysis<F extends AbstractState>
         return e.getWrappedState();
     }
 
-    mergeInto(state: DebugState, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => DebugState, wrapper: (DebugState) => F): [FrontierSet<F>, ReachedSet<F>] {
+    mergeInto(
+        state: DebugState,
+        frontier: FrontierSet<F>,
+        reached: ReachedSet<F>,
+        unwrapper: (F) => DebugState,
+        wrapper: (DebugState) => F
+    ): [FrontierSet<F>, ReachedSet<F>] {
         throw new ImplementMeException();
     }
 
@@ -214,5 +213,4 @@ export class DebugAnalysis<F extends AbstractState>
     decRef(state: DebugState) {
         this.wrappedAnalysis.decRef(state.getWrappedState());
     }
-
 }

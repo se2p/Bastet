@@ -23,44 +23,39 @@
  *
  */
 
-import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
-import {OperationId, ProgramOperation, ProgramOperations} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {List as ImmList, Record as ImmRec} from "immutable";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
-import {Preconditions} from "../../../utils/Preconditions";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {AbstractionPrecision} from "../../AbstractionPrecision";
-import {ThreadState} from "../control/ConcreteProgramState";
+import { AbstractElement, AbstractElementVisitor, AbstractState, Lattice } from '../../../lattices/Lattice';
+import { OperationId, ProgramOperation, ProgramOperations } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { List as ImmList, Record as ImmRec } from 'immutable';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { ConcreteDomain, ConcreteElement } from '../../domains/ConcreteElements';
+import { Preconditions } from '../../../utils/Preconditions';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { AbstractionPrecision } from '../../AbstractionPrecision';
+import { ThreadState } from '../control/ConcreteProgramState';
 
 export interface LabeledTransferAttributes {
+    from: AbstractElement;
 
-    from: AbstractElement,
+    ts: ThreadState;
 
-    ts: ThreadState,
+    op: OperationId;
 
-    op: OperationId,
-
-    bigStep: number
-
+    bigStep: number;
 }
 
 const LabeledTransferRecord = ImmRec({
-
     from: null,
 
     ts: null,
 
     op: ProgramOperations.epsilon().ident,
 
-    bigStep: -1
-
+    bigStep: -1,
 });
 
 export class LabeledTransfer extends LabeledTransferRecord implements LabeledTransferAttributes {
-
     constructor(from: AbstractElement, ts: ThreadState, op: ProgramOperation, bigStep: number) {
-        super({from: from, op: op.ident, ts: ts, bigStep: bigStep});
+        super({ from: from, op: op.ident, ts: ts, bigStep: bigStep });
     }
 
     public getThreadState(): ThreadState {
@@ -78,27 +73,22 @@ export class LabeledTransfer extends LabeledTransferRecord implements LabeledTra
     public getOp(): ProgramOperation {
         return ProgramOperation.for(this.get('op'));
     }
-
 }
 
 export interface LabelStateAttributes {
-
     transfers: ImmList<LabeledTransfer>;
 
     wrappedState: AbstractElement;
-
 }
 
 const LabelStateRecord = ImmRec({
-
     transfers: ImmList<LabeledTransfer>(),
     wrappedState: null,
-})
+});
 
 export class LabelState extends LabelStateRecord implements LabelStateAttributes, AbstractState {
-
     constructor(transfers: ImmList<LabeledTransfer>, wrappedState: AbstractElement) {
-        super({transfers: transfers, wrappedState: wrappedState});
+        super({ transfers: transfers, wrappedState: wrappedState });
     }
 
     public getTransfers(): ImmList<LabeledTransfer> {
@@ -110,11 +100,11 @@ export class LabelState extends LabelStateRecord implements LabelStateAttributes
     }
 
     public getWrappedState(): AbstractState {
-        return this.get("wrappedState");
+        return this.get('wrappedState');
     }
 
     public withWrappedState(wrapped: AbstractElement): LabelState {
-        return this.set("wrappedState", wrapped);
+        return this.set('wrappedState', wrapped);
     }
 
     hashCode(): number {
@@ -133,7 +123,6 @@ export class LabelState extends LabelStateRecord implements LabelStateAttributes
 }
 
 export class LabelStateLattice implements Lattice<LabelState> {
-
     private readonly _wrappedStateLattice: Lattice<AbstractElement>;
 
     private readonly _bottom: LabelState;
@@ -170,7 +159,6 @@ export class LabelStateLattice implements Lattice<LabelState> {
 }
 
 export class LabelAbstractDomain implements AbstractDomain<ConcreteElement, LabelState> {
-
     private readonly _lattice: LabelStateLattice;
     private readonly _wrapped: AbstractDomain<ConcreteElement, AbstractElement>;
 

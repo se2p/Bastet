@@ -23,34 +23,35 @@
  *
  */
 
-import {MergeIntoOperator, MergeOperator, PartitionOperator, StopOperator} from "./ProgramAnalysis";
-import {FrontierSet, ReachedSet} from "../algorithms/StateSet";
-import {AbstractElement, AbstractState} from "../../lattices/Lattice";
-import {Preconditions} from "../../utils/Preconditions";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {Unwrapper} from "./Refiner";
-import {AbstractDomain} from "../domains/AbstractDomain";
-import {ConcreteElement} from "../domains/ConcreteElements";
-import {AnalysisStatistics} from "./AnalysisStatistics";
+import { MergeIntoOperator, MergeOperator, PartitionOperator, StopOperator } from './ProgramAnalysis';
+import { FrontierSet, ReachedSet } from '../algorithms/StateSet';
+import { AbstractElement, AbstractState } from '../../lattices/Lattice';
+import { Preconditions } from '../../utils/Preconditions';
+import { IllegalArgumentException } from '../../core/exceptions/IllegalArgumentException';
+import { Unwrapper } from './Refiner';
+import { AbstractDomain } from '../domains/AbstractDomain';
+import { ConcreteElement } from '../domains/ConcreteElements';
+import { AnalysisStatistics } from './AnalysisStatistics';
 
 export class NoStopOperator<E extends AbstractElement, F extends AbstractState> implements StopOperator<E, F> {
-
     stop(state: E, reached: Iterable<F>, unwrapper: (F) => E): boolean {
         return false;
     }
-
 }
 
 export class NoMergeIntoOperator<E extends AbstractState, F extends AbstractState> implements MergeIntoOperator<E, F> {
-
-    mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): [FrontierSet<F>, ReachedSet<F>] {
+    mergeInto(
+        state: E,
+        frontier: FrontierSet<F>,
+        reached: ReachedSet<F>,
+        unwrapper: (AbstractElement) => E,
+        wrapper: (E) => AbstractElement
+    ): [FrontierSet<F>, ReachedSet<F>] {
         return [frontier, reached];
     }
-
 }
 
 export class MergeJoinOperator<E extends AbstractElement> implements MergeOperator<E> {
-
     private readonly _domain: AbstractDomain<ConcreteElement, E>;
 
     constructor(domain: AbstractDomain<ConcreteElement, E>) {
@@ -64,11 +65,9 @@ export class MergeJoinOperator<E extends AbstractElement> implements MergeOperat
     merge(state1: E, state2: E): E {
         return this._domain.lattice.join(state1, state2);
     }
-
 }
 
 export class MergeSepOperator<E extends AbstractElement> implements MergeOperator<E> {
-
     shouldMerge(state1: E, state2: E): boolean {
         return false;
     }
@@ -76,31 +75,36 @@ export class MergeSepOperator<E extends AbstractElement> implements MergeOperato
     merge(state1: E, state2: E): E {
         return state2;
     }
-
 }
 
 export class StandardMergeOperatorFactory {
-
-    public static create<E extends AbstractElement>(operatorName: string, domain: AbstractDomain<any, E>): MergeOperator<E> {
+    public static create<E extends AbstractElement>(
+        operatorName: string,
+        domain: AbstractDomain<any, E>
+    ): MergeOperator<E> {
         Preconditions.checkNotUndefined(operatorName);
 
-        if (operatorName.toUpperCase() == "SEP") {
+        if (operatorName.toUpperCase() == 'SEP') {
             return new MergeSepOperator();
-        } else if (operatorName.toUpperCase() == "JOIN") {
+        } else if (operatorName.toUpperCase() == 'JOIN') {
             return new MergeJoinOperator(domain);
         } else {
-            throw new IllegalArgumentException("No valid configuration value for the merge operator");
+            throw new IllegalArgumentException('No valid configuration value for the merge operator');
         }
     }
 
     static createDelegator<E extends AbstractElement, W extends AbstractElement>(
-        wrappedMergeOp: MergeOperator<W>, unwrapper: Unwrapper<E, W>): MergeOperator<E> {
+        wrappedMergeOp: MergeOperator<W>,
+        unwrapper: Unwrapper<E, W>
+    ): MergeOperator<E> {
         return undefined;
     }
 }
 
-export class StandardMergeIntoOperator<E extends AbstractElement, F extends AbstractState> implements MergeIntoOperator<E, F> {
-
+export class StandardMergeIntoOperator<E extends AbstractElement, F extends AbstractState> implements MergeIntoOperator<
+    E,
+    F
+> {
     private readonly _mergeOp: MergeOperator<E>;
 
     private readonly _partOp: PartitionOperator<E, F>;
@@ -116,13 +120,19 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
         this._partOp = Preconditions.checkNotUndefined(partitionOp);
 
         this._stats = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
-        this._frontierCosts = this._stats.withContext("fontier-update");
-        this._reachedCosts = this._stats.withContext("reached-update");
-        this._mergeCosts = this._stats.withContext("merge");
-        this._shouldCosts = this._stats.withContext("should");
+        this._frontierCosts = this._stats.withContext('fontier-update');
+        this._reachedCosts = this._stats.withContext('reached-update');
+        this._mergeCosts = this._stats.withContext('merge');
+        this._shouldCosts = this._stats.withContext('should');
     }
 
-    public mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
+    public mergeInto(
+        state: E,
+        frontier: FrontierSet<F>,
+        reached: ReachedSet<F>,
+        unwrapper: (F) => E,
+        wrapper: (E) => F
+    ): [FrontierSet<F>, ReachedSet<F>] {
         const removeFromReached: Set<F> = new Set<F>();
         const addToReached: Set<F> = new Set<F>();
         const relevantReached: Iterable<F> = this._partOp.mergePartitionOf(state, reached);
@@ -161,11 +171,12 @@ export class StandardMergeIntoOperator<E extends AbstractElement, F extends Abst
 
         return [frontier, reached];
     }
-
 }
 
-export class NewMergeIntoOperator<E extends AbstractElement, F extends AbstractState> implements MergeIntoOperator<E, F> {
-
+export class NewMergeIntoOperator<E extends AbstractElement, F extends AbstractState> implements MergeIntoOperator<
+    E,
+    F
+> {
     private readonly _mergeOp: MergeOperator<E>;
 
     private readonly _partOp: PartitionOperator<E, F>;
@@ -181,13 +192,19 @@ export class NewMergeIntoOperator<E extends AbstractElement, F extends AbstractS
         this._partOp = Preconditions.checkNotUndefined(partitionOp);
 
         this._stats = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
-        this._frontierCosts = this._stats.withContext("fontier-update");
-        this._reachedCosts = this._stats.withContext("reached-update");
-        this._mergeCosts = this._stats.withContext("merge");
-        this._shouldCosts = this._stats.withContext("should");
+        this._frontierCosts = this._stats.withContext('fontier-update');
+        this._reachedCosts = this._stats.withContext('reached-update');
+        this._mergeCosts = this._stats.withContext('merge');
+        this._shouldCosts = this._stats.withContext('should');
     }
 
-    public mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>, unwrapper: (F) => E, wrapper: (E) => F): [FrontierSet<F>, ReachedSet<F>] {
+    public mergeInto(
+        state: E,
+        frontier: FrontierSet<F>,
+        reached: ReachedSet<F>,
+        unwrapper: (F) => E,
+        wrapper: (E) => F
+    ): [FrontierSet<F>, ReachedSet<F>] {
         const removeFromReached: Set<F> = new Set<F>();
         const addToReached: Set<F> = new Set<F>();
         const relevantReached: Iterable<F> = this._partOp.mergePartitionOf(state, reached);
@@ -231,5 +248,4 @@ export class NewMergeIntoOperator<E extends AbstractElement, F extends AbstractS
 
         return [frontier, reached];
     }
-
 }

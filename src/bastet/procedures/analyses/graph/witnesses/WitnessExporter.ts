@@ -23,26 +23,25 @@
  *
  */
 
-
-import {WitnessHandler} from "../../WitnessHandlers";
-import {GraphAbstractState} from "../GraphAbstractDomain";
-import {ReachedSet} from "../../../algorithms/StateSet";
-import {Preconditions} from "../../../../utils/Preconditions";
-import {GraphReachedSetWrapper} from "../GraphStatesSetWrapper";
-import {TransitionLabelProvider, WrappingProgramAnalysis} from "../../ProgramAnalysis";
-import {ConcreteElement} from "../../../domains/ConcreteElements";
-import {Set as ImmSet} from "immutable";
-import {App} from "../../../../syntax/app/App";
-import {ControlAbstractState} from "../../control/ControlAbstractDomain";
-import {ControlLocationExtractor} from "../../control/ControlUtils";
-import {Action, ErrorWitnessActionVisitor} from "../../../../syntax/ast/ErrorWitnessActionVisitor";
-import {CorePrintVisitor} from "../../../../syntax/ast/CorePrintVisitor";
-import {ErrorWitness, ErrorWitnessActor, ErrorWitnessStep, Mock} from "./ErrorWitness";
-import {AccessibilityRelation} from "../../Accessibility";
-import {Property} from "../../../../syntax/Property";
-import {getTheOnlyElement} from "../../../../utils/Collections";
-import {DataLocationScoper} from "../../control/DataLocationScoping";
-import {ProgramOperation} from "../../../../syntax/app/controlflow/ops/ProgramOperation";
+import { WitnessHandler } from '../../WitnessHandlers';
+import { GraphAbstractState } from '../GraphAbstractDomain';
+import { ReachedSet } from '../../../algorithms/StateSet';
+import { Preconditions } from '../../../../utils/Preconditions';
+import { GraphReachedSetWrapper } from '../GraphStatesSetWrapper';
+import { TransitionLabelProvider, WrappingProgramAnalysis } from '../../ProgramAnalysis';
+import { ConcreteElement } from '../../../domains/ConcreteElements';
+import { Set as ImmSet } from 'immutable';
+import { App } from '../../../../syntax/app/App';
+import { ControlAbstractState } from '../../control/ControlAbstractDomain';
+import { ControlLocationExtractor } from '../../control/ControlUtils';
+import { Action, ErrorWitnessActionVisitor } from '../../../../syntax/ast/ErrorWitnessActionVisitor';
+import { CorePrintVisitor } from '../../../../syntax/ast/CorePrintVisitor';
+import { ErrorWitness, ErrorWitnessActor, ErrorWitnessStep, Mock } from './ErrorWitness';
+import { AccessibilityRelation } from '../../Accessibility';
+import { Property } from '../../../../syntax/Property';
+import { getTheOnlyElement } from '../../../../utils/Collections';
+import { DataLocationScoper } from '../../control/DataLocationScoping';
+import { ProgramOperation } from '../../../../syntax/app/controlflow/ops/ProgramOperation';
 import {
     ActionExtractor,
     AnswerActionExtractor,
@@ -51,10 +50,10 @@ import {
     MouseXActionExtractor,
     MouseYActionExtractor,
     SpriteClickBroadcastActionExtractor,
-} from "./ActionExtractor";
-import {GLOBAL_TIME_MICROS_VAR} from "../../../../syntax/app/SystemVariables";
-import {MockExtractor, RandomIntegerMockExtractor, RandomPositionMockExtractor} from "./MockExtractor";
-import {ConcreteProgramState, RelationLocation, ThreadState} from "../../control/ConcreteProgramState";
+} from './ActionExtractor';
+import { GLOBAL_TIME_MICROS_VAR } from '../../../../syntax/app/SystemVariables';
+import { MockExtractor, RandomIntegerMockExtractor, RandomPositionMockExtractor } from './MockExtractor';
+import { ConcreteProgramState, RelationLocation, ThreadState } from '../../control/ConcreteProgramState';
 
 export interface WitnessExporterConfig {
     export: 'ALL' | 'ONLY_ACTIONS';
@@ -73,16 +72,27 @@ export const DEFAULT_WITNESS_EXPORTER_CONFIG: WitnessExporterConfig = {
     collapseAtomicBlocks: true,
     removeEpsilonType: true,
     removeMethodVariables: true,
-    removeVariables: ['PI', 'TWO_PI', 'PI_HALF', 'PI_SQR_TIMES_FIVE',
-        'KEY_ENTER', 'KEY_SPACE', 'KEY_ANY', 'KEY_LEFT', 'KEY_UP', 'KEY_DOWN', 'KEY_LEFT', 'KEY_RIGHT'],
+    removeVariables: [
+        'PI',
+        'TWO_PI',
+        'PI_HALF',
+        'PI_SQR_TIMES_FIVE',
+        'KEY_ENTER',
+        'KEY_SPACE',
+        'KEY_ANY',
+        'KEY_LEFT',
+        'KEY_UP',
+        'KEY_DOWN',
+        'KEY_LEFT',
+        'KEY_RIGHT',
+    ],
     removeActors: ['IOActor', '.*Observer'],
     removeStepsBeforeBootstrap: true,
     minWaitTime: 0,
-    keepDebuggingAttributes: false
-}
+    keepDebuggingAttributes: false,
+};
 
 export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
-
     private readonly _analysis: WrappingProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>;
     private readonly _tlp: TransitionLabelProvider<GraphAbstractState>;
     private readonly _task: App;
@@ -90,8 +100,12 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     private readonly _config: WitnessExporterConfig;
     private readonly _labelPrintVisitor: CorePrintVisitor;
 
-    constructor(analysis: WrappingProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
-                tlp: TransitionLabelProvider<GraphAbstractState>, task: App, config: WitnessExporterConfig = DEFAULT_WITNESS_EXPORTER_CONFIG) {
+    constructor(
+        analysis: WrappingProgramAnalysis<ConcreteElement, GraphAbstractState, GraphAbstractState>,
+        tlp: TransitionLabelProvider<GraphAbstractState>,
+        task: App,
+        config: WitnessExporterConfig = DEFAULT_WITNESS_EXPORTER_CONFIG
+    ) {
         this._analysis = Preconditions.checkNotUndefined(analysis);
         this._tlp = Preconditions.checkNotUndefined(tlp);
         this._task = Preconditions.checkNotUndefined(task);
@@ -103,14 +117,19 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     public handleViolatingState(reached: ReachedSet<GraphAbstractState>, violating: GraphAbstractState) {
         Preconditions.checkArgument(reached instanceof GraphReachedSetWrapper);
         const ar: GraphReachedSetWrapper<GraphAbstractState> = reached as GraphReachedSetWrapper<GraphAbstractState>;
-        const testifiedSeq: [GraphAbstractState, ConcreteElement][] =
-            getTheOnlyElement(this._analysis.testifyConcreteOne(ar, violating));
+        const testifiedSeq: [GraphAbstractState, ConcreteElement][] = getTheOnlyElement(
+            this._analysis.testifyConcreteOne(ar, violating)
+        );
 
         console.log(`Extracting an error witness from a sequence of ${testifiedSeq.length} concrete states.`);
         this.exportPath(ar, testifiedSeq, violating);
     }
 
-    private exportPath(pathAr: AccessibilityRelation<GraphAbstractState>, testifiedSeq: [GraphAbstractState, ConcreteElement][], violating: GraphAbstractState) {
+    private exportPath(
+        pathAr: AccessibilityRelation<GraphAbstractState>,
+        testifiedSeq: [GraphAbstractState, ConcreteElement][],
+        violating: GraphAbstractState
+    ) {
         Preconditions.checkNotUndefined(pathAr);
         Preconditions.checkNotUndefined(testifiedSeq);
         Preconditions.checkNotUndefined(violating);
@@ -125,9 +144,11 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         this.writeErrorWitness(abstractedErrorWitness);
     }
 
-    private extractErrorWitness(pathAr: AccessibilityRelation<GraphAbstractState>, violating: GraphAbstractState,
-                                testifiedSeq: [GraphAbstractState, ConcreteElement][]): ErrorWitness {
-
+    private extractErrorWitness(
+        pathAr: AccessibilityRelation<GraphAbstractState>,
+        violating: GraphAbstractState,
+        testifiedSeq: [GraphAbstractState, ConcreteElement][]
+    ): ErrorWitness {
         const actionExtractors: ActionExtractor[] = [
             new MouseXActionExtractor(),
             new MouseYActionExtractor(),
@@ -137,10 +158,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             new KeyPressedActionExtractor(),
         ];
 
-        const mockExtractors: MockExtractor[] = [
-            new RandomIntegerMockExtractor(),
-            new RandomPositionMockExtractor()
-        ];
+        const mockExtractors: MockExtractor[] = [new RandomIntegerMockExtractor(), new RandomPositionMockExtractor()];
 
         const extractSteps = (): ErrorWitnessStep[] => {
             let index = 0;
@@ -168,7 +186,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
                     step.actionLabel = transitionLabel
                         .map(([ts, o]) => o.ast.accept(this._labelPrintVisitor))
-                        .join("; ");
+                        .join('; ');
 
                     for (const actionExtractor of actionExtractors) {
                         actionExtractor.processOperations(transitionLabel, step);
@@ -221,9 +239,9 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             steps = WitnessExporter.collapseAtomics(steps);
         }
 
-        const mocks: Mock[] = mockExtractors.map(m => m.getMock());
+        const mocks: Mock[] = mockExtractors.map((m) => m.getMock());
         const violatedProperties: Property[] = this._analysis.target(violating);
-        const violations: string[] = violatedProperties.map(property => property.getText());
+        const violations: string[] = violatedProperties.map((property) => property.getText());
 
         return new ErrorWitness(this._task.origin, violations, steps, mocks);
     }
@@ -231,19 +249,19 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     private produceWitnessAbstraction(errorWitness: ErrorWitness): ErrorWitness {
         let steps: ErrorWitnessStep[] = errorWitness.steps;
 
-        if (this._config.export === "ONLY_ACTIONS") {
+        if (this._config.export === 'ONLY_ACTIONS') {
             steps = WitnessExporter.collapseEpsilonsToWait(steps);
         }
 
         steps = WitnessExporter.addWaitTimes(steps);
         steps = WitnessExporter.removeStepsWithLowWaitTime(steps, this._config.minWaitTime);
 
-        steps.forEach(step => {
-            step.actors = step.actors.filter(actor => {
-                return !this._config.removeActors.some(actorToRemove => {
+        steps.forEach((step) => {
+            step.actors = step.actors.filter((actor) => {
+                return !this._config.removeActors.some((actorToRemove) => {
                     const regex = new RegExp(actorToRemove);
                     return regex.test(actor.name);
-                })
+                });
             });
 
             if (!this._config.keepDebuggingAttributes) {
@@ -253,13 +271,13 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
                 step.id = undefined;
             }
 
-            step.actors.forEach(target => {
+            step.actors.forEach((target) => {
                 target.removeVariables(this._config.removeVariables);
 
                 if (this._config.removeMethodVariables) {
                     delete target.methodVariables;
                 }
-            })
+            });
 
             if (this._config.removeEpsilonType) {
                 delete step.epsilonType;
@@ -269,13 +287,14 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return new ErrorWitness(errorWitness.programName, errorWitness.violations, steps, errorWitness.mocks);
     }
 
-
     private static ensureContinuousMousePositions(steps: ErrorWitnessStep[]): ErrorWitnessStep[] {
-        let mousePosition = {x: undefined, y: undefined};
-        steps.forEach(step => {
+        let mousePosition = { x: undefined, y: undefined };
+        steps.forEach((step) => {
             if (step.action === Action.MOUSE_MOVE) {
-                step.mousePosition = {x: step.mousePosition.x === undefined ? mousePosition.x : step.mousePosition.x,
-                    y: step.mousePosition.y === undefined ? mousePosition.y : step.mousePosition.y};
+                step.mousePosition = {
+                    x: step.mousePosition.x === undefined ? mousePosition.x : step.mousePosition.x,
+                    y: step.mousePosition.y === undefined ? mousePosition.y : step.mousePosition.y,
+                };
                 mousePosition = step.mousePosition;
             }
         });
@@ -333,7 +352,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
     }
 
     private static removeAllBeforeAction(steps: ErrorWitnessStep[], action: Action): ErrorWitnessStep[] {
-        let index = steps.findIndex(step => step.epsilonType === action);
+        let index = steps.findIndex((step) => step.epsilonType === action);
 
         Preconditions.checkState(index >= 0);
 
@@ -368,7 +387,9 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return filteredArray;
     }
 
-    private static mapGraphAbstractStateToControlAbstractState(graphAbstractState: GraphAbstractState): ControlAbstractState {
+    private static mapGraphAbstractStateToControlAbstractState(
+        graphAbstractState: GraphAbstractState
+    ): ControlAbstractState {
         let abstractState: any = graphAbstractState;
         while (abstractState && !(abstractState instanceof ControlAbstractState)) {
             abstractState = abstractState.getWrappedState();
@@ -379,12 +400,13 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
     private getRelationLocationForState(graphAbstractState: GraphAbstractState): RelationLocation {
         const controlAbstractState = WitnessExporter.mapGraphAbstractStateToControlAbstractState(graphAbstractState);
-        const controlLocations: ImmSet<RelationLocation> = this._controlLocationExtractor.visitControlAbstractState(controlAbstractState);
+        const controlLocations: ImmSet<RelationLocation> =
+            this._controlLocationExtractor.visitControlAbstractState(controlAbstractState);
 
         return getTheOnlyElement(controlLocations);
     }
 
-/*    private static groupByTargets<T>(map: ImmMap<string, T>): Map<string, Map<string, T>> {
+    /*    private static groupByTargets<T>(map: ImmMap<string, T>): Map<string, Map<string, T>> {
         const targets = new Map<string, Map<string, T>>();
 
         map.forEach((value, attributeWithTarget) => {
@@ -404,10 +426,13 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         return targets;
     }*/
 
-    public static splitTargetPrefixFromAttribute(attributeWithTargetName: string): {attribute: string, target: string} {
+    public static splitTargetPrefixFromAttribute(attributeWithTargetName: string): {
+        attribute: string;
+        target: string;
+    } {
         const target = DataLocationScoper.leftUnwrapScope(attributeWithTargetName).prefix;
         const attribute = DataLocationScoper.rightUnwrapScope(attributeWithTargetName).suffix;
-        return {attribute, target};
+        return { attribute, target };
     }
 
     private static collapseAtomics(steps: ErrorWitnessStep[]): ErrorWitnessStep[] {
@@ -417,15 +442,20 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
         let atomicBlock: ErrorWitnessStep[] = [];
 
         for (const step of steps) {
-            if (step.epsilonType === Action.LEAVE_ATOMIC
-                    || step.epsilonType === Action.REACHED_VIOLATION && openAtomicBrackets > 0) {
+            if (
+                step.epsilonType === Action.LEAVE_ATOMIC ||
+                (step.epsilonType === Action.REACHED_VIOLATION && openAtomicBrackets > 0)
+            ) {
                 atomicBlock.push(step);
                 openAtomicBrackets--;
 
-                Preconditions.checkArgument(openAtomicBrackets >= 0, `Missing opening atomic bracket for: ${step.actionLabel}`);
+                Preconditions.checkArgument(
+                    openAtomicBrackets >= 0,
+                    `Missing opening atomic bracket for: ${step.actionLabel}`
+                );
 
                 if (openAtomicBrackets === 0) {
-                    this.collapseOneAtomicBlock(atomicBlock).forEach(step => {
+                    this.collapseOneAtomicBlock(atomicBlock).forEach((step) => {
                         filteredArray.push(step);
                     });
                     atomicBlock = [];
@@ -457,7 +487,7 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
             const isRelevant = step.action !== undefined || step === lastStep;
 
             if (isRelevant) {
-                step.actors = lastStep.actors.map(actor => {
+                step.actors = lastStep.actors.map((actor) => {
                     // Clone data to prevent side-effects
                     return actor.clone();
                 });
@@ -468,7 +498,9 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
                 collapsedAtomicBlock.push(step);
             } else {
-                collapsedActionLabel = collapsedActionLabel ? `${collapsedActionLabel}; ${step.actionLabel}` : step.actionLabel;
+                collapsedActionLabel = collapsedActionLabel
+                    ? `${collapsedActionLabel}; ${step.actionLabel}`
+                    : step.actionLabel;
             }
         }
 
@@ -492,6 +524,6 @@ export class WitnessExporter implements WitnessHandler<GraphAbstractState> {
 
     private writeErrorWitness(errorWitness: ErrorWitness) {
         let fs = require('fs');
-        fs.writeFileSync("output/error-witness.json", JSON.stringify(errorWitness, null, 2));
+        fs.writeFileSync('output/error-witness.json', JSON.stringify(errorWitness, null, 2));
     }
 }

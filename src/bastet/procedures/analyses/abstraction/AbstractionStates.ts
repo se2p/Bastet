@@ -23,12 +23,11 @@
  *
  */
 
-import {DelegatingStateVisitor} from "../AbstractStates";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
-import {AbstractionState} from "./AbstractionAbstractDomain";
+import { DelegatingStateVisitor } from '../AbstractStates';
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
+import { AbstractionState } from './AbstractionAbstractDomain';
 
 export class AbstractionStateCollector extends DelegatingStateVisitor<AbstractionState[]> {
-
     constructor() {
         super();
     }
@@ -40,14 +39,13 @@ export class AbstractionStateCollector extends DelegatingStateVisitor<Abstractio
     protected defaultResultFor(element: AbstractElement): AbstractionState[] {
         return [];
     }
-
 }
 
-export class AbstractionStateStates { // TODO: rename to AbstractionStates
+export class AbstractionStateStates {
+    // TODO: rename to AbstractionStates
 
     public static extractFrom(fromState: AbstractState): AbstractionState[] {
         const visitor = new AbstractionStateCollector();
         return fromState.accept(visitor);
     }
-
 }

@@ -23,20 +23,19 @@
  *
  */
 
-import {DelegatingStateVisitor} from "../AbstractStates";
-import {Set as ImmSet} from "immutable";
-import {ControlAbstractState} from "./ControlAbstractDomain";
-import {App} from "../../../syntax/app/App";
-import {Preconditions} from "../../../utils/Preconditions";
-import {AbstractElement} from "../../../lattices/Lattice";
-import {RelationLocation} from "./ConcreteProgramState";
+import { DelegatingStateVisitor } from '../AbstractStates';
+import { Set as ImmSet } from 'immutable';
+import { ControlAbstractState } from './ControlAbstractDomain';
+import { App } from '../../../syntax/app/App';
+import { Preconditions } from '../../../utils/Preconditions';
+import { AbstractElement } from '../../../lattices/Lattice';
+import { RelationLocation } from './ConcreteProgramState';
 
 /**
  * Extracts the set of control locations to that the abstract
  * state made a step to.
  */
 export class ControlLocationExtractor extends DelegatingStateVisitor<ImmSet<RelationLocation>> {
-
     private readonly _task: App;
 
     constructor(task: App) {
@@ -60,5 +59,4 @@ export class ControlLocationExtractor extends DelegatingStateVisitor<ImmSet<Rela
 
         return result;
     }
-
 }

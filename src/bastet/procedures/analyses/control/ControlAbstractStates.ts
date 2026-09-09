@@ -23,15 +23,14 @@
  *
  */
 
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
-import {RelationLocation} from "./ConcreteProgramState";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {DelegatingStateVisitor} from "../AbstractStates";
-import {ControlAbstractState} from "./ControlAbstractDomain";
-import {getTheOnlyElement} from "../../../utils/Collections";
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
+import { RelationLocation } from './ConcreteProgramState';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { DelegatingStateVisitor } from '../AbstractStates';
+import { ControlAbstractState } from './ControlAbstractDomain';
+import { getTheOnlyElement } from '../../../utils/Collections';
 
 export class ControlAbstractStateCollector extends DelegatingStateVisitor<ControlAbstractState[]> {
-
     constructor() {
         super();
     }
@@ -43,12 +42,13 @@ export class ControlAbstractStateCollector extends DelegatingStateVisitor<Contro
     protected defaultResultFor(element: AbstractElement): ControlAbstractState[] {
         return [];
     }
-
 }
 
 export class ControlAbstractStates {
-
-    public static extractControlTransitions(from: AbstractState, to: AbstractState): [RelationLocation, RelationLocation][] {
+    public static extractControlTransitions(
+        from: AbstractState,
+        to: AbstractState
+    ): [RelationLocation, RelationLocation][] {
         const fromState = getTheOnlyElement(this.extractFrom(from));
         const toState = getTheOnlyElement(this.extractFrom(from));
         throw new ImplementMeException();
@@ -58,5 +58,4 @@ export class ControlAbstractStates {
         const visitor = new ControlAbstractStateCollector();
         return fromState.accept(visitor);
     }
-
 }

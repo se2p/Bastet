@@ -23,20 +23,19 @@
  *
  */
 
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {Preconditions} from "../../../utils/Preconditions";
-import {SSAState} from "./SSAAbstractDomain";
-import {DataLocation, VersionedDataLocation} from "../../../syntax/app/controlflow/DataLocation";
-import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { Preconditions } from '../../../utils/Preconditions';
+import { SSAState } from './SSAAbstractDomain';
+import { DataLocation, VersionedDataLocation } from '../../../syntax/app/controlflow/DataLocation';
+import { VariableWithDataLocation } from '../../../syntax/ast/core/Variable';
 import {
     DataLocationMode,
     DataLocationRenamer,
-    RenamingTransformerVisitor
-} from "../../../syntax/transformers/RenamingTransformerVisitor";
-import {Statement} from "../../../syntax/ast/core/statements/Statement";
+    RenamingTransformerVisitor,
+} from '../../../syntax/transformers/RenamingTransformerVisitor';
+import { Statement } from '../../../syntax/ast/core/statements/Statement';
 
 export class SSAssigner {
-
     private _ssa: SSAState;
 
     constructor(ssa: SSAState) {
@@ -47,11 +46,11 @@ export class SSAssigner {
         return this._ssa.getIndex(id);
     }
 
-   currentVersionOf(assignedDataLoc: DataLocation): VersionedDataLocation {
-       const id = assignedDataLoc.ident;
-       const currentVersion = this.getCurrentVersionOf(id);
-       return new VersionedDataLocation(assignedDataLoc.ident, assignedDataLoc.type, currentVersion);
-   }
+    currentVersionOf(assignedDataLoc: DataLocation): VersionedDataLocation {
+        const id = assignedDataLoc.ident;
+        const currentVersion = this.getCurrentVersionOf(id);
+        return new VersionedDataLocation(assignedDataLoc.ident, assignedDataLoc.type, currentVersion);
+    }
 
     newVersionOf(assignedDataLoc: DataLocation): VersionedDataLocation {
         const id = assignedDataLoc.ident;
@@ -75,7 +74,6 @@ export class SSAssigner {
 }
 
 export class SSARenamer implements DataLocationRenamer {
-
     private readonly _ssa: SSAssigner;
 
     constructor(ssa: SSAssigner) {
@@ -85,22 +83,16 @@ export class SSARenamer implements DataLocationRenamer {
     renameUsage(dataLoc: DataLocation, usageMode: DataLocationMode, inContextOf: Statement): DataLocation {
         if (usageMode == DataLocationMode.READ_FROM) {
             return this._ssa.currentVersionOf(dataLoc);
-
         } else if (usageMode == DataLocationMode.ASSINGED_TO) {
             return this._ssa.newVersionOf(dataLoc);
         }
 
         throw new ImplementMeException();
     }
-
 }
 
 export class SSATransformerVisitor extends RenamingTransformerVisitor {
-
     constructor(ssa: SSAssigner) {
         super(new SSARenamer(ssa));
     }
-
 }
-
-

@@ -23,12 +23,11 @@
  *
  */
 
-import {DelegatingStateVisitor} from "../AbstractStates";
-import {AbstractElement, AbstractState} from "../../../lattices/Lattice";
-import {SSAState} from "./SSAAbstractDomain";
+import { DelegatingStateVisitor } from '../AbstractStates';
+import { AbstractElement, AbstractState } from '../../../lattices/Lattice';
+import { SSAState } from './SSAAbstractDomain';
 
 export class SSAStateCollector extends DelegatingStateVisitor<SSAState[]> {
-
     constructor() {
         super();
     }
@@ -40,14 +39,11 @@ export class SSAStateCollector extends DelegatingStateVisitor<SSAState[]> {
     protected defaultResultFor(element: AbstractElement): SSAState[] {
         return [];
     }
-
 }
 
 export class SSAAbstractStates {
-
     public static extractFrom(fromState: AbstractState): SSAState[] {
         const visitor = new SSAStateCollector();
         return fromState.accept(visitor);
     }
-
 }

@@ -23,29 +23,26 @@
  *
  */
 
+import { ConcreteElement } from '../domains/ConcreteElements';
+import { AbstractState } from '../../lattices/Lattice';
+import { FrontierSet, ReachedSet } from './StateSet';
+import { AnalysisAlgorithm } from './Algorithm';
+import { Refiner } from '../analyses/Refiner';
+import { Preconditions } from '../../utils/Preconditions';
+import { ProgramAnalysis } from '../analyses/ProgramAnalysis';
+import { AnalysisStatistics } from '../analyses/AnalysisStatistics';
+import { getActiveBudget } from '../../utils/Budgets';
+import { getTheOnlyElement } from '../../utils/Collections';
+import { AccessibilityRelation } from '../analyses/Accessibility';
 
-import {ConcreteElement} from "../domains/ConcreteElements";
-import {AbstractState} from "../../lattices/Lattice";
-import {FrontierSet, ReachedSet} from "./StateSet";
-import {AnalysisAlgorithm} from "./Algorithm";
-import {Refiner} from "../analyses/Refiner";
-import {Preconditions} from "../../utils/Preconditions";
-import {ProgramAnalysis} from "../analyses/ProgramAnalysis";
-import {AnalysisStatistics} from "../analyses/AnalysisStatistics";
-import {getActiveBudget} from "../../utils/Budgets";
-import {getTheOnlyElement} from "../../utils/Collections";
-import {AccessibilityRelation} from "../analyses/Accessibility";
-
-export const STAT_KEY_BMC_ITERATIONS = "iterations";
+export const STAT_KEY_BMC_ITERATIONS = 'iterations';
 
 /**
  * Algorithm that implements Counterexample-guided Abstraction Refinement (CEGAR).
  *
  * See the paper by Clarke etal. (2000) on "Counterexample-guided abstraction refinement"
  */
-export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState>
-    implements AnalysisAlgorithm<C, E> {
-
+export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState> implements AnalysisAlgorithm<C, E> {
     private readonly _analysis: ProgramAnalysis<C, E, E>;
 
     private readonly _wrappedAlgorithm: AnalysisAlgorithm<C, E>;
@@ -55,13 +52,18 @@ export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState>
     private readonly _statistics: AnalysisStatistics;
     private readonly _feasibilityCheckStats: AnalysisStatistics;
 
-    constructor(wrappedAlgorithm: AnalysisAlgorithm<C, E>, refiner: Refiner<E>, analysis: ProgramAnalysis<C, E, E>, statistics: AnalysisStatistics) {
+    constructor(
+        wrappedAlgorithm: AnalysisAlgorithm<C, E>,
+        refiner: Refiner<E>,
+        analysis: ProgramAnalysis<C, E, E>,
+        statistics: AnalysisStatistics
+    ) {
         this._wrappedAlgorithm = Preconditions.checkNotUndefined(wrappedAlgorithm);
         this._refiner = Preconditions.checkNotUndefined(refiner);
         this._analysis = Preconditions.checkNotUndefined(analysis);
 
         this._statistics = Preconditions.checkNotUndefined(statistics).withContext(this.constructor.name);
-        this._feasibilityCheckStats = this._statistics.withContext("feasibility-check");
+        this._feasibilityCheckStats = this._statistics.withContext('feasibility-check');
     }
 
     private identifyTargetStates(reached: ReachedSet<E>): Set<E> {
@@ -87,8 +89,12 @@ export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState>
                 this._feasibilityCheckStats.startTimer();
                 try {
                     const ar = this._analysis.accessibility(reached, targetState);
-                    const isFeasible: boolean = this._refiner.checkIsFeasible(reached, ar,
-                        targetState as E, `Target state feasibility for ${properties.toString()}`);
+                    const isFeasible: boolean = this._refiner.checkIsFeasible(
+                        reached,
+                        ar,
+                        targetState as E,
+                        `Target state feasibility for ${properties.toString()}`
+                    );
 
                     if (isFeasible) {
                         return [frontier, reached];
@@ -105,7 +111,12 @@ export class CEGARAlgorithm<C extends ConcreteElement, E extends AbstractState>
         return [frontier, reached];
     }
 
-    protected eliminateInfeasibleState(frontier: FrontierSet<E>, reached: ReachedSet<E>, ar: AccessibilityRelation<E>, targetState: E): [FrontierSet<E>, ReachedSet<E>]{
+    protected eliminateInfeasibleState(
+        frontier: FrontierSet<E>,
+        reached: ReachedSet<E>,
+        ar: AccessibilityRelation<E>,
+        targetState: E
+    ): [FrontierSet<E>, ReachedSet<E>] {
         return this._refiner.refinePrecision(frontier, reached, ar, targetState);
     }
 }

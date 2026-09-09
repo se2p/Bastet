@@ -23,22 +23,17 @@
  *
  */
 
-import {Expression} from "./Expression";
-import {AbstractExpression} from "./AbstractExpression";
-import {ListType, ScratchType} from "../ScratchType";
-import {ExpressionList} from "./ExpressionList";
-import {VariableExpression} from "../Variable";
+import { Expression } from './Expression';
+import { AbstractExpression } from './AbstractExpression';
+import { ListType, ScratchType } from '../ScratchType';
+import { ExpressionList } from './ExpressionList';
+import { VariableExpression } from '../Variable';
 
-export interface ListExpression extends Expression {
+export interface ListExpression extends Expression {}
 
-}
-
-export class ListVariableExpression extends VariableExpression implements ListExpression {
-
-}
+export class ListVariableExpression extends VariableExpression implements ListExpression {}
 
 export class ExpressionListExpression extends AbstractExpression implements ListExpression {
-
     private readonly _elements: ExpressionList;
 
     constructor(elementType: ScratchType, elements: ExpressionList) {

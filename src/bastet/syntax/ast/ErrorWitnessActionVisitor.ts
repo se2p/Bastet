@@ -20,17 +20,17 @@
  *
  */
 
-import {AstNode} from "./AstNode";
-import {ImplementMeForException} from "../../core/exceptions/ImplementMeException";
-import {BeginAtomicStatement, EndAtomicStatement, ReturnStatement} from "./core/statements/ControlStatement";
-import {CallStatement} from "./core/statements/CallStatement";
+import { AstNode } from './AstNode';
+import { ImplementMeForException } from '../../core/exceptions/ImplementMeException';
+import { BeginAtomicStatement, EndAtomicStatement, ReturnStatement } from './core/statements/ControlStatement';
+import { CallStatement } from './core/statements/CallStatement';
 import {
     AddElementToStatement,
     DeleteAllFromStatement,
     DeleteIthFromStatement,
     InsertAtStatement,
     ReplaceElementAtStatement,
-} from "./core/statements/ListStatement";
+} from './core/statements/ListStatement';
 import {
     AndExpression,
     BooleanLiteral,
@@ -46,19 +46,19 @@ import {
     StrEqualsExpression,
     StrGreaterThanExpression,
     StrLessThanExpression,
-} from "./core/expressions/BooleanExpression";
-import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/AssumeStatement";
-import {StringLiteral, StringVariableExpression} from "./core/expressions/StringExpression";
-import {ActorVariableExpression} from "./core/expressions/ActorExpression";
-import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
-import {CastExpression} from "./core/expressions/CastExpression";
-import {CreateCloneOfStatement} from "./core/statements/CreateCloneOfStatement";
+} from './core/expressions/BooleanExpression';
+import { BranchingAssumeStatement, StrengtheningAssumeStatement } from './core/statements/AssumeStatement';
+import { StringLiteral, StringVariableExpression } from './core/expressions/StringExpression';
+import { ActorVariableExpression } from './core/expressions/ActorExpression';
+import { BroadcastAndWaitStatement, BroadcastMessageStatement } from './core/statements/BroadcastMessageStatement';
+import { CastExpression } from './core/expressions/CastExpression';
+import { CreateCloneOfStatement } from './core/statements/CreateCloneOfStatement';
 import {
     DeclareActorVariableStatement,
     DeclareStackVariableStatement,
     DeclareSystemVariableStatement,
-} from "./core/statements/DeclarationStatement";
-import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
+} from './core/statements/DeclarationStatement';
+import { DeleteThisCloneStatement, StopAllStatement, StopThisStatement } from './core/statements/TerminationStatement';
 import {
     DivideExpression,
     FloatLiteral,
@@ -72,54 +72,56 @@ import {
     NumberVariableExpression,
     PlusExpression,
     TimerExpression,
-} from "./core/expressions/NumberExpression";
-import {EpsilonStatement} from "./core/statements/EpsilonStatement";
-import {ExpressionStatement} from "./core/statements/ExpressionStatement";
+} from './core/expressions/NumberExpression';
+import { EpsilonStatement } from './core/statements/EpsilonStatement';
+import { ExpressionStatement } from './core/statements/ExpressionStatement';
 import {
     CheckFeasibilityStatement,
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
     TerminateProgramStatement,
-} from "./core/statements/InternalStatement";
-import {ResetTimerStatement} from "./core/statements/ResetTimerStatement";
-import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
-import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
-import {VariableWithDataLocation} from "./core/Variable";
-import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
+} from './core/statements/InternalStatement';
+import { ResetTimerStatement } from './core/statements/ResetTimerStatement';
+import { StopOthersInActorStatement } from './core/statements/StopOthersInActorStatement';
+import { StoreEvalResultToVariableStatement } from './core/statements/SetStatement';
+import { VariableWithDataLocation } from './core/Variable';
+import { WaitUntilStatement } from './core/statements/WaitUntilStatement';
 import {
     CoreBoolExpressionVisitor,
     CoreNonCtrlStatementnVisitor,
     CoreNumberExpressionVisitor,
     CoreVisitor,
-} from "./CoreVisitor";
-import {CorePrintVisitor} from "./CorePrintVisitor";
-import {PrecisionPopStatement, PrecisionPushStatement} from "./core/Precisions";
-import {BOOTSTRAP_FINISHED_MESSAGE_MSG} from "./core/Message";
+} from './CoreVisitor';
+import { CorePrintVisitor } from './CorePrintVisitor';
+import { PrecisionPopStatement, PrecisionPushStatement } from './core/Precisions';
+import { BOOTSTRAP_FINISHED_MESSAGE_MSG } from './core/Message';
 
 export enum Action {
-    DEFINE = "DEFINE",
-    DECLARE = "DECLARE",
-    METHOD_CALL = "METHOD_CALL",
-    EPSILON = "EPSILON",
-    MOUSE_MOVE = "MOUSE_MOVE",
-    MOUSE_DOWN = "MOUSE_DOWN",
-    MOUSE_UP = "MOUSE_UP",
-    KEY_DOWN = "KEY_DOWN",
-    KEY_UP = "KEY_UP",
-    MOUSE_INPUT = "MOUSE_INPUT",
-    KEY_PRESSED = "KEY_PRESSED",
-    INITIAL_STATE = "INITIAL_STATE",
-    WAIT = "WAIT",
-    ENTER_ATOMIC = "ENTER_ATOMIC",
-    LEAVE_ATOMIC = "LEAVE_ATOMIC",
-    COLLAPSED_ATOMIC = "COLLAPSED_ATOMIC",
-    REACHED_VIOLATION = "REACHED_VIOLATION",
-    ANSWER = "ANSWER"
+    DEFINE = 'DEFINE',
+    DECLARE = 'DECLARE',
+    METHOD_CALL = 'METHOD_CALL',
+    EPSILON = 'EPSILON',
+    MOUSE_MOVE = 'MOUSE_MOVE',
+    MOUSE_DOWN = 'MOUSE_DOWN',
+    MOUSE_UP = 'MOUSE_UP',
+    KEY_DOWN = 'KEY_DOWN',
+    KEY_UP = 'KEY_UP',
+    MOUSE_INPUT = 'MOUSE_INPUT',
+    KEY_PRESSED = 'KEY_PRESSED',
+    INITIAL_STATE = 'INITIAL_STATE',
+    WAIT = 'WAIT',
+    ENTER_ATOMIC = 'ENTER_ATOMIC',
+    LEAVE_ATOMIC = 'LEAVE_ATOMIC',
+    COLLAPSED_ATOMIC = 'COLLAPSED_ATOMIC',
+    REACHED_VIOLATION = 'REACHED_VIOLATION',
+    ANSWER = 'ANSWER',
 }
 
 export class ActionWithWeight {
-    constructor(public action: Action, public weight: number) {
-    }
+    constructor(
+        public action: Action,
+        public weight: number
+    ) {}
 
     public static readonly INITIAL_STATE = new ActionWithWeight(Action.INITIAL_STATE, 5);
     public static readonly DEFINE = new ActionWithWeight(Action.DEFINE, 1);
@@ -132,20 +134,28 @@ export class ActionWithWeight {
     public static readonly REACHED_VIOLATION = new ActionWithWeight(Action.REACHED_VIOLATION, 2);
 
     public static isActionEpsilonLike(action: Action) {
-        return !action || [
-            Action.DEFINE,
-            Action.DECLARE,
-            Action.METHOD_CALL,
-            Action.EPSILON,
-            Action.ENTER_ATOMIC,
-            Action.LEAVE_ATOMIC,
-            Action.COLLAPSED_ATOMIC].includes(action);
+        return (
+            !action ||
+            [
+                Action.DEFINE,
+                Action.DECLARE,
+                Action.METHOD_CALL,
+                Action.EPSILON,
+                Action.ENTER_ATOMIC,
+                Action.LEAVE_ATOMIC,
+                Action.COLLAPSED_ATOMIC,
+            ].includes(action)
+        );
     }
 }
 
-export class ErrorWitnessActionVisitor implements CoreVisitor<ActionWithWeight>, CoreBoolExpressionVisitor<ActionWithWeight>, CoreNumberExpressionVisitor<ActionWithWeight>,
-CoreNonCtrlStatementnVisitor<ActionWithWeight>{
-
+export class ErrorWitnessActionVisitor
+    implements
+        CoreVisitor<ActionWithWeight>,
+        CoreBoolExpressionVisitor<ActionWithWeight>,
+        CoreNumberExpressionVisitor<ActionWithWeight>,
+        CoreNonCtrlStatementnVisitor<ActionWithWeight>
+{
     private readonly printer = new CorePrintVisitor();
 
     visit(node: AstNode): ActionWithWeight {
@@ -215,7 +225,9 @@ CoreNonCtrlStatementnVisitor<ActionWithWeight>{
     visitBroadcastAndWaitStatement(node: BroadcastAndWaitStatement): ActionWithWeight {
         const broadcast = node.msg.messageid.accept(this.printer);
 
-        return broadcast === `"${BOOTSTRAP_FINISHED_MESSAGE_MSG}"` ? ActionWithWeight.INITIAL_STATE : ActionWithWeight.EPSILON;
+        return broadcast === `"${BOOTSTRAP_FINISHED_MESSAGE_MSG}"`
+            ? ActionWithWeight.INITIAL_STATE
+            : ActionWithWeight.EPSILON;
     }
 
     visitBroadcastMessageStatement(node: BroadcastMessageStatement): ActionWithWeight {

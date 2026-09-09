@@ -23,15 +23,14 @@
  *
  */
 
-import {AbstractNode} from "../AstNode";
-import {AstNodeList} from "../AstNodeList";
-import {Identifier} from "./Identifier";
-import {ScratchType} from "./ScratchType";
+import { AbstractNode } from '../AstNode';
+import { AstNodeList } from '../AstNodeList';
+import { Identifier } from './Identifier';
+import { ScratchType } from './ScratchType';
 
 export class ParameterDeclaration extends AbstractNode {
-
-    private readonly _ident : Identifier;
-    private readonly _type : ScratchType;
+    private readonly _ident: Identifier;
+    private readonly _type: ScratchType;
 
     constructor(ident: Identifier, type: ScratchType) {
         super([ident, type]);
@@ -49,7 +48,6 @@ export class ParameterDeclaration extends AbstractNode {
 }
 
 export class ParameterDeclarationList extends AstNodeList<ParameterDeclaration> {
-
     constructor(elements: ParameterDeclaration[]) {
         super(elements);
     }

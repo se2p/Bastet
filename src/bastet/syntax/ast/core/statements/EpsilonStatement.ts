@@ -23,10 +23,9 @@
  *
  */
 
-import {Statement} from "./Statement";
+import { Statement } from './Statement';
 
 export class EpsilonStatement extends Statement {
-
     constructor() {
         super([]);
     }
@@ -34,5 +33,4 @@ export class EpsilonStatement extends Statement {
     toTreeString(): string {
         return this.constructor.name;
     }
-
 }

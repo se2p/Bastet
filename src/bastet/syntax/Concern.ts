@@ -23,50 +23,43 @@
  *
  */
 
-import {Map as ImmMap, Record as ImmRec, Set as ImmSet} from "immutable";
-import {Preconditions} from "../utils/Preconditions";
+import { Map as ImmMap, Record as ImmRec, Set as ImmSet } from 'immutable';
+import { Preconditions } from '../utils/Preconditions';
 
 export interface ConcernAttributes {
-
     text: string;
-
 }
 
 const ConcernRecord = ImmRec({
-
-    text: ""
-
+    text: '',
 });
 
 export class Concern extends ConcernRecord implements ConcernAttributes {
-
     constructor(text: string) {
         Preconditions.checkNotUndefined(text);
         Preconditions.checkArgument(text.length > 0);
-        super({text: text});
+        super({ text: text });
     }
 
     get getText(): string {
-        return this.get("text");
+        return this.get('text');
     }
 
     public withText(text: string): Concern {
-        return this.set("text", text);
+        return this.set('text', text);
     }
-
 }
 
 /**
  * See the authors PhD thesis.
  */
 export class Concerns {
-
     private static LOW_CONCERN: Concern;
 
     public static lowestPriorityConcern(): Concern {
         if (!Concerns.LOW_CONCERN) {
             // Aka TOP concern
-            Concerns.LOW_CONCERN = new Concern("__TOP");
+            Concerns.LOW_CONCERN = new Concern('__TOP');
         }
         return Concerns.LOW_CONCERN;
     }
@@ -76,7 +69,7 @@ export class Concerns {
     public static highestPriorityConcern(): Concern {
         if (!Concerns.HIGH_CONCERN) {
             // Aka BOTTOM concern
-            Concerns.HIGH_CONCERN = new Concern("__BOTTOM");
+            Concerns.HIGH_CONCERN = new Concern('__BOTTOM');
         }
         return Concerns.HIGH_CONCERN;
     }
@@ -85,7 +78,7 @@ export class Concerns {
 
     public static defaultSpecificationConcern(): Concern {
         if (!Concerns.DEF_SPEC_CONCERN) {
-            Concerns.DEF_SPEC_CONCERN = new Concern("__SPEC");
+            Concerns.DEF_SPEC_CONCERN = new Concern('__SPEC');
         }
         return Concerns.DEF_SPEC_CONCERN;
     }
@@ -94,7 +87,7 @@ export class Concerns {
 
     public static defaultProgramConcern(): Concern {
         if (!Concerns.DEF_PROGRAM_CONCERN) {
-            Concerns.DEF_PROGRAM_CONCERN = new Concern("__PROG");
+            Concerns.DEF_PROGRAM_CONCERN = new Concern('__PROG');
         }
         return Concerns.DEF_PROGRAM_CONCERN;
     }
@@ -102,11 +95,9 @@ export class Concerns {
     private static defaultConcern(): Concern {
         return this.lowestPriorityConcern();
     }
-
 }
 
 export interface ConcernDependencyGraphAttributes {
-
     concerns: ImmSet<Concern>;
 
     dependencyRelation: ImmMap<Concern, ImmSet<Concern>>;
@@ -114,31 +105,29 @@ export interface ConcernDependencyGraphAttributes {
     topConcern: Concern;
 
     bottomConcern: Concern;
-
 }
 
 const ConcernDependencyGraphRecord = ImmRec({
-
     concerns: ImmSet<Concern>(),
 
     dependencyRelation: ImmMap<Concern, ImmSet<Concern>>(),
 
     topConcern: Concerns.lowestPriorityConcern(),
 
-    bottomConcern: Concerns.highestPriorityConcern()
-
+    bottomConcern: Concerns.highestPriorityConcern(),
 });
 
 /**
  * See the authors PhD thesis.
  */
 export class ConcernDependencyGraph extends ConcernDependencyGraphRecord implements ConcernDependencyGraphAttributes {
-
     constructor(concerns: ImmSet<Concern>, dependencies: ImmMap<Concern, ImmSet<Concern>>) {
-        super({concerns: Preconditions.checkNotUndefined(concerns),
+        super({
+            concerns: Preconditions.checkNotUndefined(concerns),
             dependencyRelation: Preconditions.checkNotUndefined(dependencies),
             topConcern: Concerns.lowestPriorityConcern(),
-            bottomConcern: Concerns.highestPriorityConcern()});
+            bottomConcern: Concerns.highestPriorityConcern(),
+        });
     }
 
     public withConcerns(concerns: ImmSet<Concern>): ConcernDependencyGraph {
@@ -150,11 +139,10 @@ export class ConcernDependencyGraph extends ConcernDependencyGraphRecord impleme
     }
 
     public getTop(): Concern {
-        return this.get("topConcern");
+        return this.get('topConcern');
     }
 
     public getBottom(): Concern {
-        return this.get("bottomConcern");
+        return this.get('bottomConcern');
     }
-
 }

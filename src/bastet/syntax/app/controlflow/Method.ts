@@ -23,15 +23,14 @@
  *
  */
 
-import {MethodDefinition, MethodSignature, ResultDeclaration} from "../../ast/core/MethodDefinition";
-import {ParameterDeclarationList} from "../../ast/core/ParameterDeclaration";
-import {Identifier} from "../../ast/core/Identifier";
-import {StatementList} from "../../ast/core/statements/Statement";
-import {TransitionRelation, WithTransitionRelation} from "./TransitionRelation";
-import {Preconditions} from "../../../utils/Preconditions";
+import { MethodDefinition, MethodSignature, ResultDeclaration } from '../../ast/core/MethodDefinition';
+import { ParameterDeclarationList } from '../../ast/core/ParameterDeclaration';
+import { Identifier } from '../../ast/core/Identifier';
+import { StatementList } from '../../ast/core/statements/Statement';
+import { TransitionRelation, WithTransitionRelation } from './TransitionRelation';
+import { Preconditions } from '../../../utils/Preconditions';
 
 export class Method implements WithTransitionRelation {
-
     private readonly _definition: MethodDefinition;
 
     private readonly _transitions: TransitionRelation;
@@ -41,7 +40,7 @@ export class Method implements WithTransitionRelation {
         this._transitions = Preconditions.checkNotUndefined(controlflow);
     }
 
-    get signature() : MethodSignature {
+    get signature(): MethodSignature {
         return this._definition;
     }
 
@@ -68,5 +67,4 @@ export class Method implements WithTransitionRelation {
     get isAtomic(): boolean {
         return this._definition.isAtomic;
     }
-
 }

@@ -23,20 +23,20 @@
  *
  */
 
-import {AbstractDomain} from "../domains/AbstractDomain";
-import {AbstractElement, AbstractState} from "../../lattices/Lattice";
-import {App} from "../../syntax/app/App";
-import {ConcreteElement} from "../domains/ConcreteElements";
-import {ProgramOperation} from "../../syntax/app/controlflow/ops/ProgramOperation";
-import {Refiner} from "./Refiner";
-import {Property} from "../../syntax/Property";
-import {FrontierSet, ReachedSet, StateOrderComparator, StatePartitionOperator} from "../algorithms/StateSet";
-import {LabeledTransferRelation} from "./TransferRelation";
-import {WitnessHandler} from "./WitnessHandlers";
-import {LexiKey} from "../../utils/Lexicographic";
-import {AccessibilityRelation} from "./Accessibility";
-import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
-import {ThreadState} from "./control/ConcreteProgramState";
+import { AbstractDomain } from '../domains/AbstractDomain';
+import { AbstractElement, AbstractState } from '../../lattices/Lattice';
+import { App } from '../../syntax/app/App';
+import { ConcreteElement } from '../domains/ConcreteElements';
+import { ProgramOperation } from '../../syntax/app/controlflow/ops/ProgramOperation';
+import { Refiner } from './Refiner';
+import { Property } from '../../syntax/Property';
+import { FrontierSet, ReachedSet, StateOrderComparator, StatePartitionOperator } from '../algorithms/StateSet';
+import { LabeledTransferRelation } from './TransferRelation';
+import { WitnessHandler } from './WitnessHandlers';
+import { LexiKey } from '../../utils/Lexicographic';
+import { AccessibilityRelation } from './Accessibility';
+import { NotSupportedException } from '../../core/exceptions/NotSupportedException';
+import { ThreadState } from './control/ConcreteProgramState';
 
 /**
  * Central program analysis component---sometimes called `state interpreter`.
@@ -46,12 +46,21 @@ import {ThreadState} from "./control/ConcreteProgramState";
  *  - "Configurable software verification: Concretizing the convergence of model checking and program analysis"
  */
 export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
-   extends InitOperator<E, F>, AbstractSuccOperator<E>,
-       TargetOperator<E>, MergeIntoOperator<E, F>,
-       MergeOperator<E>, StopOperator<E, F>, WidenOperator<E, F>, PartitionOperator<E, F>,
-       WitnessHandler<F>, TraversalOrderOperator<E, F>, ResultFinalization<F>,
-       TestificationOperator<E, F, C>, AccessibilityOperator<E, F>, StateReferenceOperator<E> {
-
+    extends
+        InitOperator<E, F>,
+        AbstractSuccOperator<E>,
+        TargetOperator<E>,
+        MergeIntoOperator<E, F>,
+        MergeOperator<E>,
+        StopOperator<E, F>,
+        WidenOperator<E, F>,
+        PartitionOperator<E, F>,
+        WitnessHandler<F>,
+        TraversalOrderOperator<E, F>,
+        ResultFinalization<F>,
+        TestificationOperator<E, F, C>,
+        AccessibilityOperator<E, F>,
+        StateReferenceOperator<E> {
     /**
      * The abstract domain the analysis works with.
      * Defines the mapping between sets of concrete program states and abstract states.
@@ -62,11 +71,9 @@ export interface ProgramAnalysis<C extends ConcreteElement, E extends AbstractEl
      * A refiner component for abstraction precision refinement.
      */
     refiner: Refiner<F>;
-
 }
 
 export interface StateReferenceOperator<E extends AbstractElement> {
-
     /**
      * Increment the number of references to this state.
      * Is intended to be called whenever a state is added to the set 'reached'.
@@ -81,43 +88,42 @@ export interface StateReferenceOperator<E extends AbstractElement> {
      * @param state
      */
     decRef(state: E);
-
 }
 
 export interface AccessibilityOperator<E extends AbstractElement, F extends AbstractState> {
-
     accessibility(reached: ReachedSet<F>, state: F): AccessibilityRelation<F>;
-
 }
 
 /**
  * A program analysis (state interpreter) that is aware of labels on control
  * transitions (a labelled transition system is constructed).
  */
-export interface ProgramAnalysisWithLabels<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
-    extends ProgramAnalysis<C, E, F>, LabeledTransferRelation<E>, TransitionLabelProvider<E> {
-
-}
+export interface ProgramAnalysisWithLabels<
+    C extends ConcreteElement,
+    E extends AbstractElement,
+    F extends AbstractState,
+>
+    extends ProgramAnalysis<C, E, F>, LabeledTransferRelation<E>, TransitionLabelProvider<E> {}
 
 /**
  * A program analysis (state interpreter) that wraps another state interpreter,
  * typically resulting in wrapped (nested) abstract states.
  */
-export interface WrappingProgramAnalysis<C extends ConcreteElement, E extends AbstractElement, F extends AbstractState>
-    extends ProgramAnalysis<C, E, F> {
-
+export interface WrappingProgramAnalysis<
+    C extends ConcreteElement,
+    E extends AbstractElement,
+    F extends AbstractState,
+> extends ProgramAnalysis<C, E, F> {
     /**
      * The wrapped program analysis (state interpreter)
      */
     wrappedAnalysis: ProgramAnalysis<any, any, F>;
-
 }
 
 /**
  * State set initialization operator.
  */
 export interface InitOperator<E extends AbstractElement, F extends AbstractState> {
-
     /**
      * Define the initial abstract states for the given analysis task.
      *
@@ -130,16 +136,13 @@ export interface InitOperator<E extends AbstractElement, F extends AbstractState
      * Different analyses might prefer different set data structures.
      */
     createStateSets(): [FrontierSet<F>, ReachedSet<F>];
-
 }
 
 /**
  * Testification operator. The testification concept is described in the paper
  *  "Witness validation and stepwise testification across software verifiers".
  */
-export interface TestificationOperator<E extends AbstractElement, F extends AbstractState,
-    C extends ConcreteElement> {
-
+export interface TestificationOperator<E extends AbstractElement, F extends AbstractState, C extends ConcreteElement> {
     /**
      * Refine the given accessibility relation `accessibility` such that the given
      * target state `target` (still) can be reached.
@@ -169,11 +172,9 @@ export interface TestificationOperator<E extends AbstractElement, F extends Abst
      * @param state
      */
     testifyConcreteOne(accessibility: AccessibilityRelation<F>, state: F): Iterable<[F, C][]>;
-
 }
 
 export interface ResultFinalization<F extends AbstractState> {
-
     /**
      * The operator to call after the actual analysis finished.
      * To summarize results and produce them as output.
@@ -182,15 +183,15 @@ export interface ResultFinalization<F extends AbstractState> {
      * @param reached
      */
     finalizeResults(frontier: FrontierSet<F>, reached: ReachedSet<F>);
-
 }
 
 /**
  * Collection of state-set partitioning operators for efficient algorithms.
  */
-export interface PartitionOperator<E extends AbstractElement, F extends AbstractState>
-   extends StatePartitionOperator<E> {
-
+export interface PartitionOperator<
+    E extends AbstractElement,
+    F extends AbstractState,
+> extends StatePartitionOperator<E> {
     /**
      * Determines the partition of states to consider for widening a given state.
      *
@@ -214,12 +215,12 @@ export interface PartitionOperator<E extends AbstractElement, F extends Abstract
      * @param reached
      */
     mergePartitionOf(ofState: E, reached: ReachedSet<F>): Iterable<F>;
-
 }
 
-export interface TraversalOrderOperator<E extends AbstractElement, F extends AbstractState>
-    extends StateOrderComparator<E> {
-
+export interface TraversalOrderOperator<
+    E extends AbstractElement,
+    F extends AbstractState,
+> extends StateOrderComparator<E> {
     /**
      * Get a lexicographic key for ordering the set of frontier stats.
      * Determines the traversal strategy of the analysis.
@@ -235,22 +236,18 @@ export interface TraversalOrderOperator<E extends AbstractElement, F extends Abs
      * @param ofState
      */
     getLexiDiffKey(ofState: E): LexiKey;
-
 }
 
 export interface AbstractSuccOperator<E extends AbstractElement> {
-
     /**
      * Compute a collection of abstract successor states for a given abstract state.
      *
      * @param fromState
      */
     abstractSucc(fromState: E): Iterable<E>;
-
 }
 
 export interface TargetOperator<E extends AbstractElement> {
-
     /**
      * Determine the possibly empty set of properties that are considered
      * reached (violated) for the given abstract state.
@@ -258,11 +255,9 @@ export interface TargetOperator<E extends AbstractElement> {
      * @param state
      */
     target(state: E): Property[];
-
 }
 
 export interface MergeIntoOperator<E extends AbstractElement, F extends AbstractState> {
-
     /**
      * Merge (or not) a given abstract state into the set of already reached states,
      * possibly also modifying the set of frontier states.
@@ -275,13 +270,16 @@ export interface MergeIntoOperator<E extends AbstractElement, F extends Abstract
      * @param unwrapper
      * @param wrapper
      */
-    mergeInto(state: E, frontier: FrontierSet<F>, reached: ReachedSet<F>,
-              unwrapper: (AbstractElement) => E, wrapper: (E) => AbstractElement): [FrontierSet<F>, ReachedSet<F>];
-
+    mergeInto(
+        state: E,
+        frontier: FrontierSet<F>,
+        reached: ReachedSet<F>,
+        unwrapper: (AbstractElement) => E,
+        wrapper: (E) => AbstractElement
+    ): [FrontierSet<F>, ReachedSet<F>];
 }
 
 export interface MergeOperator<E extends AbstractElement> {
-
     /**
      * Should the given pair of abstract states be merged?
      *
@@ -297,11 +295,9 @@ export interface MergeOperator<E extends AbstractElement> {
      * @param state2
      */
     merge(state1: E, state2: E): E;
-
 }
 
 export interface StopOperator<E extends AbstractElement, F extends AbstractState> {
-
     /**
      * Determine if the state-space exploration should be stopped for
      * the given abstract state (not added to the set of frontier states---the worklist---anymore).
@@ -311,11 +307,9 @@ export interface StopOperator<E extends AbstractElement, F extends AbstractState
      * @param unwrapper
      */
     stop(state: E, reached: Iterable<F>, unwrapper: (F) => E): boolean;
-
 }
 
 export interface WidenOperator<E extends AbstractElement, F extends AbstractState> {
-
     /**
      * Perform a widening of the given abstract state.
      * The abstraction precision to use is determined by the operator itself,
@@ -332,11 +326,9 @@ export interface WidenOperator<E extends AbstractElement, F extends AbstractStat
      * no information might have been lost.
      */
     isWideningState(state: E): boolean;
-
 }
 
 export interface TransitionLabelProvider<E extends AbstractElement> {
-
     /**
      * Determine the labeling between two abstract states.
      *
@@ -344,14 +336,10 @@ export interface TransitionLabelProvider<E extends AbstractElement> {
      * @param to
      */
     getTransitionLabel(from: E, to: E): [ThreadState, ProgramOperation][];
-
 }
 
 export class UnavailableTransitionLabelProvider<E extends AbstractState> implements TransitionLabelProvider<E> {
-
     getTransitionLabel(from: E, to: E): [ThreadState, ProgramOperation][] {
         throw new NotSupportedException();
     }
-
 }
-

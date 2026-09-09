@@ -23,19 +23,16 @@
  *
  */
 
-import {AbstractElement, Lattice, Lattices} from "../lattices/Lattice";
-import {List as ImmList, Record as ImmRec, Set as ImmSet} from "immutable";
-import {FirstOrderFormula} from "../utils/ConjunctiveNormalForm";
-import {FirstOrderLattice} from "./domains/FirstOrderDomain";
-import {Preconditions} from "../utils/Preconditions";
-import {IllegalStateException} from "../core/exceptions/IllegalStateException";
+import { AbstractElement, Lattice } from '../lattices/Lattice';
+import { List as ImmList, Record as ImmRec, Set as ImmSet } from 'immutable';
+import { FirstOrderFormula } from '../utils/ConjunctiveNormalForm';
+import { FirstOrderLattice } from './domains/FirstOrderDomain';
+import { Preconditions } from '../utils/Preconditions';
+import { IllegalStateException } from '../core/exceptions/IllegalStateException';
 
-export interface AbstractionPrecision extends AbstractElement {
-
-}
+export interface AbstractionPrecision extends AbstractElement {}
 
 export interface AbstractionPrecisionLattice<P extends AbstractionPrecision> extends Lattice<P> {
-
     /**
      * Defines that no information should be maintained.
      * Each concrete state (FOR ALL) is mapped to
@@ -52,31 +49,30 @@ export interface AbstractionPrecisionLattice<P extends AbstractionPrecision> ext
      * Neutral element regarding the MEET.
      */
     top(): P;
-
 }
 
 export enum PrecisionRole {
-    TOP_MAINTAIN_ALL, BOTTOM_MAINTAIN_NOTHING, INTERMEDIATE
+    TOP_MAINTAIN_ALL,
+    BOTTOM_MAINTAIN_NOTHING,
+    INTERMEDIATE,
 }
 
 export interface PredicatePrecisionAttributes {
-
-    role: PrecisionRole,
+    role: PrecisionRole;
     predicates: ImmSet<FirstOrderFormula>;
-
 }
 
 const PredicatePrecisionRecord = ImmRec({
-
     role: PrecisionRole.TOP_MAINTAIN_ALL,
-    predicates: ImmSet<FirstOrderFormula>()
-
+    predicates: ImmSet<FirstOrderFormula>(),
 });
 
-export class PredicatePrecision extends PredicatePrecisionRecord implements AbstractionPrecision, PredicatePrecisionAttributes {
-
+export class PredicatePrecision
+    extends PredicatePrecisionRecord
+    implements AbstractionPrecision, PredicatePrecisionAttributes
+{
     constructor(predicates: Iterable<FirstOrderFormula>, role: PrecisionRole) {
-        super({'predicates': ImmSet(predicates), 'role': role });
+        super({ predicates: ImmSet(predicates), role: role });
     }
 
     public withRole(role: PrecisionRole): this {
@@ -111,25 +107,22 @@ export class PredicatePrecision extends PredicatePrecisionRecord implements Abst
     public isBottom() {
         return this.role == PrecisionRole.BOTTOM_MAINTAIN_NOTHING;
     }
-
 }
 
 export interface PredicatePrecisionStackAttributes {
-
     stack: ImmList<PredicatePrecision>;
-
 }
 
 const PredicatePrecisionStackRecord = ImmRec({
-
-    stack: ImmList<PredicatePrecision>()
-
+    stack: ImmList<PredicatePrecision>(),
 });
 
-export class PredicatePrecisionStack extends PredicatePrecisionStackRecord implements PredicatePrecisionStackAttributes {
-
+export class PredicatePrecisionStack
+    extends PredicatePrecisionStackRecord
+    implements PredicatePrecisionStackAttributes
+{
     constructor(stack: ImmList<PredicatePrecision>) {
-        super({'stack': stack});
+        super({ stack: stack });
     }
 
     public push(element: PredicatePrecision): this {
@@ -139,11 +132,9 @@ export class PredicatePrecisionStack extends PredicatePrecisionStackRecord imple
     public pop(): this {
         return this.set('stack', this.stack.pop());
     }
-
 }
 
 export class PredicatePrecisionStackLattice implements Lattice<PredicatePrecisionStack> {
-
     private readonly _bottom: PredicatePrecisionStack;
     private readonly _lattice: PredicatePrecisionLattice<FirstOrderFormula>;
     private readonly _top: PredicatePrecisionStack;
@@ -190,9 +181,10 @@ export class PredicatePrecisionStackLattice implements Lattice<PredicatePrecisio
 /**
  * Precision lattice for Boolean predicate abstraction.
  */
-export class PredicatePrecisionLattice<F extends FirstOrderFormula> implements AbstractionPrecisionLattice<PredicatePrecision> {
-    
-    private readonly _folLattice: FirstOrderLattice<F>
+export class PredicatePrecisionLattice<
+    F extends FirstOrderFormula,
+> implements AbstractionPrecisionLattice<PredicatePrecision> {
+    private readonly _folLattice: FirstOrderLattice<F>;
     private readonly _bottom: PredicatePrecision;
     private readonly _top: PredicatePrecision;
 
@@ -214,7 +206,7 @@ export class PredicatePrecisionLattice<F extends FirstOrderFormula> implements A
         if (element1.predicates.isSubset(element2.predicates)) {
             return true;
         } else {
-            throw new IllegalStateException("Inclusion check would require a SAT solver call");
+            throw new IllegalStateException('Inclusion check would require a SAT solver call');
         }
     }
 
@@ -235,7 +227,10 @@ export class PredicatePrecisionLattice<F extends FirstOrderFormula> implements A
             return element2;
         }
 
-        const result = new PredicatePrecision(element1.predicates.intersect(element2.predicates), PrecisionRole.INTERMEDIATE);
+        const result = new PredicatePrecision(
+            element1.predicates.intersect(element2.predicates),
+            PrecisionRole.INTERMEDIATE
+        );
         if (result.predicates.isEmpty()) {
             return this.bottom();
         } else {
@@ -254,5 +249,4 @@ export class PredicatePrecisionLattice<F extends FirstOrderFormula> implements A
     get folLattice(): FirstOrderLattice<F> {
         return this._folLattice;
     }
-
 }

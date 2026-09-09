@@ -1,6 +1,7 @@
-FROM node:14-alpine AS base
+FROM node:24-alpine AS base
 
 RUN apk add --no-cache bash
+RUN corepack enable
 
 # Set the working directory
 # All subsequent actions will be taken from here
@@ -9,15 +10,12 @@ WORKDIR /bastet
 FROM base AS deploy
 
 # First, copy the package dependency definition only (for a better layering)
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies
-RUN npm install --production && npm install --global typescript@4.1.2 @types/node
+RUN pnpm install --frozen-lockfile
 
 # Copy BASTET fully into the image
 COPY . ./
 
-RUN npm install -D @types/node
-
-RUN npm run build-no-lint
-
+RUN pnpm run build-no-lint && pnpm prune --prod

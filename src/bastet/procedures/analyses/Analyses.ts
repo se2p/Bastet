@@ -23,22 +23,32 @@
  *
  */
 
-import {ProgramAnalysis} from "./ProgramAnalysis";
-import {StateSet} from "../algorithms/StateSet";
-import {AbstractElement} from "../../lattices/Lattice";
+import { ProgramAnalysis } from './ProgramAnalysis';
+import { StateSet } from '../algorithms/StateSet';
+import { AbstractElement } from '../../lattices/Lattice';
 
-export type ExportFunction = (reachedPrime: StateSet<AbstractElement>, frontierPrime: StateSet<AbstractElement>) => void;
+export type ExportFunction = (
+    reachedPrime: StateSet<AbstractElement>,
+    frontierPrime: StateSet<AbstractElement>
+) => void;
 
-export function resolveResultExportFunction<E extends AbstractElement>(analysis: ProgramAnalysis<any, any, any>): ExportFunction {
+export function resolveResultExportFunction<E extends AbstractElement>(
+    analysis: ProgramAnalysis<any, any, any>
+): ExportFunction {
     const a = extractWrappedAnalysis(analysis, (a) => a['exportAnalysisResult'] != null);
     if (a) {
-        return (reached, frontier) => { return a['exportAnalysisResult'](reached, frontier) };
+        return (reached, frontier) => {
+            return a['exportAnalysisResult'](reached, frontier);
+        };
     } else {
         return null;
     }
 }
 
-export function extractWrappedAnalysis(from: ProgramAnalysis<any, any, any>, filter: (analysis: ProgramAnalysis<any, any, any>) => boolean): ProgramAnalysis<any, any, any> {
+export function extractWrappedAnalysis(
+    from: ProgramAnalysis<any, any, any>,
+    filter: (analysis: ProgramAnalysis<any, any, any>) => boolean
+): ProgramAnalysis<any, any, any> {
     let it: ProgramAnalysis<any, any, any> = from;
     while (true) {
         if (!it) {

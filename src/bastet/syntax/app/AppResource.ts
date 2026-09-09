@@ -23,22 +23,21 @@
  *
  */
 
-import {WithIdent} from "../../utils/WithIdent";
-import {IllegalArgumentException} from "../../core/exceptions/IllegalArgumentException";
-import {ImageResourceType, ResourceType, SoundResourceType} from "../ast/core/ResourceDefinition";
+import { WithIdent } from '../../utils/WithIdent';
+import { IllegalArgumentException } from '../../core/exceptions/IllegalArgumentException';
+import { ImageResourceType, ResourceType, SoundResourceType } from '../ast/core/ResourceDefinition';
 
-export type AppResourceMap = { [id:string]: AppResource } ;
+export type AppResourceMap = { [id: string]: AppResource };
 
 export enum AppResourceType {
-    IMAGE = "image",
-    SOUND = "sound"
+    IMAGE = 'image',
+    SOUND = 'sound',
 }
 
 export class AppResource implements WithIdent {
-
-    private readonly _ident : string;
-    private readonly _type : ResourceType;
-    private readonly _uri : string;
+    private readonly _ident: string;
+    private readonly _type: ResourceType;
+    private readonly _uri: string;
 
     constructor(ident: string, type: ResourceType, uri: string) {
         this._ident = ident;
@@ -59,13 +58,13 @@ export class AppResource implements WithIdent {
     }
 
     public static typeFromString(text: string): ResourceType {
-        switch(text) {
-            case "image":
+        switch (text) {
+            case 'image':
                 return ImageResourceType.instance();
-            case "sound":
+            case 'sound':
                 return SoundResourceType.instance();
             default:
-                throw new IllegalArgumentException("Unsupported type of resource");
+                throw new IllegalArgumentException('Unsupported type of resource');
         }
     }
 }

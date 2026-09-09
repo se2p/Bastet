@@ -17,7 +17,7 @@ cd $BASTET_ROOT
 
 if [ -z $BASTET_NO_BUILD ]
 then
-    npm run build
+    pnpm run build
 fi
 
 grep_statistic () {

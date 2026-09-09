@@ -23,10 +23,8 @@
  *
  */
 
-import {RuleNode} from "antlr4ts/tree";
+import { RuleNode } from 'antlr4ts/tree';
 
 export interface SyntaxTreeTransformer {
-
-    transform(origin: RuleNode) : RuleNode;
-
+    transform(origin: RuleNode): RuleNode;
 }

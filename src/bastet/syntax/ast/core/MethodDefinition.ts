@@ -23,18 +23,16 @@
  *
  */
 
-import {AbstractNode} from "../AstNode";
-import {AstNodeList} from "../AstNodeList";
-import {Identifier} from "./Identifier";
-import {ParameterDeclarationList} from "./ParameterDeclaration";
-import {StatementList} from "./statements/Statement";
-import {ScratchType, VoidType} from "./ScratchType";
-import {Variable, VariableWithDataLocation} from "./Variable";
-import {DataLocations} from "../../app/controlflow/DataLocation";
-
+import { AbstractNode } from '../AstNode';
+import { AstNodeList } from '../AstNodeList';
+import { Identifier } from './Identifier';
+import { ParameterDeclarationList } from './ParameterDeclaration';
+import { StatementList } from './statements/Statement';
+import { ScratchType, VoidType } from './ScratchType';
+import { Variable, VariableWithDataLocation } from './Variable';
+import { DataLocations } from '../../app/controlflow/DataLocation';
 
 export class ResultDeclaration extends AbstractNode {
-
     private readonly _variable: Variable;
 
     constructor(variable: Variable) {
@@ -59,16 +57,14 @@ export class ResultDeclaration extends AbstractNode {
     public static void(): ResultDeclaration {
         if (!ResultDeclaration.VOID) {
             ResultDeclaration.VOID = new ResultDeclaration(
-                new VariableWithDataLocation(DataLocations.createTypedLocation(
-                    Identifier.of(""), VoidType.instance())));
+                new VariableWithDataLocation(DataLocations.createTypedLocation(Identifier.of(''), VoidType.instance()))
+            );
         }
         return ResultDeclaration.VOID;
     }
-
 }
 
 export class MethodSignature extends AbstractNode {
-
     private readonly _ident: Identifier;
     private readonly _params: ParameterDeclarationList;
     private readonly _returns: ResultDeclaration;
@@ -97,29 +93,30 @@ export class MethodSignature extends AbstractNode {
     get isExtern(): boolean {
         return this._isExtern;
     }
-
 }
 
-export type MethodDefinitionMap = { [id:string]: MethodDefinition } ;
+export type MethodDefinitionMap = { [id: string]: MethodDefinition };
 
-export type MethodSignatureMap = { [id:string]: MethodSignature } ;
+export type MethodSignatureMap = { [id: string]: MethodSignature };
 
 export class ExternMethodDeclaration extends MethodSignature {
-
     constructor(ident: Identifier, params: ParameterDeclarationList, returns: ResultDeclaration) {
         super(ident, params, returns, true);
     }
-
 }
 
 export class MethodDefinition extends MethodSignature {
-
     private readonly _statements: StatementList;
 
     private readonly _isAtomic: boolean;
 
-    constructor(ident: Identifier, params: ParameterDeclarationList, statements: StatementList,
-                returns: ResultDeclaration, isAtomic: boolean) {
+    constructor(
+        ident: Identifier,
+        params: ParameterDeclarationList,
+        statements: StatementList,
+        returns: ResultDeclaration,
+        isAtomic: boolean
+    ) {
         super(ident, params, returns, false);
         this._statements = statements;
         this._isAtomic = isAtomic;
@@ -132,13 +129,11 @@ export class MethodDefinition extends MethodSignature {
     get isAtomic(): boolean {
         return this._isAtomic;
     }
-
 }
 
-export type MethodDefinitionType = MethodDefinition | ExternMethodDeclaration ;
+export type MethodDefinitionType = MethodDefinition | ExternMethodDeclaration;
 
 export class MethodDefinitions extends AstNodeList<MethodSignature> {
-
     private readonly _fullMethodDefinitions: MethodDefinitionList;
 
     private readonly _externalMethods: MethodSignatureList;
@@ -162,24 +157,21 @@ export class MethodDefinitions extends AstNodeList<MethodSignature> {
 
     public static fromMixed(elements: MethodDefinitionType[]): MethodDefinitions {
         const fullMethodDefinitions = elements.filter((m) => m instanceof MethodDefinition) as MethodDefinition[];
-        const externalMethods = elements.filter((m) => m instanceof ExternMethodDeclaration) as ExternMethodDeclaration[];
+        const externalMethods = elements.filter(
+            (m) => m instanceof ExternMethodDeclaration
+        ) as ExternMethodDeclaration[];
         return new MethodDefinitions(fullMethodDefinitions, externalMethods);
     }
-
 }
 
 export class MethodDefinitionList extends AstNodeList<MethodDefinition> {
-
     constructor(elements: MethodDefinition[]) {
         super(elements);
     }
-
 }
 
 export class MethodSignatureList extends AstNodeList<MethodSignature> {
-
     constructor(elements: MethodSignature[]) {
         super(elements);
     }
-
 }

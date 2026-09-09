@@ -23,6 +23,4 @@
  *
  */
 
-export class InvalidInputFormatException extends Error {
-
-}
+export class InvalidInputFormatException extends Error {}

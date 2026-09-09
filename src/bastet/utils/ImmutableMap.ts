@@ -1,4 +1,3 @@
-
 /*
  *   BASTET Program Analysis and Verification Framework
  *
@@ -25,14 +24,13 @@
  */
 
 export class ImmutableMap<K, V> implements ReadonlyMap<K, V>, Iterable<[K, V]> {
-
     private readonly _map: Map<K, V>;
 
-    constructor(entries: IterableIterator<[K, V]>) {
+    constructor(entries: Iterable<[K, V]>) {
         this._map = new Map<K, V>(entries);
     }
 
-    public get(key: K) : V | undefined {
+    public get(key: K): V | undefined {
         return this._map.get(key);
     }
 
@@ -40,15 +38,15 @@ export class ImmutableMap<K, V> implements ReadonlyMap<K, V>, Iterable<[K, V]> {
         return this._map.has(key);
     }
 
-    public keys(): IterableIterator<K> {
+    public keys(): MapIterator<K> {
         return this._map.keys();
     }
 
-    public entries(): IterableIterator<[K, V]> {
+    public entries(): MapIterator<[K, V]> {
         return this._map.entries();
     }
 
-    public values(): IterableIterator<V> {
+    public values(): MapIterator<V> {
         return this._map.values();
     }
 
@@ -56,7 +54,7 @@ export class ImmutableMap<K, V> implements ReadonlyMap<K, V>, Iterable<[K, V]> {
         return this._map.size;
     }
 
-    public createMutable(): {[id: string]: V} {
+    public createMutable(): { [id: string]: V } {
         let result = {};
         for (let [k, v] of this.entries()) {
             const kid: string = k.toString();
@@ -65,7 +63,7 @@ export class ImmutableMap<K, V> implements ReadonlyMap<K, V>, Iterable<[K, V]> {
         return result;
     }
 
-    public [Symbol.iterator](): IterableIterator<[K, V]> {
+    public [Symbol.iterator](): MapIterator<[K, V]> {
         return this._map[Symbol.iterator]();
     }
 
@@ -73,7 +71,7 @@ export class ImmutableMap<K, V> implements ReadonlyMap<K, V>, Iterable<[K, V]> {
         return this._map.forEach(callbackFn, thisArg);
     }
 
-    public static copyOfStringMap<V>(input: {[id: string]: V}): ImmutableMap<string, V> {
+    public static copyOfStringMap<V>(input: { [id: string]: V }): ImmutableMap<string, V> {
         let interm: Map<string, V> = new Map<string, V>();
         for (let k in input) {
             interm.set(k, input[k]);
@@ -83,7 +81,7 @@ export class ImmutableMap<K, V> implements ReadonlyMap<K, V>, Iterable<[K, V]> {
 
     public static copyOf<K, V>(input: ReadonlyMap<K, V>): ImmutableMap<K, V> {
         if (input.constructor == ImmutableMap) {
-            return <ImmutableMap<K, V>> input;
+            return <ImmutableMap<K, V>>input;
         }
         return new ImmutableMap(input.entries());
     }
@@ -91,7 +89,4 @@ export class ImmutableMap<K, V> implements ReadonlyMap<K, V>, Iterable<[K, V]> {
     toString(): string {
         return this._map.toString();
     }
-
 }
-
-

@@ -23,25 +23,24 @@
  *
  */
 
-import {WithIdent} from "../../../../utils/WithIdent";
-import {AstNode} from "../../../ast/AstNode";
-import {Preconditions} from "../../../../utils/Preconditions";
-import {BooleanExpression, NegationExpression} from "../../../ast/core/expressions/BooleanExpression";
-import {EpsilonStatement} from "../../../ast/core/statements/EpsilonStatement";
-import {BooleanType} from "../../../ast/core/ScratchType";
-import {ImplementMeException} from "../../../../core/exceptions/ImplementMeException";
+import { WithIdent } from '../../../../utils/WithIdent';
+import { AstNode } from '../../../ast/AstNode';
+import { Preconditions } from '../../../../utils/Preconditions';
+import { BooleanExpression, NegationExpression } from '../../../ast/core/expressions/BooleanExpression';
+import { EpsilonStatement } from '../../../ast/core/statements/EpsilonStatement';
+import { BooleanType } from '../../../ast/core/ScratchType';
+import { ImplementMeException } from '../../../../core/exceptions/ImplementMeException';
 import {
     AssumeStatement,
     AssumeType,
     BranchingAssumeStatement,
-    StrengtheningAssumeStatement
-} from "../../../ast/core/statements/AssumeStatement";
-import {ThreadState} from "../../../../procedures/analyses/control/ConcreteProgramState";
+    StrengtheningAssumeStatement,
+} from '../../../ast/core/statements/AssumeStatement';
+import { ThreadState } from '../../../../procedures/analyses/control/ConcreteProgramState';
 
 export type OperationId = number;
 
 export abstract class ProgramOperation implements WithIdent {
-
     private readonly _ast: AstNode;
 
     private readonly _id: OperationId;
@@ -71,11 +70,9 @@ export abstract class ProgramOperation implements WithIdent {
     public static for(id: OperationId): ProgramOperation {
         return ProgramOperations.withID(id);
     }
-
 }
 
 export class ProgramOperationInContext {
-
     private readonly _op: ProgramOperation;
 
     private readonly _thread: ThreadState;
@@ -92,15 +89,11 @@ export class ProgramOperationInContext {
     get thread(): ThreadState {
         return this._thread;
     }
-
 }
 
-export class AssignementOperation extends ProgramOperation {
-
-}
+export class AssignementOperation extends ProgramOperation {}
 
 export class AssumeOperation extends ProgramOperation {
-
     private readonly _assume: AssumeStatement;
 
     constructor(ast: AssumeStatement) {
@@ -129,11 +122,9 @@ export class AssumeOperation extends ProgramOperation {
     toString(): string {
         return `[${this.ast.toTreeString()}]`;
     }
-
 }
 
 export class RawOperation extends ProgramOperation {
-
     constructor(ast: AstNode) {
         super(ast);
     }
@@ -141,23 +132,19 @@ export class RawOperation extends ProgramOperation {
     toString(): string {
         return this.ast.toTreeString();
     }
-
 }
 
 export class NoopProgramOperation extends ProgramOperation {
-
     constructor() {
         super(new EpsilonStatement());
     }
 
     toString(): string {
-        return "epsilon";
+        return 'epsilon';
     }
-
 }
 
 export class ProgramOperations {
-
     private static opCodeToIdMap: Map<string, OperationId> = new Map();
     private static idToAstMap: Map<OperationId, AstNode> = new Map();
     private static opMap: Map<OperationId, ProgramOperation> = new Map();
@@ -189,7 +176,7 @@ export class ProgramOperations {
         }
     }
 
-    public static withID(id: OperationId): ProgramOperation|null {
+    public static withID(id: OperationId): ProgramOperation | null {
         let result: ProgramOperation = ProgramOperations.opMap.get(id) || null;
         if (result == null) {
             const ast: AstNode = ProgramOperations.idToAstMap.get(id);
@@ -225,11 +212,9 @@ export class ProgramOperations {
         }
         return ProgramOperations.IRREDUCIBLE_EPSILON_OP;
     }
-
 }
 
 export class ProgramOperationFactory {
-
     public static createFor(ast: AstNode): ProgramOperation {
         if (ast['expressionType'] === BooleanType.instance()) {
             return this.createAssumeOpFrom(ast as BooleanExpression, AssumeType.UNDEFINED);
@@ -258,6 +243,4 @@ export class ProgramOperationFactory {
     static epsilon(): NoopProgramOperation {
         return ProgramOperations.epsilon();
     }
-
 }
-

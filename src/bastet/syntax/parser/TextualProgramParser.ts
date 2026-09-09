@@ -23,33 +23,30 @@
  *
  */
 
-import {BailErrorStrategy, CharStreams, CommonTokenStream, TokenStream} from 'antlr4ts';
-import {LeilaLexer} from "./grammar/LeilaLexer";
-import {LeilaParser, ProgramContext} from "./grammar/LeilaParser";
-import fs from "fs";
-import path from "path";
-import {ProgramParser} from "./ProgramParser";
-import {Preconditions} from "../../utils/Preconditions";
-import {ParsingException} from "../../core/exceptions/ParsingException";
+import { BailErrorStrategy, CharStreams, CommonTokenStream, TokenStream } from 'antlr4ts';
+import { LeilaLexer } from './grammar/LeilaLexer';
+import { LeilaParser, ProgramContext } from './grammar/LeilaParser';
+import fs from 'fs';
+import path from 'path';
+import { ProgramParser } from './ProgramParser';
+import { Preconditions } from '../../utils/Preconditions';
+import { ParsingException } from '../../core/exceptions/ParsingException';
 
 class MyScratchCoreParser extends LeilaParser {
-
     constructor(input: TokenStream) {
         super(input);
         this._errHandler = new BailErrorStrategy();
     }
-
 }
 
 export class TextualProgramParser implements ProgramParser {
-
     public parseFile(filepath: string): ProgramContext {
         Preconditions.checkNotEmpty(filepath);
 
         const basename = path.basename(filepath);
-        const sourcecode : string = fs.readFileSync(filepath, 'utf8');
+        const sourcecode: string = fs.readFileSync(filepath, 'utf8');
 
-        Preconditions.checkNotEmpty(sourcecode, "Empty source file");
+        Preconditions.checkNotEmpty(sourcecode, 'Empty source file');
 
         return this.parseSource(basename, sourcecode);
     }
@@ -72,10 +69,11 @@ export class TextualProgramParser implements ProgramParser {
         // Parse the program and construct the AST
         try {
             return parser.program();
-
         } catch (e) {
-            throw new ParsingException("Parsing failed! Please make sure that the input program adheres to the grammar.", e.cause.ctx);
+            throw new ParsingException(
+                'Parsing failed! Please make sure that the input program adheres to the grammar.',
+                e.cause.ctx
+            );
         }
     }
-
 }

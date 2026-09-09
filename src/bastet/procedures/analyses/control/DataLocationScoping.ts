@@ -27,57 +27,62 @@ import {
     DataLocationMode,
     DataLocationRenamer,
     RenamingTransformerVisitor,
-} from "../../../syntax/transformers/RenamingTransformerVisitor";
-import {List as ImmList, Map as ImmMap} from "immutable";
-import {DataLocation, TypedDataLocation, VAR_SCOPING_SPLITTER} from "../../../syntax/app/controlflow/DataLocation";
-import {Statement} from "../../../syntax/ast/core/statements/Statement";
-import {Preconditions} from "../../../utils/Preconditions";
-import {extractStringLiteral, StringAttributeOfExpression} from "../../../syntax/ast/core/expressions/StringExpression";
-import {AstNode} from "../../../syntax/ast/AstNode";
-import {App} from "../../../syntax/app/App";
-import {Identifier} from "../../../syntax/ast/core/Identifier";
-import {StringType} from "../../../syntax/ast/core/ScratchType";
-import {CastExpression} from "../../../syntax/ast/core/expressions/CastExpression";
-import {VariableWithDataLocation} from "../../../syntax/ast/core/Variable";
-import {ActorExpression} from "../../../syntax/ast/core/expressions/ActorExpression";
-import {ActorId} from "../../../syntax/app/Actor";
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {TypeInformationStorage} from "../../../syntax/DeclarationScopes";
-import {ImplementMeForException} from "../../../core/exceptions/ImplementMeException";
+} from '../../../syntax/transformers/RenamingTransformerVisitor';
+import { List as ImmList, Map as ImmMap } from 'immutable';
+import { DataLocation, TypedDataLocation, VAR_SCOPING_SPLITTER } from '../../../syntax/app/controlflow/DataLocation';
+import { Statement } from '../../../syntax/ast/core/statements/Statement';
+import { Preconditions } from '../../../utils/Preconditions';
+import {
+    extractStringLiteral,
+    StringAttributeOfExpression,
+} from '../../../syntax/ast/core/expressions/StringExpression';
+import { AstNode } from '../../../syntax/ast/AstNode';
+import { App } from '../../../syntax/app/App';
+import { Identifier } from '../../../syntax/ast/core/Identifier';
+import { StringType } from '../../../syntax/ast/core/ScratchType';
+import { CastExpression } from '../../../syntax/ast/core/expressions/CastExpression';
+import { VariableWithDataLocation } from '../../../syntax/ast/core/Variable';
+import { ActorExpression } from '../../../syntax/ast/core/expressions/ActorExpression';
+import { ActorId } from '../../../syntax/app/Actor';
+import { IllegalStateException } from '../../../core/exceptions/IllegalStateException';
+import { TypeInformationStorage } from '../../../syntax/DeclarationScopes';
+import { ImplementMeForException } from '../../../core/exceptions/ImplementMeException';
 
 export const SCOPE_SEPARATOR = VAR_SCOPING_SPLITTER;
 
 export class DataLocationScoper implements DataLocationRenamer {
-
     private readonly _readFromScope: ImmList<string>;
 
     private readonly _writeToScope: ImmList<string>;
 
     private readonly _typeStorage: TypeInformationStorage;
 
-    constructor(typeInformationStorage: TypeInformationStorage, readFromScope: ImmList<string>, writeToScope: ImmList<string>) {
+    constructor(
+        typeInformationStorage: TypeInformationStorage,
+        readFromScope: ImmList<string>,
+        writeToScope: ImmList<string>
+    ) {
         this._typeStorage = Preconditions.checkNotUndefined(typeInformationStorage);
         this._readFromScope = Preconditions.checkNotUndefined(readFromScope);
         this._writeToScope = Preconditions.checkNotUndefined(writeToScope);
 
-        Preconditions.checkArgument(readFromScope.size > 0, "At least the actor must be in the scope");
-        Preconditions.checkArgument(writeToScope.size > 0, "At least the actor must be in the scope");
+        Preconditions.checkArgument(readFromScope.size > 0, 'At least the actor must be in the scope');
+        Preconditions.checkArgument(writeToScope.size > 0, 'At least the actor must be in the scope');
     }
 
     private static isScoped(dataLoc: DataLocation): boolean {
-        return dataLoc.ident.indexOf("@") > -1;
+        return dataLoc.ident.indexOf('@') > -1;
     }
 
     public renameUsage(dataLoc: DataLocation, usageMode: DataLocationMode, inContextOf: Statement): DataLocation {
         // Supported scopes: SYSTEM -> ACTOR -> METHOD
         if (usageMode == DataLocationMode.READ_FROM) {
             return this.renameRead0(dataLoc, inContextOf);
-
         } else if (usageMode == DataLocationMode.ASSINGED_TO) {
             return this.renameWrite(dataLoc, inContextOf);
         }
 
-        throw new IllegalStateException("Unsupported DataLocationMode");
+        throw new IllegalStateException('Unsupported DataLocationMode');
     }
 
     private renameRead0(dataLoc: DataLocation, inContextOf: Statement): DataLocation {
@@ -89,9 +94,7 @@ export class DataLocationScoper implements DataLocationRenamer {
             return dataLoc;
         }
 
-        const readFromScope = this._typeStorage
-            .reduceToDeclarationScope(readScope, dataLoc)
-            .join(SCOPE_SEPARATOR);
+        const readFromScope = this._typeStorage.reduceToDeclarationScope(readScope, dataLoc).join(SCOPE_SEPARATOR);
 
         const newIdent: string = this.addScopePrefix(readFromScope, dataLoc.ident);
         return new TypedDataLocation(newIdent, dataLoc.type);
@@ -102,7 +105,8 @@ export class DataLocationScoper implements DataLocationRenamer {
             return dataLoc;
         }
 
-        const writeToScope = this._typeStorage.reduceToDeclarationScope(this._writeToScope, dataLoc)
+        const writeToScope = this._typeStorage
+            .reduceToDeclarationScope(this._writeToScope, dataLoc)
             .join(SCOPE_SEPARATOR);
 
         const newIdent: string = this.addScopePrefix(writeToScope, dataLoc.ident);
@@ -117,42 +121,45 @@ export class DataLocationScoper implements DataLocationRenamer {
         }
     }
 
-    public static leftUnwrapScope(name: string): {prefix: string, suffix: string} {
+    public static leftUnwrapScope(name: string): { prefix: string; suffix: string } {
         const scopeSeparatorIndex = name.indexOf(SCOPE_SEPARATOR);
 
         if (scopeSeparatorIndex > -1) {
             return this.splitAtSeparator(name, scopeSeparatorIndex);
         } else {
-            return {prefix: name, suffix: undefined};
+            return { prefix: name, suffix: undefined };
         }
     }
 
-    public static rightUnwrapScope(name: string): {prefix: string, suffix: string} {
+    public static rightUnwrapScope(name: string): { prefix: string; suffix: string } {
         const scopeSeparatorIndex = name.lastIndexOf(SCOPE_SEPARATOR);
 
         if (scopeSeparatorIndex > -1) {
             return this.splitAtSeparator(name, scopeSeparatorIndex);
         } else {
-            return {prefix: undefined, suffix: name};
+            return { prefix: undefined, suffix: name };
         }
     }
 
-    private static splitAtSeparator(name: string, separatorIndex: number): {prefix: string, suffix: string} {
+    private static splitAtSeparator(name: string, separatorIndex: number): { prefix: string; suffix: string } {
         return {
             prefix: name.substring(0, separatorIndex),
-            suffix: name.substring(separatorIndex + SCOPE_SEPARATOR.length)
+            suffix: name.substring(separatorIndex + SCOPE_SEPARATOR.length),
         };
     }
 }
 
 export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
-
     private readonly _task: App;
     private readonly _scoper: DataLocationScoper;
     private readonly _actorScopes: ImmMap<DataLocation, ActorId>;
 
-    constructor(task: App, actorScopes: ImmMap<DataLocation, ActorId>, readFromScope: ImmList<string>,
-                writeToScope: ImmList<string>) {
+    constructor(
+        task: App,
+        actorScopes: ImmMap<DataLocation, ActorId>,
+        readFromScope: ImmList<string>,
+        writeToScope: ImmList<string>
+    ) {
         const scoper = new DataLocationScoper(task.typeStorage, readFromScope, writeToScope);
         super(scoper);
         this._scoper = scoper;
@@ -169,10 +176,13 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
             const actorVar = node.ofEntity.accept(this) as VariableWithDataLocation;
             const actorScopeName: ActorId = this._actorScopes.get(actorVar.dataloc);
             if (!actorScopeName) {
-                throw new IllegalStateException(`Cannot lookup the actor-scope identifier that is assigned to ${actorVar.toTreeString()}`);
+                throw new IllegalStateException(
+                    `Cannot lookup the actor-scope identifier that is assigned to ${actorVar.toTreeString()}`
+                );
             }
             const attributeName: string = extractStringLiteral(node.attribute);
-            const attributeType = this._task.typeStorage.getSystemScope()
+            const attributeType = this._task.typeStorage
+                .getSystemScope()
                 .findChild(actorScopeName)
                 .getTypeOf(Identifier.of(attributeName));
 
@@ -187,8 +197,7 @@ export class ScopeTransformerVisitor extends RenamingTransformerVisitor {
                 return new CastExpression(readVariable, StringType.instance());
             }
         } else {
-            throw new ImplementMeForException("Attributes can only be read from variables of type actor!");
+            throw new ImplementMeForException('Attributes can only be read from variables of type actor!');
         }
     }
-
 }

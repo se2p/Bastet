@@ -28,4 +28,3 @@ let _SEQ_NO: number = 0;
 export function freshId(): number {
     return _SEQ_NO++;
 }
-

@@ -23,13 +23,13 @@
  *
  */
 
-import {LibZ3InContext, Z3_ast, Z3_func_decl, Z3_symbol} from "./libz3";
-import {Preconditions} from "../../Preconditions";
-import {Uint32} from "./ctypes";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {IllegalArgumentException} from "../../../core/exceptions/IllegalArgumentException";
-import {Map as ImmMap} from "immutable";
-import {Z3Formula} from "./Z3Theories";
+import { LibZ3InContext, Z3_ast, Z3_func_decl, Z3_symbol } from './libz3';
+import { Preconditions } from '../../Preconditions';
+import { Uint32 } from './ctypes';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { IllegalArgumentException } from '../../../core/exceptions/IllegalArgumentException';
+import { Map as ImmMap } from 'immutable';
+import { Z3Formula } from './Z3Theories';
 
 export enum Z3AstKind {
     Z3_NUMERAL_AST,
@@ -38,11 +38,10 @@ export enum Z3AstKind {
     Z3_QUANTIFIER_AST,
     Z3_SORT_AST,
     Z3_FUNC_DECL_AST,
-    Z3_UNKNOWN_AST = 1000
+    Z3_UNKNOWN_AST = 1000,
 }
 
 export interface Z3AstVisitor<R> {
-
     visitConstantOrApplication(node: Z3_ast): R;
 
     visitNumeral(node: Z3_ast): R;
@@ -60,11 +59,9 @@ export interface Z3AstVisitor<R> {
     visitUnknown(node: Z3_ast): R;
 
     visit(node: Z3_ast): R;
-
 }
 
 export class Z3AstNodeList {
-
     private readonly _list: Z3_ast[];
     private readonly _ctx: LibZ3InContext;
 
@@ -89,8 +86,7 @@ export class Z3AstNodeList {
 }
 
 export abstract class Z3Visitor<R> implements Z3AstVisitor<R> {
-
-    protected readonly _ctx: LibZ3InContext
+    protected readonly _ctx: LibZ3InContext;
 
     private readonly _visited: Map<number, R>;
 
@@ -142,7 +138,7 @@ export abstract class Z3Visitor<R> implements Z3AstVisitor<R> {
             }
             case Z3AstKind.Z3_FUNC_DECL_AST: {
                 const numArgs = this._ctx.get_decl_num_parameters(node);
-                for (let i=0; i<numArgs.val(); i++) {
+                for (let i = 0; i < numArgs.val(); i++) {
                     result.push(this._ctx.get_decl_ast_parameter(node, new Uint32(i)));
                 }
                 break;
@@ -161,7 +157,7 @@ export abstract class Z3Visitor<R> implements Z3AstVisitor<R> {
                 break;
             }
             case Z3AstKind.Z3_UNKNOWN_AST: {
-                throw new IllegalArgumentException("Unknown AST node");
+                throw new IllegalArgumentException('Unknown AST node');
             }
         }
 
@@ -186,11 +182,9 @@ export abstract class Z3Visitor<R> implements Z3AstVisitor<R> {
     abstract visitSort(node: Z3_ast): R;
 
     abstract visitUnknown(node: Z3_ast): R;
-
 }
 
 export class VariableCollectingVisitor extends Z3Visitor<ImmMap<string, Z3Formula>> {
-
     visitBoundVariable(node: Z3_ast): ImmMap<string, Z3Formula> {
         return ImmMap<string, Z3Formula>([]);
     }
@@ -208,7 +202,7 @@ export class VariableCollectingVisitor extends Z3Visitor<ImmMap<string, Z3Formul
             const symbol: Z3_symbol = this._ctx.get_decl_name(decl);
             const name: string = this._ctx.get_symbol_string(symbol);
 
-            if (!(name == "true" || name == "false")) {
+            if (!(name == 'true' || name == 'false')) {
                 result = result.set(name, new Z3Formula(node));
             }
         }
@@ -240,7 +234,4 @@ export class VariableCollectingVisitor extends Z3Visitor<ImmMap<string, Z3Formul
     visitUnknown(node: Z3_ast): ImmMap<string, Z3Formula> {
         throw new ImplementMeException();
     }
-
 }
-
-

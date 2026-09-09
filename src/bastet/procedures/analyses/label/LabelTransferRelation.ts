@@ -23,17 +23,15 @@
  *
  */
 
-
-import {LabeledTransferRelation} from "../TransferRelation";
-import {LabeledTransfer, LabelState} from "./LabelAbstractDomain";
-import {ProgramOperationInContext} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {Concern} from "../../../syntax/Concern";
-import {List as ImmList} from "immutable";
-import {AbstractElement} from "../../../lattices/Lattice";
-import {NotSupportedException} from "../../../core/exceptions/NotSupportedException";
+import { LabeledTransferRelation } from '../TransferRelation';
+import { LabeledTransfer, LabelState } from './LabelAbstractDomain';
+import { ProgramOperationInContext } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { Concern } from '../../../syntax/Concern';
+import { List as ImmList } from 'immutable';
+import { AbstractElement } from '../../../lattices/Lattice';
+import { NotSupportedException } from '../../../core/exceptions/NotSupportedException';
 
 export class LabelTransferRelation implements LabeledTransferRelation<LabelState> {
-
     private readonly _wrappedTransfer: LabeledTransferRelation<AbstractElement>;
     private readonly _bigStepProvider: () => number;
 
@@ -52,12 +50,15 @@ export class LabelTransferRelation implements LabeledTransferRelation<LabelState
             // ATTENTION: Long sequences of program operations
             //   with the same big-step-number are produced in case the SSA phi function
             //   is applied to synchronize SSA indices.
-            result.push(fromState
-                .withTransfers(ImmList([new LabeledTransfer(fromState, opic.thread, opic.op, this._bigStepProvider())]))
-                .withWrappedState(w));
+            result.push(
+                fromState
+                    .withTransfers(
+                        ImmList([new LabeledTransfer(fromState, opic.thread, opic.op, this._bigStepProvider())])
+                    )
+                    .withWrappedState(w)
+            );
         }
 
         return result;
     }
-
 }

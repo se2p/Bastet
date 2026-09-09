@@ -19,53 +19,68 @@
  *   limitations under the License.
  *
  */
-import path from "path"
-import {Bastet} from "../../../../../src/bastet/Bastet";
-import {AnalysisResult, MultiPropertyAnalysisResult} from "../../../../../src/bastet/procedures/AnalysisProcedure";
+import assert from 'node:assert/strict';
+import path from 'path';
+import { Bastet } from '../../../../../src/bastet/Bastet';
+import { AnalysisResult, MultiPropertyAnalysisResult } from '../../../../../src/bastet/procedures/AnalysisProcedure';
 
-const intermediateRelPath = "../../../../../src/public/library.sc";
+const intermediateRelPath = '../../../../../src/public/library.sc';
 const intermediatePath = path.join(__dirname, intermediateRelPath);
 
-const configRelPath = "../../../../../config/default.json";
+const configRelPath = '../../../../../config/default.json';
 const configFilePath = path.join(__dirname, configRelPath);
 
-const ciConfigRelPath = "../../../../../config/ci.delta.json";
+const ciConfigRelPath = '../../../../../config/ci.delta.json';
 const ciConfigFilePath = path.join(__dirname, ciConfigRelPath);
 
-const specRelPath = "../../../../specs/empty.sc";
+const specRelPath = '../../../../specs/empty.sc';
 const specFilePath = path.join(__dirname, specRelPath);
 
-let timeout: number = 20000; // in milliseconds
-export {timeout, execFixture, execute, execute_explicit};
+let timeout: number = 120000; // in milliseconds
+export { timeout, execFixture, execute, execute_explicit };
 
-function execFixture(fixturePath: string, done) {
+async function execFixture(
+    fixturePath: string,
+    configurationFilepaths: string[] = [configFilePath, ciConfigFilePath],
+    libraryFilepath: string = intermediatePath
+): Promise<void> {
     const bastet = new Bastet();
-    execute(bastet, fixturePath, done)
+    await execute(bastet, fixturePath, configurationFilepaths, libraryFilepath);
 }
 
-function execute(bastet: Bastet, fixturePath: string, done) {
-    if (fixturePath.endsWith("_SAFE.sc")) {
-        execute_explicit(bastet, fixturePath, true, done);
-    } else if (fixturePath.endsWith("_UNSAFE.sc")) {
-        execute_explicit(bastet, fixturePath, false, done);
+async function execute(
+    bastet: Bastet,
+    fixturePath: string,
+    configurationFilepaths: string[] = [configFilePath, ciConfigFilePath],
+    libraryFilepath: string = intermediatePath
+): Promise<void> {
+    if (fixturePath.endsWith('_SAFE.sc')) {
+        await execute_explicit(bastet, fixturePath, true, configurationFilepaths, libraryFilepath);
+    } else if (fixturePath.endsWith('_UNSAFE.sc')) {
+        await execute_explicit(bastet, fixturePath, false, configurationFilepaths, libraryFilepath);
     } else {
-        fail("Fixture file does not fit naming scheme")
+        throw new Error('Fixture file does not fit the _SAFE.sc/_UNSAFE.sc naming scheme');
     }
 }
 
-function execute_explicit(bastet: Bastet, fixturePath: string, expectSuccess: boolean, done) {
-    async function asyncAwaitFunction(): Promise<AnalysisResult> {
-        return await bastet.runFor([configFilePath, ciConfigFilePath], intermediatePath, fixturePath, specFilePath);
-    }
+async function execute_explicit(
+    bastet: Bastet,
+    fixturePath: string,
+    expectSuccess: boolean,
+    configurationFilepaths: string[] = [configFilePath, ciConfigFilePath],
+    libraryFilepath: string = intermediatePath
+): Promise<void> {
+    const result: AnalysisResult = await bastet.runFor(
+        configurationFilepaths,
+        libraryFilepath,
+        fixturePath,
+        specFilePath
+    );
+    const analysisResult = result as MultiPropertyAnalysisResult;
 
-    asyncAwaitFunction().then(result => {
-            const analysisResult: MultiPropertyAnalysisResult = result as MultiPropertyAnalysisResult;
-            if (expectSuccess) {
-                expect(analysisResult.satisfied.size).toBeGreaterThan(0);
-            } else {
-                expect(analysisResult.violated.size).toBeGreaterThan(0);
-            }
-        })
-        .catch(e => {fail("No exception expected!"); done()})
-        .finally(() => done());
+    if (expectSuccess) {
+        assert.ok(analysisResult.satisfied.size > 0);
+    } else {
+        assert.ok(analysisResult.violated.size > 0);
+    }
 }

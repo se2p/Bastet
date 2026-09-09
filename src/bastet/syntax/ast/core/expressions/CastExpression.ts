@@ -23,14 +23,12 @@
  *
  */
 
-
-import {Expression} from "./Expression";
-import {AbstractExpression} from "./AbstractExpression";
-import {ScratchType} from "../ScratchType";
-import {Preconditions} from "../../../../utils/Preconditions";
+import { Expression } from './Expression';
+import { AbstractExpression } from './AbstractExpression';
+import { ScratchType } from '../ScratchType';
+import { Preconditions } from '../../../../utils/Preconditions';
 
 export class CastExpression extends AbstractExpression implements Expression {
-
     private _toConvertFrom: Expression;
 
     constructor(inputExpression: Expression, castToType: ScratchType) {
@@ -39,7 +37,7 @@ export class CastExpression extends AbstractExpression implements Expression {
     }
 
     get castToType(): ScratchType {
-       return this.expressionType;
+        return this.expressionType;
     }
 
     get toConvertFrom(): Expression {

@@ -23,15 +23,13 @@
  *
  */
 
-
-import {AnalysisStatistics} from "../../procedures/analyses/AnalysisStatistics";
-import {App} from "./App";
-import {Preconditions} from "../../utils/Preconditions";
-import {BootstrapEvent, NeverEvent, TerminationEvent} from "../ast/core/CoreEvent";
-import {Concern, Concerns} from "../Concern";
+import { AnalysisStatistics } from '../../procedures/analyses/AnalysisStatistics';
+import { App } from './App';
+import { Preconditions } from '../../utils/Preconditions';
+import { BootstrapEvent, NeverEvent, TerminationEvent } from '../ast/core/CoreEvent';
+import { Concern, Concerns } from '../Concern';
 
 export class StructureStatistics {
-
     private computeStatisticsForConcern(task: App, concern: Concern, addTo: AnalysisStatistics) {
         let nonEmptyScripts = 0;
         let maxActorScriptCount = 0;
@@ -42,7 +40,7 @@ export class StructureStatistics {
         Preconditions.checkNotUndefined(task);
         for (const actor of task.actors) {
             if (actor.concern != concern) {
-                continue
+                continue;
             }
 
             let nonEmptyActorScripts = 0;
@@ -53,7 +51,10 @@ export class StructureStatistics {
                             if (script.event != TerminationEvent.instance()) {
                                 nonEmptyScripts++;
                                 nonEmptyActorScripts++;
-                                maxUserScriptTransitions = Math.max(maxUserScriptTransitions, script.transitions.transitions.size);
+                                maxUserScriptTransitions = Math.max(
+                                    maxUserScriptTransitions,
+                                    script.transitions.transitions.size
+                                );
                             }
                         }
                     }
@@ -62,24 +63,24 @@ export class StructureStatistics {
 
             actorCount++;
             maxActorScriptCount = Math.max(maxActorScriptCount, nonEmptyActorScripts);
-            actor.methods.createMutable()
+            actor.methods
+                .createMutable()
                 .filter((m) => !m.signature.isExtern)
                 .forEach((m) => allMethods.add(m.ident.text));
         }
 
-        addTo.put("actorCount", actorCount);
-        addTo.put("maxActorUserScriptCount", maxActorScriptCount);
-        addTo.put("nonEmptyUserScriptCount", nonEmptyScripts);
-        addTo.put("maxUserScriptTransitionCount", maxUserScriptTransitions);
-        addTo.put("methodCount", allMethods.size);
+        addTo.put('actorCount', actorCount);
+        addTo.put('maxActorUserScriptCount', maxActorScriptCount);
+        addTo.put('nonEmptyUserScriptCount', nonEmptyScripts);
+        addTo.put('maxUserScriptTransitionCount', maxUserScriptTransitions);
+        addTo.put('methodCount', allMethods.size);
     }
 
     public computeStatisitcs(task: App, addTo: AnalysisStatistics) {
-        const programStats = addTo.withContext("Program");
-        const specStats = addTo.withContext("Specification");
+        const programStats = addTo.withContext('Program');
+        const specStats = addTo.withContext('Specification');
 
         this.computeStatisticsForConcern(task, Concerns.defaultProgramConcern(), programStats);
         this.computeStatisticsForConcern(task, Concerns.defaultSpecificationConcern(), specStats);
     }
-
 }

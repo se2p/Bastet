@@ -27,9 +27,9 @@ import {
     CoreBoolExpressionVisitor,
     CoreEventVisitor,
     CoreNonCtrlStatementnVisitor,
-    CoreNumberExpressionVisitor
-} from "./CoreVisitor";
-import {AstNode} from "./AstNode";
+    CoreNumberExpressionVisitor,
+} from './CoreVisitor';
+import { AstNode } from './AstNode';
 import {
     AfterBootstrapMonitoringEvent,
     AfterStatementMonitoringEvent,
@@ -43,9 +43,9 @@ import {
     SingularityEvent,
     StartupEvent,
     TerminationEvent,
-    UnqualifiedMessageNamespace
-} from "./core/CoreEvent";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+    UnqualifiedMessageNamespace,
+} from './core/CoreEvent';
+import { ImplementMeException } from '../../core/exceptions/ImplementMeException';
 import {
     AndExpression,
     BooleanLiteral,
@@ -60,10 +60,10 @@ import {
     StrContainsExpression,
     StrEqualsExpression,
     StrGreaterThanExpression,
-    StrLessThanExpression
-} from "./core/expressions/BooleanExpression";
-import {CastExpression} from "./core/expressions/CastExpression";
-import {VariableWithDataLocation} from "./core/Variable";
+    StrLessThanExpression,
+} from './core/expressions/BooleanExpression';
+import { CastExpression } from './core/expressions/CastExpression';
+import { VariableWithDataLocation } from './core/Variable';
 import {
     DivideExpression,
     FloatLiteral,
@@ -76,71 +76,82 @@ import {
     MultiplyExpression,
     NumberVariableExpression,
     PlusExpression,
-    TimerExpression
-} from "./core/expressions/NumberExpression";
+    TimerExpression,
+} from './core/expressions/NumberExpression';
 import {
     IthLetterOfStringExpression,
     IthStringItemOfExpression,
     JoinStringsExpression,
     StringAttributeOfExpression,
     StringLiteral,
-    StringVariableExpression
-} from "./core/expressions/StringExpression";
+    StringVariableExpression,
+} from './core/expressions/StringExpression';
 import {
     ActorSelfExpression,
     ActorVariableExpression,
     LocateActorExpression,
     StartCloneActorExpression,
-    UsherActorExpression
-} from "./core/expressions/ActorExpression";
-import {ExpressionListExpression, ListVariableExpression} from "./core/expressions/ListExpression";
-import {ExpressionList} from "./core/expressions/ExpressionList";
-import {CallStatement} from "./core/statements/CallStatement";
+    UsherActorExpression,
+} from './core/expressions/ActorExpression';
+import { ExpressionListExpression, ListVariableExpression } from './core/expressions/ListExpression';
+import { ExpressionList } from './core/expressions/ExpressionList';
+import { CallStatement } from './core/statements/CallStatement';
 import {
     BeginAtomicStatement,
     EndAtomicStatement,
     IfStatement,
     RepeatForeverStatement,
     ReturnStatement,
-    UntilStatement
-} from "./core/statements/ControlStatement";
-import {StatementList} from "./core/statements/Statement";
+    UntilStatement,
+} from './core/statements/ControlStatement';
+import { StatementList } from './core/statements/Statement';
 import {
     AddElementToStatement,
     DeleteAllFromStatement,
     DeleteIthFromStatement,
     InsertAtStatement,
-    ReplaceElementAtStatement
-} from "./core/statements/ListStatement";
-import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/AssumeStatement";
-import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
-import {CreateCloneOfStatement} from "./core/statements/CreateCloneOfStatement";
+    ReplaceElementAtStatement,
+} from './core/statements/ListStatement';
+import { BranchingAssumeStatement, StrengtheningAssumeStatement } from './core/statements/AssumeStatement';
+import { BroadcastAndWaitStatement, BroadcastMessageStatement } from './core/statements/BroadcastMessageStatement';
+import { CreateCloneOfStatement } from './core/statements/CreateCloneOfStatement';
 import {
     DeclareActorVariableStatement,
     DeclareStackVariableStatement,
-    DeclareSystemVariableStatement
-} from "./core/statements/DeclarationStatement";
-import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
-import {EpsilonStatement} from "./core/statements/EpsilonStatement";
-import {ExpressionStatement} from "./core/statements/ExpressionStatement";
-import {ResetTimerStatement} from "./core/statements/ResetTimerStatement";
-import {ActorType, BooleanType, FloatType, IntegerType, ListType, StringEnumType, StringType} from "./core/ScratchType";
-import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
-import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
-import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
-import {ActorDestination, NamedDestination, SystemMessage, UserMessage} from "./core/Message";
+    DeclareSystemVariableStatement,
+} from './core/statements/DeclarationStatement';
+import { DeleteThisCloneStatement, StopAllStatement, StopThisStatement } from './core/statements/TerminationStatement';
+import { EpsilonStatement } from './core/statements/EpsilonStatement';
+import { ExpressionStatement } from './core/statements/ExpressionStatement';
+import { ResetTimerStatement } from './core/statements/ResetTimerStatement';
+import {
+    ActorType,
+    BooleanType,
+    FloatType,
+    IntegerType,
+    ListType,
+    StringEnumType,
+    StringType,
+} from './core/ScratchType';
+import { StoreEvalResultToVariableStatement } from './core/statements/SetStatement';
+import { StopOthersInActorStatement } from './core/statements/StopOthersInActorStatement';
+import { WaitUntilStatement } from './core/statements/WaitUntilStatement';
+import { ActorDestination, NamedDestination, SystemMessage, UserMessage } from './core/Message';
 import {
     CheckFeasibilityStatement,
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
-    TerminateProgramStatement
-} from "./core/statements/InternalStatement";
-import {PrecisionPopStatement, PrecisionPushStatement} from "./core/Precisions";
+    TerminateProgramStatement,
+} from './core/statements/InternalStatement';
+import { PrecisionPopStatement, PrecisionPushStatement } from './core/Precisions';
 
-export class CorePrintVisitor implements CoreEventVisitor<string>,
-    CoreBoolExpressionVisitor<string>, CoreNumberExpressionVisitor<string>,
-    CoreNonCtrlStatementnVisitor<string> {
-
+export class CorePrintVisitor
+    implements
+        CoreEventVisitor<string>,
+        CoreBoolExpressionVisitor<string>,
+        CoreNumberExpressionVisitor<string>,
+        CoreNonCtrlStatementnVisitor<string>
+{
     visit(node: AstNode): string {
         throw new ImplementMeException();
     }
@@ -158,11 +169,11 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitPrecisionPopStatement(node: PrecisionPopStatement): string {
-        return "precision pop"
+        return 'precision pop';
     }
 
     visitUnqualifiedMessageNamespace(node: UnqualifiedMessageNamespace): string {
-        return "";
+        return '';
     }
 
     visitQualifiedMessageNamespace(node: QualifiedMessageNamespace): string {
@@ -178,11 +189,11 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): string {
-        return "initialize analysis";
+        return 'initialize analysis';
     }
 
     visitTerminateProgramStatement(node: TerminateProgramStatement): string {
-        return "HALT";
+        return 'HALT';
     }
 
     visitAfterBootstrapMonitoringEvent(node: AfterBootstrapMonitoringEvent): string {
@@ -206,7 +217,7 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitStringEnumType(node: StringEnumType): string {
-        return `enum [${node.values.accept(this)}]`
+        return `enum [${node.values.accept(this)}]`;
     }
 
     visitConditionReachedEvent(node: ConditionReachedEvent): string {
@@ -370,7 +381,7 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitActorSelfExpression(node: ActorSelfExpression): string {
-        return "self";
+        return 'self';
     }
 
     visitActorVariableExpression(node: ActorVariableExpression): string {
@@ -390,7 +401,7 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitExpressionList(node: ExpressionList): string {
-        return node.elements.map((e) => e.accept(this)).join(", ");
+        return node.elements.map((e) => e.accept(this)).join(', ');
     }
 
     visitExpressionListExpression(node: ExpressionListExpression): string {
@@ -441,7 +452,7 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     }
 
     visitNamedDestination(node: NamedDestination): string {
-        return `"${node.namespace.accept(this)}"`
+        return `"${node.namespace.accept(this)}"`;
     }
 
     visitActorDestination(node: ActorDestination): string {
@@ -555,5 +566,4 @@ export class CorePrintVisitor implements CoreEventVisitor<string>,
     visitActorType(type: ActorType): string {
         return 'actor';
     }
-
 }

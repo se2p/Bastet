@@ -23,12 +23,11 @@
  *
  */
 
-import {AbstractNode} from "../AstNode";
-import {BooleanExpression} from "./expressions/BooleanExpression";
-import {Preconditions} from "../../../utils/Preconditions";
+import { AbstractNode } from '../AstNode';
+import { BooleanExpression } from './expressions/BooleanExpression';
+import { Preconditions } from '../../../utils/Preconditions';
 
 export class PrecisionPushStatement extends AbstractNode {
-
     private readonly _predicate: BooleanExpression;
 
     constructor(predicate: BooleanExpression) {
@@ -42,7 +41,6 @@ export class PrecisionPushStatement extends AbstractNode {
 }
 
 export class PrecisionPopStatement extends AbstractNode {
-
     constructor() {
         super([]);
     }

@@ -23,18 +23,16 @@
  *
  */
 
-import {Statement} from "./Statement";
-import {BooleanExpression} from "../expressions/BooleanExpression";
-
+import { Statement } from './Statement';
+import { BooleanExpression } from '../expressions/BooleanExpression';
 
 export enum AssumeType {
     UNDEFINED,
     BRANCHING,
-    STRENGTHENING
+    STRENGTHENING,
 }
 
 export abstract class AssumeStatement extends Statement {
-
     private readonly _condition: BooleanExpression;
 
     constructor(cond: BooleanExpression) {
@@ -45,18 +43,15 @@ export abstract class AssumeStatement extends Statement {
     get condition(): BooleanExpression {
         return this._condition;
     }
-
 }
 
 export class StrengtheningAssumeStatement extends AssumeStatement {
-
     constructor(cond: BooleanExpression) {
         super(cond);
     }
 }
 
 export class BranchingAssumeStatement extends AssumeStatement {
-
     constructor(cond: BooleanExpression) {
         super(cond);
     }

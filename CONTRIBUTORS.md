@@ -7,15 +7,15 @@ Please note that this list might not reflect the latest list
 of contributors. Feel free to contact one of the maintainers
 to propose an update.
 
-*BASTET* is developed at the [Chair of Software Engineering II](https://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/)
+_BASTET_ is developed at the [Chair of Software Engineering II](https://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/)
 of the [University of Passau](https://www.uni-passau.de).
-This work is supported by EPSRC project EP/N023978/2 and 
-DFG project FR 2955/3-1 *“TENDER-BLOCK: Testing, Debugging, 
-and Repairing Blocks-based Programs”*. 
+This work is supported by EPSRC project EP/N023978/2 and
+DFG project FR 2955/3-1 _“TENDER-BLOCK: Testing, Debugging,
+and Repairing Blocks-based Programs”_.
 
 ## Maintainers
 
-- Andreas Stahlbauer 
+- Andreas Stahlbauer
 - Gordon Fraser
 
 ## List of Contributors
@@ -27,4 +27,3 @@ and Repairing Blocks-based Programs”*.
 - Robert Pernerstorfer
 - Sebastian Schweikl
 - Andreas Stahlbauer
-

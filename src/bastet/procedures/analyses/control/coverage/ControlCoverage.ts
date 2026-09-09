@@ -23,19 +23,17 @@
  *
  */
 
-
-import {ReachedSet} from "../../../algorithms/StateSet";
-import {AbstractState} from "../../../../lattices/Lattice";
-import {App} from "../../../../syntax/app/App";
-import {Map as ImmMap, Set as ImmSet} from "immutable";
-import {Preconditions} from "../../../../utils/Preconditions";
-import {TransitionRelation} from "../../../../syntax/app/controlflow/TransitionRelation";
-import {ActorId} from "../../../../syntax/app/Actor";
-import {ControlLocationExtractor} from "../ControlUtils";
-import {RelationLocation} from "../ConcreteProgramState";
+import { ReachedSet } from '../../../algorithms/StateSet';
+import { AbstractState } from '../../../../lattices/Lattice';
+import { App } from '../../../../syntax/app/App';
+import { Map as ImmMap, Set as ImmSet } from 'immutable';
+import { Preconditions } from '../../../../utils/Preconditions';
+import { TransitionRelation } from '../../../../syntax/app/controlflow/TransitionRelation';
+import { ActorId } from '../../../../syntax/app/Actor';
+import { ControlLocationExtractor } from '../ControlUtils';
+import { RelationLocation } from '../ConcreteProgramState';
 
 export class ControlCoverageReport {
-
     private readonly _absUncoveredLocations: number;
 
     private readonly _absCoveredLocations: number;
@@ -44,8 +42,12 @@ export class ControlCoverageReport {
 
     private readonly _numberOfUncoveredPerRelation: ImmMap<any, any>;
 
-    constructor(absUncoveredLocations: number, absCoveredLocations: number, totalTaskLocations: number,
-                numberOfUncoveredPerRelation: {}) {
+    constructor(
+        absUncoveredLocations: number,
+        absCoveredLocations: number,
+        totalTaskLocations: number,
+        numberOfUncoveredPerRelation: {}
+    ) {
         Preconditions.checkArgument(totalTaskLocations > 0);
         this._absUncoveredLocations = absUncoveredLocations;
         this._absCoveredLocations = absCoveredLocations;
@@ -71,7 +73,6 @@ export class ControlCoverageReport {
 }
 
 export class ControlCoverageExaminer {
-
     public determineCoverageOf(task: App, reached: ReachedSet<AbstractState>): ControlCoverageReport {
         // 1. Extract the set of reached control locations from the set `reached`
         const reachedLocs = this.collectReachedLocs(task, reached);
@@ -80,9 +81,11 @@ export class ControlCoverageExaminer {
         const taskLocsAll = this.collectTaskLocs(task);
         const taskLocs = taskLocsAll.filter((l) => {
             // Filter out some locations for this calculation
-           const relation = task.getTransitionRelationById(l.getRelationId());
-           return !(relation.entryLocationSet.contains(l.getLocationId())
-                || relation.exitLocationSet.contains(l.getLocationId()));
+            const relation = task.getTransitionRelationById(l.getRelationId());
+            return !(
+                relation.entryLocationSet.contains(l.getLocationId()) ||
+                relation.exitLocationSet.contains(l.getLocationId())
+            );
         });
 
         // 3. Build the coverage report
@@ -128,5 +131,4 @@ export class ControlCoverageExaminer {
 
         return result.asImmutable();
     }
-
 }

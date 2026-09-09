@@ -23,32 +23,28 @@
  *
  */
 
-import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
-import {List as ImmList, Record as ImmRec} from "immutable";
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {ConcreteDomain, ConcreteElement} from "../../domains/ConcreteElements";
-import {Preconditions} from "../../../utils/Preconditions";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {AbstractionPrecision} from "../../AbstractionPrecision";
-
+import { AbstractElement, AbstractElementVisitor, AbstractState, Lattice } from '../../../lattices/Lattice';
+import { List as ImmList, Record as ImmRec } from 'immutable';
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { ConcreteDomain, ConcreteElement } from '../../domains/ConcreteElements';
+import { Preconditions } from '../../../utils/Preconditions';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { AbstractionPrecision } from '../../AbstractionPrecision';
 
 export interface DebugStateAttributes {
-
     debugInfos: ImmList<string>;
 
     wrappedState: AbstractElement;
-
 }
 
 const DebugStateRecord = ImmRec({
     debugInfos: ImmList<string>(),
     wrappedState: null,
-})
+});
 
 export class DebugState extends DebugStateRecord implements DebugStateAttributes, AbstractState {
-
     constructor(debugInfos: ImmList<string>, wrappedState: AbstractElement) {
-        super({debugInfos: debugInfos, wrappedState: wrappedState});
+        super({ debugInfos: debugInfos, wrappedState: wrappedState });
     }
 
     public getDebugInfos(): ImmList<string> {
@@ -60,11 +56,11 @@ export class DebugState extends DebugStateRecord implements DebugStateAttributes
     }
 
     public getWrappedState(): AbstractState {
-        return this.get("wrappedState");
+        return this.get('wrappedState');
     }
 
     public withWrappedState(wrapped: AbstractElement): this {
-        return this.set("wrappedState", wrapped);
+        return this.set('wrappedState', wrapped);
     }
 
     public accept<R>(visitor: AbstractElementVisitor<R>): R {
@@ -78,7 +74,6 @@ export class DebugState extends DebugStateRecord implements DebugStateAttributes
 }
 
 export class DebugStateLattice implements Lattice<DebugState> {
-
     private readonly _wrappedStateLattice: Lattice<AbstractElement>;
 
     private readonly _bottom: DebugState;
@@ -115,7 +110,6 @@ export class DebugStateLattice implements Lattice<DebugState> {
 }
 
 export class DebugAbstractDomain implements AbstractDomain<ConcreteElement, DebugState> {
-
     private readonly _lattice: DebugStateLattice;
     private readonly _wrapped: AbstractDomain<ConcreteElement, AbstractElement>;
 

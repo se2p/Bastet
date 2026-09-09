@@ -23,14 +23,13 @@
  *
  */
 
-import {AbstractElement, Lattice} from "../../../lattices/Lattice";
-import {FirstOrderFormula} from "../../../utils/ConjunctiveNormalForm";
-import {Record as ImmRec} from "immutable";
-import {FirstOrderLattice} from "../../domains/FirstOrderDomain";
-import {Preconditions} from "../../../utils/Preconditions";
+import { AbstractElement, Lattice } from '../../../lattices/Lattice';
+import { FirstOrderFormula } from '../../../utils/ConjunctiveNormalForm';
+import { Record as ImmRec } from 'immutable';
+import { FirstOrderLattice } from '../../domains/FirstOrderDomain';
+import { Preconditions } from '../../../utils/Preconditions';
 
 export interface BlockSummaryAttribs extends AbstractElement {
-
     /**
      * The formula that is overapproximated by `summaryFormula`.
      */
@@ -50,31 +49,26 @@ export interface BlockSummaryAttribs extends AbstractElement {
 }
 
 const BlockSummaryRecord = ImmRec({
-
     blockFormula: null,
 
     summaryFormula: null, // TODO: getter erstellen
-
 });
 
 export class BlockSummary extends BlockSummaryRecord implements BlockSummaryAttribs, AbstractElement {
-
     constructor(blockFormula: FirstOrderFormula, summary: FirstOrderFormula) {
-        super({summaryFormula: summary, blockFormula: blockFormula});
+        super({ summaryFormula: summary, blockFormula: blockFormula });
     }
 
     public withBlockFormula(blockFormula: FirstOrderFormula): this {
-        return this.set("blockFormula", blockFormula);
+        return this.set('blockFormula', blockFormula);
     }
 
     public withSummary(summaryFormula: FirstOrderFormula): this {
-        return this.set("summaryFormula", summaryFormula);
+        return this.set('summaryFormula', summaryFormula);
     }
-
 }
 
 export class BlockSummaryLattice implements Lattice<BlockSummary> {
-
     private readonly _folLattice: FirstOrderLattice<FirstOrderFormula>;
 
     private readonly _bottom: BlockSummary;
@@ -122,5 +116,4 @@ export class BlockSummaryLattice implements Lattice<BlockSummary> {
     get folLattice(): FirstOrderLattice<FirstOrderFormula> {
         return this._folLattice;
     }
-
 }

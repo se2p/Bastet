@@ -20,44 +20,40 @@
  *
  */
 
-import {Map as ImmMap, Record as ImmRec} from "immutable"
-import {LabeledTransferRelation} from "../../../src/bastet/procedures/analyses/TransferRelation";
-import {AbstractElement} from "../../../src/bastet/lattices/Lattice";
+import { Record as ImmRec } from 'immutable';
+import { LabeledTransferRelation } from '../../../src/bastet/procedures/analyses/TransferRelation';
+import { AbstractElement } from '../../../src/bastet/lattices/Lattice';
 import {
     ProgramOperation,
-    ProgramOperationInContext
-} from "../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation";
-import {Concern} from "../../../src/bastet/syntax/Concern";
-import {Preconditions} from "../../../src/bastet/utils/Preconditions";
+    ProgramOperationInContext,
+} from '../../../src/bastet/syntax/app/controlflow/ops/ProgramOperation';
+import { Concern } from '../../../src/bastet/syntax/Concern';
+import { Preconditions } from '../../../src/bastet/utils/Preconditions';
 
 export interface AbstractMockElementAttributes {
-
     stateId: number;
 
     predecessorId: number;
-
 }
 
 const AbstractMockElementRecord = ImmRec({
-
     stateId: -1,
 
-    predecessorId: -1
-
+    predecessorId: -1,
 });
 
 let STATE_ID_SEQ: number = 0;
 
-export class AbstractMockElement extends AbstractMockElementRecord implements AbstractMockElementAttributes, AbstractElement {
-
+export class AbstractMockElement
+    extends AbstractMockElementRecord
+    implements AbstractMockElementAttributes, AbstractElement
+{
     constructor(predecessorId: number) {
-        super({stateId: STATE_ID_SEQ++, predecessorId: predecessorId});
+        super({ stateId: STATE_ID_SEQ++, predecessorId: predecessorId });
     }
-
 }
 
 export class TransferRelationMock implements LabeledTransferRelation<AbstractMockElement> {
-
     private readonly _abstractSuccForCalls: Array<[AbstractMockElement, ProgramOperation, Concern]>;
 
     constructor() {
@@ -68,7 +64,11 @@ export class TransferRelationMock implements LabeledTransferRelation<AbstractMoc
         return [new AbstractMockElement(fromState.stateId)];
     }
 
-    abstractSuccFor(fromState: AbstractMockElement, op: ProgramOperationInContext, co: Concern): Iterable<AbstractMockElement> {
+    abstractSuccFor(
+        fromState: AbstractMockElement,
+        op: ProgramOperationInContext,
+        co: Concern
+    ): Iterable<AbstractMockElement> {
         this._abstractSuccForCalls.push([fromState, op.op, co]);
         return [new AbstractMockElement(fromState.stateId)];
     }

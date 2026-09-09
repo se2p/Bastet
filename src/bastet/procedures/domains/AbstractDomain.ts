@@ -23,27 +23,23 @@
  *
  */
 
-import {AbstractElement, Lattice} from "../../lattices/Lattice";
-import {ConcreteDomain, ConcreteElement} from "./ConcreteElements";
-import {NotSupportedException} from "../../core/exceptions/NotSupportedException";
-import {AbstractionPrecision} from "../AbstractionPrecision";
-
+import { AbstractElement, Lattice } from '../../lattices/Lattice';
+import { ConcreteDomain, ConcreteElement } from './ConcreteElements';
+import { NotSupportedException } from '../../core/exceptions/NotSupportedException';
+import { AbstractionPrecision } from '../AbstractionPrecision';
 
 /**
  * A concretizer is a function that maps an abstract element (of type `E`) to a concrete element (of type `C`).
  */
 export interface Concretizer<C extends ConcreteElement, E extends AbstractElement> {
-
     concretize(element: E): Iterable<C>;
 
     concretizeOne(element: E): C;
 
     enrich(element: ConcreteElement): C;
-
 }
 
 export class UnavailableConcretizer<C extends ConcreteElement, E extends AbstractElement> implements Concretizer<C, E> {
-
     concretize(element: E): Iterable<C> {
         throw new NotSupportedException();
     }
@@ -55,7 +51,6 @@ export class UnavailableConcretizer<C extends ConcreteElement, E extends Abstrac
     enrich(element: ConcreteElement): C {
         throw new NotSupportedException();
     }
-
 }
 
 /**
@@ -65,7 +60,6 @@ export class UnavailableConcretizer<C extends ConcreteElement, E extends Abstrac
  *  - A concretization function that maps from `E` to `C`.
  */
 export interface AbstractDomain<C extends ConcreteElement, E extends AbstractElement> extends Concretizer<C, E> {
-
     lattice: Lattice<E>;
 
     abstract(elements: Iterable<C>): E;
@@ -82,5 +76,4 @@ export interface AbstractDomain<C extends ConcreteElement, E extends AbstractEle
      * @return the sequential composition of the two given states
      */
     composeSeq(e1: E, e2: E): E;
-
 }

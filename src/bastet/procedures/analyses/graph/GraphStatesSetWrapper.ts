@@ -23,19 +23,19 @@
  *
  */
 
+import { DefaultAnalysisStateSet, FrontierSet, ReachedSet, StatePartitionOperator } from '../../algorithms/StateSet';
+import { GraphAbstractState, GraphStateId } from './GraphAbstractDomain';
+import { Preconditions } from '../../../utils/Preconditions';
+import { Set as ImmSet } from 'immutable';
+import { AccessibilityRelation } from '../Accessibility';
+import { TransitionLabelProvider } from '../ProgramAnalysis';
+import { Concretizer, UnavailableConcretizer } from '../../domains/AbstractDomain';
+import { ConcreteElement } from '../../domains/ConcreteElements';
 
-import {DefaultAnalysisStateSet, FrontierSet, ReachedSet, StatePartitionOperator} from "../../algorithms/StateSet";
-import {GraphAbstractState, GraphStateId} from "./GraphAbstractDomain";
-import {Preconditions} from "../../../utils/Preconditions";
-import {Set as ImmSet} from "immutable";
-import {AccessibilityRelation} from "../Accessibility";
-import {TransitionLabelProvider} from "../ProgramAnalysis";
-import {Concretizer, UnavailableConcretizer} from "../../domains/AbstractDomain";
-import {ConcreteElement} from "../../domains/ConcreteElements";
-
-export class GraphReachedSetWrapper<E extends GraphAbstractState> extends DefaultAnalysisStateSet<GraphAbstractState>
-    implements ReachedSet<GraphAbstractState>, AccessibilityRelation<E> {
-
+export class GraphReachedSetWrapper<E extends GraphAbstractState>
+    extends DefaultAnalysisStateSet<GraphAbstractState>
+    implements ReachedSet<GraphAbstractState>, AccessibilityRelation<E>
+{
     private readonly _frontierSet: FrontierSet<E>;
 
     private readonly _children: Map<GraphStateId, GraphStateId[]>;
@@ -46,8 +46,12 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
 
     private readonly _labeler: TransitionLabelProvider<E>;
 
-    constructor(frontierSet: FrontierSet<E>, partitionOp: StatePartitionOperator<E>, 
-                onStateToInspect: (r: GraphReachedSetWrapper<E>, e: E) => void, labeler: TransitionLabelProvider<E>) {
+    constructor(
+        frontierSet: FrontierSet<E>,
+        partitionOp: StatePartitionOperator<E>,
+        onStateToInspect: (r: GraphReachedSetWrapper<E>, e: E) => void,
+        labeler: TransitionLabelProvider<E>
+    ) {
         super(partitionOp);
         this._frontierSet = Preconditions.checkNotUndefined(frontierSet);
         this._children = new Map<GraphStateId, GraphStateId[]>();
@@ -60,7 +64,10 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
         // A `GraphAbstractState` has only references to the parents.
         // This wrapper has to keep track of the children, too.
         for (const parentId of element.getPredecessors()) {
-            Preconditions.checkState(this._idToStateMap.has(parentId), `Parent state ${parentId} must exist for ${element.getId()}!`);
+            Preconditions.checkState(
+                this._idToStateMap.has(parentId),
+                `Parent state ${parentId} must exist for ${element.getId()}!`
+            );
             // Above precondition check might fail, for example,
             // in case of some form of recursion that caused
             // the removal of already reached states (into that a merge was conducted).
@@ -148,7 +155,9 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
 
                             // Also remove the childs of all nodes that get re-added to the wait-list (LATER)
                             const frontierChildsIds: GraphStateId[] = this._children.get(p.getId()) || [];
-                            frontierChildsIds.map((id) => this._idToStateMap.get(id)).forEach((e) => removeChildsOf.add(e));
+                            frontierChildsIds
+                                .map((id) => this._idToStateMap.get(id))
+                                .forEach((e) => removeChildsOf.add(e));
                         }
                     }
                 }
@@ -188,7 +197,7 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
     }
 
     successorsOf(state: E): E[] {
-        return Array.from(this.getChildrenOf(state.id)).map(id => this._idToStateMap.get(id));
+        return Array.from(this.getChildrenOf(state.id)).map((id) => this._idToStateMap.get(id));
     }
 
     predecessorsOf(state: E): E[] {
@@ -206,7 +215,4 @@ export class GraphReachedSetWrapper<E extends GraphAbstractState> extends Defaul
     concretizer(): Concretizer<ConcreteElement, E> {
         return new UnavailableConcretizer();
     }
-
 }
-
-

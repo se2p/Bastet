@@ -23,49 +23,43 @@
  *
  */
 
-import {AbstractDomain} from "../../domains/AbstractDomain";
-import {AbstractElement, AbstractElementVisitor, AbstractState, Lattice} from "../../../lattices/Lattice";
-import {ImplementMeException} from "../../../core/exceptions/ImplementMeException";
-import {Map as ImmMap, Record as ImmRec} from "immutable"
-import {SingletonStateWrapper} from "../AbstractStates";
-import {ConcreteDomain, ConcreteElement, ConcreteMemory, ConcretePrimitive} from "../../domains/ConcreteElements";
-import {Preconditions} from "../../../utils/Preconditions";
-import {AbstractionPrecision} from "../../AbstractionPrecision";
-
+import { AbstractDomain } from '../../domains/AbstractDomain';
+import { AbstractElement, AbstractElementVisitor, AbstractState, Lattice } from '../../../lattices/Lattice';
+import { ImplementMeException } from '../../../core/exceptions/ImplementMeException';
+import { Map as ImmMap, Record as ImmRec } from 'immutable';
+import { SingletonStateWrapper } from '../AbstractStates';
+import { ConcreteDomain, ConcreteElement, ConcreteMemory, ConcretePrimitive } from '../../domains/ConcreteElements';
+import { Preconditions } from '../../../utils/Preconditions';
+import { AbstractionPrecision } from '../../AbstractionPrecision';
 
 export interface SSAStateAttribs extends AbstractElement, SingletonStateWrapper {
-
     ssa: ImmMap<string, number>;
 
     wrappedState: AbstractState;
-
 }
 
 export type SSAMap = ImmMap<string, number>;
 
 const SSAStateRecord = ImmRec({
-
     ssa: ImmMap<string, number>(),
 
-    wrappedState: null
-
+    wrappedState: null,
 });
 
 export const NOT_DECLARED_INDEX = 0;
 export const INITIALLY_DECLARED_INDEX = NOT_DECLARED_INDEX + 1;
 
 export class SSAState extends SSAStateRecord implements SSAStateAttribs, AbstractState {
-
     constructor(ssa: ImmMap<string, number>, wrapped: AbstractElement) {
-        super({ssa: ssa, wrappedState: wrapped});
+        super({ ssa: ssa, wrappedState: wrapped });
     }
 
     public getSSA(): ImmMap<string, number> {
-        return this.get("ssa");
+        return this.get('ssa');
     }
 
     public getWrappedState(): AbstractState {
-        return this.get("wrappedState");
+        return this.get('wrappedState');
     }
 
     public getIndex(ofDataLocation: string): number {
@@ -78,11 +72,11 @@ export class SSAState extends SSAStateRecord implements SSAStateAttribs, Abstrac
     }
 
     public withSSA(ssa: ImmMap<string, number>): SSAState {
-        return this.set("ssa", ssa);
+        return this.set('ssa', ssa);
     }
 
     public withWrappedState(wrapped: AbstractElement): SSAState {
-        return this.set("wrappedState", wrapped);
+        return this.set('wrappedState', wrapped);
     }
 
     public withAssignment(assignementTo: string): [SSAState, number] {
@@ -103,10 +97,12 @@ export class SSAState extends SSAStateRecord implements SSAStateAttribs, Abstrac
             return visitor.visit(this);
         }
     }
-
 }
 
-export function extractPrimitiveAttributes(memory: ConcreteMemory, ssa: ImmMap<string, number>): ImmMap<string, ConcretePrimitive<any>> {
+export function extractPrimitiveAttributes(
+    memory: ConcreteMemory,
+    ssa: ImmMap<string, number>
+): ImmMap<string, ConcretePrimitive<any>> {
     const attributes = new Map<string, ConcretePrimitive<any>>();
 
     ssa.forEach((ssaIndex, attributeName) => {
@@ -119,13 +115,12 @@ export function extractPrimitiveAttributes(memory: ConcreteMemory, ssa: ImmMap<s
         } else {
             attributes.set(attributeName, attribute);
         }
-    })
+    });
 
     return ImmMap<string, ConcretePrimitive<any>>(attributes);
 }
 
 export class SSAStateLattice implements Lattice<SSAState> {
-
     private readonly _wrappedStateLattice: Lattice<AbstractElement>;
 
     private readonly _bottom: SSAState;
@@ -152,7 +147,8 @@ export class SSAStateLattice implements Lattice<SSAState> {
         }
 
         return element1.withWrappedState(
-            this._wrappedStateLattice.join(element1.getWrappedState(), element2.getWrappedState()));
+            this._wrappedStateLattice.join(element1.getWrappedState(), element2.getWrappedState())
+        );
     }
 
     meet(element1: SSAState, element2: SSAState): SSAState {
@@ -165,7 +161,6 @@ export class SSAStateLattice implements Lattice<SSAState> {
 }
 
 export class SSAAbstractDomain implements AbstractDomain<ConcreteElement, SSAState> {
-
     private readonly _lattice: SSAStateLattice;
     private readonly _wrapped: AbstractDomain<ConcreteElement, AbstractElement>;
 

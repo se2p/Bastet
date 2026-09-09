@@ -23,7 +23,7 @@
  *
  */
 
-import {AstNode} from "./AstNode";
+import { AstNode } from './AstNode';
 import {
     DivideExpression,
     FloatLiteral,
@@ -36,8 +36,8 @@ import {
     MultiplyExpression,
     NumberVariableExpression,
     PlusExpression,
-    TimerExpression
-} from "./core/expressions/NumberExpression";
+    TimerExpression,
+} from './core/expressions/NumberExpression';
 import {
     AndExpression,
     BooleanLiteral,
@@ -52,8 +52,8 @@ import {
     StrContainsExpression,
     StrEqualsExpression,
     StrGreaterThanExpression,
-    StrLessThanExpression
-} from "./core/expressions/BooleanExpression";
+    StrLessThanExpression,
+} from './core/expressions/BooleanExpression';
 import {
     BoolAsStringExpression,
     IthLetterOfStringExpression,
@@ -62,9 +62,9 @@ import {
     NumAsStringExpression,
     StringAttributeOfExpression,
     StringLiteral,
-    StringVariableExpression
-} from "./core/expressions/StringExpression";
-import {ExpressionListExpression, ListVariableExpression} from "./core/expressions/ListExpression";
+    StringVariableExpression,
+} from './core/expressions/StringExpression';
+import { ExpressionListExpression, ListVariableExpression } from './core/expressions/ListExpression';
 import {
     BeginAtomicStatement,
     EndAtomicStatement,
@@ -72,41 +72,41 @@ import {
     RepeatForeverStatement,
     ReturnStatement,
     UntilQueriedConditionStatement,
-    UntilStatement
-} from "./core/statements/ControlStatement";
-import {CallStatement} from "./core/statements/CallStatement";
-import {StatementList} from "./core/statements/Statement";
+    UntilStatement,
+} from './core/statements/ControlStatement';
+import { CallStatement } from './core/statements/CallStatement';
+import { StatementList } from './core/statements/Statement';
 import {
     DeclareActorVariableStatement,
     DeclareStackVariableStatement,
-    DeclareSystemVariableStatement
-} from "./core/statements/DeclarationStatement";
-import {ExpressionStatement} from "./core/statements/ExpressionStatement";
-import {StopOthersInActorStatement} from "./core/statements/StopOthersInActorStatement";
-import {CreateCloneOfStatement} from "./core/statements/CreateCloneOfStatement";
-import {BroadcastAndWaitStatement, BroadcastMessageStatement} from "./core/statements/BroadcastMessageStatement";
-import {ResetTimerStatement} from "./core/statements/ResetTimerStatement";
-import {EpsilonStatement} from "./core/statements/EpsilonStatement";
+    DeclareSystemVariableStatement,
+} from './core/statements/DeclarationStatement';
+import { ExpressionStatement } from './core/statements/ExpressionStatement';
+import { StopOthersInActorStatement } from './core/statements/StopOthersInActorStatement';
+import { CreateCloneOfStatement } from './core/statements/CreateCloneOfStatement';
+import { BroadcastAndWaitStatement, BroadcastMessageStatement } from './core/statements/BroadcastMessageStatement';
+import { ResetTimerStatement } from './core/statements/ResetTimerStatement';
+import { EpsilonStatement } from './core/statements/EpsilonStatement';
 import {
     AddElementToStatement,
     DeleteAllFromStatement,
     DeleteIthFromStatement,
     InsertAtStatement,
-    ReplaceElementAtStatement
-} from "./core/statements/ListStatement";
-import {StoreEvalResultToVariableStatement} from "./core/statements/SetStatement";
-import {DeleteThisCloneStatement, StopAllStatement, StopThisStatement} from "./core/statements/TerminationStatement";
-import {WaitUntilStatement} from "./core/statements/WaitUntilStatement";
-import {BranchingAssumeStatement, StrengtheningAssumeStatement} from "./core/statements/AssumeStatement";
-import {VariableWithDataLocation} from "./core/Variable";
-import {CastExpression} from "./core/expressions/CastExpression";
+    ReplaceElementAtStatement,
+} from './core/statements/ListStatement';
+import { StoreEvalResultToVariableStatement } from './core/statements/SetStatement';
+import { DeleteThisCloneStatement, StopAllStatement, StopThisStatement } from './core/statements/TerminationStatement';
+import { WaitUntilStatement } from './core/statements/WaitUntilStatement';
+import { BranchingAssumeStatement, StrengtheningAssumeStatement } from './core/statements/AssumeStatement';
+import { VariableWithDataLocation } from './core/Variable';
+import { CastExpression } from './core/expressions/CastExpression';
 import {
     ActorSelfExpression,
     ActorVariableExpression,
     LocateActorExpression,
     StartCloneActorExpression,
-    UsherActorExpression
-} from "./core/expressions/ActorExpression";
+    UsherActorExpression,
+} from './core/expressions/ActorExpression';
 import {
     AfterBootstrapMonitoringEvent,
     AfterStatementMonitoringEvent,
@@ -118,26 +118,23 @@ import {
     RenderedMonitoringEvent,
     SingularityEvent,
     StartupEvent,
-    TerminationEvent
-} from "./core/CoreEvent";
-import {ActorType, BooleanType, FloatType, IntegerType, ListType, ScratchType, StringType} from "./core/ScratchType";
-import {SystemMessage} from "./core/Message";
+    TerminationEvent,
+} from './core/CoreEvent';
+import { ActorType, BooleanType, FloatType, IntegerType, ListType, ScratchType, StringType } from './core/ScratchType';
+import { SystemMessage } from './core/Message';
 import {
     CheckFeasibilityStatement,
     InitializeAnalysisStatement,
     SignalTargetReachedStatement,
-    TerminateProgramStatement
-} from "./core/statements/InternalStatement";
-import {PrecisionPopStatement, PrecisionPushStatement} from "./core/Precisions";
+    TerminateProgramStatement,
+} from './core/statements/InternalStatement';
+import { PrecisionPopStatement, PrecisionPushStatement } from './core/Precisions';
 
 export interface CoreVisitor<R> {
-
     visit(node: AstNode): R;
-
 }
 
 export interface CoreEventVisitor<R> extends CoreVisitor<R> {
-
     visitMessageReceivedEvent(node: MessageReceivedEvent): R;
 
     visitBootstrapEvent(node: BootstrapEvent): R;
@@ -161,8 +158,7 @@ export interface CoreEventVisitor<R> extends CoreVisitor<R> {
     visitConditionReachedEvent(node: ConditionReachedEvent): R;
 }
 
-export interface CoreNumberExpressionVisitor<R> extends CoreVisitor<R>{
-
+export interface CoreNumberExpressionVisitor<R> extends CoreVisitor<R> {
     visitCastExpression(node: CastExpression): R;
 
     visitIntegerLiteral(node: IntegerLiteral): R;
@@ -190,11 +186,9 @@ export interface CoreNumberExpressionVisitor<R> extends CoreVisitor<R>{
     visitPlusExpression(node: PlusExpression): R;
 
     visitMinusExpression(node: MinusExpression): R;
-
 }
 
 export interface CoreBoolExpressionVisitor<R> extends CoreVisitor<R> {
-
     visitCastExpression(node: CastExpression): R;
 
     visitAndExpression(node: AndExpression): R;
@@ -226,11 +220,9 @@ export interface CoreBoolExpressionVisitor<R> extends CoreVisitor<R> {
     visitStrContainsExpression(node: StrContainsExpression): R;
 
     visitVariableWithDataLocation(node: VariableWithDataLocation): R;
-
 }
 
 export interface CoreActorExpressionVisitor<R> extends CoreVisitor<R> {
-
     visitActorSelfExpression(node: ActorSelfExpression): R;
 
     visitLocateActorExpression(node: LocateActorExpression): R;
@@ -240,11 +232,9 @@ export interface CoreActorExpressionVisitor<R> extends CoreVisitor<R> {
     visitUsherActorExpression(node: UsherActorExpression): R;
 
     visitActorVariableExpression(node: ActorVariableExpression): R;
-
 }
 
 export interface CoreStringExpressionVisitor<R> extends CoreVisitor<R> {
-
     visitCastExpression(node: CastExpression): R;
 
     visitNumAsStringExpression(node: NumAsStringExpression): R;
@@ -264,19 +254,15 @@ export interface CoreStringExpressionVisitor<R> extends CoreVisitor<R> {
     visitStringVariableExpression(node: StringVariableExpression): R;
 
     visitVariableWithDataLocation(node: VariableWithDataLocation): R;
-
 }
 
 export interface CoreListExpressionVisitor<R> extends CoreVisitor<R> {
-
     visitListVariableExpression(node: ListVariableExpression): R;
 
     visitExpressionListExpression(node: ExpressionListExpression): R;
-
 }
 
 export interface CoreCtrlStatementnVisitor<R> extends CoreVisitor<R> {
-
     visitIfStatement(node: IfStatement): R;
 
     visitUntilStatement(node: UntilStatement): R;
@@ -290,11 +276,9 @@ export interface CoreCtrlStatementnVisitor<R> extends CoreVisitor<R> {
     visitReturnStatement(node: ReturnStatement): R;
 
     visitStatementList(node: StatementList): R;
-
 }
 
 export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
-
     visitCheckFeasibilityStatement(node: CheckFeasibilityStatement): R;
 
     visitInitializeAnalysisStatement(node: InitializeAnalysisStatement): R;
@@ -354,11 +338,9 @@ export interface CoreNonCtrlStatementnVisitor<R> extends CoreVisitor<R> {
     visitPrecisionPushStatement(node: PrecisionPushStatement): R;
 
     visitPrecisionPopStatement(node: PrecisionPopStatement): R;
-
 }
 
 export interface CoreTypeVisitor<R> extends CoreVisitor<R> {
-
     visitIntegerType(type: IntegerType): R;
 
     visitFloatType(type: FloatType): R;
@@ -370,24 +352,22 @@ export interface CoreTypeVisitor<R> extends CoreVisitor<R> {
     visitListType(type: ListType): R;
 
     visitActorType(type: ActorType): R;
-
 }
 
 export interface CoreOthersVisitor<R> extends CoreVisitor<R> {
-
     visitScratchType(node: ScratchType): R;
 
     visitSystemMessage(node: SystemMessage): R;
 }
 
-export interface CoreAllVisitor<R> extends CoreVisitor<R>,
-    CoreNumberExpressionVisitor<R>,
-    CoreActorExpressionVisitor<R>,
-    CoreStringExpressionVisitor<R>,
-    CoreListExpressionVisitor<R>,
-    CoreCtrlStatementnVisitor<R>,
-    CoreNonCtrlStatementnVisitor<R>,
-    CoreBoolExpressionVisitor<R>,
-    CoreEventVisitor<R> {
-
-}
+export interface CoreAllVisitor<R>
+    extends
+        CoreVisitor<R>,
+        CoreNumberExpressionVisitor<R>,
+        CoreActorExpressionVisitor<R>,
+        CoreStringExpressionVisitor<R>,
+        CoreListExpressionVisitor<R>,
+        CoreCtrlStatementnVisitor<R>,
+        CoreNonCtrlStatementnVisitor<R>,
+        CoreBoolExpressionVisitor<R>,
+        CoreEventVisitor<R> {}

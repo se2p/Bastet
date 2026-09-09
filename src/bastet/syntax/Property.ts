@@ -23,74 +23,62 @@
  *
  */
 
-import {Record as ImmRec, Set as ImmSet} from "immutable";
-import {ExpressionList} from "./ast/core/expressions/ExpressionList";
-import {Preconditions} from "../utils/Preconditions";
-import {StringLiteral} from "./ast/core/expressions/StringExpression";
+import { Record as ImmRec, Set as ImmSet } from 'immutable';
+import { ExpressionList } from './ast/core/expressions/ExpressionList';
+import { Preconditions } from '../utils/Preconditions';
+import { StringLiteral } from './ast/core/expressions/StringExpression';
 
 export interface PropertyAttributes {
-
     text: string;
-
 }
 
 const PropertyRecord = ImmRec({
-
-    text: ""
-
+    text: '',
 });
 
 export class Property extends PropertyRecord implements PropertyAttributes {
-
     constructor(text: string) {
         Preconditions.checkNotUndefined(text);
         Preconditions.checkArgument(text.length > 0);
-        super({text: text});
+        super({ text: text });
     }
 
     public getText(): string {
-        return this.get("text");
+        return this.get('text');
     }
 
     public withText(text: string): Property {
-        return this.set("text", text);
+        return this.set('text', text);
     }
-
 }
 
 export interface SpecificationAttributes {
-
     properties: ImmSet<Property>;
-
 }
 
 const SpecificationRecord = ImmRec({
-
-    properties: ImmSet<Property>()
-
+    properties: ImmSet<Property>(),
 });
 
 export class Specification extends SpecificationRecord {
-
     constructor(properties: ImmSet<Property>) {
-        super({properties: properties});
+        super({ properties: properties });
     }
 
     public getProperties(): ImmSet<Property> {
-        return this.get("properties");
+        return this.get('properties');
     }
 
     public withProperties(props: ImmSet<Property>): Specification {
-        return this.set("properties", props);
+        return this.set('properties', props);
     }
 
     public withProperty(prop: Property): Specification {
-        return this.set("properties", this.getProperties().add(prop));
+        return this.set('properties', this.getProperties().add(prop));
     }
 }
 
 export class Properties {
-
     public static from(str: string): Property {
         return new Property(str);
     }
@@ -104,13 +92,9 @@ export class Properties {
         }
 
         if (result.isEmpty()) {
-            result = result.add(new Property("Violating program location must NOT be reachable!"));
+            result = result.add(new Property('Violating program location must NOT be reachable!'));
         }
 
         return result;
     }
-
-
 }
-
-

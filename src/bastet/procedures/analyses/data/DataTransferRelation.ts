@@ -23,17 +23,13 @@
  *
  */
 
-import {LabeledTransferRelation} from "../TransferRelation";
-import {DataAbstractDomain, DataAbstractState} from "./DataAbstractDomain";
-import {IllegalStateException} from "../../../core/exceptions/IllegalStateException";
-import {
-    AssumeOperation,
-    ProgramOperation,
-    ProgramOperationInContext
-} from "../../../syntax/app/controlflow/ops/ProgramOperation";
-import {DataTransformerVisitor} from "./DataTransformerVisitor";
-import {TransformerTheories} from "../../domains/MemoryTransformer";
-import {Preconditions} from "../../../utils/Preconditions";
+import { LabeledTransferRelation } from '../TransferRelation';
+import { DataAbstractDomain, DataAbstractState } from './DataAbstractDomain';
+import { IllegalStateException } from '../../../core/exceptions/IllegalStateException';
+import { AssumeOperation, ProgramOperationInContext } from '../../../syntax/app/controlflow/ops/ProgramOperation';
+import { DataTransformerVisitor } from './DataTransformerVisitor';
+import { TransformerTheories } from '../../domains/MemoryTransformer';
+import { Preconditions } from '../../../utils/Preconditions';
 import {
     BooleanFormula,
     FirstOrderFormula,
@@ -41,29 +37,50 @@ import {
     IntegerFormula,
     ListFormula,
     RealFormula,
-    StringFormula
-} from "../../../utils/ConjunctiveNormalForm";
-import {AstNode} from "../../../syntax/ast/AstNode";
-import {StrengtheningAssumeStatement} from "../../../syntax/ast/core/statements/AssumeStatement";
-import {Concern} from "../../../syntax/Concern";
+    StringFormula,
+} from '../../../utils/ConjunctiveNormalForm';
+import { AstNode } from '../../../syntax/ast/AstNode';
+import { StrengtheningAssumeStatement } from '../../../syntax/ast/core/statements/AssumeStatement';
+import { Concern } from '../../../syntax/Concern';
 
 export class DataTransferRelation implements LabeledTransferRelation<DataAbstractState> {
-
     private readonly _abstDomain: DataAbstractDomain;
 
-    private readonly _theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>;
+    private readonly _theories: TransformerTheories<
+        FirstOrderFormula,
+        BooleanFormula,
+        IntegerFormula,
+        RealFormula,
+        FloatFormula,
+        StringFormula,
+        ListFormula
+    >;
 
-    constructor(abstDomain: DataAbstractDomain,
-                theories: TransformerTheories<FirstOrderFormula, BooleanFormula, IntegerFormula, RealFormula, FloatFormula, StringFormula, ListFormula>) {
+    constructor(
+        abstDomain: DataAbstractDomain,
+        theories: TransformerTheories<
+            FirstOrderFormula,
+            BooleanFormula,
+            IntegerFormula,
+            RealFormula,
+            FloatFormula,
+            StringFormula,
+            ListFormula
+        >
+    ) {
         this._abstDomain = Preconditions.checkNotUndefined(abstDomain);
         this._theories = Preconditions.checkNotUndefined(theories);
     }
 
     public abstractSucc(fromState: DataAbstractState): Iterable<DataAbstractState> {
-        throw new IllegalStateException("Only the labelled transfer is supported by this transfer relation");
+        throw new IllegalStateException('Only the labelled transfer is supported by this transfer relation');
     }
 
-    public abstractSuccFor(fromState: DataAbstractState, opic: ProgramOperationInContext, co: Concern): Iterable<DataAbstractState> {
+    public abstractSuccFor(
+        fromState: DataAbstractState,
+        opic: ProgramOperationInContext,
+        co: Concern
+    ): Iterable<DataAbstractState> {
         let ast: AstNode;
         if (opic instanceof AssumeOperation) {
             const assume = opic.op as AssumeOperation;
@@ -80,5 +97,4 @@ export class DataTransferRelation implements LabeledTransferRelation<DataAbstrac
         const blockFormulaPrime: FirstOrderFormula = ast.accept(visitor);
         return [new DataAbstractState(blockFormulaPrime)];
     }
-
 }

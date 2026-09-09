@@ -23,18 +23,18 @@
  *
  */
 
-import {NumIntervalValue} from "../procedures/domains/NumIntervalValueDomain";
-import {OperationId, ProgramOperation} from "../syntax/app/controlflow/ops/ProgramOperation";
-import {ImplementMeException} from "../core/exceptions/ImplementMeException";
-import {ConcreteNumber} from "../procedures/domains/ConcreteElements";
-import {EndAtomicStatement} from "../syntax/ast/core/statements/ControlStatement";
-import {EpsilonStatement} from "../syntax/ast/core/statements/EpsilonStatement";
+import { NumIntervalValue } from '../procedures/domains/NumIntervalValueDomain';
+import { OperationId, ProgramOperation } from '../syntax/app/controlflow/ops/ProgramOperation';
+import { ImplementMeException } from '../core/exceptions/ImplementMeException';
+import { ConcreteNumber } from '../procedures/domains/ConcreteElements';
+import { EndAtomicStatement } from '../syntax/ast/core/statements/ControlStatement';
+import { EpsilonStatement } from '../syntax/ast/core/statements/EpsilonStatement';
 import {
     DeclareActorVariableStatement,
     DeclareStackVariableStatement,
-    DeclareSystemVariableStatement
-} from "../syntax/ast/core/statements/DeclarationStatement";
-import {PrecisionPopStatement, PrecisionPushStatement} from "../syntax/ast/core/Precisions";
+    DeclareSystemVariableStatement,
+} from '../syntax/ast/core/statements/DeclarationStatement';
+import { PrecisionPopStatement, PrecisionPushStatement } from '../syntax/ast/core/Precisions';
 
 /**
  * A STATIC time profile for a given program operation.
@@ -46,7 +46,6 @@ import {PrecisionPopStatement, PrecisionPushStatement} from "../syntax/ast/core/
  * on dynamic information (which actual parameters get passed to the operation?)
  */
 export class OperationTimeProfile {
-
     /** Interval of nanoseconds needed on the reference machine(s) */
     private readonly _nsecs: NumIntervalValue;
 
@@ -57,13 +56,11 @@ export class OperationTimeProfile {
     get nsecs(): NumIntervalValue {
         return this._nsecs;
     }
-
 }
 
 export const ONE_MICSEC_IN_NSECS = 1000;
 
 export class StaticTimeProfile implements ProgramTimeProfile {
-
     private readonly _opTimes: Map<OperationId, OperationTimeProfile>;
 
     private readonly _avgOpProfile: OperationTimeProfile;
@@ -75,16 +72,25 @@ export class StaticTimeProfile implements ProgramTimeProfile {
     constructor() {
         this._staticProfiles = [];
         this._opTimes = new Map();
-        this._avgOpProfile = this.addStaticProfile(new OperationTimeProfile(
-            new NumIntervalValue(
-                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 10),
-                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 1000))));
-        this._avgAtomicBlockProfile = this.addStaticProfile(new OperationTimeProfile(
-            new NumIntervalValue(
-                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 100),
-                new ConcreteNumber(ONE_MICSEC_IN_NSECS * 10000))));
-        this._noDurationProfile = this.addStaticProfile(new OperationTimeProfile(
-            new NumIntervalValue(new ConcreteNumber(0), new ConcreteNumber(0))));
+        this._avgOpProfile = this.addStaticProfile(
+            new OperationTimeProfile(
+                new NumIntervalValue(
+                    new ConcreteNumber(ONE_MICSEC_IN_NSECS * 10),
+                    new ConcreteNumber(ONE_MICSEC_IN_NSECS * 1000)
+                )
+            )
+        );
+        this._avgAtomicBlockProfile = this.addStaticProfile(
+            new OperationTimeProfile(
+                new NumIntervalValue(
+                    new ConcreteNumber(ONE_MICSEC_IN_NSECS * 100),
+                    new ConcreteNumber(ONE_MICSEC_IN_NSECS * 10000)
+                )
+            )
+        );
+        this._noDurationProfile = this.addStaticProfile(
+            new OperationTimeProfile(new NumIntervalValue(new ConcreteNumber(0), new ConcreteNumber(0)))
+        );
     }
 
     private addStaticProfile(profile: OperationTimeProfile): OperationTimeProfile {
@@ -103,24 +109,23 @@ export class StaticTimeProfile implements ProgramTimeProfile {
     public getOpProfile(op: ProgramOperation): OperationTimeProfile {
         if (op.ast instanceof EndAtomicStatement) {
             return this._avgAtomicBlockProfile;
-        } else if (op.ast instanceof EpsilonStatement
-            || op.ast instanceof DeclareStackVariableStatement
-            || op.ast instanceof DeclareActorVariableStatement
-            || op.ast instanceof DeclareSystemVariableStatement
-            || op.ast instanceof PrecisionPushStatement
-            || op.ast instanceof PrecisionPopStatement) {
+        } else if (
+            op.ast instanceof EpsilonStatement ||
+            op.ast instanceof DeclareStackVariableStatement ||
+            op.ast instanceof DeclareActorVariableStatement ||
+            op.ast instanceof DeclareSystemVariableStatement ||
+            op.ast instanceof PrecisionPushStatement ||
+            op.ast instanceof PrecisionPopStatement
+        ) {
             return this._noDurationProfile;
         } else {
             return this._avgOpProfile;
         }
     }
-
 }
 
 export interface ProgramTimeProfile {
-
     getStaticProfiles(): OperationTimeProfile[];
 
     getOpProfile(op: ProgramOperation): OperationTimeProfile;
-
 }

@@ -23,12 +23,11 @@
  *
  */
 
-import {AbstractString} from "./MemoryTransformer";
-import {Lattice} from "../../lattices/Lattice";
-import {ImplementMeException} from "../../core/exceptions/ImplementMeException";
+import { AbstractString } from './MemoryTransformer';
+import { Lattice } from '../../lattices/Lattice';
+import { ImplementMeException } from '../../core/exceptions/ImplementMeException';
 
 export class AbstractStringLattice implements Lattice<AbstractString> {
-
     bottom(): AbstractString {
         throw new ImplementMeException();
     }
@@ -48,6 +47,4 @@ export class AbstractStringLattice implements Lattice<AbstractString> {
     top(): AbstractString {
         throw new ImplementMeException();
     }
-
 }
-

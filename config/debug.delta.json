@@ -1,5 +1,4 @@
 {
-
     "MainAnalysis": {
         "print-statistics": true,
         "export-artifacts": true
@@ -8,5 +7,4 @@
     "ReachabilityAlgorithm": {
         "dump-graph-after-iteration": true
     }
-
 }

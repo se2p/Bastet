@@ -23,107 +23,75 @@
  *
  */
 
-import {List as ImmList, Record as ImmRec} from "immutable";
-import {AbstractElement} from "../lattices/Lattice";
-import {BooleanLiteral} from "../syntax/ast/core/expressions/BooleanExpression";
-import {AbstractBoolean, AbstractList, AbstractNumber, AbstractString} from "../procedures/domains/MemoryTransformer";
+import { List as ImmList, Record as ImmRec } from 'immutable';
+import { AbstractElement } from '../lattices/Lattice';
+import { BooleanLiteral } from '../syntax/ast/core/expressions/BooleanExpression';
+import { AbstractBoolean, AbstractList, AbstractNumber, AbstractString } from '../procedures/domains/MemoryTransformer';
 
 export type ExpressionId = number;
 
-export interface FirstOrderFormula extends AbstractElement {
+export interface FirstOrderFormula extends AbstractElement {}
 
-}
+export interface BooleanFormula extends AbstractBoolean, FirstOrderFormula {}
 
-export interface BooleanFormula extends AbstractBoolean, FirstOrderFormula {
+export interface StringFormula extends AbstractString {}
 
-}
+export interface NumberFormula extends AbstractNumber {}
 
-export interface StringFormula extends AbstractString {
+export interface IntegerFormula extends NumberFormula {}
 
-}
+export interface FloatFormula extends NumberFormula {}
 
-export interface NumberFormula extends AbstractNumber {
+export interface RealFormula extends NumberFormula {}
 
-}
-
-export interface IntegerFormula extends NumberFormula {
-
-}
-
-export interface FloatFormula extends NumberFormula {
-
-}
-
-export interface RealFormula extends NumberFormula {
-
-}
-
-export interface ListFormula extends AbstractList {
-
-}
+export interface ListFormula extends AbstractList {}
 
 const LiteralRecord = ImmRec({
-
     expressionId: -1,
-
 });
 
 export class Literal extends LiteralRecord {
-
     expressionId: ExpressionId;
 
     constructor(literalExpressionId: ExpressionId) {
-        super({expressionId: literalExpressionId});
+        super({ expressionId: literalExpressionId });
     }
 }
 
 const ClauseRecord = ImmRec({
-
-    literals: ImmList([])
-
+    literals: ImmList([]),
 });
 
 /**
  * Disjunctions (OR) of a list of literals.
  */
 export class Clause extends ClauseRecord {
-
     constructor(literals: ImmList<Literal>) {
-        super({literals: literals});
+        super({ literals: literals });
     }
-
 }
 
 export interface CNFFormulaAttributes extends FirstOrderFormula {
-
     clauses: ImmList<Clause>;
-
 }
 
 const CNFFormulaRecord = ImmRec({
-
-    clauses: ImmList([])
-
+    clauses: ImmList([]),
 });
 
 /**
  * Conjunction (AND) of a list of clauses.
  */
 export class CNFFormula extends CNFFormulaRecord implements CNFFormulaAttributes {
-
     constructor(clauses: ImmList<Clause>) {
-        super({clauses: clauses});
+        super({ clauses: clauses });
     }
-
 }
 
 export const FALSE_FORMULA: CNFFormula = new CNFFormula(
-    ImmList([
-        new Clause(ImmList([
-            new Literal(BooleanLiteral.false().getRefId())]))]));
+    ImmList([new Clause(ImmList([new Literal(BooleanLiteral.false().getRefId())]))])
+);
 
 export const TRUE_FORMULA: CNFFormula = new CNFFormula(
-    ImmList([
-        new Clause(ImmList([
-            new Literal(BooleanLiteral.true().getRefId())]))]));
-
+    ImmList([new Clause(ImmList([new Literal(BooleanLiteral.true().getRefId())]))])
+);

@@ -23,7 +23,7 @@
  *
  */
 
-import {Preconditions} from "./Preconditions";
+import { Preconditions } from './Preconditions';
 
 const { performance } = require('perf_hooks');
 
@@ -31,7 +31,6 @@ const { performance } = require('perf_hooks');
  * Time is measured in milliseconds.
  */
 export class PerfTimer {
-
     private _lastIntervalDuration: number;
 
     private _totalDuartion: number;
@@ -82,7 +81,7 @@ export class PerfTimer {
         return this._lastIntervalDuration;
     }
 
-    get totalDuration() : number {
+    get totalDuration(): number {
         return this._totalDuartion;
     }
 }

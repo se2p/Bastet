@@ -1,47 +1,44 @@
-lib-cov
-*.seed
-*.log
-*.csv
-*.dat
-*.out
-*.pid
-*.gz
-*.swp
+# Dependencies and local package cache
+/node_modules/
+/.pnpm-store/
 
-pids
-logs
-results
-tmp
+# Compiled output and caches
+/dist/
+/coverage/
+*.tsbuildinfo
+.eslintcache
 
-# Build
-public/css/main.css
+# Bastet-generated analysis artifacts
+/output/
 
-# Coverage reports
-./coverage/
-
-# API keys and secrets
+# Local environment and secrets
 .env
+.env.*
+!.env.example
+!.env.*.example
 
-# Dependency directory
-node_modules
-bower_components
+# Runtime artifacts
+*.log
+*.pid
+*.pid.lock
+/logs/
+/results/
+/tmp/
 
-# Editors
-.idea
+# Local editor state
 *.iml
+*.swp
+*.swo
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/shelf/
+.idea/httpRequests/
+.idea/dataSources/
+.idea/dataSources.local.xml
 
-# OS metadata
+# Operating-system metadata
 .DS_Store
 Thumbs.db
 
-# Ignore built ts files
-dist/**/*
-
-# ignore yarn.lock
-yarn.lock
-
-
-!.idea
-
-test/programs/debug.sc
-
+# Local test/debug input
+/test/programs/debug.sc

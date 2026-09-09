@@ -23,15 +23,14 @@
  *
  */
 
-import {AbstractNode} from "../AstNode";
-import {StatementList} from "./statements/Statement";
-import {AstNodeList} from "../AstNodeList";
-import {CoreEvent} from "./CoreEvent";
-import {Identifier} from "./Identifier";
-import {Preconditions} from "../../../utils/Preconditions";
+import { AbstractNode } from '../AstNode';
+import { StatementList } from './statements/Statement';
+import { AstNodeList } from '../AstNodeList';
+import { CoreEvent } from './CoreEvent';
+import { Identifier } from './Identifier';
+import { Preconditions } from '../../../utils/Preconditions';
 
 export class ScriptDefinition extends AbstractNode {
-
     /**
      * The script identifier is used to scope variables
      * that were declared local to the script.
@@ -69,6 +68,4 @@ export class ScriptDefinition extends AbstractNode {
     }
 }
 
-export class ScriptDefinitionList extends AstNodeList<ScriptDefinition> {
-
-}
+export class ScriptDefinitionList extends AstNodeList<ScriptDefinition> {}

@@ -23,16 +23,13 @@
  *
  */
 
-
-import {LabeledTransferRelation, TransferRelation} from "../TransferRelation";
-import {List as ImmList} from "immutable";
-import {AbstractElement} from "../../../lattices/Lattice";
-import {DebugState} from "./DebugAbstractDomain";
-import {clearDebugInfos, getDebugInfos} from "./DebugInfos";
-
+import { LabeledTransferRelation, TransferRelation } from '../TransferRelation';
+import { List as ImmList } from 'immutable';
+import { AbstractElement } from '../../../lattices/Lattice';
+import { DebugState } from './DebugAbstractDomain';
+import { clearDebugInfos, getDebugInfos } from './DebugInfos';
 
 export class DebugTransferRelation implements TransferRelation<DebugState> {
-
     private readonly _wrappedTransfer: TransferRelation<AbstractElement>;
 
     constructor(wrappedTransfer: LabeledTransferRelation<AbstractElement>) {
@@ -42,14 +39,11 @@ export class DebugTransferRelation implements TransferRelation<DebugState> {
     abstractSucc(fromState: DebugState): Iterable<DebugState> {
         const result: DebugState[] = [];
         for (const w of this._wrappedTransfer.abstractSucc(fromState.wrappedState)) {
-            result.push(fromState
-                .withDebugInfos(ImmList(getDebugInfos()))
-                .withWrappedState(w));
+            result.push(fromState.withDebugInfos(ImmList(getDebugInfos())).withWrappedState(w));
         }
 
         clearDebugInfos();
 
         return result;
     }
-
 }
